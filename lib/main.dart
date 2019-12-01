@@ -42,7 +42,6 @@ class _MainWidgetState extends State<MainWidget> {
   final _viewModel = new SubscriptionViewModelImpl();
   final controller = TextEditingController();
   int currentPage = 0;
-  final _navigationListKey = GlobalKey<AnimatedListState>();
   static List<FolderModel> filesList = [];
 
   @override
@@ -56,15 +55,21 @@ class _MainWidgetState extends State<MainWidget> {
     return Column(
       children: <Widget>[
         SizedBox(
-          height: 80,
+           //todo: height is magic number. main list should show below nav widget, preferably animate as the size of nav midget changes
+          height: 120,
           child: Center(
             child: new NavWidget(
-                list: _viewModel.list, navigationListKey: _navigationListKey),
+                list: _viewModel.list,
+                backPressed: _backPressed),
           ),
         ),
         getListView(),
       ],
     );
+  }
+
+  void _backPressed(String value){
+
   }
 
   Widget getFolderListItem(FolderModel listItemModel) {
@@ -89,16 +94,8 @@ class _MainWidgetState extends State<MainWidget> {
   void listItemTap(int i) {
     _viewModel.addToNavList(filesList[i].title);
 
-    _navigationListKey.currentState.insertItem(_viewModel.list.length - 1);
-
     if (_viewModel.list.length > 2) {
-      String removedItem = _viewModel.removeFromNavList(0);
-      AnimatedListRemovedItemBuilder builder = (context, animation) {
-        // A method to build the Card widget.
-        return _buildItem(removedItem, animation);
-      };
-      _navigationListKey.currentState
-          .removeItem(0, builder, duration: Duration(milliseconds: 500));
+      _viewModel.removeFromNavList(0);
     }
 
     int id = filesList[i].id;
@@ -109,12 +106,4 @@ class _MainWidgetState extends State<MainWidget> {
     }
   }
 
-  Widget _buildItem(String item, Animation animation) {
-    var tween = Tween(begin: Offset(-1.0, 0.0), end: Offset.zero);
-    var offsetAnimation = animation.drive(tween);
-    return SlideTransition(
-      child: Text(item),
-      position: offsetAnimation,
-    );
-  }
 }

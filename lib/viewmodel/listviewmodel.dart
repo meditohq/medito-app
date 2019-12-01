@@ -12,7 +12,7 @@ abstract class MainListViewModel {
 
 class SubscriptionViewModelImpl implements MainListViewModel {
   var _mailTextController = StreamController<String>.broadcast();
-  List<String> list = ["Main Page"];
+  List<String> list = ["Home"];
 
   List<FolderModel> folders = [
     FolderModel("", "Meditate", 0, -1, ""),
@@ -39,7 +39,6 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   Stream<List<FolderModel>> get sessionListStream =>
       Stream<List<FolderModel>>.value(List<FolderModel>.generate(15, (i) {
         return null;
-        // return FolderModel("pink", "A session", "$i Dec", "Poop", 1);
       }));
 
   @override
@@ -60,4 +59,5 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   String removeFromNavList(int index) {
     return list.removeAt(index);
   }
+
 }
