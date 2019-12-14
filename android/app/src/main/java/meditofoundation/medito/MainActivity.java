@@ -1,4 +1,4 @@
-package meditofoundation.medito_app;
+package meditofoundation.medito;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

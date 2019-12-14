@@ -57,7 +57,11 @@ class _NavWidgetState extends State<NavWidget>
   List<Widget> getPills() {
     List<Widget> columns = new List<Widget>();
 
-    for (int i = 0; i < widget.list.length; i++) {
+    int startNumber = 0;
+    if (widget.list.length >= 2) {
+      startNumber = widget.list.length - 2;
+    }
+    for (int i = startNumber; i < widget.list.length; i++) {
       setState(() {
         if (i == 0) {
           _item1CurrentColor = _color2;
@@ -71,13 +75,13 @@ class _NavWidgetState extends State<NavWidget>
       });
 
       var label = widget.list[i];
-      if (i == 0) {
+      if (i == startNumber) {
         label = "< " + label;
       }
 
       columns.add(GestureDetector(
         onTap: () {
-          if (i == 0) widget.backPressed(widget.list[i]);
+          if (i == startNumber) widget.backPressed(widget.list[i]);
         },
         child: AnimatedContainer(
           padding: EdgeInsets.all(i == 0 ? _item1Padding : _item2Padding),

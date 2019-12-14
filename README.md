@@ -1,3 +1,3 @@
-# medito_app
+# medito
 
 A meditation learning tool
