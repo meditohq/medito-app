@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:medito/viewmodel/filemodel.dart';
 
-import 'ListItemModel.dart';
+class ListItemFileWidget extends StatelessWidget {
+  ListItemFileWidget({Key key, this.item}) : super(key: key);
 
-class ListItemWidget extends StatelessWidget {
-  ListItemWidget({Key key, this.listItemModel}) : super(key: key);
-
-  final FolderModel listItemModel;
+  final FileModel item;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,7 @@ class ListItemWidget extends StatelessWidget {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(right: 8.0, left: 8),
-                  child: Icon(Icons.folder),
+                  child: getIcon(),
                 ),
                 Flexible(
                     child: Container(
@@ -28,14 +27,12 @@ class ListItemWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      listItemModel.title,
+                      item.fileName,
                       style: const TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Container(height: 5),
-                    getDescWidget(),
                   ],
                 ))),
               ],
@@ -44,16 +41,15 @@ class ListItemWidget extends StatelessWidget {
     ]);
   }
 
-  Widget getDescWidget() {
-    if (listItemModel.description.isNotEmpty) {
-      return Text(
-        listItemModel.description,
-        style: const TextStyle(
-          fontSize: 16.0,
-          color: Colors.black54,
-        ),
-      );
-    } else
-      return Container();
+  Icon getIcon() {
+    switch (item.type) {
+      case FileType.audio:
+        return Icon(Icons.description);
+        break;
+      case FileType.text:
+        return Icon(Icons.audiotrack);
+        break;
+    }
+    return  Icon(Icons.audiotrack);
   }
 }

@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:medito/ListItemModel.dart';
-import 'package:medito/ListItemWidget.dart';
 import 'package:medito/api/api.dart';
+import 'package:medito/listitemfilewidget.dart';
+import 'package:medito/listitemfolderwidget.dart';
 import 'package:medito/navwidget.dart';
+import 'package:medito/viewmodel/ListItemModel.dart';
+import 'package:medito/viewmodel/filemodel.dart';
 import 'package:medito/viewmodel/listviewmodel.dart';
 
 void main() => runApp(MyApp());
@@ -44,7 +46,7 @@ class MainWidget extends StatefulWidget {
 
   @override
 //  _PlaceHolderState createState() => _PlaceHolderState();
-  _PlaceHolderState createState() => _PlaceHolderState();
+  _MainWidgetState createState() => _MainWidgetState();
 }
 
 class _PlaceHolderState extends State<MainWidget> {
@@ -105,8 +107,7 @@ class _PlaceHolderState extends State<MainWidget> {
               padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
               child: Text("* We’ll never share your email address",
                   style: const TextStyle(
-                      fontStyle: FontStyle.normal,
-                      fontSize: 10.0)),
+                      fontStyle: FontStyle.normal, fontSize: 10.0)),
             ),
             Padding(
               padding: const EdgeInsets.all(16),
@@ -153,49 +154,57 @@ class _MainWidgetState extends State<MainWidget> {
   final _viewModel = new SubscriptionViewModelImpl();
   final controller = TextEditingController();
   int currentPage = 0;
-  static List<FolderModel> filesList = [];
+  static List<FolderModel> currentFolderList = [];
+  static List<FileModel> currentFilesList = [];
 
   @override
   Widget build(BuildContext context) {
     // set up first page
-    if (filesList.isEmpty) {
-      filesList.addAll(_viewModel.getFirstFolderContents());
+    if (currentFolderList.isEmpty) {
+      currentFolderList.addAll(_viewModel.getFirstFolderContents());
     }
     // end of set up first page
 
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          //todo: height is magic number. main list should show below nav widget, preferably animate as the size of nav midget changes
-          height: 120,
-          child: Center(
-            child:
-                new NavWidget(list: _viewModel.list, backPressed: _backPressed),
+    return SafeArea(
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            //todo: height is magic number. main list should show below nav widget, preferably animate as the size of nav midget changes
+            height: 120,
+            child: Center(
+              child: new NavWidget(
+                  list: _viewModel.list, backPressed: _backPressed),
+            ),
           ),
-        ),
-        getListView(),
-      ],
+          getListView(),
+        ],
+      ),
     );
   }
 
   void _backPressed(String value) {
     setState(() {
-      filesList = _viewModel.backUp();
+      currentFolderList = _viewModel.backUp();
+      currentFilesList.clear();
+      var files = _viewModel.getFilesForId(currentFolderList[0].parentId);
+      currentFilesList.addAll(files);
     });
   }
 
   Widget getFolderListItem(FolderModel listItemModel) {
-    return new ListItemWidget(listItemModel: listItemModel);
+    return new ListItemFolderWidget(listItemModel: listItemModel);
   }
 
   Widget getListView() {
+    var length = currentFolderList.length + currentFilesList.length;
+
     return new ListView.builder(
-        itemCount: filesList.length,
+        itemCount: length,
         shrinkWrap: true,
         itemBuilder: (BuildContext context, int i) {
           return InkWell(
               splashColor: Colors.orange,
-              child: getFolderListItem(filesList[i]),
+              child: getChildForListView(i),
               onTap: () {
                 listItemTap(i);
                 setState(() {});
@@ -203,14 +212,45 @@ class _MainWidgetState extends State<MainWidget> {
         });
   }
 
-  void listItemTap(int i) {
-    _viewModel.addToNavList(filesList[i].title);
-
-    int id = filesList[i].id;
-    List<FolderModel> folder = _viewModel.getFolderContents(id);
-    if (folder.length != 0) {
-      filesList.clear();
-      filesList.addAll(folder);
+  Widget getChildForListView(int i) {
+    if (i < currentFolderList.length) {
+      return getFolderListItem(currentFolderList[i]);
+    } else {
+      return getFileListItem(getFileTapped(i));
     }
+  }
+
+  void listItemTap(int i) {
+    //if you tapped on a folder
+    if (i < currentFolderList.length) {
+      _viewModel.addToNavList(currentFolderList[i].title);
+
+      int id = currentFolderList[i].id;
+      var folder = _viewModel.getFolderContents(id);
+      var files = _viewModel.getFilesForId(id);
+
+      currentFilesList.clear();
+      currentFilesList.addAll(files);
+
+      if (folder.length != 0) {
+        currentFolderList.clear();
+        currentFolderList.addAll(folder);
+      }
+    }
+    //if you tapped on a file
+    else {
+      showPlayer(getFileTapped(i));
+    }
+  }
+
+  FileModel getFileTapped(int i) =>
+      currentFilesList[i - currentFolderList.length];
+
+  Widget getFileListItem(FileModel file) {
+    return new ListItemFileWidget(item: file);
+  }
+
+  void showPlayer(FileModel fileTapped) {
+
   }
 }
