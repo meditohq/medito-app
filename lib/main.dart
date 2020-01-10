@@ -6,6 +6,7 @@ import 'package:medito/api/api.dart';
 import 'package:medito/listitemfilewidget.dart';
 import 'package:medito/listitemfolderwidget.dart';
 import 'package:medito/navwidget.dart';
+import 'package:medito/playerwidget.dart';
 import 'package:medito/viewmodel/ListItemModel.dart';
 import 'package:medito/viewmodel/filemodel.dart';
 import 'package:medito/viewmodel/listviewmodel.dart';
@@ -25,9 +26,12 @@ class MyApp extends StatelessWidget {
       )),
       title: _title,
       home: Scaffold(
-        appBar: null, //AppBar(title: const Text(_title)),
-        body: MainWidget(),
-      ),
+          appBar: null, //AppBar(title: const Text(_title)),
+          body: Stack(
+            children: <Widget>[
+              MainWidget(),
+            ],
+          )),
     );
   }
 }
@@ -150,36 +154,78 @@ class _PlaceHolderState extends State<MainWidget> {
 }
 
 /////
-class _MainWidgetState extends State<MainWidget> {
+class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   final _viewModel = new SubscriptionViewModelImpl();
   final controller = TextEditingController();
   int currentPage = 0;
   static List<FolderModel> currentFolderList = [];
   static List<FileModel> currentFilesList = [];
+  var bottomSheetController;
+
+  AnimationController _controller;
+  Animation _animation;
+
+  double screenHeight;
+  double screenWidth;
+  double bottomSheetViewHeight = 119;
+
+  void initAnimation() {
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+
+    _controller = new AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(
+            end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
+        .animate(_controller)
+          ..addStatusListener((listener) {
+            print(listener);
+          });
+  }
 
   @override
   Widget build(BuildContext context) {
     // set up first page
     if (currentFolderList.isEmpty) {
+      initAnimation();
       currentFolderList.addAll(_viewModel.getFirstFolderContents());
     }
     // end of set up first page
 
-    return SafeArea(
-      child: Column(
-        children: <Widget>[
-          SizedBox(
-            //todo: height is magic number. main list should show below nav widget, preferably animate as the size of nav midget changes
-            height: 120,
-            child: Center(
-              child: new NavWidget(
-                  list: _viewModel.list, backPressed: _backPressed),
-            ),
+    return Stack(children: <Widget>[
+      SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                //todo: height is magic number. main list should show below nav widget, preferably animate as the size of nav midget changes
+                height: 120,
+                child: Center(
+                  child: new NavWidget(
+                      list: _viewModel.list, backPressed: _backPressed),
+                ),
+              ),
+              getListView(),
+            ],
           ),
-          getListView(),
-        ],
+        ),
       ),
-    );
+      new AnimatedBuilder(
+        builder: (context, child) {
+          return new Container(
+            color: Colors.red,
+            child: new PlayerWidget(),
+            margin: EdgeInsets.only(top: _animation.value),
+            height: bottomSheetViewHeight,
+            width: screenWidth,
+          );
+        },
+        animation: _animation,
+      )
+    ]);
   }
 
   void _backPressed(String value) {
@@ -251,6 +297,10 @@ class _MainWidgetState extends State<MainWidget> {
   }
 
   void showPlayer(FileModel fileTapped) {
-
+    if (_controller.isCompleted) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
   }
 }
