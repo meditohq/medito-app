@@ -15,7 +15,9 @@ abstract class MainListViewModel {
 class SubscriptionViewModelImpl implements MainListViewModel {
   var _mailTextController = StreamController<String>.broadcast();
   List<String> list = ["Home"];
+  FileModel currentlySelectedFile;
   int currentPage;
+  bool playerOpen = false;
 
   List<FolderModel> folders = [
     FolderModel("", "0 Meditate", 0, -1, ""),
@@ -40,10 +42,10 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   ];
 
   List<FileModel> fileList = [
-    FileModel("File 1", 1, type: FileType.audio),
-    FileModel("File 2", 1, type: FileType.text),
-    FileModel("File 3", 1, type: FileType.audio),
-    FileModel("File 4", 1),
+    FileModel("File 1", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
+    FileModel("File 2", 1, type: FileType.text, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
+    FileModel("File 3", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
+    FileModel("File 4", 1, fileUrl: "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3"),
     FileModel("File 4", 1),
     FileModel("File 5", 2, type: FileType.audio),
     FileModel("File 6", 2,  type: FileType.text),

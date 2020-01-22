@@ -1,15 +1,18 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:medito/api/api.dart';
+import 'package:medito/audioplayer/playerwidget.dart';
 import 'package:medito/listitemfilewidget.dart';
 import 'package:medito/listitemfolderwidget.dart';
 import 'package:medito/navwidget.dart';
-import 'package:medito/playerwidget.dart';
 import 'package:medito/viewmodel/ListItemModel.dart';
 import 'package:medito/viewmodel/filemodel.dart';
 import 'package:medito/viewmodel/listviewmodel.dart';
+
+import 'audioplayer/audiosingleton.dart';
 
 void main() => runApp(MyApp());
 
@@ -182,12 +185,27 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
             end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
         .animate(_controller)
           ..addStatusListener((listener) {
-            print(listener);
+            if (listener == AnimationStatus.completed) {
+              _viewModel.playerOpen = true;
+            } else if (listener == AnimationStatus.dismissed) {
+              _viewModel.playerOpen = false;
+            }
           });
   }
 
   @override
   Widget build(BuildContext context) {
+
+
+    MeditoAudioPlayer()
+        .audioPlayer
+        .onPlayerStateChanged
+        .listen((AudioPlayerState s) {
+      if (s == AudioPlayerState.COMPLETED) {
+        hidePlayer();
+      }
+    });
+
     // set up first page
     if (currentFolderList.isEmpty) {
       initAnimation();
@@ -217,7 +235,9 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
         builder: (context, child) {
           return new Container(
             color: Colors.red,
-            child: new PlayerWidget(),
+            child: new PlayerWidget(
+              fileModel: _viewModel.currentlySelectedFile,
+            ),
             margin: EdgeInsets.only(top: _animation.value),
             height: bottomSheetViewHeight,
             width: screenWidth,
@@ -297,10 +317,28 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   }
 
   void showPlayer(FileModel fileTapped) {
-    if (_controller.isCompleted) {
-      _controller.reverse();
-    } else {
+    if (fileTapped == _viewModel.currentlySelectedFile) {
+      return;
+    }
+
+    setState(() {
+      MeditoAudioPlayer().audioPlayer.stop();
+      _viewModel.currentlySelectedFile = fileTapped;
+    });
+
+    if (!_viewModel.playerOpen) {
       _controller.forward();
+    }
+
+  }
+
+  void hidePlayer() {
+    setState(() {
+      _viewModel.currentlySelectedFile = null;
+    });
+    if (_viewModel.playerOpen) {
+      _controller.reverse();
+      _viewModel.playerOpen = false;
     }
   }
 }
