@@ -14,7 +14,7 @@ abstract class MainListViewModel {
 
 class SubscriptionViewModelImpl implements MainListViewModel {
   var _mailTextController = StreamController<String>.broadcast();
-  List<String> list = ["Home"];
+  List<String> navList = ["Home"];
   FileModel currentlySelectedFile;
   int currentPage;
   bool playerOpen = false;
@@ -42,7 +42,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   ];
 
   List<FileModel> fileList = [
-    FileModel("File 1", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
+    FileModel("Really long title this is: The revenge of the titles 1", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", transcription: "Never one to leave well enough alone, I’ve made some changes to my personal infrastructure since last time around. As always, it’s not the technology itself, but what it affords which is important. These affordances are not constants, and as the tech has changed over time so too has my position. I’ll quickly explain the what, and then elaborate on the why. This site is built with Vue and deployed with Netlify (frontend). The content is hosted with Github. Different than the last stack, but shares a focus on archivability and portability. "),
     FileModel("File 2", 1, type: FileType.text, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
     FileModel("File 3", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
     FileModel("File 4", 1, fileUrl: "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3"),
@@ -72,7 +72,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     var parentItem = folders.where((f) => f.id == currentPage).toList();
     this.currentPage = parentItem.first.id;
     var result = getFolderContents(parentItem.first.parentId);
-    list.removeLast();
+    navList.removeLast();
     return result;
   }
 
@@ -86,6 +86,6 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   }
 
   void addToNavList(String title) {
-    list.add(title);
+    navList.add(title);
   }
 }

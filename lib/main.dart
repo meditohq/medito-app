@@ -171,6 +171,9 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   double screenHeight;
   double screenWidth;
   double bottomSheetViewHeight = 119;
+  double transcriptionOpacity = 0;
+  double fileListOpacity = 1;
+  String transcriptionText = "";
 
   void initAnimation() {
     screenWidth = MediaQuery.of(context).size.width;
@@ -195,8 +198,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
-
     MeditoAudioPlayer()
         .audioPlayer
         .onPlayerStateChanged
@@ -217,16 +218,25 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       SafeArea(
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(
-                //todo: height is magic number. main list should show below nav widget, preferably animate as the size of nav midget changes
-                height: 120,
-                child: Center(
-                  child: new NavWidget(
-                      list: _viewModel.list, backPressed: _backPressed),
-                ),
+              new NavWidget(
+                  list: _viewModel.navList, backPressed: _backPressed),
+              Stack(
+                children: <Widget>[
+                  Opacity(
+                    child: getListView(),
+                    opacity: fileListOpacity,
+                  ),
+                  Opacity(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(transcriptionText),
+                    ),
+                    opacity: transcriptionOpacity,
+                  )
+                ],
               ),
-              getListView(),
             ],
           ),
         ),
@@ -250,10 +260,17 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
 
   void _backPressed(String value) {
     setState(() {
-      currentFolderList = _viewModel.backUp();
-      currentFilesList.clear();
-      var files = _viewModel.getFilesForId(currentFolderList[0].parentId);
-      currentFilesList.addAll(files);
+      if (transcriptionOpacity == 1) {
+        transcriptionText = "";
+        transcriptionOpacity = 0;
+        fileListOpacity = 1;
+        _viewModel.navList.removeLast();
+      } else {
+        currentFolderList = _viewModel.backUp();
+        currentFilesList.clear();
+        var files = _viewModel.getFilesForId(currentFolderList[0].parentId);
+        currentFilesList.addAll(files);
+      }
     });
   }
 
@@ -305,7 +322,17 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     }
     //if you tapped on a file
     else {
-      showPlayer(getFileTapped(i));
+      var fileTapped = getFileTapped(i);
+      showPlayer(fileTapped);
+
+      if (fileTapped.transcription.isNotEmpty) {
+        _viewModel.addToNavList(fileTapped.fileName);
+        setState(() {
+          transcriptionText = fileTapped.transcription;
+          transcriptionOpacity = 1;
+          fileListOpacity = 0;
+        });
+      }
     }
   }
 
@@ -329,7 +356,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     if (!_viewModel.playerOpen) {
       _controller.forward();
     }
-
   }
 
   void hidePlayer() {
