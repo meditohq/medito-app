@@ -5,7 +5,6 @@ import 'package:medito/audioplayer/audiosingleton.dart';
 import 'package:medito/viewmodel/filemodel.dart';
 
 class PlayerWidget extends StatefulWidget {
-
   PlayerWidget({Key key, this.fileModel}) : super(key: key);
   final FileModel fileModel;
 
@@ -44,8 +43,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         });
       }
 
-      if (s == AudioPlayerState.COMPLETED ||
-          s == AudioPlayerState.STOPPED) {
+      if (s == AudioPlayerState.COMPLETED || s == AudioPlayerState.STOPPED) {
         setState(() {
           _playing = false;
           maxDuration = Duration(seconds: 0);
@@ -65,9 +63,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     widthOfScreen = MediaQuery.of(context).size.width;
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Expanded(child: _buildMarquee()),
-        buildControlRow(),
+        Expanded(child: buildControlRow()),
         buildSeekBar()
       ],
     );
@@ -83,7 +82,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         Container(
           width: getSeekWidth(),
           height: 16,
-          color: Colors.black,
+          color: Colors.lightGreen,
         )
       ],
     );
@@ -91,14 +90,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   double getSeekWidth() {
     if (position == null || maxDuration == null) return 0;
-    if (position.inMilliseconds == 0 || maxDuration.inMilliseconds == 0) return 0;
+    if (position.inMilliseconds == 0 || maxDuration.inMilliseconds == 0)
+      return 0;
 
     var width = position.inMilliseconds.toDouble() /
         maxDuration.inMilliseconds.toDouble() *
         widthOfScreen.toDouble();
 
     return width <= 0 ? 0 : width;
-
   }
 
   Row buildControlRow() {

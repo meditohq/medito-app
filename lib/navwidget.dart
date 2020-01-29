@@ -12,7 +12,7 @@ class NavWidget extends StatefulWidget {
 
 class _NavWidgetState extends State<NavWidget>
     with SingleTickerProviderStateMixin {
-  var _color1 = Colors.red;
+  var _color1 = Colors.lightGreen;
   var _color2 = Colors.green;
   BorderRadiusGeometry _borderRadiusSmall = BorderRadius.circular(13);
   BorderRadiusGeometry _borderRadiusLarge = BorderRadius.circular(16);
@@ -49,6 +49,8 @@ class _NavWidgetState extends State<NavWidget>
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: getPills(),
       ),
     );
@@ -63,7 +65,7 @@ class _NavWidgetState extends State<NavWidget>
     }
     for (int i = startNumber; i < widget.list.length; i++) {
       setState(() {
-        if (i == 0) {
+        if (i == startNumber) {
           _item1CurrentColor = _color2;
           _item1Radius = _borderRadiusSmall;
           _item1Padding = _paddingSmall;
@@ -75,7 +77,7 @@ class _NavWidgetState extends State<NavWidget>
       });
 
       var label = widget.list[i];
-      if (i == startNumber) {
+      if (widget.list.length > 1 && i == startNumber) {
         label = "< " + label;
       }
 
@@ -84,10 +86,11 @@ class _NavWidgetState extends State<NavWidget>
           if (i == startNumber) widget.backPressed(widget.list[i]);
         },
         child: AnimatedContainer(
-          padding: EdgeInsets.all(i == 0 ? _item1Padding : _item2Padding),
+          margin: EdgeInsets.only(top: i == startNumber ? 0 : 8),
+          padding: EdgeInsets.all(i == startNumber ? _item1Padding : _item2Padding),
           decoration: BoxDecoration(
-            color: i == 0 ? _item1CurrentColor : _item2CurrentColor,
-            borderRadius: i == 0 ? _item1Radius : _item2Radius,
+            color: i == startNumber ? _item1CurrentColor : _item2CurrentColor,
+            borderRadius: i == startNumber ? _item1Radius : _item2Radius,
           ),
           duration: Duration(seconds: 1),
           child: Text(label, style: TextStyle(color: Colors.white)),

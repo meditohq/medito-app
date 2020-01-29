@@ -25,8 +25,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
           textTheme: GoogleFonts.dMSansTextTheme(
-        Theme.of(context).textTheme,
-      )),
+            Theme
+                .of(context)
+                .textTheme,
+          )),
       title: _title,
       home: Scaffold(
           appBar: null, //AppBar(title: const Text(_title)),
@@ -176,8 +178,14 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   String transcriptionText = "";
 
   void initAnimation() {
-    screenWidth = MediaQuery.of(context).size.width;
-    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     _controller = new AnimationController(
       duration: const Duration(milliseconds: 250),
@@ -185,15 +193,15 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     );
 
     _animation = Tween<double>(
-            end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
+        end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
         .animate(_controller)
-          ..addStatusListener((listener) {
-            if (listener == AnimationStatus.completed) {
-              _viewModel.playerOpen = true;
-            } else if (listener == AnimationStatus.dismissed) {
-              _viewModel.playerOpen = false;
-            }
-          });
+      ..addStatusListener((listener) {
+        if (listener == AnimationStatus.completed) {
+          _viewModel.playerOpen = true;
+        } else if (listener == AnimationStatus.dismissed) {
+          _viewModel.playerOpen = false;
+        }
+      });
   }
 
   @override
@@ -214,48 +222,58 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     }
     // end of set up first page
 
-    return Stack(children: <Widget>[
-      SafeArea(
-        child: SingleChildScrollView(
+    return Scaffold(
+      body: Stack(children: <Widget>[
+        SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new NavWidget(
-                  list: _viewModel.navList, backPressed: _backPressed),
-              Stack(
-                children: <Widget>[
-                  Opacity(
-                    child: getListView(),
-                    opacity: fileListOpacity,
-                  ),
-                  Opacity(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(transcriptionText),
-                    ),
-                    opacity: transcriptionOpacity,
-                  )
-                ],
+                list: _viewModel.navList,
+                backPressed: _backPressed,
               ),
+              Expanded(child: buildFolderNavigator()),
             ],
           ),
         ),
+        new AnimatedBuilder(
+          builder: (context, child) {
+            return buildBottomSheet();
+          },
+          animation: _animation,
+        )
+      ]),
+    );
+  }
+
+  Container buildBottomSheet() {
+    return new Container(
+      color: Colors.green,
+      child: new PlayerWidget(
+        fileModel: _viewModel.currentlySelectedFile,
       ),
-      new AnimatedBuilder(
-        builder: (context, child) {
-          return new Container(
-            color: Colors.red,
-            child: new PlayerWidget(
-              fileModel: _viewModel.currentlySelectedFile,
-            ),
-            margin: EdgeInsets.only(top: _animation.value),
-            height: bottomSheetViewHeight,
-            width: screenWidth,
-          );
-        },
-        animation: _animation,
-      )
-    ]);
+      margin: EdgeInsets.only(top: _animation.value),
+      height: bottomSheetViewHeight,
+      width: screenWidth,
+    );
+  }
+
+  Stack buildFolderNavigator() {
+    return Stack(
+      children: <Widget>[
+        Opacity(
+          child: getListView(),
+          opacity: fileListOpacity,
+        ),
+        Opacity(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(transcriptionText),
+          ),
+          opacity: transcriptionOpacity,
+        )
+      ],
+    );
   }
 
   void _backPressed(String value) {
@@ -285,13 +303,18 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
         itemCount: length,
         shrinkWrap: true,
         itemBuilder: (BuildContext context, int i) {
-          return InkWell(
-              splashColor: Colors.orange,
-              child: getChildForListView(i),
-              onTap: () {
-                listItemTap(i);
-                setState(() {});
-              });
+          return Column(
+            children: <Widget>[
+              InkWell(
+                  splashColor: Colors.orange,
+                  child: getChildForListView(i),
+                  onTap: () {
+                    listItemTap(i);
+                    setState(() {});
+                  }),
+              Container(height: i == length -1 ? 200: 0)
+            ],
+          );
         });
   }
 

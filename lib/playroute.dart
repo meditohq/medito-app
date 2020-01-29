@@ -32,7 +32,7 @@ class _SongPageState extends State<SongPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Container(
-                  color: Colors.red,
+                  color: Colors.green,
                   child: Column(
                     children: <Widget>[
                       Text(
