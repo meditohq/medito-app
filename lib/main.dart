@@ -1,18 +1,14 @@
-import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:medito/api/api.dart';
 import 'package:medito/audioplayer/playerwidget.dart';
 import 'package:medito/listitemfilewidget.dart';
 import 'package:medito/listitemfolderwidget.dart';
-import 'package:medito/navwidget.dart';
-import 'package:medito/viewmodel/ListItemModel.dart';
-import 'package:medito/viewmodel/filemodel.dart';
+import 'package:medito/viewmodel/list_item.dart';
 import 'package:medito/viewmodel/listviewmodel.dart';
 
 import 'audioplayer/audiosingleton.dart';
+import 'navwidget.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,11 +20,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          textTheme: GoogleFonts.dMSansTextTheme(
-            Theme
-                .of(context)
-                .textTheme,
-          )),
+          textTheme:
+              GoogleFonts.dMSansTextTheme(Theme.of(context).textTheme.copyWith(
+                    title: TextStyle(
+                        fontSize: 24.0,
+                        color: Color(0xff2e3134),
+                        fontWeight: FontWeight.w600),
+                    subhead: TextStyle(
+                        fontSize: 16.0,
+                        color: Color(0xff595959),
+                        fontWeight: FontWeight.normal),
+                  ))),
       title: _title,
       home: Scaffold(
           appBar: null, //AppBar(title: const Text(_title)),
@@ -58,113 +60,12 @@ class MainWidget extends StatefulWidget {
   _MainWidgetState createState() => _MainWidgetState();
 }
 
-class _PlaceHolderState extends State<MainWidget> {
-  final _viewModel = new SubscriptionViewModelImpl();
-  final controller = TextEditingController();
-  int currentPage = 0;
-  static List<FolderModel> filesList = [];
-
-  final emailAddressController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  final String emailRegex =
-      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
-
-  @override
-  Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
-    return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Image.network("https://source.unsplash.com/AvLHH8qYbAI",
-                height: 300, width: double.infinity, fit: BoxFit.fitWidth),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                  "To make sure we provide the best service possible, we give access to new comers on a daily basis. \n\nEnter your email below and we will let you know when you can access the app.",
-                  style: const TextStyle(
-                      color: const Color(0xff656565),
-                      fontStyle: FontStyle.normal,
-                      fontSize: 16.0)),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: TextFormField(
-                decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.0),
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                    ),
-                    hintText: 'email address'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (!RegExp(emailRegex).hasMatch(value)) {
-                    return "Please enter a valid email address";
-                  }
-                  if (value.isEmpty) {
-                    return 'Please enter your emaill address';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
-              child: Text("* We’ll never share your email address",
-                  style: const TextStyle(
-                      fontStyle: FontStyle.normal, fontSize: 10.0)),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: FlatButton(
-                textColor: Colors.white,
-                color: Colors.black,
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false
-                  // otherwise.
-                  if (_formKey.currentState.validate()) {
-                    // If the form is valid, display a Snackbar.
-                    _fire();
-                    Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text('Subscribing...')));
-                  }
-                },
-                child: Text(
-                  'JOIN WAITING LIST',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _fire() {
-    Api.updateSubscribers(emailAddressController.text)
-        .whenComplete(_doneSnackBar);
-  }
-
-  FutureOr _doneSnackBar() {
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text('Complete. Thanks!'),
-      backgroundColor: Colors.green,
-    ));
-  }
-}
-
 /////
 class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   final _viewModel = new SubscriptionViewModelImpl();
+  Future<List<ListItem>> listFuture;
   final controller = TextEditingController();
   int currentPage = 0;
-  static List<FolderModel> currentFolderList = [];
-  static List<FileModel> currentFilesList = [];
   var bottomSheetController;
 
   AnimationController _controller;
@@ -177,35 +78,43 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   double fileListOpacity = 1;
   String transcriptionText = "";
 
+  @override
+  void initState() {
+    super.initState();
+    listFuture = _viewModel.getPage();
+  }
+
   void initAnimation() {
-    screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    // call after initState because MediaQuery
+    // cannot complete until initState has completed
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
 
     _controller = new AnimationController(
       duration: const Duration(milliseconds: 250),
       vsync: this,
-    );
+    )..addStatusListener((i) {
+        print(i);
+      });
 
     _animation = Tween<double>(
-        end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
+            end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
         .animate(_controller)
-      ..addStatusListener((listener) {
-        if (listener == AnimationStatus.completed) {
-          _viewModel.playerOpen = true;
-        } else if (listener == AnimationStatus.dismissed) {
-          _viewModel.playerOpen = false;
-        }
-      });
+          ..addStatusListener((listener) {
+            if (listener == AnimationStatus.completed) {
+              _viewModel.playerOpen = true;
+            } else if (listener == AnimationStatus.dismissed) {
+              _viewModel.playerOpen = false;
+            }
+          });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_controller == null) {
+      initAnimation();
+    }
+
     MeditoAudioPlayer()
         .audioPlayer
         .onPlayerStateChanged
@@ -215,20 +124,14 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       }
     });
 
-    // set up first page
-    if (currentFolderList.isEmpty) {
-      initAnimation();
-      currentFolderList.addAll(_viewModel.getFirstFolderContents());
-    }
-    // end of set up first page
-
     return Scaffold(
+      backgroundColor: Color(0xfffff1ec),
       body: Stack(children: <Widget>[
         SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new NavWidget(
+              NavWidget(
                 list: _viewModel.navList,
                 backPressed: _backPressed,
               ),
@@ -243,18 +146,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
           animation: _animation,
         )
       ]),
-    );
-  }
-
-  Container buildBottomSheet() {
-    return new Container(
-      color: Colors.green,
-      child: new PlayerWidget(
-        fileModel: _viewModel.currentlySelectedFile,
-      ),
-      margin: EdgeInsets.only(top: _animation.value),
-      height: bottomSheetViewHeight,
-      width: screenWidth,
     );
   }
 
@@ -276,82 +167,56 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     );
   }
 
-  void _backPressed(String value) {
-    setState(() {
-      if (transcriptionOpacity == 1) {
-        transcriptionText = "";
-        transcriptionOpacity = 0;
-        fileListOpacity = 1;
-        _viewModel.navList.removeLast();
-      } else {
-        currentFolderList = _viewModel.backUp();
-        currentFilesList.clear();
-        var files = _viewModel.getFilesForId(currentFolderList[0].parentId);
-        currentFilesList.addAll(files);
-      }
-    });
-  }
-
-  Widget getFolderListItem(FolderModel listItemModel) {
-    return new ListItemFolderWidget(listItemModel: listItemModel);
-  }
-
   Widget getListView() {
-    var length = currentFolderList.length + currentFilesList.length;
+    return FutureBuilder(
+        future: listFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.none ||
+              snapshot.hasData == false ||
+              snapshot.hasData == null) {
+            return Container(
+              color: Colors.red,
+            );
+          }
 
-    return new ListView.builder(
-        itemCount: length,
-        shrinkWrap: true,
-        itemBuilder: (BuildContext context, int i) {
-          return Column(
-            children: <Widget>[
-              InkWell(
-                  splashColor: Colors.orange,
-                  child: getChildForListView(i),
-                  onTap: () {
-                    listItemTap(i);
-                    setState(() {});
-                  }),
-              Container(height: i == length -1 ? 200: 0)
-            ],
-          );
+          return new ListView.builder(
+              itemCount: snapshot.data == null ? 0 : snapshot.data.length,
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int i) {
+                return Column(
+                  children: <Widget>[
+                    InkWell(
+                        splashColor: Colors.orange,
+                        child: getChildForListView(snapshot.data[i]),
+                        onTap: () {
+                          listItemTap(snapshot.data[i]);
+                          setState(() {});
+                        }),
+                    Container(height: i == snapshot.data.length - 1 ? 200 : 0)
+                  ],
+                );
+              });
         });
   }
 
-  Widget getChildForListView(int i) {
-    if (i < currentFolderList.length) {
-      return getFolderListItem(currentFolderList[i]);
-    } else {
-      return getFileListItem(getFileTapped(i));
-    }
-  }
-
-  void listItemTap(int i) {
+  void listItemTap(ListItem i) {
     //if you tapped on a folder
-    if (i < currentFolderList.length) {
-      _viewModel.addToNavList(currentFolderList[i].title);
-
-      int id = currentFolderList[i].id;
-      var folder = _viewModel.getFolderContents(id);
-      var files = _viewModel.getFilesForId(id);
-
-      currentFilesList.clear();
-      currentFilesList.addAll(files);
-
-      if (folder.length != 0) {
-        currentFolderList.clear();
-        currentFolderList.addAll(folder);
-      }
+    if (i.type == ListItemType.folder) {
+      setState(() {
+        _viewModel.addToNavList(i);
+        listFuture = _viewModel.getPage(id: i.id);
+      });
     }
     //if you tapped on a file
     else {
-      var fileTapped = getFileTapped(i);
-      showPlayer(fileTapped);
+      if (i.fileType == FileType.audio || i.fileType == FileType.both) {
+        showPlayer(i);
+      }
 
-      if (fileTapped.transcription.isNotEmpty) {
-        _viewModel.addToNavList(fileTapped.fileName);
+      if (i.contentText.isNotEmpty) {
+        _viewModel.addToNavList(i);
         setState(() {
-          transcriptionText = fileTapped.transcription;
+          transcriptionText = i.contentText;
           transcriptionOpacity = 1;
           fileListOpacity = 0;
         });
@@ -359,14 +224,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     }
   }
 
-  FileModel getFileTapped(int i) =>
-      currentFilesList[i - currentFolderList.length];
-
-  Widget getFileListItem(FileModel file) {
-    return new ListItemFileWidget(item: file);
-  }
-
-  void showPlayer(FileModel fileTapped) {
+  void showPlayer(ListItem fileTapped) {
     if (fileTapped == _viewModel.currentlySelectedFile) {
       return;
     }
@@ -389,5 +247,47 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       _controller.reverse();
       _viewModel.playerOpen = false;
     }
+  }
+
+  Widget getFolderListItem(ListItem listItemModel) {
+    return new ListItemFolderWidget(listItemModel: listItemModel);
+  }
+
+  Widget getFileListItem(ListItem item) {
+    return new ListItemFileWidget(item: item);
+  }
+
+  Widget getChildForListView(ListItem item) {
+    if (item.type == ListItemType.folder) {
+      return getFolderListItem(item);
+    } else {
+      return getFileListItem(item);
+    }
+  }
+
+  void _backPressed(String id) {
+    setState(() {
+      if (transcriptionOpacity == 1) {
+        transcriptionText = "";
+        transcriptionOpacity = 0;
+        fileListOpacity = 1;
+      } else {
+        listFuture = _viewModel.getPage(id: id);
+      }
+      _viewModel.navList.removeLast();
+    });
+  }
+
+  Widget buildBottomSheet() {
+    return Container(
+      child: new Container(
+        color: Colors.green,
+        child: new PlayerWidget(
+          fileModel: _viewModel.currentlySelectedFile,
+        ),
+        margin: EdgeInsets.only(top: _animation.value),
+        height: bottomSheetViewHeight,
+      ),
+    );
   }
 }

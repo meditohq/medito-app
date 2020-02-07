@@ -1,91 +1,95 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
-import 'package:medito/viewmodel/filemodel.dart';
+import 'package:http/http.dart' as http;
+import 'package:medito/viewmodel/files.dart';
+import 'package:medito/viewmodel/list_item.dart';
+import 'package:medito/viewmodel/pages.dart';
 
-import 'ListItemModel.dart';
-
-abstract class MainListViewModel {
-  Sink get inputTextSink;
-
-  Stream<List<FolderModel>> get sessionListStream;
-
-  void dispose();
-}
+abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
-  var _mailTextController = StreamController<String>.broadcast();
-  List<String> navList = ["Home"];
-  FileModel currentlySelectedFile;
+  final String baseUrl = 'https://medito.app/api/pages';
+  final String basicAuth =
+      'Basic bWljaGFlbGNzcGVlZEBnbWFpbC5jb206QURNSU5ybzE1OTk1MQ==';
+  List<ListItem> navList = [ListItem("Home", "", "", parentId: "app")];
   int currentPage;
   bool playerOpen = false;
+  ListItem currentlySelectedFile;
 
-  List<FolderModel> folders = [
-    FolderModel("", "0 Meditate", 0, -1, ""),
-    FolderModel("", "1 Loving-Kindness", 1, 0,
-        "Be kind to yourself, be kind to others. Great in any situation",
-        filesId: 1),
-    FolderModel("", "Subfolder 1.1", 2, 1, ""),
-    FolderModel("", "Subfolder 1.1.1", 3, 2, ""),
-    FolderModel("", "Subfolder 1.1.2", 4, 2, ""),
-    FolderModel("", "Subfolder 1.1.3", 5, 2, ""),
-    FolderModel("", "Mindfulness of breathing", 6, 1,
-        "A simple way to relax and feel less stressed. The only thing to do is being aware of your breathing",
-        filesId: 2),
-    FolderModel("", "Subfolder 1.1.1", 7, 6, ""),
-    FolderModel("", "Subfolder 1.1.2", 8, 6, ""),
-    FolderModel("", "Subfolder 1.1.3", 9, 6, ""),
-    FolderModel("", "Mantra", 10, 0,
-        "Use sound as an effective way to improve focus, to find more calm and calm your mind"),
-    FolderModel("", "Subfolder 2.1", 11, 10, ""),
-    FolderModel("", "Subfolder 2.2", 12, 10, ""),
-    FolderModel("", "Folder 3", 13, 10, ""),
-  ];
+  Future<List<ListItem>> getPage({String id = 'app'}) async {
+    if (id == null) id = 'app';
+    List<ListItem> listItemList = [];
+    var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
-  List<FileModel> fileList = [
-    FileModel("Really long title this is: The revenge of the titles 1", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", transcription: "Never one to leave well enough alone, I’ve made some changes to my personal infrastructure since last time around. As always, it’s not the technology itself, but what it affords which is important. These affordances are not constants, and as the tech has changed over time so too has my position. I’ll quickly explain the what, and then elaborate on the why. This site is built with Vue and deployed with Netlify (frontend). The content is hosted with Github. Different than the last stack, but shares a focus on archivability and portability. "),
-    FileModel("File 2", 1, type: FileType.text, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
-    FileModel("File 3", 1, type: FileType.audio, fileUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"),
-    FileModel("File 4", 1, fileUrl: "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3"),
-    FileModel("File 4", 1),
-    FileModel("File 5", 2, type: FileType.audio),
-    FileModel("File 6", 2,  type: FileType.text),
-  ];
+    final response = await http.get(
+      url,
+      headers: {HttpHeaders.authorizationHeader: basicAuth},
+    );
+    final responseJson = json.decode(response.body);
+    var pageList = Pages.fromJson(responseJson).data;
 
-  @override
-  Sink get inputTextSink => _mailTextController;
+    for (var value in pageList) {
+      var parentId = value.id.substring(0, value.id.lastIndexOf('/'));
+      var contentText = value.contentText == null ? "" : value.contentText;
 
-  @override
-  Stream<List<FolderModel>> get sessionListStream =>
-      Stream<List<FolderModel>>.value(List<FolderModel>.generate(15, (i) {
-        return null;
-      }));
+      if (value.template == 'default') {
+        //just a folder
+        listItemList.add(ListItem(value.title, value.id, value.description,
+            type: ListItemType.folder,
+            parentId: parentId,
+            contentText: contentText));
+      } else if (value.template == 'media') {
+        var fileType = getFileType(value);
+        var url;
 
-  @override
-  void dispose() => _mailTextController.close();
+        if (fileType == FileType.both || fileType == FileType.audio) {
+          try {
+            url = await getFileUrl(id: value.id);
+          } catch (e, s) {
+            print(s);
+            print('Error getting ' + value.title);
+          }
+        }
+        listItemList.add(ListItem(value.title, value.id, value.description,
+            url: url,
+            type: ListItemType.file,
+            fileType: fileType,
+            parentId: parentId,
+            contentText: contentText));
+      }
+    }
 
-  List<FolderModel> getFolderContents(int currentPage) {
-    this.currentPage = currentPage;
-    return folders.where((f) => f.parentId == currentPage).toList();
+    return listItemList;
   }
 
-  List<FolderModel> backUp() {
-    var parentItem = folders.where((f) => f.id == currentPage).toList();
-    this.currentPage = parentItem.first.id;
-    var result = getFolderContents(parentItem.first.parentId);
-    navList.removeLast();
-    return result;
+  FileType getFileType(var value) {
+    if (value.hasFiles &&
+        value.contentText != null &&
+        value.contentText.isNotEmpty) {
+      return FileType.both;
+    } else if (value.hasFiles &&
+        (value.contentText == null || value.contentText.isEmpty)) {
+      return FileType.audio;
+    } else {
+      return FileType.text;
+    }
   }
 
-  List<FolderModel> getFirstFolderContents() {
-    return folders.where((f) => f.id == 0).toList();
+  Future getFileUrl({String id = ''}) async {
+    var url = baseUrl + '/' + id.replaceAll('/', '+') + '/files';
+
+    final response = await http.get(
+      url,
+      headers: {HttpHeaders.authorizationHeader: basicAuth},
+    );
+    final responseJson = json.decode(response.body);
+    var filesList = Files.fromJson(responseJson).data;
+    return filesList?.first?.url;
   }
 
-  List<FileModel> getFilesForId(int id) {
-    print("!");
-    return fileList.where((f) => f.folderId == id).toList();
-  }
-
-  void addToNavList(String title) {
-    navList.add(title);
+  void addToNavList(ListItem item) {
+    navList.add(item);
   }
 }

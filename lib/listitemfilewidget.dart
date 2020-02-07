@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:medito/viewmodel/filemodel.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:medito/viewmodel/list_item.dart';
 
 class ListItemFileWidget extends StatelessWidget {
   ListItemFileWidget({Key key, this.item}) : super(key: key);
 
-  final FileModel item;
+  final ListItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +13,12 @@ class ListItemFileWidget extends StatelessWidget {
       Flexible(
         child: Container(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-            margin: EdgeInsets.all(4.0),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(right: 8.0, left: 8),
+                  padding: EdgeInsets.only(right: 12.0, left: 4, top: 4),
                   child: getIcon(),
                 ),
                 Flexible(
@@ -26,13 +26,13 @@ class ListItemFileWidget extends StatelessWidget {
                         child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      item.fileName,
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(item.title, style: Theme.of(context).textTheme.title),
+                    item.description == null || item.description.isEmpty
+                        ? Container()
+                        : Text(
+                            item.description,
+                            style: Theme.of(context).textTheme.subhead,
+                          ),
                   ],
                 ))),
               ],
@@ -41,15 +41,21 @@ class ListItemFileWidget extends StatelessWidget {
     ]);
   }
 
-  Icon getIcon() {
-    switch (item.type) {
+  Widget getIcon() {
+    var path;
+    switch (item.fileType) {
       case FileType.audio:
-        return Icon(Icons.description);
-        break;
-      case FileType.text:
         return Icon(Icons.audiotrack);
         break;
+      case FileType.text:
+        path = 'assets/images/ic_document.svg';
+        break;
+      case FileType.both:
+        path = 'assets/images/ic_audio.svg';
+        break;
     }
-    return  Icon(Icons.audiotrack);
+    return SvgPicture.asset(
+      path,
+    );
   }
 }

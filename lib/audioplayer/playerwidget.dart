@@ -2,11 +2,12 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:medito/audioplayer/audiosingleton.dart';
-import 'package:medito/viewmodel/filemodel.dart';
+import 'package:medito/viewmodel/list_item.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PlayerWidget extends StatefulWidget {
   PlayerWidget({Key key, this.fileModel}) : super(key: key);
-  final FileModel fileModel;
+  final ListItem fileModel;
 
   @override
   _PlayerWidgetState createState() {
@@ -127,13 +128,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       startPadding: 16,
       crossAxisAlignment: CrossAxisAlignment.center,
       accelerationCurve: Curves.easeInOut,
-      text: widget.fileModel != null ? widget.fileModel.fileName : " ",
+      text: widget.fileModel != null ? widget.fileModel.title : " ",
     );
   }
 
   void _play() async {
     int result =
-        await MeditoAudioPlayer().audioPlayer.play(widget.fileModel.fileUrl);
+        await MeditoAudioPlayer().audioPlayer.play(widget.fileModel.url);
     if (result == 1) {
       setState(() {
         _playing = true;

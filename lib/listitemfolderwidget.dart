@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
-import 'viewmodel/ListItemModel.dart';
+import 'package:medito/viewmodel/list_item.dart';
 
 class ListItemFolderWidget extends StatelessWidget {
   ListItemFolderWidget({Key key, this.listItemModel}) : super(key: key);
 
-  final FolderModel listItemModel;
+  final ListItem listItemModel;
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +12,12 @@ class ListItemFolderWidget extends StatelessWidget {
       Flexible(
         child: Container(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-            margin: EdgeInsets.all(4.0),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(right: 8.0, left: 8),
+                  padding: EdgeInsets.only(right: 12.0, left: 4, top: 4),
                   child: Icon(Icons.folder),
                 ),
                 Flexible(
@@ -27,15 +25,11 @@ class ListItemFolderWidget extends StatelessWidget {
                         child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      listItemModel.title,
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Container(height: 5),
-                    getDescWidget(),
+                    Text(listItemModel.title,
+                        style: Theme.of(context).textTheme.title),
+                    Container(
+                        height: listItemModel.description.isNotEmpty ? 5 : 0),
+                    getDescWidget(context),
                   ],
                 ))),
               ],
@@ -44,14 +38,12 @@ class ListItemFolderWidget extends StatelessWidget {
     ]);
   }
 
-  Widget getDescWidget() {
-    if (listItemModel.description.isNotEmpty) {
+  Widget getDescWidget(BuildContext context) {
+    if (listItemModel.description != null &&
+        listItemModel.description.isNotEmpty) {
       return Text(
         listItemModel.description,
-        style: const TextStyle(
-          fontSize: 16.0,
-          color: Colors.black54,
-        ),
+        style: Theme.of(context).textTheme.subhead,
       );
     } else
       return Container();

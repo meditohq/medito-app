@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:medito/viewmodel/list_item.dart';
 
 class NavWidget extends StatefulWidget {
   const NavWidget({Key key, this.list, this.backPressed}) : super(key: key);
 
-  final List<String> list;
+  final List<ListItem> list;
   final ValueChanged<String> backPressed;
 
   @override
@@ -58,6 +59,7 @@ class _NavWidgetState extends State<NavWidget>
 
   List<Widget> getPills() {
     List<Widget> columns = new List<Widget>();
+    if (widget.list == null) return columns;
 
     int startNumber = 0;
     if (widget.list.length >= 2) {
@@ -76,18 +78,19 @@ class _NavWidgetState extends State<NavWidget>
         }
       });
 
-      var label = widget.list[i];
+      var label = widget.list[i].title;
       if (widget.list.length > 1 && i == startNumber) {
         label = "< " + label;
       }
 
       columns.add(GestureDetector(
         onTap: () {
-          if (i == startNumber) widget.backPressed(widget.list[i]);
+          if (i == startNumber) widget.backPressed(widget.list[i].parentId);
         },
         child: AnimatedContainer(
           margin: EdgeInsets.only(top: i == startNumber ? 0 : 8),
-          padding: EdgeInsets.all(i == startNumber ? _item1Padding : _item2Padding),
+          padding:
+              EdgeInsets.all(i == startNumber ? _item1Padding : _item2Padding),
           decoration: BoxDecoration(
             color: i == startNumber ? _item1CurrentColor : _item2CurrentColor,
             borderRadius: i == startNumber ? _item1Radius : _item2Radius,
@@ -97,6 +100,7 @@ class _NavWidgetState extends State<NavWidget>
         ),
       ));
     }
+
     return columns;
   }
 }
