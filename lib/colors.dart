@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MeditioColors {
-  var ripple = Colors.orangeAccent;
-  var main = Colors.green;
-  var secondary = Colors.lightGreen;
+class MeditoColors {
+  static var lightColor = Color(0xffebe7e4);
+  static var lightGreyColor = Color(0xff343b43);
 }

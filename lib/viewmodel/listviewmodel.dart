@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:medito/viewmodel/files.dart';
 import 'package:medito/viewmodel/list_item.dart';
@@ -17,6 +18,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   int currentPage;
   bool playerOpen = false;
   ListItem currentlySelectedFile;
+  AudioPlayerState currentState;
 
   Future<List<ListItem>> getPage({String id = 'app'}) async {
     if (id == null) id = 'app';

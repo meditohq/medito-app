@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:medito/audioplayer/playerwidget.dart';
+import 'package:medito/colors.dart';
 import 'package:medito/listitemfilewidget.dart';
 import 'package:medito/listitemfolderwidget.dart';
 import 'package:medito/viewmodel/list_item.dart';
@@ -24,11 +25,26 @@ class MyApp extends StatelessWidget {
               GoogleFonts.dMSansTextTheme(Theme.of(context).textTheme.copyWith(
                     title: TextStyle(
                         fontSize: 24.0,
-                        color: Color(0xff2e3134),
+                        color: MeditoColors.lightColor,
                         fontWeight: FontWeight.w600),
                     subhead: TextStyle(
                         fontSize: 16.0,
-                        color: Color(0xff595959),
+                        color: Color(0xffa7aab1),
+                        fontWeight: FontWeight.normal),
+                    display1: TextStyle(
+                        //pill big
+                        fontSize: 18.0,
+                        color: Color(0xff22282d),
+                        fontWeight: FontWeight.normal),
+                    display2: TextStyle(
+                        //pill small
+                        fontSize: 14.0,
+                        color: MeditoColors.lightColor,
+                        fontWeight: FontWeight.normal),
+                    display3: TextStyle(
+                        //this is for bottom sheet text
+                        fontSize: 16.0,
+                        color: MeditoColors.lightColor,
                         fontWeight: FontWeight.normal),
                   ))),
       title: _title,
@@ -68,12 +84,8 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   int currentPage = 0;
   var bottomSheetController;
 
-  AnimationController _controller;
-  Animation _animation;
-
   double screenHeight;
   double screenWidth;
-  double bottomSheetViewHeight = 119;
   double transcriptionOpacity = 0;
   double fileListOpacity = 1;
   String transcriptionText = "";
@@ -84,37 +96,8 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     listFuture = _viewModel.getPage();
   }
 
-  void initAnimation() {
-    // call after initState because MediaQuery
-    // cannot complete until initState has completed
-    screenWidth = MediaQuery.of(context).size.width;
-    screenHeight = MediaQuery.of(context).size.height;
-
-    _controller = new AnimationController(
-      duration: const Duration(milliseconds: 250),
-      vsync: this,
-    )..addStatusListener((i) {
-        print(i);
-      });
-
-    _animation = Tween<double>(
-            end: screenHeight - bottomSheetViewHeight, begin: screenHeight)
-        .animate(_controller)
-          ..addStatusListener((listener) {
-            if (listener == AnimationStatus.completed) {
-              _viewModel.playerOpen = true;
-            } else if (listener == AnimationStatus.dismissed) {
-              _viewModel.playerOpen = false;
-            }
-          });
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (_controller == null) {
-      initAnimation();
-    }
-
     MeditoAudioPlayer()
         .audioPlayer
         .onPlayerStateChanged
@@ -122,48 +105,93 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       if (s == AudioPlayerState.COMPLETED) {
         hidePlayer();
       }
+      _viewModel.currentState = s;
     });
 
     return Scaffold(
-      backgroundColor: Color(0xfffff1ec),
-      body: Stack(children: <Widget>[
-        SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              NavWidget(
-                list: _viewModel.navList,
-                backPressed: _backPressed,
-              ),
-              Expanded(child: buildFolderNavigator()),
-            ],
-          ),
+      backgroundColor: Color(0xff22282D),
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                AnimatedOpacity(
+                  opacity: fileListOpacity,
+                  duration: Duration(milliseconds: 250),
+                  child: NavWidget(
+                    list: _viewModel.navList,
+                    backPressed: _backPressed,
+                  ),
+                ),
+                Expanded(
+                    child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 250),
+                        opacity: fileListOpacity,
+                        child: getListView())),
+                AnimatedOpacity(
+                    duration: Duration(milliseconds: 250),
+                    opacity: _viewModel.playerOpen ? 1 : 0,
+                    child: buildBottomSheet())
+              ],
+            ),
+            getTranscriptionView()
+          ],
         ),
-        new AnimatedBuilder(
-          builder: (context, child) {
-            return buildBottomSheet();
-          },
-          animation: _animation,
-        )
-      ]),
+      ),
     );
   }
 
-  Stack buildFolderNavigator() {
-    return Stack(
-      children: <Widget>[
-        Opacity(
-          child: getListView(),
-          opacity: fileListOpacity,
-        ),
-        Opacity(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(transcriptionText),
-          ),
-          opacity: transcriptionOpacity,
-        )
-      ],
+  AnimatedOpacity getTranscriptionView() {
+    return AnimatedOpacity(
+      duration: Duration(milliseconds: 250),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: transcriptionOpacity > 0
+            ? Column(
+                children: <Widget>[
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: DecoratedBox(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(child: getText()),
+                        ],
+                      ),
+                      decoration: BoxDecoration(
+                        color: MeditoColors.lightGreyColor,
+                        borderRadius: BorderRadius.all(Radius.circular(16.0)),
+                      ),
+                    ),
+                  )),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: FlatButton(
+                          child: Text("CLOSE"),
+                          color: MeditoColors.lightColor,
+                          onPressed: _closeTranscriptionView,
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            : Container(),
+      ),
+      opacity: transcriptionOpacity,
+    );
+  }
+
+  Widget getText() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child:
+            Text(transcriptionText, style: Theme.of(context).textTheme.subhead),
+      ),
     );
   }
 
@@ -171,12 +199,17 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     return FutureBuilder(
         future: listFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.none ||
+          if (snapshot.connectionState == ConnectionState.waiting ||
               snapshot.hasData == false ||
               snapshot.hasData == null) {
-            return Container(
-              color: Colors.red,
+            return Center(
+              child: CircularProgressIndicator(),
             );
+          }
+
+          if (snapshot.connectionState == ConnectionState.none) {
+            return Center(
+                child: Text('An error has occured! Please try again later'));
           }
 
           return new ListView.builder(
@@ -190,7 +223,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
                         child: getChildForListView(snapshot.data[i]),
                         onTap: () {
                           listItemTap(snapshot.data[i]);
-                          setState(() {});
                         }),
                     Container(height: i == snapshot.data.length - 1 ? 200 : 0)
                   ],
@@ -210,22 +242,23 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     //if you tapped on a file
     else {
       if (i.fileType == FileType.audio || i.fileType == FileType.both) {
+        _viewModel.playerOpen = true;
         showPlayer(i);
-      }
-
-      if (i.contentText.isNotEmpty) {
-        _viewModel.addToNavList(i);
-        setState(() {
-          transcriptionText = i.contentText;
-          transcriptionOpacity = 1;
-          fileListOpacity = 0;
-        });
       }
     }
   }
 
+  void showTextModal(ListItem i) {
+    setState(() {
+      transcriptionText = i.contentText;
+      transcriptionOpacity = 1;
+      fileListOpacity = 0;
+      _viewModel.playerOpen = false;
+    });
+  }
+
   void showPlayer(ListItem fileTapped) {
-    if (fileTapped == _viewModel.currentlySelectedFile) {
+    if (fileTapped.id == _viewModel.currentlySelectedFile?.id) {
       return;
     }
 
@@ -233,20 +266,12 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       MeditoAudioPlayer().audioPlayer.stop();
       _viewModel.currentlySelectedFile = fileTapped;
     });
-
-    if (!_viewModel.playerOpen) {
-      _controller.forward();
-    }
   }
 
   void hidePlayer() {
     setState(() {
       _viewModel.currentlySelectedFile = null;
     });
-    if (_viewModel.playerOpen) {
-      _controller.reverse();
-      _viewModel.playerOpen = false;
-    }
   }
 
   Widget getFolderListItem(ListItem listItemModel) {
@@ -254,7 +279,12 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   }
 
   Widget getFileListItem(ListItem item) {
-    return new ListItemFileWidget(item: item);
+    if (_viewModel.currentlySelectedFile == item) {
+      return new ListItemFileWidget(
+          item: item, currentlyPlayingState: _viewModel.currentState);
+    } else {
+      return new ListItemFileWidget(item: item);
+    }
   }
 
   Widget getChildForListView(ListItem item) {
@@ -279,15 +309,22 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   }
 
   Widget buildBottomSheet() {
-    return Container(
-      child: new Container(
-        color: Colors.green,
-        child: new PlayerWidget(
-          fileModel: _viewModel.currentlySelectedFile,
-        ),
-        margin: EdgeInsets.only(top: _animation.value),
-        height: bottomSheetViewHeight,
-      ),
-    );
+    var showReadMore =
+        _viewModel.currentlySelectedFile?.contentText?.isNotEmpty;
+    return PlayerWidget(
+        fileModel: _viewModel.currentlySelectedFile,
+        readMorePressed: _readMorePressed,
+        showReadMoreButton: showReadMore == null ? false : showReadMore);
+  }
+
+  void _readMorePressed() {
+    showTextModal(_viewModel.currentlySelectedFile);
+  }
+
+  void _closeTranscriptionView() {
+    _viewModel.playerOpen = true;
+    fileListOpacity = 1;
+    transcriptionOpacity = 0;
+    setState(() {});
   }
 }

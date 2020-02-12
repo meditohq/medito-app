@@ -13,37 +13,12 @@ class NavWidget extends StatefulWidget {
 
 class _NavWidgetState extends State<NavWidget>
     with SingleTickerProviderStateMixin {
-  var _color1 = Colors.lightGreen;
-  var _color2 = Colors.green;
-  BorderRadiusGeometry _borderRadiusSmall = BorderRadius.circular(13);
-  BorderRadiusGeometry _borderRadiusLarge = BorderRadius.circular(16);
+  var _colorDark = Color(0xff343b43);
+  var _colorLight = Color(0xffebe7e4);
+  var _borderRadiusSmall = BorderRadius.circular(13);
+  var _borderRadiusLarge = BorderRadius.circular(16);
   var _paddingSmall = 8.0;
   var _paddingLarge = 12.0;
-
-  var _item1CurrentColor;
-  var _item1Padding;
-  BorderRadiusGeometry _item1Radius;
-  var _item2CurrentColor;
-  var _item2Padding;
-  BorderRadiusGeometry _item2Radius;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _item1CurrentColor = _color1;
-    _item1Radius = _borderRadiusLarge;
-    _item1Padding = _paddingLarge;
-
-    _item2CurrentColor = _color1;
-    _item2Radius = _borderRadiusLarge;
-    _item2Padding = _paddingLarge;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,39 +41,31 @@ class _NavWidgetState extends State<NavWidget>
       startNumber = widget.list.length - 2;
     }
     for (int i = startNumber; i < widget.list.length; i++) {
-      setState(() {
-        if (i == startNumber) {
-          _item1CurrentColor = _color2;
-          _item1Radius = _borderRadiusSmall;
-          _item1Padding = _paddingSmall;
-        } else {
-          _item1CurrentColor = _color1;
-          _item1Radius = _borderRadiusLarge;
-          _item1Padding = _paddingLarge;
-        }
-      });
-
       var label = widget.list[i].title;
       if (widget.list.length > 1 && i == startNumber) {
         label = "< " + label;
       }
 
       columns.add(GestureDetector(
-        onTap: () {
-          if (i == startNumber) widget.backPressed(widget.list[i].parentId);
-        },
-        child: AnimatedContainer(
-          margin: EdgeInsets.only(top: i == startNumber ? 0 : 8),
-          padding:
-              EdgeInsets.all(i == startNumber ? _item1Padding : _item2Padding),
-          decoration: BoxDecoration(
-            color: i == startNumber ? _item1CurrentColor : _item2CurrentColor,
-            borderRadius: i == startNumber ? _item1Radius : _item2Radius,
-          ),
-          duration: Duration(seconds: 1),
-          child: Text(label, style: TextStyle(color: Colors.white)),
-        ),
-      ));
+          onTap: () {
+            if (i == startNumber && widget.list.length > 1)
+              widget.backPressed(widget.list[i].parentId);
+          },
+          child: AnimatedContainer(
+            margin: EdgeInsets.only(top: i == startNumber ? 0 : 8),
+            padding: EdgeInsets.all(
+                i == startNumber ? _paddingSmall : _paddingLarge),
+            decoration: BoxDecoration(
+              color: i == startNumber ? _colorDark : _colorLight,
+              borderRadius:
+                  i == startNumber ? _borderRadiusSmall : _borderRadiusLarge,
+            ),
+            duration: Duration(seconds: 1),
+            child: Text(label,
+                style: i == startNumber
+                    ? Theme.of(context).textTheme.display2
+                    : Theme.of(context).textTheme.display1),
+          )));
     }
 
     return columns;

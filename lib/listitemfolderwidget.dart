@@ -5,6 +5,7 @@ class ListItemFolderWidget extends StatelessWidget {
   ListItemFolderWidget({Key key, this.listItemModel}) : super(key: key);
 
   final ListItem listItemModel;
+  final _lightColor = Color(0xffebe7e4);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class ListItemFolderWidget extends StatelessWidget {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(right: 12.0, left: 4, top: 4),
-                  child: Icon(Icons.folder),
+                  child: Icon(Icons.folder, color: _lightColor),
                 ),
                 Flexible(
                     child: Container(

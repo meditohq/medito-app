@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:medito/audioplayer/audiosingleton.dart';
 import 'package:medito/viewmodel/list_item.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class PlayerWidget extends StatefulWidget {
-  PlayerWidget({Key key, this.fileModel}) : super(key: key);
+  PlayerWidget({Key key, this.fileModel, this.showReadMoreButton, this.readMorePressed})
+      : super(key: key);
   final ListItem fileModel;
+  final showReadMoreButton;
+  final VoidCallback readMorePressed;
 
   @override
   _PlayerWidgetState createState() {
@@ -20,6 +22,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   static Duration position;
   static Duration maxDuration;
   static double widthOfScreen = 1;
+  var _lightColor = Color(0xffebe7e4);
 
   @override
   void initState() {
@@ -63,13 +66,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget build(BuildContext context) {
     widthOfScreen = MediaQuery.of(context).size.width;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        Expanded(child: _buildMarquee()),
-        Expanded(child: buildControlRow()),
-        buildSeekBar()
-      ],
+    return Container(
+      color: Color(0xff343b43),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          _buildMarquee(),
+          widget.showReadMoreButton ? _buildReadMoreButton() : Container(),
+          buildControlRow(),
+          buildSeekBar()
+        ],
+      ),
     );
   }
 
@@ -78,12 +86,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       children: <Widget>[
         Container(
           height: 16,
-          color: Colors.blue,
+          color: Color(0xff595f65),
         ),
         Container(
           width: getSeekWidth(),
           height: 16,
-          color: Colors.lightGreen,
+          color: _lightColor,
         )
       ],
     );
@@ -101,40 +109,53 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return width <= 0 ? 0 : width;
   }
 
-  Row buildControlRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        FlatButton(
-          materialTapTargetSize: MaterialTapTargetSize.padded,
-          child: Icon(Icons.fast_rewind),
-          onPressed: _rewind,
-        ),
-        FlatButton(
-          child: _playing ? Icon(Icons.pause) : Icon(Icons.play_arrow),
-          onPressed: _playing ? _pause : _play,
-        ),
-        FlatButton(
-          child: Icon(Icons.fast_forward),
-          onPressed: _fastForward,
-        ),
-      ],
+  Widget buildControlRow() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          FlatButton(
+            materialTapTargetSize: MaterialTapTargetSize.padded,
+            child: Text('← 15s', style: Theme.of(context).textTheme.display2),
+            onPressed: _rewind,
+          ),
+          FlatButton(
+            child: getPlayOrPauseIcon(),
+            onPressed: _playing ? _pause : _play,
+          ),
+          FlatButton(
+            child: Text('15s →', style: Theme.of(context).textTheme.display2),
+            onPressed: _fastForward,
+          ),
+        ],
+      ),
     );
   }
 
+  Icon getPlayOrPauseIcon() {
+    return _playing
+            ? Icon(Icons.pause, color: _lightColor, size: 32)
+            : Icon(Icons.play_arrow, color: _lightColor, size: 32);
+  }
+
   Widget _buildMarquee() {
-    return Marquee(
-      blankSpace: 48,
-      startPadding: 16,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      accelerationCurve: Curves.easeInOut,
-      text: widget.fileModel != null ? widget.fileModel.title : " ",
+    return Container(
+      height: 48,
+      child: Marquee(
+        blankSpace: 48,
+        startPadding: 16,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        accelerationCurve: Curves.easeInOut,
+        text: widget.fileModel != null ? widget.fileModel.title : "  ",
+        style: Theme.of(context).textTheme.display3,
+      ),
     );
   }
 
   void _play() async {
     int result =
-        await MeditoAudioPlayer().audioPlayer.play(widget.fileModel.url);
+        await MeditoAudioPlayer().audioPlayer.play(widget.fileModel?.url);
     if (result == 1) {
       setState(() {
         _playing = true;
@@ -165,4 +186,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     int result = await MeditoAudioPlayer().audioPlayer.stop();
     MeditoAudioPlayer().audioPlayer.release();
   }
+
+  Widget _buildReadMoreButton() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.only(
+                top: 8.0, bottom: 8.0, left: 26.0, right: 26.0),
+            child: FlatButton(
+              child: Text('READ MORE'),
+              color: _lightColor,
+              onPressed: () => widget.readMorePressed(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 }
