@@ -9,8 +9,14 @@ class ListItem {
   String url;
   String parentId;
 
-  ListItem(this.title, this.id, this.description, {this.type, this.fileType, this.url, this.parentId, this.thumbnail, this.contentText});
+  ListItem(this.title, this.id, this.type,
+      {this.description,
+      this.fileType,
+      this.url,
+      this.parentId,
+      this.thumbnail,
+      this.contentText});
 }
 
-enum ListItemType {folder, file}
-enum FileType {audio, text, both}
+enum ListItemType { folder, file, illustration }
+enum FileType { audio, text, both }
