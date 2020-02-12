@@ -46,6 +46,7 @@ class Data {
   int timeCreated;
   String title;
   String url;
+  String illustrationUrl;
   bool hasFiles;
 
   Data(
@@ -56,7 +57,7 @@ class Data {
         this.template,
         this.timeCreated,
         this.title,
-        this.url, this.hasFiles});
+        this.url, this.illustrationUrl, this.hasFiles});
 
   Data.fromJson(Map<String, dynamic> json) {
     description = json['description'];
@@ -67,6 +68,7 @@ class Data {
     timeCreated = json['timeCreated'];
     title = json['title'];
     url = json['url'];
+    illustrationUrl = json['illustrationUrl'];
     hasFiles = json['hasFiles'];
   }
 
@@ -80,6 +82,7 @@ class Data {
     data['timeCreated'] = this.timeCreated;
     data['title'] = this.title;
     data['url'] = this.url;
+    data['illustrationUrl'] = this.illustrationUrl;
     data['hasFiles'] = this.hasFiles;
     return data;
   }
