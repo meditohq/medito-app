@@ -4,11 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:medito/audioplayer/player_widget.dart';
 import 'package:medito/colors.dart';
 import 'package:medito/viewmodel/list_item.dart';
-import 'package:medito/viewmodel/listviewmodel.dart';
+import 'package:medito/viewmodel/main_view_model.dart';
 
 import 'audioplayer/audio_singleton.dart';
-import 'list_item_file_widget.dart';
 import 'list_item_folder_widget.dart';
+import 'list_item_image_widget.dart';
 import 'nav_widget.dart';
 
 void main() => runApp(MyApp());

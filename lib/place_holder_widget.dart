@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:medito/main.dart';
-import 'package:medito/viewmodel/listviewmodel.dart';
+import 'package:medito/viewmodel/main_view_model.dart';
 
 class _PlaceHolderState extends State<MainWidget> {
   final _viewModel = new SubscriptionViewModelImpl();
