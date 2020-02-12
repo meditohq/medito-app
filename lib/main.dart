@@ -1,15 +1,15 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:medito/audioplayer/playerwidget.dart';
+import 'package:medito/audioplayer/player_widget.dart';
 import 'package:medito/colors.dart';
-import 'package:medito/listitemfilewidget.dart';
-import 'package:medito/listitemfolderwidget.dart';
 import 'package:medito/viewmodel/list_item.dart';
 import 'package:medito/viewmodel/listviewmodel.dart';
 
-import 'audioplayer/audiosingleton.dart';
-import 'navwidget.dart';
+import 'audioplayer/audio_singleton.dart';
+import 'list_item_file_widget.dart';
+import 'list_item_folder_widget.dart';
+import 'nav_widget.dart';
 
 void main() => runApp(MyApp());
 

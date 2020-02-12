@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:medito/audioplayer/audiosingleton.dart';
+import 'package:medito/audioplayer/audio_singleton.dart';
 import 'package:medito/viewmodel/list_item.dart';
 
 class ListItemFileWidget extends StatefulWidget {
