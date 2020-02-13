@@ -14,7 +14,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
   final String basicAuth =
       'Basic bWljaGFlbGNzcGVlZEBnbWFpbC5jb206QURNSU5ybzE1OTk1MQ==';
-  List<ListItem> navList = [ListItem("Home", "", "", parentId: "app")];
+  List<ListItem> navList = [ListItem("Home", "", null, parentId: "app")];
   int currentPage;
   bool playerOpen = false;
   ListItem currentlySelectedFile;
@@ -38,8 +38,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
       if (value.template == 'default') {
         //just a folder
-        listItemList.add(ListItem(value.title, value.id, value.description,
-            type: ListItemType.folder,
+        listItemList.add(ListItem(value.title, value.id, ListItemType.folder,
+            description: value.description,
             parentId: parentId,
             contentText: contentText));
       } else if (value.template == 'media') {
@@ -54,12 +54,16 @@ class SubscriptionViewModelImpl implements MainListViewModel {
             print('Error getting ' + value.title);
           }
         }
-        listItemList.add(ListItem(value.title, value.id, value.description,
+        listItemList.add(ListItem(value.title, value.id, ListItemType.file,
+            description: value.description,
             url: url,
-            type: ListItemType.file,
             fileType: fileType,
             parentId: parentId,
             contentText: contentText));
+      } else if (value.template == 'illustration') {
+        listItemList.add(ListItem(
+            value.title, value.id, ListItemType.illustration,
+            url: value.illustrationUrl));
       }
     }
 

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:medito/audioplayer/player_widget.dart';
 import 'package:medito/colors.dart';
+import 'package:medito/list_item_image_widget.dart';
 import 'package:medito/viewmodel/list_item.dart';
 import 'package:medito/viewmodel/main_view_model.dart';
 
 import 'audioplayer/audio_singleton.dart';
+import 'list_item_file_widget.dart';
 import 'list_item_folder_widget.dart';
-import 'list_item_image_widget.dart';
 import 'nav_widget.dart';
 
 void main() => runApp(MyApp());
@@ -90,6 +91,8 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   double fileListOpacity = 1;
   String transcriptionText = "";
 
+  var playerKey;
+
   @override
   void initState() {
     super.initState();
@@ -103,9 +106,13 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
         .onPlayerStateChanged
         .listen((AudioPlayerState s) {
       if (s == AudioPlayerState.COMPLETED) {
-        hidePlayer();
+        setState(() {
+          hidePlayer();
+        });
       }
-      _viewModel.currentState = s;
+      setState(() {
+        _viewModel.currentState = s;
+      });
     });
 
     return Scaffold(
@@ -113,28 +120,27 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       body: SafeArea(
         child: Stack(
           children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                AnimatedOpacity(
-                  opacity: fileListOpacity,
-                  duration: Duration(milliseconds: 250),
-                  child: NavWidget(
-                    list: _viewModel.navList,
-                    backPressed: _backPressed,
-                  ),
-                ),
-                Expanded(
-                    child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 250),
+            fileListOpacity > 0
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      AnimatedOpacity(
                         opacity: fileListOpacity,
-                        child: getListView())),
-                AnimatedOpacity(
-                    duration: Duration(milliseconds: 250),
-                    opacity: _viewModel.playerOpen ? 1 : 0,
-                    child: buildBottomSheet())
-              ],
-            ),
+                        duration: Duration(milliseconds: 250),
+                        child: NavWidget(
+                          list: _viewModel.navList,
+                          backPressed: _backPressed,
+                        ),
+                      ),
+                      Expanded(
+                          child: AnimatedOpacity(
+                              duration: Duration(milliseconds: 250),
+                              opacity: fileListOpacity,
+                              child: getListView())),
+                      buildBottomSheet()
+                    ],
+                  )
+                : Container(),
             getTranscriptionView()
           ],
         ),
@@ -203,7 +209,9 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
               snapshot.hasData == false ||
               snapshot.hasData == null) {
             return Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                backgroundColor: MeditoColors.lightColor,
+              ),
             );
           }
 
@@ -218,13 +226,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
               itemBuilder: (BuildContext context, int i) {
                 return Column(
                   children: <Widget>[
-                    InkWell(
-                        splashColor: Colors.orange,
-                        child: getChildForListView(snapshot.data[i]),
-                        onTap: () {
-                          listItemTap(snapshot.data[i]);
-                        }),
-                    Container(height: i == snapshot.data.length - 1 ? 200 : 0)
+                    getChildForListView(snapshot.data[i]),
                   ],
                 );
               });
@@ -269,9 +271,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   }
 
   void hidePlayer() {
-    setState(() {
-      _viewModel.currentlySelectedFile = null;
-    });
+    _viewModel.currentlySelectedFile = null;
   }
 
   Widget getFolderListItem(ListItem listItemModel) {
@@ -279,19 +279,31 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   }
 
   Widget getFileListItem(ListItem item) {
-    if (_viewModel.currentlySelectedFile == item) {
+    if (_viewModel.currentlySelectedFile?.id == item?.id) {
       return new ListItemFileWidget(
-          item: item, currentlyPlayingState: _viewModel.currentState);
+        item: item,
+        currentlyPlayingState: _viewModel.currentState,
+      );
     } else {
-      return new ListItemFileWidget(item: item);
+      return new ListItemFileWidget(
+        item: item,
+      );
     }
   }
 
   Widget getChildForListView(ListItem item) {
     if (item.type == ListItemType.folder) {
-      return getFolderListItem(item);
+      return InkWell(
+          onTap: () => listItemTap(item),
+          splashColor: MeditoColors.darkGreyColor,
+          child: getFolderListItem(item));
+    } else if (item.type == ListItemType.file) {
+      return InkWell(
+          onTap: () => listItemTap(item),
+          splashColor: MeditoColors.darkGreyColor,
+          child: getFileListItem(item));
     } else {
-      return getFileListItem(item);
+      return new ImageListItemWidget(src: item.url);
     }
   }
 
@@ -312,6 +324,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     var showReadMore =
         _viewModel.currentlySelectedFile?.contentText?.isNotEmpty;
     return PlayerWidget(
+        key: playerKey,
         fileModel: _viewModel.currentlySelectedFile,
         readMorePressed: _readMorePressed,
         showReadMoreButton: showReadMore == null ? false : showReadMore);

@@ -20,11 +20,12 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  bool _playing = false;
   static Duration position;
   static Duration maxDuration;
   static double widthOfScreen = 1;
   var _lightColor = Color(0xffebe7e4);
+
+  AudioPlayerState state;
 
   @override
   void initState() {
@@ -32,10 +33,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     MeditoAudioPlayer()
         .audioPlayer
         .onAudioPositionChanged
-        .listen((Duration p) => {setState(() => position = p)});
+        .listen((Duration p) => {
+              setState(() {
+                return position = p;
+              })
+            });
 
     MeditoAudioPlayer().audioPlayer.onDurationChanged.listen((Duration d) {
-      print('Max duration: $d');
       setState(() => maxDuration = d);
     });
 
@@ -43,19 +47,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         .audioPlayer
         .onPlayerStateChanged
         .listen((AudioPlayerState s) {
-      if (s == AudioPlayerState.PAUSED) {
-        setState(() {
-          _playing = false;
-        });
-      }
-
       if (s == AudioPlayerState.COMPLETED || s == AudioPlayerState.STOPPED) {
-        setState(() {
-          _playing = false;
-          maxDuration = Duration(seconds: 0);
-          position = Duration(seconds: 0);
-        });
+        maxDuration = Duration(seconds: 0);
+        position = Duration(seconds: 0);
       }
+      this.state = s;
+      setState(() {});
     });
   }
 
@@ -123,9 +120,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onPressed: _rewind,
           ),
           FlatButton(
-            child: getPlayOrPauseIcon(),
-            onPressed: _playing ? _pause : _play,
-          ),
+              child: getPlayOrPauseIcon(), onPressed: _resumeOrPlay),
           FlatButton(
             child: Text('15s →', style: Theme.of(context).textTheme.display2),
             onPressed: _fastForward,
@@ -136,7 +131,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Icon getPlayOrPauseIcon() {
-    return _playing
+    return state == AudioPlayerState.PLAYING
         ? Icon(Icons.pause, color: _lightColor, size: 32)
         : Icon(Icons.play_arrow, color: _lightColor, size: 32);
   }
@@ -155,19 +150,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
+  void _resumeOrPlay() async {
+    if (state == AudioPlayerState.STOPPED)
+      _play();
+    else if (state == AudioPlayerState.PAUSED)
+      _resume();
+    else if (state == AudioPlayerState.PLAYING) _pause();
+  }
+
+  void _resume() async {
+    await MeditoAudioPlayer().audioPlayer.resume();
+  }
+
   void _play() async {
-    int result =
-        await MeditoAudioPlayer().audioPlayer.play(widget.fileModel?.url);
-    if (result == 1) {
-      setState(() {
-        _playing = true;
-      });
-    }
+    await MeditoAudioPlayer().audioPlayer.play(widget.fileModel?.url);
   }
 
   void _pause() async {
-    int result = await MeditoAudioPlayer().audioPlayer.pause();
-    if (result == 1) {}
+    await MeditoAudioPlayer().audioPlayer.pause();
   }
 
   void _rewind() async {

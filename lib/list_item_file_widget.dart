@@ -22,41 +22,40 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       Flexible(
-        child: Container(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding:
-                      EdgeInsets.only(right: 12.0, left: 4, top: 4, bottom: 4),
-                  child: getPlayPauseButton(),
-                ),
-                Expanded(
-                    child: Container(
-                        child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Container(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Flexible(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                          Text(widget.item.title,
-                              style: Theme.of(context).textTheme.title),
-                          widget.item.description == null ||
-                                  widget.item.description.isEmpty
-                              ? Container()
-                              : Text(
-                                  widget.item.description,
-                                  style: Theme.of(context).textTheme.subhead,
-                                )
-                        ])),
-                  ],
-                ))),
-              ],
-            )),
-      )
+                    Padding(
+                      padding: EdgeInsets.only(
+                          right: 12.0, left: 4, top: 4, bottom: 4),
+                      child: getPlayPauseButton(),
+                    ),
+                    Expanded(
+                        child: Container(
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                          Flexible(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                Text(widget.item.title,
+                                    style: Theme.of(context).textTheme.title),
+                                widget.item.description == null ||
+                                        widget.item.description.isEmpty
+                                    ? Container()
+                                    : Text(
+                                        widget.item.description,
+                                        style:
+                                            Theme.of(context).textTheme.subhead,
+                                      )
+                              ]))
+                        ])))
+                  ])))
     ]);
   }
 
@@ -105,8 +104,9 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
     setState(() {
       if (widget.currentlyPlayingState == AudioPlayerState.PLAYING) {
         MeditoAudioPlayer().audioPlayer.pause();
-      } else if (widget.currentlyPlayingState == AudioPlayerState.PAUSED ||
-          widget.currentlyPlayingState == AudioPlayerState.STOPPED) {
+      } else if (widget.currentlyPlayingState == AudioPlayerState.PAUSED) {
+        MeditoAudioPlayer().audioPlayer.resume();
+      } else if (widget.currentlyPlayingState == AudioPlayerState.STOPPED) {
         MeditoAudioPlayer().audioPlayer.play(widget.item.url);
       }
     });
