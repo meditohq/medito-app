@@ -1,8 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:medito/audioplayer/audio_singleton.dart';
-import 'package:medito/viewmodel/list_item.dart';
+
+import 'audioplayer/audio_singleton.dart';
+import 'colors.dart';
+import 'viewmodel/list_item.dart';
 
 class ListItemFileWidget extends StatefulWidget {
   ListItemFileWidget({Key key, this.item, this.currentlyPlayingState})
@@ -23,6 +25,7 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
     return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       Flexible(
           child: Container(
+              color: getBackgroundColor(),
               padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
               child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -110,5 +113,12 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
         MeditoAudioPlayer().audioPlayer.play(widget.item.url);
       }
     });
+  }
+
+  Color getBackgroundColor() {
+    if (widget.currentlyPlayingState != null) {
+      return MeditoColors.darkGreyColor;
+    } else
+      return null;
   }
 }

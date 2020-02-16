@@ -1,16 +1,16 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:medito/audioplayer/player_widget.dart';
-import 'package:medito/colors.dart';
-import 'package:medito/list_item_image_widget.dart';
-import 'package:medito/viewmodel/list_item.dart';
-import 'package:medito/viewmodel/main_view_model.dart';
 
 import 'audioplayer/audio_singleton.dart';
+import 'audioplayer/player_widget.dart';
+import 'colors.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_folder_widget.dart';
+import 'list_item_image_widget.dart';
 import 'nav_widget.dart';
+import 'viewmodel/list_item.dart';
+import 'viewmodel/main_view_model.dart';
 
 void main() => runApp(MyApp());
 
@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+          accentColor: MeditoColors.lightColor,
           textTheme:
               GoogleFonts.dMSansTextTheme(Theme.of(context).textTheme.copyWith(
                     title: TextStyle(
@@ -209,15 +210,15 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
               snapshot.hasData == false ||
               snapshot.hasData == null) {
             return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: MeditoColors.lightColor,
-              ),
+              child: CircularProgressIndicator(),
             );
           }
 
           if (snapshot.connectionState == ConnectionState.none) {
-            return Center(
-                child: Text('An error has occured! Please try again later'));
+            return Text(
+              "No connection. Please try again later",
+              style: Theme.of(context).textTheme.display2,
+            );
           }
 
           return new ListView.builder(
@@ -246,6 +247,8 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       if (i.fileType == FileType.audio || i.fileType == FileType.both) {
         _viewModel.playerOpen = true;
         showPlayer(i);
+      } else if (i.fileType == FileType.text) {
+        showTextModal(i);
       }
     }
   }

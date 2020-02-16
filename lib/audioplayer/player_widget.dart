@@ -1,9 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
-import 'package:medito/audioplayer/audio_singleton.dart';
-import 'package:medito/colors.dart';
-import 'package:medito/viewmodel/list_item.dart';
+
+import '../colors.dart';
+import '../viewmodel/list_item.dart';
+import 'audio_singleton.dart';
 
 class PlayerWidget extends StatefulWidget {
   PlayerWidget(
@@ -119,8 +120,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             child: Text('← 15s', style: Theme.of(context).textTheme.display2),
             onPressed: _rewind,
           ),
-          FlatButton(
-              child: getPlayOrPauseIcon(), onPressed: _resumeOrPlay),
+          FlatButton(child: getPlayOrPauseIcon(), onPressed: _resumeOrPlay),
           FlatButton(
             child: Text('15s →', style: Theme.of(context).textTheme.display2),
             onPressed: _fastForward,
