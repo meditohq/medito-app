@@ -4,9 +4,10 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
-import 'package:medito/viewmodel/files.dart';
-import 'package:medito/viewmodel/list_item.dart';
-import 'package:medito/viewmodel/pages.dart';
+
+import 'files.dart';
+import 'list_item.dart';
+import 'pages.dart';
 
 abstract class MainListViewModel {}
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medito/viewmodel/list_item.dart';
+import 'viewmodel/list_item.dart';
 
 class NavWidget extends StatefulWidget {
   const NavWidget({Key key, this.list, this.backPressed}) : super(key: key);
