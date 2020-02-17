@@ -28,6 +28,12 @@ Possible fixes
 
 (If you can, link to the line of code that might be responsible for the problem)
 
+Device information:
+- iOS or Android (delete as appropiate)
+- Make and model:
+- OS version:
+- Other info: 
+
 /label ~bug ~reproduced ~needs-investigation
 /cc @project-manager
 /assign @qa-tester
