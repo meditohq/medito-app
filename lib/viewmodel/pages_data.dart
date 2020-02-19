@@ -1,3 +1,4 @@
+import '../utils.dart';
 
 class Data {
   String description;
@@ -11,15 +12,16 @@ class Data {
   String illustrationUrl;
   bool hasFiles;
 
-  Data(
-      {this.description,
-        this.contentText,
-        this.id,
-        this.num,
-        this.template,
-        this.timeCreated,
-        this.title,
-        this.url, this.illustrationUrl, this.hasFiles});
+  Data({this.description,
+    this.contentText,
+    this.id,
+    this.num,
+    this.template,
+    this.timeCreated,
+    this.title,
+    this.url,
+    this.illustrationUrl,
+    this.hasFiles});
 
   Data.fromJson(Map<String, dynamic> json) {
     description = json['description'];
@@ -34,18 +36,17 @@ class Data {
     hasFiles = json['hasFiles'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['\"description\"'] = "\"this.description.toString()\"";
-    data['\"contentText\"'] = "\"this.contentText.toString()\"";
-    data['\"id\"'] = "\"this.id.toString()\"";
-    data['\"num\"'] = this.num;
-    data['\"template\"'] = "\"this.template.toString()\"";
-    data['\"timeCreated\"'] = this.timeCreated;
-    data['\"title\"'] = "\"this.title.toString()\"";
-    data['\"url\"'] = "\"this.url.toString()\"";
-    data['\"illustrationUrl\"'] = "\"this.illustrationUrl.toString()\"";
-    data['\"hasFiles\"'] = this.hasFiles;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+  '\"description\"': "\"" + blankIfNull(this.description) + "\"",
+  '\"contentText\"': "\"" + blankIfNull(this.contentText) + "\"",
+  '\"id\"': "\"" + blankIfNull(this.id) + "\"",
+  '\"num\"': this.num,
+  '\"template\"': "\"" + blankIfNull(this.template) + "\"",
+  '\"timeCreated\"': this.timeCreated,
+  '\"title\"': "\"" + blankIfNull(this.title) + "\"",
+  '\"url\"': "\"" + blankIfNull(this.url) + "\"",
+  '\"illustrationUrl\"': "\"" + blankIfNull(this.illustrationUrl) + "\"",
+  '\"hasFiles\"': this.hasFiles
+  };
+
 }

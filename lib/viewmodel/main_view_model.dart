@@ -33,15 +33,29 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return File('$path/$name.txt');
   }
 
-  Future<File> writePagesToCache(String json, String id) async {
+  Future<File> writePagesToCache(Pages pages, String id) async {
+    id = id.replaceAll('/', '+');
     final file = await _localFile(id);
 
-    return file.writeAsString('$json');
+    // Write the file.
+    var pagesString = pages.toJson();
+    return file.writeAsString('$pagesString');
   }
 
   Future<Pages> readPagesFromCache(String id) async {
+    id = id.replaceAll('/', '+');
     try {
       final file = await _localFile(id);
+
+      var lastModified;
+      try {
+        lastModified = await file.lastModified();
+      } on FileSystemException catch (e) {
+        return null;
+      }
+
+      if (lastModified.add(Duration(days: 1)).isBefore(DateTime.now()))
+        return null;
 
       // Read the file.
       String contents = await file.readAsString();
@@ -65,11 +79,10 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       headers: {HttpHeaders.authorizationHeader: basicAuth},
     );
     final responseJson = json.decode(response.body);
-    writePagesToCache(responseJson, id);
-
     var pages = Pages.fromJson(responseJson);
     var pageList = pages.data;
 
+    writePagesToCache(pages, id);
 
     return await getPageListFromData(pageList);
   }
