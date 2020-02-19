@@ -106,11 +106,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
         .audioPlayer
         .onPlayerStateChanged
         .listen((AudioPlayerState s) {
-      if (s == AudioPlayerState.COMPLETED) {
-        setState(() {
-          hidePlayer();
-        });
-      }
       setState(() {
         _viewModel.currentState = s;
       });
@@ -274,10 +269,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       MeditoAudioPlayer().audioPlayer.stop();
       _viewModel.currentlySelectedFile = fileTapped;
     });
-  }
-
-  void hidePlayer() {
-    _viewModel.currentlySelectedFile = null;
   }
 
   Widget getFolderListItem(ListItem listItemModel) {

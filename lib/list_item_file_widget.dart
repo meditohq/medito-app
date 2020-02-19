@@ -72,10 +72,12 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
   }
 
   Widget getPlayPauseIcon() {
-    if (widget.currentlyPlayingState == AudioPlayerState.PLAYING) {
+    var state = widget.currentlyPlayingState;
+    if (state == AudioPlayerState.PLAYING) {
       return Icon(Icons.pause, color: widget._lightColor);
-    } else if (widget.currentlyPlayingState == AudioPlayerState.PAUSED ||
-        widget.currentlyPlayingState == AudioPlayerState.STOPPED) {
+    } else if (state == AudioPlayerState.PAUSED ||
+        state == AudioPlayerState.STOPPED ||
+        state == AudioPlayerState.COMPLETED) {
       return Icon(Icons.play_arrow, color: widget._lightColor);
     }
     return Container();
@@ -105,11 +107,13 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
 
   void _playOrPause() {
     setState(() {
-      if (widget.currentlyPlayingState == AudioPlayerState.PLAYING) {
+      var state = widget.currentlyPlayingState;
+      if (state == AudioPlayerState.PLAYING) {
         MeditoAudioPlayer().audioPlayer.pause();
-      } else if (widget.currentlyPlayingState == AudioPlayerState.PAUSED) {
+      } else if (state == AudioPlayerState.PAUSED) {
         MeditoAudioPlayer().audioPlayer.resume();
-      } else if (widget.currentlyPlayingState == AudioPlayerState.STOPPED) {
+      } else if (state == AudioPlayerState.STOPPED ||
+          state == AudioPlayerState.COMPLETED) {
         MeditoAudioPlayer().audioPlayer.play(widget.item.url);
       }
     });
