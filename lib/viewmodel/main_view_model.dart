@@ -17,7 +17,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
   final String basicAuth =
       'Basic bWljaGFlbGNzcGVlZEBnbWFpbC5jb206QURNSU5ybzE1OTk1MQ==';
-  List<ListItem> navList = [ListItem("Home", "", null, parentId: "app")];
+  List<ListItem> navList = [ListItem("Home", "app", null, parentId: "app")];
   int currentPage;
   bool playerOpen = false;
   ListItem currentlySelectedFile;
@@ -50,7 +50,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       var lastModified;
       try {
         lastModified = await file.lastModified();
-      } on FileSystemException catch (e) {
+      } on FileSystemException {
         return null;
       }
 
@@ -71,7 +71,6 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
     Pages cachedPages = await readPagesFromCache(id);
     if (cachedPages != null) return await getPageListFromData(cachedPages.data);
-
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     final response = await http.get(

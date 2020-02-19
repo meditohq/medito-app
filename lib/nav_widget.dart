@@ -49,7 +49,7 @@ class _NavWidgetState extends State<NavWidget>
       columns.add(GestureDetector(
           onTap: () {
             if (i == startNumber && widget.list.length > 1)
-              widget.backPressed(widget.list[i].parentId);
+              widget.backPressed(widget.list[i].id);
           },
           child: AnimatedContainer(
             margin: EdgeInsets.only(top: i == startNumber ? 0 : 8),
