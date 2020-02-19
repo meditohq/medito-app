@@ -102,7 +102,6 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     MeditoAudioPlayer()
         .audioPlayer
         .onPlayerStateChanged
@@ -117,34 +116,37 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       });
     });
 
-    return Scaffold(
-      backgroundColor: Color(0xff22282D),
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            fileListOpacity > 0
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      AnimatedOpacity(
-                        opacity: fileListOpacity,
-                        duration: Duration(milliseconds: 250),
-                        child: NavWidget(
-                          list: _viewModel.navList,
-                          backPressed: _backPressed,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: Color(0xff22282D),
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              fileListOpacity > 0
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        AnimatedOpacity(
+                          opacity: fileListOpacity,
+                          duration: Duration(milliseconds: 250),
+                          child: NavWidget(
+                            list: _viewModel.navList,
+                            backPressed: _backPressed,
+                          ),
                         ),
-                      ),
-                      Expanded(
-                          child: AnimatedOpacity(
-                              duration: Duration(milliseconds: 250),
-                              opacity: fileListOpacity,
-                              child: getListView())),
-                      buildBottomSheet()
-                    ],
-                  )
-                : Container(),
-            getTranscriptionView()
-          ],
+                        Expanded(
+                            child: AnimatedOpacity(
+                                duration: Duration(milliseconds: 250),
+                                opacity: fileListOpacity,
+                                child: getListView())),
+                        buildBottomSheet()
+                      ],
+                    )
+                  : Container(),
+              getTranscriptionView()
+            ],
+          ),
         ),
       ),
     );
@@ -343,5 +345,14 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     fileListOpacity = 1;
     transcriptionOpacity = 0;
     setState(() {});
+  }
+
+  Future<bool> _onWillPop() {
+    if (_viewModel.navList.length > 1) {
+      _backPressed(_viewModel.navList.last.parentId);
+    } else {
+      return new Future(() => true);
+    }
+    return new Future(() => false);
   }
 }
