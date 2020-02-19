@@ -102,6 +102,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
     MeditoAudioPlayer()
         .audioPlayer
         .onPlayerStateChanged

@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Medito/viewmodel/pages.dart';
+import 'package:Medito/viewmodel/pages_data.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import 'files.dart';
 import 'list_item.dart';
-import 'pages.dart';
 
 abstract class MainListViewModel {}
 
@@ -21,9 +23,41 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   ListItem currentlySelectedFile;
   AudioPlayerState currentState;
 
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> _localFile(String name) async {
+    final path = await _localPath;
+    return File('$path/$name.txt');
+  }
+
+  Future<File> writePagesToCache(String json, String id) async {
+    final file = await _localFile(id);
+
+    return file.writeAsString('$json');
+  }
+
+  Future<Pages> readPagesFromCache(String id) async {
+    try {
+      final file = await _localFile(id);
+
+      // Read the file.
+      String contents = await file.readAsString();
+      var decoded = json.decode(contents);
+      return Pages.fromJson(decoded);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<List<ListItem>> getPage({String id = 'app'}) async {
     if (id == null) id = 'app';
-    List<ListItem> listItemList = [];
+
+    Pages cachedPages = await readPagesFromCache(id);
+    if (cachedPages != null) return await getPageListFromData(cachedPages.data);
+
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     final response = await http.get(
@@ -31,8 +65,17 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       headers: {HttpHeaders.authorizationHeader: basicAuth},
     );
     final responseJson = json.decode(response.body);
-    var pageList = Pages.fromJson(responseJson).data;
+    writePagesToCache(responseJson, id);
 
+    var pages = Pages.fromJson(responseJson);
+    var pageList = pages.data;
+
+
+    return await getPageListFromData(pageList);
+  }
+
+  Future getPageListFromData(List<Data> pageList) async {
+    List<ListItem> listItemList = [];
     for (var value in pageList) {
       var parentId = value.id.substring(0, value.id.lastIndexOf('/'));
       var contentText = value.contentText == null ? "" : value.contentText;
@@ -91,6 +134,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       url,
       headers: {HttpHeaders.authorizationHeader: basicAuth},
     );
+
     final responseJson = json.decode(response.body);
     var filesList = Files.fromJson(responseJson).data;
     return filesList?.first?.url;

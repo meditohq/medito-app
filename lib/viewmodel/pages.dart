@@ -1,3 +1,7 @@
+import 'package:Medito/viewmodel/pages_data.dart';
+
+import '../utils.dart';
+
 class Pages {
   int code;
   List<Data> data;
@@ -22,70 +26,13 @@ class Pages {
     type = json['type'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    if (this.data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
-    }
-    if (this.pagination != null) {
-      data['pagination'] = this.pagination.toJson();
-    }
-    data['status'] = this.status;
-    data['type'] = this.type;
-    return data;
-  }
-}
-
-class Data {
-  String description;
-  String contentText;
-  String id;
-  int num;
-  String template;
-  int timeCreated;
-  String title;
-  String url;
-  String illustrationUrl;
-  bool hasFiles;
-
-  Data(
-      {this.description,
-        this.contentText,
-        this.id,
-        this.num,
-        this.template,
-        this.timeCreated,
-        this.title,
-        this.url, this.illustrationUrl, this.hasFiles});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    description = json['description'];
-    contentText = json['contentText'];
-    id = json['id'];
-    num = json['num'];
-    template = json['template'];
-    timeCreated = json['timeCreated'];
-    title = json['title'];
-    url = json['url'];
-    illustrationUrl = json['illustrationUrl'];
-    hasFiles = json['hasFiles'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['description'] = this.description;
-    data['contentText'] = this.contentText;
-    data['id'] = this.id;
-    data['num'] = this.num;
-    data['template'] = this.template;
-    data['timeCreated'] = this.timeCreated;
-    data['title'] = this.title;
-    data['url'] = this.url;
-    data['illustrationUrl'] = this.illustrationUrl;
-    data['hasFiles'] = this.hasFiles;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        '\"code\"': this.code,
+        '\"data\"': this.data?.map((v) => v.toJson())?.toList(),
+        '\"pagination\"': this.pagination?.toJson(),
+        '\"status\"': "\"" + blankIfNull(this.status) + "\"",
+        '\"type\"': "\"" + blankIfNull(this.type) + "\"",
+      };
 }
 
 class Pagination {
@@ -105,10 +52,10 @@ class Pagination {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page'] = this.page;
-    data['total'] = this.total;
-    data['offset'] = this.offset;
-    data['limit'] = this.limit;
+    data['\"page\"'] = this.page;
+    data['\"total\"'] = this.total;
+    data['\"offset\"'] = this.offset;
+    data['\"limit\"'] = this.limit;
     return data;
   }
 }
