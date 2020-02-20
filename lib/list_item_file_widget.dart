@@ -121,7 +121,7 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
 
   Color getBackgroundColor() {
     if (widget.currentlyPlayingState != null) {
-      return MeditoColors.darkGreyColor;
+      return MeditoColors.darkColor;
     } else
       return null;
   }

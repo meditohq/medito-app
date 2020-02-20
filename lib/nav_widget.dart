@@ -1,3 +1,4 @@
+import 'package:Medito/colors.dart';
 import 'package:flutter/material.dart';
 import 'viewmodel/list_item.dart';
 
@@ -13,8 +14,8 @@ class NavWidget extends StatefulWidget {
 
 class _NavWidgetState extends State<NavWidget>
     with SingleTickerProviderStateMixin {
-  var _colorDark = Color(0xff343b43);
-  var _colorLight = Color(0xffebe7e4);
+  var _colorDark =MeditoColors.darkColor;
+  var _colorLight = MeditoColors.lightColor;
   var _borderRadiusSmall = BorderRadius.circular(13);
   var _borderRadiusLarge = BorderRadius.circular(16);
   var _paddingSmall = 8.0;
@@ -60,7 +61,7 @@ class _NavWidgetState extends State<NavWidget>
               borderRadius:
                   i == startNumber ? _borderRadiusSmall : _borderRadiusLarge,
             ),
-            duration: Duration(seconds: 1),
+            duration: Duration(days: 1),
             child: Text(label,
                 style: i == startNumber
                     ? Theme.of(context).textTheme.display2

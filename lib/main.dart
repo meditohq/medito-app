@@ -90,8 +90,9 @@ class _MainWidgetState extends State<MainWidget>
   double screenHeight;
   double screenWidth;
   double transcriptionOpacity = 0;
-  double fileListOpacity = 1;
   String transcriptionText = "";
+  double fileListOpacity = 1;
+  double textFileOpacity = 0;
 
   var playerKey;
 
@@ -139,7 +140,7 @@ class _MainWidgetState extends State<MainWidget>
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: Color(0xff22282D),
+        backgroundColor: MeditoColors.darkBGColor,
         body: SafeArea(
           child: Stack(
             children: <Widget>[
@@ -156,10 +157,21 @@ class _MainWidgetState extends State<MainWidget>
                           ),
                         ),
                         Expanded(
-                            child: AnimatedOpacity(
+                            child: Stack(
+                          children: <Widget>[
+                            AnimatedOpacity(
                                 duration: Duration(milliseconds: 250),
                                 opacity: fileListOpacity,
-                                child: getListView())),
+                                child: getListView()),
+                            IgnorePointer(
+                              ignoring: textFileOpacity < 1,
+                              child: AnimatedOpacity(
+                                  duration: Duration(milliseconds: 0),
+                                  opacity: textFileOpacity,
+                                  child: getInnerTextView()),
+                            ),
+                          ],
+                        )),
                         _viewModel.currentlySelectedFile != null
                             ? buildBottomSheet()
                             : Container()
@@ -193,7 +205,7 @@ class _MainWidgetState extends State<MainWidget>
                         ],
                       ),
                       decoration: BoxDecoration(
-                        color: MeditoColors.lightGreyColor,
+                        color: MeditoColors.darkColor,
                         borderRadius: BorderRadius.all(Radius.circular(16.0)),
                       ),
                     ),
@@ -273,7 +285,10 @@ class _MainWidgetState extends State<MainWidget>
         _viewModel.playerOpen = true;
         showPlayer(i);
       } else if (i.fileType == FileType.text) {
-        showTextModal(i);
+        setState(() {
+          _viewModel.addToNavList(i);
+          textFileOpacity = 1;
+        });
       }
     }
   }
@@ -319,12 +334,12 @@ class _MainWidgetState extends State<MainWidget>
     if (item.type == ListItemType.folder) {
       return InkWell(
           onTap: () => listItemTap(item),
-          splashColor: MeditoColors.darkGreyColor,
+          splashColor: MeditoColors.darkColor,
           child: getFolderListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
           onTap: () => listItemTap(item),
-          splashColor: MeditoColors.darkGreyColor,
+          splashColor: MeditoColors.darkColor,
           child: getFileListItem(item));
     } else {
       return new ImageListItemWidget(src: item.url);
@@ -337,6 +352,8 @@ class _MainWidgetState extends State<MainWidget>
         transcriptionText = "";
         transcriptionOpacity = 0;
         fileListOpacity = 1;
+      } else if (textFileOpacity == 1) {
+        textFileOpacity = 0;
       } else {
         listFuture = _viewModel.getPage(id: id);
       }
@@ -372,5 +389,37 @@ class _MainWidgetState extends State<MainWidget>
       return new Future(() => true);
     }
     return new Future(() => false);
+  }
+
+  Widget getInnerTextView() {
+    var content = _viewModel?.navList?.last?.contentText;
+
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            color: MeditoColors.darkBGColor,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        content == null ? '' : content,
+                        style: Theme.of(context).textTheme.subhead,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
