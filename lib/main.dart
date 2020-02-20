@@ -103,7 +103,7 @@ class _MainWidgetState extends State<MainWidget>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch(state) {
+    switch (state) {
       case AppLifecycleState.resumed:
         break;
       case AppLifecycleState.inactive:
@@ -160,7 +160,9 @@ class _MainWidgetState extends State<MainWidget>
                                 duration: Duration(milliseconds: 250),
                                 opacity: fileListOpacity,
                                 child: getListView())),
-                        buildBottomSheet()
+                        _viewModel.currentlySelectedFile != null
+                            ? buildBottomSheet()
+                            : Container()
                       ],
                     )
                   : Container(),
