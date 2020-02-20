@@ -79,7 +79,8 @@ class MainWidget extends StatefulWidget {
 }
 
 /////
-class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
+class _MainWidgetState extends State<MainWidget>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
   final controller = TextEditingController();
@@ -95,9 +96,33 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   var playerKey;
 
   @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch(state) {
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.inactive:
+        MeditoAudioPlayer().audioPlayer.pause();
+        break;
+      case AppLifecycleState.paused:
+        MeditoAudioPlayer().audioPlayer.pause();
+        break;
+      case AppLifecycleState.detached:
+        MeditoAudioPlayer().audioPlayer.pause();
+        break;
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     listFuture = _viewModel.getPage();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
