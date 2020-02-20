@@ -1,6 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:marquee/marquee.dart';
 
 import '../colors.dart';
 import '../viewmodel/list_item.dart';
@@ -72,6 +71,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
+          Container(height: 1, color: MeditoColors.lightColorTrans),
           _buildMarquee(),
           widget.showReadMoreButton ? _buildReadMoreButton() : Container(),
           buildControlRow(),
@@ -137,15 +137,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget _buildMarquee() {
-    return Container(
-      height: 48,
-      child: Marquee(
-        blankSpace: 48,
-        startPadding: 16,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        accelerationCurve: Curves.easeInOut,
-        text: widget.fileModel != null ? widget.fileModel.title : "  ",
-        style: Theme.of(context).textTheme.display3,
+    return Padding(
+      padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 16, bottom: 16),
+      child: Center(
+        child: Text(
+          widget.fileModel != null ? widget.fileModel.title : "  ",
+          softWrap: false,
+          overflow: TextOverflow.fade,
+          style: Theme.of(context).textTheme.display3,
+        ),
       ),
     );
   }
@@ -196,7 +196,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           flex: 1,
           child: Padding(
             padding: const EdgeInsets.only(
-                top: 8.0, bottom: 8.0, left: 26.0, right: 26.0),
+                top: 8.0, bottom: 8.0, left: 24.0, right: 24.0),
             child: OutlineButton(
               child: Text(
                 "READ MORE",
