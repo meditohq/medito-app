@@ -8,6 +8,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
+import 'auth.dart';
 import 'files.dart';
 import 'list_item.dart';
 
@@ -15,8 +16,6 @@ abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
-  final String basicAuth =
-      'Basic bWljaGFlbGNzcGVlZEBnbWFpbC5jb206QURNSU5ybzE1OTk1MQ==';
   List<ListItem> navList = [ListItem("Home", "app", null, parentId: "app")];
   int currentPage;
   bool playerOpen = false;
