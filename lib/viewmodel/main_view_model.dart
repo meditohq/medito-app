@@ -105,8 +105,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
         if (fileType == FileType.both || fileType == FileType.audio) {
           try {
             url = await getFileUrl(id: value.id);
-          } catch (e, s) {
-            print(s);
+          } catch (e) {
             print('Error getting ' + value.title);
           }
         }

@@ -151,7 +151,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _resumeOrPlay() async {
-    if (state == AudioPlayerState.STOPPED || state == AudioPlayerState.COMPLETED)
+    if (state == null || state == AudioPlayerState.STOPPED || state == AudioPlayerState.COMPLETED)
       _play();
     else if (state == AudioPlayerState.PAUSED)
       _resume();
