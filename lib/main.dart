@@ -26,17 +26,18 @@ class MyApp extends StatelessWidget {
           textTheme:
               GoogleFonts.dMSansTextTheme(Theme.of(context).textTheme.copyWith(
                     title: TextStyle(
-                        fontSize: 24.0,
+                        fontSize: 22.0,
                         color: MeditoColors.lightColor,
                         fontWeight: FontWeight.w600),
                     subhead: TextStyle(
                         fontSize: 16.0,
-                        color: Color(0xffa7aab1),
+                        height: 1.3,
+                        color: MeditoColors.lightTextColor,
                         fontWeight: FontWeight.normal),
                     display1: TextStyle(
                         //pill big
                         fontSize: 18.0,
-                        color: Color(0xff22282d),
+                        color: MeditoColors.darkBGColor,
                         fontWeight: FontWeight.normal),
                     display2: TextStyle(
                         //pill small

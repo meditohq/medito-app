@@ -23,7 +23,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   static Duration position;
   static Duration maxDuration;
   static double widthOfScreen = 1;
-  var _lightColor = Color(0xffebe7e4);
 
   AudioPlayerState state;
 
@@ -66,12 +65,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     widthOfScreen = MediaQuery.of(context).size.width;
 
     return Container(
-      color: Color(0xff343b43),
+      color: MeditoColors.darkColor,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Container(height: 1, color: MeditoColors.lightColorTrans),
+          Container(height: 1, color: MeditoColors.lightColorLine),
           _buildMarquee(),
           widget.showReadMoreButton ? _buildReadMoreButton() : Container(),
           buildControlRow(),
@@ -86,12 +85,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       children: <Widget>[
         Container(
           height: 16,
-          color: Color(0xff595f65),
+          color: MeditoColors.lightColorLine,
         ),
         Container(
           width: getSeekWidth(),
           height: 16,
-          color: _lightColor,
+          color: MeditoColors.lightColor,
         )
       ],
     );
@@ -132,13 +131,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Icon getPlayOrPauseIcon() {
     return state == AudioPlayerState.PLAYING
-        ? Icon(Icons.pause, color: _lightColor, size: 32)
-        : Icon(Icons.play_arrow, color: _lightColor, size: 32);
+        ? Icon(Icons.pause, color: MeditoColors.lightColor, size: 32)
+        : Icon(Icons.play_arrow, color: MeditoColors.lightColor, size: 32);
   }
 
   Widget _buildMarquee() {
     return Padding(
-      padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 16, bottom: 16),
+      padding:
+          const EdgeInsets.only(left: 24.0, right: 24.0, top: 16, bottom: 16),
       child: Center(
         child: Text(
           widget.fileModel != null ? widget.fileModel.title : "  ",
@@ -151,7 +151,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _resumeOrPlay() async {
-    if (state == null || state == AudioPlayerState.STOPPED || state == AudioPlayerState.COMPLETED)
+    if (state == null ||
+        state == AudioPlayerState.STOPPED ||
+        state == AudioPlayerState.COMPLETED)
       _play();
     else if (state == AudioPlayerState.PAUSED)
       _resume();
@@ -195,7 +197,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         Expanded(
           flex: 1,
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 8.0, left: 24.0, right: 24.0),
             child: OutlineButton(
               child: Text(
                 "READ MORE",

@@ -10,8 +10,6 @@ class ListItemFileWidget extends StatefulWidget {
   ListItemFileWidget({Key key, this.item, this.currentlyPlayingState})
       : super(key: key);
 
-  final _lightColor = Color(0xffebe7e4);
-
   final ListItem item;
   final AudioPlayerState currentlyPlayingState;
 
