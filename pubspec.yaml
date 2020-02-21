@@ -23,6 +23,7 @@ dependencies:
   audioplayers: ^0.14.0
   flutter_svg: ^0.17.1
   path_provider: ^1.6.0
+  flutter_matomo: ^1.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
