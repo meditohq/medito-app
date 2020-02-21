@@ -88,7 +88,7 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
     switch (widget.item.fileType) {
       case FileType.audio:
         return Icon(
-          Icons.audiotrack,
+          Icons.headset,
           color: widget._lightColor,
         );
         break;
