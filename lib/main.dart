@@ -89,8 +89,8 @@ class _MainWidgetState extends State<MainWidget>
 
   double screenHeight;
   double screenWidth;
-  double transcriptionOpacity = 0;
-  String transcriptionText = "";
+  double readMoreOpacity = 0;
+  String readMoreText = "";
   double fileListOpacity = 1;
   double textFileOpacity = 0;
 
@@ -191,7 +191,7 @@ class _MainWidgetState extends State<MainWidget>
       duration: Duration(milliseconds: 250),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: transcriptionOpacity > 0
+        child: readMoreOpacity > 0
             ? Column(
                 children: <Widget>[
                   Expanded(
@@ -216,7 +216,7 @@ class _MainWidgetState extends State<MainWidget>
                         child: FlatButton(
                           child: Text("CLOSE"),
                           color: MeditoColors.lightColor,
-                          onPressed: _closeTranscriptionView,
+                          onPressed: _closeReadMoreView,
                         ),
                       ),
                     ],
@@ -225,7 +225,7 @@ class _MainWidgetState extends State<MainWidget>
               )
             : Container(),
       ),
-      opacity: transcriptionOpacity,
+      opacity: readMoreOpacity,
     );
   }
 
@@ -234,7 +234,7 @@ class _MainWidgetState extends State<MainWidget>
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
         child:
-            Text(transcriptionText, style: Theme.of(context).textTheme.subhead),
+            Text(readMoreText, style: Theme.of(context).textTheme.subhead),
       ),
     );
   }
@@ -295,10 +295,11 @@ class _MainWidgetState extends State<MainWidget>
 
   void showTextModal(ListItem i) {
     setState(() {
-      transcriptionText = i.contentText;
-      transcriptionOpacity = 1;
+      readMoreText = i.contentText;
+      readMoreOpacity = 1;
       fileListOpacity = 0;
       _viewModel.playerOpen = false;
+      _viewModel.readMoreTextShowing = true;
     });
   }
 
@@ -348,9 +349,9 @@ class _MainWidgetState extends State<MainWidget>
 
   void _backPressed(String id) {
     setState(() {
-      if (transcriptionOpacity == 1) {
-        transcriptionText = "";
-        transcriptionOpacity = 0;
+      if (readMoreOpacity == 1) {
+        readMoreText = "";
+        readMoreOpacity = 0;
         fileListOpacity = 1;
       } else if (textFileOpacity == 1) {
         textFileOpacity = 0;
@@ -375,14 +376,18 @@ class _MainWidgetState extends State<MainWidget>
     showTextModal(_viewModel.currentlySelectedFile);
   }
 
-  void _closeTranscriptionView() {
+  void _closeReadMoreView() {
     _viewModel.playerOpen = true;
     fileListOpacity = 1;
-    transcriptionOpacity = 0;
+    readMoreOpacity = 0;
     setState(() {});
   }
 
   Future<bool> _onWillPop() {
+    if(_viewModel.readMoreTextShowing){
+      _viewModel.readMoreTextShowing = false;
+      _closeReadMoreView();
+    } else
     if (_viewModel.navList.length > 1) {
       _backPressed(_viewModel.navList.last.parentId);
     } else {
