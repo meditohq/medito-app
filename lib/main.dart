@@ -9,17 +9,23 @@ import 'list_item_file_widget.dart';
 import 'list_item_folder_widget.dart';
 import 'list_item_image_widget.dart';
 import 'nav_widget.dart';
+import 'tracking/tracking.dart';
 import 'viewmodel/list_item.dart';
 import 'viewmodel/main_view_model.dart';
 
-void main() => runApp(MyApp());
+Future<void> main() async {
+  runApp(HomeScreenWidget());
+  Tracking.initialiseTracker();
+}
 
 /// This Widget is the main application widget.
-class MyApp extends StatelessWidget {
+class HomeScreenWidget extends StatelessWidget {
   static const String _title = 'Medito';
 
   @override
   Widget build(BuildContext context) {
+    Tracking.trackScreen(Tracking.HOME, Tracking.SCREEN_LOADED);
+
     return MaterialApp(
       theme: ThemeData(
           accentColor: MeditoColors.lightColor,
@@ -234,8 +240,7 @@ class _MainWidgetState extends State<MainWidget>
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
-        child:
-            Text(readMoreText, style: Theme.of(context).textTheme.subhead),
+        child: Text(readMoreText, style: Theme.of(context).textTheme.subhead),
       ),
     );
   }
@@ -272,25 +277,33 @@ class _MainWidgetState extends State<MainWidget>
         });
   }
 
-  void listItemTap(ListItem i) {
+  void folderTap(ListItem i) {
+    Tracking.trackScreen(
+        Tracking.FOLDER_TAPPED, Tracking.FOLDER_OPENED + " " + i.id);
     //if you tapped on a folder
-    if (i.type == ListItemType.folder) {
+    setState(() {
+      _viewModel.addToNavList(i);
+      listFuture = _viewModel.getPage(id: i.id);
+    });
+  }
+
+  void fileTap(ListItem i) {
+    if (i.fileType == FileType.audio) {
+      Tracking.trackScreen(
+          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
+      _viewModel.playerOpen = true;
+      showPlayer(i);
+    } else if (i.fileType == FileType.both) {
+      Tracking.trackScreen(
+          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
+      _viewModel.playerOpen = true;
+    } else if (i.fileType == FileType.text) {
+      Tracking.trackScreen(
+          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED + " " + i.id);
       setState(() {
         _viewModel.addToNavList(i);
-        listFuture = _viewModel.getPage(id: i.id);
+        textFileOpacity = 1;
       });
-    }
-    //if you tapped on a file
-    else {
-      if (i.fileType == FileType.audio || i.fileType == FileType.both) {
-        _viewModel.playerOpen = true;
-        showPlayer(i);
-      } else if (i.fileType == FileType.text) {
-        setState(() {
-          _viewModel.addToNavList(i);
-          textFileOpacity = 1;
-        });
-      }
     }
   }
 
@@ -335,12 +348,12 @@ class _MainWidgetState extends State<MainWidget>
   Widget getChildForListView(ListItem item) {
     if (item.type == ListItemType.folder) {
       return InkWell(
-          onTap: () => listItemTap(item),
+          onTap: () => folderTap(item),
           splashColor: MeditoColors.darkColor,
           child: getFolderListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
-          onTap: () => listItemTap(item),
+          onTap: () => fileTap(item),
           splashColor: MeditoColors.darkColor,
           child: getFileListItem(item));
     } else {
@@ -374,6 +387,9 @@ class _MainWidgetState extends State<MainWidget>
   }
 
   void _readMorePressed() {
+    Tracking.trackScreen(Tracking.READ_MORE_TAPPED,
+        _viewModel.currentlySelectedFile?.id);
+
     showTextModal(_viewModel.currentlySelectedFile);
   }
 
@@ -385,12 +401,15 @@ class _MainWidgetState extends State<MainWidget>
   }
 
   Future<bool> _onWillPop() {
-    if(_viewModel.readMoreTextShowing){
+    if (_viewModel.readMoreTextShowing) {
       _viewModel.readMoreTextShowing = false;
       _closeReadMoreView();
-    } else
-    if (_viewModel.navList.length > 1) {
+    } else if (_viewModel.navList.length > 1) {
       _backPressed(_viewModel.navList.last.parentId);
+      Tracking.trackScreen(Tracking.BACK_PRESSED,
+          Tracking.CURRENTLY_SELECTED_FILE +
+              "" +
+              _viewModel.currentlySelectedFile?.id);
     } else {
       return new Future(() => true);
     }

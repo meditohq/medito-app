@@ -1,3 +1,4 @@
+import 'package:Medito/tracking/tracking.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -72,11 +73,11 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
   Widget getPlayPauseIcon() {
     var state = widget.currentlyPlayingState;
     if (state == AudioPlayerState.PLAYING) {
-      return Icon(Icons.pause, color: widget._lightColor);
+      return Icon(Icons.pause, color: MeditoColors.lightColor);
     } else if (state == AudioPlayerState.PAUSED ||
         state == AudioPlayerState.STOPPED ||
         state == AudioPlayerState.COMPLETED) {
-      return Icon(Icons.play_arrow, color: widget._lightColor);
+      return Icon(Icons.play_arrow, color: MeditoColors.lightColor);
     }
     return Container();
   }
@@ -87,7 +88,7 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
       case FileType.audio:
         return Icon(
           Icons.headset,
-          color: widget._lightColor,
+          color: MeditoColors.lightColor,
         );
         break;
       case FileType.text:
@@ -99,7 +100,7 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
     }
     return SvgPicture.asset(
       path,
-      color: widget._lightColor,
+      color: MeditoColors.lightColor,
     );
   }
 
@@ -107,11 +108,17 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
     setState(() {
       var state = widget.currentlyPlayingState;
       if (state == AudioPlayerState.PLAYING) {
+        Tracking.trackEvent(
+            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
         MeditoAudioPlayer().audioPlayer.pause();
       } else if (state == AudioPlayerState.PAUSED) {
+        Tracking.trackEvent(
+            Tracking.FILE_TAPPED, Tracking.AUDIO_RESUME, widget.item.id);
         MeditoAudioPlayer().audioPlayer.resume();
       } else if (state == AudioPlayerState.STOPPED ||
           state == AudioPlayerState.COMPLETED) {
+        Tracking.trackEvent(
+            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
         MeditoAudioPlayer().audioPlayer.play(widget.item.url);
       }
     });

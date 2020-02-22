@@ -21,8 +21,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   bool playerOpen = false;
   ListItem currentlySelectedFile;
   AudioPlayerState currentState;
-  bool readMoreTextShowing;
-
+  bool readMoreTextShowing = false;
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();

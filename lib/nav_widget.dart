@@ -1,5 +1,7 @@
 import 'package:Medito/colors.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:flutter/material.dart';
+
 import 'viewmodel/list_item.dart';
 
 class NavWidget extends StatefulWidget {
@@ -14,7 +16,7 @@ class NavWidget extends StatefulWidget {
 
 class _NavWidgetState extends State<NavWidget>
     with SingleTickerProviderStateMixin {
-  var _colorDark =MeditoColors.darkColor;
+  var _colorDark = MeditoColors.darkColor;
   var _colorLight = MeditoColors.lightColor;
   var _borderRadiusSmall = BorderRadius.circular(13);
   var _borderRadiusLarge = BorderRadius.circular(16);
@@ -49,26 +51,39 @@ class _NavWidgetState extends State<NavWidget>
 
       columns.add(GestureDetector(
           onTap: () {
+            Tracking.trackEvent(Tracking.BREADCRUMB,
+                Tracking.BREADCRUMB_TAPPED, widget.list.last?.id);
+
             if (i == startNumber && widget.list.length > 1)
               widget.backPressed(widget.list[i].id);
           },
           child: AnimatedContainer(
             margin: EdgeInsets.only(top: i == startNumber ? 0 : 8),
-            padding: EdgeInsets.all(
-                i == startNumber ? _paddingSmall : _paddingLarge),
-            decoration: BoxDecoration(
-              color: i == startNumber ? _colorDark : _colorLight,
-              borderRadius:
-                  i == startNumber ? _borderRadiusSmall : _borderRadiusLarge,
-            ),
+            padding: getEdgeInsets(i, startNumber),
+            decoration: getBoxDecoration(i, startNumber),
             duration: Duration(days: 1),
-            child: Text(label,
-                style: i == startNumber
-                    ? Theme.of(context).textTheme.display2
-                    : Theme.of(context).textTheme.display1),
+            child: getTextLabel(label, i, startNumber),
           )));
     }
 
     return columns;
+  }
+
+  Text getTextLabel(String label, int i, int startNumber) {
+    return Text(label,
+        style: i == startNumber
+            ? Theme.of(context).textTheme.display2
+            : Theme.of(context).textTheme.display1);
+  }
+
+  BoxDecoration getBoxDecoration(int i, int startNumber) {
+    return BoxDecoration(
+      color: i == startNumber ? _colorDark : _colorLight,
+      borderRadius: i == startNumber ? _borderRadiusSmall : _borderRadiusLarge,
+    );
+  }
+
+  EdgeInsets getEdgeInsets(int i, int startNumber) {
+    return EdgeInsets.all(i == startNumber ? _paddingSmall : _paddingLarge);
   }
 }
