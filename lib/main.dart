@@ -289,14 +289,15 @@ class _MainWidgetState extends State<MainWidget>
 
   void fileTap(ListItem i) {
     if (i.fileType == FileType.audio) {
+      _viewModel.playerOpen = true;
       Tracking.trackScreen(
           Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
-      _viewModel.playerOpen = true;
       showPlayer(i);
     } else if (i.fileType == FileType.both) {
       Tracking.trackScreen(
           Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
       _viewModel.playerOpen = true;
+      showPlayer(i);
     } else if (i.fileType == FileType.text) {
       Tracking.trackScreen(
           Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED + " " + i.id);
@@ -387,8 +388,8 @@ class _MainWidgetState extends State<MainWidget>
   }
 
   void _readMorePressed() {
-    Tracking.trackScreen(Tracking.READ_MORE_TAPPED,
-        _viewModel.currentlySelectedFile?.id);
+    Tracking.trackScreen(
+        Tracking.READ_MORE_TAPPED, _viewModel.currentlySelectedFile?.id);
 
     showTextModal(_viewModel.currentlySelectedFile);
   }
@@ -406,7 +407,8 @@ class _MainWidgetState extends State<MainWidget>
       _closeReadMoreView();
     } else if (_viewModel.navList.length > 1) {
       _backPressed(_viewModel.navList.last.parentId);
-      Tracking.trackScreen(Tracking.BACK_PRESSED,
+      Tracking.trackScreen(
+          Tracking.BACK_PRESSED,
           Tracking.CURRENTLY_SELECTED_FILE +
               "" +
               _viewModel.currentlySelectedFile?.id);

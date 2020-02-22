@@ -34,6 +34,7 @@ end
 
 target 'Runner' do
   # Flutter Pod
+  use_frameworks!  # required by simple_permission
 
   copied_flutter_dir = File.join(__dir__, 'Flutter')
   copied_framework_path = File.join(copied_flutter_dir, 'Flutter.framework')
@@ -81,6 +82,7 @@ install! 'cocoapods', :disable_input_output_paths => true
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
+      config.build_settings['SWIFT_VERSION'] = '5.0'  # required by simple_permission
       config.build_settings['ENABLE_BITCODE'] = 'NO'
     end
   end

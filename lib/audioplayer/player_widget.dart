@@ -163,25 +163,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _resume() async {
     Tracking.trackEvent(
-        Tracking.PLAYER_TAPPED, Tracking.AUDIO_RESUME, widget.fileModel?.id);
+        Tracking.PLAYER_TAPPED, Tracking.AUDIO_RESUME, widget.fileModel?.title);
     await MeditoAudioPlayer().audioPlayer.resume();
   }
 
   void _play() async {
     Tracking.trackEvent(
-        Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY, widget.fileModel?.id);
+        Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY, widget.fileModel?.title);
     await MeditoAudioPlayer().audioPlayer.play(widget.fileModel?.url);
   }
 
   void _pause() async {
     Tracking.trackEvent(
-        Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED, widget.fileModel?.id);
+        Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED, widget.fileModel?.title);
     await MeditoAudioPlayer().audioPlayer.pause();
   }
 
   void _rewind() async {
     Tracking.trackEvent(
-        Tracking.PLAYER_TAPPED, Tracking.AUDIO_REWIND, widget.fileModel?.id);
+        Tracking.PLAYER_TAPPED, Tracking.AUDIO_REWIND, widget.fileModel?.title);
     MeditoAudioPlayer()
         .audioPlayer
         .seek(new Duration(seconds: position.inSeconds - 15))
@@ -190,7 +190,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _fastForward() async {
     Tracking.trackEvent(
-        Tracking.PLAYER_TAPPED, Tracking.AUDIO_FF, widget.fileModel?.id);
+        Tracking.PLAYER_TAPPED, Tracking.AUDIO_FF, widget.fileModel?.title);
     MeditoAudioPlayer()
         .audioPlayer
         .seek(new Duration(seconds: position.inSeconds + 15))

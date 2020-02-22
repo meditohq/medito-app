@@ -39,6 +39,9 @@ PODS:
     - GoogleUtilities/Environment (~> 6.5)
     - GoogleUtilities/UserDefaults (~> 6.5)
   - Flutter (1.0.0)
+  - flutter_matomo (0.0.1):
+    - Flutter
+    - MatomoTracker (> 7)
   - GoogleAppMeasurement (6.2.2):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
@@ -67,6 +70,9 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (6.5.1):
     - GoogleUtilities/Logger
+  - MatomoTracker (7.2.0):
+    - MatomoTracker/Core (= 7.2.0)
+  - MatomoTracker/Core (7.2.0)
   - nanopb (0.3.9011):
     - nanopb/decode (= 0.3.9011)
     - nanopb/encode (= 0.3.9011)
@@ -80,6 +86,7 @@ DEPENDENCIES:
   - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
   - Firebase/Analytics
   - Flutter (from `Flutter`)
+  - flutter_matomo (from `.symlinks/plugins/flutter_matomo/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
 
 SPEC REPOS:
@@ -95,6 +102,7 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
     - GoogleUtilities
+    - MatomoTracker
     - nanopb
     - PromisesObjC
 
@@ -103,6 +111,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audioplayers/ios"
   Flutter:
     :path: Flutter
+  flutter_matomo:
+    :path: ".symlinks/plugins/flutter_matomo/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
 
@@ -116,14 +126,16 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 575cd32f2aec0feeb0e44f5d0110a09e5e60b47b
   FirebaseInstanceID: 6668efc1655a4052c083f287a7141f1ead12f9c2
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_matomo: a4fc9d95faaf6f95124fc1956e892f91791b5fac
   GoogleAppMeasurement: d0560d915abf15e692e8538ba1d58442217b6aff
   GoogleDataTransport: 0048df6388dab1c254799f2a30365b1dffe20422
   GoogleDataTransportCCTSupport: f880d70972efa2ed1be4e9173a0f4c5f3dc2d176
   GoogleUtilities: 06eb53bb579efe7099152735900dd04bf09e7275
+  MatomoTracker: 6f89e2561083685a360e223fb663e9ccd57c1d1a
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
 
-PODFILE CHECKSUM: b8af44eb4c3d77cc1aa98fc962b2d0a41fc947bf
+PODFILE CHECKSUM: c48be14754b3a7c64f18fb857ab0796ddd338ce6
 
 COCOAPODS: 1.8.4
