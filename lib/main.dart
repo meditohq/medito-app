@@ -155,14 +155,6 @@ class _MainWidgetState extends State<MainWidget>
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        AnimatedOpacity(
-                          opacity: fileListOpacity,
-                          duration: Duration(milliseconds: 250),
-                          child: NavWidget(
-                            list: _viewModel.navList,
-                            backPressed: _backPressed,
-                          ),
-                        ),
                         Expanded(
                             child: Stack(
                           children: <Widget>[
@@ -265,12 +257,22 @@ class _MainWidgetState extends State<MainWidget>
           }
 
           return new ListView.builder(
-              itemCount: snapshot.data == null ? 0 : snapshot.data.length,
+              itemCount: 1+ (snapshot.data == null ? 0 : snapshot.data.length),
               shrinkWrap: true,
               itemBuilder: (BuildContext context, int i) {
+                if (i==0 ){
+                  return AnimatedOpacity(
+                    opacity: fileListOpacity,
+                    duration: Duration(milliseconds: 250),
+                    child: NavWidget(
+                      list: _viewModel.navList,
+                      backPressed: _backPressed,
+                    ),
+                  );
+                }
                 return Column(
                   children: <Widget>[
-                    getChildForListView(snapshot.data[i]),
+                    getChildForListView(snapshot.data[i - 1]),
                   ],
                 );
               });
