@@ -257,10 +257,13 @@ class _MainWidgetState extends State<MainWidget>
           }
 
           return new ListView.builder(
-              itemCount: 1+ (snapshot.data == null ? 0 : snapshot.data.length),
+              physics: textFileOpacity == 1
+                  ? NeverScrollableScrollPhysics()
+                  : ScrollPhysics(),
+              itemCount: 1 + (snapshot.data == null ? 0 : snapshot.data.length),
               shrinkWrap: true,
               itemBuilder: (BuildContext context, int i) {
-                if (i==0 ){
+                if (i == 0) {
                   return AnimatedOpacity(
                     opacity: fileListOpacity,
                     duration: Duration(milliseconds: 250),
@@ -423,32 +426,35 @@ class _MainWidgetState extends State<MainWidget>
   Widget getInnerTextView() {
     var content = _viewModel?.navList?.last?.contentText;
 
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Expanded(
-          child: Container(
-            color: MeditoColors.darkBGColor,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Text(
-                        content == null ? '' : content,
-                        style: Theme.of(context).textTheme.subhead,
+    return Padding(
+      padding: const EdgeInsets.only(top: 120.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              color: MeditoColors.darkBGColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Text(
+                          content == null ? '' : content,
+                          style: Theme.of(context).textTheme.subhead,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
