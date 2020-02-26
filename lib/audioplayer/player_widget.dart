@@ -2,7 +2,7 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
-import '../colors.dart';
+import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 import 'audio_singleton.dart';
 

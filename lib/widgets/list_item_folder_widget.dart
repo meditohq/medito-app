@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'viewmodel/list_item.dart';
+import '../viewmodel/list_item.dart';
 
-import 'colors.dart';
+import '../utils/colors.dart';
 
 class ListItemFolderWidget extends StatelessWidget {
   ListItemFolderWidget({Key key, this.listItemModel}) : super(key: key);

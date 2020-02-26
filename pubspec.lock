@@ -120,7 +120,7 @@ packages:
       name: google_fonts
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.7"
+    version: "0.3.9"
   http:
     dependency: transitive
     description:

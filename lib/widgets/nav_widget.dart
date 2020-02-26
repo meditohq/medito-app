@@ -1,8 +1,8 @@
-import 'package:Medito/colors.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:flutter/material.dart';
 
-import 'viewmodel/list_item.dart';
+import '../viewmodel/list_item.dart';
 
 class NavWidget extends StatefulWidget {
   const NavWidget({Key key, this.list, this.backPressed}) : super(key: key);

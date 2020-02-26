@@ -1,4 +1,4 @@
-import '../utils.dart';
+import '../utils/utils.dart';
 
 class Data {
   String description;

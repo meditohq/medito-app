@@ -3,9 +3,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'audioplayer/audio_singleton.dart';
-import 'colors.dart';
-import 'viewmodel/list_item.dart';
+import '../audioplayer/audio_singleton.dart';
+import '../utils/colors.dart';
+import '../viewmodel/list_item.dart';
 
 class ListItemFileWidget extends StatefulWidget {
   ListItemFileWidget({Key key, this.item, this.currentlyPlayingState})

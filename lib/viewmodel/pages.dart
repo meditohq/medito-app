@@ -1,6 +1,6 @@
 import 'package:Medito/viewmodel/pages_data.dart';
 
-import '../utils.dart';
+import '../utils/utils.dart';
 
 class Pages {
   int code;

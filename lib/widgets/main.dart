@@ -1,17 +1,19 @@
+import 'package:Medito/widgets/loading_list_widget.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'audioplayer/audio_singleton.dart';
-import 'audioplayer/player_widget.dart';
-import 'colors.dart';
+import '../audioplayer/audio_singleton.dart';
+import '../audioplayer/player_widget.dart';
+import '../utils/colors.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_folder_widget.dart';
 import 'list_item_image_widget.dart';
 import 'nav_widget.dart';
-import 'tracking/tracking.dart';
-import 'viewmodel/list_item.dart';
-import 'viewmodel/main_view_model.dart';
+import '../tracking/tracking.dart';
+import '../viewmodel/list_item.dart';
+import '../viewmodel/main_view_model.dart';
 
 Future<void> main() async {
   runApp(HomeScreenWidget());
@@ -135,6 +137,10 @@ class _MainWidgetState extends State<MainWidget>
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+    ));
+
     MeditoAudioPlayer()
         .audioPlayer
         .onPlayerStateChanged
@@ -244,9 +250,7 @@ class _MainWidgetState extends State<MainWidget>
           if (snapshot.connectionState == ConnectionState.waiting ||
               snapshot.hasData == false ||
               snapshot.hasData == null) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return LoadingListWidget();
           }
 
           if (snapshot.connectionState == ConnectionState.none) {
