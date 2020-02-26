@@ -148,26 +148,27 @@ class _MainWidgetState extends State<MainWidget>
         body: SafeArea(
           child: Stack(
             children: <Widget>[
-              !_viewModel.readMoreTextShowing
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              IgnorePointer(
+                ignoring: _viewModel.readMoreTextShowing,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                        child: Stack(
                       children: <Widget>[
-                        Expanded(
-                            child: Stack(
-                          children: <Widget>[
-                            getListView(),
-                            AnimatedOpacity(
-                                duration: Duration(milliseconds: 0),
-                                opacity: textFileOpacity,
-                                child: getInnerTextView()),
-                          ],
-                        )),
-                        _viewModel.currentlySelectedFile != null
-                            ? buildBottomSheet()
-                            : Container()
+                        getListView(),
+                        AnimatedOpacity(
+                            duration: Duration(milliseconds: 0),
+                            opacity: textFileOpacity,
+                            child: getInnerTextView()),
                       ],
-                    )
-                  : Container(),
+                    )),
+                    _viewModel.currentlySelectedFile != null
+                        ? buildBottomSheet()
+                        : Container()
+                  ],
+                ),
+              ),
               getReadMoreView()
             ],
           ),
@@ -176,13 +177,17 @@ class _MainWidgetState extends State<MainWidget>
     );
   }
 
-  AnimatedOpacity getReadMoreView() {
-    return AnimatedOpacity(
-      duration: Duration(milliseconds: 250),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _viewModel.readMoreTextShowing
-            ? Column(
+  Widget getReadMoreView() {
+    return IgnorePointer(
+      ignoring: !_viewModel.readMoreTextShowing,
+      child: AnimatedOpacity(
+        opacity: _viewModel.readMoreTextShowing ? 1 : 0,
+        duration: Duration(milliseconds: 250),
+        child: Container(
+          color: MeditoColors.darkBGColor,
+          child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 children: <Widget>[
                   Expanded(
                       child: Padding(
@@ -212,10 +217,9 @@ class _MainWidgetState extends State<MainWidget>
                     ],
                   )
                 ],
-              )
-            : Container(),
+              )),
+        ),
       ),
-      opacity: _viewModel.readMoreTextShowing ? 1 : 0,
     );
   }
 
