@@ -92,18 +92,9 @@ class _MainWidgetState extends State<MainWidget>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
-  final controller = TextEditingController();
-  int currentPage = 0;
-  var bottomSheetController;
 
-  double screenHeight;
-  double screenWidth;
-  double readMoreOpacity = 0;
   String readMoreText = "";
-  double fileListOpacity = 1;
   double textFileOpacity = 0;
-
-  var playerKey;
 
   @override
   void dispose() {
@@ -157,17 +148,14 @@ class _MainWidgetState extends State<MainWidget>
         body: SafeArea(
           child: Stack(
             children: <Widget>[
-              fileListOpacity > 0
+              !_viewModel.readMoreTextShowing
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Expanded(
                             child: Stack(
                           children: <Widget>[
-                            AnimatedOpacity(
-                                duration: Duration(milliseconds: 250),
-                                opacity: fileListOpacity,
-                                child: getListView()),
+                            getListView(),
                             AnimatedOpacity(
                                 duration: Duration(milliseconds: 0),
                                 opacity: textFileOpacity,
@@ -193,7 +181,7 @@ class _MainWidgetState extends State<MainWidget>
       duration: Duration(milliseconds: 250),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: readMoreOpacity > 0
+        child: _viewModel.readMoreTextShowing
             ? Column(
                 children: <Widget>[
                   Expanded(
@@ -227,7 +215,7 @@ class _MainWidgetState extends State<MainWidget>
               )
             : Container(),
       ),
-      opacity: readMoreOpacity,
+      opacity: _viewModel.readMoreTextShowing ? 1 : 0,
     );
   }
 
@@ -258,20 +246,13 @@ class _MainWidgetState extends State<MainWidget>
           }
 
           return new ListView.builder(
-              physics: textFileOpacity == 1
-                  ? NeverScrollableScrollPhysics()
-                  : ScrollPhysics(),
               itemCount: 1 + (snapshot.data == null ? 0 : snapshot.data.length),
               shrinkWrap: true,
               itemBuilder: (BuildContext context, int i) {
                 if (i == 0) {
-                  return AnimatedOpacity(
-                    opacity: fileListOpacity,
-                    duration: Duration(milliseconds: 250),
-                    child: NavWidget(
-                      list: _viewModel.navList,
-                      backPressed: _backPressed,
-                    ),
+                  return NavWidget(
+                    list: _viewModel.navList,
+                    backPressed: _backPressed,
                   );
                 }
                 return Column(
@@ -314,11 +295,9 @@ class _MainWidgetState extends State<MainWidget>
     }
   }
 
-  void showTextModal(ListItem i) {
+  void _showReadMoreModal(ListItem i) {
     setState(() {
       readMoreText = i.contentText;
-      readMoreOpacity = 1;
-      fileListOpacity = 0;
       _viewModel.playerOpen = false;
       _viewModel.readMoreTextShowing = true;
     });
@@ -370,10 +349,9 @@ class _MainWidgetState extends State<MainWidget>
 
   void _backPressed(String id) {
     setState(() {
-      if (readMoreOpacity == 1) {
+      if (_viewModel.readMoreTextShowing) {
         readMoreText = "";
-        readMoreOpacity = 0;
-        fileListOpacity = 1;
+        _viewModel.readMoreTextShowing = false;
       } else if (textFileOpacity == 1) {
         textFileOpacity = 0;
       } else {
@@ -387,7 +365,6 @@ class _MainWidgetState extends State<MainWidget>
     var showReadMore =
         _viewModel.currentlySelectedFile?.contentText?.isNotEmpty;
     return PlayerWidget(
-        key: playerKey,
         fileModel: _viewModel.currentlySelectedFile,
         readMorePressed: _readMorePressed,
         showReadMoreButton: showReadMore == null ? false : showReadMore);
@@ -397,13 +374,12 @@ class _MainWidgetState extends State<MainWidget>
     Tracking.trackScreen(
         Tracking.READ_MORE_TAPPED, _viewModel.currentlySelectedFile?.id);
 
-    showTextModal(_viewModel.currentlySelectedFile);
+    _showReadMoreModal(_viewModel.currentlySelectedFile);
   }
 
   void _closeReadMoreView() {
     _viewModel.playerOpen = true;
-    fileListOpacity = 1;
-    readMoreOpacity = 0;
+    _viewModel.readMoreTextShowing = false;
     setState(() {});
   }
 
