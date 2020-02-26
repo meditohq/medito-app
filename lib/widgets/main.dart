@@ -6,14 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../audioplayer/audio_singleton.dart';
 import '../audioplayer/player_widget.dart';
+import '../tracking/tracking.dart';
 import '../utils/colors.dart';
+import '../viewmodel/list_item.dart';
+import '../viewmodel/main_view_model.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_folder_widget.dart';
 import 'list_item_image_widget.dart';
 import 'nav_widget.dart';
-import '../tracking/tracking.dart';
-import '../viewmodel/list_item.dart';
-import '../viewmodel/main_view_model.dart';
 
 Future<void> main() async {
   runApp(HomeScreenWidget());
@@ -168,13 +168,10 @@ class _MainWidgetState extends State<MainWidget>
                                 duration: Duration(milliseconds: 250),
                                 opacity: fileListOpacity,
                                 child: getListView()),
-                            IgnorePointer(
-                              ignoring: textFileOpacity < 1,
-                              child: AnimatedOpacity(
-                                  duration: Duration(milliseconds: 0),
-                                  opacity: textFileOpacity,
-                                  child: getInnerTextView()),
-                            ),
+                            AnimatedOpacity(
+                                duration: Duration(milliseconds: 0),
+                                opacity: textFileOpacity,
+                                child: getInnerTextView()),
                           ],
                         )),
                         _viewModel.currentlySelectedFile != null
@@ -183,7 +180,7 @@ class _MainWidgetState extends State<MainWidget>
                       ],
                     )
                   : Container(),
-              getTranscriptionView()
+              getReadMoreView()
             ],
           ),
         ),
@@ -191,7 +188,7 @@ class _MainWidgetState extends State<MainWidget>
     );
   }
 
-  AnimatedOpacity getTranscriptionView() {
+  AnimatedOpacity getReadMoreView() {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 250),
       child: Padding(
@@ -430,14 +427,19 @@ class _MainWidgetState extends State<MainWidget>
   Widget getInnerTextView() {
     var content = _viewModel?.navList?.last?.contentText;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 120.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              color: MeditoColors.darkBGColor,
+    return IgnorePointer(
+      ignoring: textFileOpacity == 0,
+      child: Container(
+        color: MeditoColors.darkBGColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            NavWidget(
+              list: _viewModel?.navList,
+              backPressed: _backPressed,
+            ),
+            Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -456,8 +458,8 @@ class _MainWidgetState extends State<MainWidget>
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
