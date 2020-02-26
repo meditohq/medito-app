@@ -227,7 +227,14 @@ class _MainWidgetState extends State<MainWidget>
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
-        child: Text(readMoreText, style: Theme.of(context).textTheme.subhead),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(_viewModel.currentlySelectedFile.title, style: Theme.of(context).textTheme.title),
+            Container(height: 8.0),
+            Text(readMoreText, style: Theme.of(context).textTheme.subhead),
+          ],
+        ),
       ),
     );
   }
