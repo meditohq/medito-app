@@ -191,7 +191,7 @@ class _MainWidgetState extends State<MainWidget>
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Expanded(child: getText()),
+                          Expanded(child: getReadMoreTextWidget()),
                         ],
                       ),
                       decoration: BoxDecoration(
@@ -206,7 +206,7 @@ class _MainWidgetState extends State<MainWidget>
                         child: FlatButton(
                           child: Text("CLOSE"),
                           color: MeditoColors.lightColor,
-                          onPressed: _closeReadMoreView,
+                          onPressed: _closeReadMoreModal,
                         ),
                       ),
                     ],
@@ -219,7 +219,7 @@ class _MainWidgetState extends State<MainWidget>
     );
   }
 
-  Widget getText() {
+  Widget getReadMoreTextWidget() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
@@ -279,12 +279,12 @@ class _MainWidgetState extends State<MainWidget>
       _viewModel.playerOpen = true;
       Tracking.trackScreen(
           Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
-      showPlayer(i);
+      _showPlayer(i);
     } else if (i.fileType == FileType.both) {
       Tracking.trackScreen(
           Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
       _viewModel.playerOpen = true;
-      showPlayer(i);
+      _showPlayer(i);
     } else if (i.fileType == FileType.text) {
       Tracking.trackScreen(
           Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED + " " + i.id);
@@ -298,12 +298,16 @@ class _MainWidgetState extends State<MainWidget>
   void _showReadMoreModal(ListItem i) {
     setState(() {
       readMoreText = i.contentText;
-      _viewModel.playerOpen = false;
       _viewModel.readMoreTextShowing = true;
     });
   }
 
-  void showPlayer(ListItem fileTapped) {
+  void _closeReadMoreModal() {
+    _viewModel.readMoreTextShowing = false;
+    setState(() {});
+  }
+
+  void _showPlayer(ListItem fileTapped) {
     if (fileTapped.id == _viewModel.currentlySelectedFile?.id) {
       return;
     }
@@ -377,16 +381,10 @@ class _MainWidgetState extends State<MainWidget>
     _showReadMoreModal(_viewModel.currentlySelectedFile);
   }
 
-  void _closeReadMoreView() {
-    _viewModel.playerOpen = true;
-    _viewModel.readMoreTextShowing = false;
-    setState(() {});
-  }
-
   Future<bool> _onWillPop() {
     if (_viewModel.readMoreTextShowing) {
       _viewModel.readMoreTextShowing = false;
-      _closeReadMoreView();
+      _closeReadMoreModal();
     } else if (_viewModel.navList.length > 1) {
       _backPressed(_viewModel.navList.last.parentId);
       Tracking.trackScreen(
