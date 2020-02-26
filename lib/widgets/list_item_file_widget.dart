@@ -95,7 +95,10 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
         path = 'assets/images/ic_document.svg';
         break;
       case FileType.both:
-        path = 'assets/images/ic_audio.svg';
+        return Icon(
+          Icons.headset,
+          color: MeditoColors.lightColor,
+        );
         break;
     }
     return SvgPicture.asset(

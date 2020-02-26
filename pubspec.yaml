@@ -41,7 +41,6 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - assets/images/ic_audio.svg
     - assets/images/ic_document.svg
     - assets/images/ic_folder.svg
 
