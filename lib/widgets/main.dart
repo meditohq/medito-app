@@ -98,8 +98,9 @@ class _MainWidgetState extends State<MainWidget>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+
   }
 
   @override
@@ -146,6 +147,7 @@ class _MainWidgetState extends State<MainWidget>
       child: Scaffold(
         backgroundColor: MeditoColors.darkBGColor,
         body: SafeArea(
+          maintainBottomViewPadding: false,
           child: Stack(
             children: <Widget>[
               IgnorePointer(
@@ -464,4 +466,5 @@ class _MainWidgetState extends State<MainWidget>
       ),
     );
   }
+
 }

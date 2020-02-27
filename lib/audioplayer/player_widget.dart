@@ -58,6 +58,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   void dispose() {
+    MeditoAudioPlayer().audioPlayer.dispose();
     super.dispose();
   }
 

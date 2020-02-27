@@ -30,7 +30,7 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
     controller.repeat(reverse: true);
   }
 
-  int getDuration() => (600 - (50 * widget.index));
+  int getDuration() => (250 - (10 * widget.index));
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +88,7 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
 
   @override
   void dispose() {
+    controller.dispose();
     super.dispose();
   }
 }
