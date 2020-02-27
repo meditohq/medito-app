@@ -17,7 +17,6 @@ abstract class MainListViewModel {}
 class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
   List<ListItem> navList = [ListItem("Home", "app", null, parentId: "app")];
-  int currentPage;
   bool playerOpen = false;
   ListItem currentlySelectedFile;
   AudioPlayerState currentState;
@@ -66,11 +65,15 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     }
   }
 
-  Future<List<ListItem>> getPage({String id = 'app'}) async {
+  Future<List<ListItem>> getPage({String id = 'app', bool skipCache = false}) async {
     if (id == null) id = 'app';
 
-    Pages cachedPages = await readPagesFromCache(id);
-    if (cachedPages != null) return await getPageListFromData(cachedPages.data);
+    if(!skipCache) {
+      Pages cachedPages = await readPagesFromCache(id);
+      if (cachedPages != null)
+        return await getPageListFromData(cachedPages.data);
+    }
+
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     final response = await http.get(
@@ -153,5 +156,21 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   void addToNavList(ListItem item) {
     navList.add(item);
+  }
+
+  String getCurrentPageId() {
+    return navList.last.id;
+  }
+
+  Future<bool> checkConnectivity() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+    return false;
   }
 }

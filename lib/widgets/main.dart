@@ -224,13 +224,16 @@ class _MainWidgetState extends State<MainWidget>
   }
 
   Widget getReadMoreTextWidget() {
+    var title = _viewModel.currentlySelectedFile == null
+        ? ''
+        : _viewModel.currentlySelectedFile.title;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(_viewModel.currentlySelectedFile.title, style: Theme.of(context).textTheme.title),
+            Text(title, style: Theme.of(context).textTheme.title),
             Container(height: 8.0),
             Text(readMoreText, style: Theme.of(context).textTheme.subhead),
           ],
@@ -240,39 +243,52 @@ class _MainWidgetState extends State<MainWidget>
   }
 
   Widget getListView() {
-    return FutureBuilder(
-        future: listFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              snapshot.hasData == false ||
-              snapshot.hasData == null) {
-            return LoadingListWidget();
-          }
+    return RefreshIndicator(
+      color: MeditoColors.darkBGColor,
+      backgroundColor: MeditoColors.darkColor,
+      child: FutureBuilder(
+          future: listFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.none) {
+              return Text(
+                "No connection. Please try again later",
+                style: Theme.of(context).textTheme.display2,
+              );
+            }
 
-          if (snapshot.connectionState == ConnectionState.none) {
-            return Text(
-              "No connection. Please try again later",
-              style: Theme.of(context).textTheme.display2,
-            );
-          }
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                snapshot.hasData == false ||
+                snapshot.hasData == null) {
+              return LoadingListWidget();
+            }
 
-          return new ListView.builder(
-              itemCount: 1 + (snapshot.data == null ? 0 : snapshot.data.length),
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int i) {
-                if (i == 0) {
-                  return NavWidget(
-                    list: _viewModel.navList,
-                    backPressed: _backPressed,
+            return new ListView.builder(
+                itemCount:
+                    1 + (snapshot.data == null ? 0 : snapshot.data.length),
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int i) {
+                  if (i == 0) {
+                    return NavWidget(
+                      list: _viewModel.navList,
+                      backPressed: _backPressed,
+                    );
+                  }
+                  return Column(
+                    children: <Widget>[
+                      getChildForListView(snapshot.data[i - 1]),
+                    ],
                   );
-                }
-                return Column(
-                  children: <Widget>[
-                    getChildForListView(snapshot.data[i - 1]),
-                  ],
-                );
-              });
-        });
+                });
+          }),
+      onRefresh: _onPullToRefresh,
+    );
+  }
+
+  Future<void> _onPullToRefresh() async {
+    setState(() {
+      listFuture = _viewModel.getPage(
+          id: _viewModel.getCurrentPageId(), skipCache: true);
+    });
   }
 
   void folderTap(ListItem i) {
