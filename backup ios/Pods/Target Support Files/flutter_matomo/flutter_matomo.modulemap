@@ -1,0 +1,6 @@
+framework module flutter_matomo {
+  umbrella header "flutter_matomo-umbrella.h"
+
+  export *
+  module * { export * }
+}

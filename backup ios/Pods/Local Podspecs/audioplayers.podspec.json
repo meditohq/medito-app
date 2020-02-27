@@ -1,0 +1,26 @@
+{
+  "name": "audioplayers",
+  "version": "0.0.1",
+  "summary": "A flutter plugin to play multiple simultaneously audio files.",
+  "description": "A flutter plugin to play multiple simultaneously audio files.\n\nThis is a fork of rxlabz's audioplayer, with the difference that it supports playing multiple audios at the same time, and exposes volume controls.",
+  "homepage": "https://github.com/luanpotter/audioplayer",
+  "license": {
+    "file": "../LICENSE.md"
+  },
+  "authors": {
+    "Luan Nico": "luannico27@gmail.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "dependencies": {
+    "Flutter": [
+
+    ]
+  },
+  "platforms": {
+    "ios": "8.0"
+  }
+}

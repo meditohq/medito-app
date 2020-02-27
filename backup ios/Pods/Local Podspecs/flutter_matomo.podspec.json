@@ -1,0 +1,29 @@
+{
+  "name": "flutter_matomo",
+  "version": "0.0.1",
+  "summary": "Matomo tracking for flutter",
+  "description": "Matomo tracking for flutter",
+  "homepage": "http://example.com",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "Your Company": "email@example.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "dependencies": {
+    "Flutter": [
+
+    ],
+    "MatomoTracker": [
+      "> 7"
+    ]
+  },
+  "platforms": {
+    "ios": "12.0"
+  }
+}
