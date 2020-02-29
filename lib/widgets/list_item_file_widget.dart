@@ -7,104 +7,122 @@ import '../audioplayer/audio_singleton.dart';
 import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 
-class ListItemFileWidget extends StatefulWidget {
-  ListItemFileWidget({Key key, this.item, this.currentlyPlayingState})
+class ListItemWidget extends StatefulWidget {
+  ListItemWidget({Key key, this.item, this.currentlyPlayingState})
       : super(key: key);
 
   final ListItem item;
   final AudioPlayerState currentlyPlayingState;
 
   @override
-  _ListItemFileWidgetState createState() => _ListItemFileWidgetState();
+  _ListItemWidgetState createState() => _ListItemWidgetState();
 }
 
-class _ListItemFileWidgetState extends State<ListItemFileWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Flexible(
-          child: Container(
-              color: getBackgroundColor(),
-              padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-              child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(
-                          right: 12.0, left: 4, top: 4, bottom: 4),
-                      child: getPlayPauseButton(),
-                    ),
-                    Expanded(
-                        child: Container(
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                          Flexible(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                Text(widget.item.title,
-                                    style: Theme.of(context).textTheme.title),
-                                widget.item.description == null ||
-                                        widget.item.description.isEmpty
-                                    ? Container()
-                                    : Text(
-                                        widget.item.description,
-                                        style:
-                                            Theme.of(context).textTheme.subhead,
-                                      )
-                              ]))
-                        ])))
-                  ])))
-    ]);
+class _ListItemWidgetState extends State<ListItemWidget> {
+  Color getBackgroundColor() {
+    if (widget.currentlyPlayingState != null) {
+      return MeditoColors.darkColor;
+    } else
+      return null;
   }
 
-  Widget getPlayPauseButton() {
+  Widget getListItemImage() {
     return widget.currentlyPlayingState != null
-        ? GestureDetector(
-            child: getPlayPauseIcon(),
+        ? InkWell(
+            child: _getPlayPauseIcon(),
             onTap: _playOrPause,
           )
         : getIcon();
   }
 
-  Widget getPlayPauseIcon() {
+  Padding buildFolderIcon() {
+    return Padding(
+      padding: EdgeInsets.only(right: 8.0),
+      child: Icon(Icons.folder, color: MeditoColors.lightColor),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      color: getBackgroundColor(),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Container(
+              padding: EdgeInsets.only(top: 2), child: getListItemImage()),
+          getTwoTextViewsInColumn(context)
+        ],
+      ),
+    );
+  }
+
+  Widget getTwoTextViewsInColumn(BuildContext context) {
+    return Flexible(
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(widget.item.title, style: Theme.of(context).textTheme.title),
+            widget.item.description == null || widget.item.description.isEmpty
+                ? Container()
+                : Text(
+                    widget.item.description,
+                    style: Theme.of(context).textTheme.subhead,
+                  )
+          ]),
+    );
+  }
+
+  Widget _getPlayPauseIcon() {
+    var iconWidget;
     var state = widget.currentlyPlayingState;
     if (state == AudioPlayerState.PLAYING) {
-      return Icon(Icons.pause, color: MeditoColors.lightColor);
+      iconWidget = Icon(Icons.pause, color: MeditoColors.lightColor);
     } else if (state == AudioPlayerState.PAUSED ||
         state == AudioPlayerState.STOPPED ||
         state == AudioPlayerState.COMPLETED) {
-      return Icon(Icons.play_arrow, color: MeditoColors.lightColor);
+      iconWidget = Icon(Icons.play_arrow, color: MeditoColors.lightColor);
     }
-    return Container();
+    return Padding(
+      child: iconWidget,
+      padding: EdgeInsets.only(right: 8),
+    );
   }
 
   Widget getIcon() {
+    if (widget.item.type == ListItemType.folder) {
+      return buildFolderIcon();
+    }
+
+    var iconWidget;
     var path;
+
     switch (widget.item.fileType) {
       case FileType.audio:
-        return Icon(
+        iconWidget = Icon(
+          Icons.headset,
+          color: MeditoColors.lightColor,
+        );
+        break;
+      case FileType.both:
+        iconWidget = Icon(
           Icons.headset,
           color: MeditoColors.lightColor,
         );
         break;
       case FileType.text:
         path = 'assets/images/ic_document.svg';
-        break;
-      case FileType.both:
-        return Icon(
-          Icons.headset,
+        iconWidget = SvgPicture.asset(
+          path,
           color: MeditoColors.lightColor,
         );
         break;
     }
-    return SvgPicture.asset(
-      path,
-      color: MeditoColors.lightColor,
-    );
+
+    return Padding(padding: EdgeInsets.only(right: 8), child: iconWidget);
   }
 
   void _playOrPause() {
@@ -125,12 +143,5 @@ class _ListItemFileWidgetState extends State<ListItemFileWidget> {
         MeditoAudioPlayer().audioPlayer.play(widget.item.url);
       }
     });
-  }
-
-  Color getBackgroundColor() {
-    if (widget.currentlyPlayingState != null) {
-      return MeditoColors.darkColor;
-    } else
-      return null;
   }
 }

@@ -11,7 +11,6 @@ import 'utils/colors.dart';
 import 'viewmodel/list_item.dart';
 import 'viewmodel/main_view_model.dart';
 import 'widgets/list_item_file_widget.dart';
-import 'widgets/list_item_folder_widget.dart';
 import 'widgets/list_item_image_widget.dart';
 import 'widgets/nav_widget.dart';
 
@@ -347,18 +346,14 @@ class _MainWidgetState extends State<MainWidget>
     });
   }
 
-  Widget getFolderListItem(ListItem listItemModel) {
-    return new ListItemFolderWidget(listItemModel: listItemModel);
-  }
-
   Widget getFileListItem(ListItem item) {
     if (_viewModel.currentlySelectedFile?.id == item?.id) {
-      return new ListItemFileWidget(
+      return new ListItemWidget(
         item: item,
         currentlyPlayingState: _viewModel.currentState,
       );
     } else {
-      return new ListItemFileWidget(
+      return new ListItemWidget(
         item: item,
       );
     }
@@ -369,7 +364,7 @@ class _MainWidgetState extends State<MainWidget>
       return InkWell(
           onTap: () => folderTap(item),
           splashColor: MeditoColors.darkColor,
-          child: getFolderListItem(item));
+          child: getFileListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
           onTap: () => fileTap(item),
