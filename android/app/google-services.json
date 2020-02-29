@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "969745075381",
+    "firebase_url": "https://medito-9c82d.firebaseio.com",
+    "project_id": "medito-9c82d",
+    "storage_bucket": "medito-9c82d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969745075381:android:53ee7e15288c87b4",
+        "android_client_info": {
+          "package_name": "meditofoundation.medito"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "969745075381-ppfpe8si0gmr2hic8c5qqelg2ive2n46.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.meditofoundation.medito",
+            "certificate_hash": "78d0e9c29199b2e44dc52d1609e554869579af0d"
+          }
+        },
+        {
+          "client_id": "969745075381-j3c8gl5153tkvvdntq8htdkgcr74gvjn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBD3dhHLIvod9dPUhs61G64i8YW2UHMD0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "969745075381-j3c8gl5153tkvvdntq8htdkgcr74gvjn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
