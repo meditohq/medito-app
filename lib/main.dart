@@ -1,10 +1,11 @@
-import 'package:Medito/widgets/loading_list_widget.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_playout/player_state.dart';
+
+import 'package:Medito/widgets/loading_list_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'audioplayer/audio_singleton.dart';
+import 'audio_playout.dart';
 import 'audioplayer/player_widget.dart';
 import 'tracking/tracking.dart';
 import 'utils/colors.dart';
@@ -112,15 +113,6 @@ class _MainWidgetState extends State<MainWidget>
       statusBarBrightness: Brightness.dark,
     ));
 
-    MeditoAudioPlayer()
-        .audioPlayer
-        .onPlayerStateChanged
-        .listen((AudioPlayerState s) {
-      setState(() {
-        _viewModel.currentState = s;
-      });
-    });
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -144,9 +136,10 @@ class _MainWidgetState extends State<MainWidget>
                             child: getInnerTextView()),
                       ],
                     )),
-                    _viewModel.currentlySelectedFile != null
-                        ? buildBottomSheet()
-                        : Container()
+                    buildBottomSheet()
+//                    _viewModel.currentlySelectedFile != null
+//                        ? buildBottomSheet()
+//                        : Container()
                   ],
                 ),
               ),
@@ -319,18 +312,13 @@ class _MainWidgetState extends State<MainWidget>
     if (fileTapped.id == _viewModel.currentlySelectedFile?.id) {
       return;
     }
-
-    setState(() {
-      MeditoAudioPlayer().audioPlayer.stop();
-      _viewModel.currentlySelectedFile = fileTapped;
-    });
   }
 
   Widget getFileListItem(ListItem item) {
     if (_viewModel.currentlySelectedFile?.id == item?.id) {
       return new ListItemWidget(
         item: item,
-        currentlyPlayingState: _viewModel.currentState,
+//        currentlyPlayingState: _viewModel.currentState,
       );
     } else {
       return new ListItemWidget(
@@ -372,10 +360,13 @@ class _MainWidgetState extends State<MainWidget>
   Widget buildBottomSheet() {
     var showReadMore =
         _viewModel.currentlySelectedFile?.contentText?.isNotEmpty;
-    return PlayerWidget(
-        fileModel: _viewModel.currentlySelectedFile,
-        readMorePressed: _readMorePressed,
-        showReadMoreButton: showReadMore == null ? false : showReadMore);
+    return AudioPlayout(
+      desiredState: PlayerState.PLAYING,
+    );
+//    return PlayerWidget(
+//        fileModel: _viewModel.currentlySelectedFile,
+//        readMorePressed: _readMorePressed,
+//        showReadMoreButton: showReadMore == null ? false : showReadMore);
   }
 
   void _readMorePressed() {

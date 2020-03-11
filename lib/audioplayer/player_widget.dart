@@ -1,10 +1,8 @@
 import 'package:Medito/tracking/tracking.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
-import 'audio_singleton.dart';
 
 class PlayerWidget extends StatefulWidget {
   PlayerWidget(
@@ -25,40 +23,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   static Duration maxDuration;
   static double widthOfScreen = 1;
 
-  AudioPlayerState state;
 
   @override
   void initState() {
     super.initState();
-    MeditoAudioPlayer()
-        .audioPlayer
-        .onAudioPositionChanged
-        .listen((Duration p) => {
-              setState(() {
-                return position = p;
-              })
-            });
-
-    MeditoAudioPlayer().audioPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => maxDuration = d);
-    });
-
-    MeditoAudioPlayer()
-        .audioPlayer
-        .onPlayerStateChanged
-        .listen((AudioPlayerState s) {
-      if (s == AudioPlayerState.COMPLETED || s == AudioPlayerState.STOPPED) {
-        maxDuration = Duration(seconds: 0);
-        position = Duration(seconds: 0);
-      }
-      this.state = s;
-      setState(() {});
-    });
   }
 
   @override
   void dispose() {
-    MeditoAudioPlayer().audioPlayer.dispose();
+//    MeditoAudioPlayer().audioPlayer.dispose();
     super.dispose();
   }
 
@@ -132,9 +105,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Icon getPlayOrPauseIcon() {
-    return state == AudioPlayerState.PLAYING
-        ? Icon(Icons.pause, color: MeditoColors.lightColor, size: 32)
-        : Icon(Icons.play_arrow, color: MeditoColors.lightColor, size: 32);
+
   }
 
   Widget _buildMarquee() {
@@ -153,54 +124,35 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _resumeOrPlay() async {
-    if (state == null ||
-        state == AudioPlayerState.STOPPED ||
-        state == AudioPlayerState.COMPLETED)
-      _play();
-    else if (state == AudioPlayerState.PAUSED)
-      _resume();
-    else if (state == AudioPlayerState.PLAYING) _pause();
+
   }
 
   void _resume() async {
     Tracking.trackEvent(
         Tracking.PLAYER_TAPPED, Tracking.AUDIO_RESUME, widget.fileModel?.title);
-    await MeditoAudioPlayer().audioPlayer.resume();
   }
 
   void _play() async {
     Tracking.trackEvent(
         Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY, widget.fileModel?.title);
-    await MeditoAudioPlayer().audioPlayer.play(widget.fileModel?.url);
   }
 
   void _pause() async {
     Tracking.trackEvent(
         Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED, widget.fileModel?.title);
-    await MeditoAudioPlayer().audioPlayer.pause();
   }
 
   void _rewind() async {
     Tracking.trackEvent(
         Tracking.PLAYER_TAPPED, Tracking.AUDIO_REWIND, widget.fileModel?.title);
-    MeditoAudioPlayer()
-        .audioPlayer
-        .seek(new Duration(seconds: position.inSeconds - 15))
-        .then((result) {});
   }
 
   void _fastForward() async {
     Tracking.trackEvent(
         Tracking.PLAYER_TAPPED, Tracking.AUDIO_FF, widget.fileModel?.title);
-    MeditoAudioPlayer()
-        .audioPlayer
-        .seek(new Duration(seconds: position.inSeconds + 15))
-        .then((result) {});
   }
 
   void _stop() async {
-    int result = await MeditoAudioPlayer().audioPlayer.stop();
-    MeditoAudioPlayer().audioPlayer.release();
   }
 
   Widget _buildReadMoreButton() {

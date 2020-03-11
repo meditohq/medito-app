@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:Medito/viewmodel/pages.dart';
 import 'package:Medito/viewmodel/pages_data.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -19,7 +18,6 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   List<ListItem> navList = [ListItem("Home", "app", null, parentId: "app")];
   bool playerOpen = false;
   ListItem currentlySelectedFile;
-  AudioPlayerState currentState;
   bool readMoreTextShowing = false;
 
   Future<String> get _localPath async {

@@ -20,10 +20,10 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^0.3.9
-  audioplayers: ^0.14.0
   flutter_svg: ^0.17.2
   path_provider: ^1.6.5
   flutter_matomo: ^1.2.0
+  flutter_playout: ^1.0.30
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -1,9 +1,6 @@
-import 'package:Medito/tracking/tracking.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../audioplayer/audio_singleton.dart';
 import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 
@@ -12,7 +9,7 @@ class ListItemWidget extends StatefulWidget {
       : super(key: key);
 
   final ListItem item;
-  final AudioPlayerState currentlyPlayingState;
+  final currentlyPlayingState;
 
   @override
   _ListItemWidgetState createState() => _ListItemWidgetState();
@@ -20,10 +17,10 @@ class ListItemWidget extends StatefulWidget {
 
 class _ListItemWidgetState extends State<ListItemWidget> {
   Color getBackgroundColor() {
-    if (widget.currentlyPlayingState != null) {
-      return MeditoColors.darkColor;
-    } else
-      return null;
+//    if (widget.currentlyPlayingState != null) {
+//      return MeditoColors.darkColor;
+//    } else
+//      return null;
   }
 
   Widget getListItemImage() {
@@ -77,19 +74,19 @@ class _ListItemWidgetState extends State<ListItemWidget> {
   }
 
   Widget _getPlayPauseIcon() {
-    var iconWidget;
-    var state = widget.currentlyPlayingState;
-    if (state == AudioPlayerState.PLAYING) {
-      iconWidget = Icon(Icons.pause, color: MeditoColors.lightColor);
-    } else if (state == AudioPlayerState.PAUSED ||
-        state == AudioPlayerState.STOPPED ||
-        state == AudioPlayerState.COMPLETED) {
-      iconWidget = Icon(Icons.play_arrow, color: MeditoColors.lightColor);
-    }
-    return Padding(
-      child: iconWidget,
-      padding: EdgeInsets.only(right: 8),
-    );
+//    var iconWidget;
+//    var state = widget.currentlyPlayingState;
+//    if (state == AudioPlayerState.PLAYING) {
+//      iconWidget = Icon(Icons.pause, color: MeditoColors.lightColor);
+//    } else if (state == AudioPlayerState.PAUSED ||
+//        state == AudioPlayerState.STOPPED ||
+//        state == AudioPlayerState.COMPLETED) {
+//      iconWidget = Icon(Icons.play_arrow, color: MeditoColors.lightColor);
+//    }
+//    return Padding(
+//      child: iconWidget,
+//      padding: EdgeInsets.only(right: 8),
+//    );
   }
 
   Widget getIcon() {
@@ -126,22 +123,22 @@ class _ListItemWidgetState extends State<ListItemWidget> {
   }
 
   void _playOrPause() {
-    setState(() {
-      var state = widget.currentlyPlayingState;
-      if (state == AudioPlayerState.PLAYING) {
-        Tracking.trackEvent(
-            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
-        MeditoAudioPlayer().audioPlayer.pause();
-      } else if (state == AudioPlayerState.PAUSED) {
-        Tracking.trackEvent(
-            Tracking.FILE_TAPPED, Tracking.AUDIO_RESUME, widget.item.id);
-        MeditoAudioPlayer().audioPlayer.resume();
-      } else if (state == AudioPlayerState.STOPPED ||
-          state == AudioPlayerState.COMPLETED) {
-        Tracking.trackEvent(
-            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
-        MeditoAudioPlayer().audioPlayer.play(widget.item.url);
-      }
-    });
+//    setState(() {
+//      var state = widget.currentlyPlayingState;
+//      if (state == AudioPlayerState.PLAYING) {
+//        Tracking.trackEvent(
+//            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
+//        MeditoAudioPlayer().audioPlayer.pause();
+//      } else if (state == AudioPlayerState.PAUSED) {
+//        Tracking.trackEvent(
+//            Tracking.FILE_TAPPED, Tracking.AUDIO_RESUME, widget.item.id);
+//        MeditoAudioPlayer().audioPlayer.resume();
+//      } else if (state == AudioPlayerState.STOPPED ||
+//          state == AudioPlayerState.COMPLETED) {
+//        Tracking.trackEvent(
+//            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
+//        MeditoAudioPlayer().audioPlayer.play(widget.item.url);
+//      }
+//    });
   }
 }
