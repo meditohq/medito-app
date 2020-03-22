@@ -1,30 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_playout/player_observer.dart';
+import 'package:flutter_playout/player_state.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 
 class ListItemWidget extends StatefulWidget {
-  ListItemWidget({Key key, this.item, this.currentlyPlayingState})
-      : super(key: key);
+  ListItemWidget({Key key, this.item, this.state}) : super(key: key);
 
+  final PlayerState state;
   final ListItem item;
-  final currentlyPlayingState;
 
   @override
   _ListItemWidgetState createState() => _ListItemWidgetState();
 }
 
-class _ListItemWidgetState extends State<ListItemWidget> {
+class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
+  var currentIcon;
+
   Color getBackgroundColor() {
-//    if (widget.currentlyPlayingState != null) {
-//      return MeditoColors.darkColor;
-//    } else
-//      return null;
+    if (widget.state != null) {
+      return MeditoColors.darkColor;
+    } else
+      return null;
+  }
+
+  @override
+  void didUpdateWidget(ListItemWidget oldWidget) {
+    if (oldWidget.state != widget.state) {
+      _onDesiredStateChanged(oldWidget);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _onDesiredStateChanged(Widget oldWidget) async {
+    switch (widget.state) {
+      case PlayerState.PLAYING:
+        currentIcon = Icons.play_arrow;
+        break;
+      case PlayerState.PAUSED:
+      case PlayerState.STOPPED:
+        currentIcon = Icons.pause;
+        break;
+    }
   }
 
   Widget getListItemImage() {
-    return widget.currentlyPlayingState != null
+    return widget.state != null
         ? InkWell(
             child: _getPlayPauseIcon(),
             onTap: _playOrPause,
@@ -74,19 +97,10 @@ class _ListItemWidgetState extends State<ListItemWidget> {
   }
 
   Widget _getPlayPauseIcon() {
-//    var iconWidget;
-//    var state = widget.currentlyPlayingState;
-//    if (state == AudioPlayerState.PLAYING) {
-//      iconWidget = Icon(Icons.pause, color: MeditoColors.lightColor);
-//    } else if (state == AudioPlayerState.PAUSED ||
-//        state == AudioPlayerState.STOPPED ||
-//        state == AudioPlayerState.COMPLETED) {
-//      iconWidget = Icon(Icons.play_arrow, color: MeditoColors.lightColor);
-//    }
-//    return Padding(
-//      child: iconWidget,
-//      padding: EdgeInsets.only(right: 8),
-//    );
+    return Padding(
+      child: currentIcon,
+      padding: EdgeInsets.only(right: 8),
+    );
   }
 
   Widget getIcon() {

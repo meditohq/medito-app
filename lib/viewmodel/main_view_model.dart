@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Medito/viewmodel/pages.dart';
-import 'package:Medito/viewmodel/pages_data.dart';
+import 'package:Medito/viewmodel/attributions.dart';
+import 'package:Medito/viewmodel/page.dart';
+import 'package:Medito/viewmodel/pages_children.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import 'auth.dart';
-import 'files.dart';
 import 'list_item.dart';
 
 abstract class MainListViewModel {}
@@ -16,9 +16,7 @@ abstract class MainListViewModel {}
 class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
   List<ListItem> navList = [ListItem("Home", "app", null, parentId: "app")];
-  bool playerOpen = false;
   ListItem currentlySelectedFile;
-  bool readMoreTextShowing = false;
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -30,7 +28,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return File('$path/$name.txt');
   }
 
-  Future<File> writePagesToCache(Pages pages, String id) async {
+  Future<File> writePagesToCache(PagesChildren pages, String id) async {
     id = id.replaceAll('/', '+');
     final file = await _localFile(id);
 
@@ -39,7 +37,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return file.writeAsString('$pagesString');
   }
 
-  Future<Pages> readPagesFromCache(String id) async {
+
+  Future<PagesChildren> readPagesChildrenFromCache(String id) async {
     id = id.replaceAll('/', '+');
     try {
       final file = await _localFile(id);
@@ -57,19 +56,43 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       // Read the file.
       String contents = await file.readAsString();
       var decoded = json.decode(contents);
-      return Pages.fromJson(decoded);
+      return PagesChildren.fromJson(decoded);
     } catch (e) {
       return null;
     }
   }
 
-  Future<List<ListItem>> getPage({String id = 'app', bool skipCache = false}) async {
+
+  Future getAttributions(String id) async {
+
+//    if (!skipCache) {
+//      PagesChildren cachedPages = await readPagesChildrenFromCache(id);
+//      if (cachedPages != null)
+//        return await getPageListFromDataChildren(cachedPages.data);
+//    }
+
+    var url = baseUrl + '/' + id.replaceAll('/', '+');
+
+    final response = await http.get(
+      url,
+      headers: {HttpHeaders.authorizationHeader: basicAuth},
+    );
+    final responseJson = json.decode(response.body);
+    var attrs = Attributions.fromJson(responseJson);
+
+//    writePagesToCache(attList, id);
+
+    return attrs.data.content;
+  }
+
+  Future<List<ListItem>> getPageChildren(
+      {String id = 'app', bool skipCache = false}) async {
     if (id == null) id = 'app';
 
-    if(!skipCache) {
-      Pages cachedPages = await readPagesFromCache(id);
+    if (!skipCache) {
+      PagesChildren cachedPages = await readPagesChildrenFromCache(id);
       if (cachedPages != null)
-        return await getPageListFromData(cachedPages.data);
+        return await getPageListFromDataChildren(cachedPages.data);
     }
 
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
@@ -79,15 +102,15 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       headers: {HttpHeaders.authorizationHeader: basicAuth},
     );
     final responseJson = json.decode(response.body);
-    var pages = Pages.fromJson(responseJson);
+    var pages = PagesChildren.fromJson(responseJson);
     var pageList = pages.data;
 
     writePagesToCache(pages, id);
 
-    return await getPageListFromData(pageList);
+    return await getPageListFromDataChildren(pageList);
   }
 
-  Future getPageListFromData(List<Data> pageList) async {
+  Future getPageListFromDataChildren(List<DataChildren> pageList) async {
     List<ListItem> listItemList = [];
     for (var value in pageList) {
       var parentId = value.id.substring(0, value.id.lastIndexOf('/'));
@@ -95,52 +118,51 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
       if (value.template == 'default') {
         //just a folder
-        listItemList.add(ListItem(value.title, value.id, ListItemType.folder,
-            description: value.description,
-            parentId: parentId,
-            contentText: contentText));
-      } else if (value.template == 'media') {
-        var fileType = getFileType(value);
-        var url;
-
-        if (fileType == FileType.both || fileType == FileType.audio) {
-          try {
-            url = await getFileUrl(id: value.id);
-          } catch (e) {
-            print('Error getting ' + value.title);
-          }
-        }
-        listItemList.add(ListItem(value.title, value.id, ListItemType.file,
-            description: value.description,
-            url: url,
-            fileType: fileType,
-            parentId: parentId,
-            contentText: contentText));
+        _addFolderItemToList(listItemList, value, parentId, contentText);
+      } else if (value.template == 'audio') {
+        await _addAudioItemToList(value, listItemList, parentId, contentText);
+      } else if (value.template == 'text') {
+        _addTextItemToList(listItemList, value);
       } else if (value.template == 'illustration') {
-        listItemList.add(ListItem(
-            value.title, value.id, ListItemType.illustration,
-            url: value.illustrationUrl));
+        _addIllustrationItemToList(listItemList, value);
       }
     }
 
     return listItemList;
   }
 
-  FileType getFileType(var value) {
-    if (value.hasFiles &&
-        value.contentText != null &&
-        value.contentText.isNotEmpty) {
-      return FileType.both;
-    } else if (value.hasFiles &&
-        (value.contentText == null || value.contentText.isEmpty)) {
-      return FileType.audio;
-    } else {
-      return FileType.text;
-    }
+  void _addIllustrationItemToList(
+      List<ListItem> listItemList, DataChildren value) {
+    listItemList.add(ListItem(value.title, value.id, ListItemType.illustration,
+        url: value.illustrationUrl));
   }
 
-  Future getFileUrl({String id = ''}) async {
-    var url = baseUrl + '/' + id.replaceAll('/', '+') + '/files';
+  void _addTextItemToList(List<ListItem> listItemList, DataChildren value) {
+    listItemList.add(ListItem(value.title, value.id, ListItemType.file,
+        fileType: FileType.text, url: value.url, contentText: value.contentText));
+  }
+
+  void _addFolderItemToList(List<ListItem> listItemList, DataChildren value,
+      String parentId, String contentText) {
+    //just a folder
+    listItemList.add(ListItem(value.title, value.id, ListItemType.folder,
+        description: value.description,
+        parentId: parentId,
+        contentText: contentText));
+  }
+
+  Future _addAudioItemToList(DataChildren value, List<ListItem> listItemList,
+      String parentId, String contentText) async {
+    listItemList.add(ListItem(value.title, value.id, ListItemType.file,
+        description: value.description,
+        url: value.url,
+        fileType: FileType.audio,
+        parentId: parentId,
+        contentText: contentText));
+  }
+
+  Future getAudioData({String id = ''}) async {
+    var url = baseUrl + '/' + id.replaceAll('/', '+');
 
     final response = await http.get(
       url,
@@ -148,8 +170,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     );
 
     final responseJson = json.decode(response.body);
-    var filesList = Files.fromJson(responseJson).data;
-    return filesList?.first?.url;
+    return Pages.fromJson(responseJson).data.content;
   }
 
   void addToNavList(ListItem item) {

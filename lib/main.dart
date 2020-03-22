@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_playout/player_state.dart';
-
+import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/widgets/bottom_sheet_widget.dart';
 import 'package:Medito/widgets/loading_list_widget.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'audio_playout.dart';
-import 'audioplayer/player_widget.dart';
 import 'tracking/tracking.dart';
 import 'utils/colors.dart';
 import 'viewmodel/list_item.dart';
@@ -57,15 +56,17 @@ class HomeScreenWidget extends StatelessWidget {
                         fontSize: 16.0,
                         color: MeditoColors.lightColor,
                         fontWeight: FontWeight.normal),
+                    display4: TextStyle(
+                        //this is for bottom sheet text
+                        fontSize: 12.0,
+                        height: 1.3,
+                        color: MeditoColors.lightColor,
+                        fontWeight: FontWeight.w400),
                   ))),
       title: _title,
       home: Scaffold(
           appBar: null, //AppBar(title: const Text(_title)),
-          body: Stack(
-            children: <Widget>[
-              MainWidget(),
-            ],
-          )),
+          body: MainWidget()),
     );
   }
 }
@@ -88,8 +89,7 @@ class MainWidget extends StatefulWidget {
 }
 
 /////
-class _MainWidgetState extends State<MainWidget>
-    with TickerProviderStateMixin {
+  class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
@@ -104,7 +104,7 @@ class _MainWidgetState extends State<MainWidget>
   @override
   void initState() {
     super.initState();
-    listFuture = _viewModel.getPage();
+    listFuture = _viewModel.getPageChildren();
   }
 
   @override
@@ -121,77 +121,23 @@ class _MainWidgetState extends State<MainWidget>
           maintainBottomViewPadding: false,
           child: Stack(
             children: <Widget>[
-              IgnorePointer(
-                ignoring: _viewModel.readMoreTextShowing,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                        child: Stack(
-                      children: <Widget>[
-                        getListView(),
-                        AnimatedOpacity(
-                            duration: Duration(milliseconds: 0),
-                            opacity: textFileOpacity,
-                            child: getInnerTextView()),
-                      ],
-                    )),
-                    buildBottomSheet()
-//                    _viewModel.currentlySelectedFile != null
-//                        ? buildBottomSheet()
-//                        : Container()
-                  ],
-                ),
-              ),
-              getReadMoreView()
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget getReadMoreView() {
-    return IgnorePointer(
-      ignoring: !_viewModel.readMoreTextShowing,
-      child: AnimatedOpacity(
-        opacity: _viewModel.readMoreTextShowing ? 1 : 0,
-        duration: Duration(milliseconds: 250),
-        child: Container(
-          color: MeditoColors.darkBGColor,
-          child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: DecoratedBox(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(child: getReadMoreTextWidget()),
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                        color: MeditoColors.darkColor,
-                        borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                      ),
-                    ),
-                  )),
-                  Row(
+                      child: Stack(
                     children: <Widget>[
-                      Expanded(
-                        child: FlatButton(
-                          child: Text("CLOSE"),
-                          color: MeditoColors.lightColor,
-                          onPressed: _closeReadMoreModal,
-                        ),
-                      ),
+                      getListView(),
+                      AnimatedOpacity(
+                          duration: Duration(milliseconds: 0),
+                          opacity: textFileOpacity,
+                          child: getInnerTextView()),
                     ],
-                  )
+                  )),
                 ],
-              )),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -260,7 +206,7 @@ class _MainWidgetState extends State<MainWidget>
 
   Future<void> _onPullToRefresh() async {
     setState(() {
-      listFuture = _viewModel.getPage(
+      listFuture = _viewModel.getPageChildren(
           id: _viewModel.getCurrentPageId(), skipCache: true);
     });
   }
@@ -271,54 +217,62 @@ class _MainWidgetState extends State<MainWidget>
     //if you tapped on a folder
     setState(() {
       _viewModel.addToNavList(i);
-      listFuture = _viewModel.getPage(id: i.id);
+      listFuture = _viewModel.getPageChildren(id: i.id);
     });
   }
 
-  void fileTap(ListItem i) {
-    if (i.fileType == FileType.audio) {
-      _viewModel.playerOpen = true;
+  void fileTap(ListItem item) {
+    if (item.fileType == FileType.audio) {
       Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
-      _showPlayer(i);
-    } else if (i.fileType == FileType.both) {
+          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + item.id);
+      _showPlayerBottomSheet(item);
+    } else if (item.fileType == FileType.both) {
       Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + i.id);
-      _viewModel.playerOpen = true;
-      _showPlayer(i);
-    } else if (i.fileType == FileType.text) {
+          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + item.id);
+      _showPlayerBottomSheet(item);
+    } else if (item.fileType == FileType.text) {
       Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED + " " + i.id);
+          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED + " " + item.id);
       setState(() {
-        _viewModel.addToNavList(i);
+        _viewModel.addToNavList(item);
         textFileOpacity = 1;
       });
     }
   }
 
-  void _showReadMoreModal(ListItem i) {
-    setState(() {
-      readMoreText = i.contentText;
-      _viewModel.readMoreTextShowing = true;
-    });
+  _showPlayerBottomSheet(ListItem listItem) {
+    _viewModel.currentlySelectedFile = listItem;
+
+    showModalBottomSheet(
+      context: context,
+      clipBehavior: Clip.hardEdge,
+      elevation: 2.0,
+      builder: (context) => BottomSheetWidget(
+        title: listItem.title,
+        onBeginPressed: _showPlayer,
+        data: _viewModel.getAudioData(id: listItem.id),
+      ),
+    );
   }
 
-  void _closeReadMoreModal() {
-    _viewModel.readMoreTextShowing = false;
-    setState(() {});
-  }
-
-  void _showPlayer(ListItem fileTapped) {
-    if (fileTapped.id == _viewModel.currentlySelectedFile?.id) {
-      return;
-    }
+  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => PlayerWidget(
+              fileModel: fileTapped,
+              coverArt: coverArt,
+              coverColor: coverColor,
+              listItem: _viewModel.currentlySelectedFile,
+              attributions:
+                  _viewModel.getAttributions(fileTapped.attributions))),
+    );
   }
 
   Widget getFileListItem(ListItem item) {
     if (_viewModel.currentlySelectedFile?.id == item?.id) {
       return new ListItemWidget(
         item: item,
-//        currentlyPlayingState: _viewModel.currentState,
       );
     } else {
       return new ListItemWidget(
@@ -345,42 +299,17 @@ class _MainWidgetState extends State<MainWidget>
 
   void _backPressed(String id) {
     setState(() {
-      if (_viewModel.readMoreTextShowing) {
-        readMoreText = "";
-        _viewModel.readMoreTextShowing = false;
-      } else if (textFileOpacity == 1) {
+      if (textFileOpacity == 1) {
         textFileOpacity = 0;
       } else {
-        listFuture = _viewModel.getPage(id: id);
+        listFuture = _viewModel.getPageChildren(id: id);
       }
       _viewModel.navList.removeLast();
     });
   }
 
-  Widget buildBottomSheet() {
-    var showReadMore =
-        _viewModel.currentlySelectedFile?.contentText?.isNotEmpty;
-    return AudioPlayout(
-      desiredState: PlayerState.PLAYING,
-    );
-//    return PlayerWidget(
-//        fileModel: _viewModel.currentlySelectedFile,
-//        readMorePressed: _readMorePressed,
-//        showReadMoreButton: showReadMore == null ? false : showReadMore);
-  }
-
-  void _readMorePressed() {
-    Tracking.trackScreen(
-        Tracking.READ_MORE_TAPPED, _viewModel.currentlySelectedFile?.id);
-
-    _showReadMoreModal(_viewModel.currentlySelectedFile);
-  }
-
   Future<bool> _onWillPop() {
-    if (_viewModel.readMoreTextShowing) {
-      _viewModel.readMoreTextShowing = false;
-      _closeReadMoreModal();
-    } else if (_viewModel.navList.length > 1) {
+    if (_viewModel.navList.length > 1) {
       _backPressed(_viewModel.navList.last.parentId);
       Tracking.trackScreen(
           Tracking.BACK_PRESSED,
@@ -417,9 +346,14 @@ class _MainWidgetState extends State<MainWidget>
                   children: <Widget>[
                     Expanded(
                       child: SingleChildScrollView(
-                        child: Text(
-                          content == null ? '' : content,
-                          style: Theme.of(context).textTheme.subhead,
+                        child: MarkdownBody(
+                          selectable: true,
+                          styleSheet:
+                              MarkdownStyleSheet.fromTheme(Theme.of(context))
+                                  .copyWith(
+                                      p: Theme.of(context).textTheme.subhead),
+                          data: content == null ? '' : content,
+                          imageDirectory: 'https://raw.githubusercontent.com',
                         ),
                       ),
                     ),
