@@ -51,7 +51,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   Duration duration = Duration(milliseconds: 1);
   Duration currentPlaybackPosition = Duration.zero;
 
-  double eightyPercentOfScreen;
+  double widthOfScreen;
 
   get isPlaying => audioPlayerState == PlayerState.PLAYING;
 
@@ -162,21 +162,96 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   Widget build(BuildContext context) {
-    this.eightyPercentOfScreen = MediaQuery.of(context).size.height *
-        0.75; //TODO use fractionallysizedbox
+    this.widthOfScreen =
+        MediaQuery.of(context).size.width; //TODO use fractionallysizedbox
 
     return Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildGoBackPill(),
-              buildContainerWithRoundedCorners(context),
-            ],
-          ),
+        body: Stack(
+          children: <Widget>[
+            Positioned(
+                bottom: 0,
+                child: Container(
+                    width: widthOfScreen,
+                    height: 35,
+                    color: MeditoColors.darkBGColor)),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  buildGoBackPill(),
+                  buildContainerWithRoundedCorners(context),
+                ],
+              ),
+            ),
+            buildBottomSheet(),
+          ],
         ));
+  }
+
+  Widget buildBottomSheet() {
+    return SafeArea(
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.07,
+        minChildSize: 0.07,
+        builder: (BuildContext context, ScrollController scrollController) {
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+              color: MeditoColors.darkBGColor,
+            ),
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: 2,
+              itemBuilder: (BuildContext context, int index) {
+                switch (index) {
+                  case 0:
+                    return Visibility(
+                      visible: widget.listItem.contentText != '',
+                      child: Column(
+                        children: <Widget>[
+                          Center(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(16)),
+                                color: MeditoColors.lightColorLine,
+                              ),
+                              margin: EdgeInsets.only(top: 16, bottom: 16),
+                              height: 4,
+                              width: 48,
+                            ),
+                          ),
+                          Center(
+                              child: Text(
+                            'MORE DETAILS',
+                            style: Theme.of(context).textTheme.body2,
+                          )),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              widget.listItem.contentText,
+                              style: Theme.of(context).textTheme.display3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  case 1:
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(child: buildAttributionsView()),
+                    );
+                }
+
+                return Container();
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget buildContainerWithRoundedCorners(BuildContext context) {
@@ -184,7 +259,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
       margin: EdgeInsets.only(left: 16, right: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(16)),
-        color: MeditoColors.darkColor,
+        color: MeditoColors.darkBGColor,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -253,7 +328,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
       child: SliderTheme(
         data: SliderThemeData(
           activeTrackColor: MeditoColors.lightColor,
-          inactiveTrackColor: MeditoColors.darkBGColor,
+          inactiveTrackColor: MeditoColors.darkColor,
           thumbColor: MeditoColors.lightColor,
           trackHeight: 4,
         ),
@@ -314,7 +389,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   Widget buildGoBackPill() {
     return Padding(
-      padding: EdgeInsets.only(left: 16, bottom: 8),
+      padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),
       child: GestureDetector(
           onTap: () {
             stop();
@@ -358,8 +433,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             padding: const EdgeInsets.only(
                 top: 24, left: 24.0, right: 24, bottom: 24),
             child: Text(
-              widget.listItem.title + 'dfg dsfg sdfjkgh jsdfg 234 23 ',
-              style: Theme.of(context).textTheme.title.copyWith(fontSize: 22),
+              widget.listItem.title,
+              style: Theme.of(context).textTheme.title,
               textAlign: TextAlign.center,
             ),
           ),
@@ -382,15 +457,6 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     );
   }
 
-  Widget buildLowerText(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Text(getLoremLong(),
-          //widget.listItem.contentText,
-          style: Theme.of(context).textTheme.display4),
-    );
-  }
-
   String _playbackPositionString() {
     return formatDuration(currentPlaybackPosition);
   }
@@ -403,22 +469,17 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   Widget buildAttributionsView() {
     return Container(
-      padding: EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(2)),
-        color: MeditoColors.darkColor,
-      ),
+      padding: EdgeInsets.only(top: 0, bottom: 8, left: 16, right: 16),
       child: new RichText(
         text: new TextSpan(
           children: [
             new TextSpan(
               text: 'Audio from '.toUpperCase(),
-              style: new TextStyle(color: MeditoColors.lightColor),
+              style: Theme.of(context).textTheme.display4,
             ),
             new TextSpan(
-              text: licenseName?.toUpperCase(),
-              style: new TextStyle(
-                  color: MeditoColors.lightColor, fontWeight: FontWeight.bold),
+              text: licenseTitle?.toUpperCase(),
+              style: Theme.of(context).textTheme.body2,
               recognizer: new TapGestureRecognizer()
                 ..onTap = () {
                   launch(sourceUrl);
@@ -426,12 +487,11 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             ),
             new TextSpan(
               text: ' / License: '.toUpperCase(),
-              style: new TextStyle(color: MeditoColors.lightColor),
+              style: Theme.of(context).textTheme.display4,
             ),
             new TextSpan(
-              text: licenseTitle?.toUpperCase(),
-              style: new TextStyle(
-                  color: MeditoColors.lightColor, fontWeight: FontWeight.bold),
+              text: licenseName?.toUpperCase(),
+              style: Theme.of(context).textTheme.body2,
               recognizer: new TapGestureRecognizer()
                 ..onTap = () {
                   launch(licenseURL);

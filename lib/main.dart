@@ -1,4 +1,5 @@
 import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/bottom_sheet_widget.dart';
 import 'package:Medito/widgets/loading_list_widget.dart';
 import 'package:flutter/material.dart';
@@ -31,44 +32,14 @@ class HomeScreenWidget extends StatelessWidget {
       theme: ThemeData(
           accentColor: MeditoColors.lightColor,
           textTheme:
-              GoogleFonts.dMSansTextTheme(Theme.of(context).textTheme.copyWith(
-                    title: TextStyle(
-                        fontSize: 22.0,
-                        color: MeditoColors.lightColor,
-                        fontWeight: FontWeight.w600),
-                    subhead: TextStyle(
-                        fontSize: 16.0,
-                        height: 1.3,
-                        color: MeditoColors.lightTextColor,
-                        fontWeight: FontWeight.normal),
-                    display1: TextStyle(
-                        //pill big
-                        fontSize: 18.0,
-                        color: MeditoColors.darkBGColor,
-                        fontWeight: FontWeight.normal),
-                    display2: TextStyle(
-                        //pill small
-                        fontSize: 14.0,
-                        color: MeditoColors.lightColor,
-                        fontWeight: FontWeight.normal),
-                    display3: TextStyle(
-                        //this is for bottom sheet text
-                        fontSize: 16.0,
-                        color: MeditoColors.lightColor,
-                        fontWeight: FontWeight.normal),
-                    display4: TextStyle(
-                        //this is for bottom sheet text
-                        fontSize: 12.0,
-                        height: 1.3,
-                        color: MeditoColors.lightColor,
-                        fontWeight: FontWeight.w400),
-                  ))),
+              buildDMSansTextTheme(context)),
       title: _title,
       home: Scaffold(
           appBar: null, //AppBar(title: const Text(_title)),
           body: MainWidget()),
     );
   }
+
 }
 
 class MainStateless extends StatelessWidget {

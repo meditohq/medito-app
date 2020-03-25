@@ -37,7 +37,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: MeditoColors.darkBGColor,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+        color: MeditoColors.darkBGColor,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +104,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       padding: const EdgeInsets.only(left: 16.0),
       child: Text(
         'VOICE',
-        style: Theme.of(context).textTheme.display2,
+        style: Theme.of(context).textTheme.display4,
       ),
     );
   }
@@ -225,7 +229,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.subhead.copyWith(
+    return Theme.of(context).textTheme.display4.copyWith(
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);

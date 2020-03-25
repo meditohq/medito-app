@@ -37,7 +37,6 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return file.writeAsString('$pagesString');
   }
 
-
   Future<PagesChildren> readPagesChildrenFromCache(String id) async {
     id = id.replaceAll('/', '+');
     try {
@@ -62,9 +61,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     }
   }
 
-
   Future getAttributions(String id) async {
-
 //    if (!skipCache) {
 //      PagesChildren cachedPages = await readPagesChildrenFromCache(id);
 //      if (cachedPages != null)
@@ -139,7 +136,9 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   void _addTextItemToList(List<ListItem> listItemList, DataChildren value) {
     listItemList.add(ListItem(value.title, value.id, ListItemType.file,
-        fileType: FileType.text, url: value.url, contentText: value.contentText));
+        fileType: FileType.text,
+        url: value.url,
+        contentText: value.contentText));
   }
 
   void _addFolderItemToList(List<ListItem> listItemList, DataChildren value,
@@ -171,6 +170,28 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
     final responseJson = json.decode(response.body);
     return Pages.fromJson(responseJson).data.content;
+  }
+
+
+  Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
+    var url = baseUrl + id.replaceAll('/', '+') + '/children';
+
+    final response = await http.get(
+      url,
+      headers: {HttpHeaders.authorizationHeader: basicAuth},
+    );
+    final responseJson = json.decode(response.body);
+
+    List all = PagesChildren.fromJson(responseJson).data;
+
+    if (timely == 'daily') {
+      var now = DateTime.now().day;
+      var index = now % all.length;
+      if (index == 0)
+        return all[now];
+      else
+        return all[index];
+    }
   }
 
   void addToNavList(ListItem item) {

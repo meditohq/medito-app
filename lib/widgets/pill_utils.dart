@@ -27,7 +27,7 @@ BoxDecoration getBoxDecoration(int i, int startNumber, {Color color}) {
 }
 
 EdgeInsets getEdgeInsets(int i, int startNumber) {
-  return EdgeInsets.all(i == startNumber ? _paddingSmall : _paddingLarge);
+  return EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12);
 }
 
 getLoremMedium() {
