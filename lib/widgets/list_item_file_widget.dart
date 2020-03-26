@@ -113,6 +113,7 @@ class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
 
     switch (widget.item.fileType) {
       case FileType.audio:
+      case FileType.audioset:
         iconWidget = Icon(
           Icons.headset,
           color: MeditoColors.lightColor,

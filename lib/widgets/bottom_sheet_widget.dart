@@ -28,35 +28,39 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     super.initState();
 
     widget.data.then((d) {
-      this.coverArt = d.coverArt.first;
-      this.coverColor = d.coverColor;
-      compileLists(d.files);
+      this.coverArt = d?.coverArt?.first;
+      this.coverColor = d?.coverColor;
+      compileLists(d?.files);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-        color: MeditoColors.darkBGColor,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          buildInkWell(),
-          buildTitleText(context),
-          buildVoiceText(context),
-          buildVoiceRow(),
-          buildSessionLengthText(context),
-          buildSessionLengthRow(),
-          buildButton(),
-          Container(
-            height: 16,
-          )
-        ],
+      //this is to hide the white background behind the rounded corners
+      color: MeditoColors.almostBlack,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+          color: MeditoColors.darkBGColor,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            buildInkWell(),
+            buildTitleText(context),
+            buildVoiceText(context),
+            buildVoiceRow(),
+            buildSessionLengthText(context),
+            buildSessionLengthRow(),
+            buildButton(),
+            Container(
+              height: 16,
+            )
+          ],
+        ),
       ),
     );
   }

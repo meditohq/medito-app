@@ -61,9 +61,11 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void dispose() {
-    super.dispose();
-    stop();
+    if(audioPlayerState != PlayerState.STOPPED) {
+      stop();
+    }
     _audioPlayer.dispose();
+    super.dispose();
   }
 
   @override
@@ -198,7 +200,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
         builder: (BuildContext context, ScrollController scrollController) {
           return Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8), topRight: Radius.circular(8)),
               color: MeditoColors.darkBGColor,
             ),
             child: ListView.builder(
@@ -211,30 +214,38 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                       visible: widget.listItem.contentText != '',
                       child: Column(
                         children: <Widget>[
-                          Center(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(16)),
-                                color: MeditoColors.lightColorLine,
+                          Visibility(
+                            visible: widget.listItem.contentText != null,
+                            child: Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(16)),
+                                  color: MeditoColors.lightColorLine,
+                                ),
+                                margin: EdgeInsets.only(top: 16, bottom: 16),
+                                height: 4,
+                                width: 48,
                               ),
-                              margin: EdgeInsets.only(top: 16, bottom: 16),
-                              height: 4,
-                              width: 48,
                             ),
                           ),
-                          Center(
-                              child: Text(
-                            'MORE DETAILS',
-                            style: Theme.of(context).textTheme.body2,
-                          )),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              widget.listItem.contentText,
-                              style: Theme.of(context).textTheme.display3,
-                            ),
+                          Visibility(
+                            visible: widget.listItem.contentText != null,
+                            child: Center(
+                                child: Text(
+                              'MORE DETAILS',
+                              style: Theme.of(context).textTheme.body2,
+                            )),
                           ),
+                          widget.listItem.contentText != null
+                              ? Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    widget.listItem.contentText,
+                                    style: Theme.of(context).textTheme.display3,
+                                  ),
+                                )
+                              : Container(),
                         ],
                       ),
                     );
@@ -286,8 +297,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
               height: 48,
               child: FlatButton(
                 shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(12.0),
-                    side: BorderSide(color: Colors.red)),
+                  borderRadius: new BorderRadius.circular(12.0),
+                ),
                 child: _loading
                     ? buildCircularProgressIndicator()
                     : Icon(
@@ -354,7 +365,9 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     // requested
     _audioPlayer.play(widget.fileModel.url,
         title: widget.listItem.title,
-        subtitle: widget.listItem.description,
+        subtitle: widget.listItem.description == null
+            ? ''
+            : widget.listItem.description,
         position: currentPlaybackPosition,
         isLiveStream: false);
   }

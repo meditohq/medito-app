@@ -1,3 +1,4 @@
+import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class TileList extends StatefulWidget {
@@ -22,16 +23,30 @@ class TileListState extends State<TileList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 4,
-      itemBuilder: (BuildContext context, int index) {
-        if (index < 3) {
-          return ListTile(
-            title: getHorizontalTile(),
-          );
-        } else
-          return twoColumnsTile();
-      },
+    return Container(
+      color: MeditoColors.darkBGColor,
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Image.network('https://img.icons8.com/ios/72/blood-sample.png', height: 54,),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 4,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index < 3) {
+                    return ListTile(
+                      title: getHorizontalTile(),
+                    );
+                  } else
+                    return twoColumnsTile();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

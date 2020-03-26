@@ -9,4 +9,5 @@ class MeditoColors {
   static var darkColor = Color(0xff343b43);
   static var darkBGColor = Color(0xff22282D);
   static var lightBlack = Color(0xb2000000);
+  static var almostBlack = Color(0xEE000000);
 }

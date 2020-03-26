@@ -15,7 +15,7 @@ abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
-  List<ListItem> navList = [ListItem("Home", "app", null, parentId: "app")];
+  List<ListItem> navList = [ListItem("Home", "app+content", null, parentId: "app+content")];
   ListItem currentlySelectedFile;
 
   Future<String> get _localPath async {
@@ -83,8 +83,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   }
 
   Future<List<ListItem>> getPageChildren(
-      {String id = 'app', bool skipCache = false}) async {
-    if (id == null) id = 'app';
+      {String id = 'app+content', bool skipCache = false}) async {
+    if (id == null) id = 'app+content';
 
     if (!skipCache) {
       PagesChildren cachedPages = await readPagesChildrenFromCache(id);
@@ -123,6 +123,9 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       } else if (value.template == 'illustration') {
         _addIllustrationItemToList(listItemList, value);
       }
+      else if (value.template == 'audio-set') {
+        _addAudioSetItemToList(listItemList, value);
+      }
     }
 
     return listItemList;
@@ -139,6 +142,11 @@ class SubscriptionViewModelImpl implements MainListViewModel {
         fileType: FileType.text,
         url: value.url,
         contentText: value.contentText));
+  }
+
+  void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value) {
+    listItemList.add(ListItem(value.title, value.id, ListItemType.file,
+        fileType: FileType.audioset,));
   }
 
   void _addFolderItemToList(List<ListItem> listItemList, DataChildren value,
@@ -172,9 +180,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return Pages.fromJson(responseJson).data.content;
   }
 
-
   Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
-    var url = baseUrl + id.replaceAll('/', '+') + '/children';
+    var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     final response = await http.get(
       url,
@@ -187,10 +194,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     if (timely == 'daily') {
       var now = DateTime.now().day;
       var index = now % all.length;
-      if (index == 0)
-        return all[now];
-      else
-        return all[index];
+
+      return getAudioData(id: all[index == 0? now: index].id);
     }
   }
 
