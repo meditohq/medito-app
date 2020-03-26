@@ -1,6 +1,7 @@
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/bottom_sheet_widget.dart';
+import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:Medito/widgets/loading_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +37,7 @@ class HomeScreenWidget extends StatelessWidget {
       title: _title,
       home: Scaffold(
           appBar: null, //AppBar(title: const Text(_title)),
-          body: MainWidget()),
+          body: TileList()),
     );
   }
 
@@ -241,15 +242,9 @@ class MainWidget extends StatefulWidget {
   }
 
   Widget getFileListItem(ListItem item) {
-    if (_viewModel.currentlySelectedFile?.id == item?.id) {
       return new ListItemWidget(
         item: item,
       );
-    } else {
-      return new ListItemWidget(
-        item: item,
-      );
-    }
   }
 
   Widget getChildForListView(ListItem item) {
