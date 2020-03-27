@@ -39,10 +39,12 @@ class PagesChildren {
 }
 
 class DataChildren {
-  String colorBackground;
-  String colorDark;
-  String colorLight;
+  String buttonLabel;
+  String pathType;
+  String primaryColor;
+  String secondaryColor;
   String contentText;
+  String contentPath;
   String description;
   String id;
   String illustrationUrl;
@@ -52,12 +54,15 @@ class DataChildren {
   String url;
 
   DataChildren(
-      {this.colorBackground,
-        this.colorDark,
-        this.colorLight,
+      {
+        this.buttonLabel,
+        this.primaryColor,
+        this.secondaryColor,
         this.contentText,
+        this.contentPath,
         this.description,
         this.id,
+        this.pathType,
         this.illustrationUrl,
         this.num,
         this.template,
@@ -65,14 +70,16 @@ class DataChildren {
         this.url});
 
   DataChildren.fromJson(Map<String, dynamic> json) {
-    colorBackground = json['colorBackground'];
-    colorDark = json['colorDark'];
-    colorLight = json['colorLight'];
+    buttonLabel = json['buttonLabel'];
+    primaryColor = json['primaryColor'];
+    secondaryColor = json['secondaryColor'];
     contentText = json['contentText'];
+    contentPath = json['contentPath'];
     description = json['description'];
     id = json['id'];
     illustrationUrl = json['illustrationUrl'];
     num = json['num'];
+    pathType = json['pathType'];
     template = json['template'];
     title = json['title'];
     url = json['url'];
@@ -80,15 +87,17 @@ class DataChildren {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['colorBackground'] = this.colorBackground;
-    data['colorDark'] = this.colorDark;
-    data['colorLight'] = this.colorLight;
+    data['buttonLabel'] = this.buttonLabel;
+    data['primaryColor'] = this.primaryColor;
+    data['secondaryColor'] = this.secondaryColor;
     data['contentText'] = this.contentText;
+    data['contentPath'] = this.contentPath;
     data['description'] = this.description;
     data['id'] = this.id;
     data['illustrationUrl'] = this.illustrationUrl;
     data['num'] = this.num;
     data['template'] = this.template;
+    data['pathType'] = this.pathType;
     data['title'] = this.title;
     data['url'] = this.url;
     return data;

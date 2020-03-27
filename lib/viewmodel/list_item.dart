@@ -11,11 +11,11 @@ class ListItem {
 
   ListItem(this.title, this.id, this.type,
       {this.description,
-      this.fileType,
-      this.url,
-      this.parentId,
-      this.thumbnail,
-      this.contentText});
+        this.fileType,
+        this.url,
+        this.parentId,
+        this.thumbnail,
+        this.contentText});
 }
 
 enum ListItemType { folder, file, illustration }

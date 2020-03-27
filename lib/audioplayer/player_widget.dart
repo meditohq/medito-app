@@ -1,6 +1,6 @@
+import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/page.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -21,6 +21,7 @@ class PlayerWidget extends StatefulWidget {
       this.desiredState,
       this.listItem,
       this.coverColor,
+      this.title,
       this.coverArt,
       this.attributions})
       : super(key: key);
@@ -30,6 +31,7 @@ class PlayerWidget extends StatefulWidget {
   final Future attributions;
   final Files fileModel;
   final PlayerState desiredState;
+  final String title;
   final ListItem listItem;
 
   @override
@@ -61,7 +63,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void dispose() {
-    if(audioPlayerState != PlayerState.STOPPED) {
+    if (audioPlayerState != PlayerState.STOPPED) {
       stop();
     }
     _audioPlayer.dispose();
@@ -364,7 +366,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     // play in which case we want playback to start from where user has
     // requested
     _audioPlayer.play(widget.fileModel.url,
-        title: widget.listItem.title,
+        title: widget.title,
         subtitle: widget.listItem.description == null
             ? ''
             : widget.listItem.description,
@@ -427,8 +429,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16)),
-                color: Color(int.parse(widget.coverColor?.replaceFirst('#', ''),
-                    radix: 16)),
+                color: parseColor(widget.coverColor),
               ),
               child: SvgPicture.network(
                 widget.coverArt.url,
@@ -446,7 +447,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             padding: const EdgeInsets.only(
                 top: 24, left: 24.0, right: 24, bottom: 24),
             child: Text(
-              widget.listItem.title,
+              widget.title,
               style: Theme.of(context).textTheme.title,
               textAlign: TextAlign.center,
             ),

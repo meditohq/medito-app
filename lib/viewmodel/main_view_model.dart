@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Medito/viewmodel/attributions.dart';
-import 'package:Medito/viewmodel/page.dart';
-import 'package:Medito/viewmodel/pages_children.dart';
+import 'package:Medito/data/attributions.dart';
+import 'package:Medito/data/page.dart';
+import 'package:Medito/data/pages_children.dart';
+import 'package:Medito/viewmodel/tile_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -205,17 +206,5 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   String getCurrentPageId() {
     return navList.last.id;
-  }
-
-  Future<bool> checkConnectivity() async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        return true;
-      }
-    } on SocketException catch (_) {
-      return false;
-    }
-    return false;
   }
 }

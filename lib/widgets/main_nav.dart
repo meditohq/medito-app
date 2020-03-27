@@ -26,11 +26,9 @@ class MainWidget extends StatefulWidget {
   MainWidget({Key key}) : super(key: key);
 
   @override
-//  _PlaceHolderState createState() => _PlaceHolderState();
   _MainWidgetState createState() => _MainWidgetState();
 }
 
-/////
 class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
@@ -68,14 +66,14 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
                 children: <Widget>[
                   Expanded(
                       child: Stack(
-                        children: <Widget>[
-                          getListView(),
-                          AnimatedOpacity(
-                              duration: Duration(milliseconds: 0),
-                              opacity: textFileOpacity,
-                              child: getInnerTextView()),
-                        ],
-                      )),
+                    children: <Widget>[
+                      getListView(),
+                      AnimatedOpacity(
+                          duration: Duration(milliseconds: 0),
+                          opacity: textFileOpacity,
+                          child: getInnerTextView()),
+                    ],
+                  )),
                 ],
               ),
             ],
@@ -126,7 +124,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
 
             return new ListView.builder(
                 itemCount:
-                1 + (snapshot.data == null ? 0 : snapshot.data.length),
+                    1 + (snapshot.data == null ? 0 : snapshot.data.length),
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int i) {
                   if (i == 0) {
@@ -198,23 +196,25 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
         onBeginPressed: _showPlayer,
         data: listItem.fileType == FileType.audioset
             ? _viewModel.getAudioFromSet(
-            id: listItem.id, timely: listItem.title.toLowerCase())
+                id: listItem.id, timely: listItem.title.toLowerCase())
             : _viewModel.getAudioData(id: listItem.id),
       ),
     );
   }
 
-  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor) {
+  _showPlayer(
+      dynamic fileTapped, dynamic coverArt, dynamic coverColor, String title) {
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => PlayerWidget(
               fileModel: fileTapped,
+              title: title,
               coverArt: coverArt,
               coverColor: coverColor,
               listItem: _viewModel.currentlySelectedFile,
               attributions:
-              _viewModel.getAttributions(fileTapped.attributions))),
+                  _viewModel.getAttributions(fileTapped.attributions))),
     );
   }
 
@@ -292,9 +292,9 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
                         child: MarkdownBody(
                           selectable: true,
                           styleSheet:
-                          MarkdownStyleSheet.fromTheme(Theme.of(context))
-                              .copyWith(
-                              p: Theme.of(context).textTheme.subhead),
+                              MarkdownStyleSheet.fromTheme(Theme.of(context))
+                                  .copyWith(
+                                      p: Theme.of(context).textTheme.subhead),
                           data: content == null ? '' : content,
                           imageDirectory: 'https://raw.githubusercontent.com',
                         ),
