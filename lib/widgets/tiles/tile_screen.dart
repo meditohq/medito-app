@@ -135,100 +135,115 @@ class TileListState extends State<TileList> {
   Widget getTile(TileItem item) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () => _onTap(item),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-            color: parseColor(item.colorBackground),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(item.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .copyWith(color: parseColor(item.colorText))),
-                Container(height: 16),
-                SizedBox(
-                    height: 134, child: SvgPicture.network(item.thumbnail)),
-              ],
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          color: parseColor(item.colorBackground),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(item.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .title
+                      .copyWith(color: parseColor(item.colorText))),
+              Container(height: 16),
+              SizedBox(height: 134, child: SvgPicture.network(item.thumbnail)),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget getHorizontalTile(TileItem tile) {
+  Widget wrapWithInkWell(
+    Color color,
+    TileItem item,
+    Widget w,
+  ) {
+    return Material(
+        color: Colors.white.withOpacity(0.0),
+        child: InkWell(
+          onTap: () => _onTap(item),
+          borderRadius: BorderRadius.circular(16.0),
+          child: w,
+        ));
+  }
+
+  Widget getHorizontalTile(TileItem item) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-      child: GestureDetector(
-        onTap: () => _onTap(tile),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-            color: tile.colorBackground != null
-                ? parseColor(tile.colorBackground)
-                : Colors.black,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(tile.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .title
-                              .copyWith(color: parseColor(tile.colorText))),
-                      Text(tile.description,
-                          style: Theme.of(context)
-                              .textTheme
-                              .subhead
-                              .copyWith(color: parseColor(tile.colorText))),
-                      tile.buttonLabel != null
-                          ? FlatButton(
-                              color: parseColor(tile.colorButton),
-                              child: Text(tile.buttonLabel,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subhead
-                                      .copyWith(
-                                          color: parseColor(
-                                              tile.colorButtonText))),
-                            )
-                          : Container()
-                    ],
-                  ),
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+        child: InkWell(
+          splashColor: Colors.red,
+          onTap: () => _onTap(item),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+              color: item.colorBackground != null
+                  ? parseColor(item.colorBackground)
+                  : Colors.black,
+            ),
+            child: wrapWithInkWell(
+              parseColor(item.colorBackground),
+              item,
+              Padding(
+                padding:
+                    const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(item.title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .title
+                                  .copyWith(color: parseColor(item.colorText))),
+                          Text(item.description,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subhead
+                                  .copyWith(color: parseColor(item.colorText))),
+                          item.buttonLabel != null
+                              ? FlatButton(
+                                  color: parseColor(item.colorButton),
+                                  child: Text(item.buttonLabel,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .subhead
+                                          .copyWith(
+                                              color: parseColor(
+                                                  item.colorButtonText))),
+                                )
+                              : Container()
+                        ],
+                      ),
+                    ),
+                    Container(height: 16),
+                    Expanded(
+                        child: SizedBox(
+                            height: 130,
+                            child: SvgPicture.network(item.thumbnail))),
+                  ],
                 ),
-                Container(height: 16),
-                Expanded(
-                    child: SizedBox(
-                        height: 130,
-                        child: SvgPicture.network(tile.thumbnail))),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   _onTap(TileItem tile) {
-    if (tile.pathType == '/') {
+    if (tile.pathTemplate == 'audio') {
       _openBottomSheet(tile);
     }
   }
@@ -247,7 +262,8 @@ class TileListState extends State<TileList> {
     );
   }
 
-  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor, String title) {
+  _showPlayer(
+      dynamic fileTapped, dynamic coverArt, dynamic coverColor, String title) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,

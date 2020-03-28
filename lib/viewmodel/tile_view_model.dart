@@ -55,7 +55,7 @@ class TileListViewModelImpl implements TileListViewModel {
         contentPath: value.contentPath,
         colorButton: value.secondaryColor,
         colorButtonText: value.primaryColor,
-        pathType: value.pathType,
+        pathTemplate: value.pathTemplate,
         colorText: value.secondaryColor,
         buttonLabel: value.buttonLabel));
   }

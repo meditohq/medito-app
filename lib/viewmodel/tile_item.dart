@@ -5,7 +5,7 @@ class TileItem {
   String description = '';
   String url;
   String parentId;
-  String pathType;
+  String pathTemplate;
   TileType tileType;
   String contentPath;
   String colorBackground;
@@ -23,7 +23,7 @@ class TileItem {
       this.contentPath,
       this.colorBackground,
       this.colorButton,
-      this.pathType,
+      this.pathTemplate,
       this.colorButtonText,
       this.colorText,
       this.buttonLabel});

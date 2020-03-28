@@ -87,6 +87,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
       licenseURL = attr.licenseUrl;
       setState(() {});
     });
+    play();
   }
 
   @override

@@ -40,7 +40,7 @@ class PagesChildren {
 
 class DataChildren {
   String buttonLabel;
-  String pathType;
+  String pathTemplate;
   String primaryColor;
   String secondaryColor;
   String contentText;
@@ -62,7 +62,7 @@ class DataChildren {
         this.contentPath,
         this.description,
         this.id,
-        this.pathType,
+        this.pathTemplate,
         this.illustrationUrl,
         this.num,
         this.template,
@@ -79,7 +79,7 @@ class DataChildren {
     id = json['id'];
     illustrationUrl = json['illustrationUrl'];
     num = json['num'];
-    pathType = json['pathType'];
+    pathTemplate = json['pathTemplate'];
     template = json['template'];
     title = json['title'];
     url = json['url'];
@@ -97,7 +97,7 @@ class DataChildren {
     data['illustrationUrl'] = this.illustrationUrl;
     data['num'] = this.num;
     data['template'] = this.template;
-    data['pathType'] = this.pathType;
+    data['pathTemplate'] = this.pathTemplate;
     data['title'] = this.title;
     data['url'] = this.url;
     return data;
