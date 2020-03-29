@@ -23,10 +23,12 @@ class PlayerWidget extends StatefulWidget {
       this.coverColor,
       this.title,
       this.coverArt,
-      this.attributions})
+      this.attributions,
+      this.description})
       : super(key: key);
 
   final String coverColor;
+  final String description;
   final CoverArt coverArt;
   final Future attributions;
   final Files fileModel;
@@ -168,7 +170,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   @override
   Widget build(BuildContext context) {
     this.widthOfScreen =
-        MediaQuery.of(context).size.width; //TODO use fractionallysizedbox
+        MediaQuery.of(context).size.width;
 
     return Scaffold(
         backgroundColor: Colors.black,
@@ -197,6 +199,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   Widget buildBottomSheet() {
     return SafeArea(
+      bottom: false,
       child: DraggableScrollableSheet(
         initialChildSize: 0.07,
         minChildSize: 0.07,
@@ -368,9 +371,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     // requested
     _audioPlayer.play(widget.fileModel.url,
         title: widget.title,
-        subtitle: widget.listItem.description == null
-            ? ''
-            : widget.listItem.description,
+        subtitle:
+            widget.description == null ? '' : widget.description,
         position: currentPlaybackPosition,
         isLiveStream: false);
   }

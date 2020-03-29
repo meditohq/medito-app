@@ -7,6 +7,7 @@ import 'tracking/tracking.dart';
 import 'utils/colors.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(HomeScreenWidget());
   Tracking.initialiseTracker();
 }

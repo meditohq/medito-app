@@ -4,8 +4,6 @@ import 'package:flutter/widgets.dart';
 
 var _borderRadiusSmall = BorderRadius.circular(13);
 var _borderRadiusLarge = BorderRadius.circular(16);
-var _paddingSmall = 8.0;
-var _paddingLarge = 12.0;
 
 Text getTextLabel(String label, int i, int startNumber, BuildContext context) {
   return Text(label,
@@ -15,7 +13,6 @@ Text getTextLabel(String label, int i, int startNumber, BuildContext context) {
 }
 
 BoxDecoration getBoxDecoration(int i, int startNumber, {Color color}) {
-
   if (color == null) {
     color = i == startNumber ? MeditoColors.darkColor : MeditoColors.lightColor;
   }

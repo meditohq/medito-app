@@ -1,23 +1,21 @@
-import 'package:Medito/utils/colors.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../viewmodel/list_item.dart';
 
-class NavWidget extends StatefulWidget {
-  const NavWidget({Key key, this.list, this.backPressed}) : super(key: key);
+class NavPillsWidget extends StatefulWidget {
+  const NavPillsWidget({Key key, this.list, this.backPressed}) : super(key: key);
 
   final List<ListItem> list;
   final ValueChanged<String> backPressed;
 
   @override
-  _NavWidgetState createState() => new _NavWidgetState();
+  _NavPillsWidgetState createState() => new _NavPillsWidgetState();
 }
 
-class _NavWidgetState extends State<NavWidget>
+class _NavPillsWidgetState extends State<NavPillsWidget>
     with SingleTickerProviderStateMixin {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -46,10 +44,10 @@ class _NavWidgetState extends State<NavWidget>
 
       columns.add(GestureDetector(
           onTap: () {
-            Tracking.trackEvent(Tracking.BREADCRUMB,
-                Tracking.BREADCRUMB_TAPPED, widget.list.last?.id);
+            Tracking.trackEvent(Tracking.BREADCRUMB, Tracking.BREADCRUMB_TAPPED,
+                widget.list.last?.id);
 
-            if (i == startNumber && widget.list.length > 1)
+            if (i == startNumber)
               widget.backPressed(widget.list[i].id);
           },
           child: AnimatedContainer(
@@ -63,5 +61,4 @@ class _NavWidgetState extends State<NavWidget>
 
     return columns;
   }
-
 }

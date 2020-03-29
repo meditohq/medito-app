@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/pages_children.dart';
-import 'package:Medito/viewmodel/tile_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -16,7 +15,7 @@ abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
   final String baseUrl = 'https://medito.app/api/pages';
-  List<ListItem> navList = [ListItem("Home", "app+content", null, parentId: "app+content")];
+  List<ListItem> navList = [];
   ListItem currentlySelectedFile;
 
   Future<String> get _localPath async {
@@ -123,8 +122,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
         _addTextItemToList(listItemList, value);
       } else if (value.template == 'illustration') {
         _addIllustrationItemToList(listItemList, value);
-      }
-      else if (value.template == 'audio-set') {
+      } else if (value.template == 'audio-set') {
         _addAudioSetItemToList(listItemList, value);
       }
     }
@@ -146,8 +144,12 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   }
 
   void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value) {
-    listItemList.add(ListItem(value.title, value.id, ListItemType.file,
-        fileType: FileType.audioset,));
+    listItemList.add(ListItem(
+      value.title,
+      value.id,
+      ListItemType.file,
+      fileType: FileType.audioset,
+    ));
   }
 
   void _addFolderItemToList(List<ListItem> listItemList, DataChildren value,
@@ -196,7 +198,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       var now = DateTime.now().day;
       var index = now % all.length;
 
-      return getAudioData(id: all[index == 0? now: index].id);
+      return getAudioData(id: all[index == 0 ? now : index].id);
     }
   }
 

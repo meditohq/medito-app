@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
-  final Function(dynamic, dynamic, dynamic, String) onBeginPressed;
+  final Function(dynamic, dynamic, dynamic, String, String) onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
@@ -21,6 +21,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   List lengthFilteredList = [];
   List filesList;
   var coverArt;
+  String description;
   String title;
   var coverColor;
 
@@ -32,6 +33,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       this.coverArt = d.coverArt != null ? d?.coverArt?.first : null;
       this.coverColor = d?.coverColor;
       this.title = d?.title;
+      this.description = d?.description;
       compileLists(d?.files);
     });
   }
@@ -100,7 +102,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     filesList.forEach((file) => {
           (file.length == (lengthList[lengthSelected]) &&
                   file.voice == (voiceList[voiceSelected]))
-              ? widget.onBeginPressed(file, coverArt, coverColor, title)
+              ? widget.onBeginPressed(file, coverArt, coverColor, title, description)
               : null
         });
   }

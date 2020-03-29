@@ -7,7 +7,8 @@ import 'package:Medito/viewmodel/tile_view_model.dart';
 import 'package:Medito/widgets/bottom_sheet_widget.dart';
 import 'package:Medito/widgets/column_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../main_nav.dart';
 
 class TileList extends StatefulWidget {
   TileList({Key key}) : super(key: key);
@@ -42,13 +43,17 @@ class TileListState extends State<TileList> {
                 padding: EdgeInsets.only(left: 16, right: 16),
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: projectSnap.data?.length,
+                itemCount:
+                    projectSnap.data != null ? projectSnap.data?.length : 0,
                 itemBuilder: (BuildContext context, int index) {
-                  TileItem tile = projectSnap.data[index];
-                  if (tile.tileType == TileType.large) {
+                  TileItem tile =
+                      projectSnap.data != null ? projectSnap.data[index] : null;
+                  if (tile != null && tile.tileType == TileType.large) {
                     return getHorizontalTile(tile);
                   } else {
-                    return Container();
+                    return Container(
+                      color: Colors.green,
+                    );
                   }
                 },
               ),
@@ -84,7 +89,7 @@ class TileListState extends State<TileList> {
   }
 
   Widget twoColumnsTile(List<TileItem> data) {
-    data = data.where((i) => i.tileType == TileType.small).toList();
+    data = data?.where((i) => i.tileType == TileType.small)?.toList();
 
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -96,7 +101,7 @@ class TileListState extends State<TileList> {
           //left column
           Expanded(
             child: ColumnBuilder(
-                itemCount: data.length,
+                itemCount: data == null ? 0 : data?.length,
                 itemBuilder: (BuildContext context, int index) {
                   TileItem tile = data[index];
                   if (index < data.length / 2) {
@@ -109,10 +114,10 @@ class TileListState extends State<TileList> {
           //right column
           Expanded(
             child: ColumnBuilder(
-                itemCount: data.length,
+                itemCount: data == null ? 0 : data?.length,
                 itemBuilder: (BuildContext context, int index) {
                   TileItem tile = data[index];
-                  if (index >= data.length / 2) {
+                  if (data != null && index >= data.length / 2) {
                     return getTile(tile);
                   } else {
                     return Container();
@@ -133,32 +138,37 @@ class TileListState extends State<TileList> {
   }
 
   Widget getTile(TileItem item) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-          color: parseColor(item.colorBackground),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(item.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .title
-                      .copyWith(color: parseColor(item.colorText))),
-              Container(height: 16),
-              SizedBox(height: 134, child: SvgPicture.network(item.thumbnail)),
-            ],
+    return wrapWithInkWell(
+        parseColor(item.colorBackground),
+        item,
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+              color: parseColor(item.colorBackground),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(item.title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .title
+                          .copyWith(color: parseColor(item.colorText))),
+                  Container(height: 16),
+                  SizedBox(
+                      height: 134,
+                      child: Image.network(item.thumbnail, headers: null)),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget wrapWithInkWell(
@@ -232,8 +242,9 @@ class TileListState extends State<TileList> {
                     Container(height: 16),
                     Expanded(
                         child: SizedBox(
-                            height: 130,
-                            child: SvgPicture.network(item.thumbnail))),
+                      height: 130,
+//                      child: SvgPicture.network(item.thumbnail),
+                    )),
                   ],
                 ),
               ),
@@ -244,11 +255,13 @@ class TileListState extends State<TileList> {
 
   _onTap(TileItem tile) {
     if (tile.pathTemplate == 'audio') {
-      _openBottomSheet(tile);
+      _openBottomSheet(tile, _viewModel.getAudioData(id: tile.contentPath));
+    } else if (tile.pathTemplate == 'default') {
+      openNavWidget(tile);
     }
   }
 
-  void _openBottomSheet(TileItem tile) {
+  void _openBottomSheet(TileItem tile, Future data) {
     _viewModel.currentTile = tile;
     showModalBottomSheet(
       context: context,
@@ -257,13 +270,13 @@ class TileListState extends State<TileList> {
       builder: (context) => BottomSheetWidget(
         title: tile.title,
         onBeginPressed: _showPlayer,
-        data: _viewModel.getAudioData(id: tile.contentPath),
+        data: data,
       ),
     );
   }
 
-  _showPlayer(
-      dynamic fileTapped, dynamic coverArt, dynamic coverColor, String title) {
+  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
+      String title, String description) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -276,6 +289,7 @@ class TileListState extends State<TileList> {
       MaterialPageRoute(
           builder: (context) => PlayerWidget(
               fileModel: fileTapped,
+              description: description,
               coverArt: coverArt,
               coverColor: coverColor,
               title: title,
@@ -283,5 +297,13 @@ class TileListState extends State<TileList> {
               attributions:
                   _viewModel.getAttributions(fileTapped.attributions))),
     );
+  }
+
+  void openNavWidget(TileItem tile) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MainNavWidget(
+                firstTitle: tile.title, firstId: tile.contentPath)));
   }
 }

@@ -11,25 +11,29 @@ import 'bottom_sheet_widget.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
-import 'nav_widget.dart';
+import 'nav_pills_widget.dart';
 
 class MainStateless extends StatelessWidget {
   MainStateless({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MainWidget();
+    return MainNavWidget();
   }
 }
 
-class MainWidget extends StatefulWidget {
-  MainWidget({Key key}) : super(key: key);
+class MainNavWidget extends StatefulWidget {
+  MainNavWidget({Key key, this.firstId, this.firstTitle}) : super(key: key);
+
+  final String firstId;
+  final String firstTitle;
 
   @override
-  _MainWidgetState createState() => _MainWidgetState();
+  _MainNavWidgetState createState() => _MainNavWidgetState();
 }
 
-class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
+class _MainNavWidgetState extends State<MainNavWidget>
+    with TickerProviderStateMixin {
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
@@ -44,7 +48,13 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    listFuture = _viewModel.getPageChildren();
+    listFuture = _viewModel.getPageChildren(id: widget.firstId);
+    if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
+      _viewModel.addToNavList(
+          ListItem("Home", "app+content", null, parentId: "app+content"));
+      _viewModel
+          .addToNavList(ListItem(widget.firstTitle, widget.firstId, null));
+    } else {}
   }
 
   @override
@@ -58,6 +68,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       child: Scaffold(
         backgroundColor: MeditoColors.darkBGColor,
         body: SafeArea(
+          bottom: false,
           maintainBottomViewPadding: false,
           child: Stack(
             children: <Widget>[
@@ -128,7 +139,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int i) {
                   if (i == 0) {
-                    return NavWidget(
+                    return NavPillsWidget(
                       list: _viewModel.navList,
                       backPressed: _backPressed,
                     );
@@ -202,14 +213,15 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     );
   }
 
-  _showPlayer(
-      dynamic fileTapped, dynamic coverArt, dynamic coverColor, String title) {
+  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
+      String title, String description) {
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => PlayerWidget(
               fileModel: fileTapped,
               title: title,
+              description: description,
               coverArt: coverArt,
               coverColor: coverColor,
               listItem: _viewModel.currentlySelectedFile,
@@ -242,12 +254,22 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
 
   void _backPressed(String id) {
     setState(() {
-      if (textFileOpacity == 1) {
-        textFileOpacity = 0;
+      if (_viewModel.navList.length == 1) {
+        Navigator.pop(context);
+      } else if (_viewModel.navList.length == 2 && widget.firstId.isNotEmpty) {
+        Navigator.pop(context);
       } else {
-        listFuture = _viewModel.getPageChildren(id: id);
+        if (textFileOpacity == 1) {
+          textFileOpacity = 0;
+        } else {
+          if (widget.firstId != null || widget.firstId.isNotEmpty) {
+            listFuture = _viewModel.getPageChildren(id: id);
+          } else {
+            Navigator.pop(context);
+          }
+        }
+        _viewModel.navList.removeLast();
       }
-      _viewModel.navList.removeLast();
     });
   }
 
@@ -262,7 +284,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
     } else {
       return new Future(() => true);
     }
-    return new Future(() => false);
+    return new Future(() => true);
   }
 
   Widget getInnerTextView() {
@@ -276,7 +298,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            NavWidget(
+            NavPillsWidget(
               list: _viewModel?.navList,
               backPressed: _backPressed,
             ),
