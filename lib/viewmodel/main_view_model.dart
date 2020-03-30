@@ -199,6 +199,11 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       var index = now % all.length;
 
       return getAudioData(id: all[index == 0 ? now : index].id);
+    } else if (timely == 'hourly') {
+      var now = DateTime.now().hour;
+      var index = now % all.length;
+
+      return getAudioData(id: all[index == 0 ? now : index].id);
     }
   }
 
