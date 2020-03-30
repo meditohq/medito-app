@@ -109,7 +109,7 @@ class Content {
 
   Content.fromJson(Map<String, dynamic> json) {
     description = json['description'];
-    contentText = json['contentText'];
+    contentText = json['content_text'];
     if (json['cover_art'] != null) {
       coverArt = new List<CoverArt>();
       json['cover_art'].forEach((v) {

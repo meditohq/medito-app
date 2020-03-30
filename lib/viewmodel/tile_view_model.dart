@@ -60,27 +60,8 @@ class TileListViewModelImpl implements TileListViewModel {
         buttonLabel: value.buttonLabel));
   }
 
-//  Future getAudioFromDailySet({String id = '', String timely = 'daily'}) async {
-//    var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
-//
-//    final response = await http.get(
-//      url,
-//      headers: {HttpHeaders.authorizationHeader: basicAuth},
-//    );
-//    final responseJson = json.decode(response.body);
-//
-//    List all = PagesChildren.fromJson(responseJson).data;
-//
-//    if (timely == 'daily') {
-//      var now = DateTime.now().day;
-//      var index = now % all.length;
-//
-//      return getAudioData(id: all[index == 0 ? now : index].id);
-//    }
-//  }
-
-  Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
-    var url = baseUrl + '/' + id.replaceAll('/', '+');
+  Future getAudioFromDailySet({String id = '', String timely = 'daily'}) async {
+    var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     final response = await http.get(
       url,
@@ -88,7 +69,14 @@ class TileListViewModelImpl implements TileListViewModel {
     );
     final responseJson = json.decode(response.body);
 
-    return PagesChildren.fromJson(responseJson).data;
+    List all = PagesChildren.fromJson(responseJson).data;
+
+    if (timely == 'daily') {
+      var now = DateTime.now().day;
+      var index = now % all.length;
+
+      return getAudioData(id: all[index == 0 ? all.length - 1 : index].id);
+    }
   }
 
   Future getAudioData({String id = ''}) async {
@@ -114,5 +102,17 @@ class TileListViewModelImpl implements TileListViewModel {
     var attrs = Attributions.fromJson(responseJson);
 
     return attrs.data.content;
+  }
+
+  Future<String> getTextFile(String contentId) async {
+    var url = baseUrl + '/' + contentId.replaceAll('/', '+');
+
+    final response = await http.get(
+      url,
+      headers: {HttpHeaders.authorizationHeader: basicAuth},
+    );
+    final responseJson = json.decode(response.body);
+
+    return Pages.fromJson(responseJson).data.content.contentText;
   }
 }

@@ -23,10 +23,12 @@ class MainStateless extends StatelessWidget {
 }
 
 class MainNavWidget extends StatefulWidget {
-  MainNavWidget({Key key, this.firstId, this.firstTitle}) : super(key: key);
+  MainNavWidget({Key key, this.firstId, this.firstTitle, this.textFuture})
+      : super(key: key);
 
   final String firstId;
   final String firstTitle;
+  final Future<String> textFuture;
 
   @override
   _MainNavWidgetState createState() => _MainNavWidgetState();
@@ -38,6 +40,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
   Future<List<ListItem>> listFuture;
 
   String readMoreText = "";
+  String textFileFromFuture = "";
   double textFileOpacity = 0;
 
   @override
@@ -54,7 +57,14 @@ class _MainNavWidgetState extends State<MainNavWidget>
           ListItem("Home", "app+content", null, parentId: "app+content"));
       _viewModel
           .addToNavList(ListItem(widget.firstTitle, widget.firstId, null));
-    } else {}
+    }
+
+    widget.textFuture?.then((onValue) {
+      setState(() {
+        textFileFromFuture = onValue;
+        textFileOpacity = 1;
+      });
+    });
   }
 
   @override
@@ -288,7 +298,13 @@ class _MainNavWidgetState extends State<MainNavWidget>
   }
 
   Widget getInnerTextView() {
-    var content = _viewModel?.navList?.last?.contentText;
+    String content;
+
+    if (textFileFromFuture.isEmpty) {
+      content = _viewModel?.navList?.last?.contentText;
+    } else {
+      content = textFileFromFuture;
+    }
 
     return IgnorePointer(
       ignoring: textFileOpacity == 0,
@@ -316,7 +332,12 @@ class _MainNavWidgetState extends State<MainNavWidget>
                           styleSheet:
                               MarkdownStyleSheet.fromTheme(Theme.of(context))
                                   .copyWith(
-                                      p: Theme.of(context).textTheme.subhead),
+                                      h1: Theme.of(context).textTheme.title,
+                                      h2: Theme.of(context).textTheme.headline,
+                                      h3: Theme.of(context).textTheme.subtitle,
+                                      listBullet:
+                                          Theme.of(context).textTheme.subhead,
+                                      p: Theme.of(context).textTheme.body1),
                           data: content == null ? '' : content,
                           imageDirectory: 'https://raw.githubusercontent.com',
                         ),

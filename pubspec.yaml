@@ -45,6 +45,7 @@ flutter:
   assets:
     - assets/images/ic_document.svg
     - assets/images/ic_folder.svg
+    - assets/images/icon_ic_logo.svg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

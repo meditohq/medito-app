@@ -26,6 +26,12 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w600),
+        headline: TextStyle(
+            //h2
+            height: 1.4,
+            fontSize: 20.0,
+            color: MeditoColors.lightColor,
+            fontWeight: FontWeight.w600),
         subhead: TextStyle(
             fontSize: 16.0,
             height: 1.4,
@@ -46,6 +52,18 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
         display3: TextStyle(
             //this is for bottom sheet text
             fontSize: 16.0,
+            height: 1.4,
+            color: MeditoColors.lightColor,
+            fontWeight: FontWeight.normal),
+        body1: TextStyle(
+            //this is for 'text'
+            fontSize: 16.0,
+            height: 1.4,
+            color: MeditoColors.lightColor,
+            fontWeight: FontWeight.normal),
+        subtitle: TextStyle(
+            //this is for 'h3' markdown
+            fontSize: 18.0,
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
