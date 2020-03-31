@@ -102,7 +102,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     filesList.forEach((file) => {
           (file.length == (lengthList[lengthSelected]) &&
                   file.voice == (voiceList[voiceSelected]))
-              ? widget.onBeginPressed(file, coverArt, coverColor, title, description)
+              ? widget.onBeginPressed(
+                  file, coverArt, coverColor, title, description)
               : null
         });
   }
@@ -280,7 +281,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     filterLengthsForThisPerson(voiceList[0]);
 
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   void filterLengthsForThisPerson(String voiceSelected) {
