@@ -1,6 +1,0 @@
-framework module MatomoTracker {
-  umbrella header "MatomoTracker-umbrella.h"
-
-  export *
-  module * { export * }
-}
