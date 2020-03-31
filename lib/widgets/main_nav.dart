@@ -125,7 +125,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
 
   Widget getListView() {
     return RefreshIndicator(
-      color: MeditoColors.darkBGColor,
+      color: MeditoColors.lightColor,
       backgroundColor: MeditoColors.darkColor,
       child: FutureBuilder(
           future: listFuture,

@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/pages_children.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 
-import 'auth.dart';
+import 'http_get.dart';
 import 'list_item.dart';
 
 abstract class MainListViewModel {}
@@ -18,66 +14,10 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   List<ListItem> navList = [];
   ListItem currentlySelectedFile;
 
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File> _localFile(String name) async {
-    final path = await _localPath;
-    return File('$path/$name.txt');
-  }
-
-  Future<File> writePagesToCache(PagesChildren pages, String id) async {
-    id = id.replaceAll('/', '+');
-    final file = await _localFile(id);
-
-    // Write the file.
-    var pagesString = pages.toJson();
-    return file.writeAsString('$pagesString');
-  }
-
-  Future<PagesChildren> readPagesChildrenFromCache(String id) async {
-    id = id.replaceAll('/', '+');
-    try {
-      final file = await _localFile(id);
-
-      var lastModified;
-      try {
-        lastModified = await file.lastModified();
-      } on FileSystemException {
-        return null;
-      }
-
-      if (lastModified.add(Duration(days: 1)).isBefore(DateTime.now()))
-        return null;
-
-      // Read the file.
-      String contents = await file.readAsString();
-      var decoded = json.decode(contents);
-      return PagesChildren.fromJson(decoded);
-    } catch (e) {
-      return null;
-    }
-  }
-
   Future getAttributions(String id) async {
-//    if (!skipCache) {
-//      PagesChildren cachedPages = await readPagesChildrenFromCache(id);
-//      if (cachedPages != null)
-//        return await getPageListFromDataChildren(cachedPages.data);
-//    }
-
     var url = baseUrl + '/' + id.replaceAll('/', '+');
-
-    final response = await http.get(
-      url,
-      headers: {HttpHeaders.authorizationHeader: basicAuth},
-    );
-    final responseJson = json.decode(response.body);
-    var attrs = Attributions.fromJson(responseJson);
-
-//    writePagesToCache(attList, id);
+    var response = await httpGet(url);
+    var attrs = Attributions.fromJson(response);
 
     return attrs.data.content;
   }
@@ -86,23 +26,11 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       {String id = 'app+content', bool skipCache = false}) async {
     if (id == null) id = 'app+content';
 
-    if (!skipCache) {
-      PagesChildren cachedPages = await readPagesChildrenFromCache(id);
-      if (cachedPages != null)
-        return await getPageListFromDataChildren(cachedPages.data);
-    }
-
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
-    final response = await http.get(
-      url,
-      headers: {HttpHeaders.authorizationHeader: basicAuth},
-    );
-    final responseJson = json.decode(response.body);
-    var pages = PagesChildren.fromJson(responseJson);
+    var response = await httpGet(url, skipCache: skipCache);
+    var pages = PagesChildren.fromJson(response);
     var pageList = pages.data;
-
-    writePagesToCache(pages, id);
 
     return await getPageListFromDataChildren(pageList);
   }
@@ -173,38 +101,27 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   Future getAudioData({String id = ''}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
-
-    final response = await http.get(
-      url,
-      headers: {HttpHeaders.authorizationHeader: basicAuth},
-    );
-
-    final responseJson = json.decode(response.body);
-    return Pages.fromJson(responseJson).data.content;
+    var response = await httpGet(url);
+    return Pages.fromJson(response).data.content;
   }
 
   Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
-    final response = await http.get(
-      url,
-      headers: {HttpHeaders.authorizationHeader: basicAuth},
-    );
-    final responseJson = json.decode(response.body);
+    List all;
+    var response = await httpGet(url);
+    all = PagesChildren.fromJson(response).data;
 
-    List all = PagesChildren.fromJson(responseJson).data;
-
+    var index = 0;
+    var now = 0;
     if (timely == 'daily') {
       var now = DateTime.now().day;
-      var index = now % all.length;
-
-      return getAudioData(id: all[index == 0 ? now : index].id);
+      index = now % all.length;
     } else if (timely == 'hourly') {
       var now = DateTime.now().hour;
-      var index = now % all.length;
-
-      return getAudioData(id: all[index == 0 ? now : index].id);
+      index = now % all.length;
     }
+    return getAudioData(id: all[index == 0 ? now : index].id);
   }
 
   void addToNavList(ListItem item) {

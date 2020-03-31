@@ -23,52 +23,76 @@ class TileList extends StatefulWidget {
 class TileListState extends State<TileList> {
   final _viewModel = new TileListViewModelImpl();
 
+  var listFuture;
+
   @override
   void initState() {
     super.initState();
+    listFuture = _viewModel.getTiles();
+  }
+
+  Future<void> _onPullToRefresh() async {
+    setState(() {
+      listFuture = _viewModel.getTiles(skipCache: true);
+    });
   }
 
   Widget tileListWidget() {
-    return FutureBuilder(
-      builder: (context, projectSnap) {
-        if (projectSnap.connectionState == ConnectionState.none &&
-            projectSnap.hasData == null) {
-          //print('project snapshot data is: ${projectSnap.data}');
-          return Container();
-        }
-        return SingleChildScrollView(
-          primary: true,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: Column(
-              children: <Widget>[
-                ListView.builder(
-                  padding: EdgeInsets.only(left: 16, right: 16),
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount:
-                      projectSnap.data != null ? projectSnap.data?.length : 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    TileItem tile =
-                        projectSnap.data != null ? projectSnap.data[index] : null;
-                    if (tile != null && tile.tileType == TileType.announcement) {
-                      return getHorizontalAnnouncementTile(tile);
-                    } else if (tile != null && tile.tileType == TileType.large) {
-                      return getHorizontalTile(tile);
-                    } else {
-                      return Container(
-                        color: Colors.green,
-                      );
-                    }
-                  },
-                ),
-                twoColumnsTile(projectSnap.data)
-              ],
+    return RefreshIndicator(
+      displacement: 80,
+      color: MeditoColors.lightColor,
+      backgroundColor: MeditoColors.darkColor,
+      onRefresh: _onPullToRefresh,
+      child: FutureBuilder(
+        builder: (context, projectSnap) {
+          if (projectSnap.connectionState == ConnectionState.none &&
+              projectSnap.hasData == null) {
+            //print('project snapshot data is: ${projectSnap.data}');
+            return Container();
+          }
+          return SingleChildScrollView(
+            primary: true,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(19.0),
+                    child: SvgPicture.asset(
+                      'assets/images/icon_ic_logo.svg',
+                    ),
+                  ),
+                  ListView.builder(
+                    padding: EdgeInsets.only(left: 16, right: 16),
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount:
+                        projectSnap.data != null ? projectSnap.data?.length : 0,
+                    itemBuilder: (BuildContext context, int index) {
+                      TileItem tile = projectSnap.data != null
+                          ? projectSnap.data[index]
+                          : null;
+                      if (tile != null &&
+                          tile.tileType == TileType.announcement) {
+                        return getHorizontalAnnouncementTile(tile);
+                      } else if (tile != null &&
+                          tile.tileType == TileType.large) {
+                        return getHorizontalTile(tile);
+                      } else {
+                        return Container(
+                          color: Colors.green,
+                        );
+                      }
+                    },
+                  ),
+                  twoColumnsTile(projectSnap.data)
+                ],
+              ),
             ),
-          ),
-        );
-      },
-      future: _viewModel.getTiles(),
+          );
+        },
+        future: listFuture,
+      ),
     );
   }
 
@@ -81,12 +105,6 @@ class TileListState extends State<TileList> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(19.0),
-              child: SvgPicture.asset(
-                'assets/images/icon_ic_logo.svg',
-              ),
-            ),
             Expanded(
               child: tileListWidget(),
             ),
@@ -169,9 +187,7 @@ class TileListState extends State<TileList> {
                           .title
                           .copyWith(color: parseColor(item.colorText))),
                   Container(height: 16),
-                  SizedBox(
-                      height: 134,
-                      child: Image.network(item.thumbnail, headers: null)),
+                  Image.network(item.thumbnail, headers: null),
                 ],
               ),
             )),
@@ -196,7 +212,7 @@ class TileListState extends State<TileList> {
 
   Widget getHorizontalAnnouncementTile(TileItem item) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -274,8 +290,9 @@ class TileListState extends State<TileList> {
                                   child: Text(item.buttonLabel.toUpperCase(),
                                       style: Theme.of(context)
                                           .textTheme
-                                          .subhead
+                                          .display2
                                           .copyWith(
+                                              fontWeight: FontWeight.w600,
                                               color: parseColor(
                                                   item.colorButtonText))),
                                 ),
@@ -284,12 +301,8 @@ class TileListState extends State<TileList> {
                       ],
                     ),
                   ),
-                  Container(height: 16),
-                  Expanded(
-                      child: SizedBox(
-                    height: 130,
-                    child: Image.network(item.thumbnail),
-                  )),
+                  Container(width: 16),
+                  Expanded(flex: 1, child: Image.network(item.thumbnail)),
                 ],
               ),
             ),
@@ -305,8 +318,8 @@ class TileListState extends State<TileList> {
     } else if (tile.pathTemplate == 'text') {
       openNavWidget(tile, textFuture: _viewModel.getTextFile(tile.contentPath));
     } else if (tile.pathTemplate == 'audio-set') {
-      _openBottomSheet(tile, _viewModel.getAudioFromDailySet(
-          id: tile.contentPath));
+      _openBottomSheet(
+          tile, _viewModel.getAudioFromDailySet(id: tile.contentPath));
     }
   }
 
