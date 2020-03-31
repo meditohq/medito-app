@@ -437,16 +437,19 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     return Row(
       children: <Widget>[
         Expanded(
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16)),
-                color: parseColor(widget.coverColor),
-              ),
-              child: SvgPicture.network(
-                widget.coverArt.url,
-              )),
+          child: SizedBox(
+            width: 200,
+            height: 200,
+            child: Container(
+              margin: EdgeInsets.only(top: 24),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: parseColor(widget.coverColor),
+                ),
+                child: SvgPicture.network(
+                  widget.coverArt.url,
+                )),
+          ),
         ),
       ],
     );
