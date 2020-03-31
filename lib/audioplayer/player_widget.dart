@@ -120,32 +120,36 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onPlay() {
-    setState(() {
-      audioPlayerState = PlayerState.PLAYING;
-      _loading = false;
-    });
+    if (this.mounted)
+      setState(() {
+        audioPlayerState = PlayerState.PLAYING;
+        _loading = false;
+      });
   }
 
   @override
   void onPause() {
-    setState(() {
-      audioPlayerState = PlayerState.PAUSED;
-    });
+    if (this.mounted)
+      setState(() {
+        audioPlayerState = PlayerState.PAUSED;
+      });
   }
 
   @override
   void onComplete() {
-    setState(() {
-      audioPlayerState = PlayerState.PAUSED;
-      currentPlaybackPosition = Duration.zero;
-    });
+    if (this.mounted)
+      setState(() {
+        audioPlayerState = PlayerState.PAUSED;
+        currentPlaybackPosition = Duration.zero;
+      });
   }
 
   @override
   void onTime(int position) {
-    setState(() {
-      currentPlaybackPosition = Duration(seconds: position);
-    });
+    if (this.mounted)
+      setState(() {
+        currentPlaybackPosition = Duration(seconds: position);
+      });
   }
 
   @override
@@ -155,7 +159,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onDuration(int duration) {
-    if (duration > 0) {
+    if (this.mounted && duration > 0) {
       setState(() {
         this.duration = Duration(milliseconds: duration);
       });
@@ -169,8 +173,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   Widget build(BuildContext context) {
-    this.widthOfScreen =
-        MediaQuery.of(context).size.width;
+    this.widthOfScreen = MediaQuery.of(context).size.width;
 
     return Scaffold(
         backgroundColor: Colors.black,
@@ -183,13 +186,15 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                     height: 35,
                     color: MeditoColors.darkBGColor)),
             Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  buildGoBackPill(),
-                  buildContainerWithRoundedCorners(context),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    buildGoBackPill(),
+                    buildContainerWithRoundedCorners(context),
+                  ],
+                ),
               ),
             ),
             buildBottomSheet(),
@@ -363,34 +368,39 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Request audio play
   Future<void> play() async {
-    setState(() {
-      _loading = true;
-    });
+    if (this.mounted)
+      setState(() {
+        _loading = true;
+      });
     // here we send position in case user has scrubbed already before hitting
     // play in which case we want playback to start from where user has
     // requested
-    _audioPlayer.play(widget.fileModel.url,
-        title: widget.title,
-        subtitle:
-            widget.description == null ? '' : widget.description,
-        position: currentPlaybackPosition,
-        isLiveStream: false);
+    _audioPlayer
+        .play(widget.fileModel.url,
+            title: widget.title,
+            subtitle: widget.description == null ? '' : widget.description,
+            position: currentPlaybackPosition,
+            isLiveStream: false)
+        .catchError((onError) {
+      print(onError);
+    });
   }
 
   // Request audio pause
   Future<void> pause() async {
     _audioPlayer.pause();
-    setState(() => audioPlayerState = PlayerState.PAUSED);
+    if (this.mounted) setState(() => audioPlayerState = PlayerState.PAUSED);
   }
 
   // Request audio stop. this will also clear lock screen controls
   Future<void> stop() async {
-    _audioPlayer.reset();
+//    _audioPlayer.reset();
 
-    setState(() {
-      audioPlayerState = PlayerState.STOPPED;
-      currentPlaybackPosition = Duration.zero;
-    });
+    if (this.mounted)
+      setState(() {
+        audioPlayerState = PlayerState.STOPPED;
+        currentPlaybackPosition = Duration.zero;
+      });
   }
 
   // Seek to a point in seconds
