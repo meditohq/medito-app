@@ -223,16 +223,19 @@ class _MainNavWidgetState extends State<MainNavWidget>
       String title, String description) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => PlayerWidget(
-              fileModel: fileTapped,
-              title: title,
-              description: description,
-              coverArt: coverArt,
-              coverColor: coverColor,
-              listItem: _viewModel.currentlySelectedFile,
-              attributions:
-                  _viewModel.getAttributions(fileTapped.attributions))),
+      PageRouteBuilder(
+        pageBuilder: (c, a1, a2) => PlayerWidget(
+            fileModel: fileTapped,
+            description: description,
+            coverArt: coverArt,
+            coverColor: coverColor,
+            title: title,
+            listItem: _viewModel.currentlySelectedFile,
+            attributions: _viewModel.getAttributions(fileTapped.attributions)),
+        transitionsBuilder: (c, anim, a2, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: Duration(milliseconds: 150),
+      ),
     );
   }
 
@@ -289,7 +292,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
     } else {
       return new Future(() => true);
     }
-    return new Future(() => true);
+    return new Future(() => false);
   }
 
   Widget getInnerTextView() {
