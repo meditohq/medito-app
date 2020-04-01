@@ -313,8 +313,8 @@ class TileListState extends State<TileList> {
   }
 
   _onTap(TileItem tile) {
-    Tracking.trackEvent(Tracking.TILE, Tracking.TILE_TAPPED,
-        tile.id + ' ' +tile.pathTemplate);
+    Tracking.trackEvent(
+        Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
 
     if (tile.pathTemplate == 'audio') {
       _openBottomSheet(tile, _viewModel.getAudioData(id: tile.contentPath));
@@ -355,26 +355,36 @@ class TileListState extends State<TileList> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => PlayerWidget(
-              fileModel: fileTapped,
-              description: description,
-              coverArt: coverArt,
-              coverColor: coverColor,
-              title: title,
-              listItem: listItem,
-              attributions:
-                  _viewModel.getAttributions(fileTapped.attributions))),
+      PageRouteBuilder(
+        pageBuilder: (c, a1, a2) => PlayerWidget(
+            fileModel: fileTapped,
+            description: description,
+            coverArt: coverArt,
+            coverColor: coverColor,
+            title: title,
+            listItem: listItem,
+            attributions: _viewModel.getAttributions(fileTapped.attributions)),
+        transitionsBuilder: (c, anim, a2, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: Duration(milliseconds: 150),
+      ),
     );
   }
 
   void openNavWidget(TileItem tile, {Future textFuture}) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => MainNavWidget(
-                firstTitle: tile.title,
-                firstId: tile.contentPath,
-                textFuture: textFuture)));
+      context,
+      PageRouteBuilder(
+        pageBuilder: (c, a1, a2) {
+          return MainNavWidget(
+              firstTitle: tile.title,
+              firstId: tile.contentPath,
+              textFuture: textFuture);
+        },
+        transitionsBuilder: (c, anim, a2, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: Duration(milliseconds: 150),
+      ),
+    );
   }
 }
