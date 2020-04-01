@@ -313,7 +313,7 @@ class TileListState extends State<TileList> {
   }
 
   _onTap(TileItem tile) {
-    Tracking.trackEvent(Tracking.TILE, Tracking.BREADCRUMB_TAPPED,
+    Tracking.trackEvent(Tracking.TILE, Tracking.TILE_TAPPED,
         tile.id + ' ' +tile.pathTemplate);
 
     if (tile.pathTemplate == 'audio') {
@@ -329,6 +329,8 @@ class TileListState extends State<TileList> {
   }
 
   void _openBottomSheet(TileItem tile, Future data) {
+    Tracking.trackEvent(Tracking.TILE, Tracking.BOTTOM_SHEET, tile.id);
+
     _viewModel.currentTile = tile;
     showModalBottomSheet(
       context: context,

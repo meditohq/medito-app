@@ -15,16 +15,15 @@ import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 
 class PlayerWidget extends StatefulWidget {
-  PlayerWidget(
-      {Key key,
-      this.fileModel,
-      this.desiredState,
-      this.listItem,
-      this.coverColor,
-      this.title,
-      this.coverArt,
-      this.attributions,
-      this.description})
+  PlayerWidget({Key key,
+    this.fileModel,
+    this.desiredState,
+    this.listItem,
+    this.coverColor,
+    this.title,
+    this.coverArt,
+    this.attributions,
+    this.description})
       : super(key: key);
 
   final String coverColor;
@@ -61,10 +60,13 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   get isPaused =>
       audioPlayerState == PlayerState.PAUSED ||
-      audioPlayerState == PlayerState.STOPPED;
+          audioPlayerState == PlayerState.STOPPED;
 
   @override
   void dispose() {
+    Tracking.trackEvent(Tracking.BREADCRUMB, Tracking.PLAYER_BREADCRUMB_TAPPED,
+        widget.listItem.id);
+
     if (audioPlayerState != PlayerState.STOPPED) {
       stop();
     }
@@ -139,13 +141,14 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onComplete() {
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_COMPLETED);
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
+        Tracking.AUDIO_COMPLETED + widget.listItem.id);
 
-    if (this.mounted)
-      setState(() {
-        audioPlayerState = PlayerState.PAUSED;
-        currentPlaybackPosition = Duration.zero;
-      });
+        if (this.mounted)
+    setState(() {
+      audioPlayerState = PlayerState.PAUSED;
+      currentPlaybackPosition = Duration.zero;
+    });
   }
 
   @override
@@ -172,14 +175,18 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onError(String error) {
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_ERROR);
+    Tracking.trackEvent(
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_ERROR + widget.listItem.id);
 
     super.onError(error);
   }
 
   @override
   Widget build(BuildContext context) {
-    this.widthOfScreen = MediaQuery.of(context).size.width;
+    this.widthOfScreen = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Scaffold(
         backgroundColor: Colors.black,
@@ -237,7 +244,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(16)),
+                                  BorderRadius.all(Radius.circular(16)),
                                   color: MeditoColors.lightColorLine,
                                 ),
                                 margin: EdgeInsets.only(top: 16, bottom: 16),
@@ -250,18 +257,24 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                             visible: widget.listItem.contentText != null,
                             child: Center(
                                 child: Text(
-                              'MORE DETAILS',
-                              style: Theme.of(context).textTheme.body2,
-                            )),
+                                  'MORE DETAILS',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .body2,
+                                )),
                           ),
                           widget.listItem.contentText != null
                               ? Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Text(
-                                    widget.listItem.contentText,
-                                    style: Theme.of(context).textTheme.display3,
-                                  ),
-                                )
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              widget.listItem.contentText,
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .display3,
+                            ),
+                          )
                               : Container(),
                         ],
                       ),
@@ -319,9 +332,9 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                 child: _loading
                     ? buildCircularProgressIndicator()
                     : Icon(
-                        isPlaying ? Icons.pause : Icons.play_arrow,
-                        color: MeditoColors.darkColor,
-                      ),
+                  isPlaying ? Icons.pause : Icons.play_arrow,
+                  color: MeditoColors.darkColor,
+                ),
                 color: MeditoColors.lightColor,
                 onPressed: () {
                   if (isPlaying) {
@@ -374,8 +387,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Request audio play
   Future<void> play() async {
-
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY);
+    Tracking.trackEvent(
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY + widget.listItem.id);
 
     if (this.mounted)
       setState(() {
@@ -386,10 +399,10 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     // requested
     _audioPlayer
         .play(widget.fileModel.url,
-            title: widget.title,
-            subtitle: widget.description == null ? '' : widget.description,
-            position: currentPlaybackPosition,
-            isLiveStream: false)
+        title: widget.title,
+        subtitle: widget.description == null ? '' : widget.description,
+        position: currentPlaybackPosition,
+        isLiveStream: false)
         .catchError((onError) {
       print(onError);
     });
@@ -397,7 +410,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Request audio pause
   Future<void> pause() async {
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED);
+    Tracking.trackEvent(
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED + widget.listItem.id);
 
     _audioPlayer.pause();
     if (this.mounted) setState(() => audioPlayerState = PlayerState.PAUSED);
@@ -406,7 +420,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Request audio stop. this will also clear lock screen controls
   Future<void> stop() async {
 //    _audioPlayer.reset();
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_STOPPED);
+    Tracking.trackEvent(
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_STOPPED + widget.listItem.id);
 
 
     if (this.mounted)
@@ -418,7 +433,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Seek to a point in seconds
   Future<void> seekTo(double milliseconds) async {
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_SEEK + '$milliseconds');
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
+        Tracking.AUDIO_SEEK + '$milliseconds :'  + widget.listItem.id);
 
     setState(() {
       currentPlaybackPosition = Duration(milliseconds: milliseconds.toInt());
@@ -432,8 +448,6 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
       child: GestureDetector(
           onTap: () {
             stop();
-            Tracking.trackEvent(Tracking.BREADCRUMB, Tracking.BREADCRUMB_TAPPED,
-                widget.listItem.id);
             Navigator.pop(context);
           },
           child: Container(
@@ -452,7 +466,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             width: 200,
             height: 200,
             child: Container(
-              margin: EdgeInsets.only(top: 24),
+                margin: EdgeInsets.only(top: 24),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: parseColor(widget.coverColor),
@@ -475,7 +489,10 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                 top: 24, left: 24.0, right: 24, bottom: 24),
             child: Text(
               widget.title,
-              style: Theme.of(context).textTheme.title,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .title,
               textAlign: TextAlign.center,
             ),
           ),
@@ -491,9 +508,15 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(_playbackPositionString(),
-                style: Theme.of(context).textTheme.display2),
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .display2),
             Text(_playbackRemainingString(),
-                style: Theme.of(context).textTheme.display2)
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .display2)
           ]),
     );
   }
@@ -505,7 +528,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   String _playbackRemainingString() {
     return formatDuration(Duration(
         milliseconds:
-            duration.inMilliseconds - currentPlaybackPosition.inMilliseconds));
+        duration.inMilliseconds - currentPlaybackPosition.inMilliseconds));
   }
 
   Widget buildAttributionsView() {
@@ -516,11 +539,17 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
           children: [
             new TextSpan(
               text: 'Audio from '.toUpperCase(),
-              style: Theme.of(context).textTheme.display4,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display4,
             ),
             new TextSpan(
               text: licenseTitle?.toUpperCase(),
-              style: Theme.of(context).textTheme.body2,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .body2,
               recognizer: new TapGestureRecognizer()
                 ..onTap = () {
                   launch(sourceUrl);
@@ -528,11 +557,17 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             ),
             new TextSpan(
               text: ' / License: '.toUpperCase(),
-              style: Theme.of(context).textTheme.display4,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display4,
             ),
             new TextSpan(
               text: licenseName?.toUpperCase(),
-              style: Theme.of(context).textTheme.body2,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .body2,
               recognizer: new TapGestureRecognizer()
                 ..onTap = () {
                   launch(licenseURL);
