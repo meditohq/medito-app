@@ -206,8 +206,8 @@ class _MainNavWidgetState extends State<MainNavWidget>
 
     showModalBottomSheet(
       context: context,
-      clipBehavior: Clip.hardEdge,
-      elevation: 2.0,
+      clipBehavior: Clip.antiAlias,
+      elevation: 4.0,
       builder: (context) => BottomSheetWidget(
         title: listItem.title,
         onBeginPressed: _showPlayer,
@@ -257,7 +257,8 @@ class _MainNavWidgetState extends State<MainNavWidget>
           splashColor: MeditoColors.darkColor,
           child: getFileListItem(item));
     } else {
-      return new ImageListItemWidget(src: item.url);
+      return SizedBox(
+          width: 300, child: new ImageListItemWidget(src: item.url));
     }
   }
 

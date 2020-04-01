@@ -151,8 +151,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               visible: lengthFilteredList?.contains(lengthList[index]),
               child: Padding(
                 padding: buildInBetweenChipPadding(),
-                child: ChoiceChip(
-
+                child: FilterChip(
                   pressElevation: 4,
                   shape: buildChipBorder(),
                   padding: buildInnerChipPadding(),
@@ -185,8 +184,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           itemBuilder: (BuildContext context, int index) {
             return Padding(
               padding: buildInBetweenChipPadding(),
-              child: ChoiceChip(
-                pressElevation: 4,
+              child: FilterChip(
                 shape: buildChipBorder(),
                 padding: buildInnerChipPadding(),
                 label: Text(voiceList[index]),

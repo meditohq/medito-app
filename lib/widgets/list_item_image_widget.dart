@@ -10,11 +10,8 @@ class ImageListItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(40.0),
-        child: SvgPicture.network(
+        child: Image.network(
           src,
-          placeholderBuilder: (BuildContext context) => Container(
-              padding: const EdgeInsets.all(30.0),
-              child: const CircularProgressIndicator()),
         ));
   }
 }
