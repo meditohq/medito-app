@@ -282,7 +282,7 @@ class TileListState extends State<TileList> {
                         item.buttonLabel != null
                             ? Padding(
                                 padding:
-                                    const EdgeInsets.only(top: 8.0, bottom: 8),
+                                    const EdgeInsets.only(top: 8.0, bottom: 12),
                                 child: FlatButton(
                                   padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                                   onPressed: () {},
