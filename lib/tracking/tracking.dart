@@ -7,13 +7,18 @@ class Tracking {
   static const String PLAYER_TAPPED = "player tapped";
   static const String READ_MORE_TAPPED = "read more tapped";
   static const String BREADCRUMB = "breadcrumb";
+  static const String TILE = "tile";
+  static const String PLAYER = "player";
 
   static const String AUDIO_PLAY = "audio started";
+  static const String AUDIO_ERROR = "audio error";
   static const String AUDIO_REWIND = "audio rewind";
   static const String AUDIO_FF = "audio forward";
   static const String AUDIO_RESUME = "audio reumed";
+  static const String AUDIO_STOPPED = "audio stopped";
   static const String AUDIO_PAUSED = "audio paused";
   static const String AUDIO_COMPLETED = "audio completed";
+  static const String AUDIO_SEEK = "audio seek to ";
 
   static const String AUDIO_OPENED = "audio opened.";
   static const String FOLDER_OPENED = "folder opened.";
@@ -22,6 +27,7 @@ class Tracking {
   static const String CURRENTLY_SELECTED_FILE = "current file.";
 
   static const String BREADCRUMB_TAPPED = "breadcrumb tapped.";
+  static const String TILE_TAPPED = "tile tapped. ";
   static const String FINDER = "finder widget.";
   static const String HOME = "home page.";
   static const String APP_CLOSED = "app closed.";

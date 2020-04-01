@@ -74,6 +74,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void initState() {
+    Tracking.trackScreen(Tracking.PLAYER, widget.fileModel.id);
+
     super.initState();
 
     // Init audio player with a callback to handle events
@@ -137,6 +139,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onComplete() {
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_COMPLETED);
+
     if (this.mounted)
       setState(() {
         audioPlayerState = PlayerState.PAUSED;
@@ -168,6 +172,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onError(String error) {
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_ERROR);
+
     super.onError(error);
   }
 
@@ -368,6 +374,9 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Request audio play
   Future<void> play() async {
+
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY);
+
     if (this.mounted)
       setState(() {
         _loading = true;
@@ -388,6 +397,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Request audio pause
   Future<void> pause() async {
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED);
+
     _audioPlayer.pause();
     if (this.mounted) setState(() => audioPlayerState = PlayerState.PAUSED);
   }
@@ -395,6 +406,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Request audio stop. this will also clear lock screen controls
   Future<void> stop() async {
 //    _audioPlayer.reset();
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_STOPPED);
+
 
     if (this.mounted)
       setState(() {
@@ -405,14 +418,12 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   // Seek to a point in seconds
   Future<void> seekTo(double milliseconds) async {
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_SEEK + '$milliseconds');
+
     setState(() {
       currentPlaybackPosition = Duration(milliseconds: milliseconds.toInt());
     });
     _audioPlayer.seekTo(milliseconds / 1000);
-  }
-
-  void pressed() {
-    print('pressss');
   }
 
   Widget buildGoBackPill() {

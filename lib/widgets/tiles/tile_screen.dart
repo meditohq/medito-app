@@ -1,4 +1,5 @@
 import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/list_item.dart';
@@ -27,6 +28,7 @@ class TileListState extends State<TileList> {
 
   @override
   void initState() {
+    Tracking.trackScreen(Tracking.TILE, Tracking.SCREEN_LOADED);
     super.initState();
     listFuture = _viewModel.getTiles();
   }
@@ -311,6 +313,9 @@ class TileListState extends State<TileList> {
   }
 
   _onTap(TileItem tile) {
+    Tracking.trackEvent(Tracking.TILE, Tracking.BREADCRUMB_TAPPED,
+        tile.id + ' ' +tile.pathTemplate);
+
     if (tile.pathTemplate == 'audio') {
       _openBottomSheet(tile, _viewModel.getAudioData(id: tile.contentPath));
     } else if (tile.pathTemplate == 'default') {
