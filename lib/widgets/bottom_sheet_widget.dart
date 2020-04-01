@@ -274,7 +274,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     });
 
     lengthList.sort((a, b) {
-      return int.parse(a).compareTo(int.parse(b));
+      return double.parse(a).compareTo(double.parse(b));
     });
 
     filterLengthsForThisPerson(voiceList[0]);
