@@ -85,10 +85,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 color: MeditoColors.lightColor,
                 child: Text(
                   'BEGIN',
-                  style: Theme.of(context)
-                      .textTheme
-                      .display2
-                      .copyWith(color: MeditoColors.darkBGColor),
+                  style: Theme.of(context).textTheme.display2.copyWith(
+                      color: MeditoColors.darkBGColor,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -153,6 +152,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               child: Padding(
                 padding: buildInBetweenChipPadding(),
                 child: ChoiceChip(
+
                   pressElevation: 4,
                   shape: buildChipBorder(),
                   padding: buildInnerChipPadding(),
@@ -172,12 +172,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       ),
     );
   }
-
-  EdgeInsets buildInnerChipPadding() =>
-      EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 12);
-
-  EdgeInsets buildInBetweenChipPadding() =>
-      const EdgeInsets.only(left: 4, top: 10, bottom: 10, right: 4);
 
   Widget buildVoiceRow() {
     return Padding(
@@ -211,6 +205,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
+  EdgeInsets buildInnerChipPadding() =>
+      EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 12);
+
+  EdgeInsets buildInBetweenChipPadding() =>
+      const EdgeInsets.only(left: 4, top: 10, bottom: 10, right: 4);
+
   RoundedRectangleBorder buildChipBorder() {
     return RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)));
@@ -231,7 +231,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   TextStyle getSessionPillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.subhead.copyWith(
+    return Theme.of(context).textTheme.display4.copyWith(
         color: lengthSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);

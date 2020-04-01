@@ -223,6 +223,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
         minChildSize: 0.07,
         builder: (BuildContext context, ScrollController scrollController) {
           return Container(
+            padding: EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(8), topRight: Radius.circular(8)),
@@ -466,7 +467,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             width: 200,
             height: 200,
             child: Container(
-                margin: EdgeInsets.only(top: 24),
+                margin: EdgeInsets.only(top: 48),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: parseColor(widget.coverColor),
