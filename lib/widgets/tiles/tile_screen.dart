@@ -28,7 +28,7 @@ class TileListState extends State<TileList> {
 
   @override
   void initState() {
-    Tracking.trackScreen(Tracking.TILE, Tracking.SCREEN_LOADED);
+    Tracking.trackEvent(Tracking.TILE, Tracking.SCREEN_LOADED, '');
     super.initState();
     listFuture = _viewModel.getTiles();
   }

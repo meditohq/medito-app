@@ -65,7 +65,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   @override
   void dispose() {
     Tracking.trackEvent(Tracking.BREADCRUMB, Tracking.PLAYER_BREADCRUMB_TAPPED,
-        widget.listItem.id);
+        widget.fileModel.id);
 
     if (audioPlayerState != PlayerState.STOPPED) {
       stop();
@@ -76,7 +76,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void initState() {
-    Tracking.trackScreen(Tracking.PLAYER, widget.fileModel.id);
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.SCREEN_LOADED, widget.fileModel.id);
 
     super.initState();
 
@@ -388,7 +388,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Request audio play
   Future<void> play() async {
     Tracking.trackEvent(
-        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY + widget.listItem.id);
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PLAY + widget.fileModel.id);
 
     if (this.mounted)
       setState(() {
@@ -411,7 +411,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Request audio pause
   Future<void> pause() async {
     Tracking.trackEvent(
-        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED + widget.listItem.id);
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_PAUSED + widget.fileModel.id);
 
     _audioPlayer.pause();
     if (this.mounted) setState(() => audioPlayerState = PlayerState.PAUSED);
@@ -421,7 +421,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   Future<void> stop() async {
 //    _audioPlayer.reset();
     Tracking.trackEvent(
-        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_STOPPED + widget.listItem.id);
+        Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_STOPPED + widget.fileModel.id);
 
 
     if (this.mounted)
@@ -434,7 +434,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Seek to a point in seconds
   Future<void> seekTo(double milliseconds) async {
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
-        Tracking.AUDIO_SEEK + '$milliseconds :'  + widget.listItem.id);
+        Tracking.AUDIO_SEEK + '$milliseconds :'  + widget.fileModel.id);
 
     setState(() {
       currentPlaybackPosition = Duration(milliseconds: milliseconds.toInt());

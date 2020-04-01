@@ -40,10 +40,6 @@ class Tracking {
         'https://medito.app/analytics/piwik.php', 1);
   }
 
-  static Future<void> trackScreen(String screenName, String action) async {
-    await FlutterMatomo.trackScreenWithName(screenName, action);
-  }
-
   // like "LoginWidget", "Login button", "Clicked"
   static Future<void> trackEvent(
       String widgetName, String eventName, String action) async {

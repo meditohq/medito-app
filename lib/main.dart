@@ -18,7 +18,7 @@ class HomeScreenWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tracking.trackScreen(Tracking.HOME, Tracking.SCREEN_LOADED);
+    Tracking.trackEvent(Tracking.HOME, Tracking.SCREEN_LOADED, '');
 
     return MaterialApp(
       theme: ThemeData(

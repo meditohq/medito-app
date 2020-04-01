@@ -173,8 +173,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
   }
 
   void folderTap(ListItem i) {
-    Tracking.trackScreen(
-        Tracking.FOLDER_TAPPED, Tracking.FOLDER_OPENED + " " + i.id);
+    Tracking.trackEvent(Tracking.FOLDER_TAPPED, Tracking.SCREEN_LOADED, i.id);
     //if you tapped on a folder
     setState(() {
       _viewModel.addToNavList(i);
@@ -184,20 +183,17 @@ class _MainNavWidgetState extends State<MainNavWidget>
 
   void fileTap(ListItem item) {
     if (item.fileType == FileType.audioset) {
-      Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + item.id);
+      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
       _showPlayerBottomSheet(item);
     } else if (item.fileType == FileType.audio) {
-      Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + item.id);
+      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
       _showPlayerBottomSheet(item);
     } else if (item.fileType == FileType.both) {
-      Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED + " " + item.id);
+      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
       _showPlayerBottomSheet(item);
     } else if (item.fileType == FileType.text) {
-      Tracking.trackScreen(
-          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED + " " + item.id);
+      Tracking.trackEvent(
+          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED, item.id);
       setState(() {
         _viewModel.addToNavList(item);
         textFileOpacity = 1;
@@ -286,11 +282,10 @@ class _MainNavWidgetState extends State<MainNavWidget>
   Future<bool> _onWillPop() {
     if (_viewModel.navList.length > 1) {
       _backPressed(_viewModel.navList.last.parentId);
-      Tracking.trackScreen(
+      Tracking.trackEvent(
           Tracking.BACK_PRESSED,
-          Tracking.CURRENTLY_SELECTED_FILE +
-              "" +
-              _viewModel.currentlySelectedFile?.id);
+          Tracking.CURRENTLY_SELECTED_FILE,
+          _viewModel.currentlySelectedFile?.id);
     } else {
       return new Future(() => true);
     }
