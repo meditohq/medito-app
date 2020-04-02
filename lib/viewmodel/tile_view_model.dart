@@ -15,7 +15,8 @@ class TileListViewModelImpl implements TileListViewModel {
   TileItem currentTile;
 
   Future getTiles({bool skipCache = false}) async {
-    var response = await httpGet(baseUrl + '/app/children', skipCache: skipCache);
+    var response =
+        await httpGet(baseUrl + '/app/children', skipCache: skipCache);
     var pages = PagesChildren.fromJson(response);
     var pageList = pages.data;
 
@@ -41,14 +42,10 @@ class TileListViewModelImpl implements TileListViewModel {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
     var response = await httpGet(url);
 
-    List all = PagesChildren
-        .fromJson(response)
-        .data;
+    List all = PagesChildren.fromJson(response).data;
 
     if (timely == 'daily') {
-      var now = DateTime
-          .now()
-          .day;
+      var now = DateTime.now().day;
       var index = now % all.length;
 
       return getAudioData(id: all[index == 0 ? all.length - 1 : index].id);
@@ -58,10 +55,11 @@ class TileListViewModelImpl implements TileListViewModel {
   Future getAudioData({String id = ''}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
     var response = await httpGet(url);
-    return Pages
-        .fromJson(response)
-        .data
-        .content;
+    try {
+      return Pages.fromJson(response).data.content;
+    } catch (exception) {
+      return null;
+    }
   }
 
   Future getAttributions(String id) async {
@@ -75,20 +73,17 @@ class TileListViewModelImpl implements TileListViewModel {
   Future<String> getTextFile(String contentId) async {
     var url = baseUrl + '/' + contentId.replaceAll('/', '+');
     var response = await httpGet(url);
-    return Pages
-        .fromJson(response)
-        .data
-        .content
-        .contentText;
+    return Pages.fromJson(response).data.content.contentText;
   }
 
-  void _addTileItemToList(List<TileItem> listItemList, DataChildren value,
-      TileType type) {
+  void _addTileItemToList(
+      List<TileItem> listItemList, DataChildren value, TileType type) {
     listItemList.add(TileItem(value.title, value.id,
         tileType: type,
         thumbnail: value.illustrationUrl,
         description: value.description,
         url: value.url,
+        contentText: value.contentText,
         colorBackground: value.primaryColor,
         contentPath: value.contentPath,
         colorButton: value.secondaryColor,

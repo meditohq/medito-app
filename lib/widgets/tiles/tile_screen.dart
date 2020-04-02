@@ -46,9 +46,9 @@ class TileListState extends State<TileList> {
       backgroundColor: MeditoColors.darkColor,
       onRefresh: _onPullToRefresh,
       child: FutureBuilder(
-        builder: (context, projectSnap) {
-          if (projectSnap.connectionState == ConnectionState.none &&
-              projectSnap.hasData == null) {
+        builder: (context, future) {
+          if (future.connectionState == ConnectionState.none &&
+              future.hasData == null) {
             //print('project snapshot data is: ${projectSnap.data}');
             return Container();
           }
@@ -68,12 +68,10 @@ class TileListState extends State<TileList> {
                     padding: EdgeInsets.only(left: 16, right: 16),
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount:
-                        projectSnap.data != null ? projectSnap.data?.length : 0,
+                    itemCount: future.data != null ? future.data?.length : 0,
                     itemBuilder: (BuildContext context, int index) {
-                      TileItem tile = projectSnap.data != null
-                          ? projectSnap.data[index]
-                          : null;
+                      TileItem tile =
+                          future.data != null ? future.data[index] : null;
                       if (tile != null &&
                           tile.tileType == TileType.announcement) {
                         return getHorizontalAnnouncementTile(tile);
@@ -87,7 +85,7 @@ class TileListState extends State<TileList> {
                       }
                     },
                   ),
-                  twoColumnsTile(projectSnap.data)
+                  twoColumnsTile(future.data)
                 ],
               ),
             ),
@@ -346,11 +344,12 @@ class TileListState extends State<TileList> {
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description) {
+      String title, String description, String contentText) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
         fileType: FileType.audio,
+        contentText: contentText,
         url: _viewModel.currentTile.url,
         thumbnail: _viewModel.currentTile.thumbnail);
 

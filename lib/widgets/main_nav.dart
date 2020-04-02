@@ -221,7 +221,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description) {
+      String title, String description, String contentText) {
     Navigator.push(
       context,
       PageRouteBuilder(

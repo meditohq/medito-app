@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
-  final Function(dynamic, dynamic, dynamic, String, String) onBeginPressed;
+  final Function(dynamic, dynamic, dynamic, String, String, String) onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
@@ -24,15 +24,17 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   String description;
   String title;
   var coverColor;
+  String contentText;
 
   @override
   void initState() {
     super.initState();
 
     widget.data.then((d) {
-      this.coverArt = d.coverArt != null ? d?.coverArt?.first : null;
+      this.coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
       this.coverColor = d?.coverColor;
       this.title = d?.title;
+      this.contentText = d?.contentText;
       this.description = d?.description;
       compileLists(d?.files);
     });
@@ -102,7 +104,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           (file.length == (lengthList[lengthSelected]) &&
                   file.voice == (voiceList[voiceSelected]))
               ? widget.onBeginPressed(
-                  file, coverArt, coverColor, title, description)
+                  file, coverArt, coverColor, title, description, contentText)
               : null
         });
   }
@@ -211,6 +213,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   RoundedRectangleBorder buildChipBorder() {
     return RoundedRectangleBorder(
+        side: BorderSide(color: MeditoColors.lightTextColor),
         borderRadius: BorderRadius.all(Radius.circular(12)));
   }
 
@@ -264,7 +267,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     voiceList.clear();
     lengthList.clear();
 
-    files.forEach((file) {
+    files?.forEach((file) {
       if (!voiceList.contains(file.voice)) {
         voiceList.add(file.voice);
       }
@@ -277,7 +280,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       return double.parse(a).compareTo(double.parse(b));
     });
 
-    filterLengthsForThisPerson(voiceList[0]);
+    if (voiceList != null && voiceList.isNotEmpty) {
+      filterLengthsForThisPerson(voiceList[0]);
+    }
 
     if (this.mounted) {
       setState(() {});

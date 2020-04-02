@@ -8,6 +8,7 @@ class TileItem {
   String pathTemplate;
   TileType tileType;
   String contentPath;
+  String contentText;
   String colorBackground;
   String colorButton;
   String colorButtonText;
@@ -21,6 +22,7 @@ class TileItem {
       this.thumbnail,
       this.tileType,
       this.contentPath,
+      this.contentText,
       this.colorBackground,
       this.colorButton,
       this.pathTemplate,
