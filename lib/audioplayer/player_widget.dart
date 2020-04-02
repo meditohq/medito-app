@@ -458,6 +458,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             width: 200,
             height: 200,
             child: Container(
+              padding: EdgeInsets.all(22),
                 margin: EdgeInsets.only(top: 48),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -516,10 +517,11 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     return Container(
       padding: EdgeInsets.only(top: 0, bottom: 8, left: 16, right: 16),
       child: new RichText(
+        textAlign: TextAlign.center,
         text: new TextSpan(
           children: [
             new TextSpan(
-              text: 'Audio from '.toUpperCase(),
+              text: 'From '.toUpperCase(),
               style: Theme.of(context).textTheme.display4,
             ),
             new TextSpan(
