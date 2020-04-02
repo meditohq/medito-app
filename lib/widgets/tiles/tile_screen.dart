@@ -292,6 +292,7 @@ class TileListState extends State<TileList> {
                                           .textTheme
                                           .display2
                                           .copyWith(
+                                              letterSpacing: 1,
                                               fontWeight: FontWeight.w600,
                                               color: parseColor(
                                                   item.colorButtonText))),
