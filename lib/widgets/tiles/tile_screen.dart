@@ -189,7 +189,7 @@ class TileListState extends State<TileList> {
                           .title
                           .copyWith(color: parseColor(item.colorText))),
                   Container(height: 16),
-                  Image.network(item.thumbnail, headers: null),
+                  getNetworkImageWidget(item.thumbnail),
                 ],
               ),
             )),
@@ -304,7 +304,8 @@ class TileListState extends State<TileList> {
                     ),
                   ),
                   Container(width: 16),
-                  Expanded(flex: 1, child: Image.network(item.thumbnail)),
+                  Expanded(
+                      flex: 1, child: getNetworkImageWidget(item.thumbnail)),
                 ],
               ),
             ),

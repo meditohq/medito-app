@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 String blankIfNull(String s) {
@@ -79,6 +80,17 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w800),
       ));
+}
+
+Widget getNetworkImageWidget(String url, {Color svgColor}) {
+  if (url.endsWith('png')) {
+    return Image.network(url, headers: null);
+  } else {
+    return SvgPicture.network(
+      url,
+      color: svgColor != null? svgColor : MeditoColors.darkBGColor,
+    );
+  }
 }
 
 Future<bool> checkConnectivity() async {

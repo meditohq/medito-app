@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_playout/audio.dart';
 import 'package:flutter_playout/player_observer.dart';
 import 'package:flutter_playout/player_state.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/colors.dart';
@@ -464,9 +463,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                   shape: BoxShape.circle,
                   color: parseColor(widget.coverColor),
                 ),
-                child: SvgPicture.network(
-                  widget.coverArt.url,
-                )),
+                child: getNetworkImageWidget(widget.coverArt.url)),
           ),
         ),
       ],
