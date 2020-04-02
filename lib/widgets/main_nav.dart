@@ -310,40 +310,39 @@ class _MainNavWidgetState extends State<MainNavWidget>
       ignoring: textFileOpacity == 0,
       child: Container(
         color: MeditoColors.darkBGColor,
-        child: Column(
+        child: Row(
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            NavPillsWidget(
-              list: _viewModel?.navList,
-              backPressed: _backPressed,
-            ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
+              child: SingleChildScrollView(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: MarkdownBody(
-                          onTapLink: ((url) {
-                            launch(url);
-                          }),
-                          selectable: false,
-                          styleSheet:
-                              MarkdownStyleSheet.fromTheme(Theme.of(context))
-                                  .copyWith(
-                                      h1: Theme.of(context).textTheme.title,
-                                      h2: Theme.of(context).textTheme.headline,
-                                      h3: Theme.of(context).textTheme.subtitle,
-                                      listBullet:
-                                          Theme.of(context).textTheme.subhead,
-                                      p: Theme.of(context).textTheme.body1),
-                          data: content == null ? '' : content,
-                          imageDirectory: 'https://raw.githubusercontent.com',
-                        ),
+                    NavPillsWidget(
+                      list: _viewModel?.navList,
+                      backPressed: _backPressed,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                      child: MarkdownBody(
+                        onTapLink: ((url) {
+                          launch(url);
+                        }),
+                        selectable: false,
+                        styleSheet:
+                            MarkdownStyleSheet.fromTheme(Theme.of(context))
+                                .copyWith(
+                                    h1: Theme.of(context).textTheme.title,
+                                    h2: Theme.of(context).textTheme.headline,
+                                    h3: Theme.of(context).textTheme.subtitle,
+                                    listBullet:
+                                        Theme.of(context).textTheme.subhead,
+                                    p: Theme.of(context).textTheme.body1),
+                        data: content == null ? '' : content,
+                        imageDirectory: 'https://raw.githubusercontent.com',
                       ),
                     ),
                   ],
