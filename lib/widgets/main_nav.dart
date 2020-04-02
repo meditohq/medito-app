@@ -6,6 +6,7 @@ import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'bottom_sheet_widget.dart';
 import 'list_item_file_widget.dart';
@@ -327,7 +328,10 @@ class _MainNavWidgetState extends State<MainNavWidget>
                     Expanded(
                       child: SingleChildScrollView(
                         child: MarkdownBody(
-                          selectable: true,
+                          onTapLink: ((url) {
+                            launch(url);
+                          }),
+                          selectable: false,
                           styleSheet:
                               MarkdownStyleSheet.fromTheme(Theme.of(context))
                                   .copyWith(
