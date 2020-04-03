@@ -283,7 +283,7 @@ class TileListState extends State<TileList> {
                                     const EdgeInsets.only(top: 8.0, bottom: 12),
                                 child: FlatButton(
                                   padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
-                                  onPressed: () {},
+                                  onPressed: () {_onTap(item);},
                                   color: parseColor(item.colorButton),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
