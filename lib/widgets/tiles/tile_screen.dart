@@ -322,9 +322,12 @@ class TileListState extends State<TileList> {
       openNavWidget(tile);
     } else if (tile.pathTemplate == 'text') {
       openNavWidget(tile, textFuture: _viewModel.getTextFile(tile.contentPath));
-    } else if (tile.pathTemplate == 'audio-set') {
+    } else if (tile.pathTemplate == 'audio-set-daily') {
       _openBottomSheet(
-          tile, _viewModel.getAudioFromDailySet(id: tile.contentPath));
+          tile, _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'daily'));
+    } else if (tile.pathTemplate == 'audio-set-hourly') {
+      _openBottomSheet(
+          tile, _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'hourly'));
     }
   }
 

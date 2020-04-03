@@ -50,8 +50,10 @@ class SubscriptionViewModelImpl implements MainListViewModel {
         _addTextItemToList(listItemList, value);
       } else if (value.template == 'illustration') {
         _addIllustrationItemToList(listItemList, value);
-      } else if (value.template == 'audio-set') {
-        _addAudioSetItemToList(listItemList, value);
+      } else if (value.template == 'audio-set-daily') {
+        _addAudioSetItemToList(listItemList, value, fileType: FileType.audiosetdaily);
+      } else if (value.template == 'audio-set-hourly') {
+        _addAudioSetItemToList(listItemList, value, fileType: FileType.audiosethourly);
       }
     }
 
@@ -71,12 +73,12 @@ class SubscriptionViewModelImpl implements MainListViewModel {
         contentText: value.contentText));
   }
 
-  void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value) {
+  void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value, {FileType fileType}) {
     listItemList.add(ListItem(
       value.title,
       value.id,
       ListItemType.file,
-      fileType: FileType.audioset,
+      fileType: fileType,
     ));
   }
 
@@ -105,7 +107,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return Pages.fromJson(response).data.content;
   }
 
-  Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
+  Future getAudioFromSet({String id = '', FileType timely = FileType.audiosetdaily}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     List all;
@@ -114,10 +116,10 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
     var index = 0;
     var now = 0;
-    if (timely == 'daily') {
+    if (timely == FileType.audiosetdaily) {
       var now = DateTime.now().day;
       index = now % all.length;
-    } else if (timely == 'hourly') {
+    } else if (timely == FileType.audiosethourly) {
       var now = DateTime.now().hour;
       index = now % all.length;
     }

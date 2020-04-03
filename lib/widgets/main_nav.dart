@@ -183,7 +183,8 @@ class _MainNavWidgetState extends State<MainNavWidget>
   }
 
   void fileTap(ListItem item) {
-    if (item.fileType == FileType.audioset) {
+    if (item.fileType == FileType.audiosethourly ||
+        item.fileType == FileType.audiosetdaily) {
       Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
       _showPlayerBottomSheet(item);
     } else if (item.fileType == FileType.audio) {
@@ -205,6 +206,15 @@ class _MainNavWidgetState extends State<MainNavWidget>
   _showPlayerBottomSheet(ListItem listItem) {
     _viewModel.currentlySelectedFile = listItem;
 
+    var data;
+    if (listItem.fileType == FileType.audiosetdaily ||
+        listItem.fileType == FileType.audiosethourly) {
+      data = _viewModel.getAudioFromSet(
+          id: listItem.id, timely: listItem.fileType);
+    } else {
+      data = _viewModel.getAudioData(id: listItem.id);
+    }
+
     showModalBottomSheet(
       context: context,
       clipBehavior: Clip.antiAlias,
@@ -212,10 +222,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
       builder: (context) => BottomSheetWidget(
         title: listItem.title,
         onBeginPressed: _showPlayer,
-        data: listItem.fileType == FileType.audioset
-            ? _viewModel.getAudioFromSet(
-                id: listItem.id, timely: listItem.title.toLowerCase())
-            : _viewModel.getAudioData(id: listItem.id),
+        data: data,
       ),
     );
   }
@@ -326,7 +333,8 @@ class _MainNavWidgetState extends State<MainNavWidget>
                       backPressed: _backPressed,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                      padding: const EdgeInsets.only(
+                          left: 16.0, right: 16.0, bottom: 16.0),
                       child: MarkdownBody(
                         onTapLink: ((url) {
                           launch(url);

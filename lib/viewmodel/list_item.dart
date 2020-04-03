@@ -19,4 +19,4 @@ class ListItem {
 }
 
 enum ListItemType { folder, file, illustration }
-enum FileType { audio, text, both, audioset }
+enum FileType { audio, text, both, audiosetdaily, audiosethourly }

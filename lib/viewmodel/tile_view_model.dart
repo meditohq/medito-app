@@ -38,7 +38,7 @@ class TileListViewModelImpl implements TileListViewModel {
     return listItemList;
   }
 
-  Future getAudioFromDailySet({String id = '', String timely = 'daily'}) async {
+  Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
     var response = await httpGet(url);
 
@@ -46,6 +46,11 @@ class TileListViewModelImpl implements TileListViewModel {
 
     if (timely == 'daily') {
       var now = DateTime.now().day;
+      var index = now % all.length;
+
+      return getAudioData(id: all[index == 0 ? all.length - 1 : index].id);
+    }else if (timely == 'hourly') {
+      var now = DateTime.now().hour;
       var index = now % all.length;
 
       return getAudioData(id: all[index == 0 ? all.length - 1 : index].id);
