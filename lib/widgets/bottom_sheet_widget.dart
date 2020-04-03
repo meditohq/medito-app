@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
-  final Function(dynamic, dynamic, dynamic, String, String, String) onBeginPressed;
+  final Function(dynamic, dynamic, dynamic, String, String, String)
+      onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
@@ -269,7 +270,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     files?.forEach((file) {
       if (!voiceList.contains(file.voice)) {
-        voiceList.add(file.voice);
+        //put Will first
+        if (file.voice.contains('Will')) {
+          voiceList.insert(0, file.voice);
+        } else {
+          voiceList.add(file.voice);
+        }
       }
       if (!lengthList.contains(file.length)) {
         lengthList.add(file.length);
