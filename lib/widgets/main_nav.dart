@@ -89,9 +89,12 @@ class _MainNavWidgetState extends State<MainNavWidget>
                   Expanded(
                       child: Stack(
                     children: <Widget>[
-                      getListView(),
+                      Visibility(
+                        child: getListView(),
+                        visible: textFileOpacity == 0,
+                      ),
                       AnimatedOpacity(
-                          duration: Duration(milliseconds: 0),
+                          duration: Duration(milliseconds: 100),
                           opacity: textFileOpacity,
                           child: getInnerTextView()),
                     ],
