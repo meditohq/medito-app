@@ -330,6 +330,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                       ),
                 color: MeditoColors.lightColor,
                 onPressed: () {
+                  if(_loading) return null;
                   if (isPlaying) {
                     pause();
                   } else {
