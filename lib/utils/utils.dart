@@ -107,3 +107,12 @@ Future<bool> checkConnectivity() async {
 
 Color parseColor(String color) =>
     Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
+
+
+void createSnackBar(String message, BuildContext context) {
+  final snackBar = new SnackBar(content: new Text(message),
+      backgroundColor: Colors.red);
+
+  // Find the Scaffold in the Widget tree and use it to show a SnackBar!
+  Scaffold.of(context).showSnackBar(snackBar);
+}

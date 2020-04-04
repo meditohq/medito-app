@@ -7,10 +7,11 @@ import 'package:Medito/viewmodel/tile_item.dart';
 import 'package:Medito/viewmodel/tile_view_model.dart';
 import 'package:Medito/widgets/bottom_sheet_widget.dart';
 import 'package:Medito/widgets/column_builder.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../main_nav.dart';
+import '../folder_nav.dart';
 
 class TileList extends StatefulWidget {
   TileList({Key key}) : super(key: key);
@@ -359,8 +360,8 @@ class TileListState extends State<TileList> {
 
     Navigator.push(
       context,
-      PageRouteBuilder(
-        pageBuilder: (c, a1, a2) => PlayerWidget(
+      MaterialPageRoute(
+        builder: (context) => PlayerWidget(
             fileModel: fileTapped,
             description: description,
             coverArt: coverArt,
@@ -368,9 +369,6 @@ class TileListState extends State<TileList> {
             title: title,
             listItem: listItem,
             attributions: _viewModel.getAttributions(fileTapped.attributions)),
-        transitionsBuilder: (c, anim, a2, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: Duration(milliseconds: 150),
       ),
     );
   }
@@ -378,16 +376,13 @@ class TileListState extends State<TileList> {
   void openNavWidget(TileItem tile, {Future textFuture}) {
     Navigator.push(
       context,
-      PageRouteBuilder(
-        pageBuilder: (c, a1, a2) {
-          return MainNavWidget(
+      MaterialPageRoute(
+        builder: (c) {
+          return FolderNavWidget(
               firstTitle: tile.title,
               firstId: tile.contentPath,
               textFuture: textFuture);
         },
-        transitionsBuilder: (c, anim, a2, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: Duration(milliseconds: 150),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/list_item.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +15,17 @@ import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
 import 'nav_pills_widget.dart';
 
-class MainStateless extends StatelessWidget {
-  MainStateless({Key key}) : super(key: key);
+class FolderStateless extends StatelessWidget {
+  FolderStateless({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MainNavWidget();
+    return FolderNavWidget();
   }
 }
 
-class MainNavWidget extends StatefulWidget {
-  MainNavWidget({Key key, this.firstId, this.firstTitle, this.textFuture})
+class FolderNavWidget extends StatefulWidget {
+  FolderNavWidget({Key key, this.firstId, this.firstTitle, this.textFuture})
       : super(key: key);
 
   final String firstId;
@@ -32,10 +33,10 @@ class MainNavWidget extends StatefulWidget {
   final Future<String> textFuture;
 
   @override
-  _MainNavWidgetState createState() => _MainNavWidgetState();
+  _FolderNavWidgetState createState() => _FolderNavWidgetState();
 }
 
-class _MainNavWidgetState extends State<MainNavWidget>
+class _FolderNavWidgetState extends State<FolderNavWidget>
     with TickerProviderStateMixin {
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
@@ -43,6 +44,8 @@ class _MainNavWidgetState extends State<MainNavWidget>
   String readMoreText = "";
   String textFileFromFuture = "";
   double textFileOpacity = 0;
+
+  BuildContext scaffoldContext;
 
   @override
   void dispose() {
@@ -52,6 +55,7 @@ class _MainNavWidgetState extends State<MainNavWidget>
   @override
   void initState() {
     super.initState();
+
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.addToNavList(
@@ -78,32 +82,47 @@ class _MainNavWidgetState extends State<MainNavWidget>
       onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: MeditoColors.darkBGColor,
-        body: SafeArea(
-          bottom: false,
-          maintainBottomViewPadding: false,
-          child: Stack(
+        body: new Builder(
+          builder: (BuildContext context) {
+            scaffoldContext = context;
+            return buildSafeAreaBody();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildSafeAreaBody() {
+    checkConnectivity().then((connected) {
+      if (!connected) {
+        createSnackBar('Check your connectivity', scaffoldContext);
+      }
+    });
+
+    return SafeArea(
+      bottom: false,
+      maintainBottomViewPadding: false,
+      child: Stack(
+        children: <Widget>[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                  child: Stack(
                 children: <Widget>[
-                  Expanded(
-                      child: Stack(
-                    children: <Widget>[
-                      Visibility(
-                        child: getListView(),
-                        visible: textFileOpacity == 0,
-                      ),
-                      AnimatedOpacity(
-                          duration: Duration(milliseconds: 100),
-                          opacity: textFileOpacity,
-                          child: getInnerTextView()),
-                    ],
-                  )),
+                  Visibility(
+                    child: getListView(),
+                    visible: textFileOpacity == 0,
+                  ),
+                  AnimatedOpacity(
+                      duration: Duration(milliseconds: 100),
+                      opacity: textFileOpacity,
+                      child: getInnerTextView()),
                 ],
-              ),
+              )),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -233,21 +252,18 @@ class _MainNavWidgetState extends State<MainNavWidget>
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
       String title, String description, String contentText) {
     Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (c, a1, a2) => PlayerWidget(
-            fileModel: fileTapped,
-            description: description,
-            coverArt: coverArt,
-            coverColor: coverColor,
-            title: title,
-            listItem: _viewModel.currentlySelectedFile,
-            attributions: _viewModel.getAttributions(fileTapped.attributions)),
-        transitionsBuilder: (c, anim, a2, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: Duration(milliseconds: 150),
-      ),
-    );
+        context,
+        MaterialPageRoute(
+          builder: (c) => PlayerWidget(
+              fileModel: fileTapped,
+              description: description,
+              coverArt: coverArt,
+              coverColor: coverColor,
+              title: title,
+              listItem: _viewModel.currentlySelectedFile,
+              attributions:
+                  _viewModel.getAttributions(fileTapped.attributions)),
+        ));
   }
 
   Widget getFileListItem(ListItem item) {
