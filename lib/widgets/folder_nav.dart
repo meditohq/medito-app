@@ -359,15 +359,16 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                           launch(url);
                         }),
                         selectable: false,
-                        styleSheet:
-                            MarkdownStyleSheet.fromTheme(Theme.of(context))
-                                .copyWith(
-                                    h1: Theme.of(context).textTheme.title,
-                                    h2: Theme.of(context).textTheme.headline,
-                                    h3: Theme.of(context).textTheme.subtitle,
-                                    listBullet:
-                                        Theme.of(context).textTheme.subhead,
-                                    p: Theme.of(context).textTheme.body1),
+                        styleSheet: MarkdownStyleSheet.fromTheme(
+                                Theme.of(context))
+                            .copyWith(
+                                a: Theme.of(context).textTheme.body1.copyWith(
+                                    decoration: TextDecoration.underline),
+                                h1: Theme.of(context).textTheme.title,
+                                h2: Theme.of(context).textTheme.headline,
+                                h3: Theme.of(context).textTheme.subtitle,
+                                listBullet: Theme.of(context).textTheme.subhead,
+                                p: Theme.of(context).textTheme.body1),
                         data: content == null ? '' : content,
                         imageDirectory: 'https://raw.githubusercontent.com',
                       ),
