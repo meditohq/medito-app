@@ -7,6 +7,7 @@ import 'package:Medito/viewmodel/tile_item.dart';
 import 'package:Medito/viewmodel/tile_view_model.dart';
 import 'package:Medito/widgets/bottom_sheet_widget.dart';
 import 'package:Medito/widgets/column_builder.dart';
+import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -258,59 +259,76 @@ class TileListState extends State<TileList> {
             Padding(
               padding:
                   const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(item.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .title
-                                .copyWith(color: parseColor(item.colorText))),
-                        Text(item.description,
-                            style: Theme.of(context)
-                                .textTheme
-                                .subhead
-                                .copyWith(color: parseColor(item.colorText))),
-                        item.buttonLabel != null
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 8.0, bottom: 12),
-                                child: FlatButton(
-                                  padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
-                                  onPressed: () {_onTap(item);},
-                                  color: parseColor(item.colorButton),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: Text(item.buttonLabel.toUpperCase(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .display2
-                                          .copyWith(
-                                              letterSpacing: 1,
-                                              fontWeight: FontWeight.w600,
-                                              color: parseColor(
-                                                  item.colorButtonText))),
-                                ),
-                              )
-                            : Container()
-                      ],
-                    ),
+                  Positioned(
+                      bottom: 0,
+                      right: 16,
+                      child: SizedBox( height: 140, child: getNetworkImageWidget(item.thumbnail))),
+                  Positioned(bottom: 0, child: getFlatButton(item)),
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      getTitleText(item),
+                      getDescText(item),
+                    ],
                   ),
-                  Container(width: 16),
-                  Expanded(
-                      flex: 1, child: getNetworkImageWidget(item.thumbnail)),
                 ],
               ),
             ),
           ),
         ));
+  }
+
+  Widget getDescText(TileItem item) {
+    return FractionallySizedBox(
+      widthFactor: .5,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 84),
+        child: Text(item.description,
+            style: Theme.of(context)
+                .textTheme
+                .subhead
+                .copyWith(color: parseColor(item.colorText))),
+      ),
+    );
+  }
+
+  Widget getTitleText(TileItem item) {
+    return FractionallySizedBox(
+      widthFactor: 0.6,
+      child: Text(item.title,
+          style: Theme.of(context)
+              .textTheme
+              .title
+              .copyWith(color: parseColor(item.colorText))),
+    );
+  }
+
+  Widget getFlatButton(TileItem item) {
+    if (item.buttonLabel != null) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 12),
+        child: FlatButton(
+          padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+          onPressed: () {
+            _onTap(item);
+          },
+          color: parseColor(item.colorButton),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Text(item.buttonLabel.toUpperCase(),
+              style: Theme.of(context).textTheme.display2.copyWith(
+                  letterSpacing: 1,
+                  fontWeight: FontWeight.w600,
+                  color: parseColor(item.colorButtonText))),
+        ),
+      );
+    } else {
+      return Container();
+    }
   }
 
   _onTap(TileItem tile) {
@@ -324,11 +342,11 @@ class TileListState extends State<TileList> {
     } else if (tile.pathTemplate == 'text') {
       openNavWidget(tile, textFuture: _viewModel.getTextFile(tile.contentPath));
     } else if (tile.pathTemplate == 'audio-set-daily') {
-      _openBottomSheet(
-          tile, _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'daily'));
+      _openBottomSheet(tile,
+          _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'daily'));
     } else if (tile.pathTemplate == 'audio-set-hourly') {
-      _openBottomSheet(
-          tile, _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'hourly'));
+      _openBottomSheet(tile,
+          _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'hourly'));
     }
   }
 
