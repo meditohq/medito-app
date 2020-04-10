@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_playout/player_observer.dart';
 import 'package:flutter_playout/player_state.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
@@ -18,6 +19,8 @@ class ListItemWidget extends StatefulWidget {
 
 class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
   var currentIcon;
+
+  SharedPreferences prefs;
 
   Color getBackgroundColor() {
     if (widget.state != null) {
@@ -64,6 +67,12 @@ class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
 
   @override
   Widget build(BuildContext context) {
+    SharedPreferences.getInstance().then((i) {
+      setState(() {
+        this.prefs = i;
+      });
+    });
+
     return Container(
       padding: EdgeInsets.all(16),
       color: getBackgroundColor(),
@@ -115,16 +124,10 @@ class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
       case FileType.audio:
       case FileType.audiosetdaily:
       case FileType.audiosethourly:
-        iconWidget = Icon(
-          Icons.headset,
-          color: MeditoColors.lightColor,
-        );
+        iconWidget = getAudioIcon(iconWidget);
         break;
       case FileType.both:
-        iconWidget = Icon(
-          Icons.headset,
-          color: MeditoColors.lightColor,
-        );
+        iconWidget = getAudioIcon(iconWidget);
         break;
       case FileType.text:
         path = 'assets/images/ic_document.svg';
@@ -136,6 +139,23 @@ class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
     }
 
     return Padding(padding: EdgeInsets.only(right: 8), child: iconWidget);
+  }
+
+  Widget getAudioIcon(iconWidget) {
+    final listened = prefs?.getBool('listened' + widget.item.id) ?? false;
+
+    if (listened) {
+      iconWidget = Icon(
+        Icons.check_circle,
+        color: MeditoColors.lightColor,
+      );
+    } else {
+      iconWidget = Icon(
+        Icons.headset,
+        color: MeditoColors.lightColor,
+      );
+    }
+    return iconWidget;
   }
 
   void _playOrPause() {

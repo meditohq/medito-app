@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_playout/audio.dart';
 import 'package:flutter_playout/player_observer.dart';
 import 'package:flutter_playout/player_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/colors.dart';
@@ -56,6 +57,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   double widthOfScreen;
 
+  SharedPreferences prefs;
+
   get isPlaying => audioPlayerState == PlayerState.PLAYING;
 
   get isPaused =>
@@ -86,6 +89,12 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
     // Listen for audio player events
     listenForAudioPlayerEvents();
+
+    SharedPreferences.getInstance().then((i) {
+      setState(() {
+        this.prefs = i;
+      });
+    });
 
     widget.attributions.then((attr) {
       sourceUrl = attr.sourceUrl;
@@ -154,10 +163,14 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   @override
   void onTime(int position) {
-    if (this.mounted)
+    if (this.mounted) {
+      if (position > duration.inSeconds - 15 && position < duration.inSeconds - 10) {
+        prefs?.setBool('listened' + widget.listItem.id, true);
+      }
       setState(() {
         currentPlaybackPosition = Duration(seconds: position);
       });
+    }
   }
 
   @override
@@ -330,7 +343,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
                       ),
                 color: MeditoColors.lightColor,
                 onPressed: () {
-                  if(_loading) return null;
+                  if (_loading) return null;
                   if (isPlaying) {
                     pause();
                   } else {
@@ -459,7 +472,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             width: 200,
             height: 200,
             child: Container(
-              padding: EdgeInsets.all(22),
+                padding: EdgeInsets.all(22),
                 margin: EdgeInsets.only(top: 48),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
