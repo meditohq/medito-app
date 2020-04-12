@@ -7,7 +7,6 @@ import 'package:Medito/viewmodel/tile_item.dart';
 import 'package:Medito/viewmodel/tile_view_model.dart';
 import 'package:Medito/widgets/bottom_sheet_widget.dart';
 import 'package:Medito/widgets/column_builder.dart';
-import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

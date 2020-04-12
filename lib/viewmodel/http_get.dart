@@ -8,16 +8,15 @@ import 'auth.dart';
 import 'cache.dart';
 
 Future httpGet(String url, {bool skipCache = false}) async {
-
   var cache;
+
+  if (!await checkConnectivity()) {
+    skipCache = false;
+  }
 
   if (skipCache) {
     cache = null;
   } else {
-    cache = await readJSONFromCache(url);
-  }
-
-  if(cache == null && ! await checkConnectivity()){
     cache = await readJSONFromCache(url);
   }
 

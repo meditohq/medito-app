@@ -14,6 +14,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   List<ListItem> navList = [];
   ListItem currentlySelectedFile;
 
+  bool _skipCache;
+
   Future getAttributions(String id) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
     var response = await httpGet(url);
@@ -24,6 +26,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   Future<List<ListItem>> getPageChildren(
       {String id = 'app+content', bool skipCache = false}) async {
+    this._skipCache = skipCache;
+
     if (id == null) id = 'app+content';
 
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
@@ -51,9 +55,11 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       } else if (value.template == 'illustration') {
         _addIllustrationItemToList(listItemList, value);
       } else if (value.template == 'audio-set-daily') {
-        _addAudioSetItemToList(listItemList, value, fileType: FileType.audiosetdaily);
+        _addAudioSetItemToList(listItemList, value,
+            fileType: FileType.audiosetdaily);
       } else if (value.template == 'audio-set-hourly') {
-        _addAudioSetItemToList(listItemList, value, fileType: FileType.audiosethourly);
+        _addAudioSetItemToList(listItemList, value,
+            fileType: FileType.audiosethourly);
       }
     }
 
@@ -73,7 +79,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
         contentText: value.contentText));
   }
 
-  void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value, {FileType fileType}) {
+  void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value,
+      {FileType fileType}) {
     listItemList.add(ListItem(
       value.title,
       value.id,
@@ -103,15 +110,18 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   Future getAudioData({String id = ''}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
-    var response = await httpGet(url);
+    var response = await httpGet(url, skipCache: this._skipCache);
+    this._skipCache = false;
     return Pages.fromJson(response).data.content;
   }
 
-  Future getAudioFromSet({String id = '', FileType timely = FileType.audiosetdaily}) async {
+  Future getAudioFromSet(
+      {String id = '', FileType timely = FileType.audiosetdaily}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     List all;
-    var response = await httpGet(url);
+    var response = await httpGet(url, skipCache: this._skipCache);
+    this._skipCache = false;
     all = PagesChildren.fromJson(response).data;
 
     var index = 0;

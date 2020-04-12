@@ -14,7 +14,10 @@ class TileListViewModelImpl implements TileListViewModel {
   List<TileItem> navList = [];
   TileItem currentTile;
 
+  bool _skipCache;
+
   Future getTiles({bool skipCache = false}) async {
+    this._skipCache = skipCache;
     var response =
         await httpGet(baseUrl + '/app/children', skipCache: skipCache);
     var pages = PagesChildren.fromJson(response);
@@ -40,7 +43,7 @@ class TileListViewModelImpl implements TileListViewModel {
 
   Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
-    var response = await httpGet(url);
+    var response = await httpGet(url, skipCache: this._skipCache);
 
     List all = PagesChildren.fromJson(response).data;
 
@@ -59,7 +62,8 @@ class TileListViewModelImpl implements TileListViewModel {
 
   Future getAudioData({String id = ''}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
-    var response = await httpGet(url);
+    var response = await httpGet(url, skipCache: this._skipCache);
+    this._skipCache = false;
     try {
       return Pages.fromJson(response).data.content;
     } catch (exception) {
@@ -77,7 +81,8 @@ class TileListViewModelImpl implements TileListViewModel {
 
   Future<String> getTextFile(String contentId) async {
     var url = baseUrl + '/' + contentId.replaceAll('/', '+');
-    var response = await httpGet(url);
+    var response = await httpGet(url, skipCache: this._skipCache);
+    this._skipCache = false;
     return Pages.fromJson(response).data.content.contentText;
   }
 
