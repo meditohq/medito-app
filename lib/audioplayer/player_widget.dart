@@ -164,7 +164,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   @override
   void onTime(int position) {
     if (this.mounted) {
-      if (position > duration.inSeconds - 15 && position < duration.inSeconds - 10) {
+      if (position > duration.inSeconds - 15 &&
+          position < duration.inSeconds - 10) {
         prefs?.setBool('listened' + widget.listItem.id, true);
       }
       setState(() {
@@ -528,40 +529,58 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   }
 
   Widget buildAttributionsView() {
-    return Container(
-      padding: EdgeInsets.only(top: 0, bottom: 8, left: 16, right: 16),
-      child: new RichText(
-        textAlign: TextAlign.center,
-        text: new TextSpan(
-          children: [
-            new TextSpan(
-              text: 'From '.toUpperCase(),
-              style: Theme.of(context).textTheme.display4,
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(top: 0, bottom: 8, left: 16, right: 16),
+          child: new RichText(
+            textAlign: TextAlign.center,
+            text: new TextSpan(
+              children: [
+                new TextSpan(
+                  text: 'From '.toUpperCase(),
+                  style: Theme.of(context).textTheme.display4,
+                ),
+                new TextSpan(
+                  text: licenseTitle?.toUpperCase(),
+                  style: Theme.of(context).textTheme.body2,
+                  recognizer: new TapGestureRecognizer()
+                    ..onTap = () {
+                      launch(sourceUrl);
+                    },
+                ),
+                new TextSpan(
+                  text: ' / License: '.toUpperCase(),
+                  style: Theme.of(context).textTheme.display4,
+                ),
+                new TextSpan(
+                  text: licenseName?.toUpperCase(),
+                  style: Theme.of(context).textTheme.body2,
+                  recognizer: new TapGestureRecognizer()
+                    ..onTap = () {
+                      launch(licenseURL);
+                    },
+                ),
+              ],
             ),
-            new TextSpan(
-              text: licenseTitle?.toUpperCase(),
-              style: Theme.of(context).textTheme.body2,
-              recognizer: new TapGestureRecognizer()
-                ..onTap = () {
-                  launch(sourceUrl);
-                },
-            ),
-            new TextSpan(
-              text: ' / License: '.toUpperCase(),
-              style: Theme.of(context).textTheme.display4,
-            ),
-            new TextSpan(
-              text: licenseName?.toUpperCase(),
-              style: Theme.of(context).textTheme.body2,
-              recognizer: new TapGestureRecognizer()
-                ..onTap = () {
-                  launch(licenseURL);
-                },
-            ),
-          ],
+          ),
         ),
-      ),
+        buildDownloadButton()
+      ],
     );
+  }
+
+  Widget buildDownloadButton() {
+    return FlatButton.icon(
+      color: MeditoColors.darkColor,
+      onPressed: launchDownload,
+      icon: Icon(Icons.cloud_download, color: MeditoColors.lightColor,),
+      label: Text('DOWNLOAD', style: Theme.of(context).textTheme.display2,),
+    );
+  }
+
+  launchDownload() {
+    launch(widget.fileModel.url.replaceAll(' ', '%20'));
   }
 
   Widget buildPlayItems() {
