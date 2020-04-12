@@ -11,6 +11,7 @@ class Tracking {
   static const String TILE = "tile ";
   static const String PLAYER = "player ";
 
+  static const String AUDIO_DOWNLOAD = "audio download ";
   static const String AUDIO_PLAY = "audio started ";
   static const String AUDIO_ERROR = "audio error ";
   static const String AUDIO_REWIND = "audio rewind ";

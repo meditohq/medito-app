@@ -580,6 +580,9 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   }
 
   launchDownload() {
+    Tracking.trackEvent(Tracking.PLAYER, Tracking.AUDIO_DOWNLOAD,
+        widget.fileModel.id);
+
     launch(widget.fileModel.url.replaceAll(' ', '%20'));
   }
 
