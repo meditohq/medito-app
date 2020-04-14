@@ -49,7 +49,7 @@ class FadeTransitionBuilder extends PageTransitionsBuilder {
     return FadeTransition(
         opacity: CurvedAnimation(
           parent: animation,
-          curve: Curves.linear,
+          curve: Curves.easeInOut,
         ),
         child: child);
   }

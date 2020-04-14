@@ -256,15 +256,17 @@ class TileListState extends State<TileList> {
             parseColor(item.colorBackground),
             item,
             Padding(
-              padding:
-                  const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Stack(
                 children: <Widget>[
                   Positioned(
                       bottom: 0,
                       right: 16,
-                      child: SizedBox( height: 140, child: getNetworkImageWidget(item.thumbnail))),
-                  Positioned(bottom: 0, child: getFlatButton(item)),
+                      child: SizedBox(
+                          height: 120,
+                          child: getNetworkImageWidget(item.thumbnail))),
+                  //todo why is there space around this button?
+                  Positioned(bottom: -4, child: getFlatButton(item)),
                   Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -309,7 +311,7 @@ class TileListState extends State<TileList> {
   Widget getFlatButton(TileItem item) {
     if (item.buttonLabel != null) {
       return Padding(
-        padding: const EdgeInsets.only(top: 8.0, bottom: 12),
+        padding: const EdgeInsets.only(top: 8.0),
         child: FlatButton(
           padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
           onPressed: () {
