@@ -406,7 +406,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     // play in which case we want playback to start from where user has
     // requested
     _audioPlayer
-        .play(widget.fileModel.url,
+        .play(widget.fileModel.url.replaceAll(' ', '%20'),
             title: widget.title,
             subtitle: widget.description == null ? '' : widget.description,
             position: currentPlaybackPosition,
@@ -574,14 +574,20 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     return FlatButton.icon(
       color: MeditoColors.darkColor,
       onPressed: launchDownload,
-      icon: Icon(Icons.cloud_download, color: MeditoColors.lightColor,),
-      label: Text('DOWNLOAD', style: Theme.of(context).textTheme.display2,),
+      icon: Icon(
+        Icons.cloud_download,
+        color: MeditoColors.lightColor,
+      ),
+      label: Text(
+        'DOWNLOAD',
+        style: Theme.of(context).textTheme.display2,
+      ),
     );
   }
 
   launchDownload() {
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.AUDIO_DOWNLOAD,
-        widget.fileModel.id);
+    Tracking.trackEvent(
+        Tracking.PLAYER, Tracking.AUDIO_DOWNLOAD, widget.fileModel.id);
 
     launch(widget.fileModel.url.replaceAll(' ', '%20'));
   }
