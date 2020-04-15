@@ -24,6 +24,7 @@ class HomeScreenWidget extends StatelessWidget {
 
     return MaterialApp(
       theme: ThemeData(
+          canvasColor: MeditoColors.almostBlack,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: FadeTransitionBuilder(),

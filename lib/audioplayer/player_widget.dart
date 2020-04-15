@@ -1,15 +1,14 @@
+import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_playout/audio.dart';
 import 'package:flutter_playout/player_observer.dart';
 import 'package:flutter_playout/player_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
@@ -204,102 +203,28 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
         backgroundColor: Colors.black,
         body: Stack(
           children: <Widget>[
-            Positioned(
-                bottom: 0,
-                child: Container(
-                    width: widthOfScreen,
-                    height: 35,
-                    color: MeditoColors.darkBGColor)),
             Center(
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    buildGoBackPill(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        buildGoBackPill(),
+                        buildMoreInfoButton()
+                      ],
+                    ),
                     buildContainerWithRoundedCorners(context),
+                    getAttrWidget(context, licenseTitle, sourceUrl, licenseName,
+                        licenseURL),
                   ],
                 ),
               ),
             ),
-            buildBottomSheet(),
           ],
         ));
-  }
-
-  Widget buildBottomSheet() {
-    return SafeArea(
-      bottom: false,
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.07,
-        minChildSize: 0.07,
-        builder: (BuildContext context, ScrollController scrollController) {
-          return Container(
-            padding: EdgeInsets.only(top: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-              color: MeditoColors.darkBGColor,
-            ),
-            child: ListView.builder(
-              controller: scrollController,
-              itemCount: 2,
-              itemBuilder: (BuildContext context, int index) {
-                switch (index) {
-                  case 0:
-                    return Visibility(
-                      visible: widget.listItem.contentText != '',
-                      child: Column(
-                        children: <Widget>[
-                          Visibility(
-                            visible: widget.listItem.contentText != null,
-                            child: Center(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(16)),
-                                  color: MeditoColors.lightColorLine,
-                                ),
-                                margin: EdgeInsets.only(top: 16, bottom: 16),
-                                height: 4,
-                                width: 48,
-                              ),
-                            ),
-                          ),
-                          Visibility(
-                            visible: widget.listItem.contentText != null,
-                            child: Center(
-                                child: Text(
-                              'MORE DETAILS',
-                              style: Theme.of(context).textTheme.body2,
-                            )),
-                          ),
-                          widget.listItem.contentText != null
-                              ? Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Text(
-                                    widget.listItem.contentText,
-                                    style: Theme.of(context).textTheme.display3,
-                                  ),
-                                )
-                              : Container(),
-                        ],
-                      ),
-                    );
-                  case 1:
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(child: buildAttributionsView()),
-                    );
-                }
-
-                return Container();
-              },
-            ),
-          );
-        },
-      ),
-    );
   }
 
   Widget buildContainerWithRoundedCorners(BuildContext context) {
@@ -460,7 +385,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
           child: Container(
             padding: getEdgeInsets(1, 1),
             decoration: getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
-            child: getTextLabel("< Go back", 1, 1, context),
+            child: getTextLabel("Close", 1, 1, context),
           )),
     );
   }
@@ -528,70 +453,6 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
             duration.inMilliseconds - currentPlaybackPosition.inMilliseconds));
   }
 
-  Widget buildAttributionsView() {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(top: 0, bottom: 8, left: 16, right: 16),
-          child: new RichText(
-            textAlign: TextAlign.center,
-            text: new TextSpan(
-              children: [
-                new TextSpan(
-                  text: 'From '.toUpperCase(),
-                  style: Theme.of(context).textTheme.display4,
-                ),
-                new TextSpan(
-                  text: licenseTitle?.toUpperCase(),
-                  style: Theme.of(context).textTheme.body2,
-                  recognizer: new TapGestureRecognizer()
-                    ..onTap = () {
-                      launch(sourceUrl);
-                    },
-                ),
-                new TextSpan(
-                  text: ' / License: '.toUpperCase(),
-                  style: Theme.of(context).textTheme.display4,
-                ),
-                new TextSpan(
-                  text: licenseName?.toUpperCase(),
-                  style: Theme.of(context).textTheme.body2,
-                  recognizer: new TapGestureRecognizer()
-                    ..onTap = () {
-                      launch(licenseURL);
-                    },
-                ),
-              ],
-            ),
-          ),
-        ),
-        buildDownloadButton()
-      ],
-    );
-  }
-
-  Widget buildDownloadButton() {
-    return FlatButton.icon(
-      color: MeditoColors.darkColor,
-      onPressed: launchDownload,
-      icon: Icon(
-        Icons.cloud_download,
-        color: MeditoColors.lightColor,
-      ),
-      label: Text(
-        'DOWNLOAD',
-        style: Theme.of(context).textTheme.display2,
-      ),
-    );
-  }
-
-  launchDownload() {
-    Tracking.trackEvent(
-        Tracking.PLAYER, Tracking.AUDIO_DOWNLOAD, widget.fileModel.id);
-
-    launch(widget.fileModel.url.replaceAll(' ', '%20'));
-  }
-
   Widget buildPlayItems() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -603,10 +464,51 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
     );
   }
 
+  Widget buildMoreInfoButton() {
+    return Padding(
+      padding: EdgeInsets.only(left: 16, bottom: 8, top: 24, right: 16),
+      child: GestureDetector(
+          onTap: () {
+            _moreInfoPressed();
+          },
+          child: Container(
+            padding: getEdgeInsets(1, 1),
+            decoration: getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
+            child: getTextLabel("ⓘ  More info", 1, 1, context),
+          )),
+    );
+  }
+
   Widget buildImageItems() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[buildImage(), buildTitle()],
     );
+  }
+
+  void _moreInfoPressed() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => buildBottomSheet(),
+        ));
+  }
+
+  Widget buildBottomSheet() {
+    return buildAttributionsAndDownloadButtonView(
+        context,
+        widget.fileModel.url,
+        _getTextToShowOnDialog(),
+        licenseTitle,
+        sourceUrl,
+        licenseName,
+        licenseURL);
+  }
+
+  String _getTextToShowOnDialog() {
+    return widget.listItem.contentText != null &&
+              widget.listItem.contentText.isNotEmpty
+          ? widget.listItem.contentText
+          : widget.listItem.title;
   }
 }
