@@ -7,8 +7,9 @@ import 'tracking/tracking.dart';
 import 'utils/colors.dart';
 
 Future<void> main() async {
-  SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
   runApp(HomeScreenWidget());
   Tracking.initialiseTracker();
