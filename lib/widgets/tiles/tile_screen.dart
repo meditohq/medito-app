@@ -260,10 +260,10 @@ class TileListState extends State<TileList> {
               child: Stack(
                 children: <Widget>[
                   Positioned(
-                      bottom: 0,
-                      right: 16,
+                      top: 0,
+                      right: 0,
                       child: SizedBox(
-                          height: 120,
+                          height: 115,
                           child: getNetworkImageWidget(item.thumbnail))),
                   //todo why is there space around this button?
                   Positioned(bottom: -4, child: getFlatButton(item)),
@@ -285,9 +285,9 @@ class TileListState extends State<TileList> {
 
   Widget getDescText(TileItem item) {
     return FractionallySizedBox(
-      widthFactor: .5,
+      widthFactor: .6,
       child: Padding(
-        padding: EdgeInsets.only(bottom: 84),
+        padding: EdgeInsets.only(bottom: 62),
         child: Text(item.description,
             style: Theme.of(context)
                 .textTheme
