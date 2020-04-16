@@ -129,6 +129,5 @@ Widget _buildDownloadButton(BuildContext context, String url) {
 
 _launchDownload(String url) {
   Tracking.trackEvent(Tracking.PLAYER, Tracking.AUDIO_DOWNLOAD, url);
-
-  launch(url);
+  launch(url.replaceAll(' ', '%20'));
 }
