@@ -127,25 +127,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     );
   }
 
-  Widget getReadMoreTextWidget() {
-    var title = _viewModel.currentlySelectedFile == null
-        ? ''
-        : _viewModel.currentlySelectedFile.title;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(title, style: Theme.of(context).textTheme.title),
-            Container(height: 8.0),
-            Text(readMoreText, style: Theme.of(context).textTheme.subhead),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget getListView() {
     return RefreshIndicator(
       color: MeditoColors.lightColor,

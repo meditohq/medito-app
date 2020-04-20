@@ -24,7 +24,7 @@ formatDuration(Duration d) {
 TextTheme buildDMSansTextTheme(BuildContext context) {
   return GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme.copyWith(
         title: TextStyle(
-            fontSize: 22.0,
+            fontSize: 20.0,
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w600),
