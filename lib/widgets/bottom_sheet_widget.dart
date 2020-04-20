@@ -63,9 +63,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
             buildSessionLengthText(context),
             buildSessionLengthRow(),
             buildButton(),
-            Container(
-              height: 16,
-            )
           ],
         ),
       ),
@@ -146,6 +143,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       child: SizedBox(
         height: 56,
         child: ListView.builder(
+          padding: EdgeInsets.only(right: 16),
           shrinkWrap: true,
           itemCount: lengthList.length,
           scrollDirection: Axis.horizontal,
@@ -181,6 +179,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       child: SizedBox(
         height: 56,
         child: ListView.builder(
+          padding: EdgeInsets.only(right: 16),
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: voiceList.length,

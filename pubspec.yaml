@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.18+18
+version: 1.0.19+19
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -19,13 +19,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^0.4.3
+  google_fonts: ^0.5.0+1
   flutter_svg: ^0.17.4
   path_provider: ^1.6.5
   flutter_matomo: ^1.2.0
   flutter_playout: ^1.0.34
   url_launcher: ^5.4.2
-  flutter_markdown: ^0.3.4
+  flutter_markdown: ^0.3.5
   shared_preferences: ^0.5.6+3
 
   # The following adds the Cupertino Icons font to your application.

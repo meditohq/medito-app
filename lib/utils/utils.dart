@@ -21,7 +21,7 @@ formatDuration(Duration d) {
 }
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
-  return GoogleFonts.dMSansTextTheme(Theme.of(context).textTheme.copyWith(
+  return GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme.copyWith(
         title: TextStyle(
             fontSize: 22.0,
             height: 1.4,
