@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Medito/utils/colors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -82,13 +83,16 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
       ));
 }
 
-Widget getNetworkImageWidget(String url, {Color svgColor}) {
+Widget getNetworkImageWidget(String url, {Color svgColor, double startHeight = 0.0}) {
   if (url.endsWith('png')) {
-    return Image.network(url, headers: null);
+    return CachedNetworkImage(
+      placeholder: (context, url) => Container(height: startHeight,),
+      imageUrl: url,
+    );
   } else {
     return SvgPicture.network(
       url,
-      color: svgColor != null? svgColor : MeditoColors.darkBGColor,
+      color: svgColor != null ? svgColor : MeditoColors.darkBGColor,
     );
   }
 }
@@ -108,10 +112,9 @@ Future<bool> checkConnectivity() async {
 Color parseColor(String color) =>
     Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
 
-
 void createSnackBar(String message, BuildContext context) {
-  final snackBar = new SnackBar(content: new Text(message),
-      backgroundColor: Colors.red);
+  final snackBar =
+      new SnackBar(content: new Text(message), backgroundColor: Colors.red);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);

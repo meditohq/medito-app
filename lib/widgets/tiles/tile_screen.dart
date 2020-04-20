@@ -264,7 +264,8 @@ class TileListState extends State<TileList> {
                       right: 0,
                       child: SizedBox(
                           height: 115,
-                          child: getNetworkImageWidget(item.thumbnail))),
+                          child: getNetworkImageWidget(item.thumbnail,
+                              startHeight: 140.0))),
                   //todo why is there space around this button?
                   Positioned(bottom: -4, child: getFlatButton(item)),
                   Column(
