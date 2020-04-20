@@ -183,6 +183,8 @@ class TileListState extends State<TileList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(item.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.fade,
                       style: Theme.of(context)
                           .textTheme
                           .title
