@@ -51,7 +51,7 @@ class TileListViewModelImpl implements TileListViewModel {
       var now = DateTime.now().day;
       var index = now % all.length;
 
-      return getAudioData(id: all[index == 0 ? all.length - 1 : index].id);
+      return getAudioData(id: all[index >= all.length? 0 : index].id);
     }else if (timely == 'hourly') {
       var now = DateTime.now().hour;
       var index = now % all.length;
