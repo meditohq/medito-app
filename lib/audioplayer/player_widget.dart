@@ -166,6 +166,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
       if (position > duration.inSeconds - 15 &&
           position < duration.inSeconds - 10) {
         prefs?.setBool('listened' + widget.listItem.id, true);
+        updateStreak(prefs);
       }
       setState(() {
         currentPlaybackPosition = Duration(seconds: position);

@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 String blankIfNull(String s) {
   if (s == null)
@@ -83,10 +84,13 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
       ));
 }
 
-Widget getNetworkImageWidget(String url, {Color svgColor, double startHeight = 0.0}) {
+Widget getNetworkImageWidget(String url,
+    {Color svgColor, double startHeight = 0.0}) {
   if (url.endsWith('png')) {
     return CachedNetworkImage(
-      placeholder: (context, url) => Container(height: startHeight,),
+      placeholder: (context, url) => Container(
+        height: startHeight,
+      ),
       imageUrl: url,
     );
   } else {
@@ -118,4 +122,65 @@ void createSnackBar(String message, BuildContext context) {
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);
+}
+
+void updateStreak(SharedPreferences prefs, {String streak = ''}) async {
+  assert(prefs != null);
+
+  if (streak.isNotEmpty) {
+    prefs.setInt('streakCount', int.parse(streak));
+    return;
+  }
+
+  List<String> streakList = prefs.getStringList('streakList');
+  int streakCount = prefs.getInt('streakCount');
+
+  if (streakList == null) {
+    streakList = [];
+  }
+  if (streakCount == null) {
+    streakCount = 0;
+  }
+
+  if (streakList.length > 0) {
+    //if you have meditated before, was it on today? if not, increase counter
+    final lastDayInStreak =
+        DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
+    final now = DateTime.now();
+
+    if (!isSameDay(lastDayInStreak, now)) {
+      incrementStreakCounter(streakCount, prefs);
+    }
+  } else {
+    //if you've never done one before
+    incrementStreakCounter(streakCount, prefs);
+  }
+
+  streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
+  prefs.setStringList('streakList', streakList);
+}
+
+void incrementStreakCounter(int streakCount, SharedPreferences prefs) {
+  streakCount++;
+  prefs.setInt('streakCount', streakCount);
+}
+
+Future<String> getStreak(SharedPreferences prefs) async {
+  var streak = prefs.getInt('streakCount');
+  if (streak == null)
+    return '0';
+  else
+    return streak.toString();
+}
+
+bool isDayBefore(DateTime day1, DateTime day2) {
+  return day1.year == day2.year &&
+      day1.month == day2.month &&
+      day1.day == day2.day - 1;
+}
+
+bool isSameDay(DateTime day1, DateTime day2) {
+  return day1.year == day2.year &&
+      day1.month == day2.month &&
+      day1.day == day2.day;
 }

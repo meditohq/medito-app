@@ -10,6 +10,7 @@ import 'package:Medito/widgets/column_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../folder_nav.dart';
 
@@ -27,11 +28,21 @@ class TileListState extends State<TileList> {
 
   var listFuture;
 
+  SharedPreferences prefs;
+  String streakValue = '0';
+  TextEditingController _controller = TextEditingController();
+
   @override
   void initState() {
     Tracking.trackEvent(Tracking.TILE, Tracking.SCREEN_LOADED, '');
     super.initState();
     listFuture = _viewModel.getTiles();
+
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        this.prefs = prefs;
+      });
+    });
   }
 
   Future<void> _onPullToRefresh() async {
@@ -118,6 +129,8 @@ class TileListState extends State<TileList> {
   Widget twoColumnsTile(List<TileItem> data) {
     data = data?.where((i) => i.tileType == TileType.small)?.toList();
 
+    var secondColumnLength =
+        (data == null ? 0 : data?.length) + 1; // + 1 for streak tile
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
       child: Row(
@@ -141,8 +154,12 @@ class TileListState extends State<TileList> {
           //right column
           Expanded(
             child: ColumnBuilder(
-                itemCount: data == null ? 0 : data?.length,
+                itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
+                  if (index == secondColumnLength - 1) {
+                    return getStreakTile();
+                  }
+
                   TileItem tile = data[index];
                   if (data != null && index >= data.length / 2) {
                     return getTile(tile);
@@ -407,5 +424,110 @@ class TileListState extends State<TileList> {
         },
       ),
     );
+  }
+
+  Widget getStreakTile() {
+    return FutureBuilder<String>(
+        future: getStreak(prefs),
+        builder: (context, snapshot) {
+          return wrapWithStreakInkWell(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  color: MeditoColors.darkColor,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Streak',
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                          style: Theme.of(context).textTheme.title),
+                      Container(height: 4),
+                      Text(snapshot?.data ?? '0',
+                          style: Theme.of(context)
+                              .textTheme
+                              .title
+                              .copyWith(fontSize: 34))
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget wrapWithStreakInkWell(Widget w) {
+    return Material(
+      color: Colors.white.withOpacity(0.0),
+      child: InkWell(
+          splashColor: MeditoColors.lightColor,
+          onTap: () => _onStreakTap(),
+          borderRadius: BorderRadius.circular(16.0),
+          child: w),
+    );
+  }
+
+  _onStreakTap() {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Theme(
+          data: new ThemeData(
+              primaryColor: MeditoColors.lightColorLine,
+              accentColor: Colors.orange,
+              hintColor: Colors.green),
+          child: AlertDialog(
+            backgroundColor: MeditoColors.darkBGColor,
+            title: Text("How many days is your streak?",
+                style: Theme.of(context).textTheme.headline),
+            content: new TextField(
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle
+                  .copyWith(letterSpacing: 1.5),
+              decoration: new InputDecoration(
+                  border: new OutlineInputBorder(
+                      borderSide: new BorderSide(color: Colors.red))),
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              controller: _controller,
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "SAVE",
+                  style: Theme.of(context).textTheme.body1,
+                ),
+                onPressed: () {
+                  Navigator.pop(
+                      context,
+                      _controller.text.length > 4
+                          ? '999'
+                          : _controller.text);
+                  _controller.text = '';
+                },
+              )
+            ],
+          ),
+        );
+      },
+    ).then((val) {
+      setState(() {
+        if (val != null) {
+          streakValue = val;
+          updateStreak(prefs, streak: val);
+        }
+      });
+    });
   }
 }
