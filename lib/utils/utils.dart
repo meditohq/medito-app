@@ -23,12 +23,12 @@ formatDuration(Duration d) {
 }
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
-  return GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme.copyWith(
+  return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
         title: TextStyle(
             fontSize: 20.0,
             height: 1.4,
             color: MeditoColors.lightColor,
-            fontWeight: FontWeight.w600),
+            fontWeight: FontWeight.w500),
         headline: TextStyle(
             //h2
             height: 1.4,
@@ -71,6 +71,14 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
         display4: TextStyle(
+            //bottom sheet filter chip
+            //horizontal announcement
+            fontSize: 14.0,
+            height: 1.25,
+            color: MeditoColors.lightColor,
+            fontWeight: FontWeight.w400),
+        caption: TextStyle(
+            //attr widget
             fontSize: 14.0,
             height: 1.4,
             color: MeditoColors.lightColor,
@@ -80,7 +88,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             fontSize: 14.0,
             height: 1.4,
             color: MeditoColors.lightColor,
-            fontWeight: FontWeight.w800),
+            fontWeight: FontWeight.w600),
       ));
 }
 

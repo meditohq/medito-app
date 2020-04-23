@@ -39,7 +39,7 @@ class _NavPillsWidgetState extends State<NavPillsWidget>
     for (int i = startNumber; i < widget.list.length; i++) {
       var label = widget.list[i].title;
       if (widget.list.length > 1 && i == startNumber) {
-        label = "< " + label;
+        label = "← " + label;
       }
 
       columns.add(GestureDetector(

@@ -25,7 +25,10 @@ Future httpGet(String url, {bool skipCache = false}) async {
       url,
       headers: {HttpHeaders.authorizationHeader: basicAuth},
     );
-    await writeJSONToCache(response.body, url);
+
+    if (!response.body.contains('error')) {
+      await writeJSONToCache(response.body, url);
+    }
     return json.decode(response.body);
   }
   return json.decode(cache);

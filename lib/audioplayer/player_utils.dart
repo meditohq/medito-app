@@ -34,7 +34,7 @@ Widget buildAttributionsAndDownloadButtonView(
                         padding: getEdgeInsets(1, 1),
                         decoration: getBoxDecoration(1, 1,
                             color: MeditoColors.darkBGColor),
-                        child: getTextLabel("< Go back", 1, 1, context),
+                        child: getTextLabel("← Go back", 1, 1, context),
                       )),
                 ),
                 Row(

@@ -60,9 +60,9 @@ class TileListState extends State<TileList> {
       child: FutureBuilder(
         builder: (context, future) {
           if (future.connectionState == ConnectionState.none &&
-              future.hasData == null) {
-            //print('project snapshot data is: ${projectSnap.data}');
-            return Container();
+                  future.hasData == null ||
+              future.hasError) {
+            return getErrorWidget();
           }
           return SingleChildScrollView(
             primary: true,
@@ -70,12 +70,7 @@ class TileListState extends State<TileList> {
               padding: const EdgeInsets.only(bottom: 24.0),
               child: Column(
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(19.0),
-                    child: SvgPicture.asset(
-                      'assets/images/icon_ic_logo.svg',
-                    ),
-                  ),
+                  _getMeditoLogo(),
                   ListView.builder(
                     padding: EdgeInsets.only(left: 16, right: 16),
                     shrinkWrap: true,
@@ -105,6 +100,44 @@ class TileListState extends State<TileList> {
         },
         future: listFuture,
       ),
+    );
+  }
+
+  Widget getErrorWidget() {
+    return Column(
+      children: <Widget>[
+        _getMeditoLogo(),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Center(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RaisedButton(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(16.0),
+                      ),
+                      color: MeditoColors.darkColor,
+                      onPressed: _onPullToRefresh,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Oops! There was an error.\n Tap to refresh',
+                          style: Theme.of(context).textTheme.body1,
+                          textAlign: TextAlign.center,
+                        ),
+                      )),
+                )),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -157,7 +190,8 @@ class TileListState extends State<TileList> {
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == secondColumnLength - 1) {
-                    return getStreakTile();
+                    return Container();
+//                    return getStreakTile();
                   }
 
                   TileItem tile = data[index];
@@ -251,7 +285,7 @@ class TileListState extends State<TileList> {
                   Expanded(
                     child: Text(
                       item.description,
-                      style: Theme.of(context).textTheme.display4,
+                      style: Theme.of(context).textTheme.caption,
                     ),
                   ),
                 ],
@@ -509,11 +543,8 @@ class TileListState extends State<TileList> {
                   style: Theme.of(context).textTheme.body1,
                 ),
                 onPressed: () {
-                  Navigator.pop(
-                      context,
-                      _controller.text.length > 4
-                          ? '999'
-                          : _controller.text);
+                  Navigator.pop(context,
+                      _controller.text.length > 4 ? '999' : _controller.text);
                   _controller.text = '';
                 },
               )
@@ -529,5 +560,17 @@ class TileListState extends State<TileList> {
         }
       });
     });
+  }
+
+  Widget _getMeditoLogo() {
+    return GestureDetector(
+      onDoubleTap: () => _onPullToRefresh(),
+      child: Padding(
+        padding: const EdgeInsets.all(19.0),
+        child: SvgPicture.asset(
+          'assets/images/icon_ic_logo.svg',
+        ),
+      ),
+    );
   }
 }
