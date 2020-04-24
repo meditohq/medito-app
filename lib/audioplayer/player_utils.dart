@@ -12,7 +12,8 @@ Widget buildAttributionsAndDownloadButtonView(
     var licenseTitle,
     var sourceUrl,
     var licenseName,
-    String licenseURL) {
+    String licenseURL,
+    bool showDownloadButton) {
   return Scaffold(
     body: SafeArea(
       child: Padding(
@@ -57,7 +58,9 @@ Widget buildAttributionsAndDownloadButtonView(
                               ),
                               getAttrWidget(context, licenseTitle, sourceUrl,
                                   licenseName, licenseURL),
-                              _buildDownloadButton(context, downloadURL),
+                              (showDownloadButton != null && showDownloadButton)
+                                  ? _buildDownloadButton(context, downloadURL)
+                                  : Container(),
                             ],
                           ),
                         ),

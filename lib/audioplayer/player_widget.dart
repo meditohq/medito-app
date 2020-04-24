@@ -50,6 +50,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   String licenseName;
   String licenseURL;
   String sourceUrl;
+  bool showDownloadButton;
 
   Duration duration = Duration(milliseconds: 1);
   Duration currentPlaybackPosition = Duration.zero;
@@ -57,6 +58,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   double widthOfScreen;
 
   SharedPreferences prefs;
+
 
   get isPlaying => audioPlayerState == PlayerState.PLAYING;
 
@@ -99,6 +101,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
       sourceUrl = attr.sourceUrl;
       licenseName = attr.licenseName;
       licenseTitle = attr.title;
+      showDownloadButton = attr.downloadButton;
       licenseURL = attr.licenseUrl;
       setState(() {});
     });
@@ -503,7 +506,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
         licenseTitle,
         sourceUrl,
         licenseName,
-        licenseURL);
+        licenseURL, showDownloadButton);
   }
 
   String _getTextToShowOnDialog() {
