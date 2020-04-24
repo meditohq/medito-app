@@ -67,7 +67,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         getStreakTile(getCurrentStreak(prefs), 'Current Streak',
-                            null, 'days'),
+                            openEditDialog(), 'days'),
                         getStreakTile(getMinutesListened(prefs),
                             'Minutes Listened', null, 'mins')
                       ],
@@ -108,34 +108,37 @@ class _StreakWidgetState extends State<StreakWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(16)),
                 color: MeditoColors.darkColor,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(height: 4),
-                    Text(title,
-                        maxLines: 2,
-                        overflow: TextOverflow.fade,
-                        style: Theme.of(context).textTheme.title),
-                    Row(
-                      textBaseline: TextBaseline.alphabetic,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      children: <Widget>[
-                        Text(snapshot?.data ?? '0',
-                            style: Theme.of(context)
-                                .textTheme
-                                .title
-                                .copyWith(fontSize: 34)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4.0),
-                          child: Text(optionalText ?? ''),
-                        )
-                      ],
-                    )
-                  ],
+              child: GestureDetector(
+                onTap: onClick,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(height: 4),
+                      Text(title,
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                          style: Theme.of(context).textTheme.title),
+                      Row(
+                        textBaseline: TextBaseline.alphabetic,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        children: <Widget>[
+                          Text(snapshot?.data ?? '0',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .title
+                                  .copyWith(fontSize: 34)),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4.0),
+                            child: Text(optionalText ?? ''),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -147,7 +150,7 @@ class _StreakWidgetState extends State<StreakWidget> {
     Navigator.pop(context);
   }
 
-  void openEditDialog() {
+  openEditDialog() {
     showDialog(
       barrierDismissible: true,
       context: context,
