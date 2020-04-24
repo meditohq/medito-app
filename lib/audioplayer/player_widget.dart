@@ -1,6 +1,7 @@
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,11 +55,12 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
 
   Duration duration = Duration(milliseconds: 1);
   Duration currentPlaybackPosition = Duration.zero;
+  int additionalSecs = 0;
+  bool updatedStats = false;
 
   double widthOfScreen;
 
   SharedPreferences prefs;
-
 
   get isPlaying => audioPlayerState == PlayerState.PLAYING;
 
@@ -166,10 +168,14 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   @override
   void onTime(int position) {
     if (this.mounted) {
+      this.additionalSecs += 1;
       if (position > duration.inSeconds - 15 &&
-          position < duration.inSeconds - 10) {
+          position < duration.inSeconds - 10 &&
+          !updatedStats) {
         prefs?.setBool('listened' + widget.listItem.id, true);
+        incrementNumSessions(prefs);
         updateStreak(prefs);
+        updatedStats = true;
       }
       setState(() {
         currentPlaybackPosition = Duration(seconds: position);
@@ -357,6 +363,9 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Request audio stop. this will also clear lock screen controls
   Future<void> stop() async {
 //    _audioPlayer.reset();
+    updateMinuteCounter(prefs, additionalSecs);
+    additionalSecs = 0;
+
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_STOPPED + widget.fileModel.id);
 
@@ -506,13 +515,14 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
         licenseTitle,
         sourceUrl,
         licenseName,
-        licenseURL, showDownloadButton);
+        licenseURL,
+        showDownloadButton);
   }
 
   String _getTextToShowOnDialog() {
     return widget.listItem.contentText != null &&
-              widget.listItem.contentText.isNotEmpty
-          ? widget.listItem.contentText
-          : widget.listItem.title;
+            widget.listItem.contentText.isNotEmpty
+        ? widget.listItem.contentText
+        : widget.listItem.title;
   }
 }

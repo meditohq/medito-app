@@ -132,63 +132,8 @@ void createSnackBar(String message, BuildContext context) {
   Scaffold.of(context).showSnackBar(snackBar);
 }
 
-void updateStreak(SharedPreferences prefs, {String streak = ''}) async {
-  assert(prefs != null);
-
-  if (streak.isNotEmpty) {
-    prefs.setInt('streakCount', int.parse(streak));
-    return;
-  }
-
-  List<String> streakList = prefs.getStringList('streakList');
-  int streakCount = prefs.getInt('streakCount');
-
-  if (streakList == null) {
-    streakList = [];
-  }
-  if (streakCount == null) {
-    streakCount = 0;
-  }
-
-  if (streakList.length > 0) {
-    //if you have meditated before, was it on today? if not, increase counter
-    final lastDayInStreak =
-        DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
-    final now = DateTime.now();
-
-    if (!isSameDay(lastDayInStreak, now)) {
-      incrementStreakCounter(streakCount, prefs);
-    }
-  } else {
-    //if you've never done one before
-    incrementStreakCounter(streakCount, prefs);
-  }
-
-  streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
-  prefs.setStringList('streakList', streakList);
-}
-
-void incrementStreakCounter(int streakCount, SharedPreferences prefs) {
-  streakCount++;
-  prefs.setInt('streakCount', streakCount);
-}
-
-Future<String> getStreak(SharedPreferences prefs) async {
-  var streak = prefs.getInt('streakCount');
-  if (streak == null)
-    return '0';
-  else
-    return streak.toString();
-}
-
 bool isDayBefore(DateTime day1, DateTime day2) {
   return day1.year == day2.year &&
       day1.month == day2.month &&
       day1.day == day2.day - 1;
-}
-
-bool isSameDay(DateTime day1, DateTime day2) {
-  return day1.year == day2.year &&
-      day1.month == day2.month &&
-      day1.day == day2.day;
 }
