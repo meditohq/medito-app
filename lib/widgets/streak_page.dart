@@ -17,6 +17,8 @@ class StreakWidget extends StatefulWidget {
 class _StreakWidgetState extends State<StreakWidget> {
   SharedPreferences prefs;
 
+  TextEditingController _controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -143,5 +145,57 @@ class _StreakWidgetState extends State<StreakWidget> {
 
   void _backPressed(String value) {
     Navigator.pop(context);
+  }
+
+  void openEditDialog() {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Theme(
+          data: new ThemeData(
+              primaryColor: MeditoColors.lightColorLine,
+              accentColor: Colors.orange,
+              hintColor: Colors.green),
+          child: AlertDialog(
+            backgroundColor: MeditoColors.darkBGColor,
+            title: Text("How many days is your streak?",
+                style: Theme.of(context).textTheme.headline),
+            content: new TextField(
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle
+                  .copyWith(letterSpacing: 1.5),
+              decoration: new InputDecoration(
+                  border: new OutlineInputBorder(
+                      borderSide: new BorderSide(color: Colors.red))),
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              controller: _controller,
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "SAVE",
+                  style: Theme.of(context).textTheme.body1,
+                ),
+                onPressed: () {
+                  Navigator.pop(context,
+                      _controller.text.length > 4 ? '999' : _controller.text);
+                  _controller.text = '';
+                },
+              )
+            ],
+          ),
+        );
+      },
+    ).then((val) {
+      setState(() {
+        if (val != null) {
+          updateStreak(prefs, streak: val);
+        }
+      });
+    });
   }
 }
