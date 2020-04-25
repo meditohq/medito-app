@@ -173,8 +173,8 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
           position < duration.inSeconds - 10 &&
           !updatedStats) {
         prefs?.setBool('listened' + widget.listItem.id, true);
-        incrementNumSessions(prefs);
-        updateStreak(prefs);
+        incrementNumSessions();
+        updateStreak();
         updatedStats = true;
       }
       setState(() {
@@ -363,7 +363,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   // Request audio stop. this will also clear lock screen controls
   Future<void> stop() async {
 //    _audioPlayer.reset();
-    updateMinuteCounter(prefs, additionalSecs);
+    updateMinuteCounter(additionalSecs);
     additionalSecs = 0;
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,

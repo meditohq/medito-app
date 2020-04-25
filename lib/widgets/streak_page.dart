@@ -2,8 +2,8 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/list_item.dart';
 import 'package:Medito/widgets/nav_pills_widget.dart';
+import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class StreakWidget extends StatefulWidget {
   StreakWidget({Key key}) : super(key: key);
@@ -15,24 +15,7 @@ class StreakWidget extends StatefulWidget {
 }
 
 class _StreakWidgetState extends State<StreakWidget> {
-  SharedPreferences prefs;
-
   TextEditingController _controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    SharedPreferences.getInstance().then((prefs) {
-      setState(() {
-        this.prefs = prefs;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +49,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        getStreakTile(getCurrentStreak(prefs), 'Current Streak',
-                            openEditDialog(), 'days'),
-                        getStreakTile(getMinutesListened(prefs),
-                            'Minutes Listened', null, 'mins')
+                        getStreakTile(getCurrentStreak(), 'Current Streak',
+                            onClick: openEditDialog,
+                            optionalText: UnitType.day),
+                        getStreakTile(getMinutesListened(), 'Minutes Listened',
+                            optionalText: UnitType.min)
                       ],
                     ),
                   ),
@@ -80,10 +64,12 @@ class _StreakWidgetState extends State<StreakWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        getStreakTile(getLongestStreak(prefs), 'Longest Streak',
-                            null, 'days'),
+                        getStreakTile(getLongestStreak(), 'Longest Streak',
+                            optionalText: UnitType.day),
                         getStreakTile(
-                            getNumSessions(prefs), 'Number of Sessions', null)
+                          getNumSessions(),
+                          'Number of Sessions',
+                        )
                       ],
                     ),
                   ),
@@ -94,56 +80,6 @@ class _StreakWidgetState extends State<StreakWidget> {
         ),
       ),
     );
-  }
-
-  Widget getStreakTile(Future future, String title, Function onClick,
-      [String optionalText]) {
-    return FutureBuilder<String>(
-        future: future,
-        builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(16)),
-                color: MeditoColors.darkColor,
-              ),
-              child: GestureDetector(
-                onTap: onClick,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(height: 4),
-                      Text(title,
-                          maxLines: 2,
-                          overflow: TextOverflow.fade,
-                          style: Theme.of(context).textTheme.title),
-                      Row(
-                        textBaseline: TextBaseline.alphabetic,
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        children: <Widget>[
-                          Text(snapshot?.data ?? '0',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .title
-                                  .copyWith(fontSize: 34)),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4.0),
-                            child: Text(optionalText ?? ''),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
   }
 
   void _backPressed(String value) {
@@ -161,6 +97,7 @@ class _StreakWidgetState extends State<StreakWidget> {
               accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
+            shape: _roundedRectangleBorder(),
             backgroundColor: MeditoColors.darkBGColor,
             title: Text("How many days is your streak?",
                 style: Theme.of(context).textTheme.headline),
@@ -178,16 +115,59 @@ class _StreakWidgetState extends State<StreakWidget> {
               controller: _controller,
             ),
             actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "SAVE",
-                  style: Theme.of(context).textTheme.body1,
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Container(
+                      height: 48,
+                      child: FlatButton(
+                        onPressed: _onCancelTap,
+                        shape: _roundedRectangleBorder(),
+                        color: MeditoColors.darkColor,
+                        child: Text(
+                          'CANCEL',
+                          style: Theme.of(context).textTheme.display2.copyWith(
+                              color: MeditoColors.lightTextColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 8,
+                    ),
+                    Container(
+                      height: 48,
+                      child: FlatButton(
+                        onPressed: _onSaveTap,
+                        shape: _roundedRectangleBorder(),
+                        color: MeditoColors.lightColor,
+                        child: Text(
+                          'SAVE',
+                          style: Theme.of(context).textTheme.display2.copyWith(
+                              color: MeditoColors.darkBGColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onPressed: () {
-                  Navigator.pop(context,
-                      _controller.text.length > 4 ? '999' : _controller.text);
-                  _controller.text = '';
-                },
+//
+//                FlatButton(
+//                  shape: RoundedRectangleBorder(
+//                    borderRadius: new BorderRadius.circular(12.0),
+//                  ),
+//                  color: MeditoColors.lightColor,
+//                  child: Text(
+//                    "SAVE",
+//                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
+//                  ),
+//                  onPressed: () {
+//                    Navigator.pop(context, _controller.text);
+//                    _controller.text = '';
+//                  },
+//                ),
               )
             ],
           ),
@@ -196,9 +176,25 @@ class _StreakWidgetState extends State<StreakWidget> {
     ).then((val) {
       setState(() {
         if (val != null) {
-          updateStreak(prefs, streak: val);
+          updateStreak(streak: val);
         }
       });
     });
+  }
+
+  RoundedRectangleBorder _roundedRectangleBorder() {
+    return RoundedRectangleBorder(
+      borderRadius: new BorderRadius.circular(12.0),
+    );
+  }
+
+  void _onSaveTap() {
+    Navigator.pop(context, _controller.text);
+    _controller.text = '';
+  }
+
+  void _onCancelTap() {
+    Navigator.pop(context);
+    _controller.text = '';
   }
 }

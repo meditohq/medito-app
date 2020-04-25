@@ -15,6 +15,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../folder_nav.dart';
+import '../streak_tiles_utils.dart';
 
 class TileList extends StatefulWidget {
   TileList({Key key}) : super(key: key);
@@ -191,8 +192,8 @@ class TileListState extends State<TileList> {
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == secondColumnLength - 1) {
-//                    return getStreakTile();
-                  return Container();
+                    return getStreakTile(getCurrentStreak(), 'Current Streak', optionalText: UnitType.day,
+                        onClick: _onStreakTap);
                   }
 
                   TileItem tile = data[index];
@@ -458,62 +459,6 @@ class TileListState extends State<TileList> {
               textFuture: textFuture);
         },
       ),
-    );
-  }
-
-  Widget getStreakTile() {
-    return FutureBuilder<String>(
-        future: getCurrentStreak(prefs),
-        builder: (context, snapshot) {
-          return wrapWithStreakInkWell(
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                  color: MeditoColors.darkColor,
-                ),
-                child: ClipRect(
-                  child: Banner(
-                    color: MeditoColors.almostBlack,
-                    location: BannerLocation.topEnd,
-                    message: 'BETA',
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Text('Streak',
-                              maxLines: 2,
-                              overflow: TextOverflow.fade,
-                              style: Theme.of(context).textTheme.title),
-                          Container(height: 4),
-                          Text(snapshot?.data ?? '0',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .title
-                                  .copyWith(fontSize: 34))
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
-  }
-
-  Widget wrapWithStreakInkWell(Widget w) {
-    return Material(
-      color: Colors.white.withOpacity(0.0),
-      child: InkWell(
-          splashColor: MeditoColors.lightColor,
-          onTap: () => _onStreakTap(),
-          borderRadius: BorderRadius.circular(16.0),
-          child: w),
     );
   }
 
