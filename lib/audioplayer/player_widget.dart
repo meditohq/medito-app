@@ -149,6 +149,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   void onPause() {
     if (this.mounted)
       setState(() {
+        _loading = false;
         audioPlayerState = PlayerState.PAUSED;
       });
   }
@@ -200,7 +201,7 @@ class _PlayerWidgetState extends State<PlayerWidget> with PlayerObserver {
   @override
   void onError(String error) {
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
-        Tracking.AUDIO_ERROR + widget.listItem.id);
+        Tracking.AUDIO_ERROR + widget.listItem.id + error);
 
     super.onError(error);
   }
