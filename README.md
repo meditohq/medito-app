@@ -1,16 +1,53 @@
-# medito
+# Medito App
 
-A meditation learning tool
+Meditation can positively transform people's lives. We believe no one should have to pay for it. 
+
+We are the [Medito Foundation](https://meditofoundation.org), and we've built the Medito App for people who have never meditated before or want to deepen their meditation practice. 
+
+The app is free, forever: no ads, no spam, no need to sign up or pay. 
+
+Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and the community.
+
+## Download the app
+- Play Store: https://play.google.com/store/apps/details?id=meditofoundation.medito
+- App Store: https://apps.apple.com/us/app/medito/id1500780518
+
+## How to use this code
+
+The best way to start is by opening the project with [Android Studio](https://developer.android.com/studio) or [Visual Studio](https://visualstudio.microsoft.com/)
+
+Need more details? [Feel free to raise an issue](https://gitlab.com/medito/medito-app/-/issues)
+
+## About the Medito Foundation
+
+We are a registered Dutch nonprofit
+
+```html
+Medito Foundation (or in Dutch "Medito Stichting") 
+KvK-nummer: 75284251
+RSIN: 860222627 
+```
+
+- [About us](https://meditofoundation.org/about)
+- [Why we started Medito](meditofoundation.org/blog/why-meditation-should-be-free)
+- [Press release](https://meditofoundation.org/blog/medito-foundation-launches-app-to-free-meditation-from-clutches-of-big-business)
+- [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
+- [Join us on Telegram](https://t.me/meditofoundation)
+- [Email us](mailto:hi@meditofoundation.org)
 
 
+## Contributing
+Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
 
-Play Store: https://play.google.com/store/apps/details?id=meditofoundation.medito
-
-App Store: https://apps.apple.com/us/app/medito/id1500780518
-
-Foundation homepage: https://meditofoundation.org/
+Don't feel like contributing to the code? 
+Feature requests, feedback and suggestions are welcome. Reach us via telegram/email, or create a new issue.
 
 
-> The following content is licensed under CC BY-NC-ND
-> https://creativecommons.org/licenses/by-nc-nd/4.0/
-> You can use this content, but not for commercial use. Please let us know before you start using this content via hi@meditofoundation.org
+## License
+- App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://gitlab.com/medito/medito-app/-/blob/master/LICENSE)
+- Our original content is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) unless mentioned otherwise. For more information please refer to [meditofoundation.org/license](meditofoundation.org/license).
+- Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito". Make sure to respect the original copyright. 
+Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on telegram or by email.
+
+Medito Foundation
+https://meditofoundation.org/
