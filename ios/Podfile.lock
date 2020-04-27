@@ -1,4 +1,6 @@
 PODS:
+  - audio_manager (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_matomo (0.0.1):
     - Flutter
@@ -32,6 +34,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - audio_manager (from `.symlinks/plugins/audio_manager/ios`)
   - Flutter (from `Flutter`)
   - flutter_matomo (from `.symlinks/plugins/flutter_matomo/ios`)
   - flutter_playout (from `.symlinks/plugins/flutter_playout/ios`)
@@ -51,6 +54,8 @@ SPEC REPOS:
     - MatomoTracker
 
 EXTERNAL SOURCES:
+  audio_manager:
+    :path: ".symlinks/plugins/audio_manager/ios"
   Flutter:
     :path: Flutter
   flutter_matomo:
@@ -77,6 +82,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
+  audio_manager: 59466b2ea5552ebdcba8106796f09b9357ef12e0
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_matomo: a4fc9d95faaf6f95124fc1956e892f91791b5fac
   flutter_playout: a5aed32b3003b02eb4432815ecfe0c0e42a801ff

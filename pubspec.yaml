@@ -23,11 +23,11 @@ dependencies:
   flutter_svg: ^0.17.4
   path_provider: ^1.6.5
   flutter_matomo: ^1.2.0
-  flutter_playout: ^1.0.35
   url_launcher: ^5.4.2
   flutter_markdown: ^0.3.5
   shared_preferences: ^0.5.6+3
   cached_network_image: ^2.1.0+1
+  audio_manager: ^0.5.3+3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -1,6 +1,19 @@
+/*This file is part of Medito App.
+
+Medito App is free software: you can redistribute it and/or modify
+it under the terms of the Affero GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Medito App is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+Affero GNU General Public License for more details.
+
+You should have received a copy of the Affero GNU General Public License
+along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
+
 import 'package:flutter/material.dart';
-import 'package:flutter_playout/player_observer.dart';
-import 'package:flutter_playout/player_state.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,55 +21,18 @@ import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 
 class ListItemWidget extends StatefulWidget {
-  ListItemWidget({Key key, this.item, this.state}) : super(key: key);
+  ListItemWidget({Key key, this.item}) : super(key: key);
 
-  final PlayerState state;
   final ListItem item;
 
   @override
   _ListItemWidgetState createState() => _ListItemWidgetState();
 }
 
-class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
+class _ListItemWidgetState extends State<ListItemWidget> {
   var currentIcon;
 
   SharedPreferences prefs;
-
-  Color getBackgroundColor() {
-    if (widget.state != null) {
-      return MeditoColors.darkColor;
-    } else
-      return null;
-  }
-
-  @override
-  void didUpdateWidget(ListItemWidget oldWidget) {
-    if (oldWidget.state != widget.state) {
-      _onDesiredStateChanged(oldWidget);
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  void _onDesiredStateChanged(Widget oldWidget) async {
-    switch (widget.state) {
-      case PlayerState.PLAYING:
-        currentIcon = Icons.play_arrow;
-        break;
-      case PlayerState.PAUSED:
-      case PlayerState.STOPPED:
-        currentIcon = Icons.pause;
-        break;
-    }
-  }
-
-  Widget getListItemImage() {
-    return widget.state != null
-        ? InkWell(
-            child: _getPlayPauseIcon(),
-            onTap: _playOrPause,
-          )
-        : getIcon();
-  }
 
   Padding buildFolderIcon() {
     return Padding(
@@ -75,13 +51,13 @@ class _ListItemWidgetState extends State<ListItemWidget> with PlayerObserver {
 
     return Container(
       padding: EdgeInsets.all(16),
-      color: getBackgroundColor(),
+      color: MeditoColors.darkBGColor,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Container(
-              padding: EdgeInsets.only(top: 2), child: getListItemImage()),
+              padding: EdgeInsets.only(top: 2), child: getIcon()),
           getTwoTextViewsInColumn(context)
         ],
       ),
