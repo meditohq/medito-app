@@ -42,56 +42,62 @@ class _StreakWidgetState extends State<StreakWidget> {
     return Scaffold(
       backgroundColor: MeditoColors.darkBGColor,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: NavPillsWidget(list: list, backPressed: _backPressed),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  //left
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        getStreakTile(getCurrentStreak(), 'Current Streak',
-                            onClick: openEditDialog,
-                            optionalText: UnitType.day),
-                        getStreakTile(getMinutesListened(), 'Minutes Listened',
-                            optionalText: UnitType.min)
-                      ],
-                    ),
-                  ),
-                  //right
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        getStreakTile(getLongestStreak(), 'Longest Streak',
-                            optionalText: UnitType.day),
-                        getStreakTile(
-                          getNumSessions(),
-                          'Number of Sessions',
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: NavPillsWidget(list: list, backPressed: _backPressed),
               ),
-            )
-          ],
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    //left
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          getStreakTile(getCurrentStreak(), 'Current Streak',
+                              onClick: openEditDialog,
+                              editable: true,
+                              optionalText: UnitType.day),
+                          getStreakTile(
+                              getMinutesListened(), 'Minutes Listened',
+                              optionalText: UnitType.min)
+                        ],
+                      ),
+                    ),
+                    //right
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          getStreakTile(getLongestStreak(), 'Longest Streak',
+                              editable: true,
+                              onClick: openResetDialog,
+                              optionalText: UnitType.day),
+                          getStreakTile(
+                            getNumSessions(),
+                            'Number of Sessions',
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -144,7 +150,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         child: Text(
                           'CANCEL',
                           style: Theme.of(context).textTheme.display2.copyWith(
-                              color: MeditoColors.lightTextColor,
+                              color: MeditoColors.lightColor,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -197,10 +203,78 @@ class _StreakWidgetState extends State<StreakWidget> {
     });
   }
 
+  openResetDialog() {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Theme(
+          data: new ThemeData(
+              primaryColor: MeditoColors.lightColorLine,
+              accentColor: Colors.orange,
+              hintColor: Colors.green),
+          child: AlertDialog(
+            shape: _roundedRectangleBorder(),
+            backgroundColor: MeditoColors.darkBGColor,
+            title: Text("Reset longest streak to your current streak?",
+                style: Theme.of(context).textTheme.headline),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Container(
+                      height: 48,
+                      child: FlatButton(
+                        onPressed: _onCancelTap,
+                        shape: _roundedRectangleBorder(),
+                        color: MeditoColors.darkColor,
+                        child: Text(
+                          'CANCEL',
+                          style: Theme.of(context).textTheme.display2.copyWith(
+                              color: MeditoColors.lightColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 8,
+                    ),
+                    Container(
+                      height: 48,
+                      child: FlatButton(
+                        onPressed: _onResetTap,
+                        shape: _roundedRectangleBorder(),
+                        color: MeditoColors.lightColor,
+                        child: Text(
+                          'RESET',
+                          style: Theme.of(context).textTheme.display2.copyWith(
+                              color: MeditoColors.darkBGColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   RoundedRectangleBorder _roundedRectangleBorder() {
     return RoundedRectangleBorder(
       borderRadius: new BorderRadius.circular(12.0),
     );
+  }
+
+  void _onResetTap() {
+    setLongestStreakToCurrentStreak();
+    Navigator.pop(context, _controller.text);
+    setState(() {});
   }
 
   void _onSaveTap() {

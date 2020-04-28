@@ -5,8 +5,6 @@ PODS:
   - flutter_matomo (0.0.1):
     - Flutter
     - MatomoTracker (> 7)
-  - flutter_playout (0.0.1):
-    - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
@@ -37,7 +35,6 @@ DEPENDENCIES:
   - audio_manager (from `.symlinks/plugins/audio_manager/ios`)
   - Flutter (from `Flutter`)
   - flutter_matomo (from `.symlinks/plugins/flutter_matomo/ios`)
-  - flutter_playout (from `.symlinks/plugins/flutter_playout/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - path_provider_macos (from `.symlinks/plugins/path_provider_macos/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
@@ -60,8 +57,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_matomo:
     :path: ".symlinks/plugins/flutter_matomo/ios"
-  flutter_playout:
-    :path: ".symlinks/plugins/flutter_playout/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   path_provider_macos:
@@ -85,7 +80,6 @@ SPEC CHECKSUMS:
   audio_manager: 59466b2ea5552ebdcba8106796f09b9357ef12e0
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_matomo: a4fc9d95faaf6f95124fc1956e892f91791b5fac
-  flutter_playout: a5aed32b3003b02eb4432815ecfe0c0e42a801ff
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   MatomoTracker: 6f89e2561083685a360e223fb663e9ccd57c1d1a
   path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d

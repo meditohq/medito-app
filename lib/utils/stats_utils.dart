@@ -20,17 +20,16 @@ enum UnitType { day, min }
 String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:
-      return  value == 1 ? 'day' : 'days';
+      return value == 1 ? 'day' : 'days';
       break;
     case UnitType.min:
-      return  value == 1 ? 'min' : 'mins';
+      return value == 1 ? 'min' : 'mins';
       break;
   }
 }
 
 Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
-
 
   var streak = prefs.getInt('streakCount');
   if (streak == null)
@@ -76,7 +75,7 @@ void updateStreak({String streak = ''}) async {
   if (streakList.length > 0) {
     //if you have meditated before, was it on today? if not, increase counter
     final lastDayInStreak =
-    DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
+        DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
     final now = DateTime.now();
 
     if (!isSameDay(lastDayInStreak, now)) {
@@ -87,14 +86,13 @@ void updateStreak({String streak = ''}) async {
     incrementStreakCounter(streakCount);
   }
 
-  streakList.add(DateTime
-      .now()
-      .millisecondsSinceEpoch
-      .toString());
+  streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
   prefs.setStringList('streakList', streakList);
 }
 
-Future<void> incrementStreakCounter(int streakCount,) async {
+Future<void> incrementStreakCounter(
+  int streakCount,
+) async {
   var prefs = await SharedPreferences.getInstance();
 
   streakCount++;
@@ -110,6 +108,12 @@ Future _updateLongestStreak(int streakCount, SharedPreferences prefs) async {
   if (streakCount > longest) {
     prefs.setInt('longestStreak', streakCount);
   }
+}
+
+void setLongestStreakToCurrentStreak() async {
+  var prefs = await SharedPreferences.getInstance();
+  var current = await _getCurrentStreakInt();
+  prefs.setInt('longestStreak', current);
 }
 
 Future<String> getMinutesListened() async {
@@ -178,6 +182,11 @@ void incrementNumSessions() async {
   var current = await _getNumSessionsInt();
   current++;
   prefs.setInt('numSessions', current);
+}
+
+void markAsListened(String id) async {
+  var prefs = await SharedPreferences.getInstance();
+  prefs?.setBool('listened' + id, true);
 }
 
 bool isSameDay(DateTime day1, DateTime day2) {
