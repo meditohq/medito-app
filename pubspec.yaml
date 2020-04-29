@@ -21,13 +21,15 @@ dependencies:
     sdk: flutter
   google_fonts: ^1.0.0
   flutter_svg: ^0.17.4
-  path_provider: ^1.6.5
+  path_provider: ^1.6.7
   flutter_matomo: ^1.2.0
-  url_launcher: ^5.4.2
+  url_launcher: ^5.4.5
   flutter_markdown: ^0.3.5
-  shared_preferences: ^0.5.6+3
+  shared_preferences: ^0.5.7
   cached_network_image: ^2.1.0+1
-  audio_manager: ^0.5.3+3
+  audio_manager:
+    git:
+      url: https://github.com/michaelspeedcode/audio_manager
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

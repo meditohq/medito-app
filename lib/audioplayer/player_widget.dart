@@ -98,8 +98,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
       _list.add(AudioInfo(widget.fileModel.url.replaceAll(' ', '%20'),
           title: widget.title,
-          desc: widget.fileModel.info,
-          coverUrl: widget.coverArt?.url));
+          desc: widget.title,
+          coverUrl: 'https://medito.app/asset/m-dark.png'));
       setupAudio();
     });
   }
@@ -349,7 +349,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),
       child: GestureDetector(
           onTap: () {
-            stop();
             Navigator.pop(context);
           },
           child: Container(

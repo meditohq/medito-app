@@ -80,10 +80,10 @@ Widget getStreakTile(Future future, String title,
                     ? Align(
                         alignment: Alignment.topRight,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Icon(
                             Icons.edit,
-                            size: 20.0,
+                            size: 16.0,
                             color: MeditoColors.lightColorLine,
                           ),
                         ))
