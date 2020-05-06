@@ -283,6 +283,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     lengthList.clear();
 
     files?.forEach((file) {
+      file.url = file.url.replaceAll(' ', '%20');
       if (!voiceList.contains(file.voice)) {
         //put Will first
         if (file.voice.contains('Will')) {
