@@ -17,86 +17,14 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/data/page.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-Widget buildAttributionsAndDownloadButtonView(
-    BuildContext context,
-    String downloadURL,
-    var contentText,
-    var licenseTitle,
-    var sourceUrl,
-    var licenseName,
-    String licenseURL,
-    bool showDownloadButton) {
-  return Scaffold(
-    body: SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8, top: 24),
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding: getEdgeInsets(1, 1),
-                        decoration: getBoxDecoration(1, 1,
-                            color: MeditoColors.darkBGColor),
-                        child: getTextLabel("← Go back", 1, 1, context),
-                      )),
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          color: MeditoColors.darkBGColor,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 20, bottom: 16.0, left: 16, right: 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Text(
-                                contentText,
-                                style: Theme.of(context).textTheme.display3,
-                              ),
-                              getAttrWidget(context, licenseTitle, sourceUrl,
-                                  licenseName, licenseURL),
-                              (showDownloadButton != null && showDownloadButton)
-                                  ? _buildDownloadButton(context, downloadURL)
-                                  : Container(),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
 
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
@@ -107,11 +35,11 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
       text: new TextSpan(
         children: [
           new TextSpan(
-            text: 'From '.toUpperCase(),
+            text: 'From ',
             style: Theme.of(context).textTheme.display4,
           ),
           new TextSpan(
-            text: licenseTitle?.toUpperCase(),
+            text: licenseTitle ?? '',
             style: Theme.of(context).textTheme.body2,
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
@@ -119,11 +47,11 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
               },
           ),
           new TextSpan(
-            text: ' / License: '.toUpperCase(),
+            text: ' / License: ',
             style: Theme.of(context).textTheme.display4,
           ),
           new TextSpan(
-            text: licenseName?.toUpperCase(),
+            text: licenseName ?? '',
             style: Theme.of(context).textTheme.body2,
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
@@ -136,39 +64,60 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
   );
 }
 
-Widget _buildDownloadButton(BuildContext context, String url) {
-  return FlatButton.icon(
-    color: MeditoColors.darkColor,
-    onPressed: () => _launchDownload(url),
-    icon: Icon(
-      Icons.cloud_download,
-      color: MeditoColors.lightColor,
-    ),
-    label: Text(
-      'DOWNLOAD',
-      style: Theme.of(context).textTheme.display2,
-    ),
-  );
+Future<dynamic> checkFileExists(Files currentFile) async {
+  String dir = (await getApplicationSupportDirectory()).path;
+  var name = currentFile.filename;
+  File file = new File('$dir/$name.mp3');
+  var exists = await file.exists();
+  print('$exists $file');
+  return exists;
 }
 
-_launchDownload(String url) {
-  Tracking.trackEvent(Tracking.PLAYER, Tracking.AUDIO_DOWNLOAD, url);
-  launch(url.replaceAll(' ', '%20'));
-}
+Future<dynamic> downloadFile(Files currentFile) async {
+  String dir = (await getApplicationSupportDirectory()).path;
+  var name = currentFile.filename;
+  File file = new File('$dir/$name.mp3');
 
-Future<dynamic> downloadFile(String url, String filename) async {
-  String dir = (await getApplicationDocumentsDirectory()).path;
-  File file = new File('$dir/$filename.mp3');
+  if (await file.exists()) return null;
+
   var request = await http.get(
-    url,
+    currentFile.url,
   );
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
+
+  saveFileToDownloadedFilesList(currentFile);
+
   print(file.path);
 }
 
+Future<void> saveFileToDownloadedFilesList(Files file) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var list = prefs.getStringList('listOfSavedFiles') ?? [];
+  list.add(file?.toJson()?.toString() ?? '');
+  await prefs.setStringList('listOfSavedFiles', list);
+}
+
+Future<void> removeFileFromDownloadedFilesList(Files file) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var list = prefs.getStringList('listOfSavedFiles') ?? [];
+  list.remove(file?.toJson()?.toString() ?? '');
+  await prefs.setStringList('listOfSavedFiles', list);
+}
+
+Future<dynamic> removeFile(Files currentFile) async {
+  String dir = (await getApplicationSupportDirectory()).path;
+  var name = currentFile.filename;
+  File file = new File('$dir/$name.mp3');
+
+  if (await file.exists()) {
+    removeFileFromDownloadedFilesList(currentFile);
+    return file.delete();
+  }
+}
+
 Future<dynamic> getDownload(String filename) async {
-  var path = (await getApplicationDocumentsDirectory()).path;
+  var path = (await getApplicationSupportDirectory()).path;
   File file = new File('$path/$filename.mp3');
   if (await file.exists())
     return file.absolute.path;

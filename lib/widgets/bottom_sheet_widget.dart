@@ -13,8 +13,12 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Future data;
@@ -32,52 +36,67 @@ class BottomSheetWidget extends StatefulWidget {
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   var voiceSelected = 0;
   var lengthSelected = 0;
+  var _offlineSelected = 0;
   List voiceList = [' ', ' ', ' '];
   List lengthList = [' ', ' ', ' '];
   List lengthFilteredList = [];
   List filesList;
-  var coverArt;
-  String description;
-  String title;
-  var coverColor;
-  String contentText;
+  var _coverArt;
+  String _description;
+  String _title;
+  var _coverColor;
+  String _contentText = '';
+  bool _downloading = false;
+  var currentFile;
 
   @override
   void initState() {
     super.initState();
 
     widget.data.then((d) {
-      this.coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
-      this.coverColor = d?.coverColor;
-      this.title = d?.title;
-      this.contentText = d?.contentText;
-      this.description = d?.description;
+      this._coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
+      this._coverColor = d?.coverColor;
+      this._title = d?.title;
+      this._contentText = d?.contentText;
+      this._description = d?.description;
       compileLists(d?.files);
+      onVoicePillTap(true, 0);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      //this is to hide the white background behind the rounded corners
-      color: MeditoColors.almostBlack,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: MeditoColors.darkBGColor,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: MeditoColors.darkBGColor,
+      body: SafeArea(
+        child: Stack(
           children: <Widget>[
-            buildInkWell(),
-            buildTitleText(context),
-            buildVoiceText(context),
-            buildVoiceRow(),
-            buildSessionLengthText(context),
-            buildSessionLengthRow(),
-            buildButton(),
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    buildGoBackPill(),
+                    buildImage(),
+                    buildTitleText(),
+                    buildDescriptionText(),
+                    buildSpacer(),
+                    buildVoiceText(),
+                    buildVoiceRow(),
+                    buildSpacer(),
+                    buildSessionLengthText(),
+                    buildSessionLengthRow(),
+                    buildSpacer(),
+                    buildOfflineTextRow(),
+                    buildOfflineRow(),
+                    Container(height: 80)
+                  ],
+                ),
+              ),
+            ),
+            Align(alignment: Alignment.bottomCenter, child: buildButton()),
           ],
         ),
       ),
@@ -86,24 +105,30 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget buildButton() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         children: <Widget>[
           Expanded(
             child: Container(
               height: 48,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: MeditoColors.darkBGColor,
+                    spreadRadius: 16,
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
               child: FlatButton(
                 onPressed: _onBeginTap,
                 shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(12.0),
                 ),
-                color: MeditoColors.lightColor,
-                child: Text(
-                  'BEGIN',
-                  style: Theme.of(context).textTheme.display2.copyWith(
-                      color: MeditoColors.darkBGColor,
-                      fontWeight: FontWeight.bold),
-                ),
+                color: _coverColor != null
+                    ? parseColor(_coverColor)
+                    : MeditoColors.lightColor,
+                child: getBeginButtonContent(),
               ),
             ),
           ),
@@ -112,19 +137,34 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
-  void _onBeginTap() {
-    filesList.forEach((file) => {
-          (file.length == (lengthList[lengthSelected]) &&
-                  file.voice == (voiceList[voiceSelected]))
-              ? widget.onBeginPressed(
-                  file, coverArt, coverColor, title, description, contentText)
-              : null
-        });
+  Widget getBeginButtonContent() {
+    if (_downloading) {
+      return SizedBox(
+        height: 24,
+        width: 24,
+        child: CircularProgressIndicator(
+            valueColor:
+                AlwaysStoppedAnimation<Color>(MeditoColors.darkBGColor)),
+      );
+    } else {
+      return Text(
+        'BEGIN',
+        style: Theme.of(context).textTheme.display2.copyWith(
+            color: MeditoColors.darkBGColor, fontWeight: FontWeight.bold),
+      );
+    }
   }
 
-  Widget buildVoiceText(BuildContext context) {
+  void _onBeginTap() {
+    if (_downloading) return;
+
+    widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
+        _description, _contentText);
+  }
+
+  Widget buildVoiceText() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         'VOICE',
         style: Theme.of(context).textTheme.display4,
@@ -132,9 +172,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
-  Padding buildTitleText(BuildContext context) {
+  Widget buildTitleText() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 8),
       child: Text(
         widget.title,
         style: Theme.of(context).textTheme.title,
@@ -142,9 +182,20 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
-  Widget buildSessionLengthText(BuildContext context) {
+  Widget buildDescriptionText() {
+    return _contentText.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: 20.0, left: 8, right: 8),
+            child: MarkdownBody(
+              data: _contentText,
+            ),
+          )
+        : Container();
+  }
+
+  Widget buildSessionLengthText() {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, left: 16),
+      padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         'SESSION LENGTH',
         style: Theme.of(context).textTheme.display2,
@@ -152,70 +203,74 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
-  Widget buildSessionLengthRow() {
+  Widget buildOfflineTextRow() {
     return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
-      child: SizedBox(
-        height: 56,
-        child: ListView.builder(
-          padding: EdgeInsets.only(right: 16),
-          shrinkWrap: true,
-          itemCount: lengthList.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            return Visibility(
-              visible: lengthFilteredList?.contains(lengthList[index]),
-              child: Padding(
-                padding: buildInBetweenChipPadding(),
-                child: FilterChip(
-                  pressElevation: 4,
-                  shape: buildChipBorder(),
-                  padding: buildInnerChipPadding(),
-                  label: Text(lengthList[index] + ' mins'),
-                  selected: lengthSelected == index,
-                  onSelected: (bool value) {
-                    onSessionPillTap(value, index);
-                  },
-                  backgroundColor: MeditoColors.darkColor,
-                  selectedColor: MeditoColors.lightColor,
-                  labelStyle: getSessionPillTextStyle(context, index),
-                ),
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      child: Text(
+        'AVALIABLE OFFLINE',
+        style: Theme.of(context).textTheme.display2,
+      ),
+    );
+  }
+
+  Widget buildSessionLengthRow() {
+    return SizedBox(
+      height: 56,
+      child: ListView.builder(
+        padding: EdgeInsets.only(right: 16, left: 8),
+        shrinkWrap: true,
+        itemCount: lengthList.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (BuildContext context, int index) {
+          return Visibility(
+            visible: lengthFilteredList?.contains(lengthList[index]),
+            child: Padding(
+              padding: buildInBetweenChipPadding(),
+              child: FilterChip(
+                pressElevation: 4,
+                shape: buildChipBorder(),
+                padding: buildInnerChipPadding(),
+                label: Text(lengthList[index] + ' mins'),
+                selected: lengthSelected == index,
+                onSelected: (bool value) {
+                  onSessionPillTap(value, index);
+                },
+                backgroundColor: MeditoColors.darkColor,
+                selectedColor: MeditoColors.lightColor,
+                labelStyle: getLengthPillTextStyle(context, index),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget buildVoiceRow() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
-      child: SizedBox(
-        height: 56,
-        child: ListView.builder(
-          padding: EdgeInsets.only(right: 16),
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: voiceList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-              padding: buildInBetweenChipPadding(),
-              child: FilterChip(
-                shape: buildChipBorder(),
-                padding: buildInnerChipPadding(),
-                label: Text(voiceList[index]),
-                selected: voiceSelected == index,
-                onSelected: (bool value) {
-                  onVoicePillTap(value, index);
-                },
-                backgroundColor: MeditoColors.darkColor,
-                selectedColor: MeditoColors.lightColor,
-                labelStyle: getVoiceTextStyle(context, index),
-              ),
-            );
-          },
-        ),
+    return SizedBox(
+      height: 56,
+      child: ListView.builder(
+        padding: EdgeInsets.only(right: 16, left: 8),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemCount: voiceList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: buildInBetweenChipPadding(),
+            child: FilterChip(
+              shape: buildChipBorder(),
+              padding: buildInnerChipPadding(),
+              label: Text(voiceList[index]),
+              selected: voiceSelected == index,
+              onSelected: (bool value) {
+                onVoicePillTap(value, index);
+              },
+              backgroundColor: MeditoColors.darkColor,
+              selectedColor: MeditoColors.lightColor,
+              labelStyle: getVoiceTextStyle(context, index),
+            ),
+          );
+        },
       ),
     );
   }
@@ -224,31 +279,49 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 12);
 
   EdgeInsets buildInBetweenChipPadding() =>
-      const EdgeInsets.only(left: 4, top: 10, bottom: 10, right: 4);
+      const EdgeInsets.only(top: 10, bottom: 10, right: 8);
 
   RoundedRectangleBorder buildChipBorder() {
     return RoundedRectangleBorder(
-        side: BorderSide(color: MeditoColors.lightTextColor),
         borderRadius: BorderRadius.all(Radius.circular(12)));
   }
 
-  void onVoicePillTap(bool value, int index) {
+  Future<void> onVoicePillTap(bool value, int index) async {
+    lengthSelected = 0;
+    voiceSelected = index;
+    filesList.forEach((file) => {
+          if (file.length == (lengthList[lengthSelected]) &&
+              file.voice == (voiceList[index]))
+            currentFile = file
+        });
+    _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
-      voiceSelected = index;
-      lengthSelected = 0;
       filterLengthsForThisPerson(voiceList[voiceSelected]);
     });
   }
 
-  void onSessionPillTap(bool value, int index) {
+  Future<void> onSessionPillTap(bool value, int index) async {
+    filesList.forEach((file) => {
+          if (file.length == (lengthList[index]) &&
+              file.voice == (voiceList[voiceSelected]))
+            currentFile = file
+        });
+    _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
       lengthSelected = index;
     });
   }
 
-  TextStyle getSessionPillTextStyle(BuildContext context, int index) {
+  TextStyle getLengthPillTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.display4.copyWith(
         color: lengthSelected == index
+            ? MeditoColors.darkBGColor
+            : MeditoColors.lightColor);
+  }
+
+  TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
+    return Theme.of(context).textTheme.display4.copyWith(
+        color: _offlineSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
   }
@@ -258,23 +331,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
-  }
-
-  Widget buildInkWell() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Container(
-          margin: EdgeInsets.only(top: 8),
-          width: 48.0,
-          height: 4.0,
-          decoration: new BoxDecoration(
-            border: new Border.all(color: MeditoColors.darkColor, width: 2.0),
-            borderRadius: new BorderRadius.circular(4.0),
-          ),
-        ),
-      ],
-    );
   }
 
   void compileLists(List files) {
@@ -320,5 +376,121 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     });
 
     lengthSelected = lengthList.indexOf(lengthFilteredList.first);
+  }
+
+  Widget buildOfflineRow() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      child: SizedBox(
+        height: 56,
+        child: ListView.builder(
+          padding: EdgeInsets.only(right: 16),
+          shrinkWrap: true,
+          itemCount: 2,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (BuildContext context, int index) {
+            return Padding(
+              padding: buildInBetweenChipPadding(),
+              child: FilterChip(
+                pressElevation: 4,
+                shape: buildChipBorder(),
+                padding: buildInnerChipPadding(),
+                label: Text(index == 0 ? 'NO' : 'YES'),
+                selected: _offlineSelected == index,
+                onSelected: (bool value) {
+                  onOfflineSelected(index);
+                },
+                backgroundColor: MeditoColors.darkColor,
+                selectedColor: MeditoColors.lightColor,
+                labelStyle: getOfflinePillTextStyle(context, index),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void onOfflineSelected(int index) {
+    _offlineSelected = index;
+    _downloading = true;
+    if (index == 1) {
+      downloadFile(currentFile).then((onValue) {
+        setState(() {
+          _downloading = false;
+        });
+      }).catchError((onError) {
+        setState(() {
+          print(onError);
+          _downloading = false;
+          _offlineSelected = 0;
+        });
+      });
+    } else {
+      removeFile(currentFile).then((onValue) {
+        setState(() {
+          _downloading = false;
+        });
+      }).catchError((onError) {
+        setState(() {
+          print(onError);
+          _downloading = false;
+          _offlineSelected = 0;
+        });
+      });
+    }
+    setState(() {});
+  }
+
+  Widget buildImage() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+              child: Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    color: _coverColor != null
+                        ? parseColor(_coverColor)
+                        : MeditoColors.lightColor,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(26.0),
+                    child: _coverArt == null
+                        ? Container()
+                        : getNetworkImageWidget(_coverArt.url),
+                  ))),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSpacer() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 16.0, left: 8, right: 8),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+              child: Container(color: MeditoColors.lightColorLine, height: 1)),
+        ],
+      ),
+    );
+  }
+
+  Widget buildGoBackPill() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: getEdgeInsets(1, 1),
+            decoration: getBoxDecoration(1, 1, color: MeditoColors.darkColor),
+            child: getTextLabel("✗ Close", 1, 1, context),
+          )),
+    );
   }
 }

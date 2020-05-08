@@ -426,16 +426,16 @@ class TileListState extends State<TileList> {
     Tracking.trackEvent(Tracking.TILE, Tracking.BOTTOM_SHEET, tile.id);
 
     _viewModel.currentTile = tile;
-    showModalBottomSheet(
-      context: context,
-      clipBehavior: Clip.hardEdge,
-      elevation: 2.0,
-      builder: (context) => BottomSheetWidget(
-        title: tile.title,
-        onBeginPressed: _showPlayer,
-        data: data,
-      ),
-    );
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => BottomSheetWidget(
+            title: tile.title,
+            onBeginPressed: _showPlayer,
+            data: data,
+          ),
+        ));
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,

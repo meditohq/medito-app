@@ -233,16 +233,16 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       data = _viewModel.getAudioData(id: listItem.id);
     }
 
-    showModalBottomSheet(
-      context: context,
-      clipBehavior: Clip.antiAlias,
-      elevation: 4.0,
-      builder: (context) => BottomSheetWidget(
-        title: listItem.title,
-        onBeginPressed: _showPlayer,
-        data: data,
-      ),
-    );
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => BottomSheetWidget(
+            title: listItem.title,
+            onBeginPressed: _showPlayer,
+            data: data,
+          ),
+        ));
+
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,

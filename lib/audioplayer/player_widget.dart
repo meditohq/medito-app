@@ -30,14 +30,15 @@ import '../utils/colors.dart';
 import '../viewmodel/list_item.dart';
 
 class PlayerWidget extends StatefulWidget {
-  PlayerWidget({Key key,
-    this.fileModel,
-    this.listItem,
-    this.coverColor,
-    this.title,
-    this.coverArt,
-    this.attributions,
-    this.description})
+  PlayerWidget(
+      {Key key,
+      this.fileModel,
+      this.listItem,
+      this.coverColor,
+      this.title,
+      this.coverArt,
+      this.attributions,
+      this.description})
       : super(key: key);
 
   final String coverColor;
@@ -173,8 +174,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
-    Tracking.AUDIO_COMPLETED + widget.listItem.id
-    );
+        Tracking.AUDIO_COMPLETED + widget.listItem.id);
   }
 
   void onTime(double positionSeconds) {
@@ -198,10 +198,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    this.widthOfScreen = MediaQuery
-        .of(context)
-        .size
-        .width;
+    this.widthOfScreen = MediaQuery.of(context).size.width;
 
     return Scaffold(
         backgroundColor: Colors.black,
@@ -217,11 +214,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         buildGoBackPill(),
-                        buildMoreInfoButton()
                       ],
                     ),
                     buildContainerWithRoundedCorners(context),
-                    getDownloadbutton(),
                     getAttrWidget(context, licenseTitle, sourceUrl, licenseName,
                         licenseURL),
                   ],
@@ -285,12 +280,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Widget buildIcon() {
     return _loading
-        ? CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(MeditoColors.darkBGColor))
+        ? SizedBox(
+            height: 24,
+            width: 24,
+            child: CircularProgressIndicator(
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(MeditoColors.darkBGColor)),
+          )
         : Icon(
-      _isPlaying ? Icons.pause : Icons.play_arrow,
-      color: MeditoColors.darkColor,
-    );
+            _isPlaying ? Icons.pause : Icons.play_arrow,
+            color: MeditoColors.darkColor,
+          );
   }
 
   Widget buildCircularProgressIndicator() {
@@ -338,9 +338,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     final Uint8List imageBytes = await generateImageBytes();
     AudioSystem.instance.setMetadata(AudioMetadata(
-        title: widget.title,
-        artist: licenseTitle,
-        artBytes: imageBytes));
+        title: widget.title, artist: licenseTitle, artBytes: imageBytes));
     AudioSystem.instance
         .setPlaybackState(true, _position?.inSeconds?.toDouble() ?? 0);
 
@@ -426,7 +424,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           child: Container(
             padding: getEdgeInsets(1, 1),
             decoration: getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
-            child: getTextLabel("Close", 1, 1, context),
+            child: getTextLabel("✗ Close", 1, 1, context),
           )),
     );
   }
@@ -440,9 +438,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             height: 200,
             child: Container(
                 padding: EdgeInsets.all(22),
-                margin: EdgeInsets.only(top: 48),
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                   color: parseColor(widget.coverColor),
                 ),
                 child: getNetworkImageWidget(widget.coverArt.url)),
@@ -461,10 +459,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 top: 24, left: 24.0, right: 24, bottom: 24),
             child: Text(
               widget.title,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .title,
+              style: Theme.of(context).textTheme.title,
               textAlign: TextAlign.center,
             ),
           ),
@@ -480,15 +475,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(_formatDuration(_position),
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .display2),
+                style: Theme.of(context).textTheme.display2),
             Text(_formatDuration(_duration),
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .display2)
+                style: Theme.of(context).textTheme.display2)
           ]),
     );
   }
@@ -514,21 +503,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget buildMoreInfoButton() {
-    return Padding(
-      padding: EdgeInsets.only(left: 16, bottom: 8, top: 24, right: 16),
-      child: GestureDetector(
-          onTap: () {
-            _moreInfoPressed();
-          },
-          child: Container(
-            padding: getEdgeInsets(1, 1),
-            decoration: getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
-            child: getTextLabel("ⓘ  More info", 1, 1, context),
-          )),
-    );
-  }
-
   Widget buildImageItems() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -536,38 +510,4 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  void _moreInfoPressed() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (c) => buildBottomSheet(),
-        ));
-  }
-
-  Widget buildBottomSheet() {
-    return buildAttributionsAndDownloadButtonView(
-        context,
-        widget.fileModel.url,
-        _getTextToShowOnDialog(),
-        licenseTitle,
-        sourceUrl,
-        licenseName,
-        licenseURL,
-        showDownloadButton);
-  }
-
-  String _getTextToShowOnDialog() {
-    return widget.listItem.contentText != null &&
-        widget.listItem.contentText.isNotEmpty
-        ? widget.listItem.contentText
-        : widget.listItem.title;
-  }
-
-  Widget getDownloadbutton() {
-    return FlatButton.icon(
-        color: MeditoColors.lightColor,
-        onPressed: () => downloadFile(widget.fileModel.url, widget.title),
-        icon: Icon(Icons.cloud_download),
-        label: Text('Download'));
-  }
 }
