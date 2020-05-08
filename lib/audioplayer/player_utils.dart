@@ -69,7 +69,6 @@ Future<dynamic> checkFileExists(Files currentFile) async {
   var name = currentFile.filename;
   File file = new File('$dir/$name.mp3');
   var exists = await file.exists();
-  print('$exists $file');
   return exists;
 }
 
@@ -87,8 +86,6 @@ Future<dynamic> downloadFile(Files currentFile) async {
   await file.writeAsBytes(bytes);
 
   saveFileToDownloadedFilesList(currentFile);
-
-  print(file.path);
 }
 
 Future<void> saveFileToDownloadedFilesList(Files file) async {
