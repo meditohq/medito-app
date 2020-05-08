@@ -289,10 +289,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   Future<void> onVoicePillTap(bool value, int index) async {
     lengthSelected = 0;
     voiceSelected = index;
-    filesList.forEach((file) => {
-          if (file.voice == (voiceList[index]))
-            currentFile = file
-        });
+    for (final file in filesList) {
+      if (file.voice == (voiceList[index])) {
+        currentFile = file;
+        break;
+      }
+    }
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
       filterLengthsForThisPerson(voiceList[voiceSelected]);
