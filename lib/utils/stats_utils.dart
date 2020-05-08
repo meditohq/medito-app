@@ -26,6 +26,7 @@ String getUnits(UnitType type, int value) {
       return value == 1 ? 'min' : 'mins';
       break;
   }
+  return '';
 }
 
 Future<String> getCurrentStreak() async {
