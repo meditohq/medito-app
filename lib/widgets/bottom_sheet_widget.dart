@@ -290,8 +290,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     lengthSelected = 0;
     voiceSelected = index;
     filesList.forEach((file) => {
-          if (file.length == (lengthList[lengthSelected]) &&
-              file.voice == (voiceList[index]))
+          if (file.voice == (voiceList[index]))
             currentFile = file
         });
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
