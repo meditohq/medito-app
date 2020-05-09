@@ -242,7 +242,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             data: data,
           ),
         ));
-
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
