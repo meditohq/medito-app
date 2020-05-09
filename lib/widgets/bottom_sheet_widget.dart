@@ -207,7 +207,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
-        'AVALIABLE OFFLINE',
+        'AVAILABLE OFFLINE',
         style: Theme.of(context).textTheme.display2,
       ),
     );
