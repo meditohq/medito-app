@@ -429,8 +429,8 @@ class TileListState extends State<TileList> {
 
     Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (c) => BottomSheetWidget(
+        SlideTopRoute(
+          page: BottomSheetWidget(
             title: tile.title,
             onBeginPressed: _showPlayer,
             data: data,
@@ -467,6 +467,7 @@ class TileListState extends State<TileList> {
     Navigator.push(
       context,
       MaterialPageRoute(
+        settings: RouteSettings(name: '/nav'),
         builder: (c) {
           return FolderNavWidget(
               firstTitle: tile.title,

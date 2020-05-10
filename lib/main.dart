@@ -39,6 +39,12 @@ class HomeScreenWidget extends StatelessWidget {
     Tracking.trackEvent(Tracking.HOME, Tracking.SCREEN_LOADED, '');
 
     return MaterialApp(
+      initialRoute: '/nav',
+      routes: {
+        '/nav': (context) =>  Scaffold(
+            appBar: null, //AppBar(title: const Text(_title)),
+            body: TileList()),
+      },
       theme: ThemeData(
           canvasColor: MeditoColors.almostBlack,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
@@ -48,9 +54,6 @@ class HomeScreenWidget extends StatelessWidget {
           accentColor: MeditoColors.lightColor,
           textTheme: buildDMSansTextTheme(context)),
       title: _title,
-      home: Scaffold(
-          appBar: null, //AppBar(title: const Text(_title)),
-          body: TileList()),
     );
   }
 }

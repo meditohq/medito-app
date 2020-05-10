@@ -235,8 +235,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
     Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (c) => BottomSheetWidget(
+        SlideTopRoute(
+          page: BottomSheetWidget(
             title: listItem.title,
             onBeginPressed: _showPlayer,
             data: data,

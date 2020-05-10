@@ -98,7 +98,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       showDownloadButton = attr.downloadButton;
       licenseURL = attr.licenseUrl;
 
-      getDownload(widget.title).then((data) {
+      getDownload(widget.fileModel.filename).then((data) {
         if (data == null)
           loadRemote();
         else {
@@ -217,8 +217,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       ],
                     ),
                     buildContainerWithRoundedCorners(context),
-                    getAttrWidget(context, licenseTitle, sourceUrl, licenseName,
-                        licenseURL),
+                    getAttrWidget(context, licenseTitle, sourceUrl,
+                        licenseName, licenseURL),
                   ],
                 ),
               ),
@@ -344,7 +344,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
       AndroidMediaButtonType.pause,
-      AndroidMediaButtonType.stop,
     ]);
 
     AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
@@ -374,7 +373,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
       AndroidMediaButtonType.play,
-      AndroidMediaButtonType.stop,
     ]);
 
     AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
@@ -419,7 +417,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),
       child: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.popUntil(context, ModalRoute.withName("/nav"));
           },
           child: Container(
             padding: getEdgeInsets(1, 1),
@@ -440,7 +438,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 padding: EdgeInsets.all(22),
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12)),
                   color: parseColor(widget.coverColor),
                 ),
                 child: getNetworkImageWidget(widget.coverArt.url)),
@@ -509,5 +509,4 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       children: <Widget>[buildImage(), buildTitle()],
     );
   }
-
 }

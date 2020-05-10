@@ -73,7 +73,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           children: <Widget>[
             SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,4 +494,34 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           )),
     );
   }
+}
+
+class SlideTopRoute extends PageRouteBuilder {
+  final Widget page;
+
+  SlideTopRoute({this.page})
+      : super(
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            animation =
+                CurvedAnimation(parent: animation, curve: Curves.easeIn);
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
 }
