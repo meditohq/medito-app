@@ -18,26 +18,14 @@ import 'dart:io';
 import 'package:Medito/utils/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-String blankIfNull(String s) {
-  if (s == null)
-    return "";
-  else
-    return s;
-}
-
-formatDuration(Duration d) {
-  var s = d.toString().split('.').first;
-  if (s.startsWith('0:0')) {
-    s = s.replaceFirst('0:0', '');
-  }
-  return s;
-}
+import 'package:url_launcher/url_launcher.dart';
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
   return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
+    //todo change to nondeprecated ones
         title: TextStyle(
             fontSize: 20.0,
             height: 1.4,
@@ -150,4 +138,27 @@ bool isDayBefore(DateTime day1, DateTime day2) {
   return day1.year == day2.year &&
       day1.month == day2.month &&
       day1.day == day2.day - 1;
+}
+
+
+
+MarkdownBody getMarkdownBody(String content, BuildContext context) {
+  return MarkdownBody(
+    onTapLink: ((url) {
+      launch(url);
+    }),
+    selectable: false,
+    styleSheet: MarkdownStyleSheet.fromTheme(
+        Theme.of(context))
+        .copyWith(
+        a: Theme.of(context).textTheme.body1.copyWith(
+            decoration: TextDecoration.underline),
+        h1: Theme.of(context).textTheme.title,
+        h2: Theme.of(context).textTheme.headline,
+        h3: Theme.of(context).textTheme.subtitle,
+        listBullet: Theme.of(context).textTheme.subhead,
+        p: Theme.of(context).textTheme.body1),
+    data: content == null ? '' : content,
+    imageDirectory: 'https://raw.githubusercontent.com',
+  );
 }

@@ -245,7 +245,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText) {
+      String title, String description, String contentText, String textColor) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -253,6 +253,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               fileModel: fileTapped,
               description: description,
               coverArt: coverArt,
+              textColor: textColor,
               coverColor: coverColor,
               title: title,
               listItem: _viewModel.currentlySelectedFile,
@@ -349,24 +350,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                     Padding(
                       padding: const EdgeInsets.only(
                           left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
-                      child: MarkdownBody(
-                        onTapLink: ((url) {
-                          launch(url);
-                        }),
-                        selectable: false,
-                        styleSheet: MarkdownStyleSheet.fromTheme(
-                                Theme.of(context))
-                            .copyWith(
-                                a: Theme.of(context).textTheme.body1.copyWith(
-                                    decoration: TextDecoration.underline),
-                                h1: Theme.of(context).textTheme.title,
-                                h2: Theme.of(context).textTheme.headline,
-                                h3: Theme.of(context).textTheme.subtitle,
-                                listBullet: Theme.of(context).textTheme.subhead,
-                                p: Theme.of(context).textTheme.body1),
-                        data: content == null ? '' : content,
-                        imageDirectory: 'https://raw.githubusercontent.com',
-                      ),
+                      child: getMarkdownBody(content, context),
                     ),
                   ],
                 ),

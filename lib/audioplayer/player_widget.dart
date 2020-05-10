@@ -38,9 +38,11 @@ class PlayerWidget extends StatefulWidget {
       this.title,
       this.coverArt,
       this.attributions,
-      this.description})
+      this.description,
+      this.textColor})
       : super(key: key);
 
+  final String textColor;
   final String coverColor;
   final String description;
   final CoverArt coverArt;
@@ -62,12 +64,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String sourceUrl;
   bool showDownloadButton;
 
-  double _slider;
   Duration _duration;
   String _error;
   Duration _position;
 
-  var _additionalSecs = 0; //for stats
   double widthOfScreen;
 
   bool _loading = true;
@@ -123,7 +123,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           _loading = false;
         },
         // Called repeatedly with updated playback position.
-        onPosition: (double positionSeconds) => onTime(positionSeconds));
+        onPosition: (double positionSeconds) {
+          onTime(positionSeconds);
+        });
   }
 
   void loadRemote() {
@@ -167,10 +169,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
 
     if (!_updatedStats) {
-      markAsListened(widget.listItem.id);
-      incrementNumSessions();
-      updateStreak();
-      _updatedStats = true;
+      updateStats();
     }
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
@@ -180,20 +179,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void onTime(double positionSeconds) {
     if (this.mounted) {
       _position = Duration(seconds: positionSeconds.toInt());
-      _slider = positionSeconds / _duration.inSeconds;
       _isPlaying = true;
       setState(() {});
 
-      this._additionalSecs += 1;
       if (_position.inSeconds > _duration.inSeconds - 15 &&
           _position.inSeconds < _duration.inSeconds - 10 &&
           !_updatedStats) {
-        markAsListened(widget.listItem.id);
-        incrementNumSessions();
-        updateStreak();
-        _updatedStats = true;
+        updateStats();
       }
     }
+  }
+
+  void updateStats() {
+    markAsListened(widget.listItem.id);
+    incrementNumSessions();
+    updateStreak();
+    _updatedStats = true;
   }
 
   @override
@@ -217,8 +218,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       ],
                     ),
                     buildContainerWithRoundedCorners(context),
-                    getAttrWidget(context, licenseTitle, sourceUrl,
-                        licenseName, licenseURL),
+                    getAttrWidget(context, licenseTitle, sourceUrl, licenseName,
+                        licenseURL),
                   ],
                 ),
               ),
@@ -242,7 +243,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           Flexible(flex: 1, child: buildImageItems()),
           buildPlayItems(),
           Container(
-            height: 24,
+            height: 16,
           ),
         ],
       ),
@@ -251,7 +252,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Widget buildButtonRow() {
     return Padding(
-      padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -262,7 +263,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   borderRadius: new BorderRadius.circular(12.0),
                 ),
                 child: buildIcon(),
-                color: MeditoColors.lightColor,
+                color: widget.coverColor != null
+                    ? parseColor(widget.coverColor)
+                    : MeditoColors.lightColor,
                 onPressed: () {
                   if (_isPlaying) {
                     pause();
@@ -285,12 +288,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             width: 24,
             child: CircularProgressIndicator(
                 valueColor:
-                    AlwaysStoppedAnimation<Color>(MeditoColors.darkBGColor)),
+                    AlwaysStoppedAnimation<Color>(getTextColor())),
           )
         : Icon(
             _isPlaying ? Icons.pause : Icons.play_arrow,
-            color: MeditoColors.darkColor,
+            color: getTextColor(),
           );
+  }
+
+  Color getTextColor() {
+    return widget.textColor == null || widget.textColor.isEmpty
+              ? MeditoColors.darkColor
+              : parseColor(widget.textColor);
   }
 
   Widget buildCircularProgressIndicator() {
@@ -396,8 +405,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
     AudioSystem.instance.stopBackgroundDisplay();
 
-    updateMinuteCounter(_additionalSecs);
-    _additionalSecs = 0;
+    updateMinuteCounter(_position.inSeconds);
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_STOPPED + widget.fileModel.id);
@@ -406,7 +414,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   // Seek to a point in seconds
   void _seek() async {
     var milliseconds = _position.inMilliseconds;
-    _slider = _position.inMilliseconds / _duration.inMilliseconds;
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_SEEK + '$milliseconds :' + widget.fileModel.id);
@@ -485,7 +492,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String _formatDuration(Duration d) {
     if (d == null) return "--:--";
     int minute = d.inMinutes;
-    int second = (d.inSeconds > 60) ? (d.inSeconds % 60) : d.inSeconds;
+    int second = (d.inSeconds >= 60) ? (d.inSeconds % 60) : d.inSeconds;
     String format = ((minute < 10) ? "0$minute" : "$minute") +
         ":" +
         ((second < 10) ? "0$second" : "$second");

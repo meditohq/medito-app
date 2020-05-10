@@ -18,12 +18,11 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
-  final Function(dynamic, dynamic, dynamic, String, String, String)
+  final Function(dynamic, dynamic, dynamic, String, String, String, String)
       onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
@@ -114,7 +113,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget buildButton() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -171,7 +170,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (_downloading) return;
 
     widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
-        _description, _contentText);
+        _description, _contentText, _textColor);
   }
 
   Widget buildVoiceText() {
@@ -201,9 +200,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return _contentText.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.only(bottom: 20.0, left: 8, right: 8),
-            child: MarkdownBody(
-              data: _contentText,
-            ),
+            child: getMarkdownBody(_contentText, context),
           )
         : Container();
   }

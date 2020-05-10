@@ -207,8 +207,8 @@ class TileListState extends State<TileList> {
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == secondColumnLength - 1) {
-                    return getStreakTile(getCurrentStreak(), 'Current Streak', optionalText: UnitType.day,
-                        onClick: _onStreakTap);
+                    return getStreakTile(getCurrentStreak(), 'Current Streak',
+                        optionalText: UnitType.day, onClick: _onStreakTap);
                   }
 
                   TileItem tile = data[index];
@@ -439,7 +439,7 @@ class TileListState extends State<TileList> {
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText) {
+      String title, String description, String contentText, String textColor) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -457,6 +457,7 @@ class TileListState extends State<TileList> {
             coverArt: coverArt,
             coverColor: coverColor,
             title: title,
+            textColor: textColor,
             listItem: listItem,
             attributions: _viewModel.getAttributions(fileTapped.attributions)),
       ),
