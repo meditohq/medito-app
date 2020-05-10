@@ -106,6 +106,7 @@ class Content {
   String contentText;
   List<CoverArt> coverArt;
   String coverColor;
+  String textColor;
   List<Files> files;
   String title;
   String date;
@@ -140,6 +141,7 @@ class Content {
     title = json['title'];
     date = json['date'];
     customlength = json['customlength'];
+    textColor = json['text_color'];
   }
 
   Map<String, dynamic> toJson() {
@@ -156,6 +158,7 @@ class Content {
     data['title'] = this.title;
     data['date'] = this.date;
     data['customlength'] = this.customlength;
+    data['text_color'] = this.textColor;
     return data;
   }
 }

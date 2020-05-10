@@ -45,9 +45,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   String _description;
   String _title;
   var _coverColor;
+  String _textColor;
   String _contentText = '';
   bool _downloading = false;
   var currentFile;
+
+  bool _showVoiceChoice = true;
 
   @override
   void initState() {
@@ -57,6 +60,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       this._coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
       this._coverColor = d?.coverColor;
       this._title = d?.title;
+      this._textColor = d?.textColor;
       this._contentText = d?.contentText;
       this._description = d?.description;
       compileLists(d?.files);
@@ -66,6 +70,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (voiceList.length == 1 &&
+        voiceList[0].toString().toLowerCase() == 'no voice') {
+      _showVoiceChoice = false;
+    }
+
     return Scaffold(
       backgroundColor: MeditoColors.darkBGColor,
       body: SafeArea(
@@ -82,7 +91,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                     buildImage(),
                     buildTitleText(),
                     buildDescriptionText(),
-                    buildSpacer(),
+                    _showVoiceChoice ? buildSpacer() : Container(),
                     buildVoiceText(),
                     buildVoiceRow(),
                     buildSpacer(),
@@ -150,7 +159,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       return Text(
         'BEGIN',
         style: Theme.of(context).textTheme.display2.copyWith(
-            color: MeditoColors.darkBGColor, fontWeight: FontWeight.bold),
+            color: _textColor != null && _textColor.isNotEmpty
+                ? parseColor(_textColor)
+                : MeditoColors.darkBGColor,
+            fontWeight: FontWeight.bold),
       );
     }
   }
@@ -163,6 +175,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget buildVoiceText() {
+    if (!_showVoiceChoice) {
+      return Container();
+    }
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
@@ -247,6 +262,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget buildVoiceRow() {
+    if (!_showVoiceChoice) {
+      return Container();
+    }
+
     return SizedBox(
       height: 56,
       child: ListView.builder(

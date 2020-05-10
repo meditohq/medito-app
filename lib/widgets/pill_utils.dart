@@ -27,6 +27,7 @@ Text getTextLabel(String label, int i, int startNumber, BuildContext context) {
           : Theme.of(context).textTheme.display1);
 }
 
+//todo these methods have useless parameters. get rid!
 BoxDecoration getBoxDecoration(int i, int startNumber, {Color color}) {
   if (color == null) {
     color = i == startNumber ? MeditoColors.darkColor : MeditoColors.lightColor;

@@ -63,7 +63,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
         display2: TextStyle(
             //pill small
             fontSize: 14.0,
-            height: 1.4,
+            height: 1.25,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
         display3: TextStyle(

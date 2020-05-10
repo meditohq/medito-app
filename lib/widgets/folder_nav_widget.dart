@@ -348,7 +348,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, bottom: 16.0),
+                          left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
                       child: MarkdownBody(
                         onTapLink: ((url) {
                           launch(url);
