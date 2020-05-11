@@ -41,7 +41,7 @@ class HomeScreenWidget extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/nav',
       routes: {
-        '/nav': (context) =>  Scaffold(
+        '/nav': (context) => Scaffold(
             appBar: null, //AppBar(title: const Text(_title)),
             body: TileList()),
       },

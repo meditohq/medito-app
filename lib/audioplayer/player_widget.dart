@@ -411,14 +411,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         Tracking.AUDIO_STOPPED + widget.fileModel.id);
   }
 
-  // Seek to a point in seconds
-  void _seek() async {
-    var milliseconds = _position.inMilliseconds;
-
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
-        Tracking.AUDIO_SEEK + '$milliseconds :' + widget.fileModel.id);
-  }
-
   Widget buildGoBackPill() {
     return Padding(
       padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),

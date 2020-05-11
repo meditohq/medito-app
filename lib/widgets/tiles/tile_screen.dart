@@ -429,8 +429,8 @@ class TileListState extends State<TileList> {
 
     Navigator.push(
         context,
-        SlideTopRoute(
-          page: BottomSheetWidget(
+        MaterialPageRoute(
+          builder: (context) => BottomSheetWidget(
             title: tile.title,
             onBeginPressed: _showPlayer,
             data: data,

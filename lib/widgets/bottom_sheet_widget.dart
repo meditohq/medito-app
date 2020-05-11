@@ -51,6 +51,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   bool _showVoiceChoice = true;
 
+  bool _loading = true;
+
   @override
   void initState() {
     super.initState();
@@ -76,36 +78,38 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     return Scaffold(
       backgroundColor: MeditoColors.darkBGColor,
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    buildGoBackPill(),
-                    buildImage(),
-                    buildTitleText(),
-                    buildDescriptionText(),
-                    _showVoiceChoice ? buildSpacer() : Container(),
-                    buildVoiceText(),
-                    buildVoiceRow(),
-                    buildSpacer(),
-                    buildSessionLengthText(),
-                    buildSessionLengthRow(),
-                    buildSpacer(),
-                    buildOfflineTextRow(),
-                    buildOfflineRow(),
-                    Container(height: 80)
-                  ],
+      body: Container(
+        child: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      buildGoBackPill(),
+                      buildImage(),
+                      buildTitleText(),
+                      buildDescriptionText(),
+                      _showVoiceChoice ? buildSpacer() : Container(),
+                      buildVoiceText(),
+                      buildVoiceRow(),
+                      buildSpacer(),
+                      buildSessionLengthText(),
+                      buildSessionLengthRow(),
+                      buildSpacer(),
+                      buildOfflineTextRow(),
+                      buildOfflineRow(),
+                      Container(height: 80)
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Align(alignment: Alignment.bottomCenter, child: buildButton()),
-          ],
+              Align(alignment: Alignment.bottomCenter, child: buildButton()),
+            ],
+          ),
         ),
       ),
     );
@@ -180,7 +184,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
-        'VOICE',
+        _loading ? '' : 'VOICE',
         style: Theme.of(context).textTheme.display4,
       ),
     );
@@ -379,6 +383,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     }
 
     if (this.mounted) {
+      _loading = false;
       setState(() {});
     }
   }
@@ -471,7 +476,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                     color: _coverColor != null
                         ? parseColor(_coverColor)
-                        : MeditoColors.lightColor,
+                        : MeditoColors.darkColor,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(26.0),
@@ -506,38 +511,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           child: Container(
             padding: getEdgeInsets(1, 1),
             decoration: getBoxDecoration(1, 1, color: MeditoColors.darkColor),
-            child: getTextLabel("✗ Close", 1, 1, context),
+            child: getTextLabel("<- Back", 1, 1, context),
           )),
     );
   }
-}
-
-class SlideTopRoute extends PageRouteBuilder {
-  final Widget page;
-
-  SlideTopRoute({this.page})
-      : super(
-          pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-          ) =>
-              page,
-          transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
-          ) {
-            animation =
-                CurvedAnimation(parent: animation, curve: Curves.easeIn);
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            );
-          },
-        );
 }

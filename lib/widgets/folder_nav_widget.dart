@@ -21,8 +21,6 @@ import 'package:Medito/viewmodel/list_item.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'bottom_sheet_widget.dart';
 import 'list_item_file_widget.dart';
@@ -40,10 +38,16 @@ class FolderStateless extends StatelessWidget {
 }
 
 class FolderNavWidget extends StatefulWidget {
-  FolderNavWidget({Key key, this.firstId, this.firstTitle, this.textFuture})
+  FolderNavWidget(
+      {Key key,
+      this.firstId,
+      this.firstTitle,
+      this.textFuture,
+      this.navItemPair})
       : super(key: key);
 
   final String firstId;
+  final List<ListItem> navItemPair;
   final String firstTitle;
   final Future<String> textFuture;
 
@@ -72,11 +76,17 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     super.initState();
 
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
+
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.addToNavList(
           ListItem("Home", "app+content", null, parentId: "app+content"));
       _viewModel
           .addToNavList(ListItem(widget.firstTitle, widget.firstId, null));
+    }
+
+    if (widget.navItemPair != null) {
+      _viewModel.addToNavList(widget.navItemPair[0]);
+      _viewModel.addToNavList(widget.navItemPair[1]);
     }
 
     widget.textFuture?.then((onValue) {
@@ -93,16 +103,13 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       statusBarBrightness: Brightness.dark,
     ));
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        backgroundColor: MeditoColors.darkBGColor,
-        body: new Builder(
-          builder: (BuildContext context) {
-            scaffoldContext = context;
-            return buildSafeAreaBody();
-          },
-        ),
+    return Scaffold(
+      backgroundColor: MeditoColors.darkBGColor,
+      body: new Builder(
+        builder: (BuildContext context) {
+          scaffoldContext = context;
+          return buildSafeAreaBody();
+        },
       ),
     );
   }
@@ -194,10 +201,21 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   void folderTap(ListItem i) {
     Tracking.trackEvent(Tracking.FOLDER_TAPPED, Tracking.SCREEN_LOADED, i.id);
     //if you tapped on a folder
-    setState(() {
-      _viewModel.addToNavList(i);
-      listFuture = _viewModel.getPageChildren(id: i.id);
-    });
+
+    List<ListItem> itemList = [_viewModel.navList.last, i];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        settings: RouteSettings(name: '/nav'),
+        builder: (c) {
+          return FolderNavWidget(
+            navItemPair: itemList,
+            firstId: i.id,
+          );
+        },
+      ),
+    );
   }
 
   void fileTap(ListItem item) {
@@ -235,8 +253,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
     Navigator.push(
         context,
-        SlideTopRoute(
-          page: BottomSheetWidget(
+        MaterialPageRoute(
+          builder: (context) => BottomSheetWidget(
             title: listItem.title,
             onBeginPressed: _showPlayer,
             data: data,
@@ -304,19 +322,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         _viewModel.navList.removeLast();
       }
     });
-  }
-
-  Future<bool> _onWillPop() {
-    if (_viewModel.navList.length > 1) {
-      _backPressed(_viewModel.navList.last.parentId);
-      Tracking.trackEvent(
-          Tracking.BACK_PRESSED,
-          Tracking.CURRENTLY_SELECTED_FILE,
-          _viewModel.currentlySelectedFile?.id);
-    } else {
-      return new Future(() => true);
-    }
-    return new Future(() => false);
   }
 
   Widget getInnerTextView() {
