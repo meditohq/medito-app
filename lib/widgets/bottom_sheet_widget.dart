@@ -126,9 +126,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
+                    offset: const Offset(0, 10),
                     color: MeditoColors.darkBGColor,
-                    spreadRadius: 16,
-                    blurRadius: 10,
+                    spreadRadius: 25,
+                    blurRadius: 8,
                   ),
                 ],
               ),
