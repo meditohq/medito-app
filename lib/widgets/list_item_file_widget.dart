@@ -13,12 +13,12 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/colors.dart';
-import '../viewmodel/list_item.dart';
 
 class ListItemWidget extends StatefulWidget {
   ListItemWidget({Key key, this.item}) : super(key: key);

@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/viewmodel/list_item.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/nav_pills_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:flutter/material.dart';

@@ -15,12 +15,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/data/attributions.dart';
-import 'package:Medito/data/page.dart';
-import 'package:Medito/data/pages_children.dart';
+import '../data/attributions.dart';
+import '../data/page.dart';
+import '../data/pages_children.dart';
 
 import 'http_get.dart';
-import 'list_item.dart';
+import 'model/list_item.dart';
 
 abstract class MainListViewModel {}
 

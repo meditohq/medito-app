@@ -13,23 +13,23 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/audioplayer/player_widget.dart';
-import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/list_item.dart';
-import 'package:Medito/viewmodel/tile_item.dart';
-import 'package:Medito/viewmodel/tile_view_model.dart';
-import 'package:Medito/widgets/bottom_sheet_widget.dart';
-import 'package:Medito/widgets/column_builder.dart';
-import 'package:Medito/widgets/streak_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../audioplayer/player_widget.dart';
+import '../../tracking/tracking.dart';
+import '../../utils/colors.dart';
+import '../../utils/stats_utils.dart';
+import '../../utils/utils.dart';
+import '../../viewmodel/model/list_item.dart';
+import '../../viewmodel/model/tile_item.dart';
+import '../../viewmodel/tile_view_model.dart';
+import '../bottom_sheet_widget.dart';
+import '../column_builder.dart';
 import '../folder_nav_widget.dart';
+import '../streak_page.dart';
 import '../streak_tiles_utils.dart';
 
 class TileList extends StatefulWidget {

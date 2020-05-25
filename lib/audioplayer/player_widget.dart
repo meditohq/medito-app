@@ -27,7 +27,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
-import '../viewmodel/list_item.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 
 class PlayerWidget extends StatefulWidget {
   PlayerWidget(
@@ -112,7 +112,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void loadLocal(String data) {
-    //todo remove this replaceAll later
     _audio = Audio.loadFromAbsolutePath(data,
         playInBackground: true,
         // Called when audio has finished playing.
