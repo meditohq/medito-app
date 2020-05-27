@@ -75,3 +75,4 @@
 /lib/viewmodel/auth.dart
 gen/
 /pubspec.lock
+/android/key.properties

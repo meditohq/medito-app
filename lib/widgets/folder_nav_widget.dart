@@ -17,8 +17,8 @@ import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/list_item.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

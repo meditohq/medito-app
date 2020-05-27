@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/viewmodel/list_item.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/loading_item_widget.dart';
 import 'package:Medito/widgets/nav_pills_widget.dart';
 import 'package:flutter/material.dart';

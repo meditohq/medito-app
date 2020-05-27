@@ -14,10 +14,10 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../viewmodel/list_item.dart';
 
 class NavPillsWidget extends StatefulWidget {
   const NavPillsWidget({Key key, this.list, this.backPressed}) : super(key: key);

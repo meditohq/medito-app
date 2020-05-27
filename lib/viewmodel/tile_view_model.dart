@@ -18,7 +18,7 @@ import 'dart:async';
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/pages_children.dart';
-import 'package:Medito/viewmodel/tile_item.dart';
+import 'package:Medito/viewmodel/model/tile_item.dart';
 
 import 'http_get.dart';
 
