@@ -404,7 +404,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
     AudioSystem.instance.stopBackgroundDisplay();
 
-    updateMinuteCounter(_position.inSeconds);
+    updateMinuteCounter(_position?.inSeconds);
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_STOPPED + widget.fileModel.id);
