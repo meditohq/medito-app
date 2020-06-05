@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -164,14 +165,7 @@ class TileListState extends State<TileList> {
       color: MeditoColors.darkBGColor,
       child: SafeArea(
         bottom: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Expanded(
-              child: tileListWidget(),
-            ),
-          ],
-        ),
+        child: tileListWidget(),
       ),
     );
   }
@@ -189,7 +183,8 @@ class TileListState extends State<TileList> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           //left column
-          Expanded(
+          SizedBox(
+            width: getColumWidth(),
             child: ColumnBuilder(
                 itemCount: data == null ? 0 : data?.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -202,7 +197,8 @@ class TileListState extends State<TileList> {
                 }),
           ),
           //right column
-          Expanded(
+          SizedBox(
+            width: getColumWidth(),
             child: ColumnBuilder(
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
@@ -224,14 +220,10 @@ class TileListState extends State<TileList> {
     );
   }
 
-  Widget wrapWithRowExpanded(Widget w) {
-    return Row(
-      children: <Widget>[
-        Expanded(child: w),
-      ],
-    );
-  }
-
+  //todo horrible hack, but necessary because autosizetext cannot be passed unbound constraints
+  //see here https://stackoverflow.com/questions/53882591/autoresize-text-to-fit-in-container-vertically
+  double getColumWidth() => MediaQuery.of(context).size.width / 2 - 8;
+  
   Widget getTile(TileItem item) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -250,13 +242,16 @@ class TileListState extends State<TileList> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.fade,
-                      style: Theme.of(context)
-                          .textTheme
-                          .title
-                          .copyWith(color: parseColor(item.colorText))),
+                  SizedBox(
+                    width: getColumWidth() - 48, //todo horrible hack
+                    child: AutoSizeText(item.title,
+                        maxLines: 2,
+                        wrapWords: false,
+                        style: Theme.of(context)
+                            .textTheme
+                            .title
+                            .copyWith(color: parseColor(item.colorText))),
+                  ),
                   Container(height: 16),
                   getNetworkImageWidget(item.thumbnail),
                 ],
