@@ -34,10 +34,18 @@ Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('streakCount');
-  if (streak == null)
-    return '0';
-  else
-    return streak.toString();
+  if (streak == null) return '0';
+
+  List<String> streakList = prefs.getStringList('streakList');
+  final lastDayInStreak =
+      DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
+  final now = DateTime.now();
+
+  if (longerThanOneDayAgo(lastDayInStreak, now)) {
+    updateStreak(streak: "0");
+  }
+
+  return streak.toString();
 }
 
 Future<int> _getCurrentStreakInt() async {
@@ -64,17 +72,10 @@ void updateStreak({String streak = ''}) async {
     return;
   }
 
-  List<String> streakList = prefs.getStringList('streakList');
-  int streakCount = prefs.getInt('streakCount');
+  List<String> streakList = prefs.getStringList('streakList') ?? [];
+  int streakCount = prefs.getInt('streakCount') ?? 0;
 
-  if (streakList == null) {
-    streakList = [];
-  }
-  if (streakCount == null) {
-    streakCount = 0;
-  }
-
-  if (streakList.length > 0) {
+  if (streakList.isNotEmpty) {
     //if you have meditated before, was it on today? if not, increase counter
     final lastDayInStreak =
         DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
@@ -195,4 +196,8 @@ bool isSameDay(DateTime day1, DateTime day2) {
   return day1.year == day2.year &&
       day1.month == day2.month &&
       day1.day == day2.day;
+}
+
+bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
+  return now.subtract(Duration(hours: 32)).isAfter(lastDayInStreak);
 }
