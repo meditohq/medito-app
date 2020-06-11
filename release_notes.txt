@@ -1,1 +1,3 @@
-- Fixed a crash on some devices
+- Fixed some problems with offline mode
+- Tiles looks better on smaller screens
+- Fixed streak counter bugs

@@ -19,20 +19,20 @@ import '../data/attributions.dart';
 import '../data/page.dart';
 import '../data/pages_children.dart';
 
+import 'auth.dart';
 import 'http_get.dart';
 import 'model/list_item.dart';
 
 abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
-  final String baseUrl = 'https://medito.app/api/pages';
   List<ListItem> navList = [];
   ListItem currentlySelectedFile;
 
   bool _skipCache;
 
-  Future getAttributions(String id) async {
-    var url = baseUrl + '/' + id.replaceAll('/', '+');
+  Future getAttributions(String attrId) async {
+    var url = baseUrl + '/' + attrId.replaceAll('/', '+');
     var response = await httpGet(url);
     var attrs = Attributions.fromJson(response);
 

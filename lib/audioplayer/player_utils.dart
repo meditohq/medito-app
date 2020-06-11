@@ -17,8 +17,11 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -67,16 +70,27 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
 Future<dynamic> checkFileExists(Files currentFile) async {
   String dir = (await getApplicationSupportDirectory()).path;
   var name = currentFile.filename;
-  File file = new File('$dir/$name.mp3');
+  File file = new File('$dir/$name');
   var exists = await file.exists();
   print('$exists $file');
   return exists;
 }
 
+Future getAttributions(String attrId) async {
+  var url = baseUrl + '/' + attrId.replaceAll('/', '+');
+  var response = await httpGet(url);
+  var attrs = Attributions.fromJson(response);
+
+  return attrs.data.content;
+}
+
 Future<dynamic> downloadFile(Files currentFile) async {
+
+  getAttributions(currentFile.attributions);
+
   String dir = (await getApplicationSupportDirectory()).path;
   var name = currentFile.filename;
-  File file = new File('$dir/$name.mp3');
+  File file = new File('$dir/$name');
 
   if (await file.exists()) return null;
 
@@ -108,7 +122,7 @@ Future<void> removeFileFromDownloadedFilesList(Files file) async {
 Future<dynamic> removeFile(Files currentFile) async {
   String dir = (await getApplicationSupportDirectory()).path;
   var name = currentFile.filename;
-  File file = new File('$dir/$name.mp3');
+  File file = new File('$dir/$name');
 
   if (await file.exists()) {
     removeFileFromDownloadedFilesList(currentFile);
@@ -118,7 +132,7 @@ Future<dynamic> removeFile(Files currentFile) async {
 
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;
-  File file = new File('$path/$filename.mp3');
+  File file = new File('$path/$filename');
   if (await file.exists())
     return file.absolute.path;
   else
