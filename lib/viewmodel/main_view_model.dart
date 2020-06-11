@@ -31,9 +31,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   var baseUrl = 'https://medito.app/api/pages';
 
   bool _skipCache;
-
-  var baseUrl = 'https://medito.app/api/pages';
-
+  
   Future getAttributions(String attrId) async {
     var url = baseUrl + '/' + attrId.replaceAll('/', '+');
     var response = await httpGet(url);
