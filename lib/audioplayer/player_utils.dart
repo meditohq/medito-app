@@ -77,6 +77,7 @@ Future<dynamic> checkFileExists(Files currentFile) async {
 }
 
 Future getAttributions(String attrId) async {
+  var baseUrl = 'https://medito.app/api/pages';
   var url = baseUrl + '/' + attrId.replaceAll('/', '+');
   var response = await httpGet(url);
   var attrs = Attributions.fromJson(response);

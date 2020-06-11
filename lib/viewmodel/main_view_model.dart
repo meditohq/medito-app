@@ -28,6 +28,7 @@ abstract class MainListViewModel {}
 class SubscriptionViewModelImpl implements MainListViewModel {
   List<ListItem> navList = [];
   ListItem currentlySelectedFile;
+  var baseUrl = 'https://medito.app/api/pages';
 
   bool _skipCache;
 
