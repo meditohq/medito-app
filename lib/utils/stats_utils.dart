@@ -36,7 +36,7 @@ Future<String> getCurrentStreak() async {
   var streak = prefs.getInt('streakCount');
   if (streak == null) return '0';
 
-  List<String> streakList = prefs.getStringList('streakList');
+  List<String> streakList = prefs.getStringList('streakList') ?? [];
   final lastDayInStreak =
       DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
   final now = DateTime.now();
