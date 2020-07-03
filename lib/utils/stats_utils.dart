@@ -33,16 +33,19 @@ String getUnits(UnitType type, int value) {
 Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('streakCount');
-  if (streak == null) return '0';
-
+  var streak = prefs.getInt('streakCount') ?? 0;
   List<String> streakList = prefs.getStringList('streakList') ?? [];
-  final lastDayInStreak =
-      DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
-  final now = DateTime.now();
 
-  if (longerThanOneDayAgo(lastDayInStreak, now)) {
-    updateStreak(streak: "0");
+  if (streakList.length > 0) {
+    DateTime lastDayInStreak =
+        DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
+
+    final now = DateTime.now();
+
+    if (longerThanOneDayAgo(lastDayInStreak, now)) {
+      updateStreak(streak: "0");
+      streak = 0;
+    }
   }
 
   return streak.toString();
