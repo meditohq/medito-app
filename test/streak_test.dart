@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
 
   test('test longerThanOneDayAgo', () {
     var b = longerThanOneDayAgo(
@@ -70,5 +71,39 @@ void main() {
 
     Future<String> future1 = getLongestStreak();
     expect(future1, completion("5"));
+  });
+
+  test("test update min counter", () async {
+    var prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt('secsListened', 0);
+
+    await updateMinuteCounter(120).then((value) {
+      int secsListened = prefs.getInt('secsListened');
+      expect(secsListened, 120);
+    });
+  });
+
+  test("test get min counter", () async {
+    var prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt('secsListened', 0);
+
+    await updateMinuteCounter(120);
+
+    var future = getMinutesListened();
+    expect(future, completion("2"));
+
+    //add another min
+    await updateMinuteCounter(60);
+
+    var future2 = getMinutesListened();
+    expect(future2, completion("3"));
+
+    //add another min
+    await updateMinuteCounter(66);
+
+    var future3 = getMinutesListened();
+    expect(future3, completion("4"));
   });
 }

@@ -58,12 +58,13 @@ Future<int> _getCurrentStreakInt() async {
   return streak ?? 0;
 }
 
-void updateMinuteCounter(int additionalSecs) async {
+Future<bool> updateMinuteCounter(int additionalSecs) async {
   var prefs = await SharedPreferences.getInstance();
 
   var current = await _getSecondsListened();
   var plusOne = current + (additionalSecs ?? 0);
   prefs.setInt('secsListened', plusOne);
+  return true;
 }
 
 void updateStreak({String streak = ''}) async {
