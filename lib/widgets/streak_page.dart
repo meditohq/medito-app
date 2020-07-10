@@ -121,12 +121,12 @@ class _StreakWidgetState extends State<StreakWidget> {
             shape: _roundedRectangleBorder(),
             backgroundColor: MeditoColors.darkBGColor,
             title: Text("How many days is your streak?",
-                style: Theme.of(context).textTheme.headline),
+                style: Theme.of(context).textTheme.headline5),
             content: new TextField(
               textAlign: TextAlign.center,
               style: Theme.of(context)
                   .textTheme
-                  .subtitle
+                  .subtitle2
                   .copyWith(letterSpacing: 1.5),
               decoration: new InputDecoration(
                   border: new OutlineInputBorder(
@@ -149,7 +149,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         color: MeditoColors.darkColor,
                         child: Text(
                           'CANCEL',
-                          style: Theme.of(context).textTheme.display2.copyWith(
+                          style: Theme.of(context).textTheme.headline3.copyWith(
                               color: MeditoColors.lightColor,
                               fontWeight: FontWeight.bold),
                         ),
@@ -166,7 +166,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         color: MeditoColors.lightColor,
                         child: Text(
                           'SAVE',
-                          style: Theme.of(context).textTheme.display2.copyWith(
+                          style: Theme.of(context).textTheme.headline3.copyWith(
                               color: MeditoColors.darkBGColor,
                               fontWeight: FontWeight.bold),
                         ),
@@ -217,7 +217,7 @@ class _StreakWidgetState extends State<StreakWidget> {
             shape: _roundedRectangleBorder(),
             backgroundColor: MeditoColors.darkBGColor,
             title: Text("Reset longest streak to your current streak?",
-                style: Theme.of(context).textTheme.headline),
+                style: Theme.of(context).textTheme.headline5),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
@@ -232,7 +232,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         color: MeditoColors.darkColor,
                         child: Text(
                           'CANCEL',
-                          style: Theme.of(context).textTheme.display2.copyWith(
+                          style: Theme.of(context).textTheme.headline3.copyWith(
                               color: MeditoColors.lightColor,
                               fontWeight: FontWeight.bold),
                         ),
@@ -249,7 +249,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         color: MeditoColors.lightColor,
                         child: Text(
                           'RESET',
-                          style: Theme.of(context).textTheme.display2.copyWith(
+                          style: Theme.of(context).textTheme.headline3.copyWith(
                               color: MeditoColors.darkBGColor,
                               fontWeight: FontWeight.bold),
                         ),

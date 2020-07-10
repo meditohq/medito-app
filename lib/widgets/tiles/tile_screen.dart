@@ -146,7 +146,7 @@ class TileListState extends State<TileList> {
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           'Oops! There was an error.\n Tap to refresh',
-                          style: Theme.of(context).textTheme.body1,
+                          style: Theme.of(context).textTheme.bodyText2,
                           textAlign: TextAlign.center,
                         ),
                       )),
@@ -249,7 +249,7 @@ class TileListState extends State<TileList> {
                         wrapWords: false,
                         style: Theme.of(context)
                             .textTheme
-                            .title
+                            .headline6
                             .copyWith(color: parseColor(item.colorText))),
                   ),
                   Container(height: 16),
@@ -357,7 +357,7 @@ class TileListState extends State<TileList> {
         child: Text(item.description,
             style: Theme.of(context)
                 .textTheme
-                .subhead
+                .subtitle1
                 .copyWith(color: parseColor(item.colorText))),
       ),
     );
@@ -369,7 +369,7 @@ class TileListState extends State<TileList> {
       child: Text(item.title,
           style: Theme.of(context)
               .textTheme
-              .title
+              .headline6
               .copyWith(color: parseColor(item.colorText))),
     );
   }
@@ -387,7 +387,7 @@ class TileListState extends State<TileList> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Text(item.buttonLabel.toUpperCase(),
-              style: Theme.of(context).textTheme.display2.copyWith(
+              style: Theme.of(context).textTheme.headline3.copyWith(
                   letterSpacing: 1,
                   fontWeight: FontWeight.w600,
                   color: parseColor(item.colorButtonText))),

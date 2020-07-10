@@ -51,7 +51,7 @@ Widget getStreakTile(Future future, String title,
                         Text(title,
                             maxLines: 2,
                             overflow: TextOverflow.fade,
-                            style: Theme.of(context).textTheme.title),
+                            style: Theme.of(context).textTheme.headline6),
                         Wrap(
                           direction: Axis.horizontal,
                           crossAxisAlignment: WrapCrossAlignment.end,
@@ -60,7 +60,7 @@ Widget getStreakTile(Future future, String title,
                               _formatSnapshotData(snapshot),
                               style: Theme.of(context)
                                   .textTheme
-                                  .title
+                                  .headline6
                                   .copyWith(fontSize: 34),
                               overflow: TextOverflow.fade,
                               maxLines: 1,

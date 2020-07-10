@@ -457,7 +457,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 top: 24, left: 24.0, right: 24, bottom: 24),
             child: Text(
               widget.title,
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
           ),
@@ -473,9 +473,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(_formatDuration(_position),
-                style: Theme.of(context).textTheme.display2),
+                style: Theme.of(context).textTheme.headline3),
             Text(_formatDuration(_duration),
-                style: Theme.of(context).textTheme.display2)
+                style: Theme.of(context).textTheme.headline3)
           ]),
     );
   }

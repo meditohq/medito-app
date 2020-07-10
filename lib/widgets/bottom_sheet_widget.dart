@@ -162,7 +162,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     } else {
       return Text(
         'BEGIN',
-        style: Theme.of(context).textTheme.display2.copyWith(
+        style: Theme.of(context).textTheme.headline3.copyWith(
             color: _textColor != null && _textColor.isNotEmpty
                 ? parseColor(_textColor)
                 : MeditoColors.darkBGColor,
@@ -186,7 +186,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         _loading ? '' : 'VOICE',
-        style: Theme.of(context).textTheme.display4,
+        style: Theme.of(context).textTheme.headline1,
       ),
     );
   }
@@ -196,7 +196,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 8),
       child: Text(
         widget.title,
-        style: Theme.of(context).textTheme.title,
+        style: Theme.of(context).textTheme.headline6,
       ),
     );
   }
@@ -215,7 +215,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         'SESSION LENGTH',
-        style: Theme.of(context).textTheme.display2,
+        style: Theme.of(context).textTheme.headline3,
       ),
     );
   }
@@ -225,7 +225,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         'AVAILABLE OFFLINE',
-        style: Theme.of(context).textTheme.display2,
+        style: Theme.of(context).textTheme.headline3,
       ),
     );
   }
@@ -335,21 +335,21 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   TextStyle getLengthPillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.display4.copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         color: lengthSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
   }
 
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.display4.copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         color: _offlineSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
   }
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.display4.copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
