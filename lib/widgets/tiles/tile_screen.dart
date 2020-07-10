@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -223,7 +224,7 @@ class TileListState extends State<TileList> {
   //todo horrible hack, but necessary because autosizetext cannot be passed unbound constraints
   //see here https://stackoverflow.com/questions/53882591/autoresize-text-to-fit-in-container-vertically
   double getColumWidth() => MediaQuery.of(context).size.width / 2 - 8;
-  
+
   Widget getTile(TileItem item) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -465,10 +466,15 @@ class TileListState extends State<TileList> {
       MaterialPageRoute(
         settings: RouteSettings(name: '/nav'),
         builder: (c) {
-          return FolderNavWidget(
-              firstTitle: tile.title,
-              firstId: tile.contentPath,
-              textFuture: textFuture);
+          if (textFuture != null) {
+            return TextFileWidget(
+                firstTitle: tile.title,
+                firstId: tile.contentPath,
+                textFuture: textFuture);
+          } else {
+            return FolderNavWidget(
+                firstTitle: tile.title, firstId: tile.contentPath);
+          }
         },
       ),
     );
