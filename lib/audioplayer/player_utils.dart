@@ -41,11 +41,11 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
         children: [
           new TextSpan(
             text: 'From ',
-            style: Theme.of(context).textTheme.display4,
+            style: Theme.of(context).textTheme.headline1,
           ),
           new TextSpan(
             text: licenseTitle ?? '',
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.bodyText1,
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
                 launch(sourceUrl);
@@ -53,11 +53,11 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
           ),
           new TextSpan(
             text: ' / License: ',
-            style: Theme.of(context).textTheme.display4,
+            style: Theme.of(context).textTheme.headline1,
           ),
           new TextSpan(
             text: licenseName ?? '',
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.bodyText1,
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
                 launch(licenseURL);

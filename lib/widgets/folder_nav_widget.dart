@@ -150,7 +150,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             if (snapshot.connectionState == ConnectionState.none) {
               return Text(
                 "No connection. Please try again later",
-                style: Theme.of(context).textTheme.display2,
+                style: Theme.of(context).textTheme.headline3,
               );
             }
 
