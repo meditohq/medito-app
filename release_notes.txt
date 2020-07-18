@@ -1,2 +1,2 @@
 - Fixed going back from text screens
-- Fixed streak counter bugs
+- Fixed streak counter bugs (not updating on home page and resetting itself too early)
