@@ -22,13 +22,26 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   test('test longerThanOneDayAgo', () {
-    var b = longerThanOneDayAgo(
-        DateTime.parse('2020-06-26 18:15:00'), DateTime.now());
+    var b = longerThanOneDayAgo(DateTime.parse('2020-07-14 11:59:00'),
+        DateTime.parse('2020-07-16 00:01:00'));
     expect(b, true);
   });
+
   test('test not longerThanOneDayAgo', () {
     var b = longerThanOneDayAgo(DateTime.parse('2020-06-26 18:15:00'),
         DateTime.parse('2020-06-26 19:15:00'));
+    expect(b, false);
+  });
+
+  test('test not longerThanOneDayAgo', () {
+    var b = longerThanOneDayAgo(DateTime.parse('2020-06-26 18:15:00'),
+        DateTime.parse('2020-06-27 19:15:00'));
+    expect(b, false);
+  });
+
+  test('test not longerThanOneDayAgo', () {
+    var b = longerThanOneDayAgo(DateTime.parse('2020-06-26 09:00:00'),
+        DateTime.parse('2020-06-27 18:15:00'));
     expect(b, false);
   });
 

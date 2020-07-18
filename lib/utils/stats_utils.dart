@@ -203,5 +203,7 @@ bool isSameDay(DateTime day1, DateTime day2) {
 }
 
 bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
-  return now.subtract(Duration(hours: 32)).isAfter(lastDayInStreak);
+  var oneDayAfterMidnightThatNight = DateTime(lastDayInStreak.year,
+      lastDayInStreak.month, lastDayInStreak.day + 1, 23, 59, 59);
+  return now.isAfter(oneDayAfterMidnightThatNight);
 }
