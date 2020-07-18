@@ -65,11 +65,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          getStreakTile(getCurrentStreak(), 'Current Streak',
+                          StreakTileWidget(getCurrentStreak(), 'Current Streak',
                               onClick: openEditDialog,
                               editable: true,
                               optionalText: UnitType.day),
-                          getStreakTile(
+                          StreakTileWidget(
                               getMinutesListened(), 'Minutes Listened',
                               optionalText: UnitType.min)
                         ],
@@ -82,11 +82,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          getStreakTile(getLongestStreak(), 'Longest Streak',
+                          StreakTileWidget(getLongestStreak(), 'Longest Streak',
                               editable: true,
                               onClick: openResetDialog,
                               optionalText: UnitType.day),
-                          getStreakTile(
+                          StreakTileWidget(
                             getNumSessions(),
                             'Number of Sessions',
                           )

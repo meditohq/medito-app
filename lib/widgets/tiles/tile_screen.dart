@@ -47,6 +47,7 @@ class TileListState extends State<TileList> {
   final _viewModel = new TileListViewModelImpl();
 
   var listFuture;
+  var streak = getCurrentStreak();
 
   SharedPreferences prefs;
   String streakValue = '0';
@@ -85,7 +86,7 @@ class TileListState extends State<TileList> {
           }
 
           if (future.connectionState == ConnectionState.waiting) {
-           return getLoadingWidget();
+            return getLoadingWidget();
           }
 
           return SingleChildScrollView(
@@ -209,7 +210,7 @@ class TileListState extends State<TileList> {
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == secondColumnLength - 1) {
-                    return getStreakTile(getCurrentStreak(), 'Current Streak',
+                    return StreakTileWidget(streak, 'Current Streak',
                         optionalText: UnitType.day, onClick: _onStreakTap);
                   }
 
@@ -276,7 +277,7 @@ class TileListState extends State<TileList> {
         color: Colors.white.withOpacity(0.0),
         child: InkWell(
           splashColor: MeditoColors.lightColor,
-          onTap: () => item.contentText != null ? _onTap(item) : null,
+          onTap: () => item != null ? _onTap(item) : null,
           borderRadius: BorderRadius.circular(16.0),
           child: w,
         ));
@@ -436,7 +437,11 @@ class TileListState extends State<TileList> {
             onBeginPressed: _showPlayer,
             data: data,
           ),
-        ));
+        )).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
@@ -462,7 +467,11 @@ class TileListState extends State<TileList> {
             listItem: listItem,
             attributions: _viewModel.getAttributions(fileTapped.attributions)),
       ),
-    );
+    ).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   void openNavWidget(TileItem tile, {Future textFuture}) {
@@ -482,14 +491,22 @@ class TileListState extends State<TileList> {
           }
         },
       ),
-    );
+    ).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   _onStreakTap() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => StreakWidget()),
-    );
+    ).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   Widget _getMeditoLogo() {
@@ -524,7 +541,7 @@ class TileListState extends State<TileList> {
 
   Widget getBlankTile(TileItem item, Color color) {
     return Padding(
-      padding: const EdgeInsets.only( right: 16.0, bottom: 16.0, left: 16.0),
+      padding: const EdgeInsets.only(right: 16.0, bottom: 16.0, left: 16.0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
