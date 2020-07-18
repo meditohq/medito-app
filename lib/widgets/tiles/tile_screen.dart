@@ -83,6 +83,11 @@ class TileListState extends State<TileList> {
               future.hasError) {
             return getErrorWidget();
           }
+
+          if (future.connectionState == ConnectionState.waiting) {
+           return getLoadingWidget();
+          }
+
           return SingleChildScrollView(
             primary: true,
             child: Padding(
@@ -271,7 +276,7 @@ class TileListState extends State<TileList> {
         color: Colors.white.withOpacity(0.0),
         child: InkWell(
           splashColor: MeditoColors.lightColor,
-          onTap: () => _onTap(item),
+          onTap: () => item.contentText != null ? _onTap(item) : null,
           borderRadius: BorderRadius.circular(16.0),
           child: w,
         ));
@@ -297,7 +302,7 @@ class TileListState extends State<TileList> {
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                      item.description,
+                      item.description == null ? "" : item.description,
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ),
@@ -495,6 +500,47 @@ class TileListState extends State<TileList> {
         child: SvgPicture.asset(
           'assets/images/icon_ic_logo.svg',
         ),
+      ),
+    );
+  }
+
+  Widget getLoadingWidget() {
+    TileItem item = TileItem("", "", "000000");
+    return Column(
+      children: [
+        _getMeditoLogo(),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16),
+          child: getHorizontalAnnouncementTile(item),
+        ),
+        Container(height: 8),
+        getBlankTile(item, MeditoColors.lightColorLine),
+        getBlankTile(item, MeditoColors.darkColor),
+        getBlankTile(item, MeditoColors.lightColorLine),
+        getBlankTile(item, MeditoColors.darkColor),
+      ],
+    );
+  }
+
+  Widget getBlankTile(TileItem item, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only( right: 16.0, bottom: 16.0, left: 16.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+              child: wrapWithInkWell(
+            MeditoColors.lightColor,
+            item,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+                color: color,
+              ),
+              height: 100,
+            ),
+          )),
+        ],
       ),
     );
   }

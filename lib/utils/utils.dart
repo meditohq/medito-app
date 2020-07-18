@@ -96,6 +96,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
+  if (url == null) return null;
   if (url.endsWith('png')) {
     return CachedNetworkImage(
       placeholder: (context, url) => Container(
@@ -123,8 +124,11 @@ Future<bool> checkConnectivity() async {
   return false;
 }
 
-Color parseColor(String color) =>
-    Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
+Color parseColor(String color) {
+  if (color == null || color.length == 0) return Colors.white;
+
+  return Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
+}
 
 void createSnackBar(String message, BuildContext context) {
   final snackBar =
@@ -140,19 +144,17 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-
-
 MarkdownBody getMarkdownBody(String content, BuildContext context) {
   return MarkdownBody(
     onTapLink: ((url) {
       launch(url);
     }),
     selectable: false,
-    styleSheet: MarkdownStyleSheet.fromTheme(
-        Theme.of(context))
-        .copyWith(
-        a: Theme.of(context).textTheme.bodyText2.copyWith(
-            decoration: TextDecoration.underline),
+    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+        a: Theme.of(context)
+            .textTheme
+            .bodyText2
+            .copyWith(decoration: TextDecoration.underline),
         h1: Theme.of(context).textTheme.headline6,
         h2: Theme.of(context).textTheme.headline5,
         h3: Theme.of(context).textTheme.subtitle2,

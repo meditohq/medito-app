@@ -31,6 +31,7 @@ class TileItem {
   String buttonLabel;
 
   TileItem(this.title, this.id,
+      this.colorBackground,
       {this.description,
       this.url,
       this.parentId,
@@ -38,7 +39,6 @@ class TileItem {
       this.tileType,
       this.contentPath,
       this.contentText,
-      this.colorBackground,
       this.colorButton,
       this.pathTemplate,
       this.colorButtonText,
