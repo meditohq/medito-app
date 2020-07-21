@@ -445,7 +445,7 @@ class TileListState extends State<TileList> {
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText, String textColor) {
+      String title, String description, String contentText, String textColor, String bgMusicUrl) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -463,6 +463,7 @@ class TileListState extends State<TileList> {
             coverArt: coverArt,
             coverColor: coverColor,
             title: title,
+            bgMusicUrl: bgMusicUrl,
             textColor: textColor,
             listItem: listItem,
             attributions: _viewModel.getAttributions(fileTapped.attributions)),

@@ -23,7 +23,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-//todo can this be done a better way?
 TextTheme buildDMSansTextTheme(BuildContext context) {
   return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
         headline6: TextStyle(

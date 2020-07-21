@@ -109,8 +109,9 @@ class Content {
   String textColor;
   List<Files> files;
   String title;
+  bool backgroundMusic;
   String date;
-  String customlength;
+  String customLength;
 
   Content(
       {this.description,
@@ -119,8 +120,9 @@ class Content {
       this.coverColor,
       this.files,
       this.title,
+      this.backgroundMusic,
       this.date,
-      this.customlength});
+      this.customLength});
 
   Content.fromJson(Map<String, dynamic> json) {
     description = json['description'];
@@ -131,6 +133,7 @@ class Content {
         coverArt.add(new CoverArt.fromJson(v));
       });
     }
+    backgroundMusic = json['service_backgroundmusic'];
     coverColor = json['cover_color'];
     if (json['files'] != null) {
       files = new List<Files>();
@@ -140,7 +143,7 @@ class Content {
     }
     title = json['title'];
     date = json['date'];
-    customlength = json['customlength'];
+    customLength = json['customlength'];
     textColor = json['text_color'];
   }
 
@@ -151,13 +154,14 @@ class Content {
     if (this.coverArt != null) {
       data['coverArt'] = this.coverArt.map((v) => v.toJson()).toList();
     }
+    data['service_backgroundmusic'] = this.backgroundMusic;
     data['cover_color'] = this.coverColor;
     if (this.files != null) {
       data['files'] = this.files.map((v) => v.toJson()).toList();
     }
     data['title'] = this.title;
     data['date'] = this.date;
-    data['customlength'] = this.customlength;
+    data['customlength'] = this.customLength;
     data['text_color'] = this.textColor;
     return data;
   }

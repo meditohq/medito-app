@@ -17,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum UnitType { day, min }
 
-//todo unit test these
 String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:

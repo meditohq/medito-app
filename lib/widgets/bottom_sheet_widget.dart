@@ -13,16 +13,19 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
+import 'package:flutter/material.dart';
+
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
 import '../utils/utils.dart';
 import 'pill_utils.dart';
-import 'package:flutter/material.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
-  final Function(dynamic, dynamic, dynamic, String, String, String, String)
+  final Function(
+          dynamic, dynamic, dynamic, String, String, String, String, String)
       onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
@@ -36,6 +39,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   var voiceSelected = 0;
   var lengthSelected = 0;
   var _offlineSelected = 0;
+  var _musicSelected = 0;
   List voiceList = [' ', ' ', ' '];
   List lengthList = [' ', ' ', ' '];
   List lengthFilteredList = [];
@@ -48,10 +52,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   String _contentText = '';
   bool _downloading = false;
   var currentFile;
+  var _backgroundMusicUrl;
+  var _backgroundMusicAvailable;
 
   bool _showVoiceChoice = true;
 
   bool _loading = true;
+  final _viewModel = new BottomSheetViewModelImpl();
 
   @override
   void initState() {
@@ -66,6 +73,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       this._description = d?.description;
       compileLists(d?.files);
       onVoicePillTap(true, 0);
+      setState(() {
+        this._backgroundMusicAvailable = d?.backgroundMusic;
+      });
     });
   }
 
@@ -97,9 +107,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                       buildVoiceText(),
                       buildVoiceRow(),
                       buildSpacer(),
+                      ////////// spacer
                       buildSessionLengthText(),
                       buildSessionLengthRow(),
+                      getBGMusicSpacer(),
+                      ////////// spacer
+                      getBGMusicRowOrContainer(),
+                      buildBackgroundMusicRow(),
                       buildSpacer(),
+                      ////////// spacer
                       buildOfflineTextRow(),
                       buildOfflineRow(),
                       Container(height: 80)
@@ -114,6 +130,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       ),
     );
   }
+
+  Widget getBGMusicRowOrContainer() =>
+      _backgroundMusicAvailable ? buildBGMusicTextRow() : Container();
+
+  Widget getBGMusicSpacer() =>
+      _backgroundMusicAvailable ? buildSpacer() : Container();
 
   Widget buildButton() {
     return Padding(
@@ -175,7 +197,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (_downloading) return;
 
     widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
-        _description, _contentText, _textColor);
+        _description, _contentText, _textColor, _backgroundMusicUrl);
   }
 
   Widget buildVoiceText() {
@@ -225,6 +247,17 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         'AVAILABLE OFFLINE',
+        style: Theme.of(context).textTheme.headline3,
+      ),
+    );
+  }
+
+  Widget buildBGMusicTextRow() {
+    if (!_backgroundMusicAvailable) return Container();
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      child: Text(
+        'BACKGROUND MUSIC   🎉',
         style: Theme.of(context).textTheme.headline3,
       ),
     );
@@ -348,6 +381,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
             : MeditoColors.lightColor);
   }
 
+  TextStyle getMusicPillTextStyle(BuildContext context, int index) {
+    return Theme.of(context).textTheme.headline1.copyWith(
+        color: _musicSelected == index
+            ? MeditoColors.darkBGColor
+            : MeditoColors.lightColor);
+  }
+
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
         color: voiceSelected == index
@@ -432,6 +472,52 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         ),
       ),
     );
+  }
+
+  Widget buildBackgroundMusicRow() {
+    if (!_backgroundMusicAvailable) return Container();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      child: SizedBox(
+        height: 56,
+        child: FutureBuilder<List>(
+            future: _viewModel.getBackgroundMusic(),
+            builder: (context, snapshot) {
+              return ListView.builder(
+                padding: EdgeInsets.only(right: 16),
+                shrinkWrap: true,
+                itemCount: 1 + snapshot.data?.length ?? 0,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: buildInBetweenChipPadding(),
+                    child: FilterChip(
+                      pressElevation: 4,
+                      shape: buildChipBorder(),
+                      padding: buildInnerChipPadding(),
+                      label: Text(
+                          index == 0 ? "None" : snapshot.data[index - 1].key),
+                      selected: index == _musicSelected,
+                      onSelected: (bool value) {
+                        onMusicSelected(index, index > 0 ? snapshot.data[index - 1].value : "");
+                      },
+                      backgroundColor: MeditoColors.darkColor,
+                      selectedColor: MeditoColors.lightColor,
+                      labelStyle: getMusicPillTextStyle(context, index),
+                    ),
+                  );
+                },
+              );
+            }),
+      ),
+    );
+  }
+
+  void onMusicSelected(int index, String url) {
+    _musicSelected = index;
+    _backgroundMusicUrl = url;
+    setState(() {});
   }
 
   void onOfflineSelected(int index) {

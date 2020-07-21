@@ -20,6 +20,7 @@ import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:audiofileplayer/audio_system.dart';
 import 'package:audiofileplayer/audiofileplayer.dart';
@@ -27,7 +28,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 
 class PlayerWidget extends StatefulWidget {
   PlayerWidget(
@@ -39,9 +39,11 @@ class PlayerWidget extends StatefulWidget {
       this.coverArt,
       this.attributions,
       this.description,
+      this.bgMusicUrl,
       this.textColor})
       : super(key: key);
 
+  final String bgMusicUrl;
   final String textColor;
   final String coverColor;
   final String description;
@@ -103,6 +105,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           loadRemote();
         else {
           loadLocal(data);
+        }
+
+        if(widget.bgMusicUrl != null && widget.bgMusicUrl.isNotEmpty){
+          playBackgroundMusic()
         }
 
         AudioSystem.instance.addMediaEventListener(_mediaEventListener);
@@ -286,8 +292,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             height: 24,
             width: 24,
             child: CircularProgressIndicator(
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(getTextColor())),
+                valueColor: AlwaysStoppedAnimation<Color>(getTextColor())),
           )
         : Icon(
             _isPlaying ? Icons.pause : Icons.play_arrow,
@@ -297,8 +302,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Color getTextColor() {
     return widget.textColor == null || widget.textColor.isEmpty
-              ? MeditoColors.darkColor
-              : parseColor(widget.textColor);
+        ? MeditoColors.darkColor
+        : parseColor(widget.textColor);
   }
 
   Widget buildCircularProgressIndicator() {
@@ -506,5 +511,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[buildImage(), buildTitle()],
     );
+  }
+
+  void playBackgroundMusic() {
+
   }
 }

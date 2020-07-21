@@ -251,7 +251,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText, String textColor) {
+      String title, String description, String contentText, String textColor, String bgMusic) {
     Navigator.push(
         context,
         MaterialPageRoute(
