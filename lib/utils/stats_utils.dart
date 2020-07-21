@@ -183,12 +183,12 @@ Future<int> _getNumSessionsInt() async {
   return streak ?? 0;
 }
 
-void incrementNumSessions() async {
+Future<int> incrementNumSessions() async {
   var prefs = await SharedPreferences.getInstance();
-
   var current = await _getNumSessionsInt();
   current++;
   prefs.setInt('numSessions', current);
+  return current;
 }
 
 void markAsListened(String id) async {

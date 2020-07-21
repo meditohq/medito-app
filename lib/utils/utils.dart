@@ -23,6 +23,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
+launchUrl(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  }
+  else {
+    throw 'Could not launch $url';
+  }
+}
+
+
 //todo can this be done a better way?
 TextTheme buildDMSansTextTheme(BuildContext context) {
   return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
@@ -94,6 +105,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             fontWeight: FontWeight.w600),
       ));
 }
+
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {

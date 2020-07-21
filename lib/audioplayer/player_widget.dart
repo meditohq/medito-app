@@ -160,19 +160,73 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  void onComplete() {
+
+
+  void onComplete() async{
     if (this.mounted) {
       setState(() {
         _isPlaying = false;
       });
     }
 
+    var numSessions = 0;
     if (!_updatedStats) {
-      updateStats();
+      numSessions = await updateStats();
     }
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
+
+    // var numSessions = await updateStats();
+    String donateUrl = "https://meditofoundation.org/donate/";
+    if (numSessions > 0 && numSessions%10 == 0){
+      Future<bool> userAct = showDialog<bool>(
+          context: context,
+          builder: (BuildContext context){
+            return AlertDialog(
+              backgroundColor: MeditoColors.darkBGColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(12.0),
+              ),
+              title: Text("Well done for completing " + numSessions.toString() + " sessions!"),
+              content: Text("We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it.  Please consider donating to show our volunteers that their work matters."),
+              actions: <Widget>[
+
+                FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(12.0),
+                  ),
+                  color: widget.coverColor != null
+                      ? parseColor(widget.coverColor)
+                      : MeditoColors.lightColor,
+                  child: Text('Dismiss',
+                      style: TextStyle(color: getTextColor())),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+                FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(12.0),
+                  ),
+                  color: widget.coverColor != null
+                      ? parseColor(widget.coverColor)
+                      : MeditoColors.lightColor,
+                  child: Text('Donate',
+                  style: TextStyle(color: getTextColor())),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ],
+            );
+          }
+      );
+      if (await userAct){
+        launchUrl(donateUrl);
+      }
+    }
+
   }
 
   void onTime(double positionSeconds) {
@@ -184,16 +238,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if (_position.inSeconds > _duration.inSeconds - 15 &&
           _position.inSeconds < _duration.inSeconds - 10 &&
           !_updatedStats) {
-        updateStats();
+        var temp_num = updateStats();
       }
     }
   }
 
-  void updateStats() {
+  Future<int> updateStats() async {
     markAsListened(widget.listItem.id);
-    incrementNumSessions();
+    var curSessions = await incrementNumSessions();
     updateStreak();
     _updatedStats = true;
+    return curSessions;
   }
 
   @override
