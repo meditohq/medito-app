@@ -20,7 +20,6 @@ import 'dart:ui' as ui;
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +87,6 @@ Future getAttributions(String attrId) async {
 }
 
 Future<dynamic> downloadFile(Files currentFile) async {
-
   getAttributions(currentFile.attributions);
 
   String dir = (await getApplicationSupportDirectory()).path;

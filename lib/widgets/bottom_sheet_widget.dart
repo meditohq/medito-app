@@ -53,7 +53,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   bool _downloading = false;
   var currentFile;
   var _backgroundMusicUrl;
-  var _backgroundMusicAvailable;
+  var _backgroundMusicAvailable = false;
 
   bool _showVoiceChoice = true;
 
@@ -487,7 +487,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               return ListView.builder(
                 padding: EdgeInsets.only(right: 16),
                 shrinkWrap: true,
-                itemCount: 1 + snapshot.data?.length ?? 0,
+                itemCount: 1 + (snapshot.data?.length ?? 0),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
@@ -500,7 +500,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                           index == 0 ? "None" : snapshot.data[index - 1].key),
                       selected: index == _musicSelected,
                       onSelected: (bool value) {
-                        onMusicSelected(index, index > 0 ? snapshot.data[index - 1].value : "");
+                        onMusicSelected(index,
+                            index > 0 ? snapshot.data[index - 1].value : "");
                       },
                       backgroundColor: MeditoColors.darkColor,
                       selectedColor: MeditoColors.lightColor,

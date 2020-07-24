@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:Medito/audioplayer/player_utils.dart';
@@ -76,6 +77,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool _isPlaying = false;
   bool _updatedStats = false;
   Audio _audio;
+  Audio _bgAudio;
+  var _initialBgVolume = .6;
 
   @override
   void dispose() {
@@ -149,6 +152,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onPosition: (double positionSeconds) => onTime(positionSeconds));
   }
 
+  void loadBackgroundRemote() {
+    _bgAudio = Audio.loadFromRemoteUrl(widget.bgMusicUrl.replaceAll(' ', '%20'),
+        playInBackground: true,
+        looping: true,
+        onPosition: _backgroundOnPosition,
+        // Called repeatedly with updated playback position.
+        onError: (error) => onError(error))
+      ..play()
+      ..setVolume(sqrt(_initialBgVolume));
+  }
+
   void _mediaEventListener(MediaEvent mediaEvent) {
     final MediaActionType type = mediaEvent.type;
     if (type == MediaActionType.play) {
@@ -161,6 +175,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       stop();
     } else if (type == MediaActionType.seekTo) {
       _audio.seek(mediaEvent.seekToPositionSeconds);
+      if (_bgAudio != null) {
+        _bgAudio.setVolume(_initialBgVolume);
+      }
       AudioSystem.instance
           .setPlaybackState(true, mediaEvent.seekToPositionSeconds);
     }
@@ -176,6 +193,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (!_updatedStats) {
       updateStats();
     }
+    _bgAudio?.pause();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
@@ -337,6 +355,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           onChanged: (seconds) {
             setState(() {
               _audio.seek(seconds);
+              if (_bgAudio != null) {
+                _bgAudio.setVolume(_initialBgVolume);
+              }
               _position = Duration(seconds: seconds.toInt());
             });
           },
@@ -348,6 +369,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   // Request audio play
   Future<void> play() async {
     _audio.resume();
+    if (_bgAudio != null) _bgAudio.resume();
 
     final Uint8List imageBytes = await generateImageBytes();
     AudioSystem.instance.setMetadata(AudioMetadata(
@@ -381,6 +403,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       _isPlaying = false;
     });
     _audio.pause();
+    if (_bgAudio != null) _bgAudio.pause();
     AudioSystem.instance
         .setPlaybackState(false, _position?.inSeconds?.toDouble() ?? 0);
 
@@ -404,6 +427,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       _audio
         ..pause()
         ..dispose();
+      if (_bgAudio != null)
+        _bgAudio
+          ..pause()
+          ..dispose();
     }
 
     AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
@@ -513,7 +540,23 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  void playBackgroundMusic() {
+  void onError(var error) {
+    //print(error.toString());
+  }
 
+  void _backgroundOnComplete() {}
+
+  void _backgroundOnPosition(double position) {
+    //volume decreases as it approaches end of track
+    var timeLeft = _duration.inSeconds - _position.inSeconds;
+
+    // if (_bgAudio != null) _bgAudio.play(0);
+
+    var timeToStartDecreasing = _initialBgVolume * 100;
+    if (timeLeft < timeToStartDecreasing) {
+      var volume = timeLeft / 100;
+      print(volume);
+      _bgAudio.setVolume(sqrt(volume));
+    }
   }
 }
