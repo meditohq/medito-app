@@ -110,9 +110,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           loadLocal(data);
         }
 
-        if(widget.bgMusicUrl != null && widget.bgMusicUrl.isNotEmpty){
-          playBackgroundMusic()
-        }
+//        if(widget.bgMusicUrl != null && widget.bgMusicUrl.isNotEmpty){
+//          playBackgroundMusic()
+//        }
 
         AudioSystem.instance.addMediaEventListener(_mediaEventListener);
         play();
