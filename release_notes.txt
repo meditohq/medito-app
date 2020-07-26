@@ -1,2 +1,4 @@
 - Fixed going back from text screens
+- Better loading screen for tiles
 - Fixed streak counter bugs (not updating on home page and resetting itself too early)
+- Attempt to stop ANR
