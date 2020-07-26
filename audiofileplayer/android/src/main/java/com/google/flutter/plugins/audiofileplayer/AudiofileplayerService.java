@@ -22,6 +22,7 @@ import android.view.KeyEvent;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.media.MediaBrowserServiceCompat;
+import androidx.core.content.ContextCompat;
 import androidx.media.app.NotificationCompat.MediaStyle;
 import androidx.media.session.MediaButtonReceiver;
 import java.util.List;
@@ -312,10 +313,12 @@ public class AudiofileplayerService extends MediaBrowserServiceCompat
     @Override
     public void onPlay() {
       Log.i(TAG, "MediaSessionCallback.onPlay");
-      startService(new Intent(AudiofileplayerService.this, AudiofileplayerService.class));
+      Intent i = new Intent(AudiofileplayerService.this, AudiofileplayerService.class);
+      startService(i);
       if (!mediaSession.isActive()) mediaSession.setActive(true);
       Notification notif = buildNotification();
       // Display the notification and place the service in the foreground
+      startForegroundService(i);
       startForeground(NOTIFICATION_ID, notif);
     }
 
