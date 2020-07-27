@@ -244,7 +244,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  updateStats() {
+  void updateStats() {
     markAsListened(widget.listItem.id);
     incrementNumSessions();
     updateStreak();
