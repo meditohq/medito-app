@@ -160,8 +160,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-
-
   void onComplete() async{
     if (this.mounted) {
       setState(() {
@@ -171,13 +169,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     var numSessions = 0;
     if (!_updatedStats) {
-      numSessions = await updateStats();
+      updateStats();
     }
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
 
-    // var numSessions = await updateStats();
+    numSessions = await getNumSessionsInt();
     String donateUrl = "https://meditofoundation.org/donate/";
     if (numSessions > 0 && numSessions%10 == 0){
       Future<bool> userAct = showDialog<bool>(
@@ -188,8 +186,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               shape: RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(12.0),
               ),
-              title: Text("Well done for completing " + numSessions.toString() + " sessions!"),
-              content: Text("We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it.  Please consider donating to show our volunteers that their work matters."),
+              title: Text("Well done for completing " + numSessions.toString() + " sessions!", style: TextStyle(color: MeditoColors.lightTextColor)),
+              content: Text("We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it. Please consider donating to show our volunteers that their work matters.", style: TextStyle(color: MeditoColors.lightTextColor)),
               actions: <Widget>[
 
                 FlatButton(
@@ -225,11 +223,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if (await userAct){
         launchUrl(donateUrl);
       }
+      else {
+        Navigator.popUntil(context, ModalRoute.withName("/nav"));
+      }
     }
 
   }
 
-  void onTime(double positionSeconds) {
+  void onTime(double positionSeconds) async {
     if (this.mounted) {
       _position = Duration(seconds: positionSeconds.toInt());
       _isPlaying = true;
@@ -238,17 +239,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if (_position.inSeconds > _duration.inSeconds - 15 &&
           _position.inSeconds < _duration.inSeconds - 10 &&
           !_updatedStats) {
-        var temp_num = updateStats();
+        updateStats();
       }
     }
   }
 
-  Future<int> updateStats() async {
+  updateStats() {
     markAsListened(widget.listItem.id);
-    var curSessions = await incrementNumSessions();
+    incrementNumSessions();
     updateStreak();
     _updatedStats = true;
-    return curSessions;
   }
 
   @override

@@ -176,7 +176,7 @@ Future<String> getNumSessions() async {
     return streak.toString();
 }
 
-Future<int> _getNumSessionsInt() async {
+Future<int> getNumSessionsInt() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('numSessions');
@@ -185,7 +185,7 @@ Future<int> _getNumSessionsInt() async {
 
 Future<int> incrementNumSessions() async {
   var prefs = await SharedPreferences.getInstance();
-  var current = await _getNumSessionsInt();
+  var current = await getNumSessionsInt();
   current++;
   prefs.setInt('numSessions', current);
   return current;
