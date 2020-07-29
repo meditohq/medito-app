@@ -262,7 +262,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               textColor: textColor,
               coverColor: coverColor,
               title: title,
-              bgMusicUrl: bgMusic,
+              bgMusicPath: bgMusic,
               listItem: _viewModel.currentlySelectedFile,
               attributions:
                   _viewModel.getAttributions(fileTapped.attributions)),

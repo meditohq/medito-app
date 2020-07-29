@@ -51,6 +51,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   String _textColor;
   String _contentText = '';
   bool _downloading = false;
+  bool _bgDownloading = false;
   var currentFile;
   var _backgroundMusicUrl;
   var _backgroundMusicAvailable = false;
@@ -112,9 +113,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                       buildSessionLengthRow(),
                       getBGMusicSpacer(),
                       ////////// spacer
-//                      getBGMusicRowOrContainer(),
-//                      buildBackgroundMusicRow(),
-//                      buildSpacer(),
+                      getBGMusicRowOrContainer(),
+                      buildBackgroundMusicRow(),
+                      buildSpacer(),
                       ////////// spacer
                       buildOfflineTextRow(),
                       buildOfflineRow(),
@@ -173,7 +174,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget getBeginButtonContent() {
-    if (_downloading) {
+    if (_downloading || _bgDownloading) {
       return SizedBox(
         height: 24,
         width: 24,
@@ -482,7 +483,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       child: SizedBox(
         height: 56,
         child: FutureBuilder<List>(
-            future: _viewModel.getBackgroundMusic(),
+            future: _viewModel.getBackgroundMusicList(),
             builder: (context, snapshot) {
               return ListView.builder(
                 padding: EdgeInsets.only(right: 16),
@@ -500,8 +501,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                           index == 0 ? "None" : snapshot.data[index - 1].key),
                       selected: index == _musicSelected,
                       onSelected: (bool value) {
-                        onMusicSelected(index,
-                            index > 0 ? snapshot.data[index - 1].value : "");
+                        onMusicSelected(
+                            index,
+                            index > 0 ? snapshot.data[index - 1].value : "",
+                            snapshot.data[index - 1].key);
                       },
                       backgroundColor: MeditoColors.darkColor,
                       selectedColor: MeditoColors.lightColor,
@@ -515,9 +518,22 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
-  void onMusicSelected(int index, String url) {
+  void onMusicSelected(int index, String url, String name) {
     _musicSelected = index;
-    _backgroundMusicUrl = url;
+    _bgDownloading = true;
+    if (index > 0)
+      downloadBGMusicFromURL(url, name).then((value) {
+        _bgDownloading = false;
+        _backgroundMusicUrl = value;
+        setState(() {});
+      }).catchError((onError) {
+        print(onError);
+        _bgDownloading = false;
+        _musicSelected = 0;
+        _backgroundMusicUrl = null;
+        setState(() {});
+      });
+
     setState(() {});
   }
 

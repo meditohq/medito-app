@@ -106,6 +106,19 @@ Future<dynamic> downloadFile(Files currentFile) async {
   print(file.path);
 }
 
+Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
+  String dir = (await getApplicationSupportDirectory()).path;
+  File file = new File('$dir/$name');
+
+  if (await file.exists()) return file.path;
+
+  var request = await http.get(url);
+  var bytes = request.bodyBytes;
+  await file.writeAsBytes(bytes);
+
+  return file.path;
+}
+
 Future<void> saveFileToDownloadedFilesList(Files file) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var list = prefs.getStringList('listOfSavedFiles') ?? [];

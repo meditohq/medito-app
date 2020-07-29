@@ -40,11 +40,11 @@ class PlayerWidget extends StatefulWidget {
       this.coverArt,
       this.attributions,
       this.description,
-      this.bgMusicUrl,
+      this.bgMusicPath,
       this.textColor})
       : super(key: key);
 
-  final String bgMusicUrl;
+  final String bgMusicPath;
   final String textColor;
   final String coverColor;
   final String description;
@@ -80,6 +80,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Audio _bgAudio;
   var _initialBgVolume = .6;
   String donateUrl = "https://meditofoundation.org/donate/";
+  double bgDuration;
 
   @override
   void dispose() {
@@ -111,9 +112,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           loadLocal(data);
         }
 
-//        if(widget.bgMusicUrl != null && widget.bgMusicUrl.isNotEmpty){
-//          playBackgroundMusic()
-//        }
+        if (widget.bgMusicPath != null && widget.bgMusicPath.isNotEmpty) {
+          loadBackground();
+        }
 
         AudioSystem.instance.addMediaEventListener(_mediaEventListener);
         play();
@@ -153,10 +154,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onPosition: (double positionSeconds) => onTime(positionSeconds));
   }
 
-  void loadBackgroundRemote() {
-    _bgAudio = Audio.loadFromRemoteUrl(widget.bgMusicUrl.replaceAll(' ', '%20'),
+  void loadBackground() {
+    _bgAudio = Audio.loadFromAbsolutePath(widget.bgMusicPath,
         playInBackground: true,
         looping: true,
+        onDuration: _onBackgroundDuration,
         onPosition: _backgroundOnPosition,
         // Called repeatedly with updated playback position.
         onError: (error) => onError(error))
@@ -204,7 +206,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void showDonateDialog(int numSessions) async {
-     numSessions = await getNumSessionsInt();
+    numSessions = await getNumSessionsInt();
     if (numSessions > 0 && numSessions % 5 == 0) {
       Future<bool> userAct = showDialog<bool>(
           context: context,
@@ -607,19 +609,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     //print(error.toString());
   }
 
-  void _backgroundOnComplete() {}
-
   void _backgroundOnPosition(double position) {
+//    print(position);
+//    if (position >= bgDuration - 0.2) {
+//      print('going back to 0!!');
+//      _bgAudio.seek(0.2);
+//    }
+
     //volume decreases as it approaches end of track
     var timeLeft = _duration.inSeconds - _position.inSeconds;
-
-    // if (_bgAudio != null) _bgAudio.play(0);
 
     var timeToStartDecreasing = _initialBgVolume * 100;
     if (timeLeft < timeToStartDecreasing) {
       var volume = timeLeft / 100;
-      print(volume);
       _bgAudio.setVolume(sqrt(volume));
     }
+  }
+
+  void _onBackgroundDuration(double duration) {
+    this.bgDuration = duration;
   }
 }

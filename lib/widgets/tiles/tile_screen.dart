@@ -470,7 +470,7 @@ class TileListState extends State<TileList> {
             coverArt: coverArt,
             coverColor: coverColor,
             title: title,
-            bgMusicUrl: bgMusicUrl,
+            bgMusicPath: bgMusicUrl,
             textColor: textColor,
             listItem: listItem,
             attributions: _viewModel.getAttributions(fileTapped.attributions)),

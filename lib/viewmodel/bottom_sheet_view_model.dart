@@ -26,7 +26,7 @@ class BottomSheetViewModelImpl implements BottomSheetViewModel {
 
   bool _skipCache;
 
-  Future<List> getBackgroundMusic({bool skipCache = false}) async {
+  Future<List> getBackgroundMusicList({bool skipCache = false}) async {
     this._skipCache = skipCache;
 
     var url = baseUrl + musicUrl + '/';
