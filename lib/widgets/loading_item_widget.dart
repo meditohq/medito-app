@@ -75,14 +75,14 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
                           decoration:
                               buildBoxDecoration(MeditoColors.lightColorLine),
                           child: Text("                      ",
-                              style: Theme.of(context).textTheme.title)),
+                              style: Theme.of(context).textTheme.headline6)),
                       Container(height: 5),
                       Container(
                           decoration:
                               buildBoxDecoration(MeditoColors.lightColorTrans),
                           child: Text(
                               "                                            ",
-                              style: Theme.of(context).textTheme.title)),
+                              style: Theme.of(context).textTheme.headline6)),
                     ],
                   ))),
                 ],

@@ -104,12 +104,12 @@ class TileListViewModelImpl implements TileListViewModel {
   void _addTileItemToList(
       List<TileItem> listItemList, DataChildren value, TileType type) {
     listItemList.add(TileItem(value.title, value.id,
+        value.primaryColor,
         tileType: type,
         thumbnail: value.illustrationUrl,
         description: value.description,
         url: value.url,
         contentText: value.contentText,
-        colorBackground: value.primaryColor,
         contentPath: value.contentPath,
         colorButton: value.secondaryColor,
         colorButtonText: value.primaryColor,

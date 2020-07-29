@@ -66,22 +66,23 @@ class DataChildren {
   String template;
   String title;
   String url;
+  Content content;
 
   DataChildren(
-      {
-        this.buttonLabel,
-        this.primaryColor,
-        this.secondaryColor,
-        this.contentText,
-        this.contentPath,
-        this.description,
-        this.id,
-        this.pathTemplate,
-        this.illustrationUrl,
-        this.num,
-        this.template,
-        this.title,
-        this.url});
+      {this.buttonLabel,
+      this.primaryColor,
+      this.secondaryColor,
+      this.contentText,
+      this.contentPath,
+      this.description,
+      this.id,
+      this.content,
+      this.pathTemplate,
+      this.illustrationUrl,
+      this.num,
+      this.template,
+      this.title,
+      this.url});
 
   DataChildren.fromJson(Map<String, dynamic> json) {
     buttonLabel = json['buttonLabel'];
@@ -91,6 +92,8 @@ class DataChildren {
     contentPath = json['contentPath'];
     description = json['description'];
     id = json['id'];
+    content =
+        json['content'] != null ? new Content.fromJson(json['content']) : null;
     illustrationUrl = json['illustrationUrl'];
     num = json['num'];
     pathTemplate = json['pathTemplate'];
@@ -108,6 +111,7 @@ class DataChildren {
     data['contentPath'] = this.contentPath;
     data['description'] = this.description;
     data['id'] = this.id;
+    data['content'] = this.content;
     data['illustrationUrl'] = this.illustrationUrl;
     data['num'] = this.num;
     data['template'] = this.template;
@@ -139,6 +143,46 @@ class Pagination {
     data['total'] = this.total;
     data['offset'] = this.offset;
     data['limit'] = this.limit;
+    return data;
+  }
+}
+
+class Content {
+  String description;
+  String contentText;
+  String coverColor;
+  String textColor;
+  String title;
+  String date;
+  String customlength;
+
+  Content(
+      {this.description,
+      this.contentText,
+      this.coverColor,
+      this.title,
+      this.date,
+      this.customlength});
+
+  Content.fromJson(Map<String, dynamic> json) {
+    description = json['description'];
+    contentText = json['content_text'];
+    coverColor = json['cover_color'];
+    title = json['title'];
+    date = json['date'];
+    customlength = json['customlength'];
+    textColor = json['text_color'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['description'] = this.description;
+    data['content_text'] = this.contentText;
+    data['cover_color'] = this.coverColor;
+    data['title'] = this.title;
+    data['date'] = this.date;
+    data['customlength'] = this.customlength;
+    data['text_color'] = this.textColor;
     return data;
   }
 }

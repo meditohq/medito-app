@@ -32,7 +32,7 @@ RSIN: 860222627
 - [Why we started Medito](https://meditofoundation.org/blog/why-meditation-should-be-free)
 - [Press release](https://meditofoundation.org/blog/medito-foundation-launches-app-to-free-meditation-from-clutches-of-big-business)
 - [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
-- [Join us on Telegram](https://t.me/meditofoundation)
+- [Join us on Slack](meditofoundation.slack.com/)
 - [Email us](mailto:hi@meditofoundation.org)
 
 
@@ -40,7 +40,7 @@ RSIN: 860222627
 Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
 
 Don't feel like contributing to the code? 
-Feature requests, feedback and suggestions are welcome. Reach us via telegram/email, or create a new issue.
+Feature requests, feedback and suggestions are welcome. Reach us via Slack/email, or create a new issue.
 
 
 ## License

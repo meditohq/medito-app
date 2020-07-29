@@ -20,7 +20,6 @@ import 'dart:ui' as ui;
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -41,11 +40,11 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
         children: [
           new TextSpan(
             text: 'From ',
-            style: Theme.of(context).textTheme.display4,
+            style: Theme.of(context).textTheme.headline1,
           ),
           new TextSpan(
             text: licenseTitle ?? '',
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.bodyText1,
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
                 launch(sourceUrl);
@@ -53,11 +52,11 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
           ),
           new TextSpan(
             text: ' / License: ',
-            style: Theme.of(context).textTheme.display4,
+            style: Theme.of(context).textTheme.headline1,
           ),
           new TextSpan(
             text: licenseName ?? '',
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.bodyText1,
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
                 launch(licenseURL);
@@ -88,7 +87,6 @@ Future getAttributions(String attrId) async {
 }
 
 Future<dynamic> downloadFile(Files currentFile) async {
-
   getAttributions(currentFile.attributions);
 
   String dir = (await getApplicationSupportDirectory()).path;

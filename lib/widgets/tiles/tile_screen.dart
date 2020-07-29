@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class TileListState extends State<TileList> {
   final _viewModel = new TileListViewModelImpl();
 
   var listFuture;
+  var streak = getCurrentStreak();
 
   SharedPreferences prefs;
   String streakValue = '0';
@@ -82,6 +84,11 @@ class TileListState extends State<TileList> {
               future.hasError) {
             return getErrorWidget();
           }
+
+          if (future.connectionState == ConnectionState.waiting) {
+            return getLoadingWidget();
+          }
+
           return SingleChildScrollView(
             primary: true,
             child: Padding(
@@ -146,7 +153,7 @@ class TileListState extends State<TileList> {
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           'Oops! There was an error.\n Tap to refresh',
-                          style: Theme.of(context).textTheme.body1,
+                          style: Theme.of(context).textTheme.bodyText2,
                           textAlign: TextAlign.center,
                         ),
                       )),
@@ -203,7 +210,7 @@ class TileListState extends State<TileList> {
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == secondColumnLength - 1) {
-                    return getStreakTile(getCurrentStreak(), 'Current Streak',
+                    return StreakTileWidget(streak, 'Current Streak',
                         optionalText: UnitType.day, onClick: _onStreakTap);
                   }
 
@@ -223,7 +230,7 @@ class TileListState extends State<TileList> {
   //todo horrible hack, but necessary because autosizetext cannot be passed unbound constraints
   //see here https://stackoverflow.com/questions/53882591/autoresize-text-to-fit-in-container-vertically
   double getColumWidth() => MediaQuery.of(context).size.width / 2 - 8;
-  
+
   Widget getTile(TileItem item) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -249,7 +256,7 @@ class TileListState extends State<TileList> {
                         wrapWords: false,
                         style: Theme.of(context)
                             .textTheme
-                            .title
+                            .headline6
                             .copyWith(color: parseColor(item.colorText))),
                   ),
                   Container(height: 16),
@@ -270,7 +277,7 @@ class TileListState extends State<TileList> {
         color: Colors.white.withOpacity(0.0),
         child: InkWell(
           splashColor: MeditoColors.lightColor,
-          onTap: () => _onTap(item),
+          onTap: () => item != null ? _onTap(item) : null,
           borderRadius: BorderRadius.circular(16.0),
           child: w,
         ));
@@ -296,7 +303,7 @@ class TileListState extends State<TileList> {
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                      item.description,
+                      item.description == null ? "" : item.description,
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ),
@@ -357,7 +364,7 @@ class TileListState extends State<TileList> {
         child: Text(item.description,
             style: Theme.of(context)
                 .textTheme
-                .subhead
+                .subtitle1
                 .copyWith(color: parseColor(item.colorText))),
       ),
     );
@@ -369,7 +376,7 @@ class TileListState extends State<TileList> {
       child: Text(item.title,
           style: Theme.of(context)
               .textTheme
-              .title
+              .headline6
               .copyWith(color: parseColor(item.colorText))),
     );
   }
@@ -387,7 +394,7 @@ class TileListState extends State<TileList> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Text(item.buttonLabel.toUpperCase(),
-              style: Theme.of(context).textTheme.display2.copyWith(
+              style: Theme.of(context).textTheme.headline3.copyWith(
                   letterSpacing: 1,
                   fontWeight: FontWeight.w600,
                   color: parseColor(item.colorButtonText))),
@@ -430,11 +437,15 @@ class TileListState extends State<TileList> {
             onBeginPressed: _showPlayer,
             data: data,
           ),
-        ));
+        )).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText, String textColor) {
+      String title, String description, String contentText, String textColor, String bgMusicUrl) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -452,11 +463,16 @@ class TileListState extends State<TileList> {
             coverArt: coverArt,
             coverColor: coverColor,
             title: title,
+            bgMusicUrl: bgMusicUrl,
             textColor: textColor,
             listItem: listItem,
             attributions: _viewModel.getAttributions(fileTapped.attributions)),
       ),
-    );
+    ).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   void openNavWidget(TileItem tile, {Future textFuture}) {
@@ -465,20 +481,33 @@ class TileListState extends State<TileList> {
       MaterialPageRoute(
         settings: RouteSettings(name: '/nav'),
         builder: (c) {
-          return FolderNavWidget(
-              firstTitle: tile.title,
-              firstId: tile.contentPath,
-              textFuture: textFuture);
+          if (textFuture != null) {
+            return TextFileWidget(
+                firstTitle: tile.title,
+                firstId: tile.contentPath,
+                textFuture: textFuture);
+          } else {
+            return FolderNavWidget(
+                firstTitle: tile.title, firstId: tile.contentPath);
+          }
         },
       ),
-    );
+    ).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   _onStreakTap() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => StreakWidget()),
-    );
+    ).then((value) {
+      setState(() {
+        streak = getCurrentStreak();
+      });
+    });
   }
 
   Widget _getMeditoLogo() {
@@ -489,6 +518,47 @@ class TileListState extends State<TileList> {
         child: SvgPicture.asset(
           'assets/images/icon_ic_logo.svg',
         ),
+      ),
+    );
+  }
+
+  Widget getLoadingWidget() {
+    TileItem item = TileItem("", "", "000000");
+    return Column(
+      children: [
+        _getMeditoLogo(),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16),
+          child: getHorizontalAnnouncementTile(item),
+        ),
+        Container(height: 8),
+        getBlankTile(item, MeditoColors.lightColorLine),
+        getBlankTile(item, MeditoColors.darkColor),
+        getBlankTile(item, MeditoColors.lightColorLine),
+        getBlankTile(item, MeditoColors.darkColor),
+      ],
+    );
+  }
+
+  Widget getBlankTile(TileItem item, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0, bottom: 16.0, left: 16.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+              child: wrapWithInkWell(
+            MeditoColors.lightColor,
+            item,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+                color: color,
+              ),
+              height: 100,
+            ),
+          )),
+        ],
       ),
     );
   }

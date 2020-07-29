@@ -70,12 +70,12 @@ class _ListItemWidgetState extends State<ListItemWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(widget.item.title, style: Theme.of(context).textTheme.title),
+            Text(widget.item.title, style: Theme.of(context).textTheme.headline6),
             widget.item.description == null || widget.item.description.isEmpty
                 ? Container()
                 : Text(
                     widget.item.description,
-                    style: Theme.of(context).textTheme.subhead,
+                    style: Theme.of(context).textTheme.subtitle1,
                   )
           ]),
     );

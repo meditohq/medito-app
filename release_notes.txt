@@ -1,3 +1,4 @@
-- Fixed some problems with offline mode
-- Tiles looks better on smaller screens
-- Fixed streak counter bugs
+- Fixed going back from text screens
+- Better loading screen for tiles
+- Fixed streak counter bugs (not updating on home page and resetting itself too early)
+- Attempt to stop ANR

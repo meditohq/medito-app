@@ -19,6 +19,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
+import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -60,9 +61,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   final _viewModel = new SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
-  String readMoreText = "";
   String textFileFromFuture = "";
-  double textFileOpacity = 0;
 
   BuildContext scaffoldContext;
 
@@ -92,7 +91,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     widget.textFuture?.then((onValue) {
       setState(() {
         textFileFromFuture = onValue;
-        textFileOpacity = 1;
       });
     });
   }
@@ -132,14 +130,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               Expanded(
                   child: Stack(
                 children: <Widget>[
-                  Visibility(
-                    child: getListView(),
-                    visible: textFileOpacity == 0,
-                  ),
-                  AnimatedOpacity(
-                      duration: Duration(milliseconds: 100),
-                      opacity: textFileOpacity,
-                      child: getInnerTextView()),
+                  getListView(),
                 ],
               )),
             ],
@@ -159,7 +150,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             if (snapshot.connectionState == ConnectionState.none) {
               return Text(
                 "No connection. Please try again later",
-                style: Theme.of(context).textTheme.display2,
+                style: Theme.of(context).textTheme.headline3,
               );
             }
 
@@ -232,10 +223,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     } else if (item.fileType == FileType.text) {
       Tracking.trackEvent(
           Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED, item.id);
-      setState(() {
-        _viewModel.addToNavList(item);
-        textFileOpacity = 1;
-      });
+      _openTextFile(item);
     }
   }
 
@@ -263,7 +251,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText, String textColor) {
+      String title, String description, String contentText, String textColor, String bgMusic) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -274,6 +262,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               textColor: textColor,
               coverColor: coverColor,
               title: title,
+              bgMusicUrl: bgMusic,
               listItem: _viewModel.currentlySelectedFile,
               attributions:
                   _viewModel.getAttributions(fileTapped.attributions)),
@@ -304,65 +293,20 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   void _backPressed(String id) {
-    setState(() {
-      if (_viewModel.navList.length == 1) {
-        Navigator.pop(context);
-      } else if (_viewModel.navList.length == 2 && widget.firstId.isNotEmpty) {
-        Navigator.pop(context);
-      } else {
-        if (textFileOpacity == 1) {
-          textFileOpacity = 0;
-        } else {
-          if (widget.firstId != null || widget.firstId.isNotEmpty) {
-            listFuture = _viewModel.getPageChildren(id: id);
-          } else {
-            Navigator.pop(context);
-          }
-        }
-        _viewModel.navList.removeLast();
-      }
-    });
+    Navigator.pop(context);
   }
 
-  Widget getInnerTextView() {
-    String content;
-
-    if (textFileFromFuture.isEmpty) {
-      content = _viewModel?.navList?.last?.contentText;
-    } else {
-      content = textFileFromFuture;
-    }
-
-    return IgnorePointer(
-      ignoring: textFileOpacity == 0,
-      child: Container(
-        color: MeditoColors.darkBGColor,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    NavPillsWidget(
-                      list: _viewModel?.navList,
-                      backPressed: _backPressed,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
-                      child: getMarkdownBody(content, context),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+  void _openTextFile(ListItem item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        settings: RouteSettings(name: '/nav'),
+        builder: (c) {
+          return TextFileWidget(
+              firstTitle: item.title,
+              text: item.contentText,
+          );
+        },
       ),
     );
   }

@@ -17,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum UnitType { day, min }
 
-//todo unit test these
 String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:
@@ -203,5 +202,7 @@ bool isSameDay(DateTime day1, DateTime day2) {
 }
 
 bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
-  return now.subtract(Duration(hours: 32)).isAfter(lastDayInStreak);
+  var oneDayAfterMidnightThatNight = DateTime(lastDayInStreak.year,
+      lastDayInStreak.month, lastDayInStreak.day + 1, 23, 59, 59);
+  return now.isAfter(oneDayAfterMidnightThatNight);
 }

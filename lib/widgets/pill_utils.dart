@@ -23,8 +23,8 @@ var _borderRadiusLarge = BorderRadius.circular(16);
 Text getTextLabel(String label, int i, int startNumber, BuildContext context) {
   return Text(label,
       style: i == startNumber
-          ? Theme.of(context).textTheme.display2
-          : Theme.of(context).textTheme.display1);
+          ? Theme.of(context).textTheme.headline3
+          : Theme.of(context).textTheme.headline4);
 }
 
 //todo these methods have useless parameters. get rid!

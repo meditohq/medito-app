@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:Medito/audioplayer/player_utils.dart';
@@ -20,6 +21,7 @@ import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:audiofileplayer/audio_system.dart';
 import 'package:audiofileplayer/audiofileplayer.dart';
@@ -27,7 +29,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 
 class PlayerWidget extends StatefulWidget {
   PlayerWidget(
@@ -39,9 +40,11 @@ class PlayerWidget extends StatefulWidget {
       this.coverArt,
       this.attributions,
       this.description,
+      this.bgMusicUrl,
       this.textColor})
       : super(key: key);
 
+  final String bgMusicUrl;
   final String textColor;
   final String coverColor;
   final String description;
@@ -74,6 +77,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool _isPlaying = false;
   bool _updatedStats = false;
   Audio _audio;
+  Audio _bgAudio;
+  var _initialBgVolume = .6;
 
   @override
   void dispose() {
@@ -104,6 +109,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         else {
           loadLocal(data);
         }
+
+//        if(widget.bgMusicUrl != null && widget.bgMusicUrl.isNotEmpty){
+//          playBackgroundMusic()
+//        }
 
         AudioSystem.instance.addMediaEventListener(_mediaEventListener);
         play();
@@ -143,6 +152,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onPosition: (double positionSeconds) => onTime(positionSeconds));
   }
 
+  void loadBackgroundRemote() {
+    _bgAudio = Audio.loadFromRemoteUrl(widget.bgMusicUrl.replaceAll(' ', '%20'),
+        playInBackground: true,
+        looping: true,
+        onPosition: _backgroundOnPosition,
+        // Called repeatedly with updated playback position.
+        onError: (error) => onError(error))
+      ..play()
+      ..setVolume(sqrt(_initialBgVolume));
+  }
+
   void _mediaEventListener(MediaEvent mediaEvent) {
     final MediaActionType type = mediaEvent.type;
     if (type == MediaActionType.play) {
@@ -155,6 +175,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       stop();
     } else if (type == MediaActionType.seekTo) {
       _audio.seek(mediaEvent.seekToPositionSeconds);
+      if (_bgAudio != null) {
+        _bgAudio.setVolume(_initialBgVolume);
+      }
       AudioSystem.instance
           .setPlaybackState(true, mediaEvent.seekToPositionSeconds);
     }
@@ -171,6 +194,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (!_updatedStats) {
       updateStats();
     }
+    _bgAudio?.pause();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
@@ -341,8 +365,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             height: 24,
             width: 24,
             child: CircularProgressIndicator(
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(getTextColor())),
+                valueColor: AlwaysStoppedAnimation<Color>(getTextColor())),
           )
         : Icon(
             _isPlaying ? Icons.pause : Icons.play_arrow,
@@ -352,8 +375,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Color getTextColor() {
     return widget.textColor == null || widget.textColor.isEmpty
-              ? MeditoColors.darkColor
-              : parseColor(widget.textColor);
+        ? MeditoColors.darkColor
+        : parseColor(widget.textColor);
   }
 
   Widget buildCircularProgressIndicator() {
@@ -387,6 +410,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           onChanged: (seconds) {
             setState(() {
               _audio.seek(seconds);
+              if (_bgAudio != null) {
+                _bgAudio.setVolume(_initialBgVolume);
+              }
               _position = Duration(seconds: seconds.toInt());
             });
           },
@@ -398,6 +424,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   // Request audio play
   Future<void> play() async {
     _audio.resume();
+    if (_bgAudio != null) _bgAudio.resume();
 
     final Uint8List imageBytes = await generateImageBytes();
     AudioSystem.instance.setMetadata(AudioMetadata(
@@ -431,6 +458,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       _isPlaying = false;
     });
     _audio.pause();
+    if (_bgAudio != null) _bgAudio.pause();
     AudioSystem.instance
         .setPlaybackState(false, _position?.inSeconds?.toDouble() ?? 0);
 
@@ -454,6 +482,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       _audio
         ..pause()
         ..dispose();
+      if (_bgAudio != null)
+        _bgAudio
+          ..pause()
+          ..dispose();
     }
 
     AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
@@ -512,7 +544,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 top: 24, left: 24.0, right: 24, bottom: 24),
             child: Text(
               widget.title,
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
           ),
@@ -528,9 +560,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(_formatDuration(_position),
-                style: Theme.of(context).textTheme.display2),
+                style: Theme.of(context).textTheme.headline3),
             Text(_formatDuration(_duration),
-                style: Theme.of(context).textTheme.display2)
+                style: Theme.of(context).textTheme.headline3)
           ]),
     );
   }
@@ -561,5 +593,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[buildImage(), buildTitle()],
     );
+  }
+
+  void onError(var error) {
+    //print(error.toString());
+  }
+
+  void _backgroundOnComplete() {}
+
+  void _backgroundOnPosition(double position) {
+    //volume decreases as it approaches end of track
+    var timeLeft = _duration.inSeconds - _position.inSeconds;
+
+    // if (_bgAudio != null) _bgAudio.play(0);
+
+    var timeToStartDecreasing = _initialBgVolume * 100;
+    if (timeLeft < timeToStartDecreasing) {
+      var volume = timeLeft / 100;
+      print(volume);
+      _bgAudio.setVolume(sqrt(volume));
+    }
   }
 }

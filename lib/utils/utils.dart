@@ -24,67 +24,55 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
-launchUrl(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  }
-  else {
-    throw 'Could not launch $url';
-  }
-}
-
-
-//todo can this be done a better way?
 TextTheme buildDMSansTextTheme(BuildContext context) {
   return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
-    //todo change to nondeprecated ones
-        title: TextStyle(
+        headline6: TextStyle(
             fontSize: 20.0,
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w500),
-        headline: TextStyle(
+        headline5: TextStyle(
             //h2
             height: 1.4,
             fontSize: 20.0,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w600),
-        subhead: TextStyle(
+        subtitle1: TextStyle(
             fontSize: 16.0,
             height: 1.4,
             color: MeditoColors.lightTextColor,
             fontWeight: FontWeight.normal),
-        display1: TextStyle(
+        headline4: TextStyle(
             //pill big
             height: 1.4,
             fontSize: 18.0,
             color: MeditoColors.darkBGColor,
             fontWeight: FontWeight.normal),
-        display2: TextStyle(
+        headline3: TextStyle(
             //pill small
             fontSize: 14.0,
             height: 1.25,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
-        display3: TextStyle(
+        headline2: TextStyle(
             //this is for bottom sheet text
             fontSize: 16.0,
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
-        body1: TextStyle(
+        bodyText2: TextStyle(
             //this is for 'text'
             fontSize: 16.0,
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
-        subtitle: TextStyle(
+        subtitle2: TextStyle(
             //this is for 'h3' markdown
             fontSize: 18.0,
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
-        display4: TextStyle(
+        headline1: TextStyle(
             //bottom sheet filter chip
             //horizontal announcement
             fontSize: 14.0,
@@ -97,7 +85,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             height: 1.4,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w400),
-        body2: TextStyle(
+        bodyText1: TextStyle(
             //for 'MORE DETAILS'
             fontSize: 14.0,
             height: 1.4,
@@ -109,6 +97,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
+  if (url == null) return null;
   if (url.endsWith('png')) {
     return CachedNetworkImage(
       placeholder: (context, url) => Container(
@@ -136,8 +125,11 @@ Future<bool> checkConnectivity() async {
   return false;
 }
 
-Color parseColor(String color) =>
-    Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
+Color parseColor(String color) {
+  if (color == null || color.length == 0) return Colors.white;
+
+  return Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
+}
 
 void createSnackBar(String message, BuildContext context) {
   final snackBar =
@@ -153,25 +145,47 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-
-
 MarkdownBody getMarkdownBody(String content, BuildContext context) {
   return MarkdownBody(
     onTapLink: ((url) {
       launch(url);
     }),
     selectable: false,
-    styleSheet: MarkdownStyleSheet.fromTheme(
-        Theme.of(context))
-        .copyWith(
-        a: Theme.of(context).textTheme.body1.copyWith(
-            decoration: TextDecoration.underline),
-        h1: Theme.of(context).textTheme.title,
-        h2: Theme.of(context).textTheme.headline,
-        h3: Theme.of(context).textTheme.subtitle,
-        listBullet: Theme.of(context).textTheme.subhead,
-        p: Theme.of(context).textTheme.body1),
+    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+        a: Theme
+            .of(context)
+            .textTheme
+            .bodyText2
+            .copyWith(decoration: TextDecoration.underline),
+        h1: Theme
+            .of(context)
+            .textTheme
+            .headline6,
+        h2: Theme
+            .of(context)
+            .textTheme
+            .headline5,
+        h3: Theme
+            .of(context)
+            .textTheme
+            .subtitle2,
+        listBullet: Theme
+            .of(context)
+            .textTheme
+            .subtitle1,
+        p: Theme
+            .of(context)
+            .textTheme
+            .bodyText2),
     data: content == null ? '' : content,
     imageDirectory: 'https://raw.githubusercontent.com',
   );
 }
+
+launchUrl(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  }
+  else {
+    throw 'Could not launch $url';
+  }
