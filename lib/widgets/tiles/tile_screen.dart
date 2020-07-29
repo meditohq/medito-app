@@ -444,8 +444,15 @@ class TileListState extends State<TileList> {
     });
   }
 
-  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText, String textColor, String bgMusicUrl) {
+  _showPlayer(
+      dynamic fileTapped,
+      dynamic coverArt,
+      dynamic coverColor,
+      String title,
+      String description,
+      String contentText,
+      String textColor,
+      String bgMusicUrl) {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -524,19 +531,21 @@ class TileListState extends State<TileList> {
 
   Widget getLoadingWidget() {
     TileItem item = TileItem("", "", "000000");
-    return Column(
-      children: [
-        _getMeditoLogo(),
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16),
-          child: getHorizontalAnnouncementTile(item),
-        ),
-        Container(height: 8),
-        getBlankTile(item, MeditoColors.lightColorLine),
-        getBlankTile(item, MeditoColors.darkColor),
-        getBlankTile(item, MeditoColors.lightColorLine),
-        getBlankTile(item, MeditoColors.darkColor),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _getMeditoLogo(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16),
+            child: getHorizontalAnnouncementTile(item),
+          ),
+          Container(height: 8),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.darkColor),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.darkColor),
+        ],
+      ),
     );
   }
 
