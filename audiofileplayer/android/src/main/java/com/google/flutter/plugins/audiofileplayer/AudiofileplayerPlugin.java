@@ -151,7 +151,7 @@ public class AudiofileplayerPlugin
                         AudiofileplayerService.instance.setPendingIntentActivity(activity);
                         AudiofileplayerService.instance.setListener(AudiofileplayerPlugin.this);
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        Log.e(TAG, "ConnectionCallback.onConnected Failure", e);
                     }
                 }
 
