@@ -205,7 +205,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void showDonateDialog(int numSessions) async {
      numSessions = await getNumSessionsInt();
-    if (numSessions > 0/* && numSessions % 10 == 0*/) {
+    if (numSessions > 0 && numSessions % 5 == 0) {
       Future<bool> userAct = showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
