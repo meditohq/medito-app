@@ -318,7 +318,6 @@ public class AudiofileplayerService extends MediaBrowserServiceCompat
       if (!mediaSession.isActive()) mediaSession.setActive(true);
       Notification notif = buildNotification();
       // Display the notification and place the service in the foreground
-      startForegroundService(i);
       startForeground(NOTIFICATION_ID, notif);
     }
 
