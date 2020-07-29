@@ -79,6 +79,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Audio _audio;
   Audio _bgAudio;
   var _initialBgVolume = .6;
+  String donateUrl = "https://meditofoundation.org/donate/";
 
   @override
   void dispose() {
@@ -183,7 +184,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  void onComplete() async{
+  void onComplete() async {
     if (this.mounted) {
       setState(() {
         _isPlaying = false;
@@ -199,59 +200,66 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
 
-    numSessions = await getNumSessionsInt();
-    String donateUrl = "https://meditofoundation.org/donate/";
-    if (numSessions > 0 && numSessions%10 == 0){
+    showDonateDialog(numSessions);
+  }
+
+  void showDonateDialog(int numSessions) async {
+     numSessions = await getNumSessionsInt();
+    if (numSessions > 0/* && numSessions % 10 == 0*/) {
       Future<bool> userAct = showDialog<bool>(
           context: context,
-          builder: (BuildContext context){
+          builder: (BuildContext context) {
             return AlertDialog(
               backgroundColor: MeditoColors.darkBGColor,
               shape: RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(12.0),
               ),
-              title: Text("Well done for completing " + numSessions.toString() + " sessions!", style: TextStyle(color: MeditoColors.lightTextColor)),
-              content: Text("We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it. Please consider donating to show our volunteers that their work matters.", style: TextStyle(color: MeditoColors.lightTextColor)),
+              title: Text(
+                  "Well done for completing " +
+                      numSessions.toString() +
+                      " sessions!",
+                  style: TextStyle(color: MeditoColors.lightTextColor)),
+              content: Text(
+                  "We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it. Please consider donating to show our volunteers that their work matters.",
+                  style: TextStyle(color: MeditoColors.lightTextColor)),
               actions: <Widget>[
-
                 FlatButton(
+                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(12.0),
                   ),
                   color: widget.coverColor != null
                       ? parseColor(widget.coverColor)
                       : MeditoColors.lightColor,
-                  child: Text('Dismiss',
-                      style: TextStyle(color: getTextColor())),
+                  child:
+                      Text('Dismiss', style: TextStyle(color: getTextColor())),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
                 ),
                 FlatButton(
+                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(12.0),
                   ),
                   color: widget.coverColor != null
                       ? parseColor(widget.coverColor)
                       : MeditoColors.lightColor,
-                  child: Text('Donate',
-                  style: TextStyle(color: getTextColor())),
+                  child:
+                      Text('Donate', style: TextStyle(color: getTextColor())),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
                 ),
               ],
             );
-          }
-      );
-      if (await userAct){
+          });
+      if (await userAct != null && await userAct) {
         launchUrl(donateUrl);
-      }
-      else {
+      } else {
         Navigator.popUntil(context, ModalRoute.withName("/nav"));
       }
     }
-
   }
 
   void onTime(double positionSeconds) async {
