@@ -533,6 +533,7 @@ class TileListState extends State<TileList> {
     TileItem item = TileItem("", "", "000000");
     return SingleChildScrollView(
       child: Column(
+        mainAxisSize: MainAxisSize.max,
         children: [
           _getMeditoLogo(),
           Padding(

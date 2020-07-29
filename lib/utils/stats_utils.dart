@@ -72,6 +72,7 @@ void updateStreak({String streak = ''}) async {
   if (streak.isNotEmpty) {
     prefs.setInt('streakCount', int.parse(streak));
     _updateLongestStreak(int.parse(streak), prefs);
+    await addPhantomSessionToStreakList();
     return;
   }
 
@@ -94,6 +95,20 @@ void updateStreak({String streak = ''}) async {
 
   streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
   prefs.setStringList('streakList', streakList);
+}
+
+Future<void> addPhantomSessionToStreakList() async {
+  //add this session to the streak list to stop it resetting to 0,
+  // but keep a note of it in fakeStreakList
+
+  var prefs = await SharedPreferences.getInstance();
+  List<String> streakList = prefs.getStringList('streakList') ?? [];
+  List<String> fakeStreakList = prefs.getStringList('fakeStreakList') ?? [];
+  var streakTime = DateTime.now().millisecondsSinceEpoch.toString();
+  streakList.add(streakTime);
+  fakeStreakList.add(streakTime);
+  prefs.setStringList('streakList', streakList);
+  prefs.setStringList('fakeStreakList', fakeStreakList);
 }
 
 Future<void> incrementStreakCounter(
