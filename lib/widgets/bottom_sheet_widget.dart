@@ -458,7 +458,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 pressElevation: 4,
                 shape: buildChipBorder(),
                 padding: buildInnerChipPadding(),
-                label: Text(index == 0 ? 'NO' : 'YES'),
+                label: Text(index == 0 ? 'No' : 'Yes'),
                 selected: _offlineSelected == index,
                 onSelected: (bool value) {
                   onOfflineSelected(index);
