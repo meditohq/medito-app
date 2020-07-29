@@ -23,6 +23,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
 TextTheme buildDMSansTextTheme(BuildContext context) {
   return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
         headline6: TextStyle(
@@ -93,6 +94,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
       ));
 }
 
+
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
   if (url == null) return null;
@@ -150,16 +152,38 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        a: Theme.of(context)
+        a: Theme
+            .of(context)
             .textTheme
             .bodyText2
             .copyWith(decoration: TextDecoration.underline),
-        h1: Theme.of(context).textTheme.headline6,
-        h2: Theme.of(context).textTheme.headline5,
-        h3: Theme.of(context).textTheme.subtitle2,
-        listBullet: Theme.of(context).textTheme.subtitle1,
-        p: Theme.of(context).textTheme.bodyText2),
+        h1: Theme
+            .of(context)
+            .textTheme
+            .headline6,
+        h2: Theme
+            .of(context)
+            .textTheme
+            .headline5,
+        h3: Theme
+            .of(context)
+            .textTheme
+            .subtitle2,
+        listBullet: Theme
+            .of(context)
+            .textTheme
+            .subtitle1,
+        p: Theme
+            .of(context)
+            .textTheme
+            .bodyText2),
     data: content == null ? '' : content,
     imageDirectory: 'https://raw.githubusercontent.com',
   );
+}
+
+launchUrl(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  }
 }
