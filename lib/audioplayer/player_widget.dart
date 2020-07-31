@@ -132,6 +132,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           _duration = Duration(seconds: durationSeconds.toInt());
           _loading = false;
         },
+        onError: onError,
         // Called repeatedly with updated playback position.
         onPosition: (double positionSeconds) {
           onTime(positionSeconds);
@@ -606,7 +607,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void onError(var error) {
-    //print(error.toString());
+    print(error.toString());
   }
 
   void _backgroundOnPosition(double position) {
