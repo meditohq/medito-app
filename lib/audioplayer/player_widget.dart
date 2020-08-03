@@ -106,10 +106,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         else {
           _loadLocal(data);
         }
-
-        _assetsAudioPlayer.playlistAudioFinished.listen((Playing playing) {
-          onComplete();
-        });
       });
 
       if (widget.bgMusicPath != null && widget.bgMusicPath.isNotEmpty) {
@@ -121,10 +117,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _loadLocal(String data) {
     try {
-      _assetsAudioPlayer.open(Audio.file(data),
+      _assetsAudioPlayer.open(
+          Audio.file(data)..updateMetas(title: widget.title),
           showNotification: true,
           loopMode: LoopMode.single,
           headPhoneStrategy: HeadPhoneStrategy.pauseOnUnplug,
+          notificationSettings: _getNotificationSettings(),
           audioFocusStrategy:
               AudioFocusStrategy.request(resumeAfterInterruption: true));
       _onReady();
@@ -140,6 +138,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           widget.fileModel.url.replaceAll(' ', '%20'),
         )..updateMetas(title: widget.title),
         showNotification: true,
+        audioFocusStrategy:
+            AudioFocusStrategy.request(resumeAfterInterruption: true),
         notificationSettings: _getNotificationSettings(),
       );
       _onReady();
@@ -147,6 +147,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       //mp3 unreachable
       print('load remote error: ' + t);
     }
+  }
+
+  void loadBackground() {
+    AssetsAudioPlayer.newPlayer().open(
+      Audio(widget.bgMusicPath),
+      loopMode: LoopMode.single,
+      audioFocusStrategy:
+          AudioFocusStrategy.request(resumeAfterInterruption: true),
+      notificationSettings: _getNotificationSettings(),
+    );
   }
 
   void _onReady() {
@@ -162,33 +172,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  void loadBackground() {
-    print("loading!!");
-    _assetsAudioPlayer.open(
-      Audio(widget.bgMusicPath),
-      loopMode: LoopMode.single,
-      notificationSettings: _getNotificationSettings(),
-    );
-  }
-
-  void onComplete() async {
-    if (this.mounted) {
-      setState(() {
-        _isPlaying = false;
-      });
-    }
-
-    var numSessions = 0;
-    updateStats();
-
-    Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
-        Tracking.AUDIO_COMPLETED + widget.listItem.id);
-
-    showDonateDialog(numSessions);
-  }
-
-  void showDonateDialog(int numSessions) async {
-    numSessions = await getNumSessionsInt();
+  void showDonateDialog() async {
+    var numSessions = await getNumSessionsInt();
     if (numSessions > 0 && numSessions % 5 == 0) {
       Future<bool> userAct = showDialog<bool>(
           context: context,
@@ -377,7 +362,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return PlayerBuilder.currentPosition(
         player: _assetsAudioPlayer,
         builder: (context, duration) {
-          var pos = _position?.inSeconds?.toDouble() ?? 0;
+          var pos = duration?.inSeconds?.toDouble() ?? 0;
           var dur = _duration?.inSeconds?.toDouble() ?? 0;
 
           checkUpdateStatsIsNecessary(dur, pos);
@@ -412,8 +397,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void checkUpdateStatsIsNecessary(double dur, double pos) {
-    if (dur > 0 && pos > dur - 15 && pos < dur - 10) {
+    if (dur > 0 && pos > dur - 15 && pos < dur - 0) {
       updateStats();
+
+      if(!_updatedStats) {
+        Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
+            Tracking.AUDIO_COMPLETED + widget.listItem.id);
+      }
+
+      if (pos >= dur - 2) { // so almost at the end
+        showDonateDialog();
+      }
     }
   }
 
