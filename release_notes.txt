@@ -2,3 +2,5 @@
 - Better loading screen for tiles
 - Fixed streak counter bugs (not updating on home page and resetting itself too early)
 - Attempt to stop ANR
+- Fixed audio player bugs
+- Background audio
