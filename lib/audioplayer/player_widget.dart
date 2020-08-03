@@ -64,7 +64,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool showDownloadButton;
 
   Duration _duration;
-  String _error;
   Duration _position;
 
   double widthOfScreen;
@@ -107,6 +106,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         else {
           _loadLocal(data);
         }
+
+        _assetsAudioPlayer.playlistAudioFinished.listen((Playing playing) {
+          onComplete();
+        });
       });
 
       if (widget.bgMusicPath != null && widget.bgMusicPath.isNotEmpty) {
@@ -176,9 +179,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
 
     var numSessions = 0;
-    if (!_updatedStats) {
-      updateStats();
-    }
+    updateStats();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
@@ -245,25 +246,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  void onTime(double positionSeconds) async {
-    if (this.mounted) {
-      _position = Duration(seconds: positionSeconds.toInt());
-      _isPlaying = true;
-      setState(() {});
-
-      if (_position.inSeconds > _duration.inSeconds - 15 &&
-          _position.inSeconds < _duration.inSeconds - 10 &&
-          !_updatedStats) {
-        updateStats();
-      }
-    }
-  }
-
   void updateStats() {
-    markAsListened(widget.listItem.id);
-    incrementNumSessions();
-    updateStreak();
-    _updatedStats = true;
+    if (!_updatedStats) {
+      markAsListened(widget.listItem.id);
+      incrementNumSessions();
+      updateStreak();
+      _updatedStats = true;
+    }
   }
 
   @override
@@ -390,6 +379,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         builder: (context, duration) {
           var pos = _position?.inSeconds?.toDouble() ?? 0;
           var dur = _duration?.inSeconds?.toDouble() ?? 0;
+
+          checkUpdateStatsIsNecessary(dur, pos);
+
           if (pos > dur) {
             return Container();
           } else {
@@ -417,6 +409,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             );
           }
         });
+  }
+
+  void checkUpdateStatsIsNecessary(double dur, double pos) {
+    if (dur > 0 && pos > dur - 15 && pos < dur - 10) {
+      updateStats();
+    }
   }
 
   // Request audio play
