@@ -72,11 +72,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool _isPlaying = true;
   bool _updatedStats = false;
 
-  var _initialBgVolume = .6;
+  var _initialBgVolume = .8;
   String donateUrl = "https://meditofoundation.org/donate/";
-  double bgDuration;
+  Duration _bgDuration;
 
-  final _assetsAudioPlayer = AssetsAudioPlayer();
+  final _assetsAudioPlayer = AssetsAudioPlayer.newPlayer();
+  final _bgAssetsAudioPlayer1 = AssetsAudioPlayer.newPlayer();
+  final _bgAssetsAudioPlayer2 = AssetsAudioPlayer.newPlayer();
 
   @override
   void dispose() {
@@ -110,7 +112,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
       if (widget.bgMusicPath != null && widget.bgMusicPath.isNotEmpty) {
         loadBackground();
-        play();
       }
     });
   }
@@ -120,7 +121,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       _assetsAudioPlayer.open(
           Audio.file(data)..updateMetas(title: widget.title),
           showNotification: true,
-          loopMode: LoopMode.single,
           headPhoneStrategy: HeadPhoneStrategy.pauseOnUnplug,
           notificationSettings: _getNotificationSettings(),
           audioFocusStrategy:
@@ -150,22 +150,52 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void loadBackground() {
-    AssetsAudioPlayer.newPlayer().open(
-      Audio(widget.bgMusicPath),
-      loopMode: LoopMode.single,
+    _bgAssetsAudioPlayer1.open(
+      Audio.file(widget.bgMusicPath),
+      volume: _initialBgVolume,
+      loopMode: LoopMode.none,
       audioFocusStrategy:
           AudioFocusStrategy.request(resumeAfterInterruption: true),
       notificationSettings: _getNotificationSettings(),
     );
+
+    _bgAssetsAudioPlayer2
+        .open(
+          Audio.file(widget.bgMusicPath),
+          volume: _initialBgVolume,
+          loopMode: LoopMode.none,
+          audioFocusStrategy:
+              AudioFocusStrategy.request(resumeAfterInterruption: true),
+          notificationSettings: _getNotificationSettings(),
+        )
+        .then((value) {
+          return _bgAssetsAudioPlayer2.stop();
+        });
+
+    try {
+      _bgAssetsAudioPlayer1.onReadyToPlay.listen((audio) {
+        if (this.mounted) {
+          setState(() {
+            _loading = false;
+            _bgDuration = audio?.duration ?? Duration(seconds: 0);
+            _observeBgAudio();
+          });
+        }
+      });
+    } catch (t) {
+      print('bg duartion error: ' + t);
+    }
   }
 
   void _onReady() {
     try {
       _assetsAudioPlayer.onReadyToPlay.listen((audio) {
-        setState(() {
-          _loading = false;
-          _duration = audio?.duration ?? Duration(seconds: 0);
-        });
+        if (this.mounted) {
+          setState(() {
+            _loading = false;
+            _duration = audio?.duration ?? Duration(seconds: 0);
+          });
+        }
       });
     } catch (t) {
       print('onready error: ' + t);
@@ -361,11 +391,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget buildSlider() {
     return PlayerBuilder.currentPosition(
         player: _assetsAudioPlayer,
-        builder: (context, duration) {
-          var pos = duration?.inSeconds?.toDouble() ?? 0;
+        builder: (context, position) {
+          var pos = position?.inSeconds?.toDouble() ?? 0;
           var dur = _duration?.inSeconds?.toDouble() ?? 0;
 
-          checkUpdateStatsIsNecessary(dur, pos);
+          _onTick(dur, pos);
 
           if (pos > dur) {
             return Container();
@@ -396,16 +426,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         });
   }
 
-  void checkUpdateStatsIsNecessary(double dur, double pos) {
+  void _onTick(double dur, double pos) {
+    _changeBackgroundVolumeOnMainTrackPosition(dur, pos);
     if (dur > 0 && pos > dur - 15 && pos < dur - 0) {
       updateStats();
 
-      if(!_updatedStats) {
+      if (!_updatedStats) {
         Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
             Tracking.AUDIO_COMPLETED + widget.listItem.id);
       }
 
-      if (pos >= dur - 2) { // so almost at the end
+      if (pos >= dur - 2) {
+        // so almost at the end
         showDonateDialog();
       }
     }
@@ -414,7 +446,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   // Request audio play
   Future<void> play() async {
     _assetsAudioPlayer.play();
-    //if (_bgAudio != null) _bgAudio.resume();
+    _bgAssetsAudioPlayer1.play();
 
     if (this.mounted) {
       setState(() {
@@ -432,6 +464,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       _isPlaying = false;
     });
     _assetsAudioPlayer.pause();
+    _bgAssetsAudioPlayer1.stop();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_PAUSED + widget.fileModel.id);
@@ -441,6 +474,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void stop() async {
     _assetsAudioPlayer.stop();
     _assetsAudioPlayer.dispose();
+    _bgAssetsAudioPlayer1.stop();
+    _bgAssetsAudioPlayer1.dispose();
+    _bgAssetsAudioPlayer2.stop();
+    _bgAssetsAudioPlayer2.dispose();
 
     updateMinuteCounter(_position?.inSeconds);
 
@@ -555,25 +592,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     print(error.toString());
   }
 
-  void _backgroundOnPosition(double position) {
-//    print(position);
-//    if (position >= bgDuration - 0.2) {
-//      print('going back to 0!!');
-//      _bgAudio.seek(0.2);
-//    }
-
+  void _changeBackgroundVolumeOnMainTrackPosition(double dur, double pos) {
     //volume decreases as it approaches end of track
-    var timeLeft = _duration.inSeconds - _position.inSeconds;
+    var timeLeft = dur - pos;
 
     var timeToStartDecreasing = _initialBgVolume * 100;
     if (timeLeft < timeToStartDecreasing) {
       var volume = timeLeft / 100;
-      _assetsAudioPlayer.setVolume(volume);
+      _bgAssetsAudioPlayer1.setVolume(volume);
+      _bgAssetsAudioPlayer2.setVolume(volume);
+    } else {
+      _bgAssetsAudioPlayer1.setVolume(_initialBgVolume);
+      _bgAssetsAudioPlayer2.setVolume(_initialBgVolume);
     }
-  }
-
-  void _onBackgroundDuration(double duration) {
-    this.bgDuration = duration;
   }
 
   NotificationSettings _getNotificationSettings() {
@@ -597,6 +628,51 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void _customStopAction(AssetsAudioPlayer player) {
     _assetsAudioPlayer.stop();
     _assetsAudioPlayer.dispose();
+    _bgAssetsAudioPlayer1.stop();
+    _bgAssetsAudioPlayer1.dispose();
+    _bgAssetsAudioPlayer2.stop();
+    _bgAssetsAudioPlayer2.dispose();
     Navigator.of(context).pop(false);
+  }
+
+  void _observeBgAudio() {
+    _bgAssetsAudioPlayer1.currentPosition.listen((position) {
+      print('1 tick' + position.toString());
+      if (this.mounted) {
+        if (position.inSeconds > 5 &&
+            position.inSeconds < 6 &&
+            _bgAssetsAudioPlayer2.isPlaying.value) {
+          _bgAssetsAudioPlayer2.stop();
+          print('2 stopping');
+        }
+
+        if (position.inSeconds > _bgDuration.inSeconds - 5 &&
+            !_bgAssetsAudioPlayer2.isPlaying.value) {
+          _bgAssetsAudioPlayer2.play();
+          print('2 starting');
+        }
+      } else {
+        stop();
+      }
+    });
+
+    _bgAssetsAudioPlayer2.currentPosition.listen((position) {
+      print('2 tick' + position.toString());
+      if (this.mounted) {
+        if (position.inSeconds > 5 &&
+            position.inSeconds < 6 &&
+            _bgAssetsAudioPlayer1.isPlaying.value) {
+          _bgAssetsAudioPlayer1.stop();
+          print('1 stopping');
+        }
+        if (position.inSeconds > _bgDuration.inSeconds - 5 &&
+            !_bgAssetsAudioPlayer1.isPlaying.value) {
+          _bgAssetsAudioPlayer1.play();
+          print('1 starting');
+        }
+      } else {
+        stop();
+      }
+    });
   }
 }

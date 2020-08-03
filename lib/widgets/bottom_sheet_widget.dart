@@ -195,7 +195,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _onBeginTap() {
-    if (_downloading) return;
+    if (_downloading || _bgDownloading) return;
 
     widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
         _description, _contentText, _textColor, _backgroundMusicUrl);
