@@ -1,5 +1,7 @@
 PODS:
-  - audiofileplayer (0.0.1):
+  - assets_audio_player (0.0.1):
+    - Flutter
+  - assets_audio_player_web (0.0.1):
     - Flutter
   - Flutter (1.0.0)
   - flutter_matomo (0.0.1):
@@ -38,7 +40,8 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - audiofileplayer (from `.symlinks/plugins/audiofileplayer/ios`)
+  - assets_audio_player (from `.symlinks/plugins/assets_audio_player/ios`)
+  - assets_audio_player_web (from `.symlinks/plugins/assets_audio_player_web/ios`)
   - Flutter (from `Flutter`)
   - flutter_matomo (from `.symlinks/plugins/flutter_matomo/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
@@ -60,8 +63,10 @@ SPEC REPOS:
     - MatomoTracker
 
 EXTERNAL SOURCES:
-  audiofileplayer:
-    :path: ".symlinks/plugins/audiofileplayer/ios"
+  assets_audio_player:
+    :path: ".symlinks/plugins/assets_audio_player/ios"
+  assets_audio_player_web:
+    :path: ".symlinks/plugins/assets_audio_player_web/ios"
   Flutter:
     :path: Flutter
   flutter_matomo:
@@ -92,7 +97,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
-  audiofileplayer: 4aaff759a721ec3a850a682e0d9ec554e5f9e86f
+  assets_audio_player: edee322b9cb625571b830b35872ead1a295fd917
+  assets_audio_player_web: 19826380c44375761aa0b9053665c1e3fbc3b86b
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_matomo: a4fc9d95faaf6f95124fc1956e892f91791b5fac
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
@@ -110,6 +116,6 @@ SPEC CHECKSUMS:
   url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
   url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
 
-PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+PODFILE CHECKSUM: c34e2287a9ccaa606aeceab922830efb9a6ff69a
 
 COCOAPODS: 1.8.4

@@ -13,9 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'dart:math';
-import 'dart:typed_data';
-
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
@@ -23,8 +20,7 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/pill_utils.dart';
-import 'package:audiofileplayer/audio_system.dart';
-import 'package:audiofileplayer/audiofileplayer.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -74,13 +70,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   double widthOfScreen;
 
   bool _loading = true;
-  bool _isPlaying = false;
+  bool _isPlaying = true;
   bool _updatedStats = false;
-  Audio _audio;
-  Audio _bgAudio;
+
   var _initialBgVolume = .6;
   String donateUrl = "https://meditofoundation.org/donate/";
   double bgDuration;
+
+  final _assetsAudioPlayer = AssetsAudioPlayer();
 
   @override
   void dispose() {
@@ -104,87 +101,71 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       licenseTitle = attr.title;
       showDownloadButton = attr.downloadButton;
       licenseURL = attr.licenseUrl;
-
       getDownload(widget.fileModel.filename).then((data) {
         if (data == null)
-          loadRemote();
+          _loadRemote();
         else {
-          loadLocal(data);
+          _loadLocal(data);
         }
-
-        if (widget.bgMusicPath != null && widget.bgMusicPath.isNotEmpty) {
-          loadBackground();
-        }
-
-        AudioSystem.instance.addMediaEventListener(_mediaEventListener);
-        play();
       });
+
+      if (widget.bgMusicPath != null && widget.bgMusicPath.isNotEmpty) {
+        loadBackground();
+        play();
+      }
     });
   }
 
-  void loadLocal(String data) {
-    _audio = Audio.loadFromAbsolutePath(data,
-        playInBackground: true,
-        // Called when audio has finished playing.
-        onComplete: () => onComplete(),
-        // Called when audio has loaded and knows its duration.
-        onDuration: (double durationSeconds) {
-          _duration = Duration(seconds: durationSeconds.toInt());
-          _loading = false;
-        },
-        onError: onError,
-        // Called repeatedly with updated playback position.
-        onPosition: (double positionSeconds) {
-          onTime(positionSeconds);
-        });
+  void _loadLocal(String data) {
+    try {
+      _assetsAudioPlayer.open(Audio.file(data),
+          showNotification: true,
+          loopMode: LoopMode.single,
+          headPhoneStrategy: HeadPhoneStrategy.pauseOnUnplug,
+          audioFocusStrategy:
+              AudioFocusStrategy.request(resumeAfterInterruption: true));
+      _onReady();
+    } catch (t) {
+      print('load local error: ' + t);
+    }
   }
 
-  void loadRemote() {
-    //todo remove this replaceAll later
-    _audio =
-        Audio.loadFromRemoteUrl(widget.fileModel.url.replaceAll(' ', '%20'),
-            playInBackground: true,
-            // Called when audio has finished playing.
-            onComplete: () => onComplete(),
-            // Called when audio has loaded and knows its duration.
-            onDuration: (double durationSeconds) {
-              _duration = Duration(seconds: durationSeconds.toInt());
-              _loading = false;
-            },
-            // Called repeatedly with updated playback position.
-            onPosition: (double positionSeconds) => onTime(positionSeconds));
+  Future<void> _loadRemote() async {
+    try {
+      await _assetsAudioPlayer.open(
+        Audio.network(
+          widget.fileModel.url.replaceAll(' ', '%20'),
+        )..updateMetas(title: widget.title),
+        showNotification: true,
+        notificationSettings: _getNotificationSettings(),
+      );
+      _onReady();
+    } catch (t) {
+      //mp3 unreachable
+      print('load remote error: ' + t);
+    }
+  }
+
+  void _onReady() {
+    try {
+      _assetsAudioPlayer.onReadyToPlay.listen((audio) {
+        setState(() {
+          _loading = false;
+          _duration = audio?.duration ?? Duration(seconds: 0);
+        });
+      });
+    } catch (t) {
+      print('onready error: ' + t);
+    }
   }
 
   void loadBackground() {
-    _bgAudio = Audio.loadFromAbsolutePath(widget.bgMusicPath,
-        playInBackground: true,
-        looping: true,
-        onDuration: _onBackgroundDuration,
-        onPosition: _backgroundOnPosition,
-        // Called repeatedly with updated playback position.
-        onError: (error) => onError(error))
-      ..play()
-      ..setVolume(sqrt(_initialBgVolume));
-  }
-
-  void _mediaEventListener(MediaEvent mediaEvent) {
-    final MediaActionType type = mediaEvent.type;
-    if (type == MediaActionType.play) {
-      play();
-    } else if (type == MediaActionType.pause) {
-      pause();
-    } else if (type == MediaActionType.playPause) {
-      _isPlaying ? pause() : play();
-    } else if (type == MediaActionType.stop) {
-      stop();
-    } else if (type == MediaActionType.seekTo) {
-      _audio.seek(mediaEvent.seekToPositionSeconds);
-      if (_bgAudio != null) {
-        _bgAudio.setVolume(_initialBgVolume);
-      }
-      AudioSystem.instance
-          .setPlaybackState(true, mediaEvent.seekToPositionSeconds);
-    }
+    print("loading!!");
+    _assetsAudioPlayer.open(
+      Audio(widget.bgMusicPath),
+      loopMode: LoopMode.single,
+      notificationSettings: _getNotificationSettings(),
+    );
   }
 
   void onComplete() async {
@@ -198,7 +179,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (!_updatedStats) {
       updateStats();
     }
-    _bgAudio?.pause();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_COMPLETED + widget.listItem.id);
@@ -356,9 +336,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     ? parseColor(widget.coverColor)
                     : MeditoColors.lightColor,
                 onPressed: () {
-                  if (_isPlaying) {
+                  if (_assetsAudioPlayer.isPlaying.value) {
+                    _isPlaying = false;
                     pause();
                   } else {
+                    _isPlaying = true;
                     play();
                   }
                 },
@@ -403,55 +385,44 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget buildSlider() {
-    AudioSystem.instance
-        .setPlaybackState(true, _position?.inSeconds?.toDouble() ?? 0);
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-      child: SliderTheme(
-        data: SliderThemeData(
-          activeTrackColor: MeditoColors.lightColor,
-          inactiveTrackColor: MeditoColors.darkColor,
-          thumbColor: MeditoColors.lightColor,
-          trackHeight: 4,
-        ),
-        child: Slider(
-          value: _position?.inSeconds?.toDouble() ?? 0,
-          max: _duration?.inSeconds?.toDouble() ?? 0,
-          onChanged: (seconds) {
-            setState(() {
-              _audio.seek(seconds);
-              if (_bgAudio != null) {
-                _bgAudio.setVolume(_initialBgVolume);
-              }
-              _position = Duration(seconds: seconds.toInt());
-            });
-          },
-        ),
-      ),
-    );
+    return PlayerBuilder.currentPosition(
+        player: _assetsAudioPlayer,
+        builder: (context, duration) {
+          var pos = _position?.inSeconds?.toDouble() ?? 0;
+          var dur = _duration?.inSeconds?.toDouble() ?? 0;
+          if (pos > dur) {
+            return Container();
+          } else {
+            return Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: SliderTheme(
+                data: SliderThemeData(
+                  activeTrackColor: MeditoColors.lightColor,
+                  inactiveTrackColor: MeditoColors.darkColor,
+                  thumbColor: MeditoColors.lightColor,
+                  trackHeight: 4,
+                ),
+                child: Slider(
+                  value: pos,
+                  max: dur,
+                  onChanged: (seconds) {
+                    setState(() {
+                      _assetsAudioPlayer
+                          .seek(Duration(seconds: seconds.toInt()));
+                      _position = Duration(seconds: seconds.toInt());
+                    });
+                  },
+                ),
+              ),
+            );
+          }
+        });
   }
 
   // Request audio play
   Future<void> play() async {
-    _audio.resume();
-    if (_bgAudio != null) _bgAudio.resume();
-
-    final Uint8List imageBytes = await generateImageBytes();
-    AudioSystem.instance.setMetadata(AudioMetadata(
-        title: widget.title, artist: licenseTitle, artBytes: imageBytes));
-    AudioSystem.instance
-        .setPlaybackState(true, _position?.inSeconds?.toDouble() ?? 0);
-
-    AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
-      AndroidMediaButtonType.pause,
-    ]);
-
-    AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
-      MediaActionType.playPause,
-      MediaActionType.pause,
-      MediaActionType.stop,
-    }, skipIntervalSeconds: 30);
+    _assetsAudioPlayer.play();
+    //if (_bgAudio != null) _bgAudio.resume();
 
     if (this.mounted) {
       setState(() {
@@ -468,20 +439,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     setState(() {
       _isPlaying = false;
     });
-    _audio.pause();
-    if (_bgAudio != null) _bgAudio.pause();
-    AudioSystem.instance
-        .setPlaybackState(false, _position?.inSeconds?.toDouble() ?? 0);
-
-    AudioSystem.instance.setAndroidNotificationButtons(<dynamic>[
-      AndroidMediaButtonType.play,
-    ]);
-
-    AudioSystem.instance.setSupportedMediaActions(<MediaActionType>{
-      MediaActionType.playPause,
-      MediaActionType.play,
-      MediaActionType.stop,
-    }, skipIntervalSeconds: 30);
+    _assetsAudioPlayer.pause();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_PAUSED + widget.fileModel.id);
@@ -489,18 +447,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   // Request audio stop. this will also clear lock screen controls
   void stop() async {
-    if (_audio != null) {
-      _audio
-        ..pause()
-        ..dispose();
-      if (_bgAudio != null)
-        _bgAudio
-          ..pause()
-          ..dispose();
-    }
-
-    AudioSystem.instance.removeMediaEventListener(_mediaEventListener);
-    AudioSystem.instance.stopBackgroundDisplay();
+    _assetsAudioPlayer.stop();
+    _assetsAudioPlayer.dispose();
 
     updateMinuteCounter(_position?.inSeconds);
 
@@ -565,17 +513,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget buildTimeLabelsRow() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
-      child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text(_formatDuration(_position),
-                style: Theme.of(context).textTheme.headline3),
-            Text(_formatDuration(_duration),
-                style: Theme.of(context).textTheme.headline3)
-          ]),
-    );
+    return PlayerBuilder.currentPosition(
+        player: _assetsAudioPlayer,
+        builder: (context, position) {
+          return Padding(
+            padding:
+                const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(_formatDuration(position),
+                      style: Theme.of(context).textTheme.headline3),
+                  Text(_formatDuration(_duration),
+                      style: Theme.of(context).textTheme.headline3)
+                ]),
+          );
+        });
   }
 
   String _formatDuration(Duration d) {
@@ -623,11 +576,35 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var timeToStartDecreasing = _initialBgVolume * 100;
     if (timeLeft < timeToStartDecreasing) {
       var volume = timeLeft / 100;
-      _bgAudio.setVolume(sqrt(volume));
+      _assetsAudioPlayer.setVolume(volume);
     }
   }
 
   void _onBackgroundDuration(double duration) {
     this.bgDuration = duration;
+  }
+
+  NotificationSettings _getNotificationSettings() {
+    return NotificationSettings(
+        prevEnabled: false,
+        nextEnabled: false,
+        stopEnabled: true,
+        customStopAction: _customStopAction,
+        customPlayPauseAction: _customPlayPauseAction,
+        seekBarEnabled: true);
+  }
+
+  void _customPlayPauseAction(AssetsAudioPlayer player) {
+    if (!_isPlaying) {
+      play();
+    } else {
+      pause();
+    }
+  }
+
+  void _customStopAction(AssetsAudioPlayer player) {
+    _assetsAudioPlayer.stop();
+    _assetsAudioPlayer.dispose();
+    Navigator.of(context).pop(false);
   }
 }
