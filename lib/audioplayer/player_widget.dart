@@ -64,7 +64,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool showDownloadButton;
 
   Duration _duration;
-  Duration _position;
+  Duration _durationListened = Duration();
+  var _lastPos = 0.0;
 
   double widthOfScreen;
 
@@ -79,6 +80,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   final _assetsAudioPlayer = AssetsAudioPlayer.newPlayer();
   final _bgAssetsAudioPlayer1 = AssetsAudioPlayer.newPlayer();
   final _bgAssetsAudioPlayer2 = AssetsAudioPlayer.newPlayer();
+
+  bool _donateShowing = false;
 
   @override
   void dispose() {
@@ -161,16 +164,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     _bgAssetsAudioPlayer2
         .open(
-          Audio.file(widget.bgMusicPath),
-          volume: _initialBgVolume,
-          loopMode: LoopMode.none,
-          audioFocusStrategy:
-              AudioFocusStrategy.request(resumeAfterInterruption: true),
-          notificationSettings: _getNotificationSettings(),
-        )
+      Playlist(audios: [
+        Audio.file(widget.bgMusicPath),
+      ]),
+      volume: _initialBgVolume,
+      loopMode: LoopMode.none,
+      audioFocusStrategy:
+          AudioFocusStrategy.request(resumeAfterInterruption: true),
+      notificationSettings: _getNotificationSettings(),
+    )
         .then((value) {
-          return _bgAssetsAudioPlayer2.stop();
-        });
+      return _bgAssetsAudioPlayer2.stop();
+    });
 
     try {
       _bgAssetsAudioPlayer1.onReadyToPlay.listen((audio) {
@@ -204,60 +209,56 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void showDonateDialog() async {
     var numSessions = await getNumSessionsInt();
-    if (numSessions > 0 && numSessions % 5 == 0) {
-      Future<bool> userAct = showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              backgroundColor: MeditoColors.darkBGColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(12.0),
+    var sessionsString = numSessions == 1 ? " session!" : " sessions!";
+    Future<bool> userAct = showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: MeditoColors.darkBGColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(12.0),
+            ),
+            title: Text(
+                "Well done for completing " +
+                    numSessions.toString() +
+                    sessionsString,
+                style: TextStyle(color: MeditoColors.lightTextColor)),
+            content: Text(
+                "We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it. Please consider donating to show our volunteers that their work matters.",
+                style: TextStyle(color: MeditoColors.lightTextColor)),
+            actions: <Widget>[
+              FlatButton(
+                padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(12.0),
+                ),
+                color: MeditoColors.lightColor,
+                child: Text('CLOSE',
+                    style: TextStyle(color: MeditoColors.lightBlack)),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
               ),
-              title: Text(
-                  "Well done for completing " +
-                      numSessions.toString() +
-                      " sessions!",
-                  style: TextStyle(color: MeditoColors.lightTextColor)),
-              content: Text(
-                  "We believe that mindfulness and meditation can transform our lives, and no one should have to pay for it. Please consider donating to show our volunteers that their work matters.",
-                  style: TextStyle(color: MeditoColors.lightTextColor)),
-              actions: <Widget>[
-                FlatButton(
-                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(12.0),
-                  ),
-                  color: widget.coverColor != null
-                      ? parseColor(widget.coverColor)
-                      : MeditoColors.lightColor,
-                  child:
-                      Text('Dismiss', style: TextStyle(color: getTextColor())),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
+              FlatButton(
+                padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(12.0),
                 ),
-                FlatButton(
-                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(12.0),
-                  ),
-                  color: widget.coverColor != null
-                      ? parseColor(widget.coverColor)
-                      : MeditoColors.lightColor,
-                  child:
-                      Text('Donate', style: TextStyle(color: getTextColor())),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-              ],
-            );
-          });
-      if (await userAct != null && await userAct) {
-        launchUrl(donateUrl);
-      } else {
-        Navigator.popUntil(context, ModalRoute.withName("/nav"));
-      }
+                color: widget.coverColor != null
+                    ? parseColor(widget.coverColor)
+                    : MeditoColors.lightColor,
+                child: Text('Donate', style: TextStyle(color: getTextColor())),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        });
+    if (await userAct != null && await userAct) {
+      launchUrl(donateUrl);
+    } else {
+      Navigator.popUntil(context, ModalRoute.withName("/nav"));
     }
   }
 
@@ -341,10 +342,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     : MeditoColors.lightColor,
                 onPressed: () {
                   if (_assetsAudioPlayer.isPlaying.value) {
-                    _isPlaying = false;
                     pause();
                   } else {
-                    _isPlaying = true;
                     play();
                   }
                 },
@@ -397,36 +396,33 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
           _onTick(dur, pos);
 
-          if (pos > dur) {
-            return Container();
-          } else {
-            return Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              child: SliderTheme(
-                data: SliderThemeData(
-                  activeTrackColor: MeditoColors.lightColor,
-                  inactiveTrackColor: MeditoColors.darkColor,
-                  thumbColor: MeditoColors.lightColor,
-                  trackHeight: 4,
-                ),
-                child: Slider(
-                  value: pos,
-                  max: dur,
-                  onChanged: (seconds) {
-                    setState(() {
-                      _assetsAudioPlayer
-                          .seek(Duration(seconds: seconds.toInt()));
-                      _position = Duration(seconds: seconds.toInt());
-                    });
-                  },
-                ),
+          return Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: MeditoColors.lightColor,
+                inactiveTrackColor: MeditoColors.darkColor,
+                thumbColor: MeditoColors.lightColor,
+                trackHeight: 4,
               ),
-            );
-          }
+              child: Slider(
+                value: pos,
+                max: dur,
+                onChanged: (seconds) {
+                  setState(() {
+                    _assetsAudioPlayer.seek(Duration(seconds: seconds.toInt()),
+                        force: true);
+                  });
+                },
+              ),
+            ),
+          );
         });
   }
 
   void _onTick(double dur, double pos) {
+    updateDurationListened(pos);
+
     _changeBackgroundVolumeOnMainTrackPosition(dur, pos);
     if (dur > 0 && pos > dur - 15 && pos < dur - 0) {
       updateStats();
@@ -436,20 +432,29 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             Tracking.AUDIO_COMPLETED + widget.listItem.id);
       }
 
-      if (pos >= dur - 2) {
+      if (pos >= dur - 1 && !_donateShowing) {
         // so almost at the end
         showDonateDialog();
+        _donateShowing = true;
       }
+    }
+  }
+
+  void updateDurationListened(double pos) {
+    if(pos != _lastPos) {
+      var _currentDuration = _durationListened.inSeconds + 1;
+      print(pos);
+      _durationListened = new Duration(seconds: _currentDuration);
+      _lastPos = pos;
     }
   }
 
   // Request audio play
   Future<void> play() async {
-    _assetsAudioPlayer.play();
-    _bgAssetsAudioPlayer1.play();
-
     if (this.mounted) {
       setState(() {
+        _assetsAudioPlayer.play();
+        _bgAssetsAudioPlayer1.play();
         _isPlaying = true;
       });
     }
@@ -462,9 +467,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Future<void> pause() async {
     setState(() {
       _isPlaying = false;
+      _assetsAudioPlayer.pause();
+      _bgAssetsAudioPlayer1.stop();
     });
-    _assetsAudioPlayer.pause();
-    _bgAssetsAudioPlayer1.stop();
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_PAUSED + widget.fileModel.id);
@@ -479,7 +484,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _bgAssetsAudioPlayer2.stop();
     _bgAssetsAudioPlayer2.dispose();
 
-    updateMinuteCounter(_position?.inSeconds);
+    updateMinuteCounter(_durationListened?.inSeconds);
+    if (this.mounted) {
+      setState(() {
+        _durationListened = Duration();
+        _lastPos = 0.0;
+      });
+    }
 
     Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
         Tracking.AUDIO_STOPPED + widget.fileModel.id);
@@ -626,12 +637,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _customStopAction(AssetsAudioPlayer player) {
-    _assetsAudioPlayer.stop();
-    _assetsAudioPlayer.dispose();
-    _bgAssetsAudioPlayer1.stop();
-    _bgAssetsAudioPlayer1.dispose();
-    _bgAssetsAudioPlayer2.stop();
-    _bgAssetsAudioPlayer2.dispose();
+    stop();
     Navigator.of(context).pop(false);
   }
 
