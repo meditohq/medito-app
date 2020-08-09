@@ -58,12 +58,16 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   bool _showVoiceChoice = true;
 
-  bool _loading = true;
+  bool _loadingThisPage = true;
   final _viewModel = new BottomSheetViewModelImpl();
+
+  List _bgMusicList = [];
 
   @override
   void initState() {
     super.initState();
+
+    _viewModel.getBackgroundMusicList().then((value) => {_bgMusicList = value});
 
     widget.data.then((d) {
       this._coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
@@ -75,9 +79,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       compileLists(d?.files);
       onVoicePillTap(true, 0);
       setState(() {
+        _loadingThisPage = false;
         this._backgroundMusicAvailable = d?.backgroundMusic;
       });
-    });
+    }).catchError(_onFirstFutureError);
   }
 
   @override
@@ -195,7 +200,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _onBeginTap() {
-    if (_downloading || _bgDownloading) return;
+    if (_downloading || _bgDownloading || _loadingThisPage) return;
 
     widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
         _description, _contentText, _textColor, _backgroundMusicUrl);
@@ -208,7 +213,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
-        _loading ? '' : 'VOICE',
+        'VOICE',
         style: Theme.of(context).textTheme.headline1,
       ),
     );
@@ -258,13 +263,16 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
-        'BACKGROUND MUSIC   🎉',
+        'BACKGROUND SOUNDS',
         style: Theme.of(context).textTheme.headline3,
       ),
     );
   }
 
   Widget buildSessionLengthRow() {
+    if (_loadingThisPage) {
+      return getEmptyPillRow();
+    }
     return SizedBox(
       height: 56,
       child: ListView.builder(
@@ -300,6 +308,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   Widget buildVoiceRow() {
     if (!_showVoiceChoice) {
       return Container();
+    }
+
+    if (_loadingThisPage) {
+      return getEmptyPillRow();
     }
 
     return SizedBox(
@@ -382,7 +394,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
             : MeditoColors.lightColor);
   }
 
-  TextStyle getMusicPillTextStyle(BuildContext context, int index) {
+  TextStyle getMusicPillTextStyle(int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
         color: _musicSelected == index
             ? MeditoColors.darkBGColor
@@ -423,11 +435,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (voiceList != null && voiceList.isNotEmpty) {
       filterLengthsForThisPerson(voiceList[0]);
     }
-
-    if (this.mounted) {
-      _loading = false;
-      setState(() {});
-    }
   }
 
   void filterLengthsForThisPerson(String voiceSelected) {
@@ -443,6 +450,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget buildOfflineRow() {
+    if (_loadingThisPage) {
+      return getEmptyPillRow();
+    }
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: SizedBox(
@@ -481,47 +491,67 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: SizedBox(
-        height: 56,
-        child: FutureBuilder<List>(
-            future: _viewModel.getBackgroundMusicList(),
-            builder: (context, snapshot) {
-              return ListView.builder(
-                padding: EdgeInsets.only(right: 16),
-                shrinkWrap: true,
-                itemCount: 1 + (snapshot.data?.length ?? 0),
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: buildInBetweenChipPadding(),
-                    child: FilterChip(
-                      pressElevation: 4,
-                      shape: buildChipBorder(),
-                      padding: buildInnerChipPadding(),
-                      label: Text(
-                          index == 0 ? "None" : snapshot.data[index - 1].key),
-                      selected: index == _musicSelected,
-                      onSelected: (bool value) {
-                        onMusicSelected(
-                            index,
-                            index > 0 ? snapshot.data[index - 1].value : "",
-                            snapshot.data[index - 1].key);
-                      },
-                      backgroundColor: MeditoColors.darkColor,
-                      selectedColor: MeditoColors.lightColor,
-                      labelStyle: getMusicPillTextStyle(context, index),
-                    ),
-                  );
-                },
+          height: 56,
+          child: ListView.builder(
+            padding: EdgeInsets.only(right: 16),
+            shrinkWrap: true,
+            itemCount: 1 + (_bgMusicList.length ?? 0),
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (BuildContext context, int index) {
+              return Padding(
+                padding: buildInBetweenChipPadding(),
+                child: FilterChip(
+                  pressElevation: 4,
+                  shape: buildChipBorder(),
+                  padding: buildInnerChipPadding(),
+                  label:
+                      Text(index == 0 ? "None" : _bgMusicList[index - 1].key),
+                  selected: index == _musicSelected,
+                  onSelected: (bool value) {
+                    onMusicSelected(
+                        index,
+                        index > 0 ? _bgMusicList[index - 1].value : "",
+                        index > 0 ? _bgMusicList[index - 1].key : "");
+                  },
+                  backgroundColor: MeditoColors.darkColor,
+                  selectedColor: MeditoColors.lightColor,
+                  labelStyle: getMusicPillTextStyle(index),
+                ),
               );
-            }),
+            },
+          )),
+    );
+  }
+
+  Row getEmptyPillRow() {
+    return Row(
+      children: [
+        emptyPill(),
+        emptyPill(),
+      ],
+    );
+  }
+
+  Widget emptyPill() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: FilterChip(
+        onSelected: null,
+        shape: buildChipBorder(),
+        padding: buildInnerChipPadding(),
+        label: Text("        "),
+        selected: true,
+        showCheckmark: false,
+        selectedColor: MeditoColors.darkColor,
+        labelStyle: getMusicPillTextStyle(0),
       ),
     );
   }
 
   void onMusicSelected(int index, String url, String name) {
     _musicSelected = index;
-    _bgDownloading = true;
-    if (index > 0)
+    if (index > 0) {
+      _bgDownloading = true;
       downloadBGMusicFromURL(url, name).then((value) {
         _bgDownloading = false;
         _backgroundMusicUrl = value;
@@ -533,7 +563,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         _backgroundMusicUrl = null;
         setState(() {});
       });
-
+    }
     setState(() {});
   }
 
@@ -618,5 +648,40 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
             child: getTextLabel("<- Back", 1, 1, context),
           )),
     );
+  }
+
+  _onFirstFutureError(dynamic error) {
+    // set up the button
+    Widget _errorDialogOkButton = FlatButton(
+      child: Text("Go back and refresh".toUpperCase()),
+      textColor: MeditoColors.lightTextColor,
+      onPressed: () {
+        //once to close the dialog, once to go back
+        Navigator.pop(context, 'error');
+        Navigator.pop(context, 'error');
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Oops!"),
+      backgroundColor: MeditoColors.darkBGColor,
+      content: Text("An error has occured. This session may have been moved."),
+      actions: [
+        _errorDialogOkButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  _onTimeout() {
+    _onFirstFutureError(null);
   }
 }

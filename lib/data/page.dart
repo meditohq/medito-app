@@ -169,7 +169,6 @@ class Content {
 
 class CoverArt {
   String filename;
-  String dragText;
   String id;
   String info;
   String link;
@@ -183,7 +182,6 @@ class CoverArt {
 
   CoverArt(
       {this.filename,
-      this.dragText,
       this.id,
       this.info,
       this.link,
@@ -197,7 +195,6 @@ class CoverArt {
 
   CoverArt.fromJson(Map<String, dynamic> json) {
     filename = json['filename'];
-    dragText = json['dragText'];
     id = json['id'];
     info = json['info'];
     link = json['link'];
@@ -213,7 +210,6 @@ class CoverArt {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['filename'] = this.filename;
-    data['dragText'] = this.dragText;
     data['id'] = this.id;
     data['info'] = this.info;
     data['link'] = this.link;
@@ -344,7 +340,6 @@ class Parent {
 
 class Files {
   String filename;
-  String dragText;
   String id;
   String info;
   String link;
@@ -358,7 +353,6 @@ class Files {
 
   Files(
       {this.filename,
-      this.dragText,
       this.id,
       this.info,
       this.link,
@@ -372,7 +366,6 @@ class Files {
 
   Files.fromJson(Map<String, dynamic> json) {
     filename = json['filename'];
-    dragText = json['dragText'];
     id = json['id'];
     info = json['info'];
     link = json['link'];
@@ -388,7 +381,6 @@ class Files {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['filename'] = this.filename;
-    data['dragText'] = this.dragText;
     data['id'] = this.id;
     data['info'] = this.info;
     data['link'] = this.link;

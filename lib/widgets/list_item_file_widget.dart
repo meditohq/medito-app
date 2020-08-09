@@ -44,9 +44,11 @@ class _ListItemWidgetState extends State<ListItemWidget> {
   @override
   Widget build(BuildContext context) {
     SharedPreferences.getInstance().then((i) {
-      setState(() {
-        this.prefs = i;
-      });
+      if (this.mounted) {
+        setState(() {
+          this.prefs = i;
+        });
+      }
     });
 
     return Container(
@@ -56,8 +58,7 @@ class _ListItemWidgetState extends State<ListItemWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Container(
-              padding: EdgeInsets.only(top: 2), child: getIcon()),
+          Container(padding: EdgeInsets.only(top: 2), child: getIcon()),
           getTwoTextViewsInColumn(context)
         ],
       ),
@@ -70,7 +71,8 @@ class _ListItemWidgetState extends State<ListItemWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(widget.item.title, style: Theme.of(context).textTheme.headline6),
+            Text(widget.item.title,
+                style: Theme.of(context).textTheme.headline6),
             widget.item.description == null || widget.item.description.isEmpty
                 ? Container()
                 : Text(

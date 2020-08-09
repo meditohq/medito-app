@@ -239,7 +239,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       data = _viewModel.getAudioData(id: listItem.id);
     }
 
-    Navigator.push(
+    final result = Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => BottomSheetWidget(
@@ -248,6 +248,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             data: data,
           ),
         ));
+
+    if(result == "error"){
+      _onPullToRefresh();
+    }
   }
 
   _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,

@@ -96,6 +96,9 @@ Future<dynamic> downloadFile(Files currentFile) async {
   if (await file.exists()) return null;
 
   var request = await http.get(currentFile.url);
+  if (request.statusCode < 200 || request.statusCode > 300) {
+    throw HttpException("http exception erro getting file");
+  }
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
 
