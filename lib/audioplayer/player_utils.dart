@@ -95,9 +95,7 @@ Future<dynamic> downloadFile(Files currentFile) async {
 
   if (await file.exists()) return null;
 
-  var request = await http.get(
-    currentFile.url,
-  );
+  var request = await http.get(currentFile.url);
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
 
@@ -108,6 +106,7 @@ Future<dynamic> downloadFile(Files currentFile) async {
 
 Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
   String dir = (await getApplicationSupportDirectory()).path;
+  name = name.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
 
   if (await file.exists()) return file.path;
@@ -146,6 +145,7 @@ Future<dynamic> removeFile(Files currentFile) async {
 
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;
+  filename = filename.replaceAll(" ", "%20");
   File file = new File('$path/$filename');
   if (await file.exists())
     return file.absolute.path;

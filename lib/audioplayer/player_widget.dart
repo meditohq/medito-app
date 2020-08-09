@@ -79,7 +79,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   final _assetsAudioPlayer = AssetsAudioPlayer.newPlayer();
   final _bgAssetsAudioPlayer1 = AssetsAudioPlayer.newPlayer();
-  final _bgAssetsAudioPlayer2 = AssetsAudioPlayer.newPlayer();
 
   bool _donateShowing = false;
 
@@ -153,29 +152,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void loadBackground() {
-    _bgAssetsAudioPlayer1.open(
-      Audio.file(widget.bgMusicPath),
-      volume: _initialBgVolume,
-      loopMode: LoopMode.none,
-      audioFocusStrategy:
-          AudioFocusStrategy.request(resumeAfterInterruption: true),
-      notificationSettings: _getNotificationSettings(),
-    );
-
-    _bgAssetsAudioPlayer2
+    _bgAssetsAudioPlayer1
         .open(
-      Playlist(audios: [
-        Audio.file(widget.bgMusicPath),
-      ]),
-      volume: _initialBgVolume,
-      loopMode: LoopMode.none,
-      audioFocusStrategy:
-          AudioFocusStrategy.request(resumeAfterInterruption: true),
-      notificationSettings: _getNotificationSettings(),
-    )
-        .then((value) {
-      return _bgAssetsAudioPlayer2.stop();
-    });
+          Audio.file(widget.bgMusicPath),
+          volume: _initialBgVolume,
+          loopMode: LoopMode.single,
+          audioFocusStrategy:
+              AudioFocusStrategy.request(resumeAfterInterruption: true),
+        )
+        .catchError(_error);
 
     try {
       _bgAssetsAudioPlayer1.onReadyToPlay.listen((audio) {
@@ -183,7 +168,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           setState(() {
             _loading = false;
             _bgDuration = audio?.duration ?? Duration(seconds: 0);
-            _observeBgAudio();
           });
         }
       });
@@ -247,7 +231,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 color: widget.coverColor != null
                     ? parseColor(widget.coverColor)
                     : MeditoColors.lightColor,
-                child: Text('Donate', style: TextStyle(color: getTextColor())),
+                child: Text('DONATE', style: TextStyle(color: getTextColor())),
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
@@ -441,7 +425,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void updateDurationListened(double pos) {
-    if(pos != _lastPos) {
+    if (pos != _lastPos) {
       var _currentDuration = _durationListened.inSeconds + 1;
       print(pos);
       _durationListened = new Duration(seconds: _currentDuration);
@@ -481,8 +465,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _assetsAudioPlayer.dispose();
     _bgAssetsAudioPlayer1.stop();
     _bgAssetsAudioPlayer1.dispose();
-    _bgAssetsAudioPlayer2.stop();
-    _bgAssetsAudioPlayer2.dispose();
 
     updateMinuteCounter(_durationListened?.inSeconds);
     if (this.mounted) {
@@ -611,10 +593,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (timeLeft < timeToStartDecreasing) {
       var volume = timeLeft / 100;
       _bgAssetsAudioPlayer1.setVolume(volume);
-      _bgAssetsAudioPlayer2.setVolume(volume);
     } else {
       _bgAssetsAudioPlayer1.setVolume(_initialBgVolume);
-      _bgAssetsAudioPlayer2.setVolume(_initialBgVolume);
     }
   }
 
@@ -641,44 +621,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Navigator.of(context).pop(false);
   }
 
-  void _observeBgAudio() {
-    _bgAssetsAudioPlayer1.currentPosition.listen((position) {
-      print('1 tick' + position.toString());
-      if (this.mounted) {
-        if (position.inSeconds > 5 &&
-            position.inSeconds < 6 &&
-            _bgAssetsAudioPlayer2.isPlaying.value) {
-          _bgAssetsAudioPlayer2.stop();
-          print('2 stopping');
-        }
-
-        if (position.inSeconds > _bgDuration.inSeconds - 5 &&
-            !_bgAssetsAudioPlayer2.isPlaying.value) {
-          _bgAssetsAudioPlayer2.play();
-          print('2 starting');
-        }
-      } else {
-        stop();
-      }
-    });
-
-    _bgAssetsAudioPlayer2.currentPosition.listen((position) {
-      print('2 tick' + position.toString());
-      if (this.mounted) {
-        if (position.inSeconds > 5 &&
-            position.inSeconds < 6 &&
-            _bgAssetsAudioPlayer1.isPlaying.value) {
-          _bgAssetsAudioPlayer1.stop();
-          print('1 stopping');
-        }
-        if (position.inSeconds > _bgDuration.inSeconds - 5 &&
-            !_bgAssetsAudioPlayer1.isPlaying.value) {
-          _bgAssetsAudioPlayer1.play();
-          print('1 starting');
-        }
-      } else {
-        stop();
-      }
-    });
+  _error(var error) {
+    print(error);
   }
 }

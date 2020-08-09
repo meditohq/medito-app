@@ -113,9 +113,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                       buildSessionLengthRow(),
                       getBGMusicSpacer(),
                       ////////// spacer
-//                      getBGMusicRowOrContainer(),
-//                      buildBackgroundMusicRow(),
-//                      buildSpacer(),
+                      getBGMusicRowOrContainer(),
+                      buildBackgroundMusicRow(),
+                      buildSpacer(),
                       ////////// spacer
                       buildOfflineTextRow(),
                       buildOfflineRow(),
