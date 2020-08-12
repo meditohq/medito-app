@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:io';
+
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:flutter/material.dart';
 
@@ -490,7 +492,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget buildBackgroundMusicRow() {
-    if (!_backgroundMusicAvailable) return Container();
+    if (!_backgroundMusicAvailable  || Platform.isMacOS) return Container();
 
     if (_bgMusicList.length == 0) return getEmptyPillRow();
 
