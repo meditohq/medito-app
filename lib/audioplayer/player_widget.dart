@@ -241,6 +241,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         });
     if (await userAct != null && await userAct) {
       launchUrl(donateUrl);
+      Navigator.popUntil(context, ModalRoute.withName("/nav"));
     } else {
       Navigator.popUntil(context, ModalRoute.withName("/nav"));
     }

@@ -67,7 +67,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void initState() {
     super.initState();
 
-    _viewModel.getBackgroundMusicList().then((value) => {_bgMusicList = value});
+    _viewModel.getBackgroundMusicList().then((value) {
+      setState(() {
+        _bgMusicList = value;
+      });
+    });
 
     widget.data.then((d) {
       this._coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
@@ -487,6 +491,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget buildBackgroundMusicRow() {
     if (!_backgroundMusicAvailable) return Container();
+
+    if (_bgMusicList.length == 0) return getEmptyPillRow();
 
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
