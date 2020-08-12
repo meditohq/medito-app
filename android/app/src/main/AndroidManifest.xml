@@ -30,6 +30,10 @@
                 android:value="2" />
 
             <meta-data
+                android:name="assets.audio.player.notification.icon"
+                android:resource="@drawable/logo"/>
+
+            <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
                 android:resource="@drawable/launch_background" />
 
