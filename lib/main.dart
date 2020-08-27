@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -43,7 +44,7 @@ class HomeScreenWidget extends StatelessWidget {
       routes: {
         '/nav': (context) => Scaffold(
             appBar: null, //AppBar(title: const Text(_title)),
-            body: TileList()),
+            body: AudioServiceWidget(child: TileList())),
       },
       theme: ThemeData(
           canvasColor: MeditoColors.almostBlack,

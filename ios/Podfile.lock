@@ -1,18 +1,14 @@
 PODS:
-  - assets_audio_player (0.0.1):
-    - Flutter
-  - assets_audio_player_web (0.0.1):
+  - audio_service (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_matomo (0.0.1):
+  - flutter_isolate (0.0.1):
     - Flutter
-    - MatomoTracker (> 7)
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
-  - MatomoTracker (7.2.0):
-    - MatomoTracker/Core (= 7.2.0)
-  - MatomoTracker/Core (7.2.0)
+  - just_audio (0.0.1):
+    - Flutter
   - path_provider (0.0.1):
     - Flutter
   - path_provider_linux (0.0.1):
@@ -40,10 +36,10 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - assets_audio_player (from `.symlinks/plugins/assets_audio_player/ios`)
-  - assets_audio_player_web (from `.symlinks/plugins/assets_audio_player_web/ios`)
+  - audio_service (from `.symlinks/plugins/audio_service/ios`)
   - Flutter (from `Flutter`)
-  - flutter_matomo (from `.symlinks/plugins/flutter_matomo/ios`)
+  - flutter_isolate (from `.symlinks/plugins/flutter_isolate/ios`)
+  - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - path_provider_linux (from `.symlinks/plugins/path_provider_linux/ios`)
   - path_provider_macos (from `.symlinks/plugins/path_provider_macos/ios`)
@@ -60,17 +56,16 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - FMDB
-    - MatomoTracker
 
 EXTERNAL SOURCES:
-  assets_audio_player:
-    :path: ".symlinks/plugins/assets_audio_player/ios"
-  assets_audio_player_web:
-    :path: ".symlinks/plugins/assets_audio_player_web/ios"
+  audio_service:
+    :path: ".symlinks/plugins/audio_service/ios"
   Flutter:
     :path: Flutter
-  flutter_matomo:
-    :path: ".symlinks/plugins/flutter_matomo/ios"
+  flutter_isolate:
+    :path: ".symlinks/plugins/flutter_isolate/ios"
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   path_provider_linux:
@@ -97,12 +92,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
-  assets_audio_player: edee322b9cb625571b830b35872ead1a295fd917
-  assets_audio_player_web: 19826380c44375761aa0b9053665c1e3fbc3b86b
+  audio_service: f509d65da41b9521a61f1c404dd58651f265a567
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_matomo: a4fc9d95faaf6f95124fc1956e892f91791b5fac
+  flutter_isolate: 0edf5081826d071adf21759d1eb10ff5c24503b5
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  MatomoTracker: 6f89e2561083685a360e223fb663e9ccd57c1d1a
+  just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   path_provider_linux: 4d630dc393e1f20364f3e3b4a2ff41d9674a84e4
   path_provider_macos: f760a3c5b04357c380e2fddb6f9db6f3015897e0

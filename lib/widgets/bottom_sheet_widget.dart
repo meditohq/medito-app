@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
+import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,7 @@ class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
   final Function(
-          dynamic, dynamic, dynamic, String, String, String, String, String)
+          Files, CoverArt, dynamic, String, String, String, String, String)
       onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
@@ -45,7 +46,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   List voiceList = [' ', ' ', ' '];
   List lengthList = [' ', ' ', ' '];
   List lengthFilteredList = [];
-  List filesList;
+  List<Files> filesList;
   var _coverArt;
   String _description;
   String _title;
@@ -54,7 +55,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   String _contentText = '';
   bool _downloading = false;
   bool _bgDownloading = false;
-  var currentFile;
+  Files currentFile;
   var _backgroundMusicUrl;
   var _backgroundMusicAvailable = false;
 
@@ -492,7 +493,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget buildBackgroundMusicRow() {
-    if (!_backgroundMusicAvailable  || Platform.isMacOS) return Container();
+    if (!_backgroundMusicAvailable) return Container();
 
     if (_bgMusicList.length == 0) return getEmptyPillRow();
 

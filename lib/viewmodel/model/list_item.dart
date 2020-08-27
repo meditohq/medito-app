@@ -26,11 +26,36 @@ class ListItem {
 
   ListItem(this.title, this.id, this.type,
       {this.description,
-        this.fileType,
-        this.url,
-        this.parentId,
-        this.thumbnail,
-        this.contentText});
+      this.fileType,
+      this.url,
+      this.parentId,
+      this.thumbnail,
+      this.contentText});
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['thumbnail'] = this.thumbnail;
+    data['id'] = this.id;
+    data['description'] = this.description;
+    data['contentText'] = this.contentText;
+    data['type'] = this.type.index;
+    data['fileType'] = this.fileType.index;
+    data['url'] = this.url;
+    data['title'] = this.title;
+    data['parentId'] = this.parentId;
+    return data;
+  }
+
+  factory ListItem.fromJson(Map<String, dynamic> parsedJson) {
+    return new ListItem(parsedJson['title'] ?? "", parsedJson['id'] ?? "",
+        ListItemType.values[parsedJson['type'] ?? 0],
+        thumbnail: parsedJson['thumbnail'] ?? "",
+        description: parsedJson['description'] ?? "",
+        contentText: parsedJson['contentText'] ?? "",
+        fileType: FileType.values[parsedJson['fileType'] ?? 0],
+        url: parsedJson['url'] ?? "",
+        parentId: parsedJson['parentId'] ?? "");
+  }
 }
 
 enum ListItemType { folder, file, illustration }
