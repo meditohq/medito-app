@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +30,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(HomeScreenWidget());
   Tracking.initialiseTracker();
+
+  Map options = {
+    "afDevKey": "QPt3SbhrvuKm7FEnqZbi8X",
+    "afAppId": "id1500780518",
+    "isDebug": true
+  };
+
+  AppsflyerSdk appsflyerSdk = AppsflyerSdk(options);
+  appsflyerSdk.initSdk();
 }
 
 /// This Widget is the main application widget.
