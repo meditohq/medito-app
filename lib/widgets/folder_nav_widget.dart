@@ -13,8 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/audioplayer/audio_player_singleton.dart';
-import 'package:Medito/audioplayer/audio_player_task.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
@@ -24,7 +22,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -145,6 +142,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       ),
     );
   }
+
+  
 
   Widget getListView() {
     return RefreshIndicator(
@@ -281,23 +280,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             _viewModel.currentlySelectedFile,
             attributionsContent));
 
-    startService();
-    Navigator.push(context, MaterialPageRoute(builder: (c) {
-      return PlayerWidget();
-    })).then((value) {
-      return AudioPlayerSingleton().player.stop();
+    start().then((value) {
+      Navigator.push(context, MaterialPageRoute(builder: (c) {
+        return PlayerWidget();
+      }));
+      return null;
     });
-  }
-
-  void startService() async {
-    await AudioService.start(
-        backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-        androidNotificationChannelName: 'Audio Service Demo',
-        // Enable this if you want the Android service to exit the foreground state on pause.
-        androidStopForegroundOnPause: false,
-        androidNotificationColor: 0xFF2196f3,
-        androidNotificationIcon: 'drawable/logo',
-        androidEnableQueue: true);
   }
 
   Widget getFileListItem(ListItem item) {
@@ -341,9 +329,4 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       ),
     );
   }
-}
-
-// NOTE: Your entrypoint MUST be a top-level function.
-void _audioPlayerTaskEntrypoint() async {
-  AudioServiceBackground.run(() => AudioPlayerSingleton().audioPlayerTask);
 }

@@ -1,5 +1,11 @@
 PODS:
+  - "appsflyer_sdk (5.4.1+1)":
+    - AppsFlyerFramework (= 5.4.1)
+    - Flutter
+  - AppsFlyerFramework (5.4.1)
   - audio_service (0.0.1):
+    - Flutter
+  - audio_session (0.0.1):
     - Flutter
   - Flutter (1.0.0)
   - flutter_isolate (0.0.1):
@@ -36,7 +42,9 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
   - audio_service (from `.symlinks/plugins/audio_service/ios`)
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - Flutter (from `Flutter`)
   - flutter_isolate (from `.symlinks/plugins/flutter_isolate/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
@@ -55,11 +63,16 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - AppsFlyerFramework
     - FMDB
 
 EXTERNAL SOURCES:
+  appsflyer_sdk:
+    :path: ".symlinks/plugins/appsflyer_sdk/ios"
   audio_service:
     :path: ".symlinks/plugins/audio_service/ios"
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
   Flutter:
     :path: Flutter
   flutter_isolate:
@@ -92,7 +105,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
+  appsflyer_sdk: 55943fc3bc9d260c79f9be1aa107210e39ce747d
+  AppsFlyerFramework: 15ae3f973d0248bc9d3926c2c1ae0bad70b90517
   audio_service: f509d65da41b9521a61f1c404dd58651f265a567
+  audio_session: 4f3e461722055d21515cf3261b64c973c062f345
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_isolate: 0edf5081826d071adf21759d1eb10ff5c24503b5
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a

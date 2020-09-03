@@ -13,18 +13,14 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/audioplayer/audio_player_singleton.dart';
-import 'package:Medito/audioplayer/audio_player_task.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../tracking/tracking.dart';
@@ -472,27 +468,16 @@ class TileListState extends State<TileList> {
           textColor, coverColor, bgMusic, listItem, att);
     });
 
-    startService();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PlayerWidget()),
-    ).then((value) {
-      AudioPlayerSingleton().player.stop.call();
-      setState(() {
-        streak = getCurrentStreak();
-      });
-    });
-  }
-
-  void startService() async {
-    await AudioService.start(
-      backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-      androidNotificationChannelName: 'Audio Service Demo',
-      androidStopForegroundOnPause: false,
-      androidNotificationColor: 0xFF2196f3,
-      androidNotificationIcon: 'drawable/logo',
-      androidEnableQueue: true,
-    );
+    start().then((value) => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return PlayerWidget();
+          }),
+        ).then((value) {
+          setState(() {
+            streak = getCurrentStreak();
+          });
+        }));
   }
 
   void openNavWidget(TileItem tile, {Future textFuture}) {
@@ -585,9 +570,4 @@ class TileListState extends State<TileList> {
       ),
     );
   }
-}
-
-// NOTE: Your entrypoint MUST be a top-level function.
-void _audioPlayerTaskEntrypoint() async {
-  AudioServiceBackground.run(() => AudioPlayerSingleton().audioPlayerTask);
 }

@@ -8,7 +8,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MediaLibrary {
-
   static void saveMediaLibrary(
       String description,
       String title,
@@ -31,7 +30,7 @@ class MediaLibrary {
     prefs.setString("attr", json.encode(attributions.toJson()));
   }
 
-  static Future<List<MediaItem>> retrieveMediaLibrary() async {
+  static Future<MediaItem> retrieveMediaLibrary() async {
     var prefs = await SharedPreferences.getInstance();
 
     var description = prefs.getString("description");
@@ -40,23 +39,25 @@ class MediaLibrary {
     String coverArtString = prefs.getString("coverArt");
     var coverArt = CoverArt.fromJson(json.decode(coverArtString));
 
+    String bgMusic = prefs.getString("bgMusic");
+
     Files fileTapped =
         Files.fromJson(json.decode(prefs.getString("fileTapped")));
 
+    var location = fileTapped.filename;
     var listItemString = prefs.getString("listItemToListen");
     var jsonItem = json.decode(listItemString);
     ListItem listItem = ListItem.fromJson(jsonItem);
 
 //    prefs.getString("attr");
 
-    return [
-      MediaItem(
-        id: fileTapped.url,
-        album: description,
-        title: title,
-        artist: fileTapped.voice,
-        artUri: coverArt.url,
-      )
-    ];
+    return MediaItem(
+      id: fileTapped.url,
+      extras: {'location': '$location', 'bgMusic': '$bgMusic'},
+      album: description,
+      title: title,
+      artist: fileTapped.voice,
+      artUri: coverArt.url,
+    );
   }
 }

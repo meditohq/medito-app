@@ -6,7 +6,9 @@ class AudioPlayerSingleton {
   static final AudioPlayerSingleton _singleton =
       AudioPlayerSingleton._internal();
 
-  AudioPlayerTask audioPlayerTask = new AudioPlayerTask();
+  MeditoAudioPlayerTask audioPlayerTask = new MeditoAudioPlayerTask();
+
+  Duration duration = Duration();
 
   AudioPlayer player = new AudioPlayer();
 

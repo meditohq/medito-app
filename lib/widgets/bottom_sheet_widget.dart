@@ -13,8 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'dart:io';
-
 import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:flutter/material.dart';
@@ -211,6 +209,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
         _description, _contentText, _textColor, _backgroundMusicUrl);
+
+    setState(() {
+      _downloading = true;
+      Future.delayed(const Duration(milliseconds: 3000), () {
+        setState(() {
+          _downloading = false;
+        });
+      });
+    });
   }
 
   Widget buildVoiceText() {
@@ -580,6 +587,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     _offlineSelected = index;
     _downloading = true;
     if (index == 1) {
+      // 'YES' selected
       downloadFile(currentFile).then((onValue) {
         setState(() {
           _downloading = false;
@@ -592,6 +600,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         });
       });
     } else {
+      // 'NO' selected
       removeFile(currentFile).then((onValue) {
         setState(() {
           _downloading = false;
@@ -688,9 +697,5 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         return alert;
       },
     );
-  }
-
-  _onTimeout() {
-    _onFirstFutureError(null);
   }
 }
