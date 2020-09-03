@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/pill_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -32,25 +34,32 @@ class _MainScreenState extends State<MainScreen> {
   final BehaviorSubject<double> _dragPositionSubject =
       BehaviorSubject.seeded(null);
 
+  var millisecondsListened = 0;
+
+  var _updatedStats = false;
+
   @override
   void dispose() {
+    updateMinuteCounter(Duration(milliseconds: millisecondsListened).inSeconds);
     AudioService.stop();
     super.dispose();
   }
 
   Widget buildGoBackPill() {
     return Padding(
-      padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),
-      child: GestureDetector(
-          onTap: () {
-            Navigator.popUntil(context, ModalRoute.withName("/nav"));
-          },
-          child: Container(
-            padding: getEdgeInsets(1, 1),
-            decoration: getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
-            child: getTextLabel("✗ Close", 1, 1, context),
-          )),
-    );
+        padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),
+        child: GestureDetector(
+          child: GestureDetector(
+              onTap: () {
+                Navigator.popUntil(context, ModalRoute.withName("/nav"));
+              },
+              child: Container(
+                padding: getEdgeInsets(1, 1),
+                decoration:
+                    getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
+                child: getTextLabel("✗ Close", 1, 1, context),
+              )),
+        ));
   }
 
   @override
@@ -156,8 +165,8 @@ class _MainScreenState extends State<MainScreen> {
         int duration = mediaItem?.duration?.inMilliseconds ?? 0;
 
         if (duration > 0) {
-          setBgVolumeFadeAtEnd(
-              state.currentPosition.inSeconds, mediaItem.duration.inSeconds);
+          setBgVolumeFadeAtEnd(mediaItem, state.currentPosition.inSeconds,
+              mediaItem.duration.inSeconds);
         }
 
         return Column(
@@ -173,11 +182,6 @@ class _MainScreenState extends State<MainScreen> {
                 },
                 onChangeEnd: (value) {
                   AudioService.seekTo(Duration(milliseconds: value.toInt()));
-                  // Due to a delay in platform channel communication, there is
-                  // a brief moment after releasing the Slider thumb before the
-                  // new position is broadcast from the platform side. This
-                  // hack is to hold onto seekPos until the next state update
-                  // comes through.
                   seekPos = value;
                   _dragPositionSubject.add(null);
                 },
@@ -191,10 +195,19 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void setBgVolumeFadeAtEnd(int positionSecs, int durSecs) {
+  void setBgVolumeFadeAtEnd(
+      MediaItem mediaItem, int positionSecs, int durSecs) {
+    millisecondsListened += 200;
     var timeLeft = durSecs - positionSecs;
     if (timeLeft <= 10) {
       AudioService.customAction('bgVolume', timeLeft);
+    }
+    if (timeLeft < 5 && !_updatedStats) {
+      markAsListened(mediaItem.extras['id']);
+      incrementNumSessions();
+      updateStreak();
+      Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
+          Tracking.AUDIO_COMPLETED + mediaItem.id);
     }
   }
 }
@@ -403,9 +416,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   void playBgMusic(bgMusic) {
     if (bgMusic != null) {
-//      var source =
-//          LoopingAudioSource(child: ProgressiveAudioSource(bgMusic), count: 2);
-//      _bgPlayer.load(source);
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.one);

@@ -48,12 +48,13 @@ class MediaLibrary {
     var listItemString = prefs.getString("listItemToListen");
     var jsonItem = json.decode(listItemString);
     ListItem listItem = ListItem.fromJson(jsonItem);
+    var id = listItem.id;
 
 //    prefs.getString("attr");
 
     return MediaItem(
       id: fileTapped.url,
-      extras: {'location': '$location', 'bgMusic': '$bgMusic'},
+      extras: {'location': '$location', 'bgMusic': '$bgMusic', 'id': '$id'},
       album: description,
       title: title,
       artist: fileTapped.voice,
