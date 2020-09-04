@@ -13,12 +13,9 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-<<<<<<< lib/tracking/tracking.dart
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
-=======
->>>>>>> lib/tracking/tracking.dart
 class Tracking {
   static const String SCREEN_LOADED = "screen_loaded";
   static const String FOLDER_TAPPED = "folder_tapped";
@@ -58,10 +55,9 @@ class Tracking {
   static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
 
   static Future<void> initialiseTracker() async {
-<<<<<<< lib/tracking/tracking.dart
-
     _firebaseAnalytics = FirebaseAnalytics();
-    _firebaseAnalyticsObserver = FirebaseAnalyticsObserver(analytics: _firebaseAnalytics);
+    _firebaseAnalyticsObserver =
+        FirebaseAnalyticsObserver(analytics: _firebaseAnalytics);
 
     //dummy event
     _firebaseAnalytics.logEvent(
@@ -69,17 +65,13 @@ class Tracking {
       parameters: {},
     );
     print('tracking initialized');
-=======
-
->>>>>>> lib/tracking/tracking.dart
   }
 
   static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
 
   // like "LoginWidget", "Login button", "Clicked"
-<<<<<<< lib/tracking/tracking.dart
-  static Future<void> trackEvent(String widgetName, String eventName, String action) async {
-
+  static Future<void> trackEvent(
+      String widgetName, String eventName, String action) async {
     _firebaseAnalytics.logEvent(
       name: widgetName,
       parameters: {
@@ -89,9 +81,6 @@ class Tracking {
     );
 
     print("Event logged: $widgetName");
-=======
-  static Future<void> trackEvent(
-      String widgetName, String eventName, String action) async {
->>>>>>> lib/tracking/tracking.dart
   }
+
 }
