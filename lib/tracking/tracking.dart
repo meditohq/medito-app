@@ -63,8 +63,7 @@ class Tracking {
     _firebaseAnalytics.logEvent(
       name: "tracker_initialized",
       parameters: {},
-    );
-    print('tracking initialized');
+    ).then((value) => print('tracking initialized'));
   }
 
   static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
@@ -82,5 +81,4 @@ class Tracking {
 
     print("Event logged: $widgetName");
   }
-
 }

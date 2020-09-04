@@ -15,8 +15,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,24 +25,28 @@ import 'utils/colors.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark, statusBarColor: Colors.transparent));
+      statusBarBrightness: Brightness.dark,
+      statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(HomeScreenWidget());
+
   Tracking.initialiseTracker();
 
-  Map options = {
-    "afDevKey": "QPt3SbhrvuKm7FEnqZbi8X",
-    "afAppId": "id1500780518",
-    "isDebug": true
-  };
-
-  AppsflyerSdk appsflyerSdk = AppsflyerSdk(options);
-  appsflyerSdk.initSdk();
+//  Map options = {
+//    "afDevKey": "QPt3SbhrvuKm7FEnqZbi8X",
+//    "afAppId": "id1500780518",
+//    "isDebug": true
+//  };
+//
+//  AppsflyerSdk appsflyerSdk = AppsflyerSdk(options);
+//  appsflyerSdk.initSdk();
 }
 
 /// This Widget is the main application widget.
 class HomeScreenWidget extends StatelessWidget {
   static const String _title = 'Medito';
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +75,12 @@ class HomeScreenWidget extends StatelessWidget {
 
 class FadeTransitionBuilder extends PageTransitionsBuilder {
   @override
-  Widget buildTransitions<T>(PageRoute<T> route, BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
     return FadeTransition(
         opacity: CurvedAnimation(
           parent: animation,
