@@ -13,7 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:flutter_matomo/flutter_matomo.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class Tracking {
   static const String SCREEN_LOADED = "screen loaded ";
@@ -50,15 +51,29 @@ class Tracking {
   static const String HOME = "home page. ";
   static const String APP_CLOSED = "app closed. ";
   static const String BACK_PRESSED = "back pressed. ";
+  static FirebaseAnalytics _firebaseAnalytics;
+  static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
 
   static Future<void> initialiseTracker() async {
-    await FlutterMatomo.initializeTracker(
-        'https://medito.app/analytics/piwik.php', 1);
+    // await FlutterMatomo.initializeTracker(
+    //     'https://medito.app/analytics/piwik.php', 1);
+
+    _firebaseAnalytics = FirebaseAnalytics();
+    _firebaseAnalyticsObserver = FirebaseAnalyticsObserver(analytics: _firebaseAnalytics);
   }
 
+  static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
+
   // like "LoginWidget", "Login button", "Clicked"
-  static Future<void> trackEvent(
-      String widgetName, String eventName, String action) async {
-    await FlutterMatomo.trackEventWithName(widgetName, eventName, action);
+  static Future<void> trackEvent(String widgetName, String eventName, String action) async {
+    //await FlutterMatomo.trackEventWithName(widgetName, eventName, action);
+
+    _firebaseAnalytics.logEvent(
+      name: widgetName,
+      parameters: {
+        "eventName": eventName,
+        "action": action,
+      },
+    );
   }
 }
