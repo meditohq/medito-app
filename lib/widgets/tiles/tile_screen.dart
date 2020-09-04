@@ -13,6 +13,9 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/data/page.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,7 +23,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../audioplayer/player_widget.dart';
 import '../../tracking/tracking.dart';
 import '../../utils/colors.dart';
 import '../../utils/stats_utils.dart';
@@ -445,14 +447,14 @@ class TileListState extends State<TileList> {
   }
 
   _showPlayer(
-      dynamic fileTapped,
-      dynamic coverArt,
+      Files fileTapped,
+      CoverArt coverArt,
       dynamic coverColor,
       String title,
       String description,
       String contentText,
       String textColor,
-      String bgMusicUrl) {
+      String bgMusic) async {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -461,25 +463,21 @@ class TileListState extends State<TileList> {
         url: _viewModel.currentTile.url,
         thumbnail: _viewModel.currentTile.thumbnail);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PlayerWidget(
-            fileModel: fileTapped,
-            description: description,
-            coverArt: coverArt,
-            coverColor: coverColor,
-            title: title,
-            bgMusicPath: bgMusicUrl,
-            textColor: textColor,
-            listItem: listItem,
-            attributions: _viewModel.getAttributions(fileTapped.attributions)),
-      ),
-    ).then((value) {
-      setState(() {
-        streak = getCurrentStreak();
-      });
+    await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
+      MediaLibrary.saveMediaLibrary(description, title, fileTapped, coverArt,
+          textColor, coverColor, bgMusic, listItem, att);
     });
+
+    start().then((value) => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return PlayerWidget();
+          }),
+        ).then((value) {
+          setState(() {
+            streak = getCurrentStreak();
+          });
+        }));
   }
 
   void openNavWidget(TileItem tile, {Future textFuture}) {

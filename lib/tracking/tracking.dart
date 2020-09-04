@@ -13,9 +13,12 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+<<<<<<< lib/tracking/tracking.dart
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
+=======
+>>>>>>> lib/tracking/tracking.dart
 class Tracking {
   static const String SCREEN_LOADED = "screen_loaded";
   static const String FOLDER_TAPPED = "folder_tapped";
@@ -55,8 +58,7 @@ class Tracking {
   static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
 
   static Future<void> initialiseTracker() async {
-    // await FlutterMatomo.initializeTracker(
-    //     'https://medito.app/analytics/piwik.php', 1);
+<<<<<<< lib/tracking/tracking.dart
 
     _firebaseAnalytics = FirebaseAnalytics();
     _firebaseAnalyticsObserver = FirebaseAnalyticsObserver(analytics: _firebaseAnalytics);
@@ -67,13 +69,16 @@ class Tracking {
       parameters: {},
     );
     print('tracking initialized');
+=======
+
+>>>>>>> lib/tracking/tracking.dart
   }
 
   static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
 
   // like "LoginWidget", "Login button", "Clicked"
+<<<<<<< lib/tracking/tracking.dart
   static Future<void> trackEvent(String widgetName, String eventName, String action) async {
-    //await FlutterMatomo.trackEventWithName(widgetName, eventName, action);
 
     _firebaseAnalytics.logEvent(
       name: widgetName,
@@ -83,6 +88,10 @@ class Tracking {
       },
     );
 
-    print("Event logges: $widgetName");
+    print("Event logged: $widgetName");
+=======
+  static Future<void> trackEvent(
+      String widgetName, String eventName, String action) async {
+>>>>>>> lib/tracking/tracking.dart
   }
 }

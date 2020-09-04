@@ -13,13 +13,16 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -140,6 +143,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     );
   }
 
+  
+
   Widget getListView() {
     return RefreshIndicator(
       color: MeditoColors.lightColor,
@@ -249,28 +254,38 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
           ),
         ));
 
-    if(result == "error"){
+    if (result == "error") {
       _onPullToRefresh();
     }
   }
 
-  _showPlayer(dynamic fileTapped, dynamic coverArt, dynamic coverColor,
-      String title, String description, String contentText, String textColor, String bgMusic) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (c) => PlayerWidget(
-              fileModel: fileTapped,
-              description: description,
-              coverArt: coverArt,
-              textColor: textColor,
-              coverColor: coverColor,
-              title: title,
-              bgMusicPath: bgMusic,
-              listItem: _viewModel.currentlySelectedFile,
-              attributions:
-                  _viewModel.getAttributions(fileTapped.attributions)),
-        ));
+  _showPlayer(
+      Files fileTapped,
+      CoverArt coverArt,
+      dynamic coverColor,
+      String title,
+      String description,
+      String contentText,
+      String textColor,
+      String bgMusic) {
+    _viewModel.getAttributions(fileTapped.attributions).then(
+        (attributionsContent) async => MediaLibrary.saveMediaLibrary(
+            description,
+            title,
+            fileTapped,
+            coverArt,
+            textColor,
+            coverColor,
+            bgMusic,
+            _viewModel.currentlySelectedFile,
+            attributionsContent));
+
+    start().then((value) {
+      Navigator.push(context, MaterialPageRoute(builder: (c) {
+        return PlayerWidget();
+      }));
+      return null;
+    });
   }
 
   Widget getFileListItem(ListItem item) {
@@ -307,8 +322,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         settings: RouteSettings(name: '/nav'),
         builder: (c) {
           return TextFileWidget(
-              firstTitle: item.title,
-              text: item.contentText,
+            firstTitle: item.title,
+            text: item.contentText,
           );
         },
       ),
