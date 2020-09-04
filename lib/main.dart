@@ -25,8 +25,7 @@ import 'utils/colors.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarColor: Colors.transparent));
+      statusBarBrightness: Brightness.dark, statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
   runApp(HomeScreenWidget());
   Tracking.initialiseTracker();
@@ -65,18 +64,15 @@ class HomeScreenWidget extends StatelessWidget {
           accentColor: MeditoColors.lightColor,
           textTheme: buildDMSansTextTheme(context)),
       title: _title,
+      navigatorObservers: [Tracking.getObserver()],
     );
   }
 }
 
 class FadeTransitionBuilder extends PageTransitionsBuilder {
   @override
-  Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
+  Widget buildTransitions<T>(PageRoute<T> route, BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
     return FadeTransition(
         opacity: CurvedAnimation(
           parent: animation,
