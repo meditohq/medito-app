@@ -30,7 +30,6 @@ dependencies:
   audio_session: ^0.0.4
   audio_service: ^0.14.1
   rxdart: ^0.24.1
-  appsflyer_sdk: ^6.0.2
   firebase_core: ^0.5.0
   firebase_analytics: ^6.0.0
 
