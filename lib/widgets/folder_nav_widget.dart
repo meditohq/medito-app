@@ -143,8 +143,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     );
   }
 
-  
-
   Widget getListView() {
     return RefreshIndicator(
       color: MeditoColors.lightColor,
@@ -281,9 +279,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             attributionsContent));
 
     start().then((value) {
-      Navigator.push(context, MaterialPageRoute(builder: (c) {
-        return PlayerWidget();
-      }));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (c) {
+                return PlayerWidget();
+              }));
       return null;
     });
   }
@@ -319,7 +320,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     Navigator.push(
       context,
       MaterialPageRoute(
-        settings: RouteSettings(name: '/nav'),
         builder: (c) {
           return TextFileWidget(
             firstTitle: item.title,

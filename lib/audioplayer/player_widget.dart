@@ -4,32 +4,19 @@ import 'dart:math';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/widgets/pill_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
-class PlayerWidget extends StatelessWidget {
+class PlayerWidget extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Audio Service Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: AudioServiceWidget(child: MainScreen()),
-    );
-  }
+  _PlayerWidgetState createState() => _PlayerWidgetState();
 }
 
-class MainScreen extends StatefulWidget {
-  @override
-  _MainScreenState createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
+class _PlayerWidgetState extends State<PlayerWidget> {
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double> _dragPositionSubject =
       BehaviorSubject.seeded(null);
@@ -45,28 +32,11 @@ class _MainScreenState extends State<MainScreen> {
     super.dispose();
   }
 
-  Widget buildGoBackPill() {
-    return Padding(
-        padding: EdgeInsets.only(left: 16, bottom: 8, top: 24),
-        child: GestureDetector(
-          child: GestureDetector(
-              onTap: () {
-                Navigator.popUntil(context, ModalRoute.withName("/nav"));
-              },
-              child: Container(
-                padding: getEdgeInsets(1, 1),
-                decoration:
-                    getBoxDecoration(1, 1, color: MeditoColors.darkBGColor),
-                child: getTextLabel("✗ Close", 1, 1, context),
-              )),
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Audio Service Demo'),
+        leading: CloseButton(onPressed: _onBackPressed),
       ),
       body: Center(
         child: StreamBuilder<ScreenState>(
@@ -209,6 +179,10 @@ class _MainScreenState extends State<MainScreen> {
       Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
           Tracking.AUDIO_COMPLETED + mediaItem.id);
     }
+  }
+
+  void _onBackPressed() {
+    Navigator.popUntil(context, ModalRoute.withName("/nav"));
   }
 }
 

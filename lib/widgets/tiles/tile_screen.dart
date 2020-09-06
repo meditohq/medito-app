@@ -470,9 +470,10 @@ class TileListState extends State<TileList> {
 
     start().then((value) => Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) {
-            return PlayerWidget();
-          }),
+          MaterialPageRoute(
+              builder: (context) {
+                return PlayerWidget();
+              }),
         ).then((value) {
           setState(() {
             streak = getCurrentStreak();
