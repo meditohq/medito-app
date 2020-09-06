@@ -464,21 +464,20 @@ class TileListState extends State<TileList> {
         thumbnail: _viewModel.currentTile.thumbnail);
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
-      MediaLibrary.saveMediaLibrary(description, title, fileTapped, coverArt,
-          textColor, coverColor, bgMusic, listItem, att);
+      await MediaLibrary.saveMediaLibrary(description, title, fileTapped,
+          coverArt, textColor, coverColor, bgMusic, listItem, att);
+    }).then((value) {
+      start().then((value) => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) {
+              return PlayerWidget();
+            }),
+          ).then((value) {
+            setState(() {
+              streak = getCurrentStreak();
+            });
+          }));
     });
-
-    start().then((value) => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) {
-                return PlayerWidget();
-              }),
-        ).then((value) {
-          setState(() {
-            streak = getCurrentStreak();
-          });
-        }));
   }
 
   void openNavWidget(TileItem tile, {Future textFuture}) {

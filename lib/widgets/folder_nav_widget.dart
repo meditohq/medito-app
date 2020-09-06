@@ -265,27 +265,27 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       String description,
       String contentText,
       String textColor,
-      String bgMusic) {
-    _viewModel.getAttributions(fileTapped.attributions).then(
-        (attributionsContent) async => MediaLibrary.saveMediaLibrary(
-            description,
-            title,
-            fileTapped,
-            coverArt,
-            textColor,
-            coverColor,
-            bgMusic,
-            _viewModel.currentlySelectedFile,
-            attributionsContent));
-
-    start().then((value) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (c) {
-                return PlayerWidget();
-              }));
-      return null;
+      String bgMusic) async {
+    await _viewModel
+        .getAttributions(fileTapped.attributions)
+        .then((attributionsContent) async =>
+            await MediaLibrary.saveMediaLibrary(
+                description,
+                title,
+                fileTapped,
+                coverArt,
+                textColor,
+                coverColor,
+                bgMusic,
+                _viewModel.currentlySelectedFile,
+                attributionsContent))
+        .then((value) {
+      start().then((value) {
+        Navigator.push(context, MaterialPageRoute(builder: (c) {
+          return PlayerWidget();
+        }));
+        return null;
+      });
     });
   }
 

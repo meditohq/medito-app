@@ -4,12 +4,16 @@ import 'dart:math';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:share/share.dart';
 
 class PlayerWidget extends StatefulWidget {
   @override
@@ -17,17 +21,15 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  /// Tracks the position while the user drags the seek bar.
-  final BehaviorSubject<double> _dragPositionSubject =
-      BehaviorSubject.seeded(null);
-
-  var millisecondsListened = 0;
-
-  var _updatedStats = false;
+  final String completedText = "Well done for taking time for yourself!";
+  final String completedMoreText =
+      "Taking care of yourself is important. We’re here to help you do it, for free, forever.";
+  String artUrl;
+  Color textColor;
+  Color coverColorAsColor;
 
   @override
   void dispose() {
-    updateMinuteCounter(Duration(milliseconds: millisecondsListened).inSeconds);
     AudioService.stop();
     super.dispose();
   }
@@ -35,63 +37,185 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: CloseButton(onPressed: _onBackPressed),
+      body: Stack(
+        children: [
+          Center(
+            child: StreamBuilder<ScreenState>(
+              stream: _screenStateStream,
+              builder: (context, snapshot) {
+                final screenState = snapshot.data;
+                final mediaItem = screenState?.mediaItem;
+                final state = screenState?.playbackState;
+                final processingState =
+                    state?.processingState ?? AudioProcessingState.none;
+                final playing = state?.playing ?? false;
+
+                getTextColor(mediaItem);
+                getCoverColor(mediaItem);
+                getArtUrl(mediaItem);
+
+                return Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        color: coverColorAsColor,
+                        child: Center(
+                          child: FractionallySizedBox(
+                              widthFactor: .43,
+                              child: Image.network(
+                                artUrl ?? 'https://i.imgur.com/QUmnKlp.png',
+                              )),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.only(
+                            top: 28.0, left: 16.0, bottom: 8.0, right: 16.0),
+                        child: Row(children: [
+                          Expanded(
+                            child: Text(
+                              mediaItem?.title ?? completedText,
+                            ),
+                          )
+                        ])),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16.0, bottom: 20.0, right: 16.0),
+                      child: Row(children: [
+                        mediaItem?.extras != null
+                            ? Text(mediaItem?.extras['attr'] ?? 'Loading...')
+                            : Expanded(child: Text(completedMoreText)),
+                      ]),
+                    ),
+                    mediaItem == null
+                        ? Container()
+                        : positionIndicator(
+                            mediaItem, state, coverColorAsColor),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          (processingState == AudioProcessingState.buffering ||
+                                  processingState ==
+                                      AudioProcessingState.connecting)
+                              ? buildIndicatorRow()
+                              : Expanded(
+                                  child: mediaItem == null
+                                      ? getDonateAndShareButton()
+                                      : getPlayingOrPausedButton(playing),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+
+//            return Column(
+//              mainAxisAlignment: MainAxisAlignment.center,
+//              children: [
+//                if (processingState == AudioProcessingState.buffering) ...[
+//                  CircularProgressIndicator(),
+//                  Text('buffering'),
+//                ] else if (processingState ==
+//                    AudioProcessingState.buffering) ...[
+//                  CircularProgressIndicator(),
+//                  Text('connecting'),
+//                ] else if (processingState == AudioProcessingState.none) ...[
+//                  Text('none')
+//                ] else ...[
+//                  if (mediaItem?.title != null) Text(mediaItem.title),
+//                  Row(
+//                    mainAxisAlignment: MainAxisAlignment.center,
+//                    children: [
+//                      if (playing) pauseButton() else playButton(),
+//                    ],
+//                  ),
+//                  positionIndicator(mediaItem, state),
+//                  Text("Processing state: " +
+//                      "$processingState".replaceAll(RegExp(r'^.*\.'), '')),
+//                  StreamBuilder(
+//                    stream: AudioService.customEventStream,
+//                    builder: (context, snapshot) {
+//                      return Text("custom event: ${snapshot.data}");
+//                    },
+//                  ),
+//                  StreamBuilder<bool>(
+//                    stream: AudioService.notificationClickEventStream,
+//                    builder: (context, snapshot) {
+//                      return Text(
+//                        'Notification Click Status: ${snapshot.data}',
+//                      );
+//                    },
+//                  ),
+//                ],
+//              ],
+//            );
+              },
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(left: 12.0),
+              child: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: _onBackPressed,
+                color: textColor,
+              ),
+            ),
+          ),
+        ],
       ),
-      body: Center(
-        child: StreamBuilder<ScreenState>(
-          stream: _screenStateStream,
-          builder: (context, snapshot) {
-            final screenState = snapshot.data;
-            final mediaItem = screenState?.mediaItem;
-            final state = screenState?.playbackState;
-            final processingState =
-                state?.processingState ?? AudioProcessingState.none;
-            final playing = state?.playing ?? false;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (processingState == AudioProcessingState.buffering) ...[
-                  CircularProgressIndicator(),
-                  Text('buffering'),
-                ] else if (processingState ==
-                    AudioProcessingState.buffering) ...[
-                  CircularProgressIndicator(),
-                  Text('connecting'),
-                ] else if (processingState == AudioProcessingState.none) ...[
-                  Text('none')
-                ] else ...[
-                  if (mediaItem?.title != null) Text(mediaItem.title),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (playing) pauseButton() else playButton(),
-                    ],
-                  ),
-                  positionIndicator(mediaItem, state),
-                  Text("Processing state: " +
-                      "$processingState".replaceAll(RegExp(r'^.*\.'), '')),
-                  StreamBuilder(
-                    stream: AudioService.customEventStream,
-                    builder: (context, snapshot) {
-                      return Text("custom event: ${snapshot.data}");
-                    },
-                  ),
-                  StreamBuilder<bool>(
-                    stream: AudioService.notificationClickEventStream,
-                    builder: (context, snapshot) {
-                      return Text(
-                        'Notification Click Status: ${snapshot.data}',
-                      );
-                    },
-                  ),
-                ],
-              ],
-            );
-          },
+    );
+  }
+
+  void getArtUrl(MediaItem mediaItem) {
+    if (artUrl == null && mediaItem != null && mediaItem.artUri.isNotEmpty) {
+      artUrl = mediaItem.artUri;
+    }
+  }
+
+  void getCoverColor(MediaItem mediaItem) {
+    if (coverColorAsColor == null && mediaItem != null) {
+      final coverColor = mediaItem?.extras['coverColor'];
+      coverColorAsColor = parseColor(coverColor);
+    }
+  }
+
+  void getTextColor(MediaItem mediaItem) {
+    if (textColor == null && mediaItem != null) {
+      String textColorString = mediaItem?.extras['textColor'];
+      if (textColorString.isEmpty) textColorString = "#FF272829";
+      textColor = parseColor(textColorString);
+    }
+  }
+
+  Widget buildIndicatorRow() {
+    return Expanded(
+      child: Container(
+        height: 56,
+        decoration: buildBoxDecoration(MeditoColors.darkColor),
+        child: Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(
+                  backgroundColor: MeditoColors.darkBGColor)),
         ),
       ),
     );
+  }
+
+  BoxDecoration buildBoxDecoration(Color color) {
+    return new BoxDecoration(
+        color: color,
+        borderRadius: new BorderRadius.all(
+          const Radius.circular(12.0),
+        ));
+  }
+
+  Widget getPlayingOrPausedButton(bool playing) {
+    return playing ? pauseButton() : playButton();
   }
 
   /// Encapsulate all the different data we're interested in into a single
@@ -104,65 +228,138 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  RaisedButton startButton(String label, VoidCallback onPressed) =>
-      RaisedButton(
-        child: Text(label),
-        onPressed: onPressed,
-      );
-
-  IconButton playButton() => IconButton(
-        icon: Icon(Icons.play_arrow),
-        iconSize: 64.0,
+  Widget playButton() => PlayerButton(
+        icon: Icons.play_arrow,
         onPressed: AudioService.play,
+        bgColor: MeditoColors.darkColor,
       );
 
-  IconButton pauseButton() => IconButton(
-        icon: Icon(Icons.pause),
-        iconSize: 64.0,
+  Widget pauseButton() => PlayerButton(
+        icon: Icons.pause,
         onPressed: AudioService.pause,
+        bgColor: MeditoColors.darkColor,
       );
 
-  Widget positionIndicator(MediaItem mediaItem, PlaybackState state) {
-    double seekPos;
-    return StreamBuilder(
-      stream: Rx.combineLatest2<double, double, double>(
-          _dragPositionSubject.stream,
-          Stream.periodic(Duration(milliseconds: 200)),
-          (dragPosition, _) => dragPosition),
-      builder: (context, snapshot) {
-        double position =
-            snapshot.data ?? state.currentPosition.inMilliseconds.toDouble();
-        int duration = mediaItem?.duration?.inMilliseconds ?? 0;
-
-        if (duration > 0) {
-          setBgVolumeFadeAtEnd(mediaItem, state.currentPosition.inSeconds,
-              mediaItem.duration.inSeconds);
-        }
-
-        return Column(
-          children: [
-            if (duration != null)
-              Slider(
-                min: 0.0,
-                max: duration.toDouble(),
-                value: seekPos ??
-                    max(0.0, min(position.toDouble(), duration.toDouble())),
-                onChanged: (value) {
-                  _dragPositionSubject.add(value);
-                },
-                onChangeEnd: (value) {
-                  AudioService.seekTo(Duration(milliseconds: value.toInt()));
-                  seekPos = value;
-                  _dragPositionSubject.add(null);
-                },
-              ),
-            Text(Duration(milliseconds: state.currentPosition.inMilliseconds)
-                .toMinutesSeconds()),
-            Text(Duration(milliseconds: duration).toMinutesSeconds()),
-          ],
-        );
-      },
+  Widget positionIndicator(
+      MediaItem mediaItem, PlaybackState state, Color coverColorAsColor) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0),
+      child: PositionIndicatorWidget(
+          mediaItem: mediaItem, state: state, color: coverColorAsColor),
     );
+  }
+
+  void _onBackPressed() {
+    Navigator.popUntil(context, ModalRoute.withName("/nav"));
+  }
+
+  String donateUrl = "https://meditofoundation.org/donate/";
+
+  Widget getDonateAndShareButton() {
+    return Column(
+      children: <Widget>[
+        PlayerButton(
+            icon: Icons.card_giftcard,
+            onPressed: _launchDonate,
+            bgColor: coverColorAsColor,
+            text: "Donate",
+            textColor: textColor),
+        Container(height: 8),
+        PlayerButton(
+          bgColor: MeditoColors.darkColor,
+          icon: Icons.share,
+          onPressed: _share,
+          text: "Share",
+          textColor: Colors.white,
+        )
+      ],
+    );
+  }
+
+  Future<void> _launchDonate() {
+    return launchUrl(donateUrl);
+  }
+
+  Future<void> _share() {
+    Share.share('Just meditated with Medio!!');
+  }
+}
+
+class PlayerButton extends StatelessWidget {
+  final IconData icon;
+  final Future<void> Function() onPressed;
+  final Color bgColor;
+  final String text;
+  final Color textColor;
+
+  PlayerButton(
+      {Key key,
+      this.icon,
+      this.onPressed,
+      this.bgColor,
+      this.text,
+      this.textColor})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ButtonTheme(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12))),
+      height: 56.0,
+      child: FlatButton(
+          color: bgColor,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: textColor,
+              ),
+              text == null
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        text,
+                        style: TextStyle(color: textColor),
+                      ),
+                    )
+            ],
+          ),
+          onPressed: onPressed),
+    );
+  }
+}
+
+class PositionIndicatorWidget extends StatefulWidget {
+  final MediaItem mediaItem;
+  final PlaybackState state;
+  final Color color;
+
+  PositionIndicatorWidget({Key key, this.state, this.mediaItem, this.color})
+      : super(key: key);
+
+  @override
+  _PositionIndicatorWidgetState createState() =>
+      _PositionIndicatorWidgetState();
+}
+
+class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
+  double position;
+
+  /// Tracks the position while the user drags the seek bar.
+  final BehaviorSubject<double> _dragPositionSubject =
+      BehaviorSubject.seeded(null);
+  var millisecondsListened = 0;
+  var _updatedStats = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    updateMinuteCounter(Duration(milliseconds: millisecondsListened).inSeconds);
+    millisecondsListened = 0;
   }
 
   void setBgVolumeFadeAtEnd(
@@ -181,8 +378,65 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  void _onBackPressed() {
-    Navigator.popUntil(context, ModalRoute.withName("/nav"));
+  @override
+  Widget build(BuildContext context) {
+    double seekPos;
+    return StreamBuilder(
+      stream: Rx.combineLatest2<double, double, double>(
+          _dragPositionSubject.stream,
+          Stream.periodic(Duration(milliseconds: 200)),
+          (dragPosition, _) => dragPosition),
+      builder: (context, snapshot) {
+        double position = snapshot.data ??
+            widget.state?.currentPosition?.inMilliseconds?.toDouble() ??
+            0;
+        int duration = widget.mediaItem?.duration?.inMilliseconds ?? 0;
+
+        if (duration > 0 && position > 0) {
+          setBgVolumeFadeAtEnd(
+              widget.mediaItem,
+              widget.state?.currentPosition?.inSeconds ?? 0,
+              widget.mediaItem?.duration?.inSeconds);
+        }
+
+        return Column(
+          children: [
+            if (duration != null)
+              Slider(
+                min: 0.0,
+                activeColor: widget.color,
+                inactiveColor: MeditoColors.darkColor,
+                max: duration.toDouble(),
+                value: seekPos ??
+                    max(0.0, min(position.toDouble(), duration.toDouble())),
+                onChanged: (value) {
+                  _dragPositionSubject.add(value);
+                },
+                onChangeEnd: (value) {
+                  AudioService.seekTo(Duration(milliseconds: value.toInt()));
+                  seekPos = value;
+                  _dragPositionSubject.add(null);
+                },
+              ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(Duration(
+                          milliseconds:
+                              widget.state?.currentPosition?.inMilliseconds ??
+                                  0)
+                      .toMinutesSeconds()),
+                  Text(Duration(milliseconds: duration).toMinutesSeconds()),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

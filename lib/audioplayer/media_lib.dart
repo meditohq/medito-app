@@ -8,7 +8,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MediaLibrary {
-  static void saveMediaLibrary(
+  static Future<void> saveMediaLibrary(
       String description,
       String title,
       Files fileTapped,
@@ -20,15 +20,20 @@ class MediaLibrary {
       AttContent.Content attributions) async {
     var prefs = await SharedPreferences.getInstance();
 
-    prefs.setString("description", description ?? " ");
-    prefs.setString("audiotitle", title);
-    prefs.setString("fileTapped", json.encode(fileTapped.toJson()));
-    prefs.setString("coverArt", json.encode(coverArt.toJson()));
-    prefs.setString("textColor", textColor);
-    prefs.setString("bgMusic", bgMusic);
-    prefs.setString("listItemToListen", json.encode(listItem.toJson()));
-    prefs.setString("attr", json.encode(attributions.toJson()));
+    await prefs.setString("description", description ?? " ");
+    await prefs.setString("audiotitle", title);
+    await prefs.setString("fileTapped", json.encode(fileTapped.toJson()));
+    await prefs.setString("coverArt", json.encode(coverArt.toJson()));
+    await prefs.setString("textColor", textColor);
+    await prefs.setString("coverColor", coverColor);
+    await prefs.setString("bgMusic", bgMusic);
+    await prefs.setString("listItemToListen", json.encode(listItem.toJson()));
+    await prefs.setString("attrTitle", attributions.title);
+    await prefs.setString("attrLicence", attributions.licenseName);
+    return;
   }
+
+
 
   static Future<MediaItem> retrieveMediaLibrary() async {
     var prefs = await SharedPreferences.getInstance();
@@ -40,6 +45,11 @@ class MediaLibrary {
     var coverArt = CoverArt.fromJson(json.decode(coverArtString));
 
     String bgMusic = prefs.getString("bgMusic");
+    String coverColor = prefs.getString("coverColor");
+    String textColor = prefs.getString("textColor");
+
+    String attrTitle = prefs.getString("attrTitle");
+    String attrLicenseName = prefs.getString("attrLicence");
 
     Files fileTapped =
         Files.fromJson(json.decode(prefs.getString("fileTapped")));
@@ -50,11 +60,16 @@ class MediaLibrary {
     ListItem listItem = ListItem.fromJson(jsonItem);
     var id = listItem.id;
 
-//    prefs.getString("attr");
-
     return MediaItem(
       id: fileTapped.url,
-      extras: {'location': '$location', 'bgMusic': '$bgMusic', 'id': '$id'},
+      extras: {
+        'location': '$location',
+        'bgMusic': '$bgMusic',
+        'id': '$id',
+        'coverColor': coverColor,
+        'textColor': textColor,
+        'attr': 'By $attrTitle under $attrLicenseName'
+      },
       album: description,
       title: title,
       artist: fileTapped.voice,
