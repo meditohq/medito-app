@@ -51,7 +51,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       completedMoreText = value.subtitle;
       buttonLabel = value.buttonLabel;
       buttonUrl = value.buttonDestination;
-      buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
+      buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
 
       return null;
     });
