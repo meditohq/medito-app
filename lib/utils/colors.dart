@@ -25,4 +25,7 @@ class MeditoColors {
   static var darkBGColor = Color(0xff22282D);
   static var lightBlack = Color(0xb2000000);
   static var almostBlack = Color(0xEE000000);
+
+  static const newGrey = Color(0xffb6b6b8);
+  static const midnight = Color(0xff111213);
 }

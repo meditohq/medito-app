@@ -7,10 +7,13 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
@@ -21,9 +24,13 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  final String completedText = "Well done for taking time for yourself!";
-  final String completedMoreText =
+  String completedText = "Well done for taking time for yourself!";
+  String completedMoreText =
       "Taking care of yourself is important. We’re here to help you do it, for free, forever.";
+  String buttonLabel = "Donate";
+  String buttonUrl = "http://meditofoundation.org/donate";
+  String buttonIcon = "assets/images/ic_gift.svg";
+
   String artUrl;
   Color textColor;
   Color coverColorAsColor;
@@ -33,82 +40,129 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioService.stop();
     super.dispose();
   }
+@override
+  void initState() {
+    super.initState();
 
+    AudioCompleteCopyProvider provider = AudioCompleteCopyProvider();
+
+    provider.fetchCopy().then((value) {
+      completedText = value.title;
+      completedMoreText = value.subtitle;
+      buttonLabel = value.buttonLabel;
+      buttonUrl = value.buttonDestination;
+      buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
+
+      return null;
+    });
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Center(
-            child: StreamBuilder<ScreenState>(
-              stream: _screenStateStream,
-              builder: (context, snapshot) {
-                final screenState = snapshot.data;
-                final mediaItem = screenState?.mediaItem;
-                final state = screenState?.playbackState;
-                final processingState =
-                    state?.processingState ?? AudioProcessingState.none;
-                final playing = state?.playing ?? false;
+      backgroundColor: MeditoColors.midnight,
+      body: StreamBuilder<ScreenState>(
+        stream: _screenStateStream,
+        builder: (context, snapshot) {
+          final screenState = snapshot.data;
+          final mediaItem = screenState?.mediaItem;
+          final state = screenState?.playbackState;
+          final processingState =
+              state?.processingState ?? AudioProcessingState.none;
+          final playing = state?.playing ?? false;
 
-                getTextColor(mediaItem);
-                getCoverColor(mediaItem);
-                getArtUrl(mediaItem);
+          getTextColor(mediaItem);
+          getCoverColor(mediaItem);
+          getArtUrl(mediaItem);
 
-                return Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        color: coverColorAsColor,
-                        child: Center(
-                          child: FractionallySizedBox(
-                              widthFactor: .43,
-                              child: Image.network(
-                                artUrl ?? 'https://i.imgur.com/QUmnKlp.png',
-                              )),
+          return Stack(
+            children: [
+              Column(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      color: coverColorAsColor,
+                      child: Center(
+                        child: FractionallySizedBox(
+                            widthFactor: .43,
+                            child: artUrl != null
+                                ? Image.network(artUrl)
+                                : Container()),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 28.0, left: 16.0, bottom: 8.0, right: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            mediaItem?.title ?? completedText,
+                            style: GoogleFonts.merriweather().copyWith(
+                                letterSpacing: 0.4,
+                                fontSize: 26.0,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                    Padding(
-                        padding: const EdgeInsets.only(
-                            top: 28.0, left: 16.0, bottom: 8.0, right: 16.0),
-                        child: Row(children: [
-                          Expanded(
-                            child: Text(
-                              mediaItem?.title ?? completedText,
-                            ),
-                          )
-                        ])),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, bottom: 20.0, right: 16.0),
-                      child: Row(children: [
-                        mediaItem?.extras != null
-                            ? Text(mediaItem?.extras['attr'] ?? 'Loading...')
-                            : Expanded(child: Text(completedMoreText)),
-                      ]),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16.0, bottom: 20.0, right: 16.0),
+                    child: Row(children: [
+                      mediaItem?.extras != null
+                          ? Text(
+                              mediaItem?.extras['attr'] ?? 'Loading...',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .copyWith(color: MeditoColors.newGrey),
+                            )
+                          : Expanded(
+                              child: Text(
+                              completedMoreText,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .copyWith(color: MeditoColors.newGrey),
+                            )),
+                    ]),
+                  ),
+                  mediaItem == null
+                      ? Container()
+                      : positionIndicator(mediaItem, state, coverColorAsColor),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        (processingState == AudioProcessingState.buffering ||
+                                processingState ==
+                                    AudioProcessingState.connecting)
+                            ? buildIndicatorRow()
+                            : Expanded(
+                                child: mediaItem == null
+                                    ? getDonateAndShareButton()
+                                    : getPlayingOrPausedButton(playing),
+                              ),
+                      ],
                     ),
-                    mediaItem == null
-                        ? Container()
-                        : positionIndicator(
-                            mediaItem, state, coverColorAsColor),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          (processingState == AudioProcessingState.buffering ||
-                                  processingState ==
-                                      AudioProcessingState.connecting)
-                              ? buildIndicatorRow()
-                              : Expanded(
-                                  child: mediaItem == null
-                                      ? getDonateAndShareButton()
-                                      : getPlayingOrPausedButton(playing),
-                                ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
+                  ),
+                ],
+              ),
+              SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 12.0),
+                  child: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: _onBackPressed,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ],
+          );
 
 //            return Column(
 //              mainAxisAlignment: MainAxisAlignment.center,
@@ -150,20 +204,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 //                ],
 //              ],
 //            );
-              },
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.only(left: 12.0),
-              child: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: _onBackPressed,
-                color: textColor,
-              ),
-            ),
-          ),
-        ],
+        },
       ),
     );
   }
@@ -253,16 +294,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Navigator.popUntil(context, ModalRoute.withName("/nav"));
   }
 
-  String donateUrl = "https://meditofoundation.org/donate/";
-
   Widget getDonateAndShareButton() {
     return Column(
       children: <Widget>[
         PlayerButton(
-            icon: Icons.card_giftcard,
+            image: SvgPicture.asset(buttonIcon,
+              color: textColor,
+            ),
             onPressed: _launchDonate,
             bgColor: coverColorAsColor,
-            text: "Donate",
+            text: buttonLabel,
             textColor: textColor),
         Container(height: 8),
         PlayerButton(
@@ -277,11 +318,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<void> _launchDonate() {
-    return launchUrl(donateUrl);
+    return launchUrl(buttonUrl);
   }
 
   Future<void> _share() {
     Share.share('Just meditated with Medio!!');
+    return null;
   }
 }
 
@@ -291,6 +333,7 @@ class PlayerButton extends StatelessWidget {
   final Color bgColor;
   final String text;
   final Color textColor;
+  final SvgPicture image;
 
   PlayerButton(
       {Key key,
@@ -298,7 +341,8 @@ class PlayerButton extends StatelessWidget {
       this.onPressed,
       this.bgColor,
       this.text,
-      this.textColor})
+      this.textColor,
+      this.image})
       : super(key: key);
 
   @override
@@ -312,11 +356,15 @@ class PlayerButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 24,
-                color: textColor,
-              ),
+              image != null
+                  ? image
+                  : Icon(
+                      icon,
+                      size: 24,
+                      color: text == null
+                          ? MeditoColors.lightTextColor
+                          : textColor,
+                    ),
               text == null
                   ? Container()
                   : Padding(
@@ -472,29 +520,19 @@ class AudioPlayerTask extends BackgroundAudioTask {
       this.mediaItem = value;
     });
 
-    var source;
-
     // Load and broadcast the queue
     AudioServiceBackground.setQueue([mediaItem]);
     try {
-      await getDownload(mediaItem.extras['location']).then((data) {
+      await getDownload(mediaItem.extras['location']).then((data) async {
         if (data == null) {
-          source = ConcatenatingAudioSource(
-            children: [mediaItem]
-                .map((item) => AudioSource.uri(Uri.parse(item.id)))
-                .toList(),
-          );
+          _duration = await _player.setUrl(mediaItem.id);
         } else {
-          source = ConcatenatingAudioSource(
-            children: [AudioSource.uri(Uri.parse(data))],
-          );
+          _duration = await _player.setFilePath(data);
         }
+
+        playBgMusic(mediaItem.extras['bgMusic']);
+        onPlay();
       });
-
-      _duration = await _player.load(source);
-
-      playBgMusic(mediaItem.extras['bgMusic']);
-      onPlay();
     } catch (e) {
       print("Error: $e");
       onStop();
@@ -642,8 +680,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  void playBgMusic(bgMusic) {
-    if (bgMusic != null) {
+  void playBgMusic(String bgMusic) {
+    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != "null") {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.one);
@@ -711,14 +749,15 @@ class Seeker {
   }
 }
 
-Future<bool> start() {
+Future<bool> start(String coverColor) {
+  int color = getColorFromHex(coverColor);
   AudioService.connect();
   return AudioService.start(
     backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
     androidNotificationChannelName: 'Audio Service Demo',
     // Enable this if you want the Android service to exit the foreground state on pause.
     //androidStopForegroundOnPause: true,
-    androidNotificationColor: 0xFF2196f3,
+    androidNotificationColor: color,
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   );

@@ -71,7 +71,7 @@ Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
 
 Future<dynamic> checkFileExists(Files currentFile) async {
   String dir = (await getApplicationSupportDirectory()).path;
-  var name = currentFile.filename;
+  var name = currentFile.filename.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
   var exists = await file.exists();
   print('$exists $file');
@@ -85,27 +85,6 @@ Future getAttributions(String attrId) async {
   var attrs = Attributions.fromJson(response);
 
   return attrs.data.content;
-}
-
-Future<dynamic> downloadFile(Files currentFile) async {
-  getAttributions(currentFile.attributions);
-
-  String dir = (await getApplicationSupportDirectory()).path;
-  var name = currentFile.filename;
-  File file = new File('$dir/$name');
-
-  if (await file.exists()) return null;
-
-  var request = await http.get(currentFile.url);
-  if (request.statusCode < 200 || request.statusCode > 300) {
-    throw HttpException("http exception erro getting file");
-  }
-  var bytes = request.bodyBytes;
-  await file.writeAsBytes(bytes);
-
-  saveFileToDownloadedFilesList(currentFile);
-
-  print(file.path);
 }
 
 Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
@@ -147,6 +126,28 @@ Future<dynamic> removeFile(Files currentFile) async {
   }
 }
 
+
+Future<dynamic> downloadFile(Files currentFile) async {
+  getAttributions(currentFile.attributions);
+
+  String dir = (await getApplicationSupportDirectory()).path;
+  var name = currentFile.filename.replaceAll(" ", "%20");
+  File file = new File('$dir/$name');
+
+  if (await file.exists()) return null;
+
+  var request = await http.get(currentFile.url);
+  if (request.statusCode < 200 || request.statusCode > 300) {
+    throw HttpException("http exception erro getting file");
+  }
+  var bytes = request.bodyBytes;
+  await file.writeAsBytes(bytes);
+
+  saveFileToDownloadedFilesList(currentFile);
+
+  print(file.path);
+}
+
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;
   filename = filename.replaceAll(" ", "%20");
@@ -155,37 +156,4 @@ Future<dynamic> getDownload(String filename) async {
     return file.absolute.path;
   else
     return null;
-}
-
-/// Generates a 200x200 png, with randomized colors, to use as art for the
-/// notification/lockscreen.
-Future<Uint8List> generateImageBytes() async {
-// Random color generation methods: pick contrasting hues.
-  final HSLColor bgHslColor = HSLColor.fromColor(MeditoColors.darkBGColor);
-  final HSLColor fgHslColor = HSLColor.fromColor(MeditoColors.lightColor);
-
-  final Size size = const Size(200.0, 200.0);
-  final Offset center = const Offset(100.0, 100.0);
-  final ui.PictureRecorder recorder = ui.PictureRecorder();
-  final Rect rect = Offset.zero & size;
-  final Canvas canvas = Canvas(recorder, rect);
-  final Paint bgPaint = Paint()
-    ..style = PaintingStyle.fill
-    ..color = bgHslColor.toColor();
-  final Paint fgPaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..color = bgHslColor.toColor()
-    ..strokeWidth = 8;
-// Draw background color.
-  canvas.drawRect(rect, bgPaint);
-// Draw 5 inset squares around the center.
-  canvas.drawRect(
-      Rect.fromCenter(center: center, width: 40.0, height: 40.0), fgPaint);
-// Render to image, then compress to PNG ByteData, then return as Uint8List.
-  final ui.Image image = await recorder
-      .endRecording()
-      .toImage(size.width.toInt(), size.height.toInt());
-  final ByteData encodedImageData =
-      await image.toByteData(format: ui.ImageByteFormat.png);
-  return encodedImageData.buffer.asUint8List();
 }

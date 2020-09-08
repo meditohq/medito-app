@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Icon / ic_review</title>
+    <g id="Icon-/-ic_review" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M20,2 L4,2 C2.9,2 2.01,2.9 2.01,4 L2,22 L6,18 L20,18 C21.1,18 22,17.1 22,16 L22,4 C22,2.9 21.1,2 20,2 Z M6,14 L6,11.53 L12.88,4.65 C13.08,4.45 13.39,4.45 13.59,4.65 L15.36,6.42 C15.56,6.62 15.56,6.93 15.36,7.13 L8.47,14 L6,14 Z M18,14 L10.5,14 L12.5,12 L18,12 L18,14 Z" id="Shape" fill="#FFFFFF"></path>
+        <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
+    </g>
+</svg>

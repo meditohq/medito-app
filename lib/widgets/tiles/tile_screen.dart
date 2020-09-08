@@ -467,7 +467,7 @@ class TileListState extends State<TileList> {
       await MediaLibrary.saveMediaLibrary(description, title, fileTapped,
           coverArt, textColor, coverColor, bgMusic, listItem, att);
     }).then((value) {
-      start().then((value) => Navigator.push(
+      start(coverColor).then((value) => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               return PlayerWidget();

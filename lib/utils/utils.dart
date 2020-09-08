@@ -123,6 +123,14 @@ Future<bool> checkConnectivity() async {
   return false;
 }
 
+int getColorFromHex(String hexColor) {
+  hexColor = hexColor.toUpperCase().replaceAll("#", "");
+  if (hexColor.length == 6) {
+    hexColor = "FF" + hexColor;
+  }
+  return int.parse(hexColor, radix: 16);
+}
+
 Color parseColor(String color) {
   if (color == null || color.length == 0) return Colors.white;
 

@@ -280,7 +280,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 _viewModel.currentlySelectedFile,
                 attributionsContent))
         .then((value) {
-      start().then((value) {
+      start(coverColor).then((value) {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
           return PlayerWidget();
         }));

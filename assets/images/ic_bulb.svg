@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Icon / ic_bulb</title>
+    <g id="Icon-/-ic_bulb" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M12,3 C11.54,3 11.07,3.04 10.6,3.14 C7.84,3.67 5.64,5.9 5.12,8.66 C4.64,11.27 5.6,13.67 7.34,15.22 C7.77,15.6 8,16.13 8,16.69 L8,19 C8,20.1 8.9,21 10,21 L10.28,21 C10.63,21.6 11.26,22 12,22 C12.74,22 13.38,21.6 13.72,21 L14,21 C15.1,21 16,20.1 16,19 L16,16.69 C16,16.14 16.22,15.6 16.64,15.23 C18.09,13.95 19,12.08 19,10 C19,6.13 15.87,3 12,3 Z M14,19 L10,19 L10,18 L14,18 L14,19 Z M14,17 L10,17 L10,16 L14,16 L14,17 Z M12.5,11.41 L12.5,14 L11.5,14 L11.5,11.41 L9.67,9.59 L10.38,8.88 L12,10.5 L13.62,8.88 L14.33,9.59 L12.5,11.41 Z" id="Shape" fill="#FFFFFF"></path>
+        <rect id="Path" x="0" y="0" width="24" height="24"></rect>
+    </g>
+</svg>
