@@ -39,25 +39,25 @@ class Data {
 
   Data(
       {this.content,
-      this.id,
-      this.num,
-      this.options,
-      this.parent,
-      this.slug,
-      this.status,
-      this.template,
-      this.title,
-      this.url});
+        this.id,
+        this.num,
+        this.options,
+        this.parent,
+        this.slug,
+        this.status,
+        this.template,
+        this.title,
+        this.url});
 
   Data.fromJson(Map<String, dynamic> json) {
     content =
-        json['content'] != null ? new Content.fromJson(json['content']) : null;
+    json['content'] != null ? new Content.fromJson(json['content']) : null;
     id = json['id'];
     num = json['num'];
     options =
-        json['options'] != null ? new Options.fromJson(json['options']) : null;
+    json['options'] != null ? new Options.fromJson(json['options']) : null;
     parent =
-        json['parent'] != null ? new Parent.fromJson(json['parent']) : null;
+    json['parent'] != null ? new Parent.fromJson(json['parent']) : null;
     slug = json['slug'];
     status = json['status'];
     template = json['template'];
@@ -114,6 +114,7 @@ class Content {
 }
 
 class Versions {
+  int version;
   bool sticky;
   String title;
   String subtitle;
@@ -122,14 +123,16 @@ class Versions {
   String buttonDestination;
 
   Versions(
-      {this.sticky,
-      this.title,
-      this.subtitle,
-      this.buttonIcon,
-      this.buttonLabel,
-      this.buttonDestination});
+      {this.version,
+        this.sticky,
+        this.title,
+        this.subtitle,
+        this.buttonIcon,
+        this.buttonLabel,
+        this.buttonDestination});
 
   Versions.fromJson(Map<String, dynamic> json) {
+    version = json['version'];
     sticky = json['sticky'];
     title = json['title'];
     subtitle = json['subtitle'];
@@ -140,6 +143,7 @@ class Versions {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['version'] = this.version;
     data['sticky'] = this.sticky;
     data['title'] = this.title;
     data['subtitle'] = this.subtitle;
@@ -165,16 +169,16 @@ class Options {
 
   Options(
       {this.changeSlug,
-      this.changeStatus,
-      this.changeTemplate,
-      this.changeTitle,
-      this.create,
-      this.delete,
-      this.duplicate,
-      this.read,
-      this.preview,
-      this.sort,
-      this.update});
+        this.changeStatus,
+        this.changeTemplate,
+        this.changeTitle,
+        this.create,
+        this.delete,
+        this.duplicate,
+        this.read,
+        this.preview,
+        this.sort,
+        this.update});
 
   Options.fromJson(Map<String, dynamic> json) {
     changeSlug = json['changeSlug'];
@@ -224,18 +228,18 @@ class Parent {
 
   Parent(
       {this.buttonLabel,
-      this.contentPath,
-      this.contentText,
-      this.description,
-      this.id,
-      this.illustrationUrl,
-      this.num,
-      this.pathTemplate,
-      this.primaryColor,
-      this.secondaryColor,
-      this.template,
-      this.title,
-      this.url});
+        this.contentPath,
+        this.contentText,
+        this.description,
+        this.id,
+        this.illustrationUrl,
+        this.num,
+        this.pathTemplate,
+        this.primaryColor,
+        this.secondaryColor,
+        this.template,
+        this.title,
+        this.url});
 
   Parent.fromJson(Map<String, dynamic> json) {
     buttonLabel = json['buttonLabel'];
