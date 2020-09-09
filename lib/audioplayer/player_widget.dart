@@ -40,23 +40,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     AudioService.stop();
     super.dispose();
   }
-@override
+
+  @override
   void initState() {
     super.initState();
 
     AudioCompleteCopyProvider provider = AudioCompleteCopyProvider();
 
     provider.fetchCopy().then((value) {
-      completedText = value.title;
-      completedMoreText = value.subtitle;
-      buttonLabel = value.buttonLabel;
-      buttonUrl = value.buttonDestination;
-      buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
-
+      if (value != null) {
+        completedText = value.title;
+        completedMoreText = value.subtitle;
+        buttonLabel = value.buttonLabel;
+        buttonUrl = value.buttonDestination;
+        buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
+      }
       return null;
     });
-
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -298,7 +300,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Column(
       children: <Widget>[
         PlayerButton(
-            image: SvgPicture.asset(buttonIcon,
+            image: SvgPicture.asset(
+              buttonIcon,
               color: textColor,
             ),
             onPressed: _launchDonate,
