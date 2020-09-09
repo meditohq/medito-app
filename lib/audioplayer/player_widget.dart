@@ -30,7 +30,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String buttonLabel = "Donate";
   String buttonUrl = "http://meditofoundation.org/donate";
   String buttonIcon = "assets/images/ic_gift.svg";
-
   String artUrl;
   Color textColor;
   Color coverColorAsColor;
@@ -321,12 +320,23 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<void> _launchDonate() {
+    getVersionCopyInt().then((version) {
+      Tracking.trackEvent(
+          Tracking.PLAYER, Tracking.BUTTON_TAPPED, Tracking.AUDIO_COMPLETED,
+          map: {'version_seen': 'version_$version'});
+      return null;
+    });
     return launchUrl(buttonUrl);
   }
 
   Future<void> _share() {
     Share.share(
         "I just meditated with Medito. I ❤️ this app! Try it out - it's 100% free! Download on Android -> bit.ly/medito-android & iOS -> bit.ly/medito-ios");
+    Tracking.trackEvent(
+      Tracking.PLAYER,
+      Tracking.SHARE_BUTTON_TAPPED,
+      Tracking.AUDIO_COMPLETED,
+    );
     return null;
   }
 }
@@ -426,8 +436,15 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
       incrementNumSessions();
       updateStreak();
       _updatedStats = true;
-      Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
-          Tracking.AUDIO_COMPLETED + mediaItem.id);
+      getVersionCopyInt().then((version) {
+        Tracking.trackEvent(
+            Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_COMPLETED,
+            map: {
+              'version_seen': 'version_$version',
+              'session_id': mediaItem.id
+            });
+        return null;
+      });
     }
   }
 

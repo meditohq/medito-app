@@ -21,6 +21,8 @@ class Tracking {
   static const String FOLDER_TAPPED = "folder_tapped";
   static const String FILE_TAPPED = "file_tapped";
   static const String PLAYER_TAPPED = "player_tapped";
+  static const String BUTTON_TAPPED = "button_tapped";
+  static const String SHARE_BUTTON_TAPPED = "share_button_tapped";
   static const String BOTTOM_SHEET = "bottom_sheet_open";
   static const String READ_MORE_TAPPED = "read_more_tapped";
   static const String BREADCRUMB = "breadcrumb";
@@ -70,13 +72,17 @@ class Tracking {
 
   // like "LoginWidget", "Login button", "Clicked"
   static Future<void> trackEvent(
-      String widgetName, String eventName, String action) async {
+      String widgetName, String eventName, String action,
+      {Map map}) async {
+    Map defaultMap = {
+      "eventName": eventName,
+      "action": action,
+    };
+    if (map != null) defaultMap.addAll(map);
+
     _firebaseAnalytics.logEvent(
       name: widgetName,
-      parameters: {
-        "eventName": eventName,
-        "action": action,
-      },
+      parameters: defaultMap,
     );
 
     print("Event logged: $widgetName");

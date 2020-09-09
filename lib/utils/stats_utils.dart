@@ -210,6 +210,18 @@ void markAsListened(String id) async {
   prefs?.setBool('listened' + id, true);
 }
 
+void setVersionCopySeen(int id) async {
+  var prefs = await SharedPreferences.getInstance();
+  prefs?.setInt('copy', id);
+}
+
+Future<int> getVersionCopyInt() async {
+  var prefs = await SharedPreferences.getInstance();
+
+  var version = prefs.getInt('copy');
+  return version ?? -1;
+}
+
 bool isSameDay(DateTime day1, DateTime day2) {
   return day1.year == day2.year &&
       day1.month == day2.month &&

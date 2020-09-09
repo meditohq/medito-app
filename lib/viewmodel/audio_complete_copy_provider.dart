@@ -31,6 +31,8 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
           version.title =
               version.title.replaceAll('%n', numberOfSession.toString());
 
+          setVersionCopySeen(version.version);
+
           return version;
         }
       }
