@@ -325,7 +325,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<void> _share() {
-    Share.share('Just meditated with Medio!!');
+    Share.share(
+        "I just meditated with Medito. I ❤️ this app! Try it out - it's 100% free! Download on Android -> bit.ly/medito-android & iOS -> bit.ly/medito-ios");
     return null;
   }
 }
@@ -424,6 +425,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
       markAsListened(mediaItem.extras['id']);
       incrementNumSessions();
       updateStreak();
+      _updatedStats = true;
       Tracking.trackEvent(Tracking.PLAYER, Tracking.PLAYER_TAPPED,
           Tracking.AUDIO_COMPLETED + mediaItem.id);
     }
