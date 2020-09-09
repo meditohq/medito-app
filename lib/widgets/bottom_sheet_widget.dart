@@ -190,7 +190,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         width: 24,
         child: CircularProgressIndicator(
             valueColor:
-                AlwaysStoppedAnimation<Color>(MeditoColors.darkBGColor)),
+                AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
       );
     } else {
       return Text(
