@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Medito/data/audio_complete_copy_response.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/foundation.dart';
 
@@ -9,7 +10,8 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
 
   Future<Versions> fetchCopy() async {
     try {
-      final response = await httpGet(baseUrl + "/service+audiocompletecopy");
+      final response = await httpGet(baseUrl + "/service+audiocompletecopy",
+          skipCache: true);
 
       if (response != null) {
         var copy = AudioCompleteCopyResponse.fromJson(response);
@@ -22,7 +24,14 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
           return sticky;
         } else {
           versions.shuffle();
-          return versions.first;
+          var version = versions.first;
+
+          var numberOfSession = await getNumSessionsInt() + 1;
+
+          version.title =
+              version.title.replaceAll('%n', numberOfSession.toString());
+
+          return version;
         }
       }
       return null;
