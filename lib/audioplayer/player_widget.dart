@@ -12,6 +12,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -57,6 +58,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         buttonLabel = value.buttonLabel;
         buttonUrl = value.buttonDestination;
         buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
+
       }
       return null;
     });
@@ -64,6 +66,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: MeditoColors.midnight,
       body: StreamBuilder<ScreenState>(
@@ -231,7 +234,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void getTextColor(MediaItem mediaItem) {
     if (textColor == null && mediaItem != null) {
       String textColorString = mediaItem?.extras['textColor'];
-      if (textColorString.isEmpty) textColorString = "#FF272829";
+
+      if (textColorString.isEmpty) {
+        textColorString = "#FF272829";
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          statusBarIconBrightness:  Brightness.dark,
+        ));
+      }
       textColor = parseColor(textColorString);
     }
   }
@@ -313,7 +322,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             textColor: textColor),
         Container(height: 8),
         PlayerButton(
-          bgColor: MeditoColors.darkColor,
+          bgColor: MeditoColors.moonlight,
           icon: Icons.share,
           onPressed: _share,
           text: "Share",
@@ -390,7 +399,10 @@ class PlayerButton extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
                         text,
-                        style: TextStyle(color: textColor),
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle1
+                            .copyWith(color: textColor),
                       ),
                     )
             ],
@@ -425,6 +437,9 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
   @override
   void dispose() {
     super.dispose();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarIconBrightness:  Brightness.light,
+    ));
     updateMinuteCounter(Duration(milliseconds: millisecondsListened).inSeconds);
     millisecondsListened = 0;
   }
