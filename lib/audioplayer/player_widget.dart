@@ -49,9 +49,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void initState() {
     super.initState();
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.black
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.black));
 
     AudioCompleteCopyProvider provider = AudioCompleteCopyProvider();
 
@@ -131,7 +130,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     .textTheme
                                     .headline1
                                     .copyWith(
-                                        color: MeditoColors.newGrey, height: 1.3),
+                                        color: MeditoColors.newGrey,
+                                        height: 1.3),
                               )
                             : Expanded(
                                 child: Text(
@@ -148,7 +148,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     ),
                     mediaItem == null
                         ? Container()
-                        : positionIndicator(mediaItem, state, coverColorAsColor),
+                        : positionIndicator(
+                            mediaItem, state, coverColorAsColor),
                     Padding(
                       padding: const EdgeInsets.only(
                           left: 16.0, right: 16.0, bottom: 16.0),
@@ -343,9 +344,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Future<void> _launchDonate() {
     getVersionCopyInt().then((version) {
-      Tracking.trackEvent(
-          Tracking.PLAYER, Tracking.BUTTON_TAPPED, Tracking.AUDIO_COMPLETED,
-          map: {'version_seen': 'version_$version'});
+      Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.BUTTON_TAPPED,
+          Tracking.AUDIO_COMPLETED,
+          map: {'version_seen': '$version'});
       return null;
     });
     return launchUrl(buttonUrl);
@@ -409,7 +410,7 @@ class PlayerButton extends StatelessWidget {
                       child: Text(
                         text,
                         style: Theme.of(context).textTheme.subtitle1.copyWith(
-                            color: textColor, fontWeight: FontWeight.w600),
+                            color: textColor, fontWeight: FontWeight.w500),
                       ),
                     )
             ],
@@ -462,10 +463,9 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
       _updatedStats = true;
       getVersionCopyInt().then((version) {
         Tracking.trackEvent(
-            Tracking.PLAYER, Tracking.PLAYER_TAPPED, Tracking.AUDIO_COMPLETED,
+            Tracking.AUDIO_COMPLETED, Tracking.SCREEN_LOADED, Tracking.AUDIO_COMPLETED,
             map: {
-              'version_seen': 'version_$version',
-              'session_id': mediaItem.id
+              'version_seen': '$version',
             });
         return null;
       });

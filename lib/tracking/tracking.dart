@@ -38,6 +38,7 @@ class Tracking {
   static const String AUDIO_STOPPED = "audio_stopped";
   static const String AUDIO_PAUSED = "audio_paused";
   static const String AUDIO_COMPLETED = "audio_completed";
+  static const String AUDIO_COMPLETED_BUTTON_TAPPED = "audio_completed_button_tapped";
   static const String AUDIO_SEEK = "audio_seek_to";
 
   static const String AUDIO_OPENED = "audio_opened";
@@ -72,19 +73,20 @@ class Tracking {
 
   // like "LoginWidget", "Login button", "Clicked"
   static Future<void> trackEvent(
-      String widgetName, String eventName, String action,
+      String eventName, String param1, String param2,
       {Map<String, String> map}) async {
+
     Map<String, String> defaultMap = {
-      "eventName": eventName,
-      "action": action,
+      "event_info": param1,
+      "action": param2,
     };
     if (map != null) defaultMap.addAll(map);
 
     _firebaseAnalytics.logEvent(
-      name: widgetName,
+      name: eventName,
       parameters: defaultMap,
     );
 
-    print("Event logged: $widgetName");
+    print("Event logged: $eventName");
   }
 }
