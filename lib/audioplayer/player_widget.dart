@@ -49,6 +49,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void initState() {
     super.initState();
 
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.black
+    ));
+
     AudioCompleteCopyProvider provider = AudioCompleteCopyProvider();
 
     provider.fetchCopy().then((value) {
@@ -58,7 +62,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         buttonLabel = value.buttonLabel;
         buttonUrl = value.buttonDestination;
         buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
-
       }
       return null;
     });
@@ -66,7 +69,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: MeditoColors.midnight,
       body: StreamBuilder<ScreenState>(
@@ -83,94 +85,101 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           getCoverColor(mediaItem);
           getArtUrl(mediaItem);
 
-          return Stack(
-            children: [
-              Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      color: coverColorAsColor,
-                      child: Center(
-                        child: FractionallySizedBox(
-                            widthFactor: .43,
-                            child: artUrl != null
-                                ? Image.network(artUrl)
-                                : Container()),
+          return SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        color: coverColorAsColor,
+                        child: Center(
+                          child: FractionallySizedBox(
+                              widthFactor: .43,
+                              child: artUrl != null
+                                  ? Image.network(artUrl)
+                                  : Container()),
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        top: 28.0, left: 16.0, bottom: 8.0, right: 16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            mediaItem?.title ?? titleText,
-                            style: GoogleFonts.merriweather().copyWith(
-                                letterSpacing: 0.4,
-                                fontSize: 26.0,
-                                fontWeight: FontWeight.w700),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 28.0, left: 16.0, bottom: 10.0, right: 16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              mediaItem?.title ?? titleText,
+                              style: GoogleFonts.merriweather().copyWith(
+                                  letterSpacing: 1,
+                                  height: 1.5,
+                                  color: Colors.white,
+                                  fontSize: 26.0,
+                                  fontWeight: FontWeight.w600),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16.0, bottom: 24.0, right: 16.0),
-                    child: Row(children: [
-                      mediaItem?.extras != null
-                          ? Text(
-                              mediaItem?.extras['attr'] ?? 'Loading...',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .copyWith(color: MeditoColors.newGrey),
-                            )
-                          : Expanded(
-                              child: Text(
-                              subTitleText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .copyWith(color: MeditoColors.newGrey),
-                            )),
-                    ]),
-                  ),
-                  mediaItem == null
-                      ? Container()
-                      : positionIndicator(mediaItem, state, coverColorAsColor),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16.0, right: 16.0, bottom: 16.0),
-                    child: Row(
-                      children: [
-                        (processingState == AudioProcessingState.buffering ||
-                                processingState ==
-                                    AudioProcessingState.connecting)
-                            ? buildCircularIndicatorRow()
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                      child: Row(children: [
+                        mediaItem?.extras != null
+                            ? Text(
+                                mediaItem?.extras['attr'] ?? 'Loading...',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .copyWith(
+                                        color: MeditoColors.newGrey, height: 1.3),
+                              )
                             : Expanded(
-                                child: mediaItem == null
-                                    ? getDonateAndShareButton()
-                                    : getPlayingOrPausedButton(playing),
-                              ),
-                      ],
+                                child: Text(
+                                subTitleText,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .copyWith(
+                                        letterSpacing: 0.1,
+                                        color: MeditoColors.newGrey,
+                                        height: 1.5),
+                              )),
+                      ]),
                     ),
-                  ),
-                ],
-              ),
-              SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 4.0),
-                  child: IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: _onBackPressed,
-                    color: textColor,
+                    mediaItem == null
+                        ? Container()
+                        : positionIndicator(mediaItem, state, coverColorAsColor),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16.0, right: 16.0, bottom: 16.0),
+                      child: Row(
+                        children: [
+                          (processingState == AudioProcessingState.buffering ||
+                                  processingState ==
+                                      AudioProcessingState.connecting)
+                              ? buildCircularIndicatorRow()
+                              : Expanded(
+                                  child: mediaItem == null
+                                      ? getDonateAndShareButton()
+                                      : getPlayingOrPausedButton(playing),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 4.0),
+                    child: IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: _onBackPressed,
+                      color: textColor,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
 
 //            return Column(
@@ -235,11 +244,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (textColor == null && mediaItem != null) {
       String textColorString = mediaItem?.extras['textColor'];
 
-      if (textColorString.isEmpty) {
+      if (textColorString.isEmpty && textColor == null) {
         textColorString = "#FF272829";
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarIconBrightness:  Brightness.dark,
-        ));
       }
       textColor = parseColor(textColorString);
     }
@@ -311,15 +317,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget getDonateAndShareButton() {
     return Column(
       children: <Widget>[
-        PlayerButton(
-            image: SvgPicture.asset(
-              buttonIcon,
-              color: textColor,
-            ),
-            onPressed: _launchDonate,
-            bgColor: coverColorAsColor,
-            text: buttonLabel,
-            textColor: textColor),
+        Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: PlayerButton(
+              image: SvgPicture.asset(
+                buttonIcon,
+                color: textColor,
+              ),
+              onPressed: _launchDonate,
+              bgColor: coverColorAsColor,
+              text: buttonLabel,
+              textColor: textColor),
+        ),
         Container(height: 8),
         PlayerButton(
           bgColor: MeditoColors.moonlight,
@@ -399,10 +408,8 @@ class PlayerButton extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
                         text,
-                        style: Theme.of(context)
-                            .textTheme
-                            .subtitle1
-                            .copyWith(color: textColor),
+                        style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            color: textColor, fontWeight: FontWeight.w600),
                       ),
                     )
             ],
@@ -437,9 +444,6 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
   @override
   void dispose() {
     super.dispose();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarIconBrightness:  Brightness.light,
-    ));
     updateMinuteCounter(Duration(milliseconds: millisecondsListened).inSeconds);
     millisecondsListened = 0;
   }
@@ -502,7 +506,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                   child: Slider(
                     min: 0.0,
                     activeColor: widget.color,
-                    inactiveColor: MeditoColors.newGrey,
+                    inactiveColor: MeditoColors.newGrey.withAlpha(179),
                     max: duration.toDouble(),
                     value: seekPos ??
                         max(0.0, min(position.toDouble(), duration.toDouble())),
@@ -520,7 +524,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
               ),
             Padding(
               padding:
-                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 20.0),
+                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 24.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -533,7 +537,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                       style: Theme.of(context)
                           .textTheme
                           .headline1
-                          .copyWith(color: MeditoColors.newGrey)),
+                          .copyWith(color: MeditoColors.newGrey, height: 1.5)),
                   Text(
                     Duration(milliseconds: duration).toMinutesSeconds(),
                     style: Theme.of(context)
@@ -852,7 +856,7 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     final double trackHeight = sliderTheme.trackHeight;
     final double trackLeft = offset.dx;
     final double trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2;
+        offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
     final double trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
