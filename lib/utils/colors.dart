@@ -28,4 +28,5 @@ class MeditoColors {
 
   static const newGrey = Color(0xffb6b6b8);
   static const midnight = Color(0xff111213);
+  static const moonlight = Color(0xff272829);
 }

@@ -132,7 +132,7 @@ int getColorFromHex(String hexColor) {
 }
 
 Color parseColor(String color) {
-  if (color == null || color.length == 0) return Colors.white;
+  if (color == null || color.length == 0) return MeditoColors.midnight;
 
   return Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
 }

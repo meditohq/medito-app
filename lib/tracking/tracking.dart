@@ -73,8 +73,8 @@ class Tracking {
   // like "LoginWidget", "Login button", "Clicked"
   static Future<void> trackEvent(
       String widgetName, String eventName, String action,
-      {Map map}) async {
-    Map defaultMap = {
+      {Map<String, String> map}) async {
+    Map<String, String> defaultMap = {
       "eventName": eventName,
       "action": action,
     };

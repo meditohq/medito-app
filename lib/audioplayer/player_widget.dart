@@ -36,7 +36,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   void dispose() {
-    AudioService.stop();
+    try {
+      AudioService.stop();
+    } catch (e) {
+      print("stop error!");
+    }
     super.dispose();
   }
 
@@ -115,20 +119,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: Row(children: [
                       mediaItem?.extras != null
                           ? Text(
-                              mediaItem?.extras['attr'] ?? 'Loading...',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .copyWith(color: MeditoColors.newGrey),
-                            )
+                        mediaItem?.extras['attr'] ?? 'Loading...',
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .headline1
+                            .copyWith(color: MeditoColors.newGrey),
+                      )
                           : Expanded(
-                              child: Text(
-                              completedMoreText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .copyWith(color: MeditoColors.newGrey),
-                            )),
+                          child: Text(
+                            completedMoreText,
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline1
+                                .copyWith(color: MeditoColors.newGrey),
+                          )),
                     ]),
                   ),
                   mediaItem == null
@@ -139,14 +145,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: Row(
                       children: [
                         (processingState == AudioProcessingState.buffering ||
-                                processingState ==
-                                    AudioProcessingState.connecting)
+                            processingState ==
+                                AudioProcessingState.connecting)
                             ? buildIndicatorRow()
                             : Expanded(
-                                child: mediaItem == null
-                                    ? getDonateAndShareButton()
-                                    : getPlayingOrPausedButton(playing),
-                              ),
+                          child: mediaItem == null
+                              ? getDonateAndShareButton()
+                              : getPlayingOrPausedButton(playing),
+                        ),
                       ],
                     ),
                   ),
@@ -154,7 +160,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               ),
               SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.only(left: 12.0),
+                  padding: EdgeInsets.only(left: 4.0),
                   child: IconButton(
                     icon: Icon(Icons.close),
                     onPressed: _onBackPressed,
@@ -235,14 +241,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Expanded(
       child: Container(
         height: 56,
-        decoration: buildBoxDecoration(MeditoColors.darkColor),
+        decoration: buildBoxDecoration(MeditoColors.moonlight),
         child: Align(
           alignment: Alignment.center,
           child: SizedBox(
               height: 24,
               width: 24,
               child: CircularProgressIndicator(
-                  backgroundColor: MeditoColors.darkBGColor)),
+                  backgroundColor: Colors.white)),
         ),
       ),
     );
@@ -267,23 +273,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           AudioService.queueStream,
           AudioService.currentMediaItemStream,
           AudioService.playbackStateStream,
-          (queue, mediaItem, playbackState) =>
+              (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  Widget playButton() => PlayerButton(
+  Widget playButton() =>
+      PlayerButton(
         icon: Icons.play_arrow,
         onPressed: AudioService.play,
-        bgColor: MeditoColors.darkColor,
+        bgColor: MeditoColors.moonlight,
       );
 
-  Widget pauseButton() => PlayerButton(
+  Widget pauseButton() =>
+      PlayerButton(
         icon: Icons.pause,
         onPressed: AudioService.pause,
-        bgColor: MeditoColors.darkColor,
+        bgColor: MeditoColors.moonlight,
       );
 
-  Widget positionIndicator(
-      MediaItem mediaItem, PlaybackState state, Color coverColorAsColor) {
+  Widget positionIndicator(MediaItem mediaItem, PlaybackState state,
+      Color coverColorAsColor) {
     return Padding(
       padding: const EdgeInsets.only(top: 4.0),
       child: PositionIndicatorWidget(
@@ -349,14 +357,13 @@ class PlayerButton extends StatelessWidget {
   final Color textColor;
   final SvgPicture image;
 
-  PlayerButton(
-      {Key key,
-      this.icon,
-      this.onPressed,
-      this.bgColor,
-      this.text,
-      this.textColor,
-      this.image})
+  PlayerButton({Key key,
+    this.icon,
+    this.onPressed,
+    this.bgColor,
+    this.text,
+    this.textColor,
+    this.image})
       : super(key: key);
 
   @override
@@ -373,21 +380,22 @@ class PlayerButton extends StatelessWidget {
               image != null
                   ? image
                   : Icon(
-                      icon,
-                      size: 24,
-                      color: text == null
-                          ? MeditoColors.lightTextColor
-                          : textColor,
-                    ),
+                icon,
+                size: 24,
+                color: text ==
+                    null //usually if there is no text it'll just be a play/pause button
+                    ? Colors.white
+                    : textColor,
+              ),
               text == null
                   ? Container()
                   : Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        text,
-                        style: TextStyle(color: textColor),
-                      ),
-                    )
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  text,
+                  style: TextStyle(color: textColor),
+                ),
+              )
             ],
           ),
           onPressed: onPressed),
@@ -413,7 +421,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double> _dragPositionSubject =
-      BehaviorSubject.seeded(null);
+  BehaviorSubject.seeded(null);
   var millisecondsListened = 0;
   var _updatedStats = false;
 
@@ -424,8 +432,8 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
     millisecondsListened = 0;
   }
 
-  void setBgVolumeFadeAtEnd(
-      MediaItem mediaItem, int positionSecs, int durSecs) {
+  void setBgVolumeFadeAtEnd(MediaItem mediaItem, int positionSecs,
+      int durSecs) {
     millisecondsListened += 200;
     var timeLeft = durSecs - positionSecs;
     if (timeLeft <= 10) {
@@ -455,7 +463,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
       stream: Rx.combineLatest2<double, double, double>(
           _dragPositionSubject.stream,
           Stream.periodic(Duration(milliseconds: 200)),
-          (dragPosition, _) => dragPosition),
+              (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
         double position = snapshot.data ??
             widget.state?.currentPosition?.inMilliseconds?.toDouble() ??
@@ -472,32 +480,38 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
         return Column(
           children: [
             if (duration != null)
-              Slider(
-                min: 0.0,
-                activeColor: widget.color,
-                inactiveColor: MeditoColors.darkColor,
-                max: duration.toDouble(),
-                value: seekPos ??
-                    max(0.0, min(position.toDouble(), duration.toDouble())),
-                onChanged: (value) {
-                  _dragPositionSubject.add(value);
-                },
-                onChangeEnd: (value) {
-                  AudioService.seekTo(Duration(milliseconds: value.toInt()));
-                  seekPos = value;
-                  _dragPositionSubject.add(null);
-                },
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                child: SliderTheme(
+                  data: SliderThemeData(trackShape: CustomTrackShape()),
+                  child: Slider(
+                    min: 0.0,
+                    activeColor: widget.color,
+                    inactiveColor: MeditoColors.newGrey,
+                    max: duration.toDouble(),
+                    value: seekPos ??
+                        max(0.0, min(position.toDouble(), duration.toDouble())),
+                    onChanged: (value) {
+                      _dragPositionSubject.add(value);
+                    },
+                    onChangeEnd: (value) {
+                      AudioService.seekTo(Duration(milliseconds: value.toInt()));
+                      seekPos = value;
+                      _dragPositionSubject.add(null);
+                    },
+                  ),
+                ),
               ),
             Padding(
               padding:
-                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
+              const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(Duration(
-                          milliseconds:
-                              widget.state?.currentPosition?.inMilliseconds ??
-                                  0)
+                      milliseconds:
+                      widget.state?.currentPosition?.inMilliseconds ??
+                          0)
                       .toMinutesSeconds()),
                   Text(Duration(milliseconds: duration).toMinutesSeconds()),
                 ],
@@ -577,12 +591,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.processingStateStream.listen((state) {
       switch (state) {
         case ProcessingState.completed:
-          // In this example, the service stops when reaching the end.
+        // In this example, the service stops when reaching the end.
           onStop();
           break;
         case ProcessingState.ready:
-          // If we just came from skipping between tracks, clear the skip
-          // state now that we're ready to play.
+        // If we just came from skipping between tracks, clear the skip
+        // state now that we're ready to play.
           _skipState = null;
           break;
         default:
@@ -668,7 +682,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> _broadcastState() async {
     await AudioServiceBackground.setState(
       controls: [
-        if (_player.playing) MediaControl.pause else MediaControl.play,
+        if (_player.playing) MediaControl.pause else
+          MediaControl.play,
         MediaControl.stop,
       ],
       systemActions: [
@@ -748,12 +763,10 @@ class Seeker {
   final MediaItem mediaItem;
   bool _running = false;
 
-  Seeker(
-    this.player,
-    this.positionInterval,
-    this.stepInterval,
-    this.mediaItem,
-  );
+  Seeker(this.player,
+      this.positionInterval,
+      this.stepInterval,
+      this.mediaItem,);
 
   start() async {
     _running = true;
@@ -797,5 +810,22 @@ extension DurationExtensions on Duration {
   String _toTwoDigits(int n) {
     if (n >= 10) return "$n";
     return "0$n";
+  }
+}
+
+class CustomTrackShape extends RoundedRectSliderTrackShape {
+  Rect getPreferredRect({
+    @required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    @required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final double trackHeight = sliderTheme.trackHeight;
+    final double trackLeft = offset.dx;
+    final double trackTop = offset.dy +
+        (parentBox.size.height - trackHeight) / 2;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }
