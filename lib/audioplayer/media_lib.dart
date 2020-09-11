@@ -30,10 +30,10 @@ class MediaLibrary {
     await prefs.setString("listItemToListen", json.encode(listItem.toJson()));
     await prefs.setString("attrTitle", attributions.title);
     await prefs.setString("attrLicence", attributions.licenseName);
+    await prefs.setString("attrLinkSource", attributions.sourceUrl);
+    await prefs.setString("attrLinkLicense", attributions.licenseUrl);
     return;
   }
-
-
 
   static Future<MediaItem> retrieveMediaLibrary() async {
     var prefs = await SharedPreferences.getInstance();
@@ -50,6 +50,8 @@ class MediaLibrary {
 
     String attrTitle = prefs.getString("attrTitle");
     String attrLicenseName = prefs.getString("attrLicence");
+    String attrLinkSource = prefs.getString("attrLinkSource");
+    String attrLinkLicense = prefs.getString("attrLinkLicense");
 
     Files fileTapped =
         Files.fromJson(json.decode(prefs.getString("fileTapped")));
@@ -68,7 +70,10 @@ class MediaLibrary {
         'id': '$id',
         'coverColor': coverColor,
         'textColor': textColor,
-        'attr': 'By $attrTitle under $attrLicenseName'
+        'attrTitle': attrTitle ,
+        'attrName' : attrLicenseName,
+        'attrLinkSource': attrLinkSource,
+        'attrLinkLicense': attrLinkLicense,
       },
       album: description,
       title: title,
