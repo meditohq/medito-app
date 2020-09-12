@@ -16,11 +16,13 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
+import 'package:Medito/widgets/error_widget.dart';
+import 'package:Medito/widgets/medito_logo.dart';
+import '../error_widget.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../tracking/tracking.dart';
@@ -84,7 +86,7 @@ class TileListState extends State<TileList> {
           if (future.connectionState == ConnectionState.none &&
                   future.hasData == null ||
               future.hasError) {
-            return getErrorWidget();
+            return NetworkErrorWidget(onButtonTap: _onPullToRefresh);
           }
 
           if (future.connectionState == ConnectionState.waiting) {
@@ -97,7 +99,7 @@ class TileListState extends State<TileList> {
               padding: const EdgeInsets.only(bottom: 24.0),
               child: Column(
                 children: <Widget>[
-                  _getMeditoLogo(),
+                  MeditoLogo(onDoubleTap: _onPullToRefresh),
                   ListView.builder(
                     padding: EdgeInsets.only(left: 16, right: 16),
                     shrinkWrap: true,
@@ -127,44 +129,6 @@ class TileListState extends State<TileList> {
         },
         future: listFuture,
       ),
-    );
-  }
-
-  Widget getErrorWidget() {
-    return Column(
-      children: <Widget>[
-        _getMeditoLogo(),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Center(
-                    child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: RaisedButton(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(16.0),
-                      ),
-                      color: MeditoColors.darkColor,
-                      onPressed: _onPullToRefresh,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'Oops! There was an error.\n Tap to refresh',
-                          style: Theme.of(context).textTheme.bodyText2,
-                          textAlign: TextAlign.center,
-                        ),
-                      )),
-                )),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -515,25 +479,13 @@ class TileListState extends State<TileList> {
     });
   }
 
-  Widget _getMeditoLogo() {
-    return GestureDetector(
-      onDoubleTap: () => _onPullToRefresh(),
-      child: Padding(
-        padding: const EdgeInsets.all(19.0),
-        child: SvgPicture.asset(
-          'assets/images/icon_ic_logo.svg',
-        ),
-      ),
-    );
-  }
-
   Widget getLoadingWidget() {
     TileItem item = TileItem("", "", "000000");
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          _getMeditoLogo(),
+          MeditoLogo(onDoubleTap: _onPullToRefresh),
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16),
             child: getHorizontalAnnouncementTile(item),
