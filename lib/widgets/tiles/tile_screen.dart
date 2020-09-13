@@ -32,7 +32,7 @@ import '../../utils/utils.dart';
 import '../../viewmodel/model/list_item.dart';
 import '../../viewmodel/model/tile_item.dart';
 import '../../viewmodel/tile_view_model.dart';
-import '../bottom_sheet_widget.dart';
+import '../sessions_options_page.dart';
 import '../column_builder.dart';
 import '../folder_nav_widget.dart';
 import '../streak_page.dart';
@@ -398,7 +398,7 @@ class TileListState extends State<TileList> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BottomSheetWidget(
+          builder: (context) => SessionsPage(
             title: tile.title,
             onBeginPressed: _showPlayer,
             data: data,

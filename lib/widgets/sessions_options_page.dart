@@ -22,21 +22,21 @@ import '../utils/colors.dart';
 import '../utils/utils.dart';
 import 'pill_utils.dart';
 
-class BottomSheetWidget extends StatefulWidget {
+class SessionsPage extends StatefulWidget {
   final Future data;
   final String title;
   final Function(
           Files, CoverArt, dynamic, String, String, String, String, String)
       onBeginPressed;
 
-  BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
+  SessionsPage({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
 
   @override
-  _BottomSheetWidgetState createState() => _BottomSheetWidgetState();
+  _SessionsPageState createState() => _SessionsPageState();
 }
 
-class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+class _SessionsPageState extends State<SessionsPage> {
   var voiceSelected = 0;
   var lengthSelected = 0;
   var _offlineSelected = 0;
@@ -88,6 +88,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         this._backgroundMusicAvailable = d?.backgroundMusic;
       });
     }).catchError(_onFirstFutureError);
+
+    _coverColor =
+        _coverColor != null ? parseColor(_coverColor) : MeditoColors.darkColor;
   }
 
   @override
@@ -104,37 +107,77 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           child: Stack(
             children: <Widget>[
               SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      buildGoBackPill(),
-                      buildImage(),
-                      buildTitleText(),
-                      buildDescriptionText(),
-                      _showVoiceChoice ? buildSpacer() : Container(),
-                      buildVoiceText(),
-                      buildVoiceRow(),
-                      buildSpacer(),
-                      ////////// spacer
-                      buildSessionLengthText(),
-                      buildSessionLengthRow(),
-                      getBGMusicSpacer(),
-                      ////////// spacer
-                      getBGMusicRowOrContainer(),
-                      buildBackgroundMusicRow(),
-                      buildSpacer(),
-                      ////////// spacer
-                      buildOfflineTextRow(),
-                      buildOfflineRow(),
-                      Container(height: 80)
-                    ],
+                children: [
+                  //* Gradient Box
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          _coverColor != null
+                              ? parseColor(_coverColor)
+                              : MeditoColors.darkColor,
+                          MeditoColors.darkBGColor
+                        ],
+
+                        ///Play with these values to adjust the gradient settings
+                        begin: Alignment(0.0, -3),
+                        end: Alignment(0.0, 0.8),
+                      ),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Icon(Icons.arrow_back,
+                                color: Colors.white, size: 30.0),
+                          ),
+                        ),
+                        buildImage(),
+                        buildTitleText(),
+                      ],
+                    ),
                   ),
-                ),
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 0.0, 16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        //buildGoBackPill(),
+
+                        buildDescriptionText(),
+                        _showVoiceChoice ? buildSpacer() : Container(),
+                        buildNarratorText(),
+                        buildVoiceRow(),
+                        buildSpacer(),
+                        ////////// spacer
+                        buildDurationLengthText(),
+                        buildSessionLengthRow(),
+                        getBGMusicSpacer(),
+                        ////////// spacer
+                        getBGMusicRowOrContainer(),
+                        buildBackgroundMusicRow(),
+                        buildSpacer(),
+                        ////////// spacer
+                        buildOfflineTextRow(),
+                        buildOfflineRow(),
+                        Container(height: 80)
+                      ],
+                    ),
+                  ),
+                ],
+              )),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: buildButton(),
               ),
-              Align(alignment: Alignment.bottomCenter, child: buildButton()),
             ],
           ),
         ),
@@ -151,34 +194,31 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   Widget buildButton() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    offset: const Offset(0, 10),
-                    color: MeditoColors.darkBGColor,
-                    spreadRadius: 25,
-                    blurRadius: 8,
-                  ),
-                ],
+      child: Expanded(
+        child: Container(
+          width: double.infinity,
+          height: 48,
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(0, 10),
+                color: MeditoColors.darkBGColor,
+                spreadRadius: 25,
+                blurRadius: 8,
               ),
-              child: FlatButton(
-                onPressed: _onBeginTap,
-                shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(12.0),
-                ),
-                color: _coverColor != null
-                    ? parseColor(_coverColor)
-                    : MeditoColors.lightColor,
-                child: getBeginButtonContent(),
-              ),
-            ),
+            ],
           ),
-        ],
+          child: FlatButton(
+            onPressed: _onBeginTap,
+            shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(12.0),
+            ),
+            color: _coverColor != null
+                ? parseColor(_coverColor)
+                : MeditoColors.lightColor,
+            child: getBeginButtonContent(),
+          ),
+        ),
       ),
     );
   }
@@ -189,18 +229,19 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
+            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
       );
     } else {
-      return Text(
-        'BEGIN',
-        style: Theme.of(context).textTheme.headline3.copyWith(
-            color: _textColor != null && _textColor.isNotEmpty
-                ? parseColor(_textColor)
-                : MeditoColors.darkBGColor,
-            fontWeight: FontWeight.bold),
-      );
+      // return Text(
+      //   'BEGIN',
+      //   style: Theme.of(context).textTheme.headline3.copyWith(
+      //       color: _textColor != null && _textColor.isNotEmpty
+      //           ? parseColor(_textColor)
+      //           : MeditoColors.darkBGColor,
+      //       fontWeight: FontWeight.bold),
+      // );
+
+      return Icon(Icons.play_arrow);
     }
   }
 
@@ -220,14 +261,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     });
   }
 
-  Widget buildVoiceText() {
+  Widget buildNarratorText() {
     if (!_showVoiceChoice) {
       return Container();
     }
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
-        'VOICE',
+        'NARRATOR',
         style: Theme.of(context).textTheme.headline1,
       ),
     );
@@ -235,10 +276,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget buildTitleText() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 8),
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 16.0),
       child: Text(
         widget.title,
-        style: Theme.of(context).textTheme.headline6,
+        style: Theme.of(context)
+            .textTheme
+            .headline2
+            .copyWith(fontSize: 32.0, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -246,17 +290,17 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   Widget buildDescriptionText() {
     return _contentText.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, left: 8, right: 8),
+            padding: const EdgeInsets.only(bottom: 20.0, right: 8, left: 8.0),
             child: getMarkdownBody(_contentText, context),
           )
         : Container();
   }
 
-  Widget buildSessionLengthText() {
+  Widget buildDurationLengthText() {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
-        'SESSION LENGTH',
+        'DURATION',
         style: Theme.of(context).textTheme.headline3,
       ),
     );
@@ -357,13 +401,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   EdgeInsets buildInnerChipPadding() =>
-      EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 12);
+      const EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 12);
 
   EdgeInsets buildInBetweenChipPadding() =>
       const EdgeInsets.only(top: 10, bottom: 10, right: 8);
 
   RoundedRectangleBorder buildChipBorder() {
-    return RoundedRectangleBorder(
+    return const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)));
   }
 
@@ -505,7 +549,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (_bgMusicList.length == 0) return getEmptyPillRow();
 
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
+      padding: const EdgeInsets.only(left: 8),
       child: SizedBox(
           height: 56,
           child: ListView.builder(
@@ -618,25 +662,22 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget buildImage() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-              child: Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                    color: _coverColor != null
-                        ? parseColor(_coverColor)
-                        : MeditoColors.darkColor,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(26.0),
-                    child: _coverArt == null
-                        ? Container()
-                        : getNetworkImageWidget(_coverArt.url),
-                  ))),
-        ],
+      padding: const EdgeInsets.only(left: 8.0),
+      child: Container(
+        height: 120.0,
+        width: 120.0,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          color: _coverColor != null
+              ? parseColor(_coverColor)
+              : MeditoColors.darkColor,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(26.0),
+          child: _coverArt == null
+              ? Container()
+              : getNetworkImageWidget(_coverArt.url),
+        ),
       ),
     );
   }
