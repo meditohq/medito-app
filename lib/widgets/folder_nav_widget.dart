@@ -250,7 +250,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             onBeginPressed: _showPlayer,
             data: data,
           ),
-        ));
+        )).then((value) {
+      setState(() {});
+      return null;
+    });
 
     if (result == "error") {
       _onPullToRefresh();
@@ -283,7 +286,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       start(coverColor).then((value) {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
           return PlayerWidget();
-        }));
+        })).then((value) {
+          setState(() {});
+          return null;
+        });
         return null;
       });
     });

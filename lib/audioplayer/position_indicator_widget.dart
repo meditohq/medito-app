@@ -26,38 +26,13 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double> _dragPositionSubject =
       BehaviorSubject.seeded(null);
-  var millisecondsListened = 0;
-  var _updatedStats = false;
 
   @override
   void dispose() {
     super.dispose();
-    updateMinuteCounter(Duration(milliseconds: millisecondsListened).inSeconds);
-    millisecondsListened = 0;
   }
 
-  void setBgVolumeFadeAtEnd(
-      MediaItem mediaItem, int positionSecs, int durSecs) {
-    millisecondsListened += 200;
-    var timeLeft = durSecs - positionSecs;
-    if (timeLeft <= 10) {
-      AudioService.customAction('bgVolume', timeLeft);
-    }
-    if (timeLeft < 5 && !_updatedStats) {
-      markAsListened(mediaItem.extras['id']);
-      incrementNumSessions();
-      updateStreak();
-      _updatedStats = true;
-      getVersionCopyInt().then((version) {
-        Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.SCREEN_LOADED,
-            Tracking.AUDIO_COMPLETED,
-            map: {
-              'version_seen': '$version',
-            });
-        return null;
-      });
-    }
-  }
+  bool tracked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +48,16 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
             0;
         int duration = widget.mediaItem?.duration?.inMilliseconds ?? 0;
 
-        if (duration > 0 && position > 0) {
-          setBgVolumeFadeAtEnd(
-              widget.mediaItem,
-              widget.state?.currentPosition?.inSeconds ?? 0,
-              widget.mediaItem?.duration?.inSeconds);
+        if (position > duration - 10 && !tracked) {
+          tracked = true;
+          getVersionCopyInt().then((version) {
+            Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.SCREEN_LOADED,
+                Tracking.AUDIO_COMPLETED,
+                map: {
+                  'version_seen': '$version',
+                });
+            return null;
+          });
         }
 
         return Column(

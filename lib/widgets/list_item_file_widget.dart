@@ -13,26 +13,16 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/colors.dart';
 
-class ListItemWidget extends StatefulWidget {
+class ListItemWidget extends StatelessWidget {
   ListItemWidget({Key key, this.item}) : super(key: key);
-
   final ListItem item;
-
-  @override
-  _ListItemWidgetState createState() => _ListItemWidgetState();
-}
-
-class _ListItemWidgetState extends State<ListItemWidget> {
-  var currentIcon;
-
-  SharedPreferences prefs;
 
   Padding buildFolderIcon() {
     return Padding(
@@ -43,14 +33,6 @@ class _ListItemWidgetState extends State<ListItemWidget> {
 
   @override
   Widget build(BuildContext context) {
-    SharedPreferences.getInstance().then((i) {
-      if (this.mounted) {
-        setState(() {
-          this.prefs = i;
-        });
-      }
-    });
-
     return Container(
       padding: EdgeInsets.all(16),
       color: MeditoColors.darkBGColor,
@@ -71,41 +53,32 @@ class _ListItemWidgetState extends State<ListItemWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(widget.item.title,
+            Text(item.title,
                 style: Theme.of(context).textTheme.headline6),
-            widget.item.description == null || widget.item.description.isEmpty
+            item.description == null || item.description.isEmpty
                 ? Container()
                 : Text(
-                    widget.item.description,
+                    item.description,
                     style: Theme.of(context).textTheme.subtitle1,
                   )
           ]),
     );
   }
 
-  Widget _getPlayPauseIcon() {
-    return Padding(
-      child: currentIcon,
-      padding: EdgeInsets.only(right: 8),
-    );
-  }
-
   Widget getIcon() {
-    if (widget.item.type == ListItemType.folder) {
+    if (item.type == ListItemType.folder) {
       return buildFolderIcon();
     }
 
-    var iconWidget;
     var path;
+    var iconWidget;
 
-    switch (widget.item.fileType) {
+    switch (item.fileType) {
       case FileType.audio:
       case FileType.audiosetdaily:
       case FileType.audiosethourly:
-        iconWidget = getAudioIcon(iconWidget);
-        break;
       case FileType.both:
-        iconWidget = getAudioIcon(iconWidget);
+        iconWidget = getAudioIcon();
         break;
       case FileType.text:
         path = 'assets/images/ic_document.svg';
@@ -119,40 +92,21 @@ class _ListItemWidgetState extends State<ListItemWidget> {
     return Padding(padding: EdgeInsets.only(right: 8), child: iconWidget);
   }
 
-  Widget getAudioIcon(iconWidget) {
-    final listened = prefs?.getBool('listened' + widget.item.id) ?? false;
-
-    if (listened) {
-      iconWidget = Icon(
-        Icons.check_circle,
-        color: MeditoColors.lightColor,
-      );
-    } else {
-      iconWidget = Icon(
-        Icons.headset,
-        color: MeditoColors.lightColor,
-      );
-    }
-    return iconWidget;
-  }
-
-  void _playOrPause() {
-//    setState(() {
-//      var state = widget.currentlyPlayingState;
-//      if (state == AudioPlayerState.PLAYING) {
-//        Tracking.trackEvent(
-//            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
-//        MeditoAudioPlayer().audioPlayer.pause();
-//      } else if (state == AudioPlayerState.PAUSED) {
-//        Tracking.trackEvent(
-//            Tracking.FILE_TAPPED, Tracking.AUDIO_RESUME, widget.item.id);
-//        MeditoAudioPlayer().audioPlayer.resume();
-//      } else if (state == AudioPlayerState.STOPPED ||
-//          state == AudioPlayerState.COMPLETED) {
-//        Tracking.trackEvent(
-//            Tracking.FILE_TAPPED, Tracking.AUDIO_PLAY, widget.item.id);
-//        MeditoAudioPlayer().audioPlayer.play(widget.item.url);
-//      }
-//    });
+  Widget getAudioIcon() {
+    return FutureBuilder<bool>(
+        future: checkListened(item.id),
+        builder: (context, listened) {
+          if (!listened.hasError && listened.hasData && listened.data) {
+            return Icon(
+              Icons.check_circle,
+              color: MeditoColors.lightColor,
+            );
+          } else {
+            return Icon(
+              Icons.headset,
+              color: MeditoColors.lightColor,
+            );
+          }
+        });
   }
 }

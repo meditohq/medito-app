@@ -18,7 +18,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
-import 'audio_player_serice.dart';
+import 'audio_player_service.dart';
 
 class PlayerWidget extends StatefulWidget {
   @override
@@ -164,7 +164,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
                 SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 4.0),
+                    padding: EdgeInsets.only(left: 4.0, top: 4.0),
                     child: IconButton(
                       icon: Icon(Icons.close),
                       onPressed: _onBackPressed,
