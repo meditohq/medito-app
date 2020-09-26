@@ -305,12 +305,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     if (item.type == ListItemType.folder) {
       return InkWell(
           onTap: () => folderTap(item),
-          splashColor: MeditoColors.darkColor,
+          splashColor: MeditoColors.red,
           child: getFileListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
           onTap: () => fileTap(item),
-          splashColor: MeditoColors.darkColor,
+          splashColor: MeditoColors.red,
           child: getFileListItem(item));
     } else {
       return SizedBox(

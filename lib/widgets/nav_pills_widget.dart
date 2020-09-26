@@ -60,7 +60,7 @@ class _NavPillsWidgetState extends State<NavPillsWidget>
       columns.add(GestureDetector(
           onTap: () {
             Tracking.trackEvent(Tracking.BREADCRUMB, Tracking.BREADCRUMB_TAPPED,
-                widget.list.last?.id);
+                widget.list?.last?.id ?? "unknown breadcrumb");
 
             if (i == startNumber)
               widget.backPressed(widget.list[i].id);

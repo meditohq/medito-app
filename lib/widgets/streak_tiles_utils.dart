@@ -83,7 +83,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(
-                                    left: 4.0, bottom: 5.0),
+                                    left: 4.0, bottom: 7.0),
                                 child: Text(unit ?? ''),
                               )
                             ],

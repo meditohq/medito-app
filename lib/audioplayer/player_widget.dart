@@ -26,12 +26,11 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  String titleText = "Well done for taking time for yourself!";
-  String subTitleText =
-      "Taking care of yourself is important. We’re here to help you do it, for free, forever.";
-  String buttonLabel = "Donate";
+  String titleText = "Loading...";
+  String subTitleText = "Please wait...";
+  String buttonLabel = "";
   String buttonUrl = "http://meditofoundation.org/donate";
-  String buttonIcon = "assets/images/ic_gift.svg";
+  String buttonIcon = "";
   String artUrl;
   Color textColor;
   Color coverColorAsColor;
@@ -55,7 +54,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
 
-    _stream = AudioService.customEventStream.asBroadcastStream().listen((params) async {
+    _stream = AudioService.customEventStream
+        .asBroadcastStream()
+        .listen((params) async {
       await updateStatsFromBg();
       _stream.cancel();
       return true;
@@ -70,9 +71,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         buttonLabel = value.buttonLabel;
         buttonUrl = value.buttonDestination;
         buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
+      } else {
+        defaultText();
       }
       return null;
-    });
+    }).catchError((onError) => defaultText());
   }
 
   @override
@@ -362,6 +365,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       Tracking.AUDIO_COMPLETED,
     );
     return null;
+  }
+
+  void defaultText() {
+    titleText = "Well done for taking time for yourself!";
+    subTitleText =
+        "Taking care of yourself is important. We’re here to help you do it, for free, forever.";
+    buttonLabel = "Donate";
+    buttonUrl = "http://meditofoundation.org/donate";
+    buttonIcon = "assets/images/ic_gift.svg";
   }
 }
 

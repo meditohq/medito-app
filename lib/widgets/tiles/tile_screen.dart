@@ -93,35 +93,32 @@ class TileListState extends State<TileList> {
 
           return SingleChildScrollView(
             primary: true,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Column(
-                children: <Widget>[
-                  _getMeditoLogo(),
-                  ListView.builder(
-                    padding: EdgeInsets.only(left: 16, right: 16),
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: future.data != null ? future.data?.length : 0,
-                    itemBuilder: (BuildContext context, int index) {
-                      TileItem tile =
-                          future.data != null ? future.data[index] : null;
-                      if (tile != null &&
-                          tile.tileType == TileType.announcement) {
-                        return getHorizontalAnnouncementTile(tile);
-                      } else if (tile != null &&
-                          tile.tileType == TileType.large) {
-                        return getHorizontalTile(tile);
-                      } else {
-                        return Container(
-                          color: Colors.green,
-                        );
-                      }
-                    },
-                  ),
-                  getTwoColumns(future.data)
-                ],
-              ),
+            child: Column(
+              children: <Widget>[
+                _getMeditoLogo(),
+                ListView.builder(
+                  padding: EdgeInsets.only(left: 16, right: 16),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: future.data != null ? future.data?.length : 0,
+                  itemBuilder: (BuildContext context, int index) {
+                    TileItem tile =
+                        future.data != null ? future.data[index] : null;
+                    if (tile != null &&
+                        tile.tileType == TileType.announcement) {
+                      return getHorizontalAnnouncementTile(tile);
+                    } else if (tile != null &&
+                        tile.tileType == TileType.large) {
+                      return getHorizontalTile(tile);
+                    } else {
+                      return Container(
+                        color: Colors.green,
+                      );
+                    }
+                  },
+                ),
+                getTwoColumns(future.data)
+              ],
             ),
           );
         },
@@ -147,7 +144,7 @@ class TileListState extends State<TileList> {
                   child: RaisedButton(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(16.0),
+                        borderRadius: new BorderRadius.circular(12.0),
                       ),
                       color: MeditoColors.darkColor,
                       onPressed: _onPullToRefresh,
@@ -246,7 +243,7 @@ class TileListState extends State<TileList> {
               offset: Offset(0, 2), // changes position of shadow
             ),
           ],
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
           color: parseColor(item.colorBackground),
         ),
         child: wrapWithInkWell(
@@ -314,7 +311,7 @@ class TileListState extends State<TileList> {
         child: InkWell(
           splashColor: MeditoColors.lightColor,
           onTap: () => item != null ? _onTap(item) : null,
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(12.0),
           child: w,
         ));
   }
@@ -324,7 +321,7 @@ class TileListState extends State<TileList> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
           color: MeditoColors.darkColor,
         ),
         child: wrapWithInkWell(
@@ -363,7 +360,7 @@ class TileListState extends State<TileList> {
                 offset: Offset(0, 2), // changes position of shadow
               ),
             ],
-            borderRadius: BorderRadius.all(Radius.circular(16)),
+            borderRadius: BorderRadius.all(Radius.circular(12)),
             color: item.colorBackground != null
                 ? parseColor(item.colorBackground)
                 : Colors.black,
@@ -611,7 +608,7 @@ class TileListState extends State<TileList> {
             item,
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(16)),
+                borderRadius: BorderRadius.all(Radius.circular(12)),
                 color: color,
               ),
               height: 100,
