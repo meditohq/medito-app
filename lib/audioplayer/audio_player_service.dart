@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
@@ -56,13 +55,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
       return null;
     });
 
-    _player.positionStream.listen((position) {
+    _player.positionStream.listen((position) async {
       millisecondsListened = position.inMilliseconds;
 
       if (position.inSeconds > _duration.inSeconds - 10) {
         setBgVolumeFadeAtEnd(
             mediaItem, position.inSeconds, _duration.inSeconds);
-        updateStats();
+        await updateStats();
       }
     });
 
@@ -97,7 +96,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
     _bgPlayer.setVolume(initialBgVolume * (timeLeft * .1));
     print(initialBgVolume * (timeLeft * .1));
-
   }
 
   @override
@@ -211,17 +209,24 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  void updateStats() {
+  Future<void> updateStats() async {
     if (!_updatedStats) {
-      print("updating stats ........");
-
-      updateMinuteCounter(
-          Duration(milliseconds: millisecondsListened).inSeconds);
-      markAsListened(mediaItem.extras['id']);
-      incrementNumSessions();
-      updateStreak();
       _updatedStats = true;
+      print('saveStats map');
+
+      var dataMap = {
+        'secsListened': _duration.inSeconds,
+        'id': '${mediaItem.extras['id']}',
+      };
+
+      print('dataMap $dataMap');
+
+      await writeJSONToCache(encoded(dataMap), "stats");
+
+     AudioServiceBackground.sendCustomEvent('');
     }
+
+
   }
 }
 

@@ -36,6 +36,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Color textColor;
   Color coverColorAsColor;
 
+  StreamSubscription _stream;
+
   @override
   void dispose() {
     try {
@@ -52,6 +54,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
+
+    _stream = AudioService.customEventStream.asBroadcastStream().listen((params) async {
+      await updateStatsFromBg();
+      _stream.cancel();
+      return true;
+    });
 
     AudioCompleteCopyProvider provider = AudioCompleteCopyProvider();
 

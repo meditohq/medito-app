@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/viewmodel/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum UnitType { day, min }
@@ -68,7 +69,7 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
   return true;
 }
 
-void updateStreak({String streak = ''}) async {
+Future<void> updateStreak({String streak = ''}) async {
   print("update streak");
 
   var prefs = await SharedPreferences.getInstance();
@@ -145,6 +146,7 @@ Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
+  print('secsListened $streak');
   if (streak == null)
     return '0';
   else
@@ -210,11 +212,15 @@ Future<int> incrementNumSessions() async {
   return current;
 }
 
-void markAsListened(String id) async {
+Future<void> markAsListened(String id) async {
   print("mark as listened");
 
   var prefs = await SharedPreferences.getInstance();
   await prefs?.setBool('listened' + id, true);
+}
+
+Future<void> clearBgStats() {
+  return writeJSONToCache("", "stats");
 }
 
 Future<bool> checkListened(String id) async {
@@ -244,4 +250,22 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
   var oneDayAfterMidnightThatNight = DateTime(lastDayInStreak.year,
       lastDayInStreak.month, lastDayInStreak.day + 1, 23, 59, 59);
   return now.isAfter(oneDayAfterMidnightThatNight);
+}
+
+Future updateStatsFromBg() async {
+  var read = await readJSONFromCache("stats");
+  print('read ->$read');
+
+  if (read != null && read.isNotEmpty) {
+    var map = decoded(read);
+
+    if (map != null && map.isNotEmpty) {
+      await updateStreak();
+      await incrementNumSessions();
+      await markAsListened(map['id']);
+      await updateMinuteCounter(Duration(seconds: map['secsListened']).inSeconds);
+    }
+    print('clearing bg stats');
+    await clearBgStats();
+  }
 }

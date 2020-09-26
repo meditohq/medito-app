@@ -24,7 +24,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
-  return GoogleFonts.interTextTheme(Theme.of(context).textTheme.copyWith(
+  return GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme.copyWith(
         headline6: TextStyle(
             fontSize: 20.0,
             height: 1.4,
