@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/viewmodel/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum UnitType { day, min }
@@ -58,19 +59,23 @@ Future<int> _getCurrentStreakInt() async {
 }
 
 Future<bool> updateMinuteCounter(int additionalSecs) async {
+  print("increase mins counter");
+
   var prefs = await SharedPreferences.getInstance();
 
   var current = await _getSecondsListened();
   var plusOne = current + (additionalSecs ?? 0);
-  prefs.setInt('secsListened', plusOne);
+  await prefs.setInt('secsListened', plusOne);
   return true;
 }
 
-void updateStreak({String streak = ''}) async {
+Future<void> updateStreak({String streak = ''}) async {
+  print("update streak");
+
   var prefs = await SharedPreferences.getInstance();
 
   if (streak.isNotEmpty) {
-    prefs.setInt('streakCount', int.parse(streak));
+    await prefs.setInt('streakCount', int.parse(streak));
     _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomSessionToStreakList();
     return;
@@ -94,7 +99,7 @@ void updateStreak({String streak = ''}) async {
   }
 
   streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
-  prefs.setStringList('streakList', streakList);
+  await prefs.setStringList('streakList', streakList);
 }
 
 Future<void> addPhantomSessionToStreakList() async {
@@ -107,8 +112,8 @@ Future<void> addPhantomSessionToStreakList() async {
   var streakTime = DateTime.now().millisecondsSinceEpoch.toString();
   streakList.add(streakTime);
   fakeStreakList.add(streakTime);
-  prefs.setStringList('streakList', streakList);
-  prefs.setStringList('fakeStreakList', fakeStreakList);
+  await prefs.setStringList('streakList', streakList);
+  await prefs.setStringList('fakeStreakList', fakeStreakList);
 }
 
 Future<void> incrementStreakCounter(
@@ -117,7 +122,7 @@ Future<void> incrementStreakCounter(
   var prefs = await SharedPreferences.getInstance();
 
   streakCount++;
-  prefs.setInt('streakCount', streakCount);
+  await prefs.setInt('streakCount', streakCount);
 
   //update longestStreak
   await _updateLongestStreak(streakCount, prefs);
@@ -127,20 +132,21 @@ Future _updateLongestStreak(int streakCount, SharedPreferences prefs) async {
   //update longestStreak
   var longest = await _getLongestStreakInt();
   if (streakCount > longest) {
-    prefs.setInt('longestStreak', streakCount);
+    await prefs.setInt('longestStreak', streakCount);
   }
 }
 
 void setLongestStreakToCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
   var current = await _getCurrentStreakInt();
-  prefs.setInt('longestStreak', current);
+  await prefs.setInt('longestStreak', current);
 }
 
 Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
+  print('secsListened $streak');
   if (streak == null)
     return '0';
   else
@@ -198,21 +204,33 @@ Future<int> getNumSessionsInt() async {
 }
 
 Future<int> incrementNumSessions() async {
+  print("increase number of sessions");
   var prefs = await SharedPreferences.getInstance();
   var current = await getNumSessionsInt();
   current++;
-  prefs.setInt('numSessions', current);
+  await prefs.setInt('numSessions', current);
   return current;
 }
 
-void markAsListened(String id) async {
+Future<void> markAsListened(String id) async {
+  print("mark as listened");
+
   var prefs = await SharedPreferences.getInstance();
-  prefs?.setBool('listened' + id, true);
+  await prefs?.setBool('listened' + id, true);
+}
+
+Future<void> clearBgStats() {
+  return writeJSONToCache("", "stats");
+}
+
+Future<bool> checkListened(String id) async {
+  var prefs = await SharedPreferences.getInstance();
+  return prefs?.getBool('listened' + id) ?? false;
 }
 
 void setVersionCopySeen(int id) async {
   var prefs = await SharedPreferences.getInstance();
-  prefs?.setInt('copy', id);
+  await prefs?.setInt('copy', id);
 }
 
 Future<int> getVersionCopyInt() async {
@@ -232,4 +250,22 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
   var oneDayAfterMidnightThatNight = DateTime(lastDayInStreak.year,
       lastDayInStreak.month, lastDayInStreak.day + 1, 23, 59, 59);
   return now.isAfter(oneDayAfterMidnightThatNight);
+}
+
+Future updateStatsFromBg() async {
+  var read = await readJSONFromCache("stats");
+  print('read ->$read');
+
+  if (read != null && read.isNotEmpty) {
+    var map = decoded(read);
+
+    if (map != null && map.isNotEmpty) {
+      await updateStreak();
+      await incrementNumSessions();
+      await markAsListened(map['id']);
+      await updateMinuteCounter(Duration(seconds: map['secsListened']).inSeconds);
+    }
+    print('clearing bg stats');
+    await clearBgStats();
+  }
 }

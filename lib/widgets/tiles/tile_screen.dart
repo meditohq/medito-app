@@ -171,7 +171,7 @@ class TileListState extends State<TileList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: MeditoColors.darkBGColor,
+      color: MeditoColors.darkMoon,
       child: SafeArea(
         bottom: false,
         child: tileListWidget(),
@@ -238,6 +238,14 @@ class TileListState extends State<TileList> {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 0,
+              blurRadius: 2,
+              offset: Offset(0, 2), // changes position of shadow
+            ),
+          ],
           borderRadius: BorderRadius.all(Radius.circular(16)),
           color: parseColor(item.colorBackground),
         ),
@@ -248,21 +256,47 @@ class TileListState extends State<TileList> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  Container(height: 8),
+                  SizedBox(
+                      height: 70, child: getNetworkImageWidget(item.thumbnail)),
+                  Container(height: 16),
                   SizedBox(
                     width: getColumWidth() - 48, //todo horrible hack
                     child: AutoSizeText(item.title,
                         maxLines: 2,
+                        textAlign: TextAlign.center,
                         wrapWords: false,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline6
-                            .copyWith(color: parseColor(item.colorText))),
+                        style: Theme.of(context).textTheme.headline6.copyWith(
+                            color: parseColor(item.colorText),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.1,
+                            height: 1.3)),
                   ),
-                  Container(height: 16),
-                  getNetworkImageWidget(item.thumbnail),
+                  Container(height: item.description != "" ? 4 : 0),
+                  item.description != ""
+                      ? SizedBox(
+                          width: getColumWidth() - 48, //todo horrible hack
+                          child: Opacity(
+                            opacity: .7,
+                            child: AutoSizeText(item.description,
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                                wrapWords: false,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle1
+                                    .copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: 0.1,
+                                        color: parseColor(item.colorText))),
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             )),
@@ -321,6 +355,14 @@ class TileListState extends State<TileList> {
         padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
         child: Container(
           decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 0,
+                blurRadius: 2,
+                offset: Offset(0, 2), // changes position of shadow
+              ),
+            ],
             borderRadius: BorderRadius.all(Radius.circular(16)),
             color: item.colorBackground != null
                 ? parseColor(item.colorBackground)
@@ -330,14 +372,14 @@ class TileListState extends State<TileList> {
             parseColor(item.colorBackground),
             item,
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(18.0),
               child: Stack(
                 children: <Widget>[
                   Positioned(
                       top: 0,
                       right: 0,
                       child: SizedBox(
-                          height: 115,
+                          height: 100,
                           child: getNetworkImageWidget(item.thumbnail,
                               startHeight: 140.0))),
                   //todo why is there space around this button?
@@ -348,6 +390,7 @@ class TileListState extends State<TileList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       getTitleText(item),
+                      Container(height: item.description != "" ? 6 : 0),
                       getDescText(item),
                     ],
                   ),
@@ -363,11 +406,14 @@ class TileListState extends State<TileList> {
       widthFactor: .6,
       child: Padding(
         padding: EdgeInsets.only(bottom: 62),
-        child: Text(item.description,
-            style: Theme.of(context)
-                .textTheme
-                .subtitle1
-                .copyWith(color: parseColor(item.colorText))),
+        child: Opacity(
+          opacity: 0.7,
+          child: Text(item.description,
+              style: Theme.of(context).textTheme.subtitle1.copyWith(
+                  fontSize: 16,
+                  letterSpacing: 0.1,
+                  color: parseColor(item.colorText))),
+        ),
       ),
     );
   }
@@ -376,10 +422,11 @@ class TileListState extends State<TileList> {
     return FractionallySizedBox(
       widthFactor: 0.6,
       child: Text(item.title,
-          style: Theme.of(context)
-              .textTheme
-              .headline6
-              .copyWith(color: parseColor(item.colorText))),
+          style: Theme.of(context).textTheme.headline6.copyWith(
+              fontSize: 20,
+              height: 1.3,
+              letterSpacing: 0.1,
+              color: parseColor(item.colorText))),
     );
   }
 
@@ -540,9 +587,13 @@ class TileListState extends State<TileList> {
           ),
           Container(height: 8),
           getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.darkColor),
           getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.darkColor),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.lightColorLine),
         ],
       ),
     );

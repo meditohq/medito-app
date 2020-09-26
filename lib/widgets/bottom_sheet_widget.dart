@@ -189,8 +189,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
+            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
       );
     } else {
       return Text(
@@ -377,9 +376,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       }
     }
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
-    setState(() {
-      filterLengthsForThisPerson(voiceList[voiceSelected]);
-    });
+    if (mounted)
+      setState(() {
+        filterLengthsForThisPerson(voiceList[voiceSelected]);
+      });
   }
 
   Future<void> onSessionPillTap(bool value, int index) async {

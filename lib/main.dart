@@ -13,7 +13,9 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/cache.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,13 +34,37 @@ Future<void> main() async {
   runApp(HomeScreenWidget());
 
   Tracking.initialiseTracker();
-
 }
 
 /// This Widget is the main application widget.
-class HomeScreenWidget extends StatelessWidget {
+class HomeScreenWidget extends StatefulWidget {
   static const String _title = 'Medito';
 
+  @override
+  _HomeScreenWidgetState createState() => _HomeScreenWidgetState();
+}
+
+class _HomeScreenWidgetState extends State<HomeScreenWidget>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      print("resuming");
+      await updateStatsFromBg();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +78,14 @@ class HomeScreenWidget extends StatelessWidget {
             body: AudioServiceWidget(child: TileList())),
       },
       theme: ThemeData(
-          canvasColor: MeditoColors.almostBlack,
+          canvasColor: MeditoColors.darkMoon,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: FadeTransitionBuilder(),
           }),
           accentColor: MeditoColors.lightColor,
           textTheme: buildDMSansTextTheme(context)),
-      title: _title,
+      title: HomeScreenWidget._title,
       navigatorObservers: [Tracking.getObserver()],
     );
   }

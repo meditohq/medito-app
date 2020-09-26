@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -25,6 +26,7 @@ const TEXT = 'text';
 
 Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
+  print('directory $directory');
   return directory.path;
 }
 
@@ -49,6 +51,14 @@ Future<String> _readCache(String id) async {
 
   // Read the file.
   return await file.readAsString();
+}
+
+String encoded(dynamic obj){
+  return json.encode(obj);
+}
+
+dynamic decoded(String obj){
+  return json.decode(obj);
 }
 
 Future<File> writeJSONToCache(String body, String id) async {
