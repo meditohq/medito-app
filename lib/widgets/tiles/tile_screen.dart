@@ -65,6 +65,8 @@ class TileListState extends State<TileList> {
         this.prefs = prefs;
       });
     });
+
+    Future.delayed(Duration(seconds: 2), _onPullToRefresh);
   }
 
   Future<void> _onPullToRefresh() async {
