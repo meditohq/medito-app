@@ -577,8 +577,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         _bgDownloading = false;
         _musicSelected = 0;
         _backgroundMusicUrl = null;
-        setState(() {});
       });
+    } else {
+      _bgDownloading = false;
+      _musicSelected = 0;
+      _backgroundMusicUrl = null;
     }
     setState(() {});
   }
