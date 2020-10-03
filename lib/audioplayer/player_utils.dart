@@ -29,6 +29,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
 var baseUrl = 'https://medito.app/api/pages';
 int total = 1, received = 0;
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
@@ -152,9 +153,7 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
   String dir = (await getApplicationSupportDirectory()).path;
   var name = currentFile.filename.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
-
-  if (await file.exists()) return null;
-
+  if(file.existsSync()) return;
   http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
   total = _response.contentLength;
   received = 0;
@@ -168,7 +167,9 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
     await file.writeAsBytes(_bytes);
     saveFileToDownloadedFilesList(currentFile);
     print("Saved New: " + file.path);
+    return false;
   });
+
 }
 double getProgress()
 {
