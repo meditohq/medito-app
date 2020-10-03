@@ -32,6 +32,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 var baseUrl = 'https://medito.app/api/pages';
 int total = 1, received = 0;
+bool downloading = false;
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
   return Container(
@@ -163,11 +164,12 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
       _bytes.addAll(value);
       received += value.length;
       print("File Progress New: " + getProgress().toString());
-  }).onDone(() async {
-    await file.writeAsBytes(_bytes);
+  }).onDone(() {
+    file.writeAsBytes(_bytes);
     saveFileToDownloadedFilesList(currentFile);
     print("Saved New: " + file.path);
-    return false;
+
+    downloading = false;
   });
 
 }

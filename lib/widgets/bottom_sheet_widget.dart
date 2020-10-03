@@ -51,7 +51,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   var _coverColor;
   String _textColor;
   String _contentText = '';
-  bool downloading = false;
+
   bool bgDownloading = false;
   Files currentFile;
   var _backgroundMusicUrl;
@@ -591,7 +591,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       downloadFileWithProgress(currentFile).then((onValue) {
         setState(() {
           print("Download Value" + onValue.toString());
-          downloading = false;
         });
       }).catchError((onError) {
         setState(() {
