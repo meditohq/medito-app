@@ -212,7 +212,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         _description, _contentText, _textColor, _backgroundMusicUrl);
 
     setState(() {
-      _downloading = true;
       Future.delayed(const Duration(milliseconds: 3000), () {
         setState(() {
           _downloading = false;

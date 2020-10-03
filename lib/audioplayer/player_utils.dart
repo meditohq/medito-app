@@ -163,11 +163,11 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
   _response.stream.listen((value){
       _bytes.addAll(value);
       received += value.length;
-      print("File Nipun: " + getProgress().toString());
+      print("File Progress New: " + getProgress().toString());
   }).onDone(() async {
     await file.writeAsBytes(_bytes);
     saveFileToDownloadedFilesList(currentFile);
-    print("Saved Nipun: " + file.path);
+    print("Saved New: " + file.path);
   });
 }
 double getProgress()
