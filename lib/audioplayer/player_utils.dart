@@ -29,7 +29,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
+var downloadListener = ValueNotifier<double>(0);
 var baseUrl = 'https://medito.app/api/pages';
 int total = 1, received = 0;
 bool downloading = false;
@@ -164,18 +164,17 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
       _bytes.addAll(value);
       received += value.length;
       print("File Progress New: " + getProgress().toString());
-  }).onDone(() {
-    file.writeAsBytes(_bytes);
+      downloadListener.value = getProgress();
+  }).onDone(() async {
+    await file.writeAsBytes(_bytes);
     saveFileToDownloadedFilesList(currentFile);
     print("Saved New: " + file.path);
-
     downloading = false;
   });
-
 }
 double getProgress()
 {
-  return received/total;
+  return received*1.0/total;
 }
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;

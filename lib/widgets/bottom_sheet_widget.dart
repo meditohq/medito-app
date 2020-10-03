@@ -185,13 +185,23 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget getBeginButtonContent() {
     if (downloading || bgDownloading) {
-      return SizedBox(
-        height: 24,
-        width: 160,
-        //child: CircularProgressIndicator(
-            //valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
-        child: Text('DOWNLOADING '+ (received*100.0~/total).toString()+"%")
-      );
+
+      return ValueListenableBuilder(valueListenable: downloadListener,
+            builder:(context, value, widget){
+              if(value==1){
+                return Text(
+                  'BEGIN',
+                  style: Theme.of(context).textTheme.headline3.copyWith(
+                      color: _textColor != null && _textColor.isNotEmpty
+                          ? parseColor(_textColor)
+                          : MeditoColors.darkBGColor,
+                      fontWeight: FontWeight.bold),
+                );
+              }
+              else{
+                return Text('DOWNLOADING '+ (value.toInt()*100).toString()+"%");
+              }
+      });
     } else {
       return Text(
         'BEGIN',
