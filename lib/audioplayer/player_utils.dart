@@ -30,7 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 var baseUrl = 'https://medito.app/api/pages';
-
+int total = 1, received = 0;
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
   return Container(
@@ -138,7 +138,7 @@ Future<dynamic> downloadFile(Files currentFile) async {
 
   var request = await http.get(currentFile.url);
   if (request.statusCode < 200 || request.statusCode > 300) {
-    throw HttpException("http exception erro getting file");
+    throw HttpException("http exception error getting file");
   }
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
@@ -147,7 +147,33 @@ Future<dynamic> downloadFile(Files currentFile) async {
 
   print(file.path);
 }
+Future<dynamic> downloadFileWithProgress(Files currentFile) async {
+  getAttributions(currentFile.attributions);
+  String dir = (await getApplicationSupportDirectory()).path;
+  var name = currentFile.filename.replaceAll(" ", "%20");
+  File file = new File('$dir/$name');
 
+  if (await file.exists()) return null;
+
+  http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
+  total = _response.contentLength;
+  received = 0;
+  List<int> _bytes = [];
+
+  _response.stream.listen((value){
+      _bytes.addAll(value);
+      received += value.length;
+      print("File Nipun: " + getProgress().toString());
+  }).onDone(() async {
+    await file.writeAsBytes(_bytes);
+    saveFileToDownloadedFilesList(currentFile);
+    print("Saved Nipun: " + file.path);
+  });
+}
+double getProgress()
+{
+  return received/total;
+}
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;
   filename = filename.replaceAll(" ", "%20");

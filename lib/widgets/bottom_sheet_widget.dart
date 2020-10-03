@@ -187,9 +187,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (_downloading || _bgDownloading) {
       return SizedBox(
         height: 24,
-        width: 24,
-        child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
+        width: 160,
+        // child: CircularProgressIndicator(
+        //     value: received/total,
+        //     valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
+        child: Text('DOWNLOADING '+ (received*100.0~/total).toString()+"%")
       );
     } else {
       return Text(
@@ -588,7 +590,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     _downloading = true;
     if (index == 1) {
       // 'YES' selected
-      downloadFile(currentFile).then((onValue) {
+      downloadFileWithProgress(currentFile).then((onValue) {
         setState(() {
           _downloading = false;
         });
