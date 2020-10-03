@@ -16,7 +16,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../utils/colors.dart';
 
@@ -24,72 +23,8 @@ class ListItemWidget extends StatelessWidget {
   ListItemWidget({Key key, this.item}) : super(key: key);
   final ListItem item;
 
-  Padding buildFolderIcon() {
-    return Padding(
-      padding: EdgeInsets.only(right: 8.0),
-      child: Icon(Icons.folder, color: MeditoColors.lightColor),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      color: MeditoColors.darkBGColor,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Container(padding: EdgeInsets.only(top: 2), child: getIcon()),
-          getTwoTextViewsInColumn(context)
-        ],
-      ),
-    );
-  }
-
-  Widget getTwoTextViewsInColumn(BuildContext context) {
-    return Flexible(
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(item.title,
-                style: Theme.of(context).textTheme.headline6),
-            item.description == null || item.description.isEmpty
-                ? Container()
-                : Text(
-                    item.description,
-                    style: Theme.of(context).textTheme.subtitle1,
-                  )
-          ]),
-    );
-  }
-
-  Widget getIcon() {
-    if (item.type == ListItemType.folder) {
-      return buildFolderIcon();
-    }
-
-    var path;
-    var iconWidget;
-
-    switch (item.fileType) {
-      case FileType.audio:
-      case FileType.audiosetdaily:
-      case FileType.audiosethourly:
-      case FileType.both:
-        iconWidget = getAudioIcon();
-        break;
-      case FileType.text:
-        path = 'assets/images/ic_document.svg';
-        iconWidget = SvgPicture.asset(
-          path,
-          color: MeditoColors.lightColor,
-        );
-        break;
-    }
-
-    return Padding(padding: EdgeInsets.only(right: 8), child: iconWidget);
+  Widget buildFolderIcon() {
+    return Icon(Icons.folder, color: MeditoColors.lightColor);
   }
 
   Widget getAudioIcon() {
@@ -108,5 +43,79 @@ class ListItemWidget extends StatelessWidget {
             );
           }
         });
+  }
+
+  Widget buildTextIcon() {
+    return Icon(Icons.description, color: MeditoColors.lightColor);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Opacity(
+            opacity: 0.7,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: getIcon(),
+            )),
+        getTwoTextViewsInColumn(context)
+      ],
+    );
+  }
+
+  Widget getTwoTextViewsInColumn(BuildContext context) {
+    return Flexible(
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(item.title,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6
+                    .copyWith(fontSize: 18, height: 1.4)),
+            item.description == null || item.description.isEmpty
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(height: 4),
+                      Text(
+                        item.description,
+                        style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            fontSize: 14,
+                            letterSpacing: 0.2,
+                            fontWeight: FontWeight.w500,
+                            color: MeditoColors.walterWhite.withOpacity(0.7)),
+                      ),
+                    ],
+                  )
+          ]),
+    );
+  }
+
+  Widget getIcon() {
+    if (item.type == ListItemType.folder) {
+      return buildFolderIcon();
+    }
+
+    var iconWidget;
+
+    switch (item.fileType) {
+      case FileType.audio:
+      case FileType.audiosetdaily:
+      case FileType.audiosethourly:
+      case FileType.both:
+        iconWidget = getAudioIcon();
+        break;
+      case FileType.text:
+        iconWidget = buildTextIcon();
+        break;
+    }
+
+    return iconWidget;
   }
 }

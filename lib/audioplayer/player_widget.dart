@@ -115,17 +115,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 28.0, left: 16.0, bottom: 10.0, right: 16.0),
+                          top: 28.0, left: 16.0, bottom: 4.0, right: 16.0),
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
                               mediaItem?.title ?? titleText,
-                              style: GoogleFonts.merriweather().copyWith(
-                                  letterSpacing: 1,
+                              style: Theme.of(context).textTheme.bodyText1.copyWith(
+                                  letterSpacing: 0.2,
                                   height: 1.5,
                                   color: Colors.white,
-                                  fontSize: 26.0,
+                                  fontSize: 20.0,
                                   fontWeight: FontWeight.w600),
                             ),
                           ),
@@ -144,8 +144,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                     .textTheme
                                     .headline1
                                     .copyWith(
-                                        letterSpacing: 0.1,
-                                        color: MeditoColors.newGrey,
+                                        letterSpacing: 0.2,
+                                        fontWeight: FontWeight.w500,
+                                        color: MeditoColors.walterWhite.withOpacity(0.7),
                                         height: 1.5),
                               )),
                       ]),
@@ -187,46 +188,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             ),
           );
 
-//            return Column(
-//              mainAxisAlignment: MainAxisAlignment.center,
-//              children: [
-//                if (processingState == AudioProcessingState.buffering) ...[
-//                  CircularProgressIndicator(),
-//                  Text('buffering'),
-//                ] else if (processingState ==
-//                    AudioProcessingState.buffering) ...[
-//                  CircularProgressIndicator(),
-//                  Text('connecting'),
-//                ] else if (processingState == AudioProcessingState.none) ...[
-//                  Text('none')
-//                ] else ...[
-//                  if (mediaItem?.title != null) Text(mediaItem.title),
-//                  Row(
-//                    mainAxisAlignment: MainAxisAlignment.center,
-//                    children: [
-//                      if (playing) pauseButton() else playButton(),
-//                    ],
-//                  ),
-//                  positionIndicator(mediaItem, state),
-//                  Text("Processing state: " +
-//                      "$processingState".replaceAll(RegExp(r'^.*\.'), '')),
-//                  StreamBuilder(
-//                    stream: AudioService.customEventStream,
-//                    builder: (context, snapshot) {
-//                      return Text("custom event: ${snapshot.data}");
-//                    },
-//                  ),
-//                  StreamBuilder<bool>(
-//                    stream: AudioService.notificationClickEventStream,
-//                    builder: (context, snapshot) {
-//                      return Text(
-//                        'Notification Click Status: ${snapshot.data}',
-//                      );
-//                    },
-//                  ),
-//                ],
-//              ],
-//            );
         },
       ),
     );

@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
-import 'package:Medito/widgets/nav_pills_widget.dart';
+import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +40,6 @@ class _StreakWidgetState extends State<StreakWidget> {
     ];
 
     return Scaffold(
-      backgroundColor: MeditoColors.darkBGColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -48,10 +47,8 @@ class _StreakWidgetState extends State<StreakWidget> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: NavPillsWidget(list: list, backPressed: _backPressed),
-              ),
+              MeditoAppBarWidget(title: "Stats", backPressed: _backPressed),
+              Container(height: 16),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                 child: Row(
@@ -69,12 +66,14 @@ class _StreakWidgetState extends State<StreakWidget> {
                               onClick: openEditDialog,
                               editable: true,
                               optionalText: UnitType.day),
+                          Container(height: 16),
                           StreakTileWidget(
                               getMinutesListened(), 'Minutes Listened',
                               optionalText: UnitType.min)
                         ],
                       ),
                     ),
+                    Container(width: 16),
                     //right
                     Expanded(
                       child: Column(
@@ -86,6 +85,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                               editable: true,
                               onClick: openResetDialog,
                               optionalText: UnitType.day),
+                          Container(height: 16),
                           StreakTileWidget(
                             getNumSessions(),
                             'Number of Sessions',
@@ -115,11 +115,10 @@ class _StreakWidgetState extends State<StreakWidget> {
         return Theme(
           data: new ThemeData(
               primaryColor: MeditoColors.lightColorLine,
-              accentColor: Colors.orange,
-              hintColor: Colors.green),
+           ),
           child: AlertDialog(
             shape: _roundedRectangleBorder(),
-            backgroundColor: MeditoColors.darkBGColor,
+            backgroundColor: MeditoColors.moonlight,
             title: Text("How many days is your streak?",
                 style: Theme.of(context).textTheme.headline5),
             content: new TextField(
@@ -145,8 +144,6 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onCancelTap,
-                        shape: _roundedRectangleBorder(),
-                        color: MeditoColors.darkColor,
                         child: Text(
                           'CANCEL',
                           style: Theme.of(context).textTheme.headline3.copyWith(
@@ -163,7 +160,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       child: FlatButton(
                         onPressed: _onSaveTap,
                         shape: _roundedRectangleBorder(),
-                        color: MeditoColors.lightColor,
+                        color: MeditoColors.walterWhite,
                         child: Text(
                           'SAVE',
                           style: Theme.of(context).textTheme.headline3.copyWith(

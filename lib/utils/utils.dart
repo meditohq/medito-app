@@ -82,7 +82,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             //attr widget
             fontSize: 14.0,
             height: 1.4,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.w400),
         bodyText1: TextStyle(
             //for 'MORE DETAILS'
@@ -166,7 +166,7 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
         h2: Theme.of(context).textTheme.headline5,
         h3: Theme.of(context).textTheme.subtitle2,
         listBullet: Theme.of(context).textTheme.subtitle1,
-        p: Theme.of(context).textTheme.bodyText2),
+        p: Theme.of(context).textTheme.bodyText2.copyWith(height: 1.5)),
     data: content == null ? '' : content,
     imageDirectory: 'https://raw.githubusercontent.com',
   );

@@ -14,31 +14,25 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
           skipCache: true);
 
       if (response != null) {
-        var copy = AudioCompleteCopyResponse.fromJson(response);
+        var copy = AudioCompleteCopyResponse.fromJson(response).data.content.versions;
 
-        var versions = copy.data.content.versions;
+        copy.retainWhere((value) => value.active);
 
-        var sticky = versions.firstWhere((element) => element?.sticky,
-            orElse: () => null);
-        if (sticky != null) {
-          return sticky;
-        } else {
-          versions.shuffle();
-          var version = versions.first;
+        copy.shuffle();
+        var version = copy.first;
 
-          var numberOfSession = await getNumSessionsInt() + 1;
+        var numberOfSession = await getNumSessionsInt() + 1;
 
-          version.title =
-              version.title.replaceAll('%n', numberOfSession.toString());
+        version.title =
+            version.title.replaceAll('%n', numberOfSession.toString());
 
-          setVersionCopySeen(version.version);
+        setVersionCopySeen(version.version);
 
-          return version;
-        }
+        return version;
       }
       return null;
-    } on Exception {
-      return null;
+    } catch(e){
+      print(e.toString());
     }
   }
 }

@@ -81,29 +81,12 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
           canvasColor: MeditoColors.darkMoon,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: FadeTransitionBuilder(),
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           }),
           accentColor: MeditoColors.lightColor,
           textTheme: buildDMSansTextTheme(context)),
       title: HomeScreenWidget._title,
       navigatorObservers: [Tracking.getObserver()],
     );
-  }
-}
-
-class FadeTransitionBuilder extends PageTransitionsBuilder {
-  @override
-  Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    return FadeTransition(
-        opacity: CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeInOut,
-        ),
-        child: child);
   }
 }

@@ -47,65 +47,62 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
           }
           return GestureDetector(
             onTap: widget.onClick,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                      color: MeditoColors.darkColor,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(height: 4),
-                          Text(widget.title,
-                              maxLines: 2,
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    color: MeditoColors.moonlight,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(height: 4),
+                        Text(widget.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.fade,
+                            style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 18)),
+                        Wrap(
+                          direction: Axis.horizontal,
+                          crossAxisAlignment: WrapCrossAlignment.end,
+                          children: <Widget>[
+                            Text(
+                              _formatSnapshotData(snapshot),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(fontSize: 34),
                               overflow: TextOverflow.fade,
-                              style: Theme.of(context).textTheme.headline6),
-                          Wrap(
-                            direction: Axis.horizontal,
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            children: <Widget>[
-                              Text(
-                                _formatSnapshotData(snapshot),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    .copyWith(fontSize: 34),
-                                overflow: TextOverflow.fade,
-                                maxLines: 1,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 4.0, bottom: 7.0),
-                                child: Text(unit ?? ''),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+                              maxLines: 1,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 4.0, bottom: 7.0),
+                              child: Text(unit ?? ''),
+                            )
+                          ],
+                        )
+                      ],
                     ),
                   ),
-                  widget.editable
-                      ? Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.edit,
-                              size: 16.0,
-                              color: MeditoColors.lightColorLine,
-                            ),
-                          ))
-                      : Container(),
-                ],
-              ),
+                ),
+                widget.editable
+                    ? Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.edit,
+                            size: 16.0,
+                            color: MeditoColors.lightColorLine,
+                          ),
+                        ))
+                    : Container(),
+              ],
             ),
           );
         });
@@ -119,14 +116,3 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
     return value;
   }
 }
-
-//Widget wrapWithStreakInkWell(Widget w) {
-//  return Material(
-//    color: Colors.white.withOpacity(0.0),
-//    child: InkWell(
-//        splashColor: MeditoColors.lightColor,
-//        onTap: () => _onStreakTap(),
-//        borderRadius: BorderRadius.circular(16.0),
-//        child: w),
-//  );
-//}

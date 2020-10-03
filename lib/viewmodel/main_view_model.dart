@@ -18,20 +18,20 @@ import 'dart:async';
 import '../data/attributions.dart';
 import '../data/page.dart';
 import '../data/pages_children.dart';
-
-import 'auth.dart';
 import 'http_get.dart';
 import 'model/list_item.dart';
 
 abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
-  List<ListItem> navList = [];
+  String lastId = "";
+  String contentText = "";
   ListItem currentlySelectedFile;
   var baseUrl = 'https://medito.app/api/pages';
 
   bool _skipCache;
-  
+
+
   Future getAttributions(String attrId) async {
     var url = baseUrl + '/' + attrId.replaceAll('/', '+');
     var response = await httpGet(url);
@@ -152,11 +152,12 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     return getAudioData(id: all[index == 0 ? now : index].id);
   }
 
-  void addToNavList(ListItem item) {
-    navList.add(item);
+  void updateNavData(ListItem item) {
+    lastId = item.id;
+    contentText = item.contentText;
   }
 
   String getCurrentPageId() {
-    return navList.last.id;
+    return lastId;
   }
 }
