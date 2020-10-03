@@ -10,8 +10,8 @@ import 'media_lib.dart';
 
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
-  AudioPlayer _player = new AudioPlayer();
-  AudioPlayer _bgPlayer = new AudioPlayer();
+  AudioPlayer _player = new AudioPlayer(handleInterruptions: false);
+  AudioPlayer _bgPlayer = new AudioPlayer(handleInterruptions: false);
   AudioProcessingState _skipState;
   Seeker _seeker;
   StreamSubscription<PlaybackEvent> _eventSubscription;
@@ -46,7 +46,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
 
     final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.music());
+    await session.configure(AudioSessionConfiguration.speech());
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
       if (index != null)
@@ -73,12 +73,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.processingStateStream.listen((state) {
       switch (state) {
         case ProcessingState.completed:
-          // In this example, the service stops when reaching the end.
+        // In this example, the service stops when reaching the end.
           onStop();
           break;
         case ProcessingState.ready:
-          // If we just came from skipping between tracks, clear the skip
-          // state now that we're ready to play.
+        // If we just came from skipping between tracks, clear the skip
+        // state now that we're ready to play.
           _skipState = null;
           break;
         default:
@@ -223,7 +223,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       await writeJSONToCache(encoded(dataMap), "stats");
 
-     AudioServiceBackground.sendCustomEvent('');
+      AudioServiceBackground.sendCustomEvent('');
     }
 
 
@@ -238,11 +238,11 @@ class Seeker {
   bool _running = false;
 
   Seeker(
-    this.player,
-    this.positionInterval,
-    this.stepInterval,
-    this.mediaItem,
-  );
+      this.player,
+      this.positionInterval,
+      this.stepInterval,
+      this.mediaItem,
+      );
 
   start() async {
     _running = true;
