@@ -163,7 +163,7 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
   _response.stream.listen((value){
       _bytes.addAll(value);
       received += value.length;
-      print("File Progress New: " + getProgress().toString());
+      //print("File Progress New: " + getProgress().toString());
       downloadListener.value = getProgress();
   }).onDone(() async {
     await file.writeAsBytes(_bytes);

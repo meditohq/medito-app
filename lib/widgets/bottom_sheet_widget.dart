@@ -199,7 +199,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 );
               }
               else{
-                return Text('DOWNLOADING '+ (value.toInt()*100).toString()+"%");
+                print("Updated value: " + (value*100).toInt().toString());
+                return Text('DOWNLOADING '+ (value*100).toInt().toString()+"%");
               }
       });
     } else {
