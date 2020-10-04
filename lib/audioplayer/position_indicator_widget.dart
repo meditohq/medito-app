@@ -51,8 +51,8 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
         if (position > duration - 10 && !tracked) {
           tracked = true;
           getVersionCopyInt().then((version) {
-            Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.SCREEN_LOADED,
-                Tracking.AUDIO_COMPLETED,
+            Tracking.trackEvent(Tracking.AUDIO_COMPLETED,
+                Tracking.SCREEN_LOADED, Tracking.AUDIO_COMPLETED,
                 map: {
                   'version_seen': '$version',
                 });
@@ -73,7 +73,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                   child: Slider(
                     min: 0.0,
                     activeColor: widget.color,
-                    inactiveColor: MeditoColors.newGrey.withAlpha(179),
+                    inactiveColor: MeditoColors.walterWhite.withOpacity(0.7),
                     max: duration.toDouble(),
                     value: seekPos ??
                         max(0.0, min(position.toDouble(), duration.toDouble())),
@@ -101,16 +101,18 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                                       .state?.currentPosition?.inMilliseconds ??
                                   0)
                           .toMinutesSeconds(),
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline1
-                          .copyWith(color: MeditoColors.newGrey, height: 1.5)),
+                      style: Theme.of(context).textTheme.headline1.copyWith(
+                          letterSpacing: 0.2,
+                          fontWeight: FontWeight.w500,
+                          color: MeditoColors.walterWhite.withOpacity(0.7),
+                          height: 1.4)),
                   Text(
                     Duration(milliseconds: duration).toMinutesSeconds(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline1
-                        .copyWith(color: MeditoColors.newGrey),
+                    style: Theme.of(context).textTheme.headline1.copyWith(
+                        letterSpacing: 0.2,
+                        fontWeight: FontWeight.w500,
+                        color: MeditoColors.walterWhite.withOpacity(0.7),
+                        height: 1.4),
                   ),
                 ],
               ),

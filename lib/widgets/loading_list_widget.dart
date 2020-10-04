@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/loading_item_widget.dart';
-import 'package:Medito/widgets/nav_pills_widget.dart';
+import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 class LoadingListWidget extends StatelessWidget {
@@ -40,11 +40,7 @@ class LoadingListWidget extends StatelessWidget {
         itemCount: 6,
         itemBuilder: (context, i) {
           if (i == 0) {
-            var list = [
-              ListItem("            ", "             ", null, parentId: "...")
-            ];
-            return IgnorePointer(
-                ignoring: true, child: NavPillsWidget(list: list));
+            return MeditoAppBarWidget(title: "");
           }
           return LoadingItemWidget(index: i + 1);
         });

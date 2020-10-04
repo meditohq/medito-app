@@ -66,7 +66,7 @@ class TileListState extends State<TileList> {
       });
     });
 
-    Future.delayed(Duration(seconds: 2), _onPullToRefresh);
+    Future.delayed(Duration(milliseconds: 100), _onPullToRefresh);
   }
 
   Future<void> _onPullToRefresh() async {
@@ -79,7 +79,7 @@ class TileListState extends State<TileList> {
     return RefreshIndicator(
       displacement: 80,
       color: MeditoColors.lightColor,
-      backgroundColor: MeditoColors.darkColor,
+      backgroundColor: MeditoColors.moonlight,
       onRefresh: _onPullToRefresh,
       child: FutureBuilder(
         builder: (context, future) {
@@ -184,7 +184,7 @@ class TileListState extends State<TileList> {
     var secondColumnLength =
         (data == null ? 0 : data?.length) + 1; // + 1 for streak tile
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -211,8 +211,11 @@ class TileListState extends State<TileList> {
                 itemCount: secondColumnLength,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == secondColumnLength - 1) {
-                    return StreakTileWidget(streak, 'Current Streak',
-                        optionalText: UnitType.day, onClick: _onStreakTap);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: StreakTileWidget(streak, 'Current Streak',
+                          optionalText: UnitType.day, onClick: _onStreakTap),
+                    );
                   }
 
                   TileItem tile = data[index];
@@ -237,14 +240,6 @@ class TileListState extends State<TileList> {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 0,
-              blurRadius: 2,
-              offset: Offset(0, 2), // changes position of shadow
-            ),
-          ],
           borderRadius: BorderRadius.all(Radius.circular(12)),
           color: parseColor(item.colorBackground),
         ),
@@ -252,7 +247,8 @@ class TileListState extends State<TileList> {
             parseColor(item.colorBackground),
             item,
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                  top: 16.0, bottom: 16, left: 10, right: 10),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -260,7 +256,7 @@ class TileListState extends State<TileList> {
                 children: <Widget>[
                   Container(height: 8),
                   SizedBox(
-                      height: 70, child: getNetworkImageWidget(item.thumbnail)),
+                      height: 80, child: getNetworkImageWidget(item.thumbnail)),
                   Container(height: 16),
                   SizedBox(
                     width: getColumWidth() - 48, //todo horrible hack
@@ -324,7 +320,7 @@ class TileListState extends State<TileList> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: MeditoColors.darkColor,
+          color: parseColor(item.colorBackground),
         ),
         child: wrapWithInkWell(
             parseColor(item.colorBackground),
@@ -339,7 +335,10 @@ class TileListState extends State<TileList> {
                   Expanded(
                     child: Text(
                       item.description == null ? "" : item.description,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .copyWith(color: parseColor(item.colorText)),
                     ),
                   ),
                 ],
@@ -354,14 +353,6 @@ class TileListState extends State<TileList> {
         padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
         child: Container(
           decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 0,
-                blurRadius: 2,
-                offset: Offset(0, 2), // changes position of shadow
-              ),
-            ],
             borderRadius: BorderRadius.all(Radius.circular(12)),
             color: item.colorBackground != null
                 ? parseColor(item.colorBackground)
@@ -372,27 +363,23 @@ class TileListState extends State<TileList> {
             item,
             Padding(
               padding: const EdgeInsets.all(18.0),
-              child: Stack(
-                children: <Widget>[
-                  Positioned(
-                      top: 0,
-                      right: 0,
-                      child: SizedBox(
-                          height: 100,
-                          child: getNetworkImageWidget(item.thumbnail,
-                              startHeight: 140.0))),
-                  //todo why is there space around this button?
-                  Positioned(bottom: -4, child: getFlatButton(item)),
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      getTitleText(item),
-                      Container(height: item.description != "" ? 6 : 0),
-                      getDescText(item),
-                    ],
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        getTitleText(item),
+                        Container(height: item.description != "" ? 6 : 0),
+                        getDescText(item),
+                      ],
+                    ),
                   ),
+                  Container(width: 8),
+                  SizedBox(
+                      width: 90, child: getNetworkImageWidget(item.thumbnail))
                 ],
               ),
             ),
@@ -401,19 +388,13 @@ class TileListState extends State<TileList> {
   }
 
   Widget getDescText(TileItem item) {
-    return FractionallySizedBox(
-      widthFactor: .6,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 62),
-        child: Opacity(
-          opacity: 0.7,
-          child: Text(item.description,
-              style: Theme.of(context).textTheme.subtitle1.copyWith(
-                  fontSize: 16,
-                  letterSpacing: 0.1,
-                  color: parseColor(item.colorText))),
-        ),
-      ),
+    return Opacity(
+      opacity: 0.7,
+      child: Text(item.description,
+          style: Theme.of(context).textTheme.subtitle1.copyWith(
+              fontSize: 14,
+              letterSpacing: 0.1,
+              color: parseColor(item.colorText))),
     );
   }
 
@@ -422,35 +403,11 @@ class TileListState extends State<TileList> {
       widthFactor: 0.6,
       child: Text(item.title,
           style: Theme.of(context).textTheme.headline6.copyWith(
-              fontSize: 20,
+              fontSize: 18,
               height: 1.3,
               letterSpacing: 0.1,
               color: parseColor(item.colorText))),
     );
-  }
-
-  Widget getFlatButton(TileItem item) {
-    if (item.buttonLabel != null) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: FlatButton(
-          padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
-          onPressed: () {
-            _onTap(item);
-          },
-          color: parseColor(item.colorButton),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Text(item.buttonLabel.toUpperCase(),
-              style: Theme.of(context).textTheme.headline3.copyWith(
-                  letterSpacing: 1,
-                  fontWeight: FontWeight.w600,
-                  color: parseColor(item.colorButtonText))),
-        ),
-      );
-    } else {
-      return Container();
-    }
   }
 
   _onTap(TileItem tile) {
@@ -568,6 +525,7 @@ class TileListState extends State<TileList> {
         padding: const EdgeInsets.all(19.0),
         child: SvgPicture.asset(
           'assets/images/icon_ic_logo.svg',
+          color: MeditoColors.walterWhite,
         ),
       ),
     );
@@ -580,19 +538,15 @@ class TileListState extends State<TileList> {
         mainAxisSize: MainAxisSize.max,
         children: [
           _getMeditoLogo(),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16),
-            child: getHorizontalAnnouncementTile(item),
-          ),
           Container(height: 8),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
-          getBlankTile(item, MeditoColors.lightColorLine),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(item, MeditoColors.moonlight),
         ],
       ),
     );

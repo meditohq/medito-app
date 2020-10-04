@@ -26,11 +26,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'app_bar_widget.dart';
 import 'bottom_sheet_widget.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
-import 'nav_pills_widget.dart';
 
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
@@ -43,15 +43,11 @@ class FolderStateless extends StatelessWidget {
 
 class FolderNavWidget extends StatefulWidget {
   FolderNavWidget(
-      {Key key,
-      this.firstId,
-      this.firstTitle,
-      this.textFuture,
-      this.navItemPair})
+      {Key key, this.firstId, this.firstTitle, this.textFuture, this.title})
       : super(key: key);
 
+  final String title;
   final String firstId;
-  final List<ListItem> navItemPair;
   final String firstTitle;
   final Future<String> textFuture;
 
@@ -80,15 +76,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
-      _viewModel.addToNavList(
+      _viewModel.updateNavData(
           ListItem("Home", "app+content", null, parentId: "app+content"));
       _viewModel
-          .addToNavList(ListItem(widget.firstTitle, widget.firstId, null));
-    }
-
-    if (widget.navItemPair != null) {
-      _viewModel.addToNavList(widget.navItemPair[0]);
-      _viewModel.addToNavList(widget.navItemPair[1]);
+          .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
 
     widget.textFuture?.then((onValue) {
@@ -105,7 +96,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     ));
 
     return Scaffold(
-      backgroundColor: MeditoColors.darkBGColor,
       body: new Builder(
         builder: (BuildContext context) {
           scaffoldContext = context;
@@ -146,7 +136,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   Widget getListView() {
     return RefreshIndicator(
       color: MeditoColors.lightColor,
-      backgroundColor: MeditoColors.darkColor,
+      backgroundColor: MeditoColors.moonlight,
       child: FutureBuilder(
           future: listFuture,
           builder: (context, snapshot) {
@@ -169,8 +159,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int i) {
                   if (i == 0) {
-                    return NavPillsWidget(
-                      list: _viewModel.navList,
+                    return MeditoAppBarWidget(
+                      title: widget.firstTitle ?? widget.title,
                       backPressed: _backPressed,
                     );
                   }
@@ -188,7 +178,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   Future<void> _onPullToRefresh() async {
     setState(() {
       listFuture = _viewModel.getPageChildren(
-          id: _viewModel.getCurrentPageId(), skipCache: true);
+          id: widget.firstId, skipCache: true);
     });
   }
 
@@ -196,16 +186,14 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     Tracking.trackEvent(Tracking.FOLDER_TAPPED, Tracking.SCREEN_LOADED, i.id);
     //if you tapped on a folder
 
-    List<ListItem> itemList = [_viewModel.navList.last, i];
-
     Navigator.push(
       context,
       MaterialPageRoute(
         settings: RouteSettings(name: '/nav'),
         builder: (c) {
           return FolderNavWidget(
-            navItemPair: itemList,
             firstId: i.id,
+            title: i.title,
           );
         },
       ),
@@ -296,8 +284,11 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   Widget getFileListItem(ListItem item) {
-    return new ListItemWidget(
-      item: item,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: new ListItemWidget(
+        item: item,
+      ),
     );
   }
 
@@ -305,12 +296,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     if (item.type == ListItemType.folder) {
       return InkWell(
           onTap: () => folderTap(item),
-          splashColor: MeditoColors.red,
+          splashColor: MeditoColors.moonlight,
           child: getFileListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
           onTap: () => fileTap(item),
-          splashColor: MeditoColors.red,
+          splashColor: MeditoColors.moonlight,
           child: getFileListItem(item));
     } else {
       return SizedBox(

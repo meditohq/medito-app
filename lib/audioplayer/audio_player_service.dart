@@ -58,7 +58,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.positionStream.listen((position) async {
       millisecondsListened = position.inMilliseconds;
 
-      if (position.inSeconds > _duration.inSeconds - 10) {
+      if (_duration.inSeconds > 0 && position.inSeconds > _duration.inSeconds - 10) {
         setBgVolumeFadeAtEnd(
             mediaItem, position.inSeconds, _duration.inSeconds);
         await updateStats();

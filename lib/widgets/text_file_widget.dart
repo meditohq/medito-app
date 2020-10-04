@@ -20,7 +20,7 @@ import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'nav_pills_widget.dart';
+import 'app_bar_widget.dart';
 
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key key}) : super(key: key);
@@ -73,15 +73,15 @@ class _TextFileWidgetState extends State<TextFileWidget>
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
-      _viewModel.addToNavList(
+      _viewModel.updateNavData(
           ListItem("Home", "app+content", null, parentId: "app+content"));
       _viewModel
-          .addToNavList(ListItem(widget.firstTitle, widget.firstId, null));
+          .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
 
     if (widget.navItemPair != null) {
-      _viewModel.addToNavList(widget.navItemPair[0]);
-      _viewModel.addToNavList(widget.navItemPair[1]);
+      _viewModel.updateNavData(widget.navItemPair[0]);
+      _viewModel.updateNavData(widget.navItemPair[1]);
     }
 
     textFileFromFuture = widget.text ?? '';
@@ -99,7 +99,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
     ));
 
     return Scaffold(
-      backgroundColor: MeditoColors.darkBGColor,
       body: new Builder(
         builder: (BuildContext context) {
           scaffoldContext = context;
@@ -141,13 +140,12 @@ class _TextFileWidgetState extends State<TextFileWidget>
     String content;
 
     if (textFileFromFuture.isEmpty) {
-      content = _viewModel?.navList?.last?.contentText;
+      content = _viewModel?.contentText;
     } else {
       content = textFileFromFuture;
     }
 
     return Container(
-      color: MeditoColors.darkBGColor,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,8 +157,8 @@ class _TextFileWidgetState extends State<TextFileWidget>
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  NavPillsWidget(
-                    list: _viewModel?.navList,
+                  MeditoAppBarWidget(
+                    title: widget.firstTitle,
                     backPressed: _backPressed,
                   ),
                   Padding(

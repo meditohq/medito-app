@@ -115,7 +115,7 @@ class Content {
 
 class Versions {
   int version;
-  bool sticky;
+  bool active;
   String title;
   String subtitle;
   String buttonIcon;
@@ -124,7 +124,7 @@ class Versions {
 
   Versions(
       {this.version,
-        this.sticky,
+        this.active,
         this.title,
         this.subtitle,
         this.buttonIcon,
@@ -133,7 +133,7 @@ class Versions {
 
   Versions.fromJson(Map<String, dynamic> json) {
     version = json['version'];
-    sticky = json['sticky'];
+    active = json['active'];
     title = json['title'];
     subtitle = json['subtitle'];
     buttonIcon = json['button_icon'];
@@ -144,7 +144,7 @@ class Versions {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['version'] = this.version;
-    data['sticky'] = this.sticky;
+    data['active'] = this.active;
     data['title'] = this.title;
     data['subtitle'] = this.subtitle;
     data['button_icon'] = this.buttonIcon;
