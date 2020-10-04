@@ -184,7 +184,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget getBeginButtonContent() {
-    if (downloading || bgDownloading) {
+    if (downloading) {
 
       return ValueListenableBuilder(valueListenable: downloadListener,
             builder:(context, value, widget){
@@ -203,7 +203,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 return Text('DOWNLOADING '+ (value*100).toInt().toString()+"%");
               }
       });
-    } else {
+    }
+    else if (bgDownloading){
+      return CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor)));
+    }
+    else {
       return Text(
         'BEGIN',
         style: Theme.of(context).textTheme.headline3.copyWith(
