@@ -600,7 +600,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         _backgroundMusicUrl = null;
       });
     } else {
-      _bgDownloading = false;
+      bgDownloading = false;
       _musicSelected = 0;
       _backgroundMusicUrl = null;
     }
