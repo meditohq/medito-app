@@ -205,8 +205,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       });
     }
     else if (bgDownloading){
-      return CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor)));
+      return SizedBox(
+        height: 24,
+        width: 24,
+        child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
+      );
     }
     else {
       return Text(
