@@ -189,7 +189,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
       return ValueListenableBuilder(valueListenable: downloadListener,
             builder:(context, value, widget){
-              if(value==1){
+              if(value>=1){
                 return Text(
                   'BEGIN',
                   style: Theme.of(context).textTheme.headline3.copyWith(

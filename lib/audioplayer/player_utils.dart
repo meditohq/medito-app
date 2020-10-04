@@ -30,9 +30,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 var downloadListener = ValueNotifier<double>(0);
+var bgDownloadListener = ValueNotifier<double>(0);
 var baseUrl = 'https://medito.app/api/pages';
-int total = 1, received = 0;
-bool downloading = false;
+int total = 1, received = 0, bgTotal = 1, bgReceived = 0;
+var backgroundMusicUrl = "";
+bool downloading = false, bgDownloading = false;
+
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
   return Container(
@@ -102,7 +105,32 @@ Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
 
   return file.path;
 }
+Future<dynamic> downloadBGMusicFromURLWithProgress(String url, String name) async {
+  String dir = (await getApplicationSupportDirectory()).path;
+  name = name.replaceAll(" ", "%20");
+  File file = new File('$dir/$name');
 
+  if (await file.exists()){
+    backgroundMusicUrl = file.path;
+    return file.path;
+  }
+  http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(url)));
+  bgTotal = _response.contentLength;
+  bgReceived = 0;
+  List<int> _bytes = [];
+
+  _response.stream.listen((value){
+    _bytes.addAll(value);
+    bgReceived += value.length;
+    //print("File Progress New: " + getProgress().toString());
+    bgDownloadListener.value = bgReceived*1.0/bgTotal;
+  }).onDone(() async {
+    await file.writeAsBytes(_bytes);
+    print("Saved BG New: " + file.path);
+    bgDownloading = false;
+    backgroundMusicUrl = file.path;
+  });
+}
 Future<void> saveFileToDownloadedFilesList(Files file) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var list = prefs.getStringList('listOfSavedFiles') ?? [];
@@ -154,7 +182,9 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
   String dir = (await getApplicationSupportDirectory()).path;
   var name = currentFile.filename.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
-  if(file.existsSync()) return;
+  if(file.existsSync()){
+    downloading = false;
+  }
   http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
   total = _response.contentLength;
   received = 0;
