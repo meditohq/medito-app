@@ -15,7 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/cache.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -81,12 +80,30 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
           canvasColor: MeditoColors.darkMoon,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: SlideTransitionBuilder(),
           }),
           accentColor: MeditoColors.lightColor,
           textTheme: buildDMSansTextTheme(context)),
       title: HomeScreenWidget._title,
       navigatorObservers: [Tracking.getObserver()],
+    );
+  }
+}
+
+class SlideTransitionBuilder extends PageTransitionsBuilder {
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    animation = CurvedAnimation(curve: Curves.easeInOutExpo, parent: animation);
+
+    return SlideTransition(
+      position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+          .animate(animation),
+      child: child,
     );
   }
 }
