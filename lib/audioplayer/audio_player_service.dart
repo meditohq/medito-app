@@ -60,15 +60,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
     });
 
     _player.positionStream.listen((position) async {
-
-      if (_duration.inSeconds > 0 &&
-          position.inSeconds > _duration.inSeconds - fadeDuration) {
-        await setBgVolumeFadeAtEnd(
-            mediaItem, position.inSeconds, _duration.inSeconds);
-        await updateStats();
-      } else if (_duration.inSeconds > 0 &&
-          position.inSeconds <= _duration.inSeconds - fadeDuration) {
-        await _bgPlayer.setVolume(initialBgVolume);
+      if (position != null) {
+        if (_duration.inSeconds > 0 &&
+            position.inSeconds > _duration.inSeconds - fadeDuration) {
+          await setBgVolumeFadeAtEnd(
+              mediaItem, position.inSeconds, _duration.inSeconds);
+          await updateStats();
+        } else if (_duration.inSeconds > 0 &&
+            position.inSeconds <= _duration.inSeconds - fadeDuration) {
+          await _bgPlayer.setVolume(initialBgVolume);
+        }
       }
     });
 
@@ -179,7 +180,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       ],
       processingState: _getProcessingState(),
       playing: _player.playing,
-      position: _player.position,
+      position: _player.position ?? Duration(),
       bufferedPosition: _player.bufferedPosition,
       speed: _player.speed,
     );
