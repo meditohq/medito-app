@@ -12,9 +12,9 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 class Tracking {
   static const String SCREEN_LOADED = "screen_loaded";
@@ -38,7 +38,8 @@ class Tracking {
   static const String AUDIO_STOPPED = "audio_stopped";
   static const String AUDIO_PAUSED = "audio_paused";
   static const String AUDIO_COMPLETED = "audio_completed";
-  static const String AUDIO_COMPLETED_BUTTON_TAPPED = "audio_completed_button_tapped";
+  static const String AUDIO_COMPLETED_BUTTON_TAPPED =
+      "audio_completed_button_tapped";
   static const String AUDIO_SEEK = "audio_seek_to";
 
   static const String AUDIO_OPENED = "audio_opened";
@@ -72,21 +73,23 @@ class Tracking {
   static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
 
   // like "LoginWidget", "Login button", "Clicked"
-  static Future<void> trackEvent(
-      String eventName, String param1, String param2,
+  static Future<void> trackEvent(String eventName, String param1, String param2,
       {Map<String, String> map}) async {
+    if (Foundation.kReleaseMode) {
+      //only track in release mode, not debug
 
-    Map<String, String> defaultMap = {
-      "event_info": param1,
-      "action": param2,
-    };
-    if (map != null) defaultMap.addAll(map);
+      Map<String, String> defaultMap = {
+        "event_info": param1,
+        "action": param2,
+      };
+      if (map != null) defaultMap.addAll(map);
 
-    _firebaseAnalytics.logEvent(
-      name: eventName,
-      parameters: defaultMap,
-    );
+      _firebaseAnalytics.logEvent(
+        name: eventName,
+        parameters: defaultMap,
+      );
 
-    print("Event logged: $eventName");
+      print("Event logged: $eventName");
+    }
   }
 }

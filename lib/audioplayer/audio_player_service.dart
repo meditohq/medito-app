@@ -8,6 +8,9 @@ import 'package:just_audio/just_audio.dart';
 
 import 'media_lib.dart';
 
+//This is the duration of bgSound fade towards the end.
+const fadeDuration = 20;
+
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
   AudioPlayer _player = new AudioPlayer(handleInterruptions: false);
@@ -58,10 +61,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.positionStream.listen((position) async {
       millisecondsListened = position.inMilliseconds;
 
-      if (_duration.inSeconds > 0 && position.inSeconds > _duration.inSeconds - 10) {
-        setBgVolumeFadeAtEnd(
+      if (_duration.inSeconds > 0 &&
+          position.inSeconds > _duration.inSeconds - fadeDuration) {
+        await setBgVolumeFadeAtEnd(
             mediaItem, position.inSeconds, _duration.inSeconds);
         await updateStats();
+      } else if (_duration.inSeconds > 0 &&
+          position.inSeconds <= _duration.inSeconds - fadeDuration) {
+        await _bgPlayer.setVolume(initialBgVolume);
       }
     });
 
@@ -73,12 +80,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.processingStateStream.listen((state) {
       switch (state) {
         case ProcessingState.completed:
-        // In this example, the service stops when reaching the end.
+          // In this example, the service stops when reaching the end.
           onStop();
           break;
         case ProcessingState.ready:
-        // If we just came from skipping between tracks, clear the skip
-        // state now that we're ready to play.
+          // If we just came from skipping between tracks, clear the skip
+          // state now that we're ready to play.
           _skipState = null;
           break;
         default:
@@ -90,12 +97,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
   var _updatedStats = false;
   var millisecondsListened = 0;
 
-  void setBgVolumeFadeAtEnd(
-      MediaItem mediaItem, int positionSecs, int durSecs) {
+  Future<void> setBgVolumeFadeAtEnd(
+      MediaItem mediaItem, int positionSecs, int durSecs) async {
     var timeLeft = durSecs - positionSecs;
-
-    _bgPlayer.setVolume(initialBgVolume * (timeLeft * .1));
-    print(initialBgVolume * (timeLeft * .1));
+    await _bgPlayer.setVolume(initialBgVolume -
+        ((fadeDuration - timeLeft) * (initialBgVolume / fadeDuration)));
+    print(initialBgVolume -
+        ((fadeDuration - timeLeft) * (initialBgVolume / fadeDuration)));
   }
 
   @override
@@ -225,8 +233,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       AudioServiceBackground.sendCustomEvent('');
     }
-
-
   }
 }
 
@@ -238,11 +244,11 @@ class Seeker {
   bool _running = false;
 
   Seeker(
-      this.player,
-      this.positionInterval,
-      this.stepInterval,
-      this.mediaItem,
-      );
+    this.player,
+    this.positionInterval,
+    this.stepInterval,
+    this.mediaItem,
+  );
 
   start() async {
     _running = true;
