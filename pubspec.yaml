@@ -28,7 +28,7 @@ dependencies:
   auto_size_text: ^2.1.0
   just_audio: ^0.5.2
   audio_session: ^0.0.7
-  audio_service: ^0.15.1
+  audio_service: '0.15.0'
   rxdart: ^0.24.1
   share: ^0.6.5+2
   firebase_core: ^0.5.0

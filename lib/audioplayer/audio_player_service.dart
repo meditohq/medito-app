@@ -23,6 +23,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   int get index => _player.currentIndex;
   MediaItem mediaItem;
   var initialBgVolume = 0.4;
+  var _updatedStats = false;
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
@@ -59,7 +60,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
     });
 
     _player.positionStream.listen((position) async {
-      millisecondsListened = position.inMilliseconds;
 
       if (_duration.inSeconds > 0 &&
           position.inSeconds > _duration.inSeconds - fadeDuration) {
@@ -93,9 +93,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
       }
     });
   }
-
-  var _updatedStats = false;
-  var millisecondsListened = 0;
 
   Future<void> setBgVolumeFadeAtEnd(
       MediaItem mediaItem, int positionSecs, int durSecs) async {
@@ -135,16 +132,15 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStop() async {
-    await _player.pause();
-    await _player.dispose();
-    await _bgPlayer.pause();
-    await _bgPlayer.dispose();
-    _eventSubscription.cancel();
-    millisecondsListened = 0;
     // It is important to wait for this state to be broadcast before we shut
     // down the task. If we don't, the background task will be destroyed before
     // the message gets sent to the UI.
+    await _player.stop();
+    await _bgPlayer.stop();
     await _broadcastState();
+    await _player.dispose();
+    await _bgPlayer.dispose();
+    _eventSubscription.cancel();
     // Shut down this task
     await super.onStop();
   }
