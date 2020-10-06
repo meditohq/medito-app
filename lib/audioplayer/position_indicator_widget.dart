@@ -91,7 +91,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
               ),
             Padding(
               padding:
-                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 24.0),
+                  const EdgeInsets.only(left: 16.0, right: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

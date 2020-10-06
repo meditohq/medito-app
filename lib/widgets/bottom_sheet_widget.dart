@@ -15,7 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
-import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../audioplayer/player_utils.dart';

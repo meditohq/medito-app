@@ -66,6 +66,7 @@ flutter:
     - assets/images/ic_review.svg
     - assets/images/ic_support.svg
     - assets/images/ic_twitter.svg
+    - assets/images/blurb.svg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

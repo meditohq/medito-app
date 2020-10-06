@@ -14,7 +14,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
@@ -99,78 +98,91 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           return SafeArea(
             child: Stack(
               children: [
+                Container(
+                  height: 350,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      coverColorAsColor.withOpacity(0.6),
+                      MeditoColors.midnight,
+                    ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                  ),
+                ),
                 Column(
                   children: <Widget>[
-                    Expanded(
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 32.0, right: 32.0, top: 64.0),
                       child: Container(
-                        color: coverColorAsColor,
+                        constraints: BoxConstraints(minHeight: 280),
+                        decoration: BoxDecoration(
+                            color: coverColorAsColor,
+                            borderRadius: BorderRadius.circular(12.0)),
+                        padding: EdgeInsets.all(48.0),
                         child: Center(
-                          child: FractionallySizedBox(
-                              widthFactor: .43,
-                              child: artUrl != null
-                                  ? Image.network(artUrl)
-                                  : Container()),
+                          child: artUrl != null
+                              ? Image.network(artUrl)
+                              : Container(),
                         ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 28.0, left: 16.0, bottom: 4.0, right: 16.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              mediaItem?.title ?? titleText,
-                              style: Theme.of(context).textTheme.bodyText1.copyWith(
-                                  letterSpacing: 0.2,
-                                  height: 1.5,
-                                  color: Colors.white,
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ],
+                          top: 24.0, left: 32.0, bottom: 4.0, right: 32.0),
+                      child: Text(
+                        mediaItem?.title ?? titleText,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(
+                            letterSpacing: 0.2,
+                            height: 1.5,
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w600),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                      child: Row(children: [
-                        mediaItem?.extras != null
-                            ? SubtitleTextWidget(mediaItem: mediaItem)
-                            : Expanded(
-                                child: Text(
-                                subTitleText,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .copyWith(
-                                        letterSpacing: 0.2,
-                                        fontWeight: FontWeight.w500,
-                                        color: MeditoColors.walterWhite.withOpacity(0.7),
-                                        height: 1.5),
-                              )),
-                      ]),
-                    ),
-                    mediaItem == null
-                        ? Container()
-                        : positionIndicator(
-                            mediaItem, state, coverColorAsColor),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, bottom: 16.0),
+                      padding: const EdgeInsets.only(left: 32.0, right: 32.0),
                       child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            mediaItem?.extras != null
+                                ? SubtitleTextWidget(mediaItem: mediaItem)
+                                : Text(
+                                    subTitleText,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .copyWith(
+                                            letterSpacing: 0.2,
+                                            fontWeight: FontWeight.w500,
+                                            color: MeditoColors.walterWhite
+                                                .withOpacity(0.7),
+                                            height: 1.5),
+                                  ),
+                          ]),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           (processingState == AudioProcessingState.buffering ||
                                   processingState ==
                                       AudioProcessingState.connecting)
                               ? buildCircularIndicatorRow()
-                              : Expanded(
-                                  child: mediaItem == null
-                                      ? getDonateAndShareButton()
-                                      : getPlayingOrPausedButton(playing),
-                                ),
+                              : mediaItem == null
+                                  ? getDonateAndShareButton()
+                                  : getPlayingOrPausedButton(playing),
                         ],
                       ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 24.0, right: 24.0, bottom: 32.0),
+                      child: mediaItem == null
+                          ? Container()
+                          : positionIndicator(
+                              mediaItem, state, coverColorAsColor),
                     ),
                   ],
                 ),
@@ -180,14 +192,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: IconButton(
                       icon: Icon(Icons.close),
                       onPressed: _onBackPressed,
-                      color: textColor,
+                      color: MeditoColors.walterWhite,
                     ),
                   ),
                 ),
               ],
             ),
           );
-
         },
       ),
     );
@@ -218,18 +229,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget buildCircularIndicatorRow() {
-    return Expanded(
-      child: Container(
-        height: 56,
-        decoration: buildBoxDecoration(MeditoColors.moonlight),
-        child: Align(
-          alignment: Alignment.center,
-          child: SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(backgroundColor: Colors.white)),
-        ),
-      ),
+    return PlayerButton(
+      child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(coverColorAsColor),
+            backgroundColor: textColor,
+          )),
+      bgColor: coverColorAsColor,
     );
   }
 
@@ -258,22 +266,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget playButton() => PlayerButton(
         icon: Icons.play_arrow,
         onPressed: AudioService.play,
-        bgColor: MeditoColors.moonlight,
+        textColor: textColor,
+        bgColor: coverColorAsColor,
       );
 
   Widget pauseButton() => PlayerButton(
         icon: Icons.pause,
+        textColor: textColor,
         onPressed: AudioService.pause,
-        bgColor: MeditoColors.moonlight,
+        bgColor: coverColorAsColor,
       );
 
   Widget positionIndicator(
       MediaItem mediaItem, PlaybackState state, Color coverColorAsColor) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
-      child: PositionIndicatorWidget(
-          mediaItem: mediaItem, state: state, color: coverColorAsColor),
-    );
+    return PositionIndicatorWidget(
+        mediaItem: mediaItem, state: state, color: coverColorAsColor);
   }
 
   void _onBackPressed() {
@@ -344,14 +351,12 @@ void _audioPlayerTaskEntrypoint() async {
 }
 
 Future<bool> start(String coverColor) {
-  int color = getColorFromHex(coverColor);
   AudioService.connect();
   return AudioService.start(
     backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-    androidNotificationChannelName: 'Audio Service Demo',
+    androidNotificationChannelName: 'Medito Audio Service',
     // Enable this if you want the Android service to exit the foreground state on pause.
     //androidStopForegroundOnPause: true,
-    androidNotificationColor: color,
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   );
