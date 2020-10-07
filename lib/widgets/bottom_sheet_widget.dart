@@ -51,8 +51,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   var _coverColor;
   String _textColor;
   String _contentText = '';
-  bool _downloading = false;
-  bool _bgDownloading = false;
+
+  bool bgDownloading = false;
   Files currentFile;
   var _backgroundMusicUrl;
   var _backgroundMusicAvailable = false;
@@ -184,14 +184,35 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget getBeginButtonContent() {
-    if (_downloading || _bgDownloading) {
+    if (downloading) {
+
+      return ValueListenableBuilder(valueListenable: downloadListener,
+            builder:(context, value, widget){
+              if(value>=1){
+                return Text(
+                  'BEGIN',
+                  style: Theme.of(context).textTheme.headline3.copyWith(
+                      color: _textColor != null && _textColor.isNotEmpty
+                          ? parseColor(_textColor)
+                          : MeditoColors.darkBGColor,
+                      fontWeight: FontWeight.bold),
+                );
+              }
+              else{
+                print("Updated value: " + (value*100).toInt().toString());
+                return Text('DOWNLOADING '+ (value*100).toInt().toString()+"%");
+              }
+      });
+    }
+    else if (bgDownloading){
       return SizedBox(
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
       );
-    } else {
+    }
+    else {
       return Text(
         'BEGIN',
         style: Theme.of(context).textTheme.headline3.copyWith(
@@ -204,16 +225,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _onBeginTap() {
-    if (_downloading || _bgDownloading || _loadingThisPage) return;
+    if (downloading || bgDownloading || _loadingThisPage) return;
 
     widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
         _description, _contentText, _textColor, _backgroundMusicUrl);
 
     setState(() {
-      _downloading = true;
       Future.delayed(const Duration(milliseconds: 3000), () {
         setState(() {
-          _downloading = false;
+          downloading = false;
         });
       });
     });
@@ -567,19 +587,19 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void onMusicSelected(int index, String url, String name) {
     _musicSelected = index;
     if (index > 0) {
-      _bgDownloading = true;
+      bgDownloading = true;
       downloadBGMusicFromURL(url, name).then((value) {
-        _bgDownloading = false;
+        bgDownloading = false;
         _backgroundMusicUrl = value;
         setState(() {});
       }).catchError((onError) {
         print(onError);
-        _bgDownloading = false;
+        bgDownloading = false;
         _musicSelected = 0;
         _backgroundMusicUrl = null;
       });
     } else {
-      _bgDownloading = false;
+      bgDownloading = false;
       _musicSelected = 0;
       _backgroundMusicUrl = null;
     }
@@ -588,17 +608,17 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   void onOfflineSelected(int index) {
     _offlineSelected = index;
-    _downloading = true;
+    downloading = true;
     if (index == 1) {
       // 'YES' selected
-      downloadFile(currentFile).then((onValue) {
+      downloadFileWithProgress(currentFile).then((onValue) {
         setState(() {
-          _downloading = false;
+          print("Download Value: " + onValue.toString());
         });
       }).catchError((onError) {
         setState(() {
-          print(onError);
-          _downloading = false;
+          print("error in downloading: " + onError);
+          downloading = false;
           _offlineSelected = 0;
         });
       });
@@ -606,12 +626,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       // 'NO' selected
       removeFile(currentFile).then((onValue) {
         setState(() {
-          _downloading = false;
+          print("Removed file");
+          downloading = false;
         });
       }).catchError((onError) {
         setState(() {
           print(onError);
-          _downloading = false;
+          downloading = false;
           _offlineSelected = 0;
         });
       });
