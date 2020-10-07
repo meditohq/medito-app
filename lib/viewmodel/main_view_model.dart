@@ -27,7 +27,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   String lastId = "";
   String contentText = "";
   ListItem currentlySelectedFile;
-  var baseUrl = 'https://medito.app/api/pages';
+  var baseUrl = 'https://medito.space/api/pages';
 
   bool _skipCache;
 

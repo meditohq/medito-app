@@ -6,7 +6,7 @@ import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/foundation.dart';
 
 class AudioCompleteCopyProvider extends ChangeNotifier {
-  var baseUrl = 'https://medito.app/api/pages';
+  var baseUrl = 'https://medito.space/api/pages';
 
   Future<Versions> fetchCopy() async {
     try {

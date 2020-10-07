@@ -21,7 +21,7 @@ import 'http_get.dart';
 abstract class BottomSheetViewModel {}
 
 class BottomSheetViewModelImpl implements BottomSheetViewModel {
-  var baseUrl = 'https://medito.app/api/pages/';
+  var baseUrl = 'https://medito.space/api/pages/';
   var musicUrl = 'service+backgroundmusic/files';
 
   bool _skipCache;
