@@ -57,9 +57,10 @@ class DataChildren {
   String pathTemplate;
   String primaryColor;
   String secondaryColor;
-  String contentText;
-  String contentPath;
   String description;
+  String contentPath;
+  String subtitle;
+  String body;
   String id;
   String illustrationUrl;
   int num;
@@ -72,9 +73,10 @@ class DataChildren {
       {this.buttonLabel,
       this.primaryColor,
       this.secondaryColor,
-      this.contentText,
-      this.contentPath,
       this.description,
+      this.contentPath,
+      this.subtitle,
+      this.body,
       this.id,
       this.content,
       this.pathTemplate,
@@ -86,11 +88,12 @@ class DataChildren {
 
   DataChildren.fromJson(Map<String, dynamic> json) {
     buttonLabel = json['buttonLabel'];
-    primaryColor = json['primaryColor'];
-    secondaryColor = json['secondaryColor'];
-    contentText = json['contentText'];
-    contentPath = json['contentPath'];
+    primaryColor = json['color_primary'];
+    secondaryColor = json['color_secondary'];
+    body = json['body'];
     description = json['description'];
+    contentPath = json['contentPath'];
+    subtitle = json['subtitle'];
     id = json['id'];
     content =
         json['content'] != null ? new Content.fromJson(json['content']) : null;
@@ -105,13 +108,14 @@ class DataChildren {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['buttonLabel'] = this.buttonLabel;
-    data['primaryColor'] = this.primaryColor;
-    data['secondaryColor'] = this.secondaryColor;
-    data['contentText'] = this.contentText;
-    data['contentPath'] = this.contentPath;
+    data['color_primary'] = this.primaryColor;
+    data['color_secondary'] = this.secondaryColor;
     data['description'] = this.description;
+    data['contentPath'] = this.contentPath;
+    data['subtitle'] = this.subtitle;
     data['id'] = this.id;
     data['content'] = this.content;
+    data['body'] = this.body;
     data['illustrationUrl'] = this.illustrationUrl;
     data['num'] = this.num;
     data['template'] = this.template;
@@ -150,7 +154,7 @@ class Pagination {
 class Content {
   String description;
   String contentText;
-  String coverColor;
+  String primaryColor;
   String textColor;
   String title;
   String date;
@@ -159,7 +163,7 @@ class Content {
   Content(
       {this.description,
       this.contentText,
-      this.coverColor,
+      this.primaryColor,
       this.title,
       this.date,
       this.customlength});
@@ -167,22 +171,22 @@ class Content {
   Content.fromJson(Map<String, dynamic> json) {
     description = json['description'];
     contentText = json['content_text'];
-    coverColor = json['cover_color'];
+    primaryColor = json['primary_color'];
     title = json['title'];
     date = json['date'];
     customlength = json['customlength'];
-    textColor = json['text_color'];
+    textColor = json['color_secondary'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['description'] = this.description;
     data['content_text'] = this.contentText;
-    data['cover_color'] = this.coverColor;
+    data['color_primary'] = this.primaryColor;
     data['title'] = this.title;
     data['date'] = this.date;
     data['customlength'] = this.customlength;
-    data['text_color'] = this.textColor;
+    data['color_secondary'] = this.textColor;
     return data;
   }
 }

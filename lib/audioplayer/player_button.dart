@@ -5,10 +5,10 @@ import 'package:flutter_svg/svg.dart';
 class PlayerButton extends StatelessWidget {
   final IconData icon;
   final Future<void> Function() onPressed;
-  final Color bgColor;
+  final Color primaryColor;
   final Widget child;
   final String text;
-  final Color textColor;
+  final Color secondaryColor;
   final SvgPicture image;
 
   PlayerButton(
@@ -16,9 +16,9 @@ class PlayerButton extends StatelessWidget {
       this.child,
       this.icon,
       this.onPressed,
-      this.bgColor,
+      this.primaryColor,
       this.text,
-      this.textColor,
+      this.secondaryColor,
       this.image})
       : super(key: key);
 
@@ -33,14 +33,14 @@ class PlayerButton extends StatelessWidget {
             'assets/images/blurb.svg',
             height: 100,
             width: 100,
-            color: bgColor,
+            color: primaryColor,
           ),
           image != null
               ? image
               : Icon(
                   icon,
                   size: 24,
-                  color: textColor ?? MeditoColors.darkMoon,
+                  color: secondaryColor ?? MeditoColors.darkMoon,
                 ),
           child != null ? child : Container()
         ],

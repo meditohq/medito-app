@@ -26,7 +26,7 @@ class BottomSheetWidget extends StatefulWidget {
   final Future data;
   final String title;
   final Function(
-          Files, CoverArt, dynamic, String, String, String, String, String)
+          Files, Illustration, dynamic, String, String, String, String, String)
       onBeginPressed;
 
   BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
@@ -45,11 +45,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   List lengthList = [' ', ' ', ' '];
   List lengthFilteredList = [];
   List<Files> filesList;
-  var _coverArt;
+  var _illustration;
   String _description;
   String _title;
-  var _coverColor;
-  String _textColor;
+  var _primaryColor;
+  String _secondaryColor;
   String _contentText = '';
 
   bool bgDownloading = false;
@@ -75,12 +75,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     });
 
     widget.data.then((d) {
-      this._coverArt = d?.coverArt != null ? d?.coverArt?.first : null;
-      this._coverColor = d?.coverColor;
+      this._illustration = d?.illustration != null ? d?.illustration?.first : null;
+      this._primaryColor = d?.primaryColor;
       this._title = d?.title;
-      this._textColor = d?.textColor;
-      this._contentText = d?.contentText;
-      this._description = d?.description;
+      this._secondaryColor = d?.secondaryColor;
+      this._contentText = d?.description;
+      this._description = d?.subtitle;
       compileLists(d?.files);
       onVoicePillTap(true, 0);
       setState(() {
@@ -171,8 +171,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(12.0),
                 ),
-                color: _coverColor != null
-                    ? parseColor(_coverColor)
+                color: _primaryColor != null
+                    ? parseColor(_primaryColor)
                     : MeditoColors.lightColor,
                 child: getBeginButtonContent(),
               ),
@@ -192,8 +192,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 return Text(
                   'BEGIN',
                   style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: _textColor != null && _textColor.isNotEmpty
-                          ? parseColor(_textColor)
+                      color: _secondaryColor != null && _secondaryColor.isNotEmpty
+                          ? parseColor(_secondaryColor)
                           : MeditoColors.darkBGColor,
                       fontWeight: FontWeight.bold),
                 );
@@ -209,15 +209,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_textColor))),
+            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
       );
     }
     else {
       return Text(
         'BEGIN',
         style: Theme.of(context).textTheme.headline3.copyWith(
-            color: _textColor != null && _textColor.isNotEmpty
-                ? parseColor(_textColor)
+            color: _secondaryColor != null && _secondaryColor.isNotEmpty
+                ? parseColor(_secondaryColor)
                 : MeditoColors.darkBGColor,
             fontWeight: FontWeight.bold),
       );
@@ -227,8 +227,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void _onBeginTap() {
     if (downloading || bgDownloading || _loadingThisPage) return;
 
-    widget.onBeginPressed(currentFile, _coverArt, _coverColor, _title,
-        _description, _contentText, _textColor, _backgroundMusicUrl);
+    widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
+        _description, _contentText, _secondaryColor, _backgroundMusicUrl);
 
     setState(() {
       Future.delayed(const Duration(milliseconds: 3000), () {
@@ -650,15 +650,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
-                    color: _coverColor != null
-                        ? parseColor(_coverColor)
+                    color: _primaryColor != null
+                        ? parseColor(_primaryColor)
                         : MeditoColors.darkColor,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(26.0),
-                    child: _coverArt == null
+                    child: _illustration == null
                         ? Container()
-                        : getNetworkImageWidget(_coverArt.url),
+                        : getNetworkImageWidget(_illustration.url),
                   ))),
         ],
       ),

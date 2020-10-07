@@ -415,7 +415,7 @@ class TileListState extends State<TileList> {
     Tracking.trackEvent(
         Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
 
-    if (tile.pathTemplate == 'audio') {
+    if (tile.pathTemplate == 'session-single') {
       _openBottomSheet(tile, _viewModel.getAudioData(id: tile.contentPath));
     } else if (tile.pathTemplate == 'default') {
       openNavWidget(tile);
@@ -452,12 +452,12 @@ class TileListState extends State<TileList> {
 
   _showPlayer(
       Files fileTapped,
-      CoverArt coverArt,
-      dynamic coverColor,
+      Illustration coverArt,
+      dynamic primaryColor,
       String title,
       String description,
       String contentText,
-      String textColor,
+      String secondaryColor,
       String bgMusic) async {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
@@ -469,9 +469,9 @@ class TileListState extends State<TileList> {
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
       await MediaLibrary.saveMediaLibrary(description, title, fileTapped,
-          coverArt, textColor, coverColor, bgMusic, listItem, att);
+          coverArt, secondaryColor, primaryColor, bgMusic, listItem, att);
     }).then((value) {
-      start(coverColor).then((value) => Navigator.push(
+      start(primaryColor).then((value) => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               return PlayerWidget();

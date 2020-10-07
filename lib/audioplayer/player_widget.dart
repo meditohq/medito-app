@@ -31,8 +31,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String buttonUrl = "http://meditofoundation.org/donate";
   String buttonIcon = "";
   String artUrl;
-  Color textColor;
-  Color coverColorAsColor;
+  Color secondaryColor;
+  Color primaryColorAsColor;
 
   StreamSubscription _stream;
 
@@ -91,8 +91,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               state?.processingState ?? AudioProcessingState.none;
           final playing = state?.playing ?? false;
 
-          getTextColor(mediaItem);
-          getCoverColor(mediaItem);
+          getSecondaryColor(mediaItem);
+          getPrimaryColor(mediaItem);
           getArtUrl(mediaItem);
 
           return SafeArea(
@@ -102,7 +102,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   height: 350,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(colors: [
-                      coverColorAsColor.withOpacity(0.6),
+                      primaryColorAsColor?.withOpacity(0.6) ?? MeditoColors.moonlight,
                       MeditoColors.midnight,
                     ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                   ),
@@ -115,7 +115,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       child: Container(
                         constraints: BoxConstraints(minHeight: 280),
                         decoration: BoxDecoration(
-                            color: coverColorAsColor,
+                            color: primaryColorAsColor,
                             borderRadius: BorderRadius.circular(12.0)),
                         padding: EdgeInsets.all(48.0),
                         child: Center(
@@ -182,7 +182,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       child: mediaItem == null
                           ? Container()
                           : positionIndicator(
-                              mediaItem, state, coverColorAsColor),
+                              mediaItem, state, primaryColorAsColor),
                     ),
                   ],
                 ),
@@ -210,21 +210,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  void getCoverColor(MediaItem mediaItem) {
-    if (coverColorAsColor == null && mediaItem != null) {
-      final coverColor = mediaItem?.extras['coverColor'];
-      coverColorAsColor = parseColor(coverColor);
+  void getPrimaryColor(MediaItem mediaItem) {
+    if (primaryColorAsColor == null && mediaItem != null) {
+      final primaryColor = mediaItem?.extras['primaryColor'];
+      primaryColorAsColor = parseColor(primaryColor);
     }
   }
 
-  void getTextColor(MediaItem mediaItem) {
-    if (textColor == null && mediaItem != null) {
-      String textColorString = mediaItem?.extras['textColor'];
+  void getSecondaryColor(MediaItem mediaItem) {
+    if (secondaryColor == null && mediaItem != null) {
+      String secondaryColorString = mediaItem?.extras['secondaryColor'] ?? "";
 
-      if (textColorString.isEmpty && textColor == null) {
-        textColorString = "#FF272829";
+      if (secondaryColorString.isEmpty && secondaryColor == null) {
+        secondaryColorString = "#FF272829";
       }
-      textColor = parseColor(textColorString);
+      secondaryColor = parseColor(secondaryColorString);
     }
   }
 
@@ -234,10 +234,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           width: 24,
           height: 24,
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(coverColorAsColor),
-            backgroundColor: textColor,
+            valueColor: AlwaysStoppedAnimation<Color>(primaryColorAsColor),
+            backgroundColor: secondaryColor,
           )),
-      bgColor: coverColorAsColor,
+      primaryColor: primaryColorAsColor,
     );
   }
 
@@ -266,21 +266,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget playButton() => PlayerButton(
         icon: Icons.play_arrow,
         onPressed: AudioService.play,
-        textColor: textColor,
-        bgColor: coverColorAsColor,
+        secondaryColor: secondaryColor,
+        primaryColor: primaryColorAsColor,
       );
 
   Widget pauseButton() => PlayerButton(
         icon: Icons.pause,
-        textColor: textColor,
+        secondaryColor: secondaryColor,
         onPressed: AudioService.pause,
-        bgColor: coverColorAsColor,
+        primaryColor: primaryColorAsColor,
       );
 
   Widget positionIndicator(
-      MediaItem mediaItem, PlaybackState state, Color coverColorAsColor) {
+      MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
     return PositionIndicatorWidget(
-        mediaItem: mediaItem, state: state, color: coverColorAsColor);
+        mediaItem: mediaItem, state: state, color: primaryColorAsColor);
   }
 
   void _onBackPressed() {
@@ -295,20 +295,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           child: PlayerButton(
               image: SvgPicture.asset(
                 buttonIcon,
-                color: textColor,
+                color: secondaryColor,
               ),
               onPressed: _launchDonate,
-              bgColor: coverColorAsColor,
+              primaryColor: primaryColorAsColor,
               text: buttonLabel,
-              textColor: textColor),
+              secondaryColor: secondaryColor),
         ),
         Container(height: 8),
         PlayerButton(
-          bgColor: MeditoColors.moonlight,
+          primaryColor: MeditoColors.moonlight,
           icon: Icons.share,
           onPressed: _share,
           text: "Share",
-          textColor: Colors.white,
+          secondaryColor: Colors.white,
         )
       ],
     );
@@ -350,7 +350,7 @@ void _audioPlayerTaskEntrypoint() async {
   AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
-Future<bool> start(String coverColor) {
+Future<bool> start(String primaryColor) {
   AudioService.connect();
   return AudioService.start(
     backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,

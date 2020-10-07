@@ -98,7 +98,7 @@ class TileListViewModelImpl implements TileListViewModel {
     var url = baseUrl + '/' + contentId.replaceAll('/', '+');
     var response = await httpGet(url, skipCache: this._skipCache);
     this._skipCache = false;
-    return Pages.fromJson(response).data.content.contentText;
+    return Pages.fromJson(response).data.content.body;
   }
 
   void _addTileItemToList(
@@ -107,9 +107,9 @@ class TileListViewModelImpl implements TileListViewModel {
         value.primaryColor,
         tileType: type,
         thumbnail: value.illustrationUrl,
-        description: value.description,
+        description: value.subtitle,
         url: value.url,
-        contentText: value.contentText,
+        contentText: value.description,
         contentPath: value.contentPath,
         colorButton: value.secondaryColor,
         colorButtonText: value.primaryColor,

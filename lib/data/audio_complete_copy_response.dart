@@ -250,8 +250,8 @@ class Parent {
     illustrationUrl = json['illustrationUrl'];
     num = json['num'];
     pathTemplate = json['pathTemplate'];
-    primaryColor = json['primaryColor'];
-    secondaryColor = json['secondaryColor'];
+    primaryColor = json['color_primary'];
+    secondaryColor = json['color_secondary'];
     template = json['template'];
     title = json['title'];
     url = json['url'];
