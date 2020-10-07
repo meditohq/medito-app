@@ -613,7 +613,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       // 'YES' selected
       downloadFileWithProgress(currentFile).then((onValue) {
         setState(() {
-          print("Download Value" + onValue.toString());
+          print("Download Value: " + onValue.toString());
         });
       }).catchError((onError) {
         setState(() {
@@ -626,6 +626,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       // 'NO' selected
       removeFile(currentFile).then((onValue) {
         setState(() {
+          print("Removed file");
           downloading = false;
         });
       }).catchError((onError) {

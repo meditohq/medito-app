@@ -146,8 +146,9 @@ Future<void> removeFileFromDownloadedFilesList(Files file) async {
 }
 
 Future<dynamic> removeFile(Files currentFile) async {
+  getAttributions(currentFile.attributions);
   String dir = (await getApplicationSupportDirectory()).path;
-  var name = currentFile.filename;
+  var name = currentFile.filename.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
 
   if (await file.exists()) {
