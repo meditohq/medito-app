@@ -204,11 +204,11 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
       if(received==null || total==null){
         progress = 0;
         print("Unexpected State of downloading");
-        if(received==null) received = 0;
+        if(received==null) received = _bytes.length;
         if(total==null){
           http.Client().send(http.Request('GET', Uri.parse(currentFile.url))).then((value) => _response = value);
           total = _response.contentLength;
-          received = 0;
+          received = _bytes.length;
         }
       }
       else {
