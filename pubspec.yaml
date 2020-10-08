@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.41+374
+version: 1.0.41+376
 environment:
   sdk: ">=2.6.0 <3.0.0"
 
@@ -20,20 +20,21 @@ dependencies:
     sdk: flutter
   google_fonts: ^1.1.0
   flutter_svg: ^0.19.0
-  path_provider: ^1.6.14
-  url_launcher: ^5.6.0
+  path_provider: ^1.6.18
+  url_launcher: ^5.7.2
   flutter_markdown: ^0.4.4
-  shared_preferences: ^0.5.10
+  shared_preferences: 0.5.12
   cached_network_image: ^2.3.2+1
   auto_size_text: ^2.1.0
-  just_audio: ^0.4.4
+  just_audio: ^0.5.2
   audio_session: ^0.0.7
-  audio_service: ^0.15.0
+  audio_service: ^0.15.1
   rxdart: ^0.24.1
-  share: ^0.6.5
+  share: ^0.6.5+2
   firebase_core: ^0.5.0
-  firebase_analytics: ^6.0.0
+  firebase_analytics: ^6.0.1
   provider: ^4.3.2+2
+  package_info: ^0.4.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -65,6 +66,7 @@ flutter:
     - assets/images/ic_review.svg
     - assets/images/ic_support.svg
     - assets/images/ic_twitter.svg
+    - assets/images/blurb.svg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

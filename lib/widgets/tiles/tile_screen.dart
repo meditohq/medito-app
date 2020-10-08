@@ -21,6 +21,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../tracking/tracking.dart';
@@ -414,7 +415,7 @@ class TileListState extends State<TileList> {
     Tracking.trackEvent(
         Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
 
-    if (tile.pathTemplate == 'audio') {
+    if (tile.pathTemplate == 'session-single') {
       _openBottomSheet(tile, _viewModel.getAudioData(id: tile.contentPath));
     } else if (tile.pathTemplate == 'default') {
       openNavWidget(tile);
@@ -451,12 +452,12 @@ class TileListState extends State<TileList> {
 
   _showPlayer(
       Files fileTapped,
-      CoverArt coverArt,
-      dynamic coverColor,
+      Illustration coverArt,
+      dynamic primaryColor,
       String title,
       String description,
       String contentText,
-      String textColor,
+      String secondaryColor,
       String bgMusic) async {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
@@ -468,9 +469,9 @@ class TileListState extends State<TileList> {
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
       await MediaLibrary.saveMediaLibrary(description, title, fileTapped,
-          coverArt, textColor, coverColor, bgMusic, listItem, att);
+          coverArt, secondaryColor, primaryColor, bgMusic, listItem, att);
     }).then((value) {
-      start(coverColor).then((value) => Navigator.push(
+      start(primaryColor).then((value) => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               return PlayerWidget();
@@ -520,7 +521,8 @@ class TileListState extends State<TileList> {
 
   Widget _getMeditoLogo() {
     return GestureDetector(
-      onDoubleTap: () => _onPullToRefresh(),
+      onDoubleTap: () => _showVersionPopUp(),
+      onLongPress: () => _onPullToRefresh(),
       child: Padding(
         padding: const EdgeInsets.all(19.0),
         child: SvgPicture.asset(
@@ -573,5 +575,22 @@ class TileListState extends State<TileList> {
         ],
       ),
     );
+  }
+
+  Future<void> _showVersionPopUp() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+
+    final snackBar = new SnackBar(
+        content: new Text(
+          "Version: $version - Build Number: $buildNumber",
+          style: TextStyle(color: MeditoColors.lightTextColor),
+        ),
+        backgroundColor: MeditoColors.midnight);
+
+    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }

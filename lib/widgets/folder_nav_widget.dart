@@ -250,8 +250,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   _showPlayer(
       Files fileTapped,
-      CoverArt coverArt,
-      dynamic coverColor,
+      Illustration coverArt,
+      dynamic primaryColor,
       String title,
       String description,
       String contentText,
@@ -266,12 +266,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 fileTapped,
                 coverArt,
                 textColor,
-                coverColor,
+                primaryColor,
                 bgMusic,
                 _viewModel.currentlySelectedFile,
                 attributionsContent))
         .then((value) {
-      start(coverColor).then((value) {
+      start(primaryColor).then((value) {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
           return PlayerWidget();
         })).then((value) {

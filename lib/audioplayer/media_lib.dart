@@ -12,9 +12,9 @@ class MediaLibrary {
       String description,
       String title,
       Files fileTapped,
-      CoverArt coverArt,
-      String textColor,
-      coverColor,
+      Illustration illustration,
+      String secondaryColor,
+      String primaryColor,
       String bgMusic,
       ListItem listItem,
       AttContent.Content attributions) async {
@@ -23,9 +23,9 @@ class MediaLibrary {
     await prefs.setString("description", description ?? " ");
     await prefs.setString("audiotitle", title);
     await prefs.setString("fileTapped", json.encode(fileTapped.toJson()));
-    await prefs.setString("coverArt", json.encode(coverArt.toJson()));
-    await prefs.setString("textColor", textColor);
-    await prefs.setString("coverColor", coverColor);
+    await prefs.setString("illustration", json.encode(illustration.toJson()));
+    await prefs.setString("secondaryColor", secondaryColor);
+    await prefs.setString("primaryColor", primaryColor);
     await prefs.setString("bgMusic", bgMusic);
     await prefs.setString("listItemToListen", json.encode(listItem.toJson()));
     await prefs.setString("attrTitle", attributions.title);
@@ -41,12 +41,12 @@ class MediaLibrary {
     var description = prefs.getString("description");
     var title = prefs.getString("audiotitle");
 
-    String coverArtString = prefs.getString("coverArt");
-    var coverArt = CoverArt.fromJson(json.decode(coverArtString));
+    String illustrationAsString = prefs.getString("illustration");
+    var illustration = Illustration.fromJson(json.decode(illustrationAsString));
 
     String bgMusic = prefs.getString("bgMusic");
-    String coverColor = prefs.getString("coverColor");
-    String textColor = prefs.getString("textColor");
+    String primaryColor = prefs.getString("primaryColor");
+    String secondaryColor = prefs.getString("secondaryColor");
 
     String attrTitle = prefs.getString("attrTitle");
     String attrLicenseName = prefs.getString("attrLicence");
@@ -68,8 +68,8 @@ class MediaLibrary {
         'location': '$location',
         'bgMusic': '$bgMusic',
         'id': '$id',
-        'coverColor': coverColor,
-        'textColor': textColor,
+        'primaryColor': primaryColor,
+        'secondaryColor': secondaryColor,
         'attrTitle': attrTitle ,
         'attrName' : attrLicenseName,
         'attrLinkSource': attrLinkSource,
@@ -78,7 +78,7 @@ class MediaLibrary {
       album: description,
       title: title,
       artist: fileTapped.voice,
-      artUri: coverArt.url,
+      artUri: illustration.url,
     );
   }
 }

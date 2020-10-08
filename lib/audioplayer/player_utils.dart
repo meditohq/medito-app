@@ -31,7 +31,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 var downloadListener = ValueNotifier<double>(0);
 var bgDownloadListener = ValueNotifier<double>(0);
-var baseUrl = 'https://medito.app/api/pages';
+var baseUrl = 'https://medito.space/api/pages';
 int total = 1, received = 0, bgTotal = 1, bgReceived = 0;
 var backgroundMusicUrl = "";
 bool downloading = false, bgDownloading = false;
@@ -84,7 +84,7 @@ Future<dynamic> checkFileExists(Files currentFile) async {
 }
 
 Future getAttributions(String attrId) async {
-  var baseUrl = 'https://medito.app/api/pages';
+  var baseUrl = 'https://medito.space/api/pages';
   var url = baseUrl + '/' + attrId.replaceAll('/', '+');
   var response = await httpGet(url);
   var attrs = Attributions.fromJson(response);

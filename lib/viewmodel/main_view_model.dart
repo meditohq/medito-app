@@ -27,7 +27,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   String lastId = "";
   String contentText = "";
   ListItem currentlySelectedFile;
-  var baseUrl = 'https://medito.app/api/pages';
+  var baseUrl = 'https://medito.space/api/pages';
 
   bool _skipCache;
 
@@ -59,12 +59,12 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     List<ListItem> listItemList = [];
     for (var value in pageList) {
       var parentId = value.id.substring(0, value.id.lastIndexOf('/'));
-      var contentText = value.contentText == null ? "" : value.contentText;
+      var contentText = value.description == null ? "" : value.description;
 
       if (value.template == 'default') {
         //just a folder
         _addFolderItemToList(listItemList, value, parentId, contentText);
-      } else if (value.template == 'audio') {
+      } else if (value.template == 'session-single') {
         await _addAudioItemToList(value, listItemList, parentId, contentText);
       } else if (value.template == 'text') {
         _addTextItemToList(listItemList, value);
@@ -92,7 +92,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     listItemList.add(ListItem(value.title, value.id, ListItemType.file,
         fileType: FileType.text,
         url: value.url,
-        contentText: value.contentText));
+        contentText: value.body));
   }
 
   void _addAudioSetItemToList(List<ListItem> listItemList, DataChildren value,
@@ -109,7 +109,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
       String parentId, String contentText) {
     //just a folder
     listItemList.add(ListItem(value.title, value.id, ListItemType.folder,
-        description: value.description,
+        description: value.subtitle,
         parentId: parentId,
         contentText: contentText));
   }
@@ -117,7 +117,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   Future _addAudioItemToList(DataChildren value, List<ListItem> listItemList,
       String parentId, String contentText) async {
     listItemList.add(ListItem(value.title, value.id, ListItemType.file,
-        description: value.description,
+        description: value.subtitle,
         url: value.url,
         fileType: FileType.audio,
         parentId: parentId,

@@ -13,8 +13,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
@@ -30,10 +29,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String subTitleText = "Please wait...";
   String buttonLabel = "";
   String buttonUrl = "http://meditofoundation.org/donate";
-  String buttonIcon = "";
-  String artUrl;
-  Color textColor;
-  Color coverColorAsColor;
+  String buttonIcon = "assets/images/ic_gift.svg";
+  String illustrationUrl;
+  Color secondaryColor;
+  Color primaryColorAsColor;
 
   StreamSubscription _stream;
 
@@ -92,85 +91,122 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               state?.processingState ?? AudioProcessingState.none;
           final playing = state?.playing ?? false;
 
-          getTextColor(mediaItem);
-          getCoverColor(mediaItem);
+          getSecondaryColor(mediaItem);
+          getPrimaryColor(mediaItem);
           getArtUrl(mediaItem);
 
           return SafeArea(
             child: Stack(
               children: [
+                Container(
+                  height: mediaItem == null ? 180 : 350,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      primaryColorAsColor?.withOpacity(0.6) ??
+                          MeditoColors.moonlight,
+                      MeditoColors.midnight,
+                    ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                  ),
+                ),
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Expanded(
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 32.0, right: 32.0, top: 64.0),
                       child: Container(
-                        color: coverColorAsColor,
+                        constraints: BoxConstraints(
+                            maxHeight: mediaItem == null ? 88 : 280,
+                            maxWidth: mediaItem == null ? 88 : 1000),
+                        decoration: BoxDecoration(
+                            color: primaryColorAsColor,
+                            borderRadius: BorderRadius.circular(12.0)),
+                        padding: EdgeInsets.all(mediaItem == null ? 8 : 48.0),
                         child: Center(
-                          child: FractionallySizedBox(
-                              widthFactor: .43,
-                              child: artUrl != null
-                                  ? Image.network(artUrl)
-                                  : Container()),
+                          child: illustrationUrl != null
+                              ? Image.network(illustrationUrl)
+                              : Container(),
                         ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 28.0, left: 16.0, bottom: 4.0, right: 16.0),
+                          top: 24.0, left: 32.0, bottom: 4.0, right: 32.0),
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
                               mediaItem?.title ?? titleText,
-                              style: Theme.of(context).textTheme.bodyText1.copyWith(
-                                  letterSpacing: 0.2,
-                                  height: 1.5,
-                                  color: Colors.white,
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.w600),
+                              textAlign: mediaItem == null
+                                  ? TextAlign.left
+                                  : TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText1
+                                  .copyWith(
+                                      letterSpacing: 0.2,
+                                      height: 1.5,
+                                      color: Colors.white,
+                                      fontSize: mediaItem == null ? 24.0 : 20.0,
+                                      fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                      child: Row(children: [
-                        mediaItem?.extras != null
-                            ? SubtitleTextWidget(mediaItem: mediaItem)
-                            : Expanded(
-                                child: Text(
-                                subTitleText,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .copyWith(
-                                        letterSpacing: 0.2,
-                                        fontWeight: FontWeight.w500,
-                                        color: MeditoColors.walterWhite.withOpacity(0.7),
-                                        height: 1.5),
-                              )),
-                      ]),
-                    ),
-                    mediaItem == null
-                        ? Container()
-                        : positionIndicator(
-                            mediaItem, state, coverColorAsColor),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, bottom: 16.0),
+                      padding: const EdgeInsets.only(left: 32.0, right: 32.0),
                       child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            mediaItem?.extras != null
+                                ? SubtitleTextWidget(mediaItem: mediaItem)
+                                : Expanded(
+                                    child: Text(
+                                      subTitleText,
+                                      textAlign: mediaItem == null
+                                          ? TextAlign.left
+                                          : TextAlign.center,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .copyWith(
+                                              fontSize: mediaItem == null
+                                                  ? 16.0
+                                                  : 14.0,
+                                              letterSpacing: 0.2,
+                                              fontWeight: FontWeight.w500,
+                                              color: MeditoColors.walterWhite
+                                                  .withOpacity(0.7),
+                                              height: 1.5),
+                                    ),
+                                  ),
+                          ]),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           (processingState == AudioProcessingState.buffering ||
                                   processingState ==
                                       AudioProcessingState.connecting)
                               ? buildCircularIndicatorRow()
-                              : Expanded(
-                                  child: mediaItem == null
-                                      ? getDonateAndShareButton()
-                                      : getPlayingOrPausedButton(playing),
-                                ),
+                              : mediaItem == null
+                                  ? getDonateAndShareButton()
+                                  : getPlayingOrPausedButton(playing),
                         ],
                       ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 24.0, right: 24.0, bottom: 32.0),
+                      child: mediaItem == null
+                          ? Container()
+                          : positionIndicator(
+                              mediaItem, state, primaryColorAsColor),
                     ),
                   ],
                 ),
@@ -180,65 +216,55 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: IconButton(
                       icon: Icon(Icons.close),
                       onPressed: _onBackPressed,
-                      color: textColor,
+                      color: MeditoColors.walterWhite,
                     ),
                   ),
                 ),
               ],
             ),
           );
-
         },
       ),
     );
   }
 
   void getArtUrl(MediaItem mediaItem) {
-    if (artUrl == null && mediaItem != null && mediaItem.artUri.isNotEmpty) {
-      artUrl = mediaItem.artUri;
+    if (illustrationUrl == null &&
+        mediaItem != null &&
+        mediaItem.artUri.isNotEmpty) {
+      illustrationUrl = mediaItem.artUri;
     }
   }
 
-  void getCoverColor(MediaItem mediaItem) {
-    if (coverColorAsColor == null && mediaItem != null) {
-      final coverColor = mediaItem?.extras['coverColor'];
-      coverColorAsColor = parseColor(coverColor);
+  void getPrimaryColor(MediaItem mediaItem) {
+    if (primaryColorAsColor == null && mediaItem != null) {
+      final primaryColor = mediaItem?.extras['primaryColor'];
+      primaryColorAsColor = parseColor(primaryColor);
     }
   }
 
-  void getTextColor(MediaItem mediaItem) {
-    if (textColor == null && mediaItem != null) {
-      String textColorString = mediaItem?.extras['textColor'];
+  void getSecondaryColor(MediaItem mediaItem) {
+    if (secondaryColor == null && mediaItem != null) {
+      String secondaryColorString = mediaItem?.extras['secondaryColor'] ?? "";
 
-      if (textColorString.isEmpty && textColor == null) {
-        textColorString = "#FF272829";
+      if (secondaryColorString.isEmpty && secondaryColor == null) {
+        secondaryColorString = "#FF272829";
       }
-      textColor = parseColor(textColorString);
+      secondaryColor = parseColor(secondaryColorString);
     }
   }
 
   Widget buildCircularIndicatorRow() {
-    return Expanded(
-      child: Container(
-        height: 56,
-        decoration: buildBoxDecoration(MeditoColors.moonlight),
-        child: Align(
-          alignment: Alignment.center,
-          child: SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(backgroundColor: Colors.white)),
-        ),
-      ),
+    return PlayerButton(
+      child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(primaryColorAsColor),
+            backgroundColor: secondaryColor,
+          )),
+      primaryColor: primaryColorAsColor,
     );
-  }
-
-  BoxDecoration buildBoxDecoration(Color color) {
-    return new BoxDecoration(
-        color: color,
-        borderRadius: new BorderRadius.all(
-          const Radius.circular(12.0),
-        ));
   }
 
   Widget getPlayingOrPausedButton(bool playing) {
@@ -258,22 +284,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget playButton() => PlayerButton(
         icon: Icons.play_arrow,
         onPressed: AudioService.play,
-        bgColor: MeditoColors.moonlight,
+        secondaryColor: secondaryColor,
+        primaryColor: primaryColorAsColor,
       );
 
   Widget pauseButton() => PlayerButton(
         icon: Icons.pause,
+        secondaryColor: secondaryColor,
         onPressed: AudioService.pause,
-        bgColor: MeditoColors.moonlight,
+        primaryColor: primaryColorAsColor,
       );
 
   Widget positionIndicator(
-      MediaItem mediaItem, PlaybackState state, Color coverColorAsColor) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
-      child: PositionIndicatorWidget(
-          mediaItem: mediaItem, state: state, color: coverColorAsColor),
-    );
+      MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
+    return PositionIndicatorWidget(
+        mediaItem: mediaItem, state: state, color: primaryColorAsColor);
   }
 
   void _onBackPressed() {
@@ -281,29 +306,64 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget getDonateAndShareButton() {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: PlayerButton(
-              image: SvgPicture.asset(
-                buttonIcon,
-                color: textColor,
+    return Expanded(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 32.0, top: 32, bottom: 8, right: 32.0),
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
               ),
+              padding: const EdgeInsets.all(16.0),
               onPressed: _launchDonate,
-              bgColor: coverColorAsColor,
-              text: buttonLabel,
-              textColor: textColor),
-        ),
-        Container(height: 8),
-        PlayerButton(
-          bgColor: MeditoColors.moonlight,
-          icon: Icons.share,
-          onPressed: _share,
-          text: "Share",
-          textColor: Colors.white,
-        )
-      ],
+              color: primaryColorAsColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    buttonIcon,
+                    color: secondaryColor,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      buttonLabel,
+                      style: TextStyle(color: secondaryColor, fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 32.0, right: 32.0),
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              onPressed: _share,
+              color: MeditoColors.moonlight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.share, color: MeditoColors.walterWhite),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      "Share",
+                      style: TextStyle(
+                          color: MeditoColors.walterWhite, fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -343,15 +403,13 @@ void _audioPlayerTaskEntrypoint() async {
   AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
-Future<bool> start(String coverColor) {
-  int color = getColorFromHex(coverColor);
+Future<bool> start(String primaryColor) {
   AudioService.connect();
   return AudioService.start(
     backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-    androidNotificationChannelName: 'Audio Service Demo',
+    androidNotificationChannelName: 'Medito Audio Service',
     // Enable this if you want the Android service to exit the foreground state on pause.
     //androidStopForegroundOnPause: true,
-    androidNotificationColor: color,
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   );

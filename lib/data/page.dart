@@ -103,10 +103,11 @@ class Data {
 
 class Content {
   String description;
-  String contentText;
-  List<CoverArt> coverArt;
-  String coverColor;
-  String textColor;
+  String subtitle;
+  String body;
+  List<Illustration> illustration;
+  String primaryColor;
+  String secondaryColor;
   List<Files> files;
   String title;
   bool backgroundMusic;
@@ -115,9 +116,10 @@ class Content {
 
   Content(
       {this.description,
-      this.contentText,
-      this.coverArt,
-      this.coverColor,
+      this.body,
+      this.subtitle,
+      this.illustration,
+      this.primaryColor,
       this.files,
       this.title,
       this.backgroundMusic,
@@ -126,15 +128,16 @@ class Content {
 
   Content.fromJson(Map<String, dynamic> json) {
     description = json['description'];
-    contentText = json['content_text'];
-    if (json['cover_art'] != null) {
-      coverArt = new List<CoverArt>();
-      json['cover_art'].forEach((v) {
-        coverArt.add(new CoverArt.fromJson(v));
+    subtitle = json['subtitle'];
+    body = json['body'];
+    if (json['illustration'] != null) {
+      illustration = new List<Illustration>();
+      json['illustration'].forEach((v) {
+        illustration.add(new Illustration.fromJson(v));
       });
     }
     backgroundMusic = json['service_backgroundmusic'];
-    coverColor = json['cover_color'];
+    primaryColor = json['color_primary'];
     if (json['files'] != null) {
       files = new List<Files>();
       json['files'].forEach((v) {
@@ -144,30 +147,31 @@ class Content {
     title = json['title'];
     date = json['date'];
     customLength = json['customlength'];
-    textColor = json['text_color'];
+    secondaryColor = json['color_secondary'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['description'] = this.description;
-    data['content_text'] = this.contentText;
-    if (this.coverArt != null) {
-      data['coverArt'] = this.coverArt.map((v) => v.toJson()).toList();
+    data['subtitle'] = this.subtitle;
+    data['body'] = this.body;
+    if (this.illustration != null) {
+      data['illustration'] = this.illustration.map((v) => v.toJson()).toList();
     }
     data['service_backgroundmusic'] = this.backgroundMusic;
-    data['cover_color'] = this.coverColor;
+    data['color_primary'] = this.primaryColor;
     if (this.files != null) {
       data['files'] = this.files.map((v) => v.toJson()).toList();
     }
     data['title'] = this.title;
     data['date'] = this.date;
     data['customlength'] = this.customLength;
-    data['text_color'] = this.textColor;
+    data['color_secondary'] = this.secondaryColor;
     return data;
   }
 }
 
-class CoverArt {
+class Illustration {
   String filename;
   String id;
   String info;
@@ -180,7 +184,7 @@ class CoverArt {
   String length;
   String attributions;
 
-  CoverArt(
+  Illustration(
       {this.filename,
       this.id,
       this.info,
@@ -193,7 +197,7 @@ class CoverArt {
       this.length,
       this.attributions});
 
-  CoverArt.fromJson(Map<String, dynamic> json) {
+  Illustration.fromJson(Map<String, dynamic> json) {
     filename = json['filename'];
     id = json['id'];
     info = json['info'];

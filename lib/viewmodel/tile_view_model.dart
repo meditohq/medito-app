@@ -25,7 +25,7 @@ import 'http_get.dart';
 abstract class TileListViewModel {}
 
 class TileListViewModelImpl implements TileListViewModel {
-  final String baseUrl = 'https://medito.app/api/pages';
+  final String baseUrl = 'https://medito.space/api/pages';
   List<TileItem> navList = [];
   TileItem currentTile;
 
@@ -34,7 +34,7 @@ class TileListViewModelImpl implements TileListViewModel {
   Future getTiles({bool skipCache = false}) async {
     this._skipCache = skipCache;
     var response =
-        await httpGet(baseUrl + '/app/children', skipCache: skipCache);
+        await httpGet(baseUrl + '/tile/children', skipCache: skipCache);
     var pages = PagesChildren.fromJson(response);
     var pageList = pages.data;
 
@@ -98,7 +98,7 @@ class TileListViewModelImpl implements TileListViewModel {
     var url = baseUrl + '/' + contentId.replaceAll('/', '+');
     var response = await httpGet(url, skipCache: this._skipCache);
     this._skipCache = false;
-    return Pages.fromJson(response).data.content.contentText;
+    return Pages.fromJson(response).data.content.body;
   }
 
   void _addTileItemToList(
@@ -107,9 +107,9 @@ class TileListViewModelImpl implements TileListViewModel {
         value.primaryColor,
         tileType: type,
         thumbnail: value.illustrationUrl,
-        description: value.description,
+        description: value.subtitle,
         url: value.url,
-        contentText: value.contentText,
+        contentText: value.description,
         contentPath: value.contentPath,
         colorButton: value.secondaryColor,
         colorButtonText: value.primaryColor,
