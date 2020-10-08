@@ -204,7 +204,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               }
       });
     }
-    else if (showIndeterminateSpinner){
+    else if (showIndeterminateSpinner || removing){
       return SizedBox(
         height: 24,
         width: 24,
@@ -625,9 +625,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       });
     } else {
       // 'NO' selected
+      removing = true;
       removeFile(currentFile).then((onValue) {
         setState(() {
           print("Removed file");
+          //removing = false;
           downloading = false;
         });
       }).catchError((onError) {
@@ -725,6 +727,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _goBack(String value) {
+    if(downloading){
+      downloading = false;
+    }
     Navigator.pop(context);
   }
 }
