@@ -185,6 +185,7 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
   File file = new File('$dir/$name');
   if(file.existsSync()){
     downloading = false;
+    return null;
   }
   http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
   total = _response.contentLength;
@@ -193,9 +194,10 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
 
   _response.stream.listen((value){
       _bytes.addAll(value);
-      received += value.length;
-      //print("File Progress New: " + getProgress().toString());
-      downloadListener.value = getProgress();
+      received += value==null?0:value.length;
+      //print("File Progress New: " + getProgress().toString())
+      double progress = getProgress();
+      downloadListener.value = progress==null?0:progress;
   }).onDone(() async {
     await file.writeAsBytes(_bytes);
     saveFileToDownloadedFilesList(currentFile);
