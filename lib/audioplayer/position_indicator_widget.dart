@@ -90,8 +90,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 ),
               ),
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 16.0, right: 16.0),
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -145,7 +144,9 @@ extension DurationExtensions on Duration {
   /// Converts the duration into a readable string
   /// 15:35
   String toMinutesSeconds() {
-    String twoDigitMinutes = _toTwoDigits(this.inMinutes.remainder(60));
+    String twoDigitMinutes = _toTwoDigits(this
+        .inMinutes
+        .remainder(100)); //NB: if it's over 100 mins it'll show 0:00!!
     String twoDigitSeconds = _toTwoDigits(this.inSeconds.remainder(60));
     return "$twoDigitMinutes:$twoDigitSeconds";
   }
