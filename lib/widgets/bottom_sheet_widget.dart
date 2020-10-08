@@ -52,7 +52,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   String _secondaryColor;
   String _contentText = '';
 
-  bool bgDownloading = false;
+  bool showIndeterminateSpinner = false;
   Files currentFile;
   var _backgroundMusicUrl;
   var _backgroundMusicAvailable = false;
@@ -204,7 +204,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               }
       });
     }
-    else if (bgDownloading){
+    else if (showIndeterminateSpinner){
       return SizedBox(
         height: 24,
         width: 24,
@@ -225,15 +225,16 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _onBeginTap() {
-    if (downloading || bgDownloading || _loadingThisPage) return;
+    if (downloading || showIndeterminateSpinner || _loadingThisPage) return;
 
     widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
         _description, _contentText, _secondaryColor, _backgroundMusicUrl);
 
     setState(() {
+      showIndeterminateSpinner = true;
       Future.delayed(const Duration(milliseconds: 3000), () {
         setState(() {
-          downloading = false;
+          showIndeterminateSpinner = false;
         });
       });
     });
@@ -587,19 +588,19 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void onMusicSelected(int index, String url, String name) {
     _musicSelected = index;
     if (index > 0) {
-      bgDownloading = true;
+      showIndeterminateSpinner = true;
       downloadBGMusicFromURL(url, name).then((value) {
-        bgDownloading = false;
+        showIndeterminateSpinner = false;
         _backgroundMusicUrl = value;
         setState(() {});
       }).catchError((onError) {
         print(onError);
-        bgDownloading = false;
+        showIndeterminateSpinner = false;
         _musicSelected = 0;
         _backgroundMusicUrl = null;
       });
     } else {
-      bgDownloading = false;
+      showIndeterminateSpinner = false;
       _musicSelected = 0;
       _backgroundMusicUrl = null;
     }
