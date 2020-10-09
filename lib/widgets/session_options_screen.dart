@@ -176,7 +176,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               return Text((value * 100).toInt().toString() + "%");
             }
           });
-    } else if (showIndeterminateSpinner) {
+    } else if (showIndeterminateSpinner || removing) {
       return SizedBox(
         height: 24,
         width: 24,
@@ -573,9 +573,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       });
     } else {
       // 'NO' selected
+      removing = true;
       removeFile(currentFile).then((onValue) {
         setState(() {
           print("Removed file");
+          //removing = false;
           downloading = false;
         });
       }).catchError((onError) {
