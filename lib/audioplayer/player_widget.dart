@@ -9,6 +9,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
+import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -98,16 +99,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           return SafeArea(
             child: Stack(
               children: [
-                Container(
-                  height: mediaItem == null ? 180 : 350,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      primaryColorAsColor?.withOpacity(0.6) ??
-                          MeditoColors.moonlight,
-                      MeditoColors.midnight,
-                    ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                  ),
-                ),
+                GradientWidget(
+                    primaryColor: primaryColorAsColor,
+                    height: mediaItem == null ? 180.0 : 350.0),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,

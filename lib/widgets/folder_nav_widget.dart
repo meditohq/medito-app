@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app_bar_widget.dart';
-import 'bottom_sheet_widget.dart';
+import 'session_options_screen.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
@@ -233,7 +233,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     final result = Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BottomSheetWidget(
+          builder: (context) => SessionOptionsScreen(
             title: listItem.title,
             onBeginPressed: _showPlayer,
             data: data,

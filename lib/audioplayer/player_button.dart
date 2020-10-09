@@ -31,8 +31,8 @@ class PlayerButton extends StatelessWidget {
         children: [
           SvgPicture.asset(
             'assets/images/blurb.svg',
-            height: 100,
-            width: 100,
+            height: 88,
+            width: 88,
             color: primaryColor,
           ),
           image != null
