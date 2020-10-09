@@ -77,6 +77,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
             body: AudioServiceWidget(child: TileList())),
       },
       theme: ThemeData(
+          splashColor: MeditoColors.moonlight,
           canvasColor: MeditoColors.darkMoon,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),

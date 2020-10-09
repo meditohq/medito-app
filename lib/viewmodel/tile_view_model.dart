@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/pages_children.dart';
+import 'package:Medito/data/welcome.dart';
 import 'package:Medito/viewmodel/model/tile_item.dart';
 
 import 'http_get.dart';
@@ -39,6 +40,14 @@ class TileListViewModelImpl implements TileListViewModel {
     var pageList = pages.data;
 
     return await _getTileListFromDataChildren(pageList);
+  }
+
+  Future<WelcomeContent> getAnnouncement({bool skipCache = false}) async {
+    this._skipCache = skipCache;
+    var response =
+        await httpGet(baseUrl + '/service+announcement', skipCache: skipCache);
+    Welcome pages = Welcome.fromMap(response);
+    return pages.data.content;
   }
 
   Future _getTileListFromDataChildren(List<DataChildren> pageList) async {
@@ -103,8 +112,7 @@ class TileListViewModelImpl implements TileListViewModel {
 
   void _addTileItemToList(
       List<TileItem> listItemList, DataChildren value, TileType type) {
-    listItemList.add(TileItem(value.title, value.id,
-        value.primaryColor,
+    listItemList.add(TileItem(value.title, value.id, value.primaryColor,
         tileType: type,
         thumbnail: value.illustrationUrl,
         description: value.subtitle,

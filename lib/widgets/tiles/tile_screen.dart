@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
+import 'package:Medito/data/welcome.dart';
 import 'package:Medito/widgets/session_options_screen.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -99,8 +100,18 @@ class TileListState extends State<TileList> {
             child: Column(
               children: <Widget>[
                 _getMeditoLogo(),
+//fixme 
+//                FutureBuilder<WelcomeContent>(
+//                    future: _viewModel.getAnnouncement(skipCache: true),
+//                    builder: (context, snapshot) {
+//                      if (snapshot.connectionState == ConnectionState.done &&
+//                          snapshot.hasData)
+//                        return buildBanner(snapshot.data);
+//                      else
+//                        return Container();
+//                    }),
                 ListView.builder(
-                  padding: EdgeInsets.only(left: 16, right: 16),
+                  padding: EdgeInsets.only(left: 16, top: 8, right: 16),
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: future.data != null ? future.data?.length : 0,
@@ -128,6 +139,10 @@ class TileListState extends State<TileList> {
         future: listFuture,
       ),
     );
+  }
+
+  Widget buildBanner(WelcomeContent data) {
+    return AnnouncementBanner(data: data);
   }
 
   Widget getErrorWidget() {
@@ -416,21 +431,21 @@ class TileListState extends State<TileList> {
         Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
 
     if (tile.pathTemplate == 'session-single') {
-      _openBottomSheet(tile, _viewModel.getAudioData(id: tile.contentPath));
+      _openSessionOptionsScreen(tile, _viewModel.getAudioData(id: tile.contentPath));
     } else if (tile.pathTemplate == 'default') {
       openNavWidget(tile);
     } else if (tile.pathTemplate == 'text') {
       openNavWidget(tile, textFuture: _viewModel.getTextFile(tile.contentPath));
     } else if (tile.pathTemplate == 'audio-set-daily') {
-      _openBottomSheet(tile,
+      _openSessionOptionsScreen(tile,
           _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'daily'));
     } else if (tile.pathTemplate == 'audio-set-hourly') {
-      _openBottomSheet(tile,
+      _openSessionOptionsScreen(tile,
           _viewModel.getAudioFromSet(id: tile.contentPath, timely: 'hourly'));
     }
   }
 
-  void _openBottomSheet(TileItem tile, Future data) {
+  void _openSessionOptionsScreen(TileItem tile, Future data) {
     Tracking.trackEvent(Tracking.TILE, Tracking.BOTTOM_SHEET, tile.id);
 
     _viewModel.currentTile = tile;
@@ -592,5 +607,86 @@ class TileListState extends State<TileList> {
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     Scaffold.of(context).showSnackBar(snackBar);
+  }
+}
+
+class AnnouncementBanner extends StatefulWidget {
+  AnnouncementBanner({Key key, this.data}) : super(key: key);
+  final WelcomeContent data;
+
+  @override
+  _AnnouncementBannerState createState() => _AnnouncementBannerState();
+}
+
+class _AnnouncementBannerState extends State<AnnouncementBanner> {
+  var hidden = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: !hidden,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          buildSpacer(),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: MaterialBanner(
+              backgroundColor: MeditoColors.darkMoon,
+              content: Text(widget.data.content),
+              leading: widget.data.showIcon
+                  ? CircleAvatar(
+                      backgroundColor: parseColor(widget.data.primaryColor),
+                      child: SvgPicture.asset(
+                        'assets/images/${widget.data.icon}.svg',
+                        color: MeditoColors.darkMoon,
+                      ),
+                    )
+                  : Container(),
+              actions: [
+                FlatButton(
+                  child: const Text(
+                    'DISMISS',
+                    style: TextStyle(
+                      color: MeditoColors.walterWhite,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      hidden = true;
+                    });
+                  },
+                ),
+                FlatButton(
+                  child: Text(widget.data.buttonLabel.toUpperCase(),
+                      style: TextStyle(
+                          color: MeditoColors.walterWhite, letterSpacing: 0.2)),
+                  onPressed: () {
+                    
+                    switch(widget.data.buttonDestinationType.toLowerCase()){
+                      case "folder":
+                      case "text":
+                      case "session-single":
+                      case "url": launchUrl(widget.data.buttonDestinationLink);
+                    }
+                    
+                  },
+                ),
+              ],
+            ),
+          ),
+          buildSpacer()
+        ],
+      ),
+    );
+  }
+
+  Row buildSpacer() {
+    return Row(
+      children: [
+        Expanded(child: Container(color: MeditoColors.moonlight, height: 1)),
+      ],
+    );
   }
 }
