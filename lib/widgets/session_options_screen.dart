@@ -173,7 +173,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
             } else {
               print("Updated value: " + (value * 100).toInt().toString());
-              return Text((value * 100).toInt().toString() + "%");
+              return Text((value * 100).toInt().toString() + "%",
+                  style: TextStyle(color: parseColor(_secondaryColor)));
             }
           });
     } else if (showIndeterminateSpinner || removing) {
