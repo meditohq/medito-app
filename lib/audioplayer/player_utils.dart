@@ -34,7 +34,7 @@ var bgDownloadListener = ValueNotifier<double>(0);
 var baseUrl = 'https://medito.space/api/pages';
 int total = 1, received = 0, bgTotal = 1, bgReceived = 0;
 var backgroundMusicUrl = "";
-bool downloading = false, bgDownloading = false;
+bool downloading = false, bgDownloading = false, removing = false;
 
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
@@ -152,9 +152,12 @@ Future<dynamic> removeFile(Files currentFile) async {
   File file = new File('$dir/$name');
 
   if (await file.exists()) {
+
+    await file.delete();
     removeFileFromDownloadedFilesList(currentFile);
-    return file.delete();
+    removing = false;
   }
+  else removing = false;
 }
 
 
@@ -185,6 +188,7 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
   File file = new File('$dir/$name');
   if(file.existsSync()){
     downloading = false;
+    return null;
   }
   http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
   total = _response.contentLength;
@@ -193,9 +197,24 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
 
   _response.stream.listen((value){
       _bytes.addAll(value);
-      received += value.length;
-      //print("File Progress New: " + getProgress().toString());
-      downloadListener.value = getProgress();
+      received += value==null?0:value.length;
+      //print("File Progress New: " + getProgress().toString())
+      //double progress = getProgress();
+      double progress = 0;
+      if(received==null || total==null){
+        progress = 0;
+        print("Unexpected State of downloading");
+        if(received==null) received = _bytes.length;
+        if(total==null){
+          http.Client().send(http.Request('GET', Uri.parse(currentFile.url))).then((value) => _response = value);
+          total = _response.contentLength;
+          received = _bytes.length;
+        }
+      }
+      else {
+        progress = received/total;
+      }
+      downloadListener.value = progress;
   }).onDone(() async {
     await file.writeAsBytes(_bytes);
     saveFileToDownloadedFilesList(currentFile);
@@ -205,7 +224,8 @@ Future<dynamic> downloadFileWithProgress(Files currentFile) async {
 }
 double getProgress()
 {
-  return received*1.0/total;
+  if(received==null) received = 0;
+  return received/total;
 }
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;
