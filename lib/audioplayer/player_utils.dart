@@ -91,7 +91,7 @@ class Download{
       else {
         progress = _received/_total;
       }
-      _downloadListener.value = progress;
+      downloadListener.value = progress;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
       saveFileToDownloadedFilesList(currentFile);
