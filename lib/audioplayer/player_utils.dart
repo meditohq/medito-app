@@ -36,6 +36,71 @@ int total = 1, received = 0, bgTotal = 1, bgReceived = 0;
 var backgroundMusicUrl = "";
 bool downloading = false, bgDownloading = false, removing = false;
 
+class Download{
+  bool _isDownloading = false;
+  Files _file;
+  int _received = 0, _total = 1;
+  var downloadListener = ValueNotifier<double>(0);
+
+  Download(Files file){
+    this._file = file;
+  }
+  bool isThisFile(Files file){
+    return file.toString() == this._file.toString();
+  }
+  void startDownloading(Files file) {
+    if (!isThisFile(file)) return;
+    _isDownloading = true;
+    this._downloadFileWithProgress(file);
+  }
+  bool isDownloading(Files file){
+    if(!isThisFile(file)) return false;
+    return _isDownloading;
+  }
+  Future<dynamic> _downloadFileWithProgress(Files currentFile) async {
+    getAttributions(currentFile.attributions);
+    String dir = (await getApplicationSupportDirectory()).path;
+    var name = currentFile.filename.replaceAll(" ", "%20");
+    File file = new File('$dir/$name');
+    if(file.existsSync()){
+      downloading = false;
+      return null;
+    }
+    http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
+    this._total = _response.contentLength;
+    this._received = 0;
+    List<int> _bytes = [];
+
+    _response.stream.listen((value){
+      _bytes.addAll(value);
+      _received += value==null?0:value.length;
+      //print("File Progress New: " + getProgress().toString())
+      //double progress = getProgress();
+      double progress = 0;
+      if(received==null || total==null){
+        progress = 0;
+        print("Unexpected State of downloading");
+        if(received==null) received = _bytes.length;
+        if(total==null){
+          http.StreamedResponse _throwResponse;
+          http.Client().send(http.Request('GET', Uri.parse(currentFile.url))).then((value) => _throwResponse = value);
+          total = _throwResponse.contentLength;
+          _received = _bytes.length;
+        }
+      }
+      else {
+        progress = _received/_total;
+      }
+      _downloadListener.value = progress;
+    }).onDone(() async {
+      await file.writeAsBytes(_bytes);
+      saveFileToDownloadedFilesList(currentFile);
+      print("Saved New: " + file.path);
+      _isDownloading = false;
+    });
+  }
+}
+
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
   return Container(
