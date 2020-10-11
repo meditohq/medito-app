@@ -172,6 +172,32 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
   );
 }
 
+MarkdownBody getDescriptionMarkdownBody(String content, BuildContext context) {
+  return MarkdownBody(
+    onTapLink: ((url) {
+      launch(url);
+    }),
+    selectable: false,
+    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+        a: Theme.of(context)
+            .textTheme
+            .bodyText2
+            .copyWith(decoration: TextDecoration.underline),
+        h1: Theme.of(context).textTheme.headline6,
+        h2: Theme.of(context).textTheme.headline5,
+        h3: Theme.of(context).textTheme.subtitle2,
+        listBullet: Theme.of(context).textTheme.subtitle1,
+        p: Theme.of(context).textTheme.headline1.copyWith(
+            fontSize: 16.0,
+            letterSpacing: 0.2,
+            fontWeight: FontWeight.w500,
+            color: MeditoColors.walterWhite.withOpacity(0.7),
+            height: 1.5)),
+    data: content == null ? '' : content,
+    imageDirectory: 'https://raw.githubusercontent.com',
+  );
+}
+
 launchUrl(String url) async {
   if (await canLaunch(url)) {
     await launch(url);

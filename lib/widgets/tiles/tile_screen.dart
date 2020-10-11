@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
+import 'package:Medito/widgets/session_options_screen.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,7 +32,6 @@ import '../../utils/utils.dart';
 import '../../viewmodel/model/list_item.dart';
 import '../../viewmodel/model/tile_item.dart';
 import '../../viewmodel/tile_view_model.dart';
-import '../bottom_sheet_widget.dart';
 import '../column_builder.dart';
 import '../folder_nav_widget.dart';
 import '../streak_page.dart';
@@ -438,7 +438,7 @@ class TileListState extends State<TileList> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BottomSheetWidget(
+          builder: (context) => SessionOptionsScreen(
             title: tile.title,
             onBeginPressed: _showPlayer,
             data: data,

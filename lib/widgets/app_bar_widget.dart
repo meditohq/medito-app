@@ -17,12 +17,15 @@ import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class MeditoAppBarWidget extends StatefulWidget {
-
   const MeditoAppBarWidget(
-      {Key key, this.title, this.backPressed, this.paddingBelow})
+      {Key key,
+      this.title,
+      this.backPressed,
+      this.paddingBelow,
+      this.transparent = false})
       : super(key: key);
   final bool paddingBelow;
-
+  final transparent;
   final String title;
   final ValueChanged<String> backPressed;
 
@@ -35,11 +38,12 @@ class _MeditoAppBarWidgetState extends State<MeditoAppBarWidget>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(bottom: 12.0),
       child: AppBar(
           centerTitle: true,
           elevation: 0,
-          backgroundColor: MeditoColors.moonlight,
+          backgroundColor:
+              widget.transparent ? Colors.transparent : MeditoColors.moonlight,
           title: Text(widget.title,
               style: Theme.of(context).textTheme.headline2.copyWith(
                   letterSpacing: 0.1,

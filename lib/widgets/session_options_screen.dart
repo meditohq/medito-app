@@ -13,30 +13,32 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
+import 'package:Medito/widgets/app_bar_widget.dart';
+import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
 import '../utils/utils.dart';
-import 'pill_utils.dart';
 
-class BottomSheetWidget extends StatefulWidget {
+class SessionOptionsScreen extends StatefulWidget {
   final Future data;
   final String title;
   final Function(
           Files, Illustration, dynamic, String, String, String, String, String)
       onBeginPressed;
 
-  BottomSheetWidget({Key key, this.title, this.data, this.onBeginPressed})
+  SessionOptionsScreen({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
 
   @override
-  _BottomSheetWidgetState createState() => _BottomSheetWidgetState();
+  _SessionOptionsScreenState createState() => _SessionOptionsScreenState();
 }
 
-class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   var voiceSelected = 0;
   var lengthSelected = 0;
   var _offlineSelected = 0;
@@ -74,7 +76,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     });
 
     widget.data.then((d) {
-      this._illustration = d?.illustration != null ? d?.illustration?.first : null;
+      this._illustration =
+          d?.illustration != null ? d?.illustration?.first : null;
       this._primaryColor = d?.primaryColor;
       this._title = d?.title;
       this._secondaryColor = d?.secondaryColor;
@@ -97,43 +100,55 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     }
 
     return Scaffold(
-      backgroundColor: MeditoColors.darkBGColor,
+      floatingActionButton: PlayerButton(
+        onPressed: _onBeginTap,
+        child: SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
+        primaryColor: _primaryColor != null
+            ? parseColor(_primaryColor)
+            : MeditoColors.lightColor,
+      ),
       body: Container(
         child: SafeArea(
           child: Stack(
             children: <Widget>[
               SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      buildGoBackPill(),
-                      buildImage(),
-                      buildTitleText(),
-                      buildDescriptionText(),
-                      _showVoiceChoice ? buildSpacer() : Container(),
-                      buildVoiceText(),
-                      buildVoiceRow(),
-                      buildSpacer(),
-                      ////////// spacer
-                      buildSessionLengthText(),
-                      buildSessionLengthRow(),
-                      getBGMusicSpacer(),
-                      ////////// spacer
-                      getBGMusicRowOrContainer(),
-                      buildBackgroundMusicRow(),
-                      buildSpacer(),
-                      ////////// spacer
-                      buildOfflineTextRow(),
-                      buildOfflineRow(),
-                      Container(height: 80)
-                    ],
-                  ),
+                child: Stack(
+                  children: [
+                    GradientWidget(
+                      height: 250.0,
+                      primaryColor: parseColor(_primaryColor),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        MeditoAppBarWidget(title: '', transparent: true),
+                        buildImage(),
+                        buildTitleText(),
+                        buildDescriptionText(),
+                        _showVoiceChoice ? buildSpacer() : Container(),
+                        _showVoiceChoice
+                            ? buildTextHeaderForRow('Voice')
+                            : Container(),
+                        buildVoiceRow(),
+                        buildSpacer(),
+                        ////////// spacer
+                        buildTextHeaderForRow('Session length'),
+                        buildSessionLengthRow(),
+                        getBGMusicSpacer(),
+                        ////////// spacer
+                        getBGMusicRowOrContainer(),
+                        buildBackgroundMusicRow(),
+                        buildSpacer(),
+                        ////////// spacer
+                        buildTextHeaderForRow('Available Offline'),
+                        buildOfflineRow(),
+                        Container(height: 80)
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Align(alignment: Alignment.bottomCenter, child: buildButton()),
             ],
           ),
         ),
@@ -141,46 +156,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     );
   }
 
-  Widget getBGMusicRowOrContainer() =>
-      _backgroundMusicAvailable ? buildBGMusicTextRow() : Container();
+  Widget getBGMusicRowOrContainer() => _backgroundMusicAvailable
+      ? buildTextHeaderForRow('Background Sounds')
+      : Container();
 
   Widget getBGMusicSpacer() =>
       _backgroundMusicAvailable ? buildSpacer() : Container();
-
-  Widget buildButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    offset: const Offset(0, 10),
-                    color: MeditoColors.darkBGColor,
-                    spreadRadius: 25,
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: FlatButton(
-                onPressed: _onBeginTap,
-                shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(12.0),
-                ),
-                color: _primaryColor != null
-                    ? parseColor(_primaryColor)
-                    : MeditoColors.lightColor,
-                child: getBeginButtonContent(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget getBeginButtonContent() {
     if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
@@ -239,20 +220,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
+            valueColor:
+                AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
       );
-    }
-    else {
-      return Text(
-        'BEGIN',
-        style: Theme.of(context).textTheme.headline3.copyWith(
-            color: _secondaryColor != null && _secondaryColor.isNotEmpty
-                ? parseColor(_secondaryColor)
-                : MeditoColors.darkBGColor,
-            fontWeight: FontWeight.bold),
-      );
+    } else {
+      return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
     }
   }
+
 
   void _onBeginTap() {
     if(downloadSingleton==null) downloadSingleton = new DownloadSingleton(currentFile);
@@ -269,27 +244,21 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         });
       });
     });
-  }
 
-  Widget buildVoiceText() {
-    if (!_showVoiceChoice) {
-      return Container();
-    }
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: Text(
-        'VOICE',
-        style: Theme.of(context).textTheme.headline1,
-      ),
-    );
+    return null;
   }
 
   Widget buildTitleText() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 8),
+      padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
       child: Text(
         widget.title,
-        style: Theme.of(context).textTheme.headline6,
+        style: Theme.of(context).textTheme.bodyText1.copyWith(
+            letterSpacing: 0.2,
+            height: 1.5,
+            color: Colors.white,
+            fontSize: 24.0,
+            fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -297,39 +266,21 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   Widget buildDescriptionText() {
     return _contentText.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, left: 8, right: 8),
-            child: getMarkdownBody(_contentText, context),
+            padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
+            child: getDescriptionMarkdownBody(_contentText, context),
           )
         : Container();
   }
 
-  Widget buildSessionLengthText() {
+  Widget buildTextHeaderForRow(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
+      padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
-        'SESSION LENGTH',
-        style: Theme.of(context).textTheme.headline3,
-      ),
-    );
-  }
-
-  Widget buildOfflineTextRow() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: Text(
-        'AVAILABLE OFFLINE',
-        style: Theme.of(context).textTheme.headline3,
-      ),
-    );
-  }
-
-  Widget buildBGMusicTextRow() {
-    if (!_backgroundMusicAvailable) return Container();
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: Text(
-        'BACKGROUND SOUNDS',
-        style: Theme.of(context).textTheme.headline3,
+        title,
+        style: Theme.of(context).textTheme.headline3.copyWith(
+            color: MeditoColors.walterWhite.withOpacity(0.7),
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.3),
       ),
     );
   }
@@ -341,7 +292,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return SizedBox(
       height: 56,
       child: ListView.builder(
-        padding: EdgeInsets.only(right: 16, left: 8),
+        padding: const EdgeInsets.only(left: 16),
         shrinkWrap: true,
         itemCount: lengthList.length,
         scrollDirection: Axis.horizontal,
@@ -349,17 +300,18 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           return Visibility(
             visible: lengthFilteredList?.contains(lengthList[index]),
             child: Padding(
-              padding: buildInBetweenChipPadding(),
+              padding: buildInBetweenChipPadding(index),
               child: FilterChip(
                 pressElevation: 4,
                 shape: buildChipBorder(),
-                padding: buildInnerChipPadding(),
-                label: Text(lengthList[index] + ' mins'),
+                showCheckmark: false,
+                labelPadding: buildInnerChipPadding(),
+                label: Text(lengthList[index] + ' min'),
                 selected: lengthSelected == index,
                 onSelected: (bool value) {
                   onSessionPillTap(value, index);
                 },
-                backgroundColor: MeditoColors.darkColor,
+                backgroundColor: MeditoColors.moonlight,
                 selectedColor: MeditoColors.lightColor,
                 labelStyle: getLengthPillTextStyle(context, index),
               ),
@@ -382,22 +334,23 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return SizedBox(
       height: 56,
       child: ListView.builder(
-        padding: EdgeInsets.only(right: 16, left: 8),
+        padding: const EdgeInsets.only(left: 16),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemCount: voiceList.length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
-            padding: buildInBetweenChipPadding(),
+            padding: buildInBetweenChipPadding(index),
             child: FilterChip(
               shape: buildChipBorder(),
-              padding: buildInnerChipPadding(),
+              labelPadding: buildInnerChipPadding(),
               label: Text(voiceList[index]),
+              showCheckmark: false,
               selected: voiceSelected == index,
               onSelected: (bool value) {
                 onVoicePillTap(value, index);
               },
-              backgroundColor: MeditoColors.darkColor,
+              backgroundColor: MeditoColors.moonlight,
               selectedColor: MeditoColors.lightColor,
               labelStyle: getVoiceTextStyle(context, index),
             ),
@@ -408,10 +361,12 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   EdgeInsets buildInnerChipPadding() =>
-      EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 12);
+      EdgeInsets.only(left: 12, top: 4, bottom: 4, right: 12);
 
-  EdgeInsets buildInBetweenChipPadding() =>
-      const EdgeInsets.only(top: 10, bottom: 10, right: 8);
+  EdgeInsets buildInBetweenChipPadding(var index) {
+    var leftPadding = index == 0 ? 0.0 : 0.0;
+    return EdgeInsets.only(right: 8, left: leftPadding);
+  }
 
   RoundedRectangleBorder buildChipBorder() {
     return RoundedRectangleBorder(
@@ -449,6 +404,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   TextStyle getLengthPillTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
         color: lengthSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
@@ -456,6 +412,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
         color: _offlineSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
@@ -463,6 +420,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   TextStyle getMusicPillTextStyle(int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
         color: _musicSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
@@ -470,6 +428,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.lightColor);
@@ -520,34 +479,32 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (_loadingThisPage) {
       return getEmptyPillRow();
     }
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: SizedBox(
-        height: 56,
-        child: ListView.builder(
-          padding: EdgeInsets.only(right: 16),
-          shrinkWrap: true,
-          itemCount: 2,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-              padding: buildInBetweenChipPadding(),
-              child: FilterChip(
-                pressElevation: 4,
-                shape: buildChipBorder(),
-                padding: buildInnerChipPadding(),
-                label: Text(index == 0 ? 'No' : 'Yes'),
-                selected: _offlineSelected == index,
-                onSelected: (bool value) {
-                  onOfflineSelected(index);
-                },
-                backgroundColor: MeditoColors.darkColor,
-                selectedColor: MeditoColors.lightColor,
-                labelStyle: getOfflinePillTextStyle(context, index),
-              ),
-            );
-          },
-        ),
+    return SizedBox(
+      height: 56,
+      child: ListView.builder(
+        padding: const EdgeInsets.only(left: 16),
+        shrinkWrap: true,
+        itemCount: 2,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: buildInBetweenChipPadding(index),
+            child: FilterChip(
+              pressElevation: 4,
+              shape: buildChipBorder(),
+              showCheckmark: false,
+              labelPadding: buildInnerChipPadding(),
+              label: Text(index == 0 ? 'No' : 'Yes'),
+              selected: _offlineSelected == index,
+              onSelected: (bool value) {
+                onOfflineSelected(index);
+              },
+              backgroundColor: MeditoColors.moonlight,
+              selectedColor: MeditoColors.lightColor,
+              labelStyle: getOfflinePillTextStyle(context, index),
+            ),
+          );
+        },
       ),
     );
   }
@@ -557,47 +514,47 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     if (_bgMusicList.length == 0) return getEmptyPillRow();
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: SizedBox(
-          height: 56,
-          child: ListView.builder(
-            padding: EdgeInsets.only(right: 16),
-            shrinkWrap: true,
-            itemCount: 1 + (_bgMusicList.length ?? 0),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (BuildContext context, int index) {
-              return Padding(
-                padding: buildInBetweenChipPadding(),
-                child: FilterChip(
-                  pressElevation: 4,
-                  shape: buildChipBorder(),
-                  padding: buildInnerChipPadding(),
-                  label:
-                      Text(index == 0 ? "None" : _bgMusicList[index - 1].key),
-                  selected: index == _musicSelected,
-                  onSelected: (bool value) {
-                    onMusicSelected(
-                        index,
-                        index > 0 ? _bgMusicList[index - 1].value : "",
-                        index > 0 ? _bgMusicList[index - 1].key : "");
-                  },
-                  backgroundColor: MeditoColors.darkColor,
-                  selectedColor: MeditoColors.lightColor,
-                  labelStyle: getMusicPillTextStyle(index),
-                ),
-              );
-            },
-          )),
-    );
+    return SizedBox(
+        height: 56,
+        child: ListView.builder(
+          padding: const EdgeInsets.only(left: 16),
+          shrinkWrap: true,
+          itemCount: 1 + (_bgMusicList.length ?? 0),
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (BuildContext context, int index) {
+            return Padding(
+              padding: buildInBetweenChipPadding(index),
+              child: FilterChip(
+                pressElevation: 4,
+                shape: buildChipBorder(),
+                labelPadding: buildInnerChipPadding(),
+                showCheckmark: false,
+                label: Text(index == 0 ? "None" : _bgMusicList[index - 1].key),
+                selected: index == _musicSelected,
+                onSelected: (bool value) {
+                  onMusicSelected(
+                      index,
+                      index > 0 ? _bgMusicList[index - 1].value : "",
+                      index > 0 ? _bgMusicList[index - 1].key : "");
+                },
+                backgroundColor: MeditoColors.moonlight,
+                selectedColor: MeditoColors.lightColor,
+                labelStyle: getMusicPillTextStyle(index),
+              ),
+            );
+          },
+        ));
   }
 
-  Row getEmptyPillRow() {
-    return Row(
-      children: [
-        emptyPill(),
-        emptyPill(),
-      ],
+  Padding getEmptyPillRow() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 16),
+      child: Row(
+        children: [
+          emptyPill(),
+          emptyPill(),
+        ],
+      ),
     );
   }
 
@@ -611,7 +568,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         label: Text("        "),
         selected: true,
         showCheckmark: false,
-        selectedColor: MeditoColors.darkColor,
+        selectedColor: MeditoColors.moonlight,
         labelStyle: getMusicPillTextStyle(0),
       ),
     );
@@ -673,53 +630,32 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   Widget buildImage() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-              child: Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                    color: _primaryColor != null
-                        ? parseColor(_primaryColor)
-                        : MeditoColors.darkColor,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(26.0),
-                    child: _illustration == null
-                        ? Container()
-                        : getNetworkImageWidget(_illustration.url),
-                  ))),
-        ],
-      ),
+      padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
+      child: Container(
+          height: 100,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            color: _primaryColor != null
+                ? parseColor(_primaryColor)
+                : MeditoColors.moonlight,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _illustration == null
+                ? Container()
+                : getNetworkImageWidget(_illustration.url),
+          )),
     );
   }
 
   Widget buildSpacer() {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 16.0, left: 8, right: 8),
+      padding: const EdgeInsets.only(top: 8, bottom: 16.0, left: 16, right: 16),
       child: Row(
         children: <Widget>[
-          Expanded(
-              child: Container(color: MeditoColors.lightColorLine, height: 1)),
+          Expanded(child: Container(color: MeditoColors.moonlight, height: 1)),
         ],
       ),
-    );
-  }
-
-  Widget buildGoBackPill() {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 8),
-      child: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            padding: getEdgeInsets(1, 1),
-            decoration: getBoxDecoration(1, 1, color: MeditoColors.darkColor),
-            child: getTextLabel("<- Back", 1, 1, context),
-          )),
     );
   }
 
@@ -752,9 +688,5 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         return alert;
       },
     );
-  }
-
-  void _goBack(String value) {
-    Navigator.pop(context);
   }
 }
