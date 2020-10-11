@@ -170,23 +170,12 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           valueListenable: downloadSingleton.returnNotifier(),
           builder: (context, value, widget) {
             if (value >= 1) {
-              return Text(
-                'BEGIN',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headline3
-                    .copyWith(
-                    color: _secondaryColor != null && _secondaryColor.isNotEmpty
-                        ? parseColor(_secondaryColor)
-                        : MeditoColors.darkBGColor,
-                    fontWeight: FontWeight.bold),
-              );
+              return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
             }
             else {
               print("Updated value: " + (value * 100).toInt().toString());
-              return Text(
-                  'DOWNLOADING ' + (value * 100).toInt().toString() + "%");
+              return Text((value * 100).toInt().toString() + "%",
+                  style: TextStyle(color: parseColor(_secondaryColor), fontSize: 11));
             }
           });
     }
@@ -229,9 +218,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
 
-  void _onBeginTap() {
-    if(downloadSingleton==null) downloadSingleton = new DownloadSingleton(currentFile);
-    if (downloadSingleton.isDownloadingMe(currentFile) || showIndeterminateSpinner || _loadingThisPage) return;
+Future<void> _onBeginTap() {
+    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton.isDownloadingMe(currentFile) || showIndeterminateSpinner || _loadingThisPage) return null;
 
     widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
         _description, _contentText, _secondaryColor, _backgroundMusicUrl);
