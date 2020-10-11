@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
 import '../utils/utils.dart';
@@ -56,7 +56,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   Files currentFile;
   var _backgroundMusicUrl;
   var _backgroundMusicAvailable = false;
-
   bool _showVoiceChoice = true;
 
   bool _loadingThisPage = true;
@@ -184,26 +183,57 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   Widget getBeginButtonContent() {
-    if (downloading) {
-
-      return ValueListenableBuilder(valueListenable: downloadListener,
-            builder:(context, value, widget){
-              if(value>=1){
-                return Text(
-                  'BEGIN',
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: _secondaryColor != null && _secondaryColor.isNotEmpty
-                          ? parseColor(_secondaryColor)
-                          : MeditoColors.darkBGColor,
-                      fontWeight: FontWeight.bold),
-                );
-              }
-              else{
-                print("Updated value: " + (value*100).toInt().toString());
-                return Text('DOWNLOADING '+ (value*100).toInt().toString()+"%");
-              }
-      });
+    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton.isDownloadingMe(currentFile)) {
+      return ValueListenableBuilder(
+          valueListenable: downloadSingleton.returnNotifier(),
+          builder: (context, value, widget) {
+            if (value >= 1) {
+              return Text(
+                'BEGIN',
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .headline3
+                    .copyWith(
+                    color: _secondaryColor != null && _secondaryColor.isNotEmpty
+                        ? parseColor(_secondaryColor)
+                        : MeditoColors.darkBGColor,
+                    fontWeight: FontWeight.bold),
+              );
+            }
+            else {
+              print("Updated value: " + (value * 100).toInt().toString());
+              return Text(
+                  'DOWNLOADING ' + (value * 100).toInt().toString() + "%");
+            }
+          });
     }
+    // }
+    // else if (downloadSingleton.isDownloadingSomething()) {
+    //   return ValueListenableBuilder(valueListenable: downloadSingleton.returnNotifier(),
+    //       builder:(context, value, widget){
+    //         if(value>=1){
+    //           return Text(
+    //             'BEGIN',
+    //             style: Theme.of(context).textTheme.headline3.copyWith(
+    //                 color: _secondaryColor != null && _secondaryColor.isNotEmpty
+    //                     ? parseColor(_secondaryColor)
+    //                     : MeditoColors.darkBGColor,
+    //                 fontWeight: FontWeight.bold),
+    //           );
+    //         }
+    //         else{
+    //           print("Updated value: " + (value*100).toInt().toString());
+    //           return SizedBox(
+    //             height: 24,
+    //             width: 24,
+    //             child: CircularProgressIndicator(
+    //                 valueColor: AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
+    //           );
+    //         }
+    //       });
+    // }
     else if (showIndeterminateSpinner || removing){
       return SizedBox(
         height: 24,
@@ -225,7 +255,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _onBeginTap() {
-    if (downloading || showIndeterminateSpinner || _loadingThisPage) return;
+    if(downloadSingleton==null) downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton.isDownloadingMe(currentFile) || showIndeterminateSpinner || _loadingThisPage) return;
 
     widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
         _description, _contentText, _secondaryColor, _backgroundMusicUrl);
@@ -393,6 +424,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     for (final file in filesList) {
       if (file.voice == (voiceList[index])) {
         currentFile = file;
+        if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
         break;
       }
     }
@@ -609,20 +641,18 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   void onOfflineSelected(int index) {
     _offlineSelected = index;
-    downloading = true;
+    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
     if (index == 1) {
       // 'YES' selected
-      downloadFileWithProgress(currentFile).then((onValue) {
-        setState(() {
-          print("Download Value: " + onValue.toString());
-        });
-      }).catchError((onError) {
-        setState(() {
-          print("error in downloading: " + onError);
-          downloading = false;
-          _offlineSelected = 0;
-        });
-      });
+      if(!downloadSingleton.isDownloadingSomething()) downloadSingleton.start(currentFile);
+      else {
+        _offlineSelected = 0;
+        Fluttertoast.showToast(
+            msg: "Another Download in Progress",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER
+        );
+      }
     } else {
       // 'NO' selected
       removing = true;
@@ -630,12 +660,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         setState(() {
           print("Removed file");
           //removing = false;
-          downloading = false;
         });
       }).catchError((onError) {
         setState(() {
           print(onError);
-          downloading = false;
           _offlineSelected = 0;
         });
       });
@@ -727,9 +755,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   void _goBack(String value) {
-    if(downloading){
-      downloading = false;
-    }
     Navigator.pop(context);
   }
 }
