@@ -35,6 +35,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     AudioServiceBackground.setQueue([mediaItem]);
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
+        // (data == null) is true if this session has not been downloaded
         if (data == null) {
           _duration = await _player.setUrl(mediaItem.id);
         } else {
@@ -60,14 +61,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
     });
 
     _player.positionStream.listen((position) async {
+      //ticks on each position
       if (position != null) {
-        if (_duration.inSeconds > 0 &&
-            position.inSeconds > _duration.inSeconds - fadeDuration) {
+        if (audioPositionIsInEndPeriod(position)) {
           await setBgVolumeFadeAtEnd(
               mediaItem, position.inSeconds, _duration.inSeconds);
           await updateStats();
-        } else if (_duration.inSeconds > 0 &&
-            position.inSeconds <= _duration.inSeconds - fadeDuration) {
+        } else if (audioPositionBeforeEndPeriod(position)) {
           await _bgPlayer.setVolume(initialBgVolume);
         }
       }
@@ -93,6 +93,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
           break;
       }
     });
+  }
+
+  bool audioPositionBeforeEndPeriod(Duration position) {
+    //also makes sure the audio has started
+    return _duration.inSeconds > 0 &&
+        position.inSeconds <= _duration.inSeconds - fadeDuration;
+  }
+
+  bool audioPositionIsInEndPeriod(Duration position) {
+    return _duration.inSeconds > 0 &&
+        position.inSeconds > _duration.inSeconds - fadeDuration;
   }
 
   Future<void> setBgVolumeFadeAtEnd(
@@ -217,14 +228,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> updateStats() async {
     if (!_updatedStats) {
       _updatedStats = true;
-      print('saveStats map');
 
       var dataMap = {
         'secsListened': _duration.inSeconds,
         'id': '${mediaItem.extras['id']}',
       };
-
-      print('dataMap $dataMap');
 
       await writeJSONToCache(encoded(dataMap), "stats");
 
