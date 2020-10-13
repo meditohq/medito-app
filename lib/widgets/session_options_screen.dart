@@ -13,13 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
 import '../utils/utils.dart';
@@ -65,6 +65,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   List _bgMusicList = [];
 
+  BuildContext scaffoldContext;
+
   @override
   void initState() {
     super.initState();
@@ -107,7 +109,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             ? parseColor(_primaryColor)
             : MeditoColors.lightColor,
       ),
-      body: Container(
+      body: new Builder(builder:(BuildContext context) {
+        scaffoldContext = context;
+        return Container(
         child: SafeArea(
           child: Stack(
             children: <Widget>[
@@ -152,7 +156,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             ],
           ),
         ),
-      ),
+      );}),
     );
   }
 
@@ -179,31 +183,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             }
           });
     }
-    // }
-    // else if (downloadSingleton.isDownloadingSomething()) {
-    //   return ValueListenableBuilder(valueListenable: downloadSingleton.returnNotifier(),
-    //       builder:(context, value, widget){
-    //         if(value>=1){
-    //           return Text(
-    //             'BEGIN',
-    //             style: Theme.of(context).textTheme.headline3.copyWith(
-    //                 color: _secondaryColor != null && _secondaryColor.isNotEmpty
-    //                     ? parseColor(_secondaryColor)
-    //                     : MeditoColors.darkBGColor,
-    //                 fontWeight: FontWeight.bold),
-    //           );
-    //         }
-    //         else{
-    //           print("Updated value: " + (value*100).toInt().toString());
-    //           return SizedBox(
-    //             height: 24,
-    //             width: 24,
-    //             child: CircularProgressIndicator(
-    //                 valueColor: AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
-    //           );
-    //         }
-    //       });
-    // }
     else if (showIndeterminateSpinner || removing){
       return SizedBox(
         height: 24,
@@ -593,11 +572,7 @@ Future<void> _onBeginTap() {
       if(!downloadSingleton.isDownloadingSomething()) downloadSingleton.start(currentFile);
       else {
         _offlineSelected = 0;
-        Fluttertoast.showToast(
-            msg: "Another Download in Progress",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER
-        );
+        createSnackBarWithColor("Another Download in Progress", scaffoldContext, Colors.black12);
       }
     } else {
       // 'NO' selected
