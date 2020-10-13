@@ -10,12 +10,12 @@ PODS:
     - FirebaseAnalytics (= 6.6.0)
   - Firebase/CoreOnly (6.26.0):
     - FirebaseCore (= 6.7.2)
-  - firebase_analytics (6.0.0):
+  - firebase_analytics (6.0.2):
     - Firebase/Analytics (~> 6.26.0)
     - Firebase/CoreOnly (~> 6.26.0)
     - firebase_core
     - Flutter
-  - firebase_core (0.5.0):
+  - firebase_core (0.5.0-1):
     - Firebase/CoreOnly (~> 6.26.0)
     - Flutter
   - FirebaseAnalytics (6.6.0):
@@ -83,6 +83,8 @@ PODS:
     - nanopb/encode (= 1.30905.0)
   - nanopb/decode (1.30905.0)
   - nanopb/encode (1.30905.0)
+  - package_info (0.0.1):
+    - Flutter
   - path_provider (0.0.1):
     - Flutter
   - PromisesObjC (1.2.10)
@@ -104,6 +106,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_isolate (from `.symlinks/plugins/flutter_isolate/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
+  - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - share (from `.symlinks/plugins/share/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
@@ -140,6 +143,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_isolate/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
+  package_info:
+    :path: ".symlinks/plugins/package_info/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   share:
@@ -155,8 +160,8 @@ SPEC CHECKSUMS:
   audio_service: f509d65da41b9521a61f1c404dd58651f265a567
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345
   Firebase: 7cf5f9c67f03cb3b606d1d6535286e1080e57eb6
-  firebase_analytics: 3ad65aa7be059752b2c1a6392bfafe030b4ab9fa
-  firebase_core: 3134fe79d257d430f163b558caf52a10a87efe8a
+  firebase_analytics: 31b66f23a42fa62bdf6a134af1d3a3a50bf5ac3e
+  firebase_core: 00e54a4744164a6b5a250b96dd1ad5afaba7a342
   FirebaseAnalytics: 96634d356482d4f3af8fe459a0ebf19a99c71b75
   FirebaseCore: f42e5e5f382cdcf6b617ed737bf6c871a6947b17
   FirebaseCoreDiagnostics: 7535fe695737f8c5b350584292a70b7f8ff0357b
@@ -170,6 +175,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
+  package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
