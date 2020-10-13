@@ -29,13 +29,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'download_class.dart';
+
 var downloadListener = ValueNotifier<double>(0);
 var bgDownloadListener = ValueNotifier<double>(0);
 var baseUrl = 'https://medito.space/api/pages';
-int total = 1, received = 0, bgTotal = 1, bgReceived = 0;
+int bgTotal = 1, bgReceived = 0;
 var backgroundMusicUrl = "";
-bool downloading = false, bgDownloading = false, removing = false;
 
+bool bgDownloading = false, removing = false;
+
+
+DownloadSingleton downloadSingleton;
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
   return Container(
@@ -180,52 +185,6 @@ Future<dynamic> downloadFile(Files currentFile) async {
   saveFileToDownloadedFilesList(currentFile);
 
   print(file.path);
-}
-Future<dynamic> downloadFileWithProgress(Files currentFile) async {
-  getAttributions(currentFile.attributions);
-  String dir = (await getApplicationSupportDirectory()).path;
-  var name = currentFile.filename.replaceAll(" ", "%20");
-  File file = new File('$dir/$name');
-  if(file.existsSync()){
-    downloading = false;
-    return null;
-  }
-  http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(currentFile.url)));
-  total = _response.contentLength;
-  received = 0;
-  List<int> _bytes = [];
-
-  _response.stream.listen((value){
-      _bytes.addAll(value);
-      received += value==null?0:value.length;
-      //print("File Progress New: " + getProgress().toString())
-      //double progress = getProgress();
-      double progress = 0;
-      if(received==null || total==null){
-        progress = 0;
-        print("Unexpected State of downloading");
-        if(received==null) received = _bytes.length;
-        if(total==null){
-          http.Client().send(http.Request('GET', Uri.parse(currentFile.url))).then((value) => _response = value);
-          total = _response.contentLength;
-          received = _bytes.length;
-        }
-      }
-      else {
-        progress = received/total;
-      }
-      downloadListener.value = progress;
-  }).onDone(() async {
-    await file.writeAsBytes(_bytes);
-    saveFileToDownloadedFilesList(currentFile);
-    print("Saved New: " + file.path);
-    downloading = false;
-  });
-}
-double getProgress()
-{
-  if(received==null) received = 0;
-  return received/total;
 }
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;

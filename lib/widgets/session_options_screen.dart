@@ -13,13 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
-
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
 import '../utils/utils.dart';
@@ -58,13 +58,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Files currentFile;
   var _backgroundMusicUrl;
   var _backgroundMusicAvailable = false;
-
   bool _showVoiceChoice = true;
 
   bool _loadingThisPage = true;
   final _viewModel = new BottomSheetViewModelImpl();
 
   List _bgMusicList = [];
+
+  BuildContext scaffoldContext;
 
   @override
   void initState() {
@@ -108,7 +109,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             ? parseColor(_primaryColor)
             : MeditoColors.lightColor,
       ),
-      body: Container(
+      body: new Builder(builder:(BuildContext context) {
+        scaffoldContext = context;
+        return Container(
         child: SafeArea(
           child: Stack(
             children: <Widget>[
@@ -153,7 +156,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             ],
           ),
         ),
-      ),
+      );}),
     );
   }
 
@@ -165,19 +168,22 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       _backgroundMusicAvailable ? buildSpacer() : Container();
 
   Widget getBeginButtonContent() {
-    if (downloading) {
+    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton.isDownloadingMe(currentFile)) {
       return ValueListenableBuilder(
-          valueListenable: downloadListener,
+          valueListenable: downloadSingleton.returnNotifier(),
           builder: (context, value, widget) {
             if (value >= 1) {
               return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
-            } else {
+            }
+            else {
               print("Updated value: " + (value * 100).toInt().toString());
               return Text((value * 100).toInt().toString() + "%",
-                  style: TextStyle(color: parseColor(_secondaryColor)));
+                  style: TextStyle(color: parseColor(_secondaryColor), fontSize: 11));
             }
           });
-    } else if (showIndeterminateSpinner || removing) {
+    }
+    else if (showIndeterminateSpinner || removing){
       return SizedBox(
         height: 24,
         width: 24,
@@ -190,9 +196,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
   }
 
-  Future<void> _onBeginTap() {
-    if (downloading || showIndeterminateSpinner || _loadingThisPage)
-      return null;
+
+Future<void> _onBeginTap() {
+    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton.isDownloadingMe(currentFile) || showIndeterminateSpinner || _loadingThisPage) return null;
 
     widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
         _description, _contentText, _secondaryColor, _backgroundMusicUrl);
@@ -340,6 +347,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     for (final file in filesList) {
       if (file.voice == (voiceList[index])) {
         currentFile = file;
+        if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
         break;
       }
     }
@@ -558,20 +566,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void onOfflineSelected(int index) {
     _offlineSelected = index;
-    downloading = true;
+    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
     if (index == 1) {
       // 'YES' selected
-      downloadFileWithProgress(currentFile).then((onValue) {
-        setState(() {
-          print("Download Value: " + onValue.toString());
-        });
-      }).catchError((onError) {
-        setState(() {
-          print("error in downloading: " + onError);
-          downloading = false;
-          _offlineSelected = 0;
-        });
-      });
+      if(!downloadSingleton.isDownloadingSomething()) downloadSingleton.start(currentFile);
+      else {
+        _offlineSelected = 0;
+        createSnackBarWithColor("Another Download in Progress", scaffoldContext, Colors.black12);
+      }
     } else {
       // 'NO' selected
       removing = true;
@@ -579,12 +581,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         setState(() {
           print("Removed file");
           //removing = false;
-          downloading = false;
         });
       }).catchError((onError) {
         setState(() {
           print(onError);
-          downloading = false;
           _offlineSelected = 0;
         });
       });
