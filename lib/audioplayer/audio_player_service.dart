@@ -31,68 +31,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       this.mediaItem = value;
     });
 
-    // Load and broadcast the queue
-    AudioServiceBackground.setQueue([mediaItem]);
-    try {
-      await getDownload(mediaItem.extras['location']).then((data) async {
-        // (data == null) is true if this session has not been downloaded
-        if (data == null) {
-          _duration = await _player.setUrl(mediaItem.id);
-        } else {
-          _duration = await _player.setFilePath(data);
-        }
-
-        playBgMusic(mediaItem.extras['bgMusic']);
-        onPlay();
-      });
-    } catch (e) {
-      print("Error: $e");
-      onStop();
-    }
-
-    final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.speech());
-    // Broadcast media item changes.
-    _player.currentIndexStream.listen((index) {
-      if (index != null)
-        AudioServiceBackground.setMediaItem(
-            mediaItem.copyWith(duration: _duration));
-      return null;
-    });
-
-    _player.positionStream.listen((position) async {
-      //ticks on each position
-      if (position != null) {
-        if (audioPositionIsInEndPeriod(position)) {
-          await setBgVolumeFadeAtEnd(
-              mediaItem, position.inSeconds, _duration.inSeconds);
-          await updateStats();
-        } else if (audioPositionBeforeEndPeriod(position)) {
-          await _bgPlayer.setVolume(initialBgVolume);
-        }
-      }
-    });
-
-    // Propagate all events from the audio player to AudioService clients.
-    _eventSubscription = _player.playbackEventStream.listen((event) {
-      _broadcastState();
-    });
-    // Special processing for state transitions.
-    _player.processingStateStream.listen((state) {
-      switch (state) {
-        case ProcessingState.completed:
-          // In this example, the service stops when reaching the end.
-          onStop();
-          break;
-        case ProcessingState.ready:
-          // If we just came from skipping between tracks, clear the skip
-          // state now that we're ready to play.
-          _skipState = null;
-          break;
-        default:
-          break;
-      }
-    });
+    getAudioAndStartPlaying();
   }
 
   bool audioPositionBeforeEndPeriod(Duration position) {
@@ -238,6 +177,71 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       AudioServiceBackground.sendCustomEvent('');
     }
+  }
+
+  void getAudioAndStartPlaying() async {
+    // Load and broadcast the queue
+    AudioServiceBackground.setQueue([mediaItem]);
+    try {
+      await getDownload(mediaItem.extras['location']).then((data) async {
+        // (data == null) is true if this session has not been downloaded
+        if (data == null) {
+          _duration = await _player.setUrl(mediaItem.id);
+        } else {
+          _duration = await _player.setFilePath(data);
+        }
+
+        playBgMusic(mediaItem.extras['bgMusic']);
+        onPlay();
+      });
+    } catch (e) {
+      print("Error: $e");
+      onStop();
+    }
+
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration.speech());
+    // Broadcast media item changes.
+    _player.currentIndexStream.listen((index) {
+      if (index != null)
+        AudioServiceBackground.setMediaItem(
+            mediaItem.copyWith(duration: _duration));
+      return null;
+    });
+
+    _player.positionStream.listen((position) async {
+      //ticks on each position
+      if (position != null) {
+        if (audioPositionIsInEndPeriod(position)) {
+          await setBgVolumeFadeAtEnd(
+              mediaItem, position.inSeconds, _duration.inSeconds);
+          await updateStats();
+        } else if (audioPositionBeforeEndPeriod(position)) {
+          await _bgPlayer.setVolume(initialBgVolume);
+        }
+      }
+    });
+
+    // Propagate all events from the audio player to AudioService clients.
+    _eventSubscription = _player.playbackEventStream.listen((event) {
+      _broadcastState();
+    });
+    // Special processing for state transitions.
+    _player.processingStateStream.listen((state) {
+      switch (state) {
+        case ProcessingState.completed:
+        // In this example, the service stops when reaching the end.
+          onStop();
+          break;
+        case ProcessingState.ready:
+        // If we just came from skipping between tracks, clear the skip
+        // state now that we're ready to play.
+          _skipState = null;
+          break;
+        default:
+          break;
+      }
+    });
   }
 }
 

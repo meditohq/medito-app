@@ -28,7 +28,7 @@ class PlayerWidget extends StatefulWidget {
 class _PlayerWidgetState extends State<PlayerWidget> {
   String titleText = "Loading...";
   String subTitleText = "Please wait...";
-  String buttonLabel = "";
+  String buttonLabel = "Donate";
   String buttonUrl = "http://meditofoundation.org/donate";
   String buttonIcon = "assets/images/ic_gift.svg";
   String illustrationUrl;
@@ -81,145 +81,155 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MeditoColors.midnight,
-      body: StreamBuilder<ScreenState>(
-        stream: _screenStateStream,
-        builder: (context, snapshot) {
-          final screenState = snapshot.data;
-          final mediaItem = screenState?.mediaItem;
-          final state = screenState?.playbackState;
-          final processingState =
-              state?.processingState ?? AudioProcessingState.none;
-          final playing = state?.playing ?? false;
+        backgroundColor: MeditoColors.midnight,
+        body: StreamBuilder<ScreenState>(
+            stream: _screenStateStream,
+            builder: (context, snapshot) {
+              final screenState = snapshot.data;
+              final mediaItem = screenState?.mediaItem;
+              final state = screenState?.playbackState;
+              final processingState =
+                  state?.processingState ?? AudioProcessingState.none;
+              final playing = state?.playing ?? false;
 
-          getSecondaryColor(mediaItem);
-          getPrimaryColor(mediaItem);
-          getArtUrl(mediaItem);
+              getSecondaryColor(mediaItem);
+              getPrimaryColor(mediaItem);
+              getArtUrl(mediaItem);
 
-          return SafeArea(
-            child: Stack(
-              children: [
-                GradientWidget(
-                    primaryColor: primaryColorAsColor,
-                    height: mediaItem == null ? 180.0 : 350.0),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 32.0, right: 32.0, top: 64.0),
-                      child: Container(
-                        constraints: BoxConstraints(
-                            maxHeight: mediaItem == null ? 88 : 280,
-                            maxWidth: mediaItem == null ? 88 : 1000),
-                        decoration: BoxDecoration(
-                            color: primaryColorAsColor,
-                            borderRadius: BorderRadius.circular(12.0)),
-                        padding: EdgeInsets.all(mediaItem == null ? 8 : 48.0),
-                        child: Center(
-                          child: illustrationUrl != null
-                              ? Image.network(illustrationUrl)
-                              : Container(),
+              return SafeArea(
+                child: Stack(
+                  children: [
+                    GradientWidget(
+                        primaryColor: primaryColorAsColor, height: 350.0),
+                    mediaItem != null
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 32.0, right: 32.0, top: 64.0),
+                                child: Container(
+                                  constraints: BoxConstraints(
+                                      maxHeight: 280, maxWidth: 1000),
+                                  decoration: BoxDecoration(
+                                      color: primaryColorAsColor,
+                                      borderRadius:
+                                          BorderRadius.circular(12.0)),
+                                  padding: EdgeInsets.all(48.0),
+                                  child: Center(
+                                    child: illustrationUrl != null
+                                        ? Image.network(illustrationUrl)
+                                        : Container(),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 24.0,
+                                    left: 32.0,
+                                    bottom: 4.0,
+                                    right: 32.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        mediaItem?.title ?? titleText,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1
+                                            .copyWith(
+                                                letterSpacing: 0.2,
+                                                height: 1.5,
+                                                color: Colors.white,
+                                                fontSize: 20.0,
+                                                fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 32.0, right: 32.0),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      mediaItem?.extras != null
+                                          ? SubtitleTextWidget(
+                                              mediaItem: mediaItem)
+                                          : Expanded(
+                                              child: Text(
+                                                subTitleText,
+                                                textAlign: TextAlign.center,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline1
+                                                    .copyWith(
+                                                        fontSize: 14.0,
+                                                        letterSpacing: 0.2,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: MeditoColors
+                                                            .walterWhite
+                                                            .withOpacity(0.7),
+                                                        height: 1.5),
+                                              ),
+                                            ),
+                                    ]),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    (processingState ==
+                                                AudioProcessingState
+                                                    .buffering ||
+                                            processingState ==
+                                                AudioProcessingState.connecting)
+                                        ? buildCircularIndicatorRow()
+                                        : getPlayingOrPausedButton(playing),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 24.0, right: 24.0, bottom: 32.0),
+                                child: positionIndicator(
+                                    mediaItem, state, primaryColorAsColor),
+                              ),
+                            ],
+                          )
+                        : buildLoadingScreenWidget(),
+                    SafeArea(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 4.0, top: 4.0),
+                        child: IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () => _onBackPressed(mediaItem),
+                          color: MeditoColors.walterWhite,
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 24.0, left: 32.0, bottom: 4.0, right: 32.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              mediaItem?.title ?? titleText,
-                              textAlign: mediaItem == null
-                                  ? TextAlign.left
-                                  : TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1
-                                  .copyWith(
-                                      letterSpacing: 0.2,
-                                      height: 1.5,
-                                      color: Colors.white,
-                                      fontSize: mediaItem == null ? 24.0 : 20.0,
-                                      fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 32.0, right: 32.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            mediaItem?.extras != null
-                                ? SubtitleTextWidget(mediaItem: mediaItem)
-                                : Expanded(
-                                    child: Text(
-                                      subTitleText,
-                                      textAlign: mediaItem == null
-                                          ? TextAlign.left
-                                          : TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .copyWith(
-                                              fontSize: mediaItem == null
-                                                  ? 16.0
-                                                  : 14.0,
-                                              letterSpacing: 0.2,
-                                              fontWeight: FontWeight.w500,
-                                              color: MeditoColors.walterWhite
-                                                  .withOpacity(0.7),
-                                              height: 1.5),
-                                    ),
-                                  ),
-                          ]),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          (processingState == AudioProcessingState.buffering ||
-                                  processingState ==
-                                      AudioProcessingState.connecting)
-                              ? buildCircularIndicatorRow()
-                              : mediaItem == null
-                                  ? getDonateAndShareButton()
-                                  : getPlayingOrPausedButton(playing),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 24.0, right: 24.0, bottom: 32.0),
-                      child: mediaItem == null
-                          ? Container()
-                          : positionIndicator(
-                              mediaItem, state, primaryColorAsColor),
-                    ),
                   ],
                 ),
-                SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 4.0, top: 4.0),
-                    child: IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: _onBackPressed,
-                      color: MeditoColors.walterWhite,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+              );
+            }));
+  }
+
+  Center buildLoadingScreenWidget() {
+    return Center(
+                          child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                            Container(height: 16),
+                            Text("Buffering")
+                          ],
+                        ));
   }
 
   void getArtUrl(MediaItem mediaItem) {
@@ -295,8 +305,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         mediaItem: mediaItem, state: state, color: primaryColorAsColor);
   }
 
-  void _onBackPressed() {
-    Navigator.popUntil(context, ModalRoute.withName("/nav"));
+  void _onBackPressed(MediaItem mediaItem) {
+    if (mediaItem != null) {
+      Navigator.popUntil(context, ModalRoute.withName("/nav"));
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   Widget getDonateAndShareButton() {
