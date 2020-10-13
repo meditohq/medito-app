@@ -556,14 +556,15 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: FilterChip(
-        onSelected: null,
+        pressElevation: 4,
         shape: buildChipBorder(),
-        padding: buildInnerChipPadding(),
-        label: Text("        "),
-        selected: true,
+        labelPadding: buildInnerChipPadding(),
         showCheckmark: false,
-        selectedColor: MeditoColors.moonlight,
-        labelStyle: getMusicPillTextStyle(0),
+        label: Text("          "),
+        selected: false,
+        onSelected: (bool value) {},
+        backgroundColor: MeditoColors.moonlight,
+        selectedColor: MeditoColors.lightColor,
       ),
     );
   }
@@ -639,6 +640,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
       child: Container(
           height: 100,
+          width: 100,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(16)),
             color: _primaryColor != null
