@@ -20,6 +20,7 @@ import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
+
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
 import '../utils/utils.dart';
@@ -28,8 +29,8 @@ class SessionOptionsScreen extends StatefulWidget {
   final Future data;
   final String title;
   final Function(
-      Files, Illustration, dynamic, String, String, String, String, String)
-  onBeginPressed;
+          Files, Illustration, dynamic, String, String, String, String, String)
+      onBeginPressed;
 
   SessionOptionsScreen({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
@@ -81,7 +82,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     widget.data.then((d) {
       this._illustration =
-      d?.illustration != null ? d?.illustration?.first : null;
+          d?.illustration != null ? d?.illustration?.first : null;
       this._primaryColor = d?.primaryColor;
       this._title = d?.title;
       this._secondaryColor = d?.secondaryColor;
@@ -164,10 +165,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget getBGMusicRowOrContainer() =>
-      _backgroundMusicAvailable
-          ? buildTextHeaderForRow('Background Sounds')
-          : Container();
+  Widget getBGMusicRowOrContainer() => _backgroundMusicAvailable
+      ? buildTextHeaderForRow('Background Sounds')
+      : Container();
 
   Widget getBGMusicSpacer() =>
       _backgroundMusicAvailable ? buildSpacer() : Container();
@@ -181,45 +181,50 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           builder: (context, value, widget) {
             if (value >= 1) {
               return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
-            }
-            else {
-              print("Updated value: " + (value * 100).toInt().toString());
-              return CircularProgressIndicator(value: value);
-//              return Text((value * 100).toInt().toString() + "%",
-//                  style: TextStyle(
-//                      color: parseColor(_secondaryColor), fontSize: 11));
-            }
+            } else {
+            print("Updated value: " + (value * 100).toInt().toString());
+            return SizedBox(
+                height: 12,
+                width: 12,
+                child: Stack(
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.black12
+                      ),
+                    ),
+                    CircularProgressIndicator(
+                      value: value,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        parseColor(_secondaryColor),
+                      ),
+                    ),
+                  ],
+                ));
+              }
           });
-    }
-    else if (showIndeterminateSpinner || removing) {
+    } else if (showIndeterminateSpinner || removing) {
       return SizedBox(
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
             valueColor:
-            AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
+                AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
       );
     } else {
       return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
     }
   }
 
-
   Future<void> _onBeginTap() {
     if (downloadSingleton == null || !downloadSingleton.isValid())
       downloadSingleton = new DownloadSingleton(currentFile);
     if (downloadSingleton.isDownloadingMe(currentFile) ||
-        showIndeterminateSpinner || _loadingThisPage) return null;
+        showIndeterminateSpinner ||
+        _loadingThisPage) return null;
 
-    widget.onBeginPressed(
-        currentFile,
-        _illustration,
-        _primaryColor,
-        _title,
-        _description,
-        _contentText,
-        _secondaryColor,
-        _backgroundMusicUrl);
+    widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
+        _description, _contentText, _secondaryColor, _backgroundMusicUrl);
 
     setState(() {
       showIndeterminateSpinner = true;
@@ -238,11 +243,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
       child: Text(
         widget.title,
-        style: Theme
-            .of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(
+        style: Theme.of(context).textTheme.bodyText1.copyWith(
             letterSpacing: 0.2,
             height: 1.5,
             color: Colors.white,
@@ -255,9 +256,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Widget buildDescriptionText() {
     return _contentText.isNotEmpty
         ? Padding(
-      padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
-      child: getDescriptionMarkdownBody(_contentText, context),
-    )
+            padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
+            child: getDescriptionMarkdownBody(_contentText, context),
+          )
         : Container();
   }
 
@@ -266,11 +267,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
         title,
-        style: Theme
-            .of(context)
-            .textTheme
-            .headline3
-            .copyWith(
+        style: Theme.of(context).textTheme.headline3.copyWith(
             color: MeditoColors.walterWhite.withOpacity(0.7),
             fontWeight: FontWeight.w500,
             letterSpacing: 0.3),
@@ -387,12 +384,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Future<void> onSessionPillTap(bool value, int index) async {
-    filesList.forEach((file) =>
-    {
-      if (file.length == (lengthList[index]) &&
-          file.voice == (voiceList[voiceSelected]))
-        currentFile = file
-    });
+    filesList.forEach((file) => {
+          if (file.length == (lengthList[index]) &&
+              file.voice == (voiceList[voiceSelected]))
+            currentFile = file
+        });
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
       lengthSelected = index;
@@ -401,11 +397,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   TextStyle getLengthPillTextStyle(BuildContext context, int index) {
-    return Theme
-        .of(context)
-        .textTheme
-        .headline1
-        .copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
         color: lengthSelected == index
             ? MeditoColors.darkBGColor
@@ -413,11 +405,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
-    return Theme
-        .of(context)
-        .textTheme
-        .headline1
-        .copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
         color: _offlineSelected == index
             ? MeditoColors.darkBGColor
@@ -425,11 +413,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   TextStyle getMusicPillTextStyle(int index) {
-    return Theme
-        .of(context)
-        .textTheme
-        .headline1
-        .copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
         color: _musicSelected == index
             ? MeditoColors.darkBGColor
@@ -437,11 +421,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
-    return Theme
-        .of(context)
-        .textTheme
-        .headline1
-        .copyWith(
+    return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
@@ -648,7 +628,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   void _updateAvailableOfflineIndicatorText() {
     if (_offlineSelected != 0) {
       _availableOfflineIndicatorText =
-      '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]} min)';
+          '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]} min)';
     } else {
       _availableOfflineIndicatorText = "";
     }
