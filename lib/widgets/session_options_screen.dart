@@ -28,8 +28,8 @@ class SessionOptionsScreen extends StatefulWidget {
   final Future data;
   final String title;
   final Function(
-          Files, Illustration, dynamic, String, String, String, String, String)
-      onBeginPressed;
+      Files, Illustration, dynamic, String, String, String, String, String)
+  onBeginPressed;
 
   SessionOptionsScreen({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
@@ -60,6 +60,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   var _backgroundMusicAvailable = false;
   bool _showVoiceChoice = true;
 
+  String _availableOfflineIndicatorText = "";
+
   bool _loadingThisPage = true;
   final _viewModel = new BottomSheetViewModelImpl();
 
@@ -79,7 +81,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     widget.data.then((d) {
       this._illustration =
-          d?.illustration != null ? d?.illustration?.first : null;
+      d?.illustration != null ? d?.illustration?.first : null;
       this._primaryColor = d?.primaryColor;
       this._title = d?.title;
       this._secondaryColor = d?.secondaryColor;
@@ -109,66 +111,70 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             ? parseColor(_primaryColor)
             : MeditoColors.lightColor,
       ),
-      body: new Builder(builder:(BuildContext context) {
+      body: new Builder(builder: (BuildContext context) {
         scaffoldContext = context;
         return Container(
-        child: SafeArea(
-          child: Stack(
-            children: <Widget>[
-              SingleChildScrollView(
-                child: Stack(
-                  children: [
-                    GradientWidget(
-                      height: 250.0,
-                      primaryColor: parseColor(_primaryColor),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        MeditoAppBarWidget(title: '', transparent: true),
-                        buildImage(),
-                        buildTitleText(),
-                        buildDescriptionText(),
-                        _showVoiceChoice ? buildSpacer() : Container(),
-                        _showVoiceChoice
-                            ? buildTextHeaderForRow('Voice')
-                            : Container(),
-                        buildVoiceRow(),
-                        buildSpacer(),
-                        ////////// spacer
-                        buildTextHeaderForRow('Session length'),
-                        buildSessionLengthRow(),
-                        getBGMusicSpacer(),
-                        ////////// spacer
-                        getBGMusicRowOrContainer(),
-                        buildBackgroundMusicRow(),
-                        buildSpacer(),
-                        ////////// spacer
-                        buildTextHeaderForRow('Available Offline'),
-                        buildOfflineRow(),
-                        Container(height: 80)
-                      ],
-                    ),
-                  ],
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                SingleChildScrollView(
+                  child: Stack(
+                    children: [
+                      GradientWidget(
+                        height: 250.0,
+                        primaryColor: parseColor(_primaryColor),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          MeditoAppBarWidget(title: '', transparent: true),
+                          buildImage(),
+                          buildTitleText(),
+                          buildDescriptionText(),
+                          _showVoiceChoice ? buildSpacer() : Container(),
+                          _showVoiceChoice
+                              ? buildTextHeaderForRow('Voice')
+                              : Container(),
+                          buildVoiceRow(),
+                          buildSpacer(),
+                          ////////// spacer
+                          buildTextHeaderForRow('Session length'),
+                          buildSessionLengthRow(),
+                          getBGMusicSpacer(),
+                          ////////// spacer
+                          getBGMusicRowOrContainer(),
+                          buildBackgroundMusicRow(),
+                          buildSpacer(),
+                          ////////// spacer
+                          buildTextHeaderForRow(
+                              'Available Offline $_availableOfflineIndicatorText'),
+                          buildOfflineRow(),
+                          Container(height: 80)
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );}),
+        );
+      }),
     );
   }
 
-  Widget getBGMusicRowOrContainer() => _backgroundMusicAvailable
-      ? buildTextHeaderForRow('Background Sounds')
-      : Container();
+  Widget getBGMusicRowOrContainer() =>
+      _backgroundMusicAvailable
+          ? buildTextHeaderForRow('Background Sounds')
+          : Container();
 
   Widget getBGMusicSpacer() =>
       _backgroundMusicAvailable ? buildSpacer() : Container();
 
   Widget getBeginButtonContent() {
-    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton == null || !downloadSingleton.isValid())
+      downloadSingleton = new DownloadSingleton(currentFile);
     if (downloadSingleton.isDownloadingMe(currentFile)) {
       return ValueListenableBuilder(
           valueListenable: downloadSingleton.returnNotifier(),
@@ -178,18 +184,20 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             }
             else {
               print("Updated value: " + (value * 100).toInt().toString());
-              return Text((value * 100).toInt().toString() + "%",
-                  style: TextStyle(color: parseColor(_secondaryColor), fontSize: 11));
+              return CircularProgressIndicator(value: value);
+//              return Text((value * 100).toInt().toString() + "%",
+//                  style: TextStyle(
+//                      color: parseColor(_secondaryColor), fontSize: 11));
             }
           });
     }
-    else if (showIndeterminateSpinner || removing){
+    else if (showIndeterminateSpinner || removing) {
       return SizedBox(
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
             valueColor:
-                AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
+            AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
       );
     } else {
       return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
@@ -197,12 +205,21 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
 
-Future<void> _onBeginTap() {
-    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
-    if (downloadSingleton.isDownloadingMe(currentFile) || showIndeterminateSpinner || _loadingThisPage) return null;
+  Future<void> _onBeginTap() {
+    if (downloadSingleton == null || !downloadSingleton.isValid())
+      downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton.isDownloadingMe(currentFile) ||
+        showIndeterminateSpinner || _loadingThisPage) return null;
 
-    widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
-        _description, _contentText, _secondaryColor, _backgroundMusicUrl);
+    widget.onBeginPressed(
+        currentFile,
+        _illustration,
+        _primaryColor,
+        _title,
+        _description,
+        _contentText,
+        _secondaryColor,
+        _backgroundMusicUrl);
 
     setState(() {
       showIndeterminateSpinner = true;
@@ -221,7 +238,11 @@ Future<void> _onBeginTap() {
       padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
       child: Text(
         widget.title,
-        style: Theme.of(context).textTheme.bodyText1.copyWith(
+        style: Theme
+            .of(context)
+            .textTheme
+            .bodyText1
+            .copyWith(
             letterSpacing: 0.2,
             height: 1.5,
             color: Colors.white,
@@ -234,9 +255,9 @@ Future<void> _onBeginTap() {
   Widget buildDescriptionText() {
     return _contentText.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
-            child: getDescriptionMarkdownBody(_contentText, context),
-          )
+      padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
+      child: getDescriptionMarkdownBody(_contentText, context),
+    )
         : Container();
   }
 
@@ -245,7 +266,11 @@ Future<void> _onBeginTap() {
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.headline3.copyWith(
+        style: Theme
+            .of(context)
+            .textTheme
+            .headline3
+            .copyWith(
             color: MeditoColors.walterWhite.withOpacity(0.7),
             fontWeight: FontWeight.w500,
             letterSpacing: 0.3),
@@ -344,10 +369,12 @@ Future<void> _onBeginTap() {
   Future<void> onVoicePillTap(bool value, int index) async {
     lengthSelected = 0;
     voiceSelected = index;
+
     for (final file in filesList) {
       if (file.voice == (voiceList[index])) {
         currentFile = file;
-        if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+        if (downloadSingleton == null || !downloadSingleton.isValid())
+          downloadSingleton = new DownloadSingleton(currentFile);
         break;
       }
     }
@@ -355,23 +382,30 @@ Future<void> _onBeginTap() {
     if (mounted)
       setState(() {
         filterLengthsForThisPerson(voiceList[voiceSelected]);
+        _updateAvailableOfflineIndicatorText();
       });
   }
 
   Future<void> onSessionPillTap(bool value, int index) async {
-    filesList.forEach((file) => {
-          if (file.length == (lengthList[index]) &&
-              file.voice == (voiceList[voiceSelected]))
-            currentFile = file
-        });
+    filesList.forEach((file) =>
+    {
+      if (file.length == (lengthList[index]) &&
+          file.voice == (voiceList[voiceSelected]))
+        currentFile = file
+    });
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
       lengthSelected = index;
+      _updateAvailableOfflineIndicatorText();
     });
   }
 
   TextStyle getLengthPillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
+    return Theme
+        .of(context)
+        .textTheme
+        .headline1
+        .copyWith(
         fontSize: 16.0,
         color: lengthSelected == index
             ? MeditoColors.darkBGColor
@@ -379,7 +413,11 @@ Future<void> _onBeginTap() {
   }
 
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
+    return Theme
+        .of(context)
+        .textTheme
+        .headline1
+        .copyWith(
         fontSize: 16.0,
         color: _offlineSelected == index
             ? MeditoColors.darkBGColor
@@ -387,7 +425,11 @@ Future<void> _onBeginTap() {
   }
 
   TextStyle getMusicPillTextStyle(int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
+    return Theme
+        .of(context)
+        .textTheme
+        .headline1
+        .copyWith(
         fontSize: 16.0,
         color: _musicSelected == index
             ? MeditoColors.darkBGColor
@@ -395,7 +437,11 @@ Future<void> _onBeginTap() {
   }
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
+    return Theme
+        .of(context)
+        .textTheme
+        .headline1
+        .copyWith(
         fontSize: 16.0,
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
@@ -544,6 +590,7 @@ Future<void> _onBeginTap() {
 
   void onMusicSelected(int index, String url, String name) {
     _musicSelected = index;
+
     if (index > 0) {
       showIndeterminateSpinner = true;
       downloadBGMusicFromURL(url, name).then((value) {
@@ -566,13 +613,19 @@ Future<void> _onBeginTap() {
 
   void onOfflineSelected(int index) {
     _offlineSelected = index;
-    if(downloadSingleton==null || !downloadSingleton.isValid()) downloadSingleton = new DownloadSingleton(currentFile);
+
+    _updateAvailableOfflineIndicatorText();
+
+    if (downloadSingleton == null || !downloadSingleton.isValid())
+      downloadSingleton = new DownloadSingleton(currentFile);
     if (index == 1) {
       // 'YES' selected
-      if(!downloadSingleton.isDownloadingSomething()) downloadSingleton.start(currentFile);
+      if (!downloadSingleton.isDownloadingSomething())
+        downloadSingleton.start(currentFile);
       else {
         _offlineSelected = 0;
-        createSnackBarWithColor("Another Download in Progress", scaffoldContext, Colors.black12);
+        createSnackBarWithColor(
+            "Another Download in Progress", scaffoldContext, Colors.black12);
       }
     } else {
       // 'NO' selected
@@ -590,6 +643,15 @@ Future<void> _onBeginTap() {
       });
     }
     setState(() {});
+  }
+
+  void _updateAvailableOfflineIndicatorText() {
+    if (_offlineSelected != 0) {
+      _availableOfflineIndicatorText =
+      '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]} min)';
+    } else {
+      _availableOfflineIndicatorText = "";
+    }
   }
 
   Widget buildImage() {
