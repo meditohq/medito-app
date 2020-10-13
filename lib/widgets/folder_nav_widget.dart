@@ -43,13 +43,12 @@ class FolderStateless extends StatelessWidget {
 
 class FolderNavWidget extends StatefulWidget {
   FolderNavWidget(
-      {Key key, this.firstId, this.firstTitle, this.textFuture, this.title})
+      {Key key, this.firstId, this.firstTitle, this.title})
       : super(key: key);
 
   final String title;
   final String firstId;
   final String firstTitle;
-  final Future<String> textFuture;
 
   @override
   _FolderNavWidgetState createState() => _FolderNavWidgetState();
@@ -82,11 +81,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
 
-    widget.textFuture?.then((onValue) {
-      setState(() {
-        textFileFromFuture = onValue;
-      });
-    });
   }
 
   @override
