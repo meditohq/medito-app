@@ -16,25 +16,18 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
-class MeditoAppBarWidget extends StatefulWidget {
+class MeditoAppBarWidget extends StatelessWidget {
   const MeditoAppBarWidget(
       {Key key,
       this.title,
       this.backPressed,
-      this.paddingBelow,
       this.transparent = false})
       : super(key: key);
-  final bool paddingBelow;
+
   final transparent;
   final String title;
   final ValueChanged<String> backPressed;
 
-  @override
-  _MeditoAppBarWidgetState createState() => new _MeditoAppBarWidgetState();
-}
-
-class _MeditoAppBarWidgetState extends State<MeditoAppBarWidget>
-    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,8 +36,8 @@ class _MeditoAppBarWidgetState extends State<MeditoAppBarWidget>
           centerTitle: true,
           elevation: 0,
           backgroundColor:
-              widget.transparent ? Colors.transparent : MeditoColors.moonlight,
-          title: Text(widget.title,
+              transparent ? Colors.transparent : MeditoColors.moonlight,
+          title: Text(title,
               style: Theme.of(context).textTheme.headline2.copyWith(
                   letterSpacing: 0.1,
                   fontSize: 18,
