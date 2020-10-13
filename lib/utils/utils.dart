@@ -145,7 +145,7 @@ void createSnackBar(String message, BuildContext context) {
   Scaffold.of(context).showSnackBar(snackBar);
 }
 
-void createSnackBarWithColor(String message, BuildContext context, MaterialColor color) {
+void createSnackBarWithColor(String message, BuildContext context, Color color) {
   final snackBar =
   new SnackBar(content: new Text(message), backgroundColor: color);
 
