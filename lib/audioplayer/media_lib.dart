@@ -7,6 +7,7 @@ import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+//todo why not just pass params to audioservice.start() ?
 class MediaLibrary {
   static Future<void> saveMediaLibrary(
       String description,
@@ -16,6 +17,7 @@ class MediaLibrary {
       String secondaryColor,
       String primaryColor,
       String bgMusic,
+      int durationAsMiliseconds,
       ListItem listItem,
       AttContent.Content attributions) async {
     var prefs = await SharedPreferences.getInstance();
@@ -32,6 +34,7 @@ class MediaLibrary {
     await prefs.setString("attrLicence", attributions.licenseName);
     await prefs.setString("attrLinkSource", attributions.sourceUrl);
     await prefs.setString("attrLinkLicense", attributions.licenseUrl);
+    await prefs.setInt("durationAsMiliseconds", durationAsMiliseconds);
     return;
   }
 
@@ -52,6 +55,7 @@ class MediaLibrary {
     String attrLicenseName = prefs.getString("attrLicence");
     String attrLinkSource = prefs.getString("attrLinkSource");
     String attrLinkLicense = prefs.getString("attrLinkLicense");
+    int durationAsMiliseconds = prefs.getInt("durationAsMiliseconds");
 
     Files fileTapped =
         Files.fromJson(json.decode(prefs.getString("fileTapped")));
@@ -74,6 +78,7 @@ class MediaLibrary {
         'attrName' : attrLicenseName,
         'attrLinkSource': attrLinkSource,
         'attrLinkLicense': attrLinkLicense,
+        'duration': durationAsMiliseconds,
       },
       album: description,
       title: title,

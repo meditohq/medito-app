@@ -28,9 +28,8 @@ import '../utils/utils.dart';
 class SessionOptionsScreen extends StatefulWidget {
   final Future data;
   final String title;
-  final Function(
-          Files, Illustration, dynamic, String, String, String, String, String)
-      onBeginPressed;
+  final Function(Files, Illustration, dynamic, String, String, String, String,
+      String, int) onBeginPressed;
 
   SessionOptionsScreen({Key key, this.title, this.data, this.onBeginPressed})
       : super(key: key);
@@ -182,26 +181,25 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             if (value >= 1) {
               return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
             } else {
-            print("Updated value: " + (value * 100).toInt().toString());
-            return SizedBox(
-                height: 12,
-                width: 12,
-                child: Stack(
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.black12
+              print("Updated value: " + (value * 100).toInt().toString());
+              return SizedBox(
+                  height: 12,
+                  width: 12,
+                  child: Stack(
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.black12),
                       ),
-                    ),
-                    CircularProgressIndicator(
-                      value: value,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        parseColor(_secondaryColor),
+                      CircularProgressIndicator(
+                        value: value,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          parseColor(_secondaryColor),
+                        ),
                       ),
-                    ),
-                  ],
-                ));
-              }
+                    ],
+                  ));
+            }
           });
     } else if (showIndeterminateSpinner || removing) {
       return SizedBox(
@@ -217,14 +215,24 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Future<void> _onBeginTap() {
+
     if (downloadSingleton == null || !downloadSingleton.isValid())
       downloadSingleton = new DownloadSingleton(currentFile);
+
     if (downloadSingleton.isDownloadingMe(currentFile) ||
         showIndeterminateSpinner ||
         _loadingThisPage) return null;
 
-    widget.onBeginPressed(currentFile, _illustration, _primaryColor, _title,
-        _description, _contentText, _secondaryColor, _backgroundMusicUrl);
+    widget.onBeginPressed(
+        currentFile,
+        _illustration,
+        _primaryColor,
+        _title,
+        _description,
+        _contentText,
+        _secondaryColor,
+        _backgroundMusicUrl,
+        clockTimeToDuration(lengthList[lengthSelected]).inMilliseconds);
 
     setState(() {
       showIndeterminateSpinner = true;
@@ -296,7 +304,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 shape: buildChipBorder(),
                 showCheckmark: false,
                 labelPadding: buildInnerChipPadding(),
-                label: Text(lengthList[index] + ' min'),
+                label: Text(formatSessionLength(index)),
                 selected: lengthSelected == index,
                 onSelected: (bool value) {
                   onSessionPillTap(value, index);
@@ -310,6 +318,24 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         },
       ),
     );
+  }
+
+  formatSessionLength(int index) {
+    String lengthText = lengthList[index];
+    if (lengthText.contains(":")) {
+      var duration = clockTimeToDuration(lengthText);
+      return "${duration.inMinutes} min";
+    }
+    return lengthList[index] + ' min';
+  }
+
+  Duration clockTimeToDuration(String lengthText) {
+    var tempList = lengthText.split(":");
+    var tempListInts = tempList.map(int.parse).toList();
+    return Duration(
+        hours: tempListInts[0],
+        minutes: tempListInts[1],
+        seconds: tempListInts[2]);
   }
 
   Widget buildVoiceRow() {
@@ -449,6 +475,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     });
 
     lengthList.sort((a, b) {
+      if (a.contains(":")) {
+        return clockTimeToDuration(a)
+            .inMilliseconds
+            .compareTo(clockTimeToDuration(b).inMilliseconds);
+      }
       return double.parse(a).compareTo(double.parse(b));
     });
 

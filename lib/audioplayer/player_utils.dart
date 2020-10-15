@@ -84,7 +84,6 @@ Future<dynamic> checkFileExists(Files currentFile) async {
   var name = currentFile.filename.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
   var exists = await file.exists();
-  print('$exists $file');
   return exists;
 }
 

@@ -34,6 +34,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String illustrationUrl;
   Color secondaryColor;
   Color primaryColorAsColor;
+  bool itemLoaded = false;
 
   StreamSubscription _stream;
 
@@ -92,6 +93,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   state?.processingState ?? AudioProcessingState.none;
               final playing = state?.playing ?? false;
 
+              if (!itemLoaded) {
+                itemLoaded = mediaItem != null;
+              }
               getSecondaryColor(mediaItem);
               getPrimaryColor(mediaItem);
               getArtUrl(mediaItem);
@@ -101,7 +105,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   children: [
                     GradientWidget(
                         primaryColor: primaryColorAsColor, height: 350.0),
-                    mediaItem != null
+                    (mediaItem != null && itemLoaded == true)
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,14 +226,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Center buildLoadingScreenWidget() {
     return Center(
-                          child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(),
-                            Container(height: 16),
-                            Text("Buffering")
-                          ],
-                        ));
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(),
+        Container(height: 16),
+        Text("Buffering")
+      ],
+    ));
   }
 
   void getArtUrl(MediaItem mediaItem) {

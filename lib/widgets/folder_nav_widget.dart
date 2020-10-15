@@ -250,7 +250,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       String description,
       String contentText,
       String textColor,
-      String bgMusic) async {
+      String bgMusic, int durationAsMiliseconds) async {
     await _viewModel
         .getAttributions(fileTapped.attributions)
         .then((attributionsContent) async =>
@@ -262,6 +262,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 textColor,
                 primaryColor,
                 bgMusic,
+                durationAsMiliseconds,
                 _viewModel.currentlySelectedFile,
                 attributionsContent))
         .then((value) {

@@ -473,7 +473,8 @@ class TileListState extends State<TileList> {
       String description,
       String contentText,
       String secondaryColor,
-      String bgMusic) async {
+      String bgMusic,
+      int duration) async {
     var listItem = ListItem(_viewModel.currentTile.title,
         _viewModel.currentTile.id, ListItemType.file,
         description: _viewModel.currentTile.description,
@@ -484,7 +485,7 @@ class TileListState extends State<TileList> {
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
       await MediaLibrary.saveMediaLibrary(description, title, fileTapped,
-          coverArt, secondaryColor, primaryColor, bgMusic, listItem, att);
+          coverArt, secondaryColor, primaryColor, bgMusic, duration, listItem, att);
     }).then((value) {
       start(primaryColor).then((value) => Navigator.push(
             context,
