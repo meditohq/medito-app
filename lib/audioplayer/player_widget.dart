@@ -34,7 +34,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String illustrationUrl;
   Color secondaryColor;
   Color primaryColorAsColor;
-  bool itemLoaded = false;
+  bool _complete = false;
+  double _height = 0;
 
   StreamSubscription _stream;
 
@@ -55,10 +56,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
 
-    _stream = AudioService.customEventStream
-        .asBroadcastStream()
-        .listen((params) async {
-      await updateStatsFromBg();
+    _stream = AudioService.customEventStream.listen((event) async {
+      if (event == 'stats') {
+        await updateStatsFromBg();
+      }
+
       _stream.cancel();
       return true;
     });
@@ -81,6 +83,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+
+    if(_height == 0){
+      _height = MediaQuery.of(context).size.height;
+
+    }
+
     return Scaffold(
         backgroundColor: MeditoColors.midnight,
         body: StreamBuilder<ScreenState>(
@@ -93,9 +101,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   state?.processingState ?? AudioProcessingState.none;
               final playing = state?.playing ?? false;
 
-              if (!itemLoaded) {
-                itemLoaded = mediaItem != null;
+              print(processingState);
+              if (processingState == AudioProcessingState.stopped ||
+                  processingState == AudioProcessingState.completed) {
+                _complete = true;
               }
+
               getSecondaryColor(mediaItem);
               getPrimaryColor(mediaItem);
               getArtUrl(mediaItem);
@@ -105,29 +116,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   children: [
                     GradientWidget(
                         primaryColor: primaryColorAsColor, height: 350.0),
-                    (mediaItem != null && itemLoaded == true)
+                    (mediaItem != null || _complete)
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 32.0, right: 32.0, top: 64.0),
-                                child: Container(
-                                  constraints: BoxConstraints(
-                                      maxHeight: 280, maxWidth: 1000),
-                                  decoration: BoxDecoration(
-                                      color: primaryColorAsColor,
-                                      borderRadius:
-                                          BorderRadius.circular(12.0)),
-                                  padding: EdgeInsets.all(48.0),
-                                  child: Center(
-                                    child: illustrationUrl != null
-                                        ? Image.network(illustrationUrl)
-                                        : Container(),
-                                  ),
-                                ),
-                              ),
+                              getBigImage(),
                               Padding(
                                 padding: const EdgeInsets.only(
                                     top: 24.0,
@@ -185,26 +179,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                             ),
                                     ]),
                               ),
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    (processingState ==
-                                                AudioProcessingState
-                                                    .buffering ||
-                                            processingState ==
-                                                AudioProcessingState.connecting)
-                                        ? buildCircularIndicatorRow()
-                                        : getPlayingOrPausedButton(playing),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 24.0, right: 24.0, bottom: 32.0),
-                                child: positionIndicator(
-                                    mediaItem, state, primaryColorAsColor),
-                              ),
+                              _complete
+                                  ? getDonateAndShareButton()
+                                  : buildPlayingPauseOrLoadingIndicator(
+                                      processingState, playing),
+                              _complete
+                                  ? Container()
+                                  : Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 24.0,
+                                          right: 24.0,
+                                          bottom: 32.0),
+                                      child: positionIndicator(mediaItem, state,
+                                          primaryColorAsColor),
+                                    ),
                             ],
                           )
                         : buildLoadingScreenWidget(),
@@ -222,6 +210,39 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
               );
             }));
+  }
+
+  Padding getBigImage() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 32.0, right: 32.0, top: 64.0),
+      child: Container(
+        constraints: BoxConstraints(maxHeight: _height/3, maxWidth: 1000),
+        decoration: BoxDecoration(
+            color: primaryColorAsColor,
+            borderRadius: BorderRadius.circular(12.0)),
+        padding: EdgeInsets.all(48.0),
+        child: Center(
+          child: illustrationUrl != null
+              ? Image.network(illustrationUrl)
+              : Container(),
+        ),
+      ),
+    );
+  }
+
+  Expanded buildPlayingPauseOrLoadingIndicator(
+      AudioProcessingState processingState, bool playing) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          (processingState == AudioProcessingState.buffering ||
+                  processingState == AudioProcessingState.connecting)
+              ? buildCircularIndicatorRow()
+              : getPlayingOrPausedButton(playing),
+        ],
+      ),
+    );
   }
 
   Center buildLoadingScreenWidget() {

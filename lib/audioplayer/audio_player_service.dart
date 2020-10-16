@@ -88,7 +88,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _player.processingStateStream.listen((state) {
       switch (state) {
         case ProcessingState.completed:
-          // In this example, the service stops when reaching the end.
           onStop();
           break;
         case ProcessingState.ready:
@@ -243,7 +242,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       await writeJSONToCache(encoded(dataMap), "stats");
 
-      AudioServiceBackground.sendCustomEvent('');
+      AudioServiceBackground.sendCustomEvent('stats');
     }
   }
 }
