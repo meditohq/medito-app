@@ -79,17 +79,29 @@ class Tracking {
       //only track in release mode, not debug
 
       Map<String, String> defaultMap = {
-        "event_info": param1,
-        "action": param2,
+        "event_info": param1.clean(),
+        "action": param2.clean(),
       };
       if (map != null) defaultMap.addAll(map);
 
       _firebaseAnalytics.logEvent(
-        name: eventName,
+        name: eventName.clean(),
         parameters: defaultMap,
       );
 
       print("Event logged: $eventName");
     }
+  }
+}
+
+extension on String {
+  clean() {
+    var str = this.replaceAll('/', '_').replaceAll('-', '_');
+
+    if (!str.startsWith(new RegExp(r'[A-Za-z]'))) {
+      str.replaceRange(0, 1, "");
+    }
+
+    return str;
   }
 }
