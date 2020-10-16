@@ -324,7 +324,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     String lengthText = lengthList[index];
     if (lengthText.contains(":")) {
       var duration = clockTimeToDuration(lengthText);
-      return "${duration.inMinutes} min";
+      String time = "";
+      if(duration.inMinutes < 1){
+        time = "<1";
+      } else {
+       time = duration.inMinutes.toString();
+      }
+      return "$time min";
     }
     return lengthList[index] + ' min';
   }
