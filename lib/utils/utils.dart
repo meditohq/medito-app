@@ -211,3 +211,12 @@ launchUrl(String url) async {
     await launch(url);
   }
 }
+
+Duration clockTimeToDuration(String lengthText) {
+  var tempList = lengthText.split(":");
+  var tempListInts = tempList.map(int.parse).toList();
+  return Duration(
+      hours: tempListInts[0],
+      minutes: tempListInts[1],
+      seconds: tempListInts[2]);
+}

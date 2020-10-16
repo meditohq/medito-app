@@ -329,15 +329,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     return lengthList[index] + ' min';
   }
 
-  Duration clockTimeToDuration(String lengthText) {
-    var tempList = lengthText.split(":");
-    var tempListInts = tempList.map(int.parse).toList();
-    return Duration(
-        hours: tempListInts[0],
-        minutes: tempListInts[1],
-        seconds: tempListInts[2]);
-  }
-
   Widget buildVoiceRow() {
     if (!_showVoiceChoice) {
       return Container();
@@ -659,8 +650,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void _updateAvailableOfflineIndicatorText() {
     if (_offlineSelected != 0) {
+      var time = clockTimeToDuration(lengthList[lengthSelected]).inMinutes;
       _availableOfflineIndicatorText =
-          '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]} min)';
+          '(${voiceList[voiceSelected]} - $time min)';
     } else {
       _availableOfflineIndicatorText = "";
     }
