@@ -26,7 +26,6 @@ const TEXT = 'text';
 
 Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
-  print('directory $directory');
   return directory.path;
 }
 
