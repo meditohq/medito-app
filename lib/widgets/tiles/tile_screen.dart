@@ -336,10 +336,10 @@ class TileListState extends State<TileList> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: parseColor(item.colorBackground),
+          color: MeditoColors.moonlight,
         ),
         child: wrapWithInkWell(
-            parseColor(item.colorBackground),
+            MeditoColors.moonlight,
             item,
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -354,7 +354,7 @@ class TileListState extends State<TileList> {
                       style: Theme.of(context)
                           .textTheme
                           .caption
-                          .copyWith(color: parseColor(item.colorText)),
+                          .copyWith(color: MeditoColors.walterWhite),
                     ),
                   ),
                 ],
