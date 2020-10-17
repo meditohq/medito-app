@@ -31,6 +31,18 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+
+project.ext {
+    APP_ID = configured ? keystoreProperties['appId'] : "meditofoundation.medito.DEFAULT_DO_NOT_USE"
+    KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : null
+    KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
+    KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
+    KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
+    VERSION_CODE = configured ? keystoreProperties['versionCode'].toInteger() : 1
+    VERSION_NAME = configured ? keystoreProperties['versionName'] : "0.0.1"
+}
+
+
 android {
     compileSdkVersion 29
 

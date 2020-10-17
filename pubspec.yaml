@@ -35,6 +35,7 @@ dependencies:
   firebase_analytics: ^6.0.2
   provider: ^4.3.2+2
   package_info: ^0.4.3
+  in_app_purchase: ^0.3.4+15
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
