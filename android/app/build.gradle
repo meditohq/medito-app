@@ -26,27 +26,10 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('keystore.properties')
-def configured = true
+def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
-    try {
-        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-    } catch (IOException e) {
-        configured = false
-        logger.error('Release signing information not found. Message:' + e.message)
-    }
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
-
-project.ext {
-    APP_ID = configured ? keystoreProperties['appId'] : "meditofoundation.medito"
-    KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : keystorePropertiesFile
-    KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
-    KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
-    KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
-    VERSION_CODE = configured ? keystoreProperties['versionCode'].toInteger() : 1
-    VERSION_NAME = configured ? keystoreProperties['versionName'] : "0.0.1"
-}
-
 
 android {
     compileSdkVersion 29
