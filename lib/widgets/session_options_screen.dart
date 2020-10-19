@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:io';
+
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
@@ -271,16 +273,22 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildTextHeaderForRow(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.headline3.copyWith(
-            color: MeditoColors.walterWhite.withOpacity(0.7),
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.3),
-      ),
-    );
+    if(!Platform.isIOS) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16),
+        child: Text(
+          title,
+          style: Theme
+              .of(context)
+              .textTheme
+              .headline3
+              .copyWith(
+              color: MeditoColors.walterWhite.withOpacity(0.7),
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.3),
+        ),
+      );
+    } else return Container();
   }
 
   Widget buildSessionLengthRow() {
