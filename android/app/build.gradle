@@ -26,15 +26,20 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def configured = true
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    try {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    } catch (IOException e) {
+        configured = false
+        logger.error('Release signing information not found. Message:' + e.message)
+    }
 }
 
-
 project.ext {
-    APP_ID = configured ? keystoreProperties['appId'] : "meditofoundation.medito.DEFAULT_DO_NOT_USE"
-    KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : null
+    APP_ID = configured ? keystoreProperties['appId'] : "meditofoundation.medito"
+    KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : keystorePropertiesFile
     KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
     KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
     KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
@@ -87,7 +92,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
-    
+
     //Firebase Analytics Dependency
     implementation 'com.google.firebase:firebase-analytics:17.6.0'
 }
