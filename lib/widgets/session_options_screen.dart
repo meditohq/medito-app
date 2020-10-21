@@ -145,13 +145,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           buildSessionLengthRow(),
                           getBGMusicSpacer(),
                           ////////// spacer
-                          getBGMusicRowOrContainer(),
-                          buildBackgroundMusicRow(),
-                          buildSpacer(),
+                          !Platform.isIOS
+                              ? getBGMusicRowOrContainer()
+                              : Container(),
+                          !Platform.isIOS
+                              ? buildBackgroundMusicRow()
+                              : Container(),
+                          !Platform.isIOS ? buildSpacer() : Container(),
                           ////////// spacer
-                          buildTextHeaderForRow(
-                              'Available Offline $_availableOfflineIndicatorText'),
-                          buildOfflineRow(),
+                          !Platform.isIOS
+                              ? buildTextHeaderForRow(
+                                  'Available Offline $_availableOfflineIndicatorText')
+                              : Container(),
+                          !Platform.isIOS ? buildOfflineRow() : Container(),
                           Container(height: 80)
                         ],
                       ),
@@ -217,7 +223,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Future<void> _onBeginTap() {
-
     if (downloadSingleton == null || !downloadSingleton.isValid())
       downloadSingleton = new DownloadSingleton(currentFile);
 
@@ -273,22 +278,16 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildTextHeaderForRow(String title) {
-    if(!Platform.isIOS) {
-      return Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16),
-        child: Text(
-          title,
-          style: Theme
-              .of(context)
-              .textTheme
-              .headline3
-              .copyWith(
-              color: MeditoColors.walterWhite.withOpacity(0.7),
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.3),
-        ),
-      );
-    } else return Container();
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.headline3.copyWith(
+            color: MeditoColors.walterWhite.withOpacity(0.7),
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.3),
+      ),
+    );
   }
 
   Widget buildSessionLengthRow() {
@@ -333,10 +332,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (lengthText.contains(":")) {
       var duration = clockTimeToDuration(lengthText);
       String time = "";
-      if(duration.inMinutes < 1){
+      if (duration.inMinutes < 1) {
         time = "<1";
       } else {
-       time = duration.inMinutes.toString();
+        time = duration.inMinutes.toString();
       }
       return "$time min";
     }
