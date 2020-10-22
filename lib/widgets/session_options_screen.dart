@@ -196,6 +196,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   child: Stack(
                     children: [
                       CircularProgressIndicator(
+                        value: 1,
                         valueColor:
                             AlwaysStoppedAnimation<Color>(Colors.black12),
                       ),
