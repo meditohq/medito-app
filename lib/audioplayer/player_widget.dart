@@ -37,6 +37,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool _complete = false;
   double _height = 0;
 
+  String __loaded;
+
+  bool get loaded => __loaded == "true";
+
+  void setLoaded(bool b) {
+    if (__loaded == null && b == true) __loaded = "true";
+  }
+
   StreamSubscription _stream;
 
   @override
@@ -99,12 +107,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   state?.processingState ?? AudioProcessingState.none;
               final playing = state?.playing ?? false;
 
-              print(processingState);
               if (processingState == AudioProcessingState.stopped ||
-                  processingState == AudioProcessingState.completed) {
+                  processingState == AudioProcessingState.completed ||
+                  (loaded && mediaItem == null)) {
                 _complete = true;
               }
 
+              setLoaded(mediaItem != null);
               getSecondaryColor(mediaItem);
               getPrimaryColor(mediaItem);
               getArtUrl(mediaItem);

@@ -117,8 +117,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
     var timeLeft = durSecs - positionSecs;
     await _bgPlayer.setVolume(initialBgVolume -
         ((fadeDuration - timeLeft) * (initialBgVolume / fadeDuration)));
-    print(initialBgVolume -
-        ((fadeDuration - timeLeft) * (initialBgVolume / fadeDuration)));
   }
 
   @override
