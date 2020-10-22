@@ -77,3 +77,4 @@
 gen/
 /pubspec.lock
 /android/key.properties
+/android/keystore.properties

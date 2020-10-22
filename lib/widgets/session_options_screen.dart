@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:io';
+
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
@@ -143,13 +145,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           buildSessionLengthRow(),
                           getBGMusicSpacer(),
                           ////////// spacer
-                          getBGMusicRowOrContainer(),
-                          buildBackgroundMusicRow(),
-                          buildSpacer(),
+                          !Platform.isIOS
+                              ? getBGMusicRowOrContainer()
+                              : Container(),
+                          !Platform.isIOS
+                              ? buildBackgroundMusicRow()
+                              : Container(),
+                          !Platform.isIOS ? buildSpacer() : Container(),
                           ////////// spacer
-                          buildTextHeaderForRow(
-                              'Available Offline $_availableOfflineIndicatorText'),
-                          buildOfflineRow(),
+                          !Platform.isIOS
+                              ? buildTextHeaderForRow(
+                                  'Available Offline $_availableOfflineIndicatorText')
+                              : Container(),
+                          !Platform.isIOS ? buildOfflineRow() : Container(),
                           Container(height: 80)
                         ],
                       ),
@@ -215,7 +223,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Future<void> _onBeginTap() {
-
     if (downloadSingleton == null || !downloadSingleton.isValid())
       downloadSingleton = new DownloadSingleton(currentFile);
 
@@ -325,10 +332,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (lengthText.contains(":")) {
       var duration = clockTimeToDuration(lengthText);
       String time = "";
-      if(duration.inMinutes < 1){
+      if (duration.inMinutes < 1) {
         time = "<1";
       } else {
-       time = duration.inMinutes.toString();
+        time = duration.inMinutes.toString();
       }
       return "$time min";
     }

@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.50+378
+version: 1.0.51+381
 environment:
   sdk: ">=2.6.0 <3.0.0"
 
@@ -33,8 +33,10 @@ dependencies:
   share: ^0.6.5+2
   firebase_core: ^0.5.0+1
   firebase_analytics: ^6.0.2
+  firebase_messaging: ^7.0.3
   provider: ^4.3.2+2
   package_info: ^0.4.3
+  in_app_purchase: ^0.3.4+15
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

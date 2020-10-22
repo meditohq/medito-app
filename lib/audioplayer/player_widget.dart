@@ -83,10 +83,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(_height == 0){
+    if (_height == 0) {
       _height = MediaQuery.of(context).size.height;
-
     }
 
     return Scaffold(
@@ -216,7 +214,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 32.0, right: 32.0, top: 64.0),
       child: Container(
-        constraints: BoxConstraints(maxHeight: _height/3, maxWidth: 1000),
+        constraints: BoxConstraints(maxHeight: _height / 3, maxWidth: 1000),
         decoration: BoxDecoration(
             color: primaryColorAsColor,
             borderRadius: BorderRadius.circular(12.0)),
