@@ -114,7 +114,7 @@ class _StreakWidgetState extends State<StreakWidget> {
       builder: (BuildContext context) {
         return Theme(
           data: new ThemeData(
-              primaryColor: MeditoColors.lightColorLine,
+              primaryColor: MeditoColors.walterWhite,
            ),
           child: AlertDialog(
             shape: _roundedRectangleBorder(),
@@ -147,7 +147,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         child: Text(
                           'CANCEL',
                           style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.lightColor,
+                              color: MeditoColors.walterWhite,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -164,7 +164,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                         child: Text(
                           'SAVE',
                           style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.darkBGColor,
+                              color: MeditoColors.darkMoon,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -207,12 +207,12 @@ class _StreakWidgetState extends State<StreakWidget> {
       builder: (BuildContext context) {
         return Theme(
           data: new ThemeData(
-              primaryColor: MeditoColors.lightColorLine,
+              primaryColor: MeditoColors.walterWhite,
               accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
             shape: _roundedRectangleBorder(),
-            backgroundColor: MeditoColors.darkBGColor,
+            backgroundColor: MeditoColors.moonlight,
             title: Text("Reset longest streak to your current streak?",
                 style: Theme.of(context).textTheme.headline5),
             actions: <Widget>[
@@ -226,11 +226,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                       child: FlatButton(
                         onPressed: _onCancelTap,
                         shape: _roundedRectangleBorder(),
-                        color: MeditoColors.darkColor,
+                        color: MeditoColors.moonlight,
                         child: Text(
                           'CANCEL',
                           style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.lightColor,
+                              color: MeditoColors.walterWhite,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -243,11 +243,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                       child: FlatButton(
                         onPressed: _onResetTap,
                         shape: _roundedRectangleBorder(),
-                        color: MeditoColors.lightColor,
+                        color: MeditoColors.walterWhite,
                         child: Text(
                           'RESET',
                           style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.darkBGColor,
+                              color: MeditoColors.moonlight,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
