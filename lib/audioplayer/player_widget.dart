@@ -317,19 +317,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  Widget playButton() => PlayerButton(
-        icon: Icons.play_arrow,
-        onPressed: AudioService.play,
-        secondaryColor: secondaryColor,
-        primaryColor: primaryColorAsColor,
-      );
+  Widget playButton() => Semantics(
+    label: "Play button",
+    child: PlayerButton(
+          icon: Icons.play_arrow,
+          onPressed: AudioService.play,
+          secondaryColor: secondaryColor,
+          primaryColor: primaryColorAsColor,
+        ),
+  );
 
-  Widget pauseButton() => PlayerButton(
-        icon: Icons.pause,
-        secondaryColor: secondaryColor,
-        onPressed: AudioService.pause,
-        primaryColor: primaryColorAsColor,
-      );
+  Widget pauseButton() => Semantics(
+    label: "Pause button",
+    child: PlayerButton(
+          icon: Icons.pause,
+          secondaryColor: secondaryColor,
+          onPressed: AudioService.pause,
+          primaryColor: primaryColorAsColor,
+        ),
+  );
 
   Widget positionIndicator(
       MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
