@@ -18,6 +18,7 @@ import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
@@ -32,6 +33,9 @@ import 'list_item_file_widget.dart';
 import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
 
+// Enum to save the state of appbar.
+enum appbar_type { normal, selected }
+
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
 
@@ -42,8 +46,7 @@ class FolderStateless extends StatelessWidget {
 }
 
 class FolderNavWidget extends StatefulWidget {
-  FolderNavWidget(
-      {Key key, this.firstId, this.firstTitle, this.title})
+  FolderNavWidget({Key key, this.firstId, this.firstTitle, this.title})
       : super(key: key);
 
   final String title;
@@ -63,6 +66,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   BuildContext scaffoldContext;
 
+  var appBarType = appbar_type.normal;
+  ListItem selectedItem;
+
   @override
   void dispose() {
     super.dispose();
@@ -80,7 +86,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
-
   }
 
   @override
@@ -95,6 +100,44 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
           scaffoldContext = context;
           return buildSafeAreaBody();
         },
+      ),
+    );
+  }
+
+  //The AppBar Widget when an audio file is long pressed.
+  Widget buildSelectedAppBar() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: AppBar(
+        title: Text(''),
+        leading: IconButton(
+            icon: Icon(
+              Icons.close,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              // print("Close pressed");
+              setState(() {
+                appBarType = appbar_type.normal;
+                selectedItem = null;
+              });
+            }),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                // print("Open pressed");
+                await markAsListened(selectedItem.id);
+                setState(() {
+                  appBarType = appbar_type.normal;
+                  selectedItem = null;
+                });
+              }),
+        ],
+        backgroundColor: MeditoColors.moonlight,
       ),
     );
   }
@@ -153,10 +196,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int i) {
                   if (i == 0) {
-                    return MeditoAppBarWidget(
-                      title: widget.firstTitle ?? widget.title,
-                      backPressed: _backPressed,
-                    );
+                    return appBarType == appbar_type.normal
+                        ? MeditoAppBarWidget(
+                            title: widget.firstTitle ?? widget.title,
+                            backPressed: _backPressed,
+                          )
+                        : buildSelectedAppBar();
                   }
                   return Column(
                     children: <Widget>[
@@ -171,8 +216,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   Future<void> _onPullToRefresh() async {
     setState(() {
-      listFuture = _viewModel.getPageChildren(
-          id: widget.firstId, skipCache: true);
+      listFuture =
+          _viewModel.getPageChildren(id: widget.firstId, skipCache: true);
     });
   }
 
@@ -250,7 +295,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       String description,
       String contentText,
       String textColor,
-      String bgMusic, int durationAsMiliseconds) async {
+      String bgMusic,
+      int durationAsMiliseconds) async {
     await _viewModel
         .getAttributions(fileTapped.attributions)
         .then((attributionsContent) async =>
@@ -278,6 +324,14 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     });
   }
 
+  void onLongPressFile(item) {
+    // print("Longpressed");
+    setState(() {
+      appBarType = appbar_type.selected;
+      selectedItem = item;
+    });
+  }
+
   Widget getFileListItem(ListItem item) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -295,9 +349,29 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
           child: getFileListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
-          onTap: () => fileTap(item),
-          splashColor: MeditoColors.moonlight,
-          child: getFileListItem(item));
+        onTap: () {
+          if (selectedItem != null) {
+            setState(() {
+              appBarType = appbar_type.normal;
+              selectedItem = null;
+            });
+          } else {
+            fileTap(item);
+          }
+        },
+        onLongPress: () {
+          if (item.fileType != FileType.text) {
+            onLongPressFile(item);
+          }
+        },
+        splashColor: MeditoColors.moonlight,
+        child: Ink(
+          color: (selectedItem == null || selectedItem.id != item.id)
+              ? MeditoColors.lightBlack
+              : MeditoColors.lightColorLine,
+          child: getFileListItem(item),
+        ),
+      );
     } else {
       return SizedBox(
           width: 300, child: new ImageListItemWidget(src: item.url));
