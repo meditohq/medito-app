@@ -106,12 +106,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
 
     return Scaffold(
-      floatingActionButton: PlayerButton(
-        onPressed: _onBeginTap,
-        child: SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
-        primaryColor: _primaryColor != null
-            ? parseColor(_primaryColor)
-            : MeditoColors.lightColor,
+      floatingActionButton: Semantics(label: "Play button",
+        child: PlayerButton(
+          onPressed: _onBeginTap,
+          child: SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
+          primaryColor: _primaryColor != null
+              ? parseColor(_primaryColor)
+              : MeditoColors.lightColor,
+        ),
       ),
       body: new Builder(builder: (BuildContext context) {
         scaffoldContext = context;
@@ -196,6 +198,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   child: Stack(
                     children: [
                       CircularProgressIndicator(
+                        value: 1,
                         valueColor:
                             AlwaysStoppedAnimation<Color>(Colors.black12),
                       ),

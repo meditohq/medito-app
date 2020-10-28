@@ -53,6 +53,9 @@ class TileListState extends State<TileList> {
   var listFuture;
   var streak = getCurrentStreak();
 
+  // TextTheme titleTextTheme;
+  // TextTheme horizontalAnnouncementTextTheme;
+
   SharedPreferences prefs;
   String streakValue = '0';
 
@@ -88,7 +91,7 @@ class TileListState extends State<TileList> {
           if ((future.connectionState == ConnectionState.none &&
                   future.hasData == null) ||
               future.hasError) {
-            print("in the if block");
+            print("in the if block\n\n");
             return getErrorWidget();
           }
 
