@@ -51,24 +51,10 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
+# There's no need to specify all the files separately, just mentioning the root works too!
 flutter:
   assets:
-    - assets/images/ic_document.svg
-    - assets/images/ic_folder.svg
-    - assets/images/icon_ic_logo.svg
-    - assets/images/ic_gift.svg
-    - assets/images/ic_bulb.svg
-    - assets/images/ic_corona.svg
-    - assets/images/ic_email.svg
-    - assets/images/ic_happyface.svg
-    - assets/images/ic_help.svg
-    - assets/images/ic_instagram.svg
-    - assets/images/ic_people.svg
-    - assets/images/ic_psychology.svg
-    - assets/images/ic_review.svg
-    - assets/images/ic_support.svg
-    - assets/images/ic_twitter.svg
-    - assets/images/blurb.svg
+    - assets/images/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

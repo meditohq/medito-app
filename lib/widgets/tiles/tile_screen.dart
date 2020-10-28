@@ -85,9 +85,10 @@ class TileListState extends State<TileList> {
       onRefresh: _onPullToRefresh,
       child: FutureBuilder(
         builder: (context, future) {
-          if (future.connectionState == ConnectionState.none &&
-                  future.hasData == null ||
+          if ((future.connectionState == ConnectionState.none &&
+                  future.hasData == null) ||
               future.hasError) {
+            print("in the if block");
             return getErrorWidget();
           }
 
@@ -100,7 +101,7 @@ class TileListState extends State<TileList> {
             child: Column(
               children: <Widget>[
                 _getMeditoLogo(),
-//fixme 
+//fixme
 //                FutureBuilder<WelcomeContent>(
 //                    future: _viewModel.getAnnouncement(skipCache: true),
 //                    builder: (context, snapshot) {
@@ -431,7 +432,8 @@ class TileListState extends State<TileList> {
         Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
 
     if (tile.pathTemplate == 'session-single') {
-      _openSessionOptionsScreen(tile, _viewModel.getAudioData(id: tile.contentPath));
+      _openSessionOptionsScreen(
+          tile, _viewModel.getAudioData(id: tile.contentPath));
     } else if (tile.pathTemplate == 'default') {
       openNavWidget(tile);
     } else if (tile.pathTemplate == 'text') {
@@ -484,8 +486,17 @@ class TileListState extends State<TileList> {
         thumbnail: _viewModel.currentTile.thumbnail);
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
-      await MediaLibrary.saveMediaLibrary(description, title, fileTapped,
-          coverArt, secondaryColor, primaryColor, bgMusic, duration, listItem, att);
+      await MediaLibrary.saveMediaLibrary(
+          description,
+          title,
+          fileTapped,
+          coverArt,
+          secondaryColor,
+          primaryColor,
+          bgMusic,
+          duration,
+          listItem,
+          att);
     }).then((value) {
       start(primaryColor).then((value) => Navigator.push(
             context,
@@ -664,14 +675,13 @@ class _AnnouncementBannerState extends State<AnnouncementBanner> {
                       style: TextStyle(
                           color: MeditoColors.walterWhite, letterSpacing: 0.2)),
                   onPressed: () {
-                    
-                    switch(widget.data.buttonDestinationType.toLowerCase()){
+                    switch (widget.data.buttonDestinationType.toLowerCase()) {
                       case "folder":
                       case "text":
                       case "session-single":
-                      case "url": launchUrl(widget.data.buttonDestinationLink);
+                      case "url":
+                        launchUrl(widget.data.buttonDestinationLink);
                     }
-                    
                   },
                 ),
               ],

@@ -18,15 +18,11 @@ import 'package:flutter/material.dart';
 
 class MeditoAppBarWidget extends StatelessWidget {
   const MeditoAppBarWidget(
-      {Key key,
-      this.title,
-      this.backPressed,
-      this.transparent = false})
+      {Key key, this.title, this.transparent = false})
       : super(key: key);
 
   final transparent;
   final String title;
-  final ValueChanged<String> backPressed;
 
   @override
   Widget build(BuildContext context) {

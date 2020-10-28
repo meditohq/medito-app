@@ -42,8 +42,7 @@ class FolderStateless extends StatelessWidget {
 }
 
 class FolderNavWidget extends StatefulWidget {
-  FolderNavWidget(
-      {Key key, this.firstId, this.firstTitle, this.title})
+  FolderNavWidget({Key key, this.firstId, this.firstTitle, this.title})
       : super(key: key);
 
   final String title;
@@ -80,7 +79,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
-
   }
 
   @override
@@ -155,7 +153,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                   if (i == 0) {
                     return MeditoAppBarWidget(
                       title: widget.firstTitle ?? widget.title,
-                      backPressed: _backPressed,
                     );
                   }
                   return Column(
@@ -171,8 +168,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   Future<void> _onPullToRefresh() async {
     setState(() {
-      listFuture = _viewModel.getPageChildren(
-          id: widget.firstId, skipCache: true);
+      listFuture =
+          _viewModel.getPageChildren(id: widget.firstId, skipCache: true);
     });
   }
 
@@ -250,7 +247,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       String description,
       String contentText,
       String textColor,
-      String bgMusic, int durationAsMiliseconds) async {
+      String bgMusic,
+      int durationAsMiliseconds) async {
     await _viewModel
         .getAttributions(fileTapped.attributions)
         .then((attributionsContent) async =>
@@ -304,9 +302,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     }
   }
 
-  void _backPressed(String id) {
-    Navigator.pop(context);
-  }
+  // void _backPressed(String id) {
+  //   Navigator.pop(context);
+  // }
 
   void _openTextFile(ListItem item) {
     Navigator.push(
