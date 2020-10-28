@@ -28,10 +28,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app_bar_widget.dart';
-import 'session_options_screen.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
+import 'session_options_screen.dart';
 
 // Enum to save the state of appbar.
 enum appbar_type { normal, selected }
@@ -68,6 +68,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   var appBarType = appbar_type.normal;
   ListItem selectedItem;
+
+  Future<bool> listened;
 
   @override
   void dispose() {
@@ -106,40 +108,56 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   //The AppBar Widget when an audio file is long pressed.
   Widget buildSelectedAppBar() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: AppBar(
-        title: Text(''),
-        leading: IconButton(
-            icon: Icon(
-              Icons.close,
-              color: Colors.white,
+    return FutureBuilder<bool>(
+        future: listened,
+        builder: (context, snapshot) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: AppBar(
+              title: Text(''),
+              leading: snapshot != null
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // print("Close pressed");
+                        setState(() {
+                          appBarType = appbar_type.normal;
+                          selectedItem = null;
+                        });
+                      })
+                  : Container(),
+              actions: <Widget>[
+                snapshot != null && snapshot.connectionState != ConnectionState.waiting
+                    ? IconButton(
+                        tooltip: snapshot?.data != null && snapshot.data
+                            ? "Mark session as unlistened"
+                            : "Mark session as listened",
+                        icon: Icon(
+                          snapshot?.data != null && snapshot.data
+                              ? Icons.undo
+                              : Icons.check_circle,
+                          color: MeditoColors.walterWhite,
+                        ),
+                        onPressed: () async {
+                          if (!snapshot?.data) {
+                            await markAsListened(selectedItem.id);
+                          } else {
+                            await markAsNotListened(selectedItem.id);
+                          }
+                          setState(() {
+                            appBarType = appbar_type.normal;
+                            selectedItem = null;
+                          });
+                        })
+                    : Container(),
+              ],
+              backgroundColor: MeditoColors.moonlight,
             ),
-            onPressed: () {
-              // print("Close pressed");
-              setState(() {
-                appBarType = appbar_type.normal;
-                selectedItem = null;
-              });
-            }),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(
-                Icons.check,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                // print("Open pressed");
-                await markAsListened(selectedItem.id);
-                setState(() {
-                  appBarType = appbar_type.normal;
-                  selectedItem = null;
-                });
-              }),
-        ],
-        backgroundColor: MeditoColors.moonlight,
-      ),
-    );
+          );
+        });
   }
 
   Widget buildSafeAreaBody() {
@@ -329,6 +347,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     setState(() {
       appBarType = appbar_type.selected;
       selectedItem = item;
+      listened = checkListened(selectedItem.id);
     });
   }
 
@@ -367,7 +386,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         splashColor: MeditoColors.moonlight,
         child: Ink(
           color: (selectedItem == null || selectedItem.id != item.id)
-              ? MeditoColors.lightBlack
+              ? MeditoColors.darkMoon
               : MeditoColors.lightColorLine,
           child: getFileListItem(item),
         ),
