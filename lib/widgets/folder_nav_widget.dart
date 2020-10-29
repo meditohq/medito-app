@@ -18,6 +18,7 @@ import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
@@ -27,10 +28,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app_bar_widget.dart';
-import 'session_options_screen.dart';
 import 'list_item_file_widget.dart';
 import 'list_item_image_widget.dart';
 import 'loading_list_widget.dart';
+import 'session_options_screen.dart';
+
+// Enum to save the state of appbar.
+enum appbar_type { normal, selected }
 
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
@@ -61,6 +65,11 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   String textFileFromFuture = "";
 
   BuildContext scaffoldContext;
+
+  var appBarType = appbar_type.normal;
+  ListItem selectedItem;
+
+  Future<bool> listened;
 
   @override
   void dispose() {
@@ -95,6 +104,61 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         },
       ),
     );
+  }
+
+  //The AppBar Widget when an audio file is long pressed.
+  Widget buildSelectedAppBar() {
+    return FutureBuilder<bool>(
+        future: listened,
+        builder: (context, snapshot) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: AppBar(
+              title: Text(''),
+              leading: snapshot != null
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // print("Close pressed");
+                        setState(() {
+                          appBarType = appbar_type.normal;
+                          selectedItem = null;
+                        });
+                      })
+                  : Container(),
+              actions: <Widget>[
+                snapshot != null &&
+                        snapshot.connectionState != ConnectionState.waiting
+                    ? IconButton(
+                        tooltip: snapshot?.data != null && snapshot.data
+                            ? "Mark session as unlistened"
+                            : "Mark session as listened",
+                        icon: Icon(
+                          snapshot?.data != null && snapshot.data
+                              ? Icons.undo
+                              : Icons.check_circle,
+                          color: MeditoColors.walterWhite,
+                        ),
+                        onPressed: () async {
+                          if (!snapshot?.data) {
+                            await markAsListened(selectedItem.id);
+                          } else {
+                            await markAsNotListened(selectedItem.id);
+                          }
+                          setState(() {
+                            appBarType = appbar_type.normal;
+                            selectedItem = null;
+                          });
+                        })
+                    : Container(),
+              ],
+              backgroundColor: MeditoColors.moonlight,
+            ),
+          );
+        });
   }
 
   Widget buildSafeAreaBody() {
@@ -151,9 +215,11 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int i) {
                   if (i == 0) {
-                    return MeditoAppBarWidget(
-                      title: widget.firstTitle ?? widget.title,
-                    );
+                    return appBarType == appbar_type.normal
+                        ? MeditoAppBarWidget(
+                            title: widget.firstTitle ?? widget.title,
+                          )
+                        : buildSelectedAppBar();
                   }
                   return Column(
                     children: <Widget>[
@@ -276,6 +342,15 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     });
   }
 
+  void onLongPressFile(item) {
+    // print("Longpressed");
+    setState(() {
+      appBarType = appbar_type.selected;
+      selectedItem = item;
+      listened = checkListened(selectedItem.id);
+    });
+  }
+
   Widget getFileListItem(ListItem item) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -293,9 +368,29 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
           child: getFileListItem(item));
     } else if (item.type == ListItemType.file) {
       return InkWell(
-          onTap: () => fileTap(item),
-          splashColor: MeditoColors.moonlight,
-          child: getFileListItem(item));
+        onTap: () {
+          if (selectedItem != null) {
+            setState(() {
+              appBarType = appbar_type.normal;
+              selectedItem = null;
+            });
+          } else {
+            fileTap(item);
+          }
+        },
+        onLongPress: () {
+          if (item.fileType != FileType.text) {
+            onLongPressFile(item);
+          }
+        },
+        splashColor: MeditoColors.moonlight,
+        child: Ink(
+          color: (selectedItem == null || selectedItem.id != item.id)
+              ? MeditoColors.darkMoon
+              : MeditoColors.lightColorLine,
+          child: getFileListItem(item),
+        ),
+      );
     } else {
       return SizedBox(
           width: 300, child: new ImageListItemWidget(src: item.url));
