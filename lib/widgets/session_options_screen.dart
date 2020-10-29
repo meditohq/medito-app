@@ -106,10 +106,12 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
 
     return Scaffold(
-      floatingActionButton: Semantics(label: "Play button",
+      floatingActionButton: Semantics(
+        label: "Play button",
         child: PlayerButton(
           onPressed: _onBeginTap,
-          child: SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
+          child:
+              SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
           primaryColor: _primaryColor != null
               ? parseColor(_primaryColor)
               : MeditoColors.lightColor,
@@ -261,12 +263,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
       child: Text(
         widget.title,
-        style: Theme.of(context).textTheme.bodyText1.copyWith(
-            letterSpacing: 0.2,
-            height: 1.5,
-            color: Colors.white,
-            fontSize: 24.0,
-            fontWeight: FontWeight.w600),
+        style: Theme.of(context).textTheme.bodyText1,
       ),
     );
   }
