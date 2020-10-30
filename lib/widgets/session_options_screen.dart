@@ -22,6 +22,7 @@ import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
@@ -45,6 +46,16 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   var lengthSelected = 0;
   var _offlineSelected = 0;
   var _musicSelected = 0;
+  void addIntToSF(file, key, value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    file = file.toString();
+    prefs.setInt(file+'_'+key, value);
+  }
+  Future<int> getIntValuesSF(file, key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    file=file.toString();
+    return prefs.getInt(file+'_'+key) ?? 0;
+  }
   List voiceList = [' ', ' ', ' '];
   List lengthList = [' ', ' ', ' '];
   List lengthFilteredList = [];
@@ -74,7 +85,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   @override
   void initState() {
     super.initState();
-
+    getIntValuesSF(widget.title, 'voiceSelected').then((value) => voiceSelected=value);
+    getIntValuesSF(widget.title, 'lengthSelected').then((value) => lengthSelected=value);
+    getIntValuesSF(widget.title, 'musicSelected').then((value) => _musicSelected=value);
     _viewModel.getBackgroundMusicList().then((value) {
       setState(() {
         _bgMusicList = value;
@@ -220,6 +233,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     if (downloadSingleton == null || !downloadSingleton.isValid())
       downloadSingleton = new DownloadSingleton(currentFile);
+    addIntToSF(widget.title, 'voiceSelected', voiceSelected);
+    addIntToSF(widget.title, 'lengthSelected', lengthSelected);
+    addIntToSF(widget.title, 'musicSelected', _musicSelected);
 
     if (downloadSingleton.isDownloadingMe(currentFile) ||
         showIndeterminateSpinner ||
