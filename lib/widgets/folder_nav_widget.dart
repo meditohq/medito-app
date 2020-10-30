@@ -130,7 +130,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                       })
                   : Container(),
               actions: <Widget>[
-                snapshot != null && snapshot.connectionState != ConnectionState.waiting
+                snapshot != null &&
+                        snapshot.connectionState != ConnectionState.waiting
                     ? IconButton(
                         tooltip: snapshot?.data != null && snapshot.data
                             ? "Mark session as unlistened"
@@ -217,7 +218,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                     return appBarType == appbar_type.normal
                         ? MeditoAppBarWidget(
                             title: widget.firstTitle ?? widget.title,
-                            backPressed: _backPressed,
                           )
                         : buildSelectedAppBar();
                   }
@@ -397,9 +397,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     }
   }
 
-  void _backPressed(String id) {
-    Navigator.pop(context);
-  }
+  // void _backPressed(String id) {
+  //   Navigator.pop(context);
+  // }
 
   void _openTextFile(ListItem item) {
     Navigator.push(

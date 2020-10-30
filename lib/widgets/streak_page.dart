@@ -47,7 +47,7 @@ class _StreakWidgetState extends State<StreakWidget> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              MeditoAppBarWidget(title: "Stats", backPressed: _backPressed),
+              MeditoAppBarWidget(title: "Stats"),
               Container(height: 16),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -103,9 +103,9 @@ class _StreakWidgetState extends State<StreakWidget> {
     );
   }
 
-  void _backPressed(String value) {
-    Navigator.pop(context);
-  }
+  // void _backPressed(String value) {
+  //   Navigator.pop(context);
+  // }
 
   openEditDialog() {
     showDialog(
@@ -114,8 +114,8 @@ class _StreakWidgetState extends State<StreakWidget> {
       builder: (BuildContext context) {
         return Theme(
           data: new ThemeData(
-              primaryColor: MeditoColors.walterWhite,
-           ),
+            primaryColor: MeditoColors.walterWhite,
+          ),
           child: AlertDialog(
             shape: _roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,

@@ -54,11 +54,14 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.normal),
         headline2: TextStyle(
-            //this is for bottom sheet text
-            fontSize: 16.0,
-            height: 1.4,
-            color: MeditoColors.lightColor,
-            fontWeight: FontWeight.normal),
+          //this is for bottom sheet text
+          letterSpacing: 0.1,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          // fontSize: 16.0,
+          height: 1.4,
+          color: MeditoColors.lightColor,
+        ),
         bodyText2: TextStyle(
             //this is for 'text'
             fontSize: 16.0,
@@ -74,7 +77,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
         headline1: TextStyle(
             //bottom sheet filter chip
             //horizontal announcement
-            fontSize: 14.0,
+            fontSize: 16.0,
             height: 1.25,
             color: MeditoColors.lightColor,
             fontWeight: FontWeight.w400),
@@ -86,9 +89,13 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             fontWeight: FontWeight.w400),
         bodyText1: TextStyle(
             //for 'MORE DETAILS'
-            fontSize: 14.0,
-            height: 1.4,
-            color: MeditoColors.lightColor,
+            // fontSize: 14.0,
+            // height: 1.4,
+            // color: MeditoColors.lightColor,
+            letterSpacing: 0.2,
+            height: 1.5,
+            color: Colors.white,
+            fontSize: 24.0,
             fontWeight: FontWeight.w600),
       ));
 }
@@ -145,9 +152,10 @@ void createSnackBar(String message, BuildContext context) {
   Scaffold.of(context).showSnackBar(snackBar);
 }
 
-void createSnackBarWithColor(String message, BuildContext context, Color color) {
+void createSnackBarWithColor(
+    String message, BuildContext context, Color color) {
   final snackBar =
-  new SnackBar(content: new Text(message), backgroundColor: color);
+      new SnackBar(content: new Text(message), backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);

@@ -159,7 +159,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
                 children: <Widget>[
                   MeditoAppBarWidget(
                     title: widget.firstTitle,
-                    backPressed: _backPressed,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
@@ -175,7 +174,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     );
   }
 
-  void _backPressed(String value) {
-    Navigator.pop(context);
-  }
+  // void _backPressed(String value) {
+  //   Navigator.pop(context);
+  // }
 }
