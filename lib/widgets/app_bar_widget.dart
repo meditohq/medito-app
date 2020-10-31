@@ -17,16 +17,11 @@ import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class MeditoAppBarWidget extends StatelessWidget {
-  const MeditoAppBarWidget(
-      {Key key,
-      this.title,
-      this.backPressed,
-      this.transparent = false})
+  const MeditoAppBarWidget({Key key, this.title, this.transparent = false})
       : super(key: key);
 
   final transparent;
   final String title;
-  final ValueChanged<String> backPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +32,7 @@ class MeditoAppBarWidget extends StatelessWidget {
           elevation: 0,
           backgroundColor:
               transparent ? Colors.transparent : MeditoColors.moonlight,
-          title: Text(title,
-              style: Theme.of(context).textTheme.headline2.copyWith(
-                  letterSpacing: 0.1,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600))),
+          title: Text(title, style: Theme.of(context).textTheme.headline2)),
     );
   }
 }

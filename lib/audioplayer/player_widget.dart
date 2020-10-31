@@ -37,6 +37,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   bool _complete = false;
   double _height = 0;
 
+  String __loaded;
+
+  bool get loaded => __loaded == "true";
+
+  void setLoaded(bool b) {
+    if (__loaded == null && b == true) __loaded = "true";
+  }
+
   StreamSubscription _stream;
 
   @override
@@ -83,10 +91,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(_height == 0){
+    if (_height == 0) {
       _height = MediaQuery.of(context).size.height;
-
     }
 
     return Scaffold(
@@ -101,12 +107,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   state?.processingState ?? AudioProcessingState.none;
               final playing = state?.playing ?? false;
 
-              print(processingState);
               if (processingState == AudioProcessingState.stopped ||
-                  processingState == AudioProcessingState.completed) {
+                  processingState == AudioProcessingState.completed ||
+                  (loaded && mediaItem == null)) {
                 _complete = true;
               }
 
+              setLoaded(mediaItem != null);
               getSecondaryColor(mediaItem);
               getPrimaryColor(mediaItem);
               getArtUrl(mediaItem);
@@ -216,7 +223,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 32.0, right: 32.0, top: 64.0),
       child: Container(
-        constraints: BoxConstraints(maxHeight: _height/3, maxWidth: 1000),
+        constraints: BoxConstraints(maxHeight: _height / 3, maxWidth: 1000),
         decoration: BoxDecoration(
             color: primaryColorAsColor,
             borderRadius: BorderRadius.circular(12.0)),
@@ -310,19 +317,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  Widget playButton() => PlayerButton(
-        icon: Icons.play_arrow,
-        onPressed: AudioService.play,
-        secondaryColor: secondaryColor,
-        primaryColor: primaryColorAsColor,
-      );
+  Widget playButton() => Semantics(
+    label: "Play button",
+    child: PlayerButton(
+          icon: Icons.play_arrow,
+          onPressed: AudioService.play,
+          secondaryColor: secondaryColor,
+          primaryColor: primaryColorAsColor,
+        ),
+  );
 
-  Widget pauseButton() => PlayerButton(
-        icon: Icons.pause,
-        secondaryColor: secondaryColor,
-        onPressed: AudioService.pause,
-        primaryColor: primaryColorAsColor,
-      );
+  Widget pauseButton() => Semantics(
+    label: "Pause button",
+    child: PlayerButton(
+          icon: Icons.pause,
+          secondaryColor: secondaryColor,
+          onPressed: AudioService.pause,
+          primaryColor: primaryColorAsColor,
+        ),
+  );
 
   Widget positionIndicator(
       MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {

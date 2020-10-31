@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.50+380
+version: 1.0.51+382
 environment:
   sdk: ">=2.6.0 <3.0.0"
 
@@ -33,6 +33,7 @@ dependencies:
   share: ^0.6.5+2
   firebase_core: ^0.5.0+1
   firebase_analytics: ^6.0.2
+  firebase_messaging: ^7.0.3
   provider: ^4.3.2+2
   package_info: ^0.4.3
   in_app_purchase: ^0.3.4+15
@@ -50,24 +51,10 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
+# There's no need to specify all the files separately, just mentioning the root works too!
 flutter:
   assets:
-    - assets/images/ic_document.svg
-    - assets/images/ic_folder.svg
-    - assets/images/icon_ic_logo.svg
-    - assets/images/ic_gift.svg
-    - assets/images/ic_bulb.svg
-    - assets/images/ic_corona.svg
-    - assets/images/ic_email.svg
-    - assets/images/ic_happyface.svg
-    - assets/images/ic_help.svg
-    - assets/images/ic_instagram.svg
-    - assets/images/ic_people.svg
-    - assets/images/ic_psychology.svg
-    - assets/images/ic_review.svg
-    - assets/images/ic_support.svg
-    - assets/images/ic_twitter.svg
-    - assets/images/blurb.svg
+    - assets/images/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -5,13 +5,13 @@
             <size
                 android:width="2000dp"
                 android:height="2000dp" />
-            <solid android:color="#282828" />
+            <solid android:color="#121212" />
         </shape>
     </item>
 
     <item
-        android:height="80dp"
-        android:width="230dp"
+        android:height="40dp"
+        android:width="115dp"
         android:gravity="center"
         android:drawable="@drawable/logo" />
 </layer-list>
