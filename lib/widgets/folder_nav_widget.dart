@@ -294,6 +294,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             title: listItem.title,
             onBeginPressed: _showPlayer,
             data: data,
+            id: listItem.id
           ),
         )).then((value) {
       setState(() {});

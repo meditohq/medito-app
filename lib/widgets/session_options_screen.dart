@@ -18,6 +18,7 @@ import 'dart:io';
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
+import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
@@ -31,10 +32,11 @@ import '../utils/utils.dart';
 class SessionOptionsScreen extends StatefulWidget {
   final Future data;
   final String title;
+  final String id;
   final Function(Files, Illustration, dynamic, String, String, String, String,
       String, int) onBeginPressed;
 
-  SessionOptionsScreen({Key key, this.title, this.data, this.onBeginPressed})
+  SessionOptionsScreen({Key key, this.title, this.data, this.onBeginPressed, this.id})
       : super(key: key);
 
   @override
@@ -46,16 +48,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   var lengthSelected = 0;
   var _offlineSelected = 0;
   var _musicSelected = 0;
-  void addIntToSF(file, key, value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    file = file.toString();
-    prefs.setInt(file+'_'+key, value);
-  }
-  Future<int> getIntValuesSF(file, key) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    file=file.toString();
-    return prefs.getInt(file+'_'+key) ?? 0;
-  }
   List voiceList = [' ', ' ', ' '];
   List lengthList = [' ', ' ', ' '];
   List lengthFilteredList = [];
@@ -85,9 +77,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   @override
   void initState() {
     super.initState();
-    getIntValuesSF(widget.title, 'voiceSelected').then((value) => voiceSelected=value);
-    getIntValuesSF(widget.title, 'lengthSelected').then((value) => lengthSelected=value);
-    getIntValuesSF(widget.title, 'musicSelected').then((value) => _musicSelected=value);
+    getIntValuesSF(widget.id, 'voiceSelected').then((value) => voiceSelected=value);
+    getIntValuesSF(widget.id, 'lengthSelected').then((value) => lengthSelected=value);
+    getIntValuesSF(widget.id, 'musicSelected').then((value) => _musicSelected=value);
     _viewModel.getBackgroundMusicList().then((value) {
       setState(() {
         _bgMusicList = value;
@@ -243,9 +235,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Future<void> _onBeginTap() {
     if (downloadSingleton == null || !downloadSingleton.isValid())
       downloadSingleton = new DownloadSingleton(currentFile);
-    addIntToSF(widget.title, 'voiceSelected', voiceSelected);
-    addIntToSF(widget.title, 'lengthSelected', lengthSelected);
-    addIntToSF(widget.title, 'musicSelected', _musicSelected);
+    addIntToSF(widget.id, 'voiceSelected', voiceSelected);
+    addIntToSF(widget.id, 'lengthSelected', lengthSelected);
+    addIntToSF(widget.id, 'musicSelected', _musicSelected);
 
     if (downloadSingleton.isDownloadingMe(currentFile) ||
         showIndeterminateSpinner ||
