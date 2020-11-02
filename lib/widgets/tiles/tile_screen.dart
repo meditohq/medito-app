@@ -462,6 +462,7 @@ class TileListState extends State<TileList> {
             title: tile.title,
             onBeginPressed: _showPlayer,
             data: data,
+            id: tile.id
           ),
         )).then((value) {
       setState(() {
