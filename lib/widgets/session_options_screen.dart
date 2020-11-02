@@ -23,7 +23,6 @@ import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../audioplayer/player_utils.dart';
 import '../utils/colors.dart';
