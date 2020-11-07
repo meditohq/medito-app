@@ -1,3 +1,4 @@
+import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class InAppReviewWidget extends StatelessWidget {
   }
   void thanksPopUp() {
     createSnackBarWithColor("Thanks for the rating", context, Colors.black12);
+    addCurrentDateToSF("UserDeclinedRating");
     Navigator.pop(context);
   }
 }
