@@ -10,9 +10,10 @@ Future<int> getIntValuesSF(file, key) async {
   file=file.toString();
   return prefs.getInt(file+'_'+key) ?? 0;
 }
-void addDateToSF(key, DateTime date) async {
+void addCurrentDateToSF(key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   key = key.toString();
+  DateTime date = DateTime.now();
   var epochDate = date.millisecondsSinceEpoch;
   prefs.setInt(key, epochDate);
 }
