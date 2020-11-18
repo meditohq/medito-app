@@ -87,7 +87,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     widget.data.then((d) {
       this._illustration =
-          d?.illustration != null ? d?.illustration?.first : null;
+      d?.illustration != null ? d?.illustration?.first : null;
       this._primaryColor = d?.primaryColor;
       this._title = d?.title;
       this._secondaryColor = d?.secondaryColor;
@@ -115,7 +115,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         child: PlayerButton(
           onPressed: _onBeginTap,
           child:
-              SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
+          SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
           primaryColor: _primaryColor != null
               ? parseColor(_primaryColor)
               : MeditoColors.lightColor,
@@ -163,7 +163,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           ////////// spacer
                           !Platform.isIOS
                               ? buildTextHeaderForRow(
-                                  'Available Offline $_availableOfflineIndicatorText')
+                              'Available Offline $_availableOfflineIndicatorText')
                               : Container(),
                           !Platform.isIOS ? buildOfflineRow() : Container(),
                           Container(height: 80)
@@ -206,7 +206,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                       CircularProgressIndicator(
                         value: 1,
                         valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.black12),
+                        AlwaysStoppedAnimation<Color>(Colors.black12),
                       ),
                       CircularProgressIndicator(
                         value: value,
@@ -224,7 +224,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         width: 24,
         child: CircularProgressIndicator(
             valueColor:
-                AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
+            AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
       );
     } else {
       return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
@@ -278,9 +278,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Widget buildDescriptionText() {
     return _contentText.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
-            child: getDescriptionMarkdownBody(_contentText, context),
-          )
+      padding: const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
+      child: getDescriptionMarkdownBody(_contentText, context),
+    )
         : Container();
   }
 
@@ -401,7 +401,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Future<void> onVoicePillTap(bool value, int index) async {
-    lengthSelected = 0;
     voiceSelected = index;
 
     for (final file in filesList) {
@@ -415,17 +414,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     if (mounted)
       setState(() {
-        filterLengthsForThisPerson(voiceList[voiceSelected]);
+        filterLengthsForThisPerson(voiceList[voiceSelected], clockTimeToDuration(lengthList[lengthSelected]).inMinutes);
         _updateAvailableOfflineIndicatorText();
       });
   }
 
   Future<void> onSessionPillTap(bool value, int index) async {
     filesList.forEach((file) => {
-          if (file.length == (lengthList[index]) &&
-              file.voice == (voiceList[voiceSelected]))
-            currentFile = file
-        });
+      if (file.length == (lengthList[index]) &&
+          file.voice == (voiceList[voiceSelected]))
+        currentFile = file
+    });
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
       lengthSelected = index;
@@ -499,7 +498,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
   }
 
-  void filterLengthsForThisPerson(String voiceSelected) {
+  void filterLengthsForThisPerson(String voiceSelected, [int previousMusicSelected]) {
+    lengthSelected = -1;
     lengthFilteredList.clear();
 
     this.filesList?.forEach((file) {
@@ -507,8 +507,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         lengthFilteredList.add(file.length);
       }
     });
+    List<dynamic> roundedList;
+    for(int i = 0; i < lengthList.length; i++) {
+      roundedList.add(clockTimeToDuration(lengthList[i]).inMinutes);
+    }
+    if(previousMusicSelected!=null) lengthSelected = roundedList.indexOf(previousMusicSelected);
+    if(lengthSelected==-1) lengthSelected = 0;
 
-    lengthSelected = lengthList.indexOf(lengthFilteredList.first);
+
   }
 
   Widget buildOfflineRow() {
@@ -672,7 +678,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (_offlineSelected != 0) {
       var time = clockTimeToDuration(lengthList[lengthSelected]).inMinutes;
       _availableOfflineIndicatorText =
-          '(${voiceList[voiceSelected]} - $time min)';
+      '(${voiceList[voiceSelected]} - $time min)';
     } else {
       _availableOfflineIndicatorText = "";
     }
