@@ -80,7 +80,7 @@ class Tracking {
   // like "LoginWidget", "Login button", "Clicked"
   static Future<void> trackEvent(String eventName, String action, String destination,
       {Map<String, String> map}) async {
-    if (!Foundation.kReleaseMode) {
+    if (Foundation.kReleaseMode) {
       //only track in release mode, not debug
 
       Map<String, String> defaultMap = {
