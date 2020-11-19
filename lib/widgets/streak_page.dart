@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
@@ -32,6 +33,11 @@ class StreakWidget extends StatefulWidget {
 class _StreakWidgetState extends State<StreakWidget> {
   TextEditingController _controller = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    Tracking.changeScreenName(Tracking.STREAK_PAGE);
+  }
   @override
   Widget build(BuildContext context) {
     var list = [

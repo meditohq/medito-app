@@ -80,6 +80,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   void initState() {
     super.initState();
 
+    Tracking.changeScreenName(Tracking.FOLDER_PAGE);
+
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
@@ -240,7 +242,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   void folderTap(ListItem i) {
-    Tracking.trackEvent(Tracking.FOLDER_TAPPED, Tracking.SCREEN_LOADED, i.id);
+    Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
     //if you tapped on a folder
 
     Navigator.push(
@@ -260,22 +262,17 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   void fileTap(ListItem item) {
     if (item.fileType == FileType.audiosethourly ||
         item.fileType == FileType.audiosetdaily) {
-      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
-      _showPlayerBottomSheet(item);
+      _showSessionOptionsScreen(item);
     } else if (item.fileType == FileType.audio) {
-      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
-      _showPlayerBottomSheet(item);
+      _showSessionOptionsScreen(item);
     } else if (item.fileType == FileType.both) {
-      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
-      _showPlayerBottomSheet(item);
+      _showSessionOptionsScreen(item);
     } else if (item.fileType == FileType.text) {
-      Tracking.trackEvent(
-          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED, item.id);
       _openTextFile(item);
     }
   }
 
-  _showPlayerBottomSheet(ListItem listItem) {
+  _showSessionOptionsScreen(ListItem listItem) {
     _viewModel.currentlySelectedFile = listItem;
 
     var data;
@@ -287,15 +284,16 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       data = _viewModel.getAudioData(id: listItem.id);
     }
 
+    Tracking.trackEvent(Tracking.TAP, Tracking.SESSION_TAPPED, listItem.id);
+
     final result = Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => SessionOptionsScreen(
-            title: listItem.title,
-            onBeginPressed: _showPlayer,
-            data: data,
-            id: listItem.id
-          ),
+              title: listItem.title,
+              onBeginPressed: _showPlayer,
+              data: data,
+              id: listItem.id),
         )).then((value) {
       setState(() {});
       return null;
@@ -398,11 +396,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     }
   }
 
-  // void _backPressed(String id) {
-  //   Navigator.pop(context);
-  // }
-
   void _openTextFile(ListItem item) {
+    Tracking.trackEvent(Tracking.TAP, Tracking.TEXT_TAPPED, item.id);
+
     Navigator.push(
       context,
       MaterialPageRoute(

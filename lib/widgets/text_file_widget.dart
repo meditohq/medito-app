@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
@@ -69,6 +69,8 @@ class _TextFileWidgetState extends State<TextFileWidget>
   @override
   void initState() {
     super.initState();
+
+    Tracking.changeScreenName(Tracking.TEXT_PAGE);
 
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
 
@@ -174,7 +176,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     );
   }
 
-  // void _backPressed(String value) {
-  //   Navigator.pop(context);
-  // }
+// void _backPressed(String value) {
+//   Navigator.pop(context);
+// }
 }

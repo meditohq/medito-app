@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:io';
 
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -170,7 +171,11 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 MarkdownBody getMarkdownBody(String content, BuildContext context) {
   return MarkdownBody(
     onTapLink: ((url) {
-      launch(url);
+      if (url.contains("medito-donate")) {
+        //open the donate page here
+        launchDonatePageOrWidget(context);
+      } else
+        launch(url);
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
@@ -191,7 +196,11 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
 MarkdownBody getDescriptionMarkdownBody(String content, BuildContext context) {
   return MarkdownBody(
     onTapLink: ((url) {
-      launch(url);
+      if (url.contains("medito-donate")) {
+        //open the donate page here
+        launchDonatePageOrWidget(context);
+      } else
+        launch(url);
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
@@ -212,6 +221,18 @@ MarkdownBody getDescriptionMarkdownBody(String content, BuildContext context) {
     data: content == null ? '' : content,
     imageDirectory: 'https://raw.githubusercontent.com',
   );
+}
+
+void launchDonatePageOrWidget(BuildContext context) {
+  //open the donate page here
+  if (Platform.isAndroid) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DonationWidget(),
+        ));
+  } else
+    launch("https://meditofoundation.org/donate");
 }
 
 launchUrl(String url) async {

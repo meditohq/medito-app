@@ -32,4 +32,6 @@ class MeditoColors {
   static const moonlight = Color(0xff282828);
   static const walterWhite = Colors.white;
   static const darkMoon = Color(0xff121212);
+  static const peacefulBlue = Color(0xffd1f6fe);
+  static const peacefulPink = Color(0xffffc2c2);
 }

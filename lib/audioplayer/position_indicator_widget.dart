@@ -50,14 +50,6 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
         if (position > duration - 10 && !tracked) {
           tracked = true;
-          getVersionCopyInt().then((version) {
-            Tracking.trackEvent(Tracking.AUDIO_COMPLETED,
-                Tracking.SCREEN_LOADED, Tracking.AUDIO_COMPLETED,
-                map: {
-                  'version_seen': '$version',
-                });
-            return null;
-          });
         }
 
         return Column(

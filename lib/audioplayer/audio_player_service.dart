@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Medito/audioplayer/player_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -48,7 +49,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
         if (_duration.inMilliseconds < 1000) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
-
         }
 
         playBgMusic(mediaItem.extras['bgMusic']);
@@ -241,6 +241,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
       await writeJSONToCache(encoded(dataMap), "stats");
 
       AudioServiceBackground.sendCustomEvent('stats');
+
+      Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, '');
     }
   }
 }

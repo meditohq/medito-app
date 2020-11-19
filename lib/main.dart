@@ -13,13 +13,17 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
+
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 import 'tracking/tracking.dart';
 import 'utils/colors.dart';
@@ -29,10 +33,23 @@ Future<void> main() async {
       statusBarBrightness: Brightness.dark,
       statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  //If these values are missing, just delete this method and initialiseTracker below.
+  // But please don't commit to git
+  FirebaseApp app = await Firebase.initializeApp(
+      options: FirebaseOptions(
+    appId: appId,
+    apiKey: apiKey,
+    messagingSenderId: messagingSenderId,
+    projectId: projectId,
+    databaseURL: databaseURL,
+  ));
+
+  InAppPurchaseConnection.enablePendingPurchases();
+  Tracking.initialiseTracker(app);
+
   runApp(HomeScreenWidget());
 
-  Tracking.initialiseTracker();
 }
 
 /// This Widget is the main application widget.
@@ -67,7 +84,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
 
   @override
   Widget build(BuildContext context) {
-    Tracking.trackEvent(Tracking.HOME, Tracking.SCREEN_LOADED, '');
 
     return MaterialApp(
       initialRoute: '/nav',

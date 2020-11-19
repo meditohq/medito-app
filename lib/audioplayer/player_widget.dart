@@ -60,6 +60,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   void initState() {
     super.initState();
+    Tracking.changeScreenName(Tracking.PLAYER_PAGE);
 
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
@@ -111,6 +112,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   processingState == AudioProcessingState.completed ||
                   (loaded && mediaItem == null)) {
                 _complete = true;
+                Tracking.changeScreenName(Tracking.PLAYER_END_PAGE);
               }
 
               setLoaded(mediaItem != null);
@@ -318,24 +320,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               ScreenState(queue, mediaItem, playbackState));
 
   Widget playButton() => Semantics(
-    label: "Play button",
-    child: PlayerButton(
+        label: "Play button",
+        child: PlayerButton(
           icon: Icons.play_arrow,
           onPressed: AudioService.play,
           secondaryColor: secondaryColor,
           primaryColor: primaryColorAsColor,
         ),
-  );
+      );
 
   Widget pauseButton() => Semantics(
-    label: "Pause button",
-    child: PlayerButton(
+        label: "Pause button",
+        child: PlayerButton(
           icon: Icons.pause,
           secondaryColor: secondaryColor,
           onPressed: AudioService.pause,
           primaryColor: primaryColorAsColor,
         ),
-  );
+      );
 
   Widget positionIndicator(
       MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
@@ -363,7 +365,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 borderRadius: BorderRadius.circular(12.0),
               ),
               padding: const EdgeInsets.all(16.0),
-              onPressed: _launchDonate,
+              onPressed: _launchPrimaryButton,
               color: primaryColorAsColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -413,23 +415,27 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Future<void> _launchDonate() {
+  Future<void> _launchPrimaryButton() {
     getVersionCopyInt().then((version) {
-      Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.BUTTON_TAPPED,
-          Tracking.AUDIO_COMPLETED,
+      Tracking.trackEvent(Tracking.CTA_TAPPED, Tracking.MAIN_CTA_TAPPED, buttonUrl,
           map: {'version_seen': '$version'});
       return null;
     });
-    return launchUrl(buttonUrl);
+    if (buttonUrl.contains("medito-donate")) {
+      launchDonatePageOrWidget(context);
+    } else
+      return launchUrl(buttonUrl);
+
+    return null;
   }
 
   Future<void> _share() {
     Share.share(
-        "I just meditated with Medito. I ❤️ this app! Try it out - it's 100% free! Download on Android -> bit.ly/medito-android & iOS -> bit.ly/medito-ios");
+        "I just meditated with Medito. I ❤️ this app! Try it out - it's 100% free! Download on Android -> https://bit.ly/medito-android & iOS -> https://bit.ly/medito-ios");
     Tracking.trackEvent(
-      Tracking.PLAYER,
-      Tracking.SHARE_BUTTON_TAPPED,
-      Tracking.AUDIO_COMPLETED,
+      Tracking.CTA_TAPPED,
+      Tracking.SECOND_CTA_TAPPED,
+      '',
     );
     return null;
   }

@@ -17,6 +17,8 @@ import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/welcome.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/session_options_screen.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -29,7 +31,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../tracking/tracking.dart';
 import '../../utils/colors.dart';
 import '../../utils/stats_utils.dart';
-import '../../utils/utils.dart';
 import '../../viewmodel/model/list_item.dart';
 import '../../viewmodel/model/tile_item.dart';
 import '../../viewmodel/tile_view_model.dart';
@@ -53,15 +54,13 @@ class TileListState extends State<TileList> {
   var listFuture;
   var streak = getCurrentStreak();
 
-  // TextTheme titleTextTheme;
-  // TextTheme horizontalAnnouncementTextTheme;
-
   SharedPreferences prefs;
   String streakValue = '0';
 
   @override
   void initState() {
-    Tracking.trackEvent(Tracking.TILE, Tracking.SCREEN_LOADED, '');
+    Tracking.changeScreenName(Tracking.HOME);
+
     super.initState();
     listFuture = _viewModel.getTiles();
 
@@ -432,7 +431,7 @@ class TileListState extends State<TileList> {
 
   _onTap(TileItem tile) {
     Tracking.trackEvent(
-        Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
+        Tracking.TAP, Tracking.TILE_TAPPED, tile.id + '_' + tile.pathTemplate);
 
     if (tile.pathTemplate == 'session-single') {
       _openSessionOptionsScreen(
@@ -451,7 +450,7 @@ class TileListState extends State<TileList> {
   }
 
   void _openSessionOptionsScreen(TileItem tile, Future data) {
-    Tracking.trackEvent(Tracking.TILE, Tracking.BOTTOM_SHEET, tile.id);
+    Tracking.trackEvent(Tracking.TAP, Tracking.SESSION_TAPPED, tile.id);
 
     _viewModel.currentTile = tile;
 
@@ -459,11 +458,10 @@ class TileListState extends State<TileList> {
         context,
         MaterialPageRoute(
           builder: (context) => SessionOptionsScreen(
-            title: tile.title,
-            onBeginPressed: _showPlayer,
-            data: data,
-            id: tile.id
-          ),
+              title: tile.title,
+              onBeginPressed: _showPlayer,
+              data: data,
+              id: tile.id),
         )).then((value) {
       setState(() {
         streak = getCurrentStreak();
@@ -623,6 +621,14 @@ class TileListState extends State<TileList> {
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     Scaffold.of(context).showSnackBar(snackBar);
+  }
+
+  void _openDonate() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DonationWidget(),
+        ));
   }
 }
 
