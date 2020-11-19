@@ -518,7 +518,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         lengthFilteredList.add(file.length);
       }
     });
-    List<dynamic> roundedList;
+    List<dynamic> roundedList = [];
     for (int i = 0; i < lengthList.length; i++) {
       roundedList.add(clockTimeToDuration(lengthList[i]).inMinutes);
     }
