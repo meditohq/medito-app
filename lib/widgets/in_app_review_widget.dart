@@ -17,26 +17,35 @@ class InAppReviewWidget extends StatelessWidget {
             children: <Widget>[
               new FloatingActionButton(
                 onPressed: rateUsPopUp,
-                child: new Icon(Icons.thumb_up, color: Colors.black12,),
-                backgroundColor: Colors.white,),
-
+                child: new Icon(
+                  Icons.thumb_up,
+                  color: Colors.black12,
+                ),
+                backgroundColor: Colors.white,
+              ),
               new FloatingActionButton(
                 onPressed: thanksPopUp,
-                child: new Icon(Icons.thumb_down, color: Colors.black12,),
-                backgroundColor: Colors.white,),
+                child: new Icon(
+                  Icons.thumb_down,
+                  color: Colors.black12,
+                ),
+                backgroundColor: Colors.white,
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
   void rateUsPopUp() async {
     final InAppReview inAppReview = InAppReview.instance;
 
     if (await inAppReview.isAvailable()) {
-    inAppReview.requestReview();
+      inAppReview.requestReview();
     }
   }
+
   void thanksPopUp() {
     createSnackBarWithColor("Thanks for the rating", context, Colors.black12);
     addCurrentDateToSF("UserDeclinedRating");
