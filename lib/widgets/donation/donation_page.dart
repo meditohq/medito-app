@@ -17,7 +17,7 @@ class _DonationWidgetState extends State<DonationWidget> {
   static const ONCE = 1;
   static const MONTHLY = 2;
   var _giveSelected = MONTHLY;
-  var _amountSelect = 1;
+  var _amountSelect = 2;
 
   static const GIVE_SIZE = 56.0;
   static const NEXT_SIZE = 56.0;
