@@ -510,21 +510,25 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void filterLengthsForThisPerson(String voiceSelected,
       [int previousMusicSelected]) {
-    lengthSelected = -1;
+    lengthSelected = 0;
     lengthFilteredList.clear();
-
     this.filesList?.forEach((file) {
       if (file.voice == voiceSelected) {
         lengthFilteredList.add(file.length);
       }
     });
     List<dynamic> roundedList = [];
-    for (int i = 0; i < lengthList.length; i++) {
-      roundedList.add(clockTimeToDuration(lengthList[i]).inMinutes);
+    for (int i = 0; i < lengthFilteredList.length; i++) {
+      roundedList.add(clockTimeToDuration(lengthFilteredList[i])
+          .inMinutes); //Find the rounded length of the voice of current artist
     }
+    int indexOfMusic = 0;
     if (previousMusicSelected != null)
-      lengthSelected = roundedList.indexOf(previousMusicSelected);
-    if (lengthSelected == -1) lengthSelected = 0;
+      indexOfMusic = roundedList.indexOf(
+          previousMusicSelected); //find the index of the previous selection in the rounded list
+    if (indexOfMusic == -1) indexOfMusic = 0; //if it doesn't exist make it zero
+    lengthSelected = lengthList
+        .indexOf(lengthFilteredList[indexOfMusic]); //set the correct index
   }
 
   Widget buildOfflineRow() {
