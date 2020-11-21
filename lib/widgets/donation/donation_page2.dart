@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/donate_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/donation/thank_you_page.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
@@ -84,8 +86,9 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
                   _stayInTouchSelected == 0 ? _begView() : Container(),
                   Container(height: 32),
                   _donateButton(),
+                  Container(height: 124),
+                  _explainRow(),
                   Container(height: 64),
-                  _explainRow()
                 ],
               ),
             ),
@@ -218,11 +221,14 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
           child: Text.rich(
             TextSpan(
               text:
-                  'Medito Foundation is a nonprofit registered in the UK & Netherlands. ',
+                  'We really care about your privacy. We’ll never spam you or sell your data. ',
               style: Theme.of(context).textTheme.bodyText2,
               children: <TextSpan>[
                 TextSpan(
-                    text: 'Tap here to learn more.',
+                    text: 'Tap here to read our privacy policy.',
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                          "https://meditofoundation.org/privacy"),
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                     )),

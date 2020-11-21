@@ -1,6 +1,8 @@
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_svg/svg.dart';
@@ -118,21 +120,22 @@ class _DonationWidgetState extends State<DonationWidget> {
                         _donationGrid(),
                         Container(height: 32),
                         _donateButton(),
+                        Container(height: 124),
+                        _explainRow(),
                         Container(height: 64),
-                        _explainRow()
                       ],
                     ),
                   ),
                 )
               : Column(
-                children: [
-                  Center(
-                      child: SizedBox(
-                          height: 32,
-                          width: 32,
-                          child: CircularProgressIndicator())),
-                ],
-              ),
+                  children: [
+                    Center(
+                        child: SizedBox(
+                            height: 32,
+                            width: 32,
+                            child: CircularProgressIndicator())),
+                  ],
+                ),
         ],
       ),
     );
@@ -422,11 +425,15 @@ class _DonationWidgetState extends State<DonationWidget> {
         Expanded(
           child: Text.rich(
             TextSpan(
-              text: 'Medito Foundation is a nonprofit registered in the UK & Netherlands. ',
+              text:
+                  'Medito Foundation is a nonprofit registered in the UK & Netherlands. ',
               style: Theme.of(context).textTheme.bodyText2,
               children: <TextSpan>[
                 TextSpan(
                     text: 'Tap here to learn more.',
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                          "https://meditofoundation.org/about/foundation"),
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                     )),
