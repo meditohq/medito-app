@@ -125,7 +125,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
           primaryColor: _primaryColor != null
               ? parseColor(_primaryColor)
-              : MeditoColors.lightColor,
+              : MeditoColors.walterWhite,
         ),
       ),
       body: new Builder(builder: (BuildContext context) {
@@ -333,7 +333,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   onSessionPillTap(value, index);
                 },
                 backgroundColor: MeditoColors.moonlight,
-                selectedColor: MeditoColors.lightColor,
+                selectedColor: MeditoColors.walterWhite,
                 labelStyle: getLengthPillTextStyle(context, index),
               ),
             ),
@@ -387,7 +387,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 onVoicePillTap(value, index);
               },
               backgroundColor: MeditoColors.moonlight,
-              selectedColor: MeditoColors.lightColor,
+              selectedColor: MeditoColors.walterWhite,
               labelStyle: getVoiceTextStyle(context, index),
             ),
           );
@@ -447,7 +447,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         fontSize: 16.0,
         color: lengthSelected == index
             ? MeditoColors.darkBGColor
-            : MeditoColors.lightColor);
+            : MeditoColors.walterWhite);
   }
 
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
@@ -455,7 +455,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         fontSize: 16.0,
         color: _offlineSelected == index
             ? MeditoColors.darkBGColor
-            : MeditoColors.lightColor);
+            : MeditoColors.walterWhite);
   }
 
   TextStyle getMusicPillTextStyle(int index) {
@@ -463,7 +463,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         fontSize: 16.0,
         color: _musicSelected == index
             ? MeditoColors.darkBGColor
-            : MeditoColors.lightColor);
+            : MeditoColors.walterWhite);
   }
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
@@ -471,7 +471,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         fontSize: 16.0,
         color: voiceSelected == index
             ? MeditoColors.darkBGColor
-            : MeditoColors.lightColor);
+            : MeditoColors.walterWhite);
   }
 
   void compileLists(List files) {
@@ -552,7 +552,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 onOfflineSelected(index);
               },
               backgroundColor: MeditoColors.moonlight,
-              selectedColor: MeditoColors.lightColor,
+              selectedColor: MeditoColors.walterWhite,
               labelStyle: getOfflinePillTextStyle(context, index),
             ),
           );
@@ -590,7 +590,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                       index > 0 ? _bgMusicList[index - 1].key : "");
                 },
                 backgroundColor: MeditoColors.moonlight,
-                selectedColor: MeditoColors.lightColor,
+                selectedColor: MeditoColors.walterWhite,
                 labelStyle: getMusicPillTextStyle(index),
               ),
             );
@@ -622,7 +622,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         selected: false,
         onSelected: (bool value) {},
         backgroundColor: MeditoColors.moonlight,
-        selectedColor: MeditoColors.lightColor,
+        selectedColor: MeditoColors.walterWhite,
       ),
     );
   }

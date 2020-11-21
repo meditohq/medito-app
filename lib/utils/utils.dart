@@ -17,11 +17,13 @@ import 'dart:io';
 
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
+import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
@@ -29,13 +31,13 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
         headline6: TextStyle(
             fontSize: 20.0,
             height: 1.4,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.w500),
         headline5: TextStyle(
             //h2
             height: 1.4,
             fontSize: 20.0,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.w600),
         subtitle1: TextStyle(
             fontSize: 16.0,
@@ -52,7 +54,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             //pill small
             fontSize: 14.0,
             height: 1.25,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.normal),
         headline2: TextStyle(
           //this is for bottom sheet text
@@ -61,26 +63,26 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
           fontWeight: FontWeight.w600,
           // fontSize: 16.0,
           height: 1.4,
-          color: MeditoColors.lightColor,
+          color: MeditoColors.walterWhite,
         ),
         bodyText2: TextStyle(
             //this is for 'text'
             fontSize: 16.0,
             height: 1.4,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.normal),
         subtitle2: TextStyle(
             //this is for 'h3' markdown
             fontSize: 18.0,
             height: 1.4,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.normal),
         headline1: TextStyle(
             //bottom sheet filter chip
             //horizontal announcement
             fontSize: 16.0,
             height: 1.25,
-            color: MeditoColors.lightColor,
+            color: MeditoColors.walterWhite,
             fontWeight: FontWeight.w400),
         caption: TextStyle(
             //attr widget
@@ -92,7 +94,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             //for 'MORE DETAILS'
             // fontSize: 14.0,
             // height: 1.4,
-            // color: MeditoColors.lightColor,
+            // color: MeditoColors.walterWhite,
             letterSpacing: 0.2,
             height: 1.5,
             color: Colors.white,
@@ -248,4 +250,65 @@ Duration clockTimeToDuration(String lengthText) {
       hours: tempListInts[0],
       minutes: tempListInts[1],
       seconds: tempListInts[2]);
+}
+
+Future<void> acceptTracking() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('tracking', true);
+}
+
+Future<bool> trackingAccepted() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('tracking') ?? true;
+}
+
+Future<void> trackingAnswered() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('trackingAnswered', true);
+}
+
+Future<bool> getTrackingAnswered() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('trackingAnswered') ?? false;
+}
+
+void showConsentDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      child: AlertDialog(
+        backgroundColor: MeditoColors.moonlight,
+        content: getMarkdownBody(
+            '### We’d like to automatically collect information about your use of Medito so we can make it better.\n ### You don’t have to do anything & the data collected is anonymous.\n [Learn more by tapping here.](https://meditofoundation.org/privacy)',
+            context),
+        actions: [
+          FlatButton(
+            textColor: MeditoColors.walterWhite,
+            onPressed: () {
+              trackingAnswered();
+              Navigator.pop(context);
+            },
+            child: Text(
+              'DECLINE',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText2
+                  .copyWith(fontSize: 18.0, color: MeditoColors.walterWhite),
+            ),
+          ),
+          FlatButton(
+            color: MeditoColors.peacefulBlue,
+            shape: roundedRectangleBorder(),
+            onPressed: () {
+              acceptTracking();
+              trackingAnswered();
+              Navigator.pop(context);
+            },
+            child: Text(
+              'ACCEPT',
+              style: Theme.of(context).textTheme.headline3.copyWith(
+                  color: MeditoColors.darkMoon, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ));
 }

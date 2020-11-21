@@ -123,7 +123,7 @@ class _StreakWidgetState extends State<StreakWidget> {
             primaryColor: MeditoColors.walterWhite,
           ),
           child: AlertDialog(
-            shape: _roundedRectangleBorder(),
+            shape: roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,
             title: Text("How many days is your streak?",
                 style: Theme.of(context).textTheme.headline5),
@@ -165,7 +165,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onSaveTap,
-                        shape: _roundedRectangleBorder(),
+                        shape: roundedRectangleBorder(),
                         color: MeditoColors.walterWhite,
                         child: Text(
                           'SAVE',
@@ -182,7 +182,7 @@ class _StreakWidgetState extends State<StreakWidget> {
 //                  shape: RoundedRectangleBorder(
 //                    borderRadius: new BorderRadius.circular(12.0),
 //                  ),
-//                  color: MeditoColors.lightColor,
+//                  color: MeditoColors.walterWhite,
 //                  child: Text(
 //                    "SAVE",
 //                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
@@ -217,7 +217,7 @@ class _StreakWidgetState extends State<StreakWidget> {
               accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
-            shape: _roundedRectangleBorder(),
+            shape: roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,
             title: Text("Reset longest streak to your current streak?",
                 style: Theme.of(context).textTheme.headline5),
@@ -231,7 +231,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onCancelTap,
-                        shape: _roundedRectangleBorder(),
+                        shape: roundedRectangleBorder(),
                         color: MeditoColors.moonlight,
                         child: Text(
                           'CANCEL',
@@ -248,7 +248,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onResetTap,
-                        shape: _roundedRectangleBorder(),
+                        shape: roundedRectangleBorder(),
                         color: MeditoColors.walterWhite,
                         child: Text(
                           'RESET',
@@ -265,12 +265,6 @@ class _StreakWidgetState extends State<StreakWidget> {
           ),
         );
       },
-    );
-  }
-
-  RoundedRectangleBorder _roundedRectangleBorder() {
-    return RoundedRectangleBorder(
-      borderRadius: new BorderRadius.circular(12.0),
     );
   }
 

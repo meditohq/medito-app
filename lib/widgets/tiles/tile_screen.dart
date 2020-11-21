@@ -74,15 +74,16 @@ class TileListState extends State<TileList> {
   }
 
   Future<void> _onPullToRefresh() async {
-    setState(() {
-      listFuture = _viewModel.getTiles(skipCache: true);
-    });
+    showConsentDialog(context);
+    // setState(() {
+    //   listFuture = _viewModel.getTiles(skipCache: true);
+    // });
   }
 
   Widget tileListWidget() {
     return RefreshIndicator(
       displacement: 80,
-      color: MeditoColors.lightColor,
+      color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       onRefresh: _onPullToRefresh,
       child: FutureBuilder(
@@ -188,6 +189,9 @@ class TileListState extends State<TileList> {
 
   @override
   Widget build(BuildContext context) {
+    getTrackingAnswered().then((value) {
+      if (!value) showConsentDialog(context);
+    });
     return Container(
       color: MeditoColors.darkMoon,
       child: SafeArea(
@@ -326,7 +330,7 @@ class TileListState extends State<TileList> {
     return Material(
         color: Colors.white.withOpacity(0.0),
         child: InkWell(
-          splashColor: MeditoColors.lightColor,
+          splashColor: MeditoColors.walterWhite,
           onTap: () => item != null ? _onTap(item) : null,
           borderRadius: BorderRadius.circular(12.0),
           child: w,
@@ -591,7 +595,7 @@ class TileListState extends State<TileList> {
         children: [
           Expanded(
               child: wrapWithInkWell(
-            MeditoColors.lightColor,
+            MeditoColors.walterWhite,
             item,
             Container(
               decoration: BoxDecoration(

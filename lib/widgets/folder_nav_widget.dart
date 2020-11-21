@@ -193,7 +193,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   Widget getListView() {
     return RefreshIndicator(
-      color: MeditoColors.lightColor,
+      color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       child: FutureBuilder(
           future: listFuture,
@@ -386,7 +386,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         child: Ink(
           color: (selectedItem == null || selectedItem.id != item.id)
               ? MeditoColors.darkMoon
-              : MeditoColors.lightColorLine,
+              : MeditoColors.walterWhiteLine,
           child: getFileListItem(item),
         ),
       );

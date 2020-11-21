@@ -85,6 +85,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   @override
   Widget build(BuildContext context) {
 
+
     return MaterialApp(
       initialRoute: '/nav',
       routes: {
@@ -99,7 +100,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: SlideTransitionBuilder(),
           }),
-          accentColor: MeditoColors.lightColor,
+          accentColor: MeditoColors.walterWhite,
           textTheme: buildDMSansTextTheme(context)),
       title: HomeScreenWidget._title,
       navigatorObservers: [Tracking.getObserver()],

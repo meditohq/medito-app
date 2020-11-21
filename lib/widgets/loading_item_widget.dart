@@ -62,7 +62,7 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
                   Padding(
                       padding: EdgeInsets.only(right: 12.0, left: 4, top: 4),
                       child: Container(
-                        decoration: buildBoxDecoration(MeditoColors.lightColorLine),
+                        decoration: buildBoxDecoration(MeditoColors.walterWhiteLine),
                         height: 24,
                         width: 24,
                       )),
@@ -73,13 +73,13 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
                     children: <Widget>[
                       Container(
                           decoration:
-                              buildBoxDecoration(MeditoColors.lightColorLine),
+                              buildBoxDecoration(MeditoColors.walterWhiteLine),
                           child: Text("                      ",
                               style: Theme.of(context).textTheme.headline6)),
                       Container(height: 5),
                       Container(
                           decoration:
-                              buildBoxDecoration(MeditoColors.lightColorTrans),
+                              buildBoxDecoration(MeditoColors.walterWhiteTrans),
                           child: Text(
                               "                                            ",
                               style: Theme.of(context).textTheme.headline6)),

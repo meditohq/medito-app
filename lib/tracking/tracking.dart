@@ -12,6 +12,7 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
+import 'package:Medito/utils/utils.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,7 +48,6 @@ class Tracking {
   static const String SESSION_TAPPED = "session_tapped";
   static const String PLAY_TAPPED = "play_tapped";
 
-
   static const String HOME = "home_page";
   static FirebaseAnalytics _firebaseAnalytics;
   static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
@@ -73,14 +73,17 @@ class Tracking {
 
   static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
 
-  static void changeScreenName(String screenName){
+  static void changeScreenName(String screenName) {
     _firebaseAnalytics.setCurrentScreen(screenName: screenName);
   }
 
   // like "LoginWidget", "Login button", "Clicked"
-  static Future<void> trackEvent(String eventName, String action, String destination,
+  static Future<void> trackEvent(
+      String eventName, String action, String destination,
       {Map<String, String> map}) async {
-    if (Foundation.kReleaseMode) {
+    var accepted = await trackingAccepted();
+
+    if (Foundation.kReleaseMode && accepted) {
       //only track in release mode, not debug
 
       Map<String, String> defaultMap = {

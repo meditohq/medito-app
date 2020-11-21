@@ -98,7 +98,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
                           child: Icon(
                             Icons.edit,
                             size: 16.0,
-                            color: MeditoColors.lightColorLine,
+                            color: MeditoColors.walterWhiteLine,
                           ),
                         ))
                     : Container(),
@@ -115,4 +115,10 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
     }
     return value;
   }
+}
+
+RoundedRectangleBorder roundedRectangleBorder() {
+  return RoundedRectangleBorder(
+    borderRadius: new BorderRadius.circular(12.0),
+  );
 }
