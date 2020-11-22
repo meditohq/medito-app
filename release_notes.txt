@@ -1,7 +1,7 @@
-- Fixed going back from text screens
-- Better loading screen for tiles
-- Fixed streak counter bugs (not updating on home page and resetting itself too early)
-- Attempt to stop ANR
-- Fixed audio player bugs
-- Background audio
-- Better error handling
+- Added ability to donate with Google Pay
+- Added ability to consent to tracking
+- Increased background audio volume and quality
+- Remembers previous session length selection
+- Enable move to SD card
+- Improved support for screen readers
+- UI and bug fixes!
