@@ -43,10 +43,14 @@ class Tracking {
   static const String STREAK_PAGE = "streak_page";
 
   static const String TILE_TAPPED = "tile_tapped";
+  static const String TRACKING_TAPPED = "tracking_tapped";
   static const String TEXT_TAPPED = "text_tapped";
   static const String FOLDER_TAPPED = "folder_tapped";
   static const String SESSION_TAPPED = "session_tapped";
   static const String PLAY_TAPPED = "play_tapped";
+
+  static const String ACCEPT_TRACKING = "accept_tracking";
+  static const String DENY_TRACKING = "deny_tracking";
 
   static const String HOME = "home_page";
   static FirebaseAnalytics _firebaseAnalytics;
@@ -103,6 +107,11 @@ class Tracking {
 
   static void trackDonation(String recordName, Map<String, dynamic> map) {
     _dbRef.child(recordName).set(map);
+  }
+
+  static void trackTrackingAnswered(bool track) {
+    Tracking.trackEvent(Tracking.TRACKING_TAPPED,
+        track ? Tracking.ACCEPT_TRACKING : Tracking.DENY_TRACKING, "");
   }
 }
 

@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
@@ -284,6 +285,7 @@ void showConsentDialog(BuildContext context) {
           FlatButton(
             textColor: MeditoColors.walterWhite,
             onPressed: () {
+              Tracking.trackTrackingAnswered(false);
               trackingAnswered();
               Navigator.pop(context);
             },
@@ -299,6 +301,7 @@ void showConsentDialog(BuildContext context) {
             color: MeditoColors.peacefulBlue,
             shape: roundedRectangleBorder(),
             onPressed: () {
+              Tracking.trackTrackingAnswered(true);
               acceptTracking();
               trackingAnswered();
               Navigator.pop(context);
