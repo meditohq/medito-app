@@ -81,10 +81,17 @@ android {
     signingConfigs {
         signingConfigs {
             release {
-                storeFile project.KEYSTORE_STORE_FILE
-                storePassword project.KEYSTORE_STORE_PASSWORD
-                keyAlias project.KEYSTORE_KEY_ALIAS
-                keyPassword project.KEYSTORE_KEY_PASSWORD
+                if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
+                    storeFile file(System.getenv()["FCI_KEYSTORE_PATH"])
+                    storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
+                    keyAlias System.getenv()["FCI_KEY_ALIAS"]
+                    keyPassword System.getenv()["FCI_KEY_PASSWORD"]
+                } else {
+                    storeFile project.KEYSTORE_STORE_FILE
+                    storePassword project.KEYSTORE_STORE_PASSWORD
+                    keyAlias project.KEYSTORE_KEY_ALIAS
+                    keyPassword project.KEYSTORE_KEY_PASSWORD
+                }
             }
         }
     }
