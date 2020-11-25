@@ -20,8 +20,8 @@ import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
@@ -604,7 +604,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   Padding getEmptyPillRow() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 16),
+      padding: const EdgeInsets.only(left: 16.0, top: 4),
       child: Row(
         children: [
           emptyPill(),
@@ -618,15 +618,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: FilterChip(
+        onSelected:  (bool value) {},
         pressElevation: 4,
         shape: buildChipBorder(),
         labelPadding: buildInnerChipPadding(),
-        showCheckmark: false,
-        label: Text("          "),
-        selected: false,
-        onSelected: (bool value) {},
+        label: Text("        "),
         backgroundColor: MeditoColors.moonlight,
-        selectedColor: MeditoColors.walterWhite,
+        labelStyle: getLengthPillTextStyle(context, 1),
       ),
     );
   }

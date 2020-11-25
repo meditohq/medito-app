@@ -38,6 +38,7 @@ class _StreakWidgetState extends State<StreakWidget> {
     super.initState();
     Tracking.changeScreenName(Tracking.STREAK_PAGE);
   }
+
   @override
   Widget build(BuildContext context) {
     var list = [

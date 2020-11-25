@@ -57,6 +57,8 @@ class TileListState extends State<TileList> {
   SharedPreferences prefs;
   String streakValue = '0';
 
+  bool _dialogShown = false;
+
   @override
   void initState() {
     Tracking.changeScreenName(Tracking.HOME);
@@ -74,10 +76,9 @@ class TileListState extends State<TileList> {
   }
 
   Future<void> _onPullToRefresh() async {
-    showConsentDialog(context);
-    // setState(() {
-    //   listFuture = _viewModel.getTiles(skipCache: true);
-    // });
+    setState(() {
+      listFuture = _viewModel.getTiles(skipCache: true);
+    });
   }
 
   Widget tileListWidget() {
@@ -189,9 +190,7 @@ class TileListState extends State<TileList> {
 
   @override
   Widget build(BuildContext context) {
-    getTrackingAnswered().then((value) {
-      if (!value) showConsentDialog(context);
-    });
+    _trackingDialog(context);
     return Container(
       color: MeditoColors.darkMoon,
       child: SafeArea(
@@ -199,6 +198,13 @@ class TileListState extends State<TileList> {
         child: tileListWidget(),
       ),
     );
+  }
+
+  Future<void> _trackingDialog(BuildContext context) async {
+    getTrackingAnswered().then((answered) async {
+      if (!answered && !_dialogShown) showConsentDialog(context);
+      this._dialogShown = true;
+    });
   }
 
   Widget getTwoColumns(List<TileItem> data) {

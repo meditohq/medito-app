@@ -85,7 +85,7 @@ class Tracking {
   static Future<void> trackEvent(
       String eventName, String action, String destination,
       {Map<String, String> map}) async {
-    var accepted = await trackingAccepted();
+    var accepted = await isTrackingAccepted();
 
     if (Foundation.kReleaseMode && accepted) {
       //only track in release mode, not debug
@@ -105,13 +105,17 @@ class Tracking {
     }
   }
 
+  static void enableAnalytics(bool enable) {
+    _firebaseAnalytics.setAnalyticsCollectionEnabled(enable);
+  }
+
   static void trackDonation(String recordName, Map<String, dynamic> map) {
     _dbRef.child(recordName).set(map);
   }
 
-  static void trackTrackingAnswered(bool track) {
-    Tracking.trackEvent(Tracking.TRACKING_TAPPED,
-        track ? Tracking.ACCEPT_TRACKING : Tracking.DENY_TRACKING, "");
+  static Future<void> trackTrackingAnswered(bool track) async {
+    await Tracking.trackEvent(
+        Tracking.TRACKING_TAPPED, Tracking.ACCEPT_TRACKING, "");
   }
 }
 
@@ -119,7 +123,7 @@ extension on String {
   clean() {
     var str = this.replaceAll('/', '_').replaceAll('-', '_');
 
-    if (!str.startsWith(new RegExp(r'[A-Za-z]'))) {
+    if (str.isNotEmpty && !str.startsWith(new RegExp(r'[A-Za-z]'))) {
       str.replaceRange(0, 1, "");
     }
 

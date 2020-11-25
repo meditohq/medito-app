@@ -51,50 +51,55 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            MeditoAppBarWidget(
-              titleWidget: SvgPicture.asset(
-                'assets/images/medito.svg',
-                height: 16,
-              ),
-              transparent: true,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '3. What\'s your email address?',
-                    style: Theme.of(context).textTheme.headline2,
-                  ),
-                  Container(height: 12),
-                  _getEmailAddressBox(),
-                  Container(height: 32),
-                  Text('4. Can we stay in touch?',
-                      style: Theme.of(context).textTheme.headline2),
-                  Container(height: 12),
-                  Text(
-                      'We’ll send you updates, let you know how your donation is spent and if we need your support.',
-                      style: Theme.of(context).textTheme.caption),
-                  Container(height: 12),
-                  _stayInTouchRow(),
-                  _stayInTouchSelected == 0 ? _begView() : Container(),
-                  Container(height: 32),
-                  _donateButton(),
-                  Container(height: 124),
-                  _explainRow(),
-                  Container(height: 64),
-                ],
-              ),
-            ),
+      appBar: MeditoAppBarWidget(
+        titleWidget: SvgPicture.asset(
+          'assets/images/medito.svg',
+          height: 16,
+        ),
+        transparent: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+        child: CustomScrollView(
+          physics: new ClampingScrollPhysics(),
+          slivers: [
+            SliverFillRemaining(
+                hasScrollBody: false, child: _buildColumn(context)),
           ],
         ),
       ),
+    );
+  }
+
+  Column _buildColumn(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '3. What\'s your email address?',
+          style: Theme.of(context).textTheme.headline2,
+        ),
+        Container(height: 12),
+        _getEmailAddressBox(),
+        Container(height: 32),
+        Text('4. Can we stay in touch?',
+            style: Theme.of(context).textTheme.headline2),
+        Container(height: 12),
+        Text(
+            'We’ll send you updates, let you know how your donation is spent and if we need your support.',
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                .copyWith(letterSpacing: 0.2)),
+        Container(height: 12),
+        _stayInTouchRow(),
+        _stayInTouchSelected == 0 ? _begView() : Container(),
+        Container(height: 32),
+        _donateButton(),
+        Expanded(child: Container(height: 32)),
+        _explainRow(),
+        Container(height: 16),
+      ],
     );
   }
 
@@ -158,7 +163,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
               child: Text(
                 'Donate Now',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
-                    color: MeditoColors.moonlight, fontWeight: FontWeight.w600),
+                    color: MeditoColors.moonlight, fontWeight: FontWeight.w500),
               ),
               onPressed: () {
                 if (_emailValid && _stayInTouchSelected != -1) _next();
@@ -184,10 +189,6 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
                 style: Theme.of(context).textTheme.caption,
               ),
             ),
-            Container(width: 16),
-            SvgPicture.asset(
-              'assets/images/up_arrow.svg',
-            )
           ],
         ),
       ],
@@ -227,8 +228,8 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
                 TextSpan(
                     text: 'Tap here to read our privacy policy.',
                     recognizer: new TapGestureRecognizer()
-                      ..onTap = () => launchUrl(
-                          "https://meditofoundation.org/privacy"),
+                      ..onTap = () =>
+                          launchUrl("https://meditofoundation.org/privacy"),
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                     )),
@@ -257,10 +258,10 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
           controller: _emailController,
           cursorColor: MeditoColors.walterWhite,
           decoration: InputDecoration(
-            hintText: 'email',
+            hintText: 'Enter your email here',
             hintStyle: Theme.of(context)
                 .textTheme
-                .headline2
+                .headline3
                 .copyWith(color: MeditoColors.walterWhite.withAlpha(178)),
             suffixIcon: _emailController.text.length > 0
                 ? IconButton(

@@ -258,9 +258,9 @@ Future<void> acceptTracking() async {
   await prefs.setBool('tracking', true);
 }
 
-Future<bool> trackingAccepted() async {
+Future<bool> isTrackingAccepted() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('tracking') ?? true;
+  return prefs.getBool('tracking') ?? false;
 }
 
 Future<void> trackingAnswered() async {
@@ -275,41 +275,50 @@ Future<bool> getTrackingAnswered() async {
 
 void showConsentDialog(BuildContext context) {
   showDialog(
+      barrierDismissible: false,
       context: context,
       child: AlertDialog(
+        actionsPadding: const EdgeInsets.only(right: 12.0, bottom: 12.0),
+        title: Text("👋"),
         backgroundColor: MeditoColors.moonlight,
         content: getMarkdownBody(
             '### We’d like to automatically collect information about your use of Medito so we can make it better.\n ### You don’t have to do anything & the data collected is anonymous.\n [Learn more by tapping here.](https://meditofoundation.org/privacy)',
             context),
         actions: [
-          FlatButton(
-            textColor: MeditoColors.walterWhite,
-            onPressed: () {
-              Tracking.trackTrackingAnswered(false);
-              trackingAnswered();
-              Navigator.pop(context);
-            },
-            child: Text(
-              'DECLINE',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2
-                  .copyWith(fontSize: 18.0, color: MeditoColors.walterWhite),
+          Container(
+            height: 48,
+            child: FlatButton(
+              textColor: MeditoColors.walterWhite,
+              shape: roundedRectangleBorder(),
+              onPressed: () async {
+                Tracking.enableAnalytics(false);
+                await trackingAnswered();
+                Navigator.pop(context);
+              },
+              child: Text(
+                'DECLINE',
+                style: Theme.of(context).textTheme.headline3.copyWith(
+                    color: MeditoColors.walterWhite, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-          FlatButton(
-            color: MeditoColors.peacefulBlue,
-            shape: roundedRectangleBorder(),
-            onPressed: () {
-              Tracking.trackTrackingAnswered(true);
-              acceptTracking();
-              trackingAnswered();
-              Navigator.pop(context);
-            },
-            child: Text(
-              'ACCEPT',
-              style: Theme.of(context).textTheme.headline3.copyWith(
-                  color: MeditoColors.darkMoon, fontWeight: FontWeight.bold),
+          Container(
+            height: 48,
+            child: FlatButton(
+              color: MeditoColors.peacefulBlue,
+              shape: roundedRectangleBorder(),
+              onPressed: () async {
+                Tracking.enableAnalytics(true);
+                await acceptTracking();
+                await Tracking.trackTrackingAnswered(true);
+                await trackingAnswered();
+                Navigator.pop(context);
+              },
+              child: Text(
+                ' ACCEPT ',
+                style: Theme.of(context).textTheme.headline3.copyWith(
+                    color: MeditoColors.darkMoon, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],

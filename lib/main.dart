@@ -16,8 +16,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,8 +34,6 @@ Future<void> main() async {
       statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
 
-  //If these values are missing, just delete this method and initialiseTracker below.
-  // But please don't commit to git
   FirebaseApp app = await Firebase.initializeApp(
       options: FirebaseOptions(
     appId: appId,
@@ -45,11 +43,11 @@ Future<void> main() async {
     databaseURL: databaseURL,
   ));
 
-  InAppPurchaseConnection.enablePendingPurchases();
   Tracking.initialiseTracker(app);
 
-  runApp(HomeScreenWidget());
+  InAppPurchaseConnection.enablePendingPurchases();
 
+  runApp(HomeScreenWidget());
 }
 
 /// This Widget is the main application widget.
@@ -64,8 +62,18 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
+
+    isTrackingAccepted().then((value) async {
+      if (value) {
+        Tracking.enableAnalytics(true);
+      } else {
+        Tracking.enableAnalytics(false);
+      }
+    });
+
+
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -84,8 +92,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
 
   @override
   Widget build(BuildContext context) {
-
-
     return MaterialApp(
       initialRoute: '/nav',
       routes: {
