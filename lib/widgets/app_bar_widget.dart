@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
-class MeditoAppBarWidget extends StatelessWidget {
+class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
   const MeditoAppBarWidget(
       {Key key,
       this.title,
@@ -57,4 +57,8 @@ class MeditoAppBarWidget extends StatelessWidget {
         ],
       );
   }
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size.fromHeight(56.0);
 }

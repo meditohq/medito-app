@@ -89,22 +89,21 @@ class _DonationWidgetState extends State<DonationWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          MeditoAppBarWidget(
-            transparent: true,
-            titleWidget: SvgPicture.asset(
-              'assets/images/medito.svg',
-              height: 16,
-            ),
-            hasCloseButton: true,
-          ),
-          subscriptions != null && subscriptions.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                  child: SingleChildScrollView(
+      appBar: MeditoAppBarWidget(
+        transparent: true,
+        titleWidget: SvgPicture.asset(
+          'assets/images/medito.svg',
+          height: 16,
+        ),
+        hasCloseButton: true,
+      ),
+      body: subscriptions != null && subscriptions.isNotEmpty
+          ? Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -120,25 +119,28 @@ class _DonationWidgetState extends State<DonationWidget> {
                         _donationGrid(),
                         Container(height: 32),
                         _donateButton(),
-                        Container(height: 124),
+                        Expanded(child: Container(height: 0)),
                         _explainRow(),
-                        Container(height: 64),
                       ],
                     ),
                   ),
-                )
-              : Column(
-                  children: [
-                    Center(
-                        child: SizedBox(
-                            height: 32,
-                            width: 32,
-                            child: CircularProgressIndicator())),
-                  ],
-                ),
-        ],
-      ),
+                ],
+              ),
+          )
+          : _loadingWidget(),
     );
+  }
+
+  Column _loadingWidget() {
+    return Column(
+            children: [
+              Center(
+                  child: SizedBox(
+                      height: 32,
+                      width: 32,
+                      child: CircularProgressIndicator())),
+            ],
+          );
   }
 
   Widget _donationTypeRow() {
@@ -157,6 +159,7 @@ class _DonationWidgetState extends State<DonationWidget> {
               child: Text(
                 'Give Once',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    fontWeight: FontWeight.w500,
                     color: _giveSelected == ONCE
                         ? MeditoColors.almostBlack
                         : MeditoColors.walterWhite),
@@ -177,6 +180,7 @@ class _DonationWidgetState extends State<DonationWidget> {
               child: Text(
                 '♥️ Give Monthly',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    fontWeight: FontWeight.w500,
                     color: _giveSelected == MONTHLY
                         ? MeditoColors.almostBlack
                         : MeditoColors.walterWhite),
@@ -204,10 +208,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                       : MeditoColors.moonlight,
                   child: Text(
                     getPrice(index: 0),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: _amountSelect == 0
-                            ? MeditoColors.almostBlack
-                            : MeditoColors.walterWhite),
+                    style: getAmountTextStyle(0),
                   ),
                   onPressed: () {
                     setState(() {
@@ -227,10 +228,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                       : MeditoColors.moonlight,
                   child: Text(
                     getPrice(index: 1),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: _amountSelect == 1
-                            ? MeditoColors.almostBlack
-                            : MeditoColors.walterWhite),
+                    style: getAmountTextStyle(1),
                   ),
                   onPressed: () {
                     setState(() {
@@ -250,10 +248,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                       : MeditoColors.moonlight,
                   child: Text(
                     getPrice(index: 2),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: _amountSelect == 2
-                            ? MeditoColors.almostBlack
-                            : MeditoColors.walterWhite),
+                    style: getAmountTextStyle(2),
                   ),
                   onPressed: () {
                     setState(() {
@@ -278,10 +273,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                       : MeditoColors.moonlight,
                   child: Text(
                     getPrice(index: 3),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: _amountSelect == 3
-                            ? MeditoColors.almostBlack
-                            : MeditoColors.walterWhite),
+                    style: getAmountTextStyle(3),
                   ),
                   onPressed: () {
                     setState(() {
@@ -301,10 +293,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                       : MeditoColors.moonlight,
                   child: Text(
                     getPrice(index: 4),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: _amountSelect == 4
-                            ? MeditoColors.almostBlack
-                            : MeditoColors.walterWhite),
+                    style: getAmountTextStyle(4),
                   ),
                   onPressed: () {
                     setState(() {
@@ -324,10 +313,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                       : MeditoColors.moonlight,
                   child: Text(
                     getPrice(index: 5),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: _amountSelect == 5
-                            ? MeditoColors.almostBlack
-                            : MeditoColors.walterWhite),
+                    style: getAmountTextStyle(5),
                   ),
                   onPressed: () {
                     setState(() {
@@ -343,6 +329,13 @@ class _DonationWidgetState extends State<DonationWidget> {
     );
   }
 
+  TextStyle getAmountTextStyle(amountSelected) =>
+      Theme.of(context).textTheme.bodyText2.copyWith(
+          fontWeight: FontWeight.w500,
+          color: _amountSelect == amountSelected
+              ? MeditoColors.almostBlack
+              : MeditoColors.walterWhite);
+
   Widget _donateButton() {
     return Row(
       children: [
@@ -355,7 +348,7 @@ class _DonationWidgetState extends State<DonationWidget> {
                 'Next',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
                       color: MeditoColors.moonlight,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
               ),
               onPressed: () => _openPage2(),
@@ -388,7 +381,7 @@ class _DonationWidgetState extends State<DonationWidget> {
               child: Text(
                 'A monthly donation helps us reach even more people & plan ahead',
                 textAlign: TextAlign.right,
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.headline3,
               ),
             ),
             Container(width: 16),
@@ -427,7 +420,7 @@ class _DonationWidgetState extends State<DonationWidget> {
             TextSpan(
               text:
                   'Medito Foundation is a nonprofit registered in the UK & Netherlands. ',
-              style: Theme.of(context).textTheme.bodyText2,
+              style: Theme.of(context).textTheme.headline3,
               children: <TextSpan>[
                 TextSpan(
                     text: 'Tap here to learn more.',
