@@ -362,7 +362,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
             'donation_id': donation.billingClientPurchase.orderId,
             'donation_platform': 'app',
             'donation_timestamp': _getTimeStamp(donation),
-            'donation_email': _emailController.text,
+            'donor_email': _emailController.text,
             'newsletter': _getNewsletterTrueOrFalse(),
             'pending': donation.status == PurchaseStatus.pending
           });
