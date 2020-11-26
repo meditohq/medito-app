@@ -44,8 +44,8 @@ project.ext {
     KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
     KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
     KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
-    VERSION_CODE = configured ? keystoreProperties['versionCode'].toInteger() : 1
-    VERSION_NAME = configured ? keystoreProperties['versionName'] : "0.0.1"
+    VERSION_CODE = flutterVersionCode
+    VERSION_NAME = flutterVersionName
 }
 
 if (project.APP_ID == "DEFAULT_DO_NOT_USE") {
