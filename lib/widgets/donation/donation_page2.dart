@@ -184,7 +184,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
           children: [
             Expanded(
               child: Text(
-                '😔 Sorry to hear that. We don\'t email often; would you consider changing your mind? If you don’t like our emails you can easily unsubscribe!',
+                '😔 We\'re sorry to hear that. Please hit YES if you are curious about what we do and how you can help in other ways! We don\'t email often.',
                 textAlign: TextAlign.right,
                 style: Theme.of(context).textTheme.caption,
               ),
