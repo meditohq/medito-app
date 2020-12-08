@@ -85,10 +85,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     getIntValuesSF(widget.id, 'lengthSelected')
         .then((value) => lengthSelected = value);
     getIntValuesSF(widget.id, 'musicSelected')
-        .then((value) => _musicSelected = value);
+        .then((index) {
+          _musicSelected = index;
+        });
     _viewModel.getBackgroundMusicList().then((value) {
       setState(() {
         _bgMusicList = value;
+        var index = _musicSelected;
+        onMusicSelected(
+            index,
+            index > 0 ? _bgMusicList[index - 1].value : "",
+            index > 0 ? _bgMusicList[index - 1].key : "");
       });
     });
 
