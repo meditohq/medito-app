@@ -27,9 +27,9 @@ dependencies:
   shared_preferences: 0.5.12
   cached_network_image: ^2.3.2+1
   auto_size_text: ^2.1.0
-  just_audio: ^0.5.4
+  just_audio: ^0.5.6
   audio_session: ^0.0.9
-  audio_service: ^0.15.2
+  audio_service: ^0.15.3
   rxdart: ^0.24.1
   share: ^0.6.5+2
   firebase_core: ^0.5.0+1

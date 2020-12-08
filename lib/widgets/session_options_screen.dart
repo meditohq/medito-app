@@ -13,15 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'dart:io';
-
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
-import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/bottom_sheet_view_model.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
@@ -160,19 +158,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           buildSessionLengthRow(),
                           getBGMusicSpacer(),
                           ////////// spacer
-                          !Platform.isIOS
-                              ? getBGMusicRowOrContainer()
-                              : Container(),
-                          !Platform.isIOS
-                              ? buildBackgroundMusicRow()
-                              : Container(),
-                          !Platform.isIOS ? buildSpacer() : Container(),
+                          getBGMusicRowOrContainer(),
+                          buildBackgroundMusicRow(),
+                          buildSpacer(),
                           ////////// spacer
-                          !Platform.isIOS
-                              ? buildTextHeaderForRow(
-                                  'Available Offline $_availableOfflineIndicatorText')
-                              : Container(),
-                          !Platform.isIOS ? buildOfflineRow() : Container(),
+                          buildTextHeaderForRow(
+                              'Available Offline $_availableOfflineIndicatorText'),
+                          buildOfflineRow(),
                           Container(height: 80)
                         ],
                       ),
@@ -618,7 +610,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: FilterChip(
-        onSelected:  (bool value) {},
+        onSelected: (bool value) {},
         pressElevation: 4,
         shape: buildChipBorder(),
         labelPadding: buildInnerChipPadding(),

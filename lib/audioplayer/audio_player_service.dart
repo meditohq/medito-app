@@ -151,12 +151,18 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // It is important to wait for this state to be broadcast before we shut
     // down the task. If we don't, the background task will be destroyed before
     // the message gets sent to the UI.
-    await _player.stop();
-    await _bgPlayer.stop();
-    await _broadcastState();
-    await _player.dispose();
-    await _bgPlayer.dispose();
-    _eventSubscription.cancel();
+    try {
+      _eventSubscription.cancel();
+    } catch (e) {}
+    try {
+      await _player.stop();
+      await _broadcastState();
+      await _player.dispose();
+    } catch (e) {}
+    try {
+      await _bgPlayer.stop();
+      await _bgPlayer.dispose();
+    } catch (e) {}
     // Shut down this task
     await super.onStop();
   }
@@ -185,7 +191,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   /// Broadcasts the current state to all clients.
   Future<void> _broadcastState() async {
-    await AudioServiceBackground.setState(
+    return AudioServiceBackground.setState(
       controls: [
         if (_player.playing) MediaControl.pause else MediaControl.play,
         MediaControl.stop,
@@ -242,7 +248,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       AudioServiceBackground.sendCustomEvent('stats');
 
-      Tracking.trackEvent(Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, '');
+      Tracking.trackEvent(
+          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, '');
     }
   }
 }
