@@ -2,8 +2,6 @@
 //
 //     final welcome = welcomeFromMap(jsonString);
 
-import 'dart:convert';
-
 class Welcome {
   Welcome({
     this.data,

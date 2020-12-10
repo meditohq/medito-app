@@ -18,7 +18,6 @@ import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/welcome.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/session_options_screen.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -633,13 +632,6 @@ class TileListState extends State<TileList> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void _openDonate() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DonationWidget(),
-        ));
-  }
 }
 
 class AnnouncementBanner extends StatefulWidget {
