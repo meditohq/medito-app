@@ -241,7 +241,7 @@ void launchDonatePageOrWidget(BuildContext context) {
   }
 }
 
-void launchUrl(String url) async {
+launchUrl(String url) async {
   if (await canLaunch(url)) {
     await launch(url);
   }

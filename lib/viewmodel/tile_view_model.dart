@@ -33,7 +33,7 @@ class TileListViewModelImpl implements TileListViewModel {
   bool _skipCache;
 
   Future getTiles({bool skipCache = false}) async {
-    this._skipCache = skipCache;
+    _skipCache = skipCache;
     var response =
         await httpGet(baseUrl + '/tile/children', skipCache: skipCache);
     var pages = PagesChildren.fromJson(response);
@@ -43,15 +43,15 @@ class TileListViewModelImpl implements TileListViewModel {
   }
 
   Future<WelcomeContent> getAnnouncement({bool skipCache = false}) async {
-    this._skipCache = skipCache;
+    _skipCache = skipCache;
     var response =
         await httpGet(baseUrl + '/service+announcement', skipCache: skipCache);
-    Welcome pages = Welcome.fromMap(response);
+    var pages = Welcome.fromMap(response);
     return pages.data.content;
   }
 
   Future _getTileListFromDataChildren(List<DataChildren> pageList) async {
-    List<TileItem> listItemList = [];
+    var listItemList = <TileItem>[];
     for (var value in pageList) {
       if (value.template == 'tile-large') {
         _addTileItemToList(listItemList, value, TileType.large);
@@ -67,7 +67,7 @@ class TileListViewModelImpl implements TileListViewModel {
 
   Future getAudioFromSet({String id = '', String timely = 'daily'}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
-    var response = await httpGet(url, skipCache: this._skipCache);
+    var response = await httpGet(url, skipCache: _skipCache);
 
     List all = PagesChildren.fromJson(response).data;
 
@@ -86,8 +86,8 @@ class TileListViewModelImpl implements TileListViewModel {
 
   Future getAudioData({String id = ''}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
-    var response = await httpGet(url, skipCache: this._skipCache);
-    this._skipCache = false;
+    var response = await httpGet(url, skipCache: _skipCache);
+    _skipCache = false;
     try {
       return Pages.fromJson(response).data.content;
     } catch (exception) {
@@ -105,8 +105,8 @@ class TileListViewModelImpl implements TileListViewModel {
 
   Future<String> getTextFile(String contentId) async {
     var url = baseUrl + '/' + contentId.replaceAll('/', '+');
-    var response = await httpGet(url, skipCache: this._skipCache);
-    this._skipCache = false;
+    var response = await httpGet(url, skipCache: _skipCache);
+    _skipCache = false;
     return Pages.fromJson(response).data.content.body;
   }
 

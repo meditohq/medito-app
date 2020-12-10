@@ -33,28 +33,28 @@ class ListItem {
       this.contentText});
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['thumbnail'] = this.thumbnail;
-    data['id'] = this.id;
-    data['description'] = this.description;
-    data['contentText'] = this.contentText;
-    data['type'] = this.type.index;
-    data['fileType'] = this.fileType.index;
-    data['url'] = this.url;
-    data['title'] = this.title;
-    data['parentId'] = this.parentId;
+    final data = <String, dynamic>{};
+    data['thumbnail'] = thumbnail;
+    data['id'] = id;
+    data['description'] = description;
+    data['contentText'] = contentText;
+    data['type'] = type.index;
+    data['fileType'] = fileType.index;
+    data['url'] = url;
+    data['title'] = title;
+    data['parentId'] = parentId;
     return data;
   }
 
   factory ListItem.fromJson(Map<String, dynamic> parsedJson) {
-    return new ListItem(parsedJson['title'] ?? "", parsedJson['id'] ?? "",
+    return ListItem(parsedJson['title'] ?? '', parsedJson['id'] ?? '',
         ListItemType.values[parsedJson['type'] ?? 0],
-        thumbnail: parsedJson['thumbnail'] ?? "",
-        description: parsedJson['description'] ?? "",
-        contentText: parsedJson['contentText'] ?? "",
+        thumbnail: parsedJson['thumbnail'] ?? '',
+        description: parsedJson['description'] ?? '',
+        contentText: parsedJson['contentText'] ?? '',
         fileType: FileType.values[parsedJson['fileType'] ?? 0],
-        url: parsedJson['url'] ?? "",
-        parentId: parsedJson['parentId'] ?? "");
+        url: parsedJson['url'] ?? '',
+        parentId: parsedJson['parentId'] ?? '');
   }
 }
 

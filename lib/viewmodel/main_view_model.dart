@@ -59,7 +59,7 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     var listItemList = <ListItem>[];
     for (var value in pageList) {
       var parentId = value.id.substring(0, value.id.lastIndexOf('/'));
-      var contentText = value.description ?? "";
+      var contentText = value.description ?? '';
 
       if (value.template == 'default') {
         //just a folder

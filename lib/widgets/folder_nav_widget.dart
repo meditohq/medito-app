@@ -86,7 +86,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.updateNavData(
-          ListItem("Home", 'app+content', null, parentId: "app+content"));
+          ListItem('Home', 'app+content', null, parentId: 'app+content'));
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
@@ -211,7 +211,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               return LoadingListWidget();
             }
 
-            return new ListView.builder(
+            return ListView.builder(
                 itemCount:
                     1 + (snapshot.data == null ? 0 : snapshot.data.length),
                 shrinkWrap: true,
@@ -272,7 +272,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     }
   }
 
-  _showSessionOptionsScreen(ListItem listItem) {
+  void _showSessionOptionsScreen(ListItem listItem) {
     _viewModel.currentlySelectedFile = listItem;
 
     var data;

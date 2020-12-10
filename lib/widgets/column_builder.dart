@@ -28,22 +28,22 @@ class ColumnBuilder extends StatelessWidget {
     Key key,
     @required this.itemBuilder,
     @required this.itemCount,
-    this.mainAxisAlignment: MainAxisAlignment.start,
-    this.mainAxisSize: MainAxisSize.max,
-    this.crossAxisAlignment: CrossAxisAlignment.center,
+    this.mainAxisAlignment = MainAxisAlignment.start,
+    this.mainAxisSize = MainAxisSize.max,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
     this.textDirection,
-    this.verticalDirection: VerticalDirection.down,
+    this.verticalDirection = VerticalDirection.down,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return new Column(
-      crossAxisAlignment: this.crossAxisAlignment,
-      mainAxisSize: this.mainAxisSize,
-      mainAxisAlignment: this.mainAxisAlignment,
-      verticalDirection: this.verticalDirection,
-      children: new List.generate(
-          this.itemCount, (index) => this.itemBuilder(context, index)).toList(),
+    return Column(
+      crossAxisAlignment: crossAxisAlignment,
+      mainAxisSize: mainAxisSize,
+      mainAxisAlignment: mainAxisAlignment,
+      verticalDirection: verticalDirection,
+      children: List.generate(itemCount, (index) => itemBuilder(context, index))
+          .toList(),
     );
   }
 }
