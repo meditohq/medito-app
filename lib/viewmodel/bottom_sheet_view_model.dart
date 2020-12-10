@@ -32,7 +32,7 @@ class SessionOptionsViewModelImpl implements SessionOptionsViewModel {
     var pages = PagesChildren.fromJson(response);
     var pageList = pages.data;
 
-    List list = [];
+    var list = [];
 
     for (var value in pageList) {
       var musicMap = MapEntry(value?.content?.title, value.url);

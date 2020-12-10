@@ -39,7 +39,7 @@ class LoadingListWidget extends StatelessWidget {
         itemCount: 6,
         itemBuilder: (context, i) {
           if (i == 0) {
-            return MeditoAppBarWidget(title: "");
+            return MeditoAppBarWidget(title: '');
           }
           return LoadingItemWidget(index: i + 1);
         });

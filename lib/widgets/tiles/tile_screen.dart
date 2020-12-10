@@ -48,7 +48,7 @@ class TileList extends StatefulWidget {
 }
 
 class TileListState extends State<TileList> {
-  final _viewModel = new TileListViewModelImpl();
+  final _viewModel = TileListViewModelImpl();
 
   var listFuture;
   var streak = getCurrentStreak();
@@ -91,7 +91,6 @@ class TileListState extends State<TileList> {
           if ((future.connectionState == ConnectionState.none &&
                   future.hasData == null) ||
               future.hasError) {
-            print("in the if block\n\n");
             return getErrorWidget();
           }
 
@@ -166,7 +165,7 @@ class TileListState extends State<TileList> {
                   child: RaisedButton(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(12.0),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                       color: MeditoColors.darkColor,
                       onPressed: _onPullToRefresh,
@@ -200,9 +199,9 @@ class TileListState extends State<TileList> {
   }
 
   Future<void> _trackingDialog(BuildContext context) async {
-    getTrackingAnswered().then((answered) async {
+    await getTrackingAnswered().then((answered) async {
       if (!answered && !_dialogShown) showConsentDialog(context);
-      this._dialogShown = true;
+      _dialogShown = true;
     });
   }
 
@@ -224,7 +223,7 @@ class TileListState extends State<TileList> {
             child: ColumnBuilder(
                 itemCount: data == null ? 0 : data?.length,
                 itemBuilder: (BuildContext context, int index) {
-                  TileItem tile = data[index];
+                  var tile = data[index];
                   if (index < data.length / 2) {
                     return getTile(tile);
                   } else {
@@ -246,7 +245,7 @@ class TileListState extends State<TileList> {
                     );
                   }
 
-                  TileItem tile = data[index];
+                  var tile = data[index];
                   if (data != null && index >= data.length / 2) {
                     return getTile(tile);
                   } else {
@@ -299,8 +298,8 @@ class TileListState extends State<TileList> {
                             letterSpacing: 0.1,
                             height: 1.3)),
                   ),
-                  Container(height: item.description != "" ? 4 : 0),
-                  item.description != ""
+                  Container(height: item.description != '' ? 4 : 0),
+                  item.description != ''
                       ? SizedBox(
                           width: getColumWidth() - 48, //todo horrible hack
                           child: Opacity(
@@ -362,7 +361,7 @@ class TileListState extends State<TileList> {
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                      item.description == null ? "" : item.description,
+                      item.description ?? '',
                       style: Theme.of(context)
                           .textTheme
                           .caption
@@ -400,7 +399,7 @@ class TileListState extends State<TileList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         getTitleText(item),
-                        Container(height: item.description != "" ? 6 : 0),
+                        Container(height: item.description != '' ? 6 : 0),
                         getDescText(item),
                       ],
                     ),
@@ -438,7 +437,7 @@ class TileListState extends State<TileList> {
     );
   }
 
-  _onTap(TileItem tile) {
+  void _onTap(TileItem tile) {
     Tracking.trackEvent(
         Tracking.TAP, Tracking.TILE_TAPPED, tile.id + '_' + tile.pathTemplate);
 
@@ -478,7 +477,7 @@ class TileListState extends State<TileList> {
     });
   }
 
-  _showPlayer(
+  void _showPlayer(
       Files fileTapped,
       Illustration coverArt,
       dynamic primaryColor,
@@ -546,7 +545,7 @@ class TileListState extends State<TileList> {
     });
   }
 
-  _onStreakTap() {
+  void _onStreakTap() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => StreakWidget()),
@@ -572,7 +571,7 @@ class TileListState extends State<TileList> {
   }
 
   Widget getLoadingWidget() {
-    TileItem item = TileItem("", "", "000000");
+    var item = TileItem('', '', '000000');
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -616,14 +615,14 @@ class TileListState extends State<TileList> {
   }
 
   Future<void> _showVersionPopUp() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var packageInfo = await PackageInfo.fromPlatform();
 
-    String version = packageInfo.version;
-    String buildNumber = packageInfo.buildNumber;
+    var version = packageInfo.version;
+    var buildNumber = packageInfo.buildNumber;
 
-    final snackBar = new SnackBar(
-        content: new Text(
-          "Version: $version - Build Number: $buildNumber",
+    final snackBar = SnackBar(
+        content: Text(
+          'Version: $version - Build Number: $buildNumber',
           style: TextStyle(color: MeditoColors.lightTextColor),
         ),
         backgroundColor: MeditoColors.midnight);
@@ -688,10 +687,10 @@ class _AnnouncementBannerState extends State<AnnouncementBanner> {
                           color: MeditoColors.walterWhite, letterSpacing: 0.2)),
                   onPressed: () {
                     switch (widget.data.buttonDestinationType.toLowerCase()) {
-                      case "folder":
-                      case "text":
-                      case "session-single":
-                      case "url":
+                      case 'folder':
+                      case 'text':
+                      case 'session-single':
+                      case 'url':
                         launchUrl(widget.data.buttonDestinationLink);
                     }
                   },

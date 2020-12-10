@@ -44,7 +44,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
         double position = snapshot.data ??
             widget.state?.currentPosition?.inMilliseconds?.toDouble() ??
             0;
-        int duration = widget.mediaItem?.duration?.inMilliseconds ?? 0;
+        var duration = widget.mediaItem?.duration?.inMilliseconds ?? 0;
 
         if (position > duration - 10 && !tracked) {
           tracked = true;
@@ -114,6 +114,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 }
 
 class CustomTrackShape extends RoundedRectSliderTrackShape {
+  @override
   Rect getPreferredRect({
     @required RenderBox parentBox,
     Offset offset = Offset.zero,
@@ -121,11 +122,11 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     bool isEnabled = false,
     bool isDiscrete = false,
   }) {
-    final double trackHeight = sliderTheme.trackHeight;
-    final double trackLeft = offset.dx;
-    final double trackTop =
+    final trackHeight = sliderTheme.trackHeight;
+    final trackLeft = offset.dx;
+    final trackTop =
         offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
-    final double trackWidth = parentBox.size.width;
+    final trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }
@@ -134,15 +135,14 @@ extension DurationExtensions on Duration {
   /// Converts the duration into a readable string
   /// 15:35
   String toMinutesSeconds() {
-    String twoDigitMinutes = _toTwoDigits(this
-        .inMinutes
+    var twoDigitMinutes = _toTwoDigits(inMinutes
         .remainder(100)); //NB: if it's over 100 mins it'll show 0:00!!
-    String twoDigitSeconds = _toTwoDigits(this.inSeconds.remainder(60));
-    return "$twoDigitMinutes:$twoDigitSeconds";
+    var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
+    return '$twoDigitMinutes:$twoDigitSeconds';
   }
 
   String _toTwoDigits(int n) {
-    if (n >= 10) return "$n";
-    return "0$n";
+    if (n >= 10) return '$n';
+    return '0$n';
   }
 }

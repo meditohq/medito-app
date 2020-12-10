@@ -117,7 +117,7 @@ Widget getNetworkImageWidget(String url,
   } else {
     return SvgPicture.network(
       url,
-      color: svgColor != null ? svgColor : MeditoColors.darkBGColor,
+      color: svgColor ?? MeditoColors.darkBGColor,
     );
   }
 }
@@ -135,22 +135,22 @@ Future<bool> checkConnectivity() async {
 }
 
 int getColorFromHex(String hexColor) {
-  hexColor = hexColor.toUpperCase().replaceAll("#", "");
+  hexColor = hexColor.toUpperCase().replaceAll('#', '');
   if (hexColor.length == 6) {
-    hexColor = "FF" + hexColor;
+    hexColor = 'FF' + hexColor;
   }
   return int.parse(hexColor, radix: 16);
 }
 
 Color parseColor(String color) {
-  if (color == null || color.length == 0) return MeditoColors.midnight;
+  if (color == null || color.isEmpty) return MeditoColors.midnight;
 
   return Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
 }
 
 void createSnackBar(String message, BuildContext context) {
   final snackBar =
-      new SnackBar(content: new Text(message), backgroundColor: Colors.red);
+      SnackBar(content: Text(message), backgroundColor: Colors.red);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);
@@ -159,7 +159,7 @@ void createSnackBar(String message, BuildContext context) {
 void createSnackBarWithColor(
     String message, BuildContext context, Color color) {
   final snackBar =
-      new SnackBar(content: new Text(message), backgroundColor: color);
+      SnackBar(content: Text(message), backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);
@@ -174,11 +174,12 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 MarkdownBody getMarkdownBody(String content, BuildContext context) {
   return MarkdownBody(
     onTapLink: ((url) {
-      if (url.contains("medito-donate")) {
+      if (url.contains('medito-donate')) {
         //open the donate page here
         launchDonatePageOrWidget(context);
-      } else
+      } else {
         launch(url);
+      }
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
@@ -191,7 +192,7 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
         h3: Theme.of(context).textTheme.subtitle2,
         listBullet: Theme.of(context).textTheme.subtitle1,
         p: Theme.of(context).textTheme.bodyText2.copyWith(height: 1.5)),
-    data: content == null ? '' : content,
+    data: content ?? '',
     imageDirectory: 'https://raw.githubusercontent.com',
   );
 }
@@ -199,11 +200,12 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
 MarkdownBody getDescriptionMarkdownBody(String content, BuildContext context) {
   return MarkdownBody(
     onTapLink: ((url) {
-      if (url.contains("medito-donate")) {
+      if (url.contains('medito-donate')) {
         //open the donate page here
         launchDonatePageOrWidget(context);
-      } else
+      } else {
         launch(url);
+      }
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
@@ -221,7 +223,7 @@ MarkdownBody getDescriptionMarkdownBody(String content, BuildContext context) {
             fontWeight: FontWeight.w500,
             color: MeditoColors.walterWhite.withOpacity(0.7),
             height: 1.5)),
-    data: content == null ? '' : content,
+    data: content ?? '',
     imageDirectory: 'https://raw.githubusercontent.com',
   );
 }
@@ -234,18 +236,19 @@ void launchDonatePageOrWidget(BuildContext context) {
         MaterialPageRoute(
           builder: (context) => DonationWidget(),
         ));
-  } else
-    launch("https://meditofoundation.org/donate");
+  } else {
+    launch('https://meditofoundation.org/donate');
+  }
 }
 
-launchUrl(String url) async {
+void launchUrl(String url) async {
   if (await canLaunch(url)) {
     await launch(url);
   }
 }
 
 Duration clockTimeToDuration(String lengthText) {
-  var tempList = lengthText.split(":");
+  var tempList = lengthText.split(':');
   var tempListInts = tempList.map(int.parse).toList();
   return Duration(
       hours: tempListInts[0],
@@ -254,22 +257,22 @@ Duration clockTimeToDuration(String lengthText) {
 }
 
 Future<void> acceptTracking() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var prefs = await SharedPreferences.getInstance();
   await prefs.setBool('tracking', true);
 }
 
 Future<bool> isTrackingAccepted() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var prefs = await SharedPreferences.getInstance();
   return prefs.getBool('tracking') ?? false;
 }
 
 Future<void> trackingAnswered() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var prefs = await SharedPreferences.getInstance();
   await prefs.setBool('trackingAnswered', true);
 }
 
 Future<bool> getTrackingAnswered() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var prefs = await SharedPreferences.getInstance();
   return prefs.getBool('trackingAnswered') ?? false;
 }
 
@@ -279,7 +282,7 @@ void showConsentDialog(BuildContext context) {
       context: context,
       child: AlertDialog(
         actionsPadding: const EdgeInsets.only(right: 12.0, bottom: 12.0),
-        title: Text("👋"),
+        title: Text('👋'),
         backgroundColor: MeditoColors.moonlight,
         content: getMarkdownBody(
             '### We’d like to automatically collect information about your use of Medito so we can make it better.\n ### You don’t have to do anything & the data collected is anonymous.\n [Learn more by tapping here.](https://meditofoundation.org/privacy)',

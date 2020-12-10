@@ -322,7 +322,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   bool _isConsumable(ProductDetails product) {
-    return !product.id.contains("subscription");
+    return !product.id.contains('subscription');
   }
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) {
@@ -367,7 +367,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   String _getNewsletterTrueOrFalse() =>
-      _stayInTouchSelected == 0 ? "false" : "true";
+      _stayInTouchSelected == 0 ? "false" : 'true';
 
   int _getTimeStamp(PurchaseDetails donation) {
     var timeAsString = donation.billingClientPurchase.purchaseTime.toString();
@@ -375,7 +375,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   dynamic getDonationType(PurchaseDetails donation) {
-    if (donation.productID.contains("donation"))
+    if (donation.productID.contains('donation'))
       return 1;
     else
       return "Subscription update";

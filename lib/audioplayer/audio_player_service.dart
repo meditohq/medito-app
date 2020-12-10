@@ -14,8 +14,8 @@ const fadeDuration = 20;
 
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
-  AudioPlayer _player = new AudioPlayer(handleInterruptions: false);
-  AudioPlayer _bgPlayer = new AudioPlayer(handleInterruptions: false);
+  final AudioPlayer _player = AudioPlayer(handleInterruptions: false);
+  final AudioPlayer _bgPlayer = AudioPlayer(handleInterruptions: false);
   AudioProcessingState _skipState;
   Seeker _seeker;
   StreamSubscription<PlaybackEvent> _eventSubscription;
@@ -29,14 +29,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
     await MediaLibrary.retrieveMediaLibrary().then((value) {
-      this.mediaItem = value;
+      mediaItem = value;
     });
 
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    AudioServiceBackground.setQueue([mediaItem]);
+    await AudioServiceBackground.setQueue([mediaItem]);
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
@@ -52,18 +52,19 @@ class AudioPlayerTask extends BackgroundAudioTask {
         }
 
         playBgMusic(mediaItem.extras['bgMusic']);
-        onPlay();
+        await onPlay();
       });
     } catch (e) {
-      print("Error: $e");
-      onStop();
+      print('Error: $e');
+      await onStop();
     }
 
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
-      if (index != null)
+      if (index != null) {
         AudioServiceBackground.setMediaItem(
             mediaItem.copyWith(duration: _duration));
+      }
       return null;
     });
 
@@ -152,17 +153,23 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // down the task. If we don't, the background task will be destroyed before
     // the message gets sent to the UI.
     try {
-      _eventSubscription.cancel();
-    } catch (e) {}
+      await _eventSubscription.cancel();
+    } catch (e) {
+      print('error cancelling');
+    }
     try {
       await _player.stop();
       await _broadcastState();
       await _player.dispose();
-    } catch (e) {}
+    } catch (e) {
+      print('error cancelling player');
+    }
     try {
       await _bgPlayer.stop();
       await _bgPlayer.dispose();
-    } catch (e) {}
+    } catch (e) {
+      print('error bg player');
+    }
     // Shut down this task
     await super.onStop();
   }
@@ -223,12 +230,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case ProcessingState.completed:
         return AudioProcessingState.completed;
       default:
-        throw Exception("Invalid state: ${_player.processingState}");
+        throw Exception('Invalid state: ${_player.processingState}');
     }
   }
 
   void playBgMusic(String bgMusic) {
-    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != "null") {
+    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != 'null') {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.one);
@@ -244,11 +251,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
         'id': '${mediaItem.extras['id']}',
       };
 
-      await writeJSONToCache(encoded(dataMap), "stats");
+      await writeJSONToCache(encoded(dataMap), 'stats');
 
       AudioServiceBackground.sendCustomEvent('stats');
 
-      Tracking.trackEvent(
+      await Tracking.trackEvent(
           Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, '');
     }
   }
@@ -268,18 +275,18 @@ class Seeker {
     this.mediaItem,
   );
 
-  start() async {
+  void start() async {
     _running = true;
     while (_running) {
-      Duration newPosition = player.position + positionInterval;
+      var newPosition = player.position + positionInterval;
       if (newPosition < Duration.zero) newPosition = Duration.zero;
       if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
-      player.seek(newPosition);
+      await player.seek(newPosition);
       await Future.delayed(stepInterval);
     }
   }
 
-  stop() {
+  void stop() {
     _running = false;
   }
 }

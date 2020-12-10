@@ -34,7 +34,7 @@ Future<void> main() async {
       statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
 
-  FirebaseApp app = await Firebase.initializeApp(
+  var app = await Firebase.initializeApp(
       options: FirebaseOptions(
     appId: appId,
     apiKey: apiKey,
@@ -43,7 +43,7 @@ Future<void> main() async {
     databaseURL: databaseURL,
   ));
 
-  Tracking.initialiseTracker(app);
+  await Tracking.initialiseTracker(app);
 
   InAppPurchaseConnection.enablePendingPurchases();
 
@@ -85,7 +85,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      print("resuming");
+      print('resuming');
       await updateStatsFromBg();
     }
   }

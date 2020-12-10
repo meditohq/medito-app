@@ -10,7 +10,7 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
 
   Future<Versions> fetchCopy() async {
     try {
-      final response = await httpGet(baseUrl + "/service+audiocompletecopy",
+      final response = await httpGet(baseUrl + '/service+audiocompletecopy',
           skipCache: true);
 
       if (response != null) {

@@ -24,19 +24,19 @@ class Attributions {
 
   Attributions.fromJson(Map<String, dynamic> json) {
     code = json['code'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
     status = json['status'];
     type = json['type'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
+    final data = <String, dynamic>{};
+    data['code'] = code;
     if (this.data != null) {
       data['data'] = this.data.toJson();
     }
-    data['status'] = this.status;
-    data['type'] = this.type;
+    data['status'] = status;
+    data['type'] = type;
     return data;
   }
 }
@@ -67,13 +67,13 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     content =
-    json['content'] != null ? new Content.fromJson(json['content']) : null;
+    json['content'] != null ? Content.fromJson(json['content']) : null;
     id = json['id'];
     num = json['num'];
     options =
-    json['options'] != null ? new Options.fromJson(json['options']) : null;
+    json['options'] != null ? Options.fromJson(json['options']) : null;
     parent =
-    json['parent'] != null ? new Parent.fromJson(json['parent']) : null;
+    json['parent'] != null ? Parent.fromJson(json['parent']) : null;
     slug = json['slug'];
     status = json['status'];
     template = json['template'];
@@ -82,23 +82,23 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.content != null) {
-      data['content'] = this.content.toJson();
+    final data = <String, dynamic>{};
+    if (content != null) {
+      data['content'] = content.toJson();
     }
-    data['id'] = this.id;
-    data['num'] = this.num;
-    if (this.options != null) {
-      data['options'] = this.options.toJson();
+    data['id'] = id;
+    data['num'] = num;
+    if (options != null) {
+      data['options'] = options.toJson();
     }
-    if (this.parent != null) {
-      data['parent'] = this.parent.toJson();
+    if (parent != null) {
+      data['parent'] = parent.toJson();
     }
-    data['slug'] = this.slug;
-    data['status'] = this.status;
-    data['template'] = this.template;
-    data['title'] = this.title;
-    data['url'] = this.url;
+    data['slug'] = slug;
+    data['status'] = status;
+    data['template'] = template;
+    data['title'] = title;
+    data['url'] = url;
     return data;
   }
 }
@@ -145,7 +145,7 @@ class Options {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['changeSlug'] = this.changeSlug;
+    data['changeSlug'] = changeSlug;
     data['changeStatus'] = this.changeStatus;
     data['changeTemplate'] = this.changeTemplate;
     data['changeTitle'] = this.changeTitle;
@@ -202,17 +202,17 @@ class Parent {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['color_background'] = this.colorBackground;
-    data['color_dark'] = this.colorDark;
-    data['color_light'] = this.colorLight;
-    data['contentText'] = this.contentText;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['illustrationUrl'] = this.illustrationUrl;
-    data['num'] = this.num;
-    data['template'] = this.template;
-    data['title'] = this.title;
-    data['url'] = this.url;
+    data['color_background'] = colorBackground;
+    data['color_dark'] = colorDark;
+    data['color_light'] = colorLight;
+    data['contentText'] = contentText;
+    data['description'] = description;
+    data['id'] = id;
+    data['illustrationUrl'] = illustrationUrl;
+    data['num'] = num;
+    data['template'] = template;
+    data['title'] = title;
+    data['url'] = url;
     return data;
   }
 }

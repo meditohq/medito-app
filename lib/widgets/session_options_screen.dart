@@ -64,10 +64,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   var _backgroundMusicAvailable = false;
   bool _showVoiceChoice = true;
 
-  String _availableOfflineIndicatorText = "";
+  String _availableOfflineIndicatorText = '';
 
   bool _loadingThisPage = true;
-  final _viewModel = new SessionOptionsViewModelImpl();
+  final _viewModel = SessionOptionsViewModelImpl();
 
   List _bgMusicList = [];
 
@@ -91,18 +91,18 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     });
 
     widget.data.then((d) {
-      this._illustration =
+      _illustration =
           d?.illustration != null ? d?.illustration?.first : null;
-      this._primaryColor = d?.primaryColor;
-      this._title = d?.title;
-      this._secondaryColor = d?.secondaryColor;
-      this._contentText = d?.description;
-      this._description = d?.subtitle;
+      _primaryColor = d?.primaryColor;
+      _title = d?.title;
+      _secondaryColor = d?.secondaryColor;
+      _contentText = d?.description;
+      _description = d?.subtitle;
       compileLists(d?.files);
       onVoicePillTap(true, 0);
       setState(() {
         _loadingThisPage = false;
-        this._backgroundMusicAvailable = d?.backgroundMusic;
+        _backgroundMusicAvailable = d?.backgroundMusic;
       });
     }).catchError(_onFirstFutureError);
   }
@@ -116,7 +116,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     return Scaffold(
       floatingActionButton: Semantics(
-        label: "Play button",
+        label: 'Play button',
         child: PlayerButton(
           onPressed: _onBeginTap,
           child:
@@ -126,7 +126,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               : MeditoColors.walterWhite,
         ),
       ),
-      body: new Builder(builder: (BuildContext context) {
+      body: Builder(builder: (BuildContext context) {
         scaffoldContext = context;
         return Container(
           child: SafeArea(
@@ -187,8 +187,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       _backgroundMusicAvailable ? buildSpacer() : Container();
 
   Widget getBeginButtonContent() {
-    if (downloadSingleton == null || !downloadSingleton.isValid())
-      downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton == null || !downloadSingleton.isValid()) {
+      downloadSingleton = DownloadSingleton(currentFile);
+    }
     if (downloadSingleton.isDownloadingMe(currentFile)) {
       return ValueListenableBuilder(
           valueListenable: downloadSingleton.returnNotifier(),
@@ -196,7 +197,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             if (value >= 1) {
               return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
             } else {
-              print("Updated value: " + (value * 100).toInt().toString());
+              print('Updated value: ' + (value * 100).toInt().toString());
               return SizedBox(
                   height: 12,
                   width: 12,
@@ -233,8 +234,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Future<void> _onBeginTap() {
     Tracking.trackEvent(Tracking.TAP, Tracking.PLAY_TAPPED, widget.id);
 
-    if (downloadSingleton == null || !downloadSingleton.isValid())
-      downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton == null || !downloadSingleton.isValid()) {
+      downloadSingleton = DownloadSingleton(currentFile);
+    }
     addIntToSF(widget.id, 'voiceSelected', voiceSelected);
     addIntToSF(widget.id, 'lengthSelected', lengthSelected);
     addIntToSF(widget.id, 'musicSelected', _musicSelected);
@@ -335,17 +337,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  formatSessionLength(int index) {
+  String formatSessionLength(int index) {
     String lengthText = lengthList[index];
-    if (lengthText.contains(":")) {
+    if (lengthText.contains(':')) {
       var duration = clockTimeToDuration(lengthText);
-      String time = "";
+      var time = '';
       if (duration.inMinutes < 1) {
-        time = "<1";
+        time = '<1';
       } else {
         time = duration.inMinutes.toString();
       }
-      return "$time min";
+      return '$time min';
     }
     return lengthList[index] + ' min';
   }
@@ -407,18 +409,20 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     for (final file in filesList) {
       if (file.voice == (voiceList[index])) {
         currentFile = file;
-        if (downloadSingleton == null || !downloadSingleton.isValid())
-          downloadSingleton = new DownloadSingleton(currentFile);
+        if (downloadSingleton == null || !downloadSingleton.isValid()) {
+          downloadSingleton = DownloadSingleton(currentFile);
+        }
         break;
       }
     }
     _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
-    if (mounted)
+    if (mounted) {
       setState(() {
         filterLengthsForThisPerson(voiceList[voiceSelected],
             clockTimeToDuration(lengthList[lengthSelected]).inMinutes);
         _updateAvailableOfflineIndicatorText();
       });
+    }
   }
 
   Future<void> onSessionPillTap(bool value, int index) async {
@@ -467,7 +471,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   void compileLists(List files) {
-    this.filesList = files;
+    filesList = files;
     voiceList.clear();
     lengthList.clear();
 
@@ -487,7 +491,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     });
 
     lengthList.sort((a, b) {
-      if (a.contains(":")) {
+      if (a.contains(':')) {
         return clockTimeToDuration(a)
             .inMilliseconds
             .compareTo(clockTimeToDuration(b).inMilliseconds);
@@ -504,20 +508,21 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       [int previousMusicSelected]) {
     lengthSelected = 0;
     lengthFilteredList.clear();
-    this.filesList?.forEach((file) {
+    filesList?.forEach((file) {
       if (file.voice == voiceSelected) {
         lengthFilteredList.add(file.length);
       }
     });
-    List<dynamic> roundedList = [];
-    for (int i = 0; i < lengthFilteredList.length; i++) {
+    var roundedList = <dynamic>[];
+    for (var i = 0; i < lengthFilteredList.length; i++) {
       roundedList.add(clockTimeToDuration(lengthFilteredList[i])
           .inMinutes); //Find the rounded length of the voice of current artist
     }
-    int indexOfMusic = 0;
-    if (previousMusicSelected != null)
+    var indexOfMusic = 0;
+    if (previousMusicSelected != null) {
       indexOfMusic = roundedList.indexOf(
-          previousMusicSelected); //find the index of the previous selection in the rounded list
+          previousMusicSelected);
+    } //find the index of the previous selection in the rounded list
     if (indexOfMusic == -1) indexOfMusic = 0; //if it doesn't exist make it zero
     lengthSelected = lengthList
         .indexOf(lengthFilteredList[indexOfMusic]); //set the correct index
@@ -560,7 +565,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Widget buildBackgroundMusicRow() {
     if (!_backgroundMusicAvailable) return Container();
 
-    if (_bgMusicList.length == 0) return getEmptyPillRow();
+    if (_bgMusicList.isEmpty) return getEmptyPillRow();
 
     return SizedBox(
         height: 56,
@@ -577,13 +582,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 shape: buildChipBorder(),
                 labelPadding: buildInnerChipPadding(),
                 showCheckmark: false,
-                label: Text(index == 0 ? "None" : _bgMusicList[index - 1].key),
+                label: Text(index == 0 ? 'None' : _bgMusicList[index - 1].key),
                 selected: index == _musicSelected,
                 onSelected: (bool value) {
                   onMusicSelected(
                       index,
-                      index > 0 ? _bgMusicList[index - 1].value : "",
-                      index > 0 ? _bgMusicList[index - 1].key : "");
+                      index > 0 ? _bgMusicList[index - 1].value : '',
+                      index > 0 ? _bgMusicList[index - 1].key : '');
                 },
                 backgroundColor: MeditoColors.moonlight,
                 selectedColor: MeditoColors.walterWhite,
@@ -614,7 +619,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         pressElevation: 4,
         shape: buildChipBorder(),
         labelPadding: buildInnerChipPadding(),
-        label: Text("        "),
+        label: Text('        '),
         backgroundColor: MeditoColors.moonlight,
         labelStyle: getLengthPillTextStyle(context, 1),
       ),
@@ -649,23 +654,24 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     _updateAvailableOfflineIndicatorText();
 
-    if (downloadSingleton == null || !downloadSingleton.isValid())
-      downloadSingleton = new DownloadSingleton(currentFile);
+    if (downloadSingleton == null || !downloadSingleton.isValid()) {
+      downloadSingleton = DownloadSingleton(currentFile);
+    }
     if (index == 1) {
       // 'YES' selected
-      if (!downloadSingleton.isDownloadingSomething())
+      if (!downloadSingleton.isDownloadingSomething()) {
         downloadSingleton.start(currentFile);
-      else {
+      } else {
         _offlineSelected = 0;
         createSnackBarWithColor(
-            "Another Download in Progress", scaffoldContext, Colors.black12);
+            'Another Download in Progress', scaffoldContext, Colors.black12);
       }
     } else {
       // 'NO' selected
       removing = true;
       removeFile(currentFile).then((onValue) {
         setState(() {
-          print("Removed file");
+          print('Removed file');
           //removing = false;
         });
       }).catchError((onError) {
@@ -684,7 +690,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       _availableOfflineIndicatorText =
           '(${voiceList[voiceSelected]} - $time min)';
     } else {
-      _availableOfflineIndicatorText = "";
+      _availableOfflineIndicatorText = '';
     }
   }
 
@@ -720,10 +726,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  _onFirstFutureError(dynamic error) {
+  void _onFirstFutureError(dynamic error) {
     // set up the button
     Widget _errorDialogOkButton = FlatButton(
-      child: Text("Go back and refresh".toUpperCase()),
+      child: Text('Go back and refresh'.toUpperCase()),
       textColor: MeditoColors.lightTextColor,
       onPressed: () {
         //once to close the dialog, once to go back
@@ -733,10 +739,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
 
     // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Oops!"),
+    var alert = AlertDialog(
+      title: Text('Oops!'),
       backgroundColor: MeditoColors.darkBGColor,
-      content: Text("An error has occured. This session may have been moved."),
+      content: Text('An error has occured. This session may have been moved.'),
       actions: [
         _errorDialogOkButton,
       ],
