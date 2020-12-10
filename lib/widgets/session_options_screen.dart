@@ -69,7 +69,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   String _availableOfflineIndicatorText = "";
 
   bool _loadingThisPage = true;
-  final _viewModel = new BottomSheetViewModelImpl();
+  final _viewModel = new SessionOptionsViewModelImpl();
 
   List _bgMusicList = [];
 

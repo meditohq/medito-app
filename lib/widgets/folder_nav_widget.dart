@@ -145,7 +145,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                           color: MeditoColors.walterWhite,
                         ),
                         onPressed: () async {
-                          if (!snapshot?.data) {
+                          if (snapshot != null && !snapshot.data) {
                             await markAsListened(selectedItem.id);
                           } else {
                             await markAsNotListened(selectedItem.id);
@@ -299,7 +299,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       return null;
     });
 
-    if (result == "error") {
+    if (result.toString() == "error") {
       _onPullToRefresh();
     }
   }

@@ -12,7 +12,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_purchase/src/in_app_purchase/product_details.dart';
 
 class DonationWidgetPage2 extends StatefulWidget {
   DonationWidgetPage2(this.product);
@@ -25,7 +24,6 @@ class DonationWidgetPage2 extends StatefulWidget {
 
 class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   var _stayInTouchSelected = -1;
-  var _autoValidate = false;
   bool _emailValid = false;
   TextEditingController _emailController = TextEditingController();
   StreamSubscription<List<PurchaseDetails>> _subscription;
@@ -243,7 +241,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
 
   Widget _getEmailAddressBox() {
     return Form(
-      autovalidate: false,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Container(
         color: MeditoColors.moonlight,
         padding: const EdgeInsets.only(
@@ -252,7 +250,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
           autofocus: _emailController.text.length == 0,
           autofillHints: [AutofillHints.email],
           style: Theme.of(context).textTheme.headline2,
-          autovalidate: _autoValidate,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           autocorrect: false,
           keyboardType: TextInputType.emailAddress,
           controller: _emailController,
@@ -295,7 +293,6 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   void _handleEmail() {
-    _autoValidate = true;
     validateEmail(_emailController.text);
     setState(() {});
   }

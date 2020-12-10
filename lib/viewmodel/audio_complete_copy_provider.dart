@@ -14,7 +14,8 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
           skipCache: true);
 
       if (response != null) {
-        var copy = AudioCompleteCopyResponse.fromJson(response).data.content.versions;
+        var copy =
+            AudioCompleteCopyResponse.fromJson(response).data.content.versions;
 
         copy.retainWhere((value) => value.active);
 
@@ -31,8 +32,9 @@ class AudioCompleteCopyProvider extends ChangeNotifier {
         return version;
       }
       return null;
-    } catch(e){
+    } catch (e) {
       print(e.toString());
     }
+    return null;
   }
 }

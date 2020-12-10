@@ -15,12 +15,9 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:Medito/data/attributions.dart';
 import 'package:Medito/data/page.dart';
-import 'package:Medito/utils/colors.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +36,8 @@ var backgroundMusicUrl = "";
 
 bool bgDownloading = false, removing = false;
 
-
 DownloadSingleton downloadSingleton;
+
 Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
     licenseName, String licenseURL) {
   return Container(
@@ -109,25 +106,28 @@ Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
 
   return file.path;
 }
-Future<dynamic> downloadBGMusicFromURLWithProgress(String url, String name) async {
+
+Future<dynamic> downloadBGMusicFromURLWithProgress(
+    String url, String name) async {
   String dir = (await getApplicationSupportDirectory()).path;
   name = name.replaceAll(" ", "%20");
   File file = new File('$dir/$name');
 
-  if (await file.exists()){
+  if (await file.exists()) {
     backgroundMusicUrl = file.path;
     return file.path;
   }
-  http.StreamedResponse _response = await http.Client().send(http.Request('GET', Uri.parse(url)));
+  http.StreamedResponse _response =
+      await http.Client().send(http.Request('GET', Uri.parse(url)));
   bgTotal = _response.contentLength;
   bgReceived = 0;
   List<int> _bytes = [];
 
-  _response.stream.listen((value){
+  _response.stream.listen((value) {
     _bytes.addAll(value);
     bgReceived += value.length;
     //print("File Progress New: " + getProgress().toString());
-    bgDownloadListener.value = bgReceived*1.0/bgTotal;
+    bgDownloadListener.value = bgReceived * 1.0 / bgTotal;
   }).onDone(() async {
     await file.writeAsBytes(_bytes);
     print("Saved BG New: " + file.path);
@@ -135,6 +135,7 @@ Future<dynamic> downloadBGMusicFromURLWithProgress(String url, String name) asyn
     backgroundMusicUrl = file.path;
   });
 }
+
 Future<void> saveFileToDownloadedFilesList(Files file) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var list = prefs.getStringList('listOfSavedFiles') ?? [];
@@ -156,14 +157,12 @@ Future<dynamic> removeFile(Files currentFile) async {
   File file = new File('$dir/$name');
 
   if (await file.exists()) {
-
     await file.delete();
     removeFileFromDownloadedFilesList(currentFile);
     removing = false;
-  }
-  else removing = false;
+  } else
+    removing = false;
 }
-
 
 Future<dynamic> downloadFile(Files currentFile) async {
   getAttributions(currentFile.attributions);
@@ -185,6 +184,7 @@ Future<dynamic> downloadFile(Files currentFile) async {
 
   print(file.path);
 }
+
 Future<dynamic> getDownload(String filename) async {
   var path = (await getApplicationSupportDirectory()).path;
   filename = filename.replaceAll(" ", "%20");

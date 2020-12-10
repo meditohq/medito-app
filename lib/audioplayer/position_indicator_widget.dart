@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
