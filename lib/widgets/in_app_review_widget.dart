@@ -1,3 +1,4 @@
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -5,36 +6,52 @@ import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 
 class InAppReviewWidget extends StatelessWidget {
-  BuildContext get context => context;
+
+
+  InAppReviewWidget({@required this.thumbsdown});
+  VoidCallback thumbsdown;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              FloatingActionButton(
-                onPressed: _rateUsPopUp,
-                child: Icon(
-                  Icons.thumb_up,
-                  color: Colors.black12,
-                ),
-                backgroundColor: Colors.white,
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              FloatingActionButton(
-                onPressed: _thanksPopUp,
-                child: Icon(
-                  Icons.thumb_down,
-                  color: Colors.black12,
-                ),
-                backgroundColor: Colors.white,
+              onPressed: _rateUsPopUp,
+              child: Icon(
+                Icons.thumb_up,
+                color: MeditoColors.almostBlack,
               ),
-            ],
+              color: MeditoColors.peacefulBlue,
+            ),
           ),
         ),
-      ),
+        Container(
+          width: 8,
+        ),
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              onPressed: thumbsdown,
+              child: Icon(
+                Icons.thumb_down,
+                color: MeditoColors.almostBlack,
+              ),
+              color: MeditoColors.peacefulBlue,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -46,9 +63,4 @@ class InAppReviewWidget extends StatelessWidget {
     }
   }
 
-  void _thanksPopUp() {
-    createSnackBarWithColor('Thanks for the rating!', context, Colors.black12);
-    addCurrentDateToSF('UserDeclinedRating');
-    Navigator.pop(context);
-  }
 }

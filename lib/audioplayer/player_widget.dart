@@ -6,10 +6,12 @@ import 'package:Medito/audioplayer/screen_state.dart';
 import 'package:Medito/audioplayer/subtitle_text_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
+import 'package:Medito/widgets/in_app_review_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +84,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         subTitleText = value.subtitle;
         buttonLabel = value.buttonLabel;
         buttonUrl = value.buttonDestination;
+        buttonUrl = 'review';
         buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
       } else {
         defaultText();
@@ -360,30 +363,33 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           Padding(
             padding: const EdgeInsets.only(
                 left: 32.0, top: 32, bottom: 8, right: 32.0),
-            child: FlatButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              onPressed: _launchPrimaryButton,
-              color: primaryColorAsColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    buttonIcon,
-                    color: secondaryColor,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      buttonLabel,
-                      style: TextStyle(color: secondaryColor, fontSize: 16),
+            child: buttonUrl.contains('review')
+                ? InAppReviewWidget(thumbsdown: _thanksPopUp)
+                : FlatButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    onPressed: _launchPrimaryButton,
+                    color: primaryColorAsColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          buttonIcon,
+                          color: secondaryColor,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            buttonLabel,
+                            style:
+                                TextStyle(color: secondaryColor, fontSize: 16),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 32.0, right: 32.0),
@@ -415,9 +421,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
+  void _thanksPopUp() {
+    createSnackBarWithColor('Thanks for the rating!', context, Colors.black12);
+    addCurrentDateToSF('UserDeclinedRating');
+    Navigator.pop(context);
+  }
+
   Future<void> _launchPrimaryButton() {
     getVersionCopyInt().then((version) {
-      Tracking.trackEvent(Tracking.CTA_TAPPED, Tracking.MAIN_CTA_TAPPED, buttonUrl,
+      Tracking.trackEvent(
+          Tracking.CTA_TAPPED, Tracking.MAIN_CTA_TAPPED, buttonUrl,
           map: {'version_seen': '$version'});
       return null;
     });
