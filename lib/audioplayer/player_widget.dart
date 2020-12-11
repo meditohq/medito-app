@@ -26,11 +26,11 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  String titleText = "Loading...";
-  String subTitleText = "Please wait...";
-  String buttonLabel = "Donate";
-  String buttonUrl = "http://meditofoundation.org/donate";
-  String buttonIcon = "assets/images/ic_gift.svg";
+  String titleText = 'Loading...';
+  String subTitleText = 'Please wait...';
+  String buttonLabel = 'Donate';
+  String buttonUrl = 'http://meditofoundation.org/donate';
+  String buttonIcon = 'assets/images/ic_gift.svg';
   String illustrationUrl;
   Color secondaryColor;
   Color primaryColorAsColor;
@@ -39,10 +39,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   String __loaded;
 
-  bool get loaded => __loaded == "true";
+  bool get loaded => __loaded == 'true';
 
   void setLoaded(bool b) {
-    if (__loaded == null && b == true) __loaded = "true";
+    if (__loaded == null && b == true) __loaded = 'true';
   }
 
   StreamSubscription _stream;
@@ -52,7 +52,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     try {
       AudioService.stop();
     } catch (e) {
-      print("stop error!");
+      print('stop error!');
     }
     super.dispose();
   }
@@ -70,11 +70,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         await updateStatsFromBg();
       }
 
-      _stream.cancel();
+      await _stream.cancel();
       return true;
     });
 
-    AudioCompleteCopyProvider provider = AudioCompleteCopyProvider();
+    var provider = AudioCompleteCopyProvider();
 
     provider.fetchCopy().then((value) {
       if (value != null) {
@@ -82,7 +82,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         subTitleText = value.subtitle;
         buttonLabel = value.buttonLabel;
         buttonUrl = value.buttonDestination;
-        buttonIcon = buttonIcon.replaceFirst("ic_gift", value.buttonIcon);
+        buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
       } else {
         defaultText();
       }
@@ -261,7 +261,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       children: [
         CircularProgressIndicator(),
         Container(height: 16),
-        Text("Buffering")
+        Text('Buffering')
       ],
     ));
   }
@@ -283,10 +283,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void getSecondaryColor(MediaItem mediaItem) {
     if (secondaryColor == null && mediaItem != null) {
-      String secondaryColorString = mediaItem?.extras['secondaryColor'] ?? "";
+      String secondaryColorString = mediaItem?.extras['secondaryColor'] ?? '';
 
       if (secondaryColorString.isEmpty && secondaryColor == null) {
-        secondaryColorString = "#FF272829";
+        secondaryColorString = '#FF272829';
       }
       secondaryColor = parseColor(secondaryColorString);
     }
@@ -320,7 +320,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               ScreenState(queue, mediaItem, playbackState));
 
   Widget playButton() => Semantics(
-        label: "Play button",
+        label: 'Play button',
         child: PlayerButton(
           icon: Icons.play_arrow,
           onPressed: AudioService.play,
@@ -330,7 +330,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       );
 
   Widget pauseButton() => Semantics(
-        label: "Pause button",
+        label: 'Pause button',
         child: PlayerButton(
           icon: Icons.pause,
           secondaryColor: secondaryColor,
@@ -347,7 +347,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _onBackPressed(MediaItem mediaItem) {
     if (mediaItem != null) {
-      Navigator.popUntil(context, ModalRoute.withName("/nav"));
+      Navigator.popUntil(context, ModalRoute.withName('/nav'));
     } else {
       Navigator.pop(context);
     }
@@ -401,7 +401,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
-                      "Share",
+                      'Share',
                       style: TextStyle(
                           color: MeditoColors.walterWhite, fontSize: 16),
                     ),
@@ -421,10 +421,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           map: {'version_seen': '$version'});
       return null;
     });
-    if (buttonUrl.contains("medito-donate")) {
+    if (buttonUrl.contains('medito-donate')) {
       launchDonatePageOrWidget(context);
-    } else
+    } else {
       return launchUrl(buttonUrl);
+    }
 
     return null;
   }
@@ -441,18 +442,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void defaultText() {
-    titleText = "Well done for taking time for yourself!";
+    titleText = 'Well done for taking time for yourself!';
     subTitleText =
-        "Taking care of yourself is important. We’re here to help you do it, for free, forever.";
-    buttonLabel = "Donate";
-    buttonUrl = "http://meditofoundation.org/donate";
-    buttonIcon = "assets/images/ic_gift.svg";
+        'Taking care of yourself is important. We’re here to help you do it, for free, forever.';
+    buttonLabel = 'Donate';
+    buttonUrl = 'http://meditofoundation.org/donate';
+    buttonIcon = 'assets/images/ic_gift.svg';
   }
 }
 
 // NOTE: Your entrypoint MUST be a top-level function.
 void _audioPlayerTaskEntrypoint() async {
-  AudioServiceBackground.run(() => AudioPlayerTask());
+  await AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
 Future<bool> start(String primaryColor) {

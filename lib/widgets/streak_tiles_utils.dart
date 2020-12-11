@@ -119,6 +119,6 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
 
 RoundedRectangleBorder roundedRectangleBorder() {
   return RoundedRectangleBorder(
-    borderRadius: new BorderRadius.circular(12.0),
+    borderRadius: BorderRadius.circular(12.0),
   );
 }

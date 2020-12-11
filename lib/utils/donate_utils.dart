@@ -27,10 +27,10 @@ Future<void> savePurchases(List<PurchaseDetails> purchases) async {
 
 Future<void> saveEmailAddress(String email) async {
   var prefs = await SharedPreferences.getInstance();
-  prefs.setString('emailAddress', email);
+  await prefs.setString('emailAddress', email);
 }
 
 Future<String> getEmailAddress() async {
   var prefs = await SharedPreferences.getInstance();
-  return prefs.getString('emailAddress') ?? "";
+  return prefs.getString('emailAddress') ?? '';
 }

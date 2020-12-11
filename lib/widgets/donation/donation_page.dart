@@ -39,7 +39,7 @@ class _DonationWidgetState extends State<DonationWidget> {
   }
 
   void _getSubProducts() {
-    const Set<String> _subIds = {
+    const _subIds = <String>{
       'subscription_5',
       'subscription_10',
       'subscription_15',
@@ -49,7 +49,7 @@ class _DonationWidgetState extends State<DonationWidget> {
     };
 
     InAppPurchaseConnection.instance.queryProductDetails(_subIds).then((value) {
-      final ProductDetailsResponse response = value;
+      final response = value;
       if (response.notFoundIDs.isNotEmpty) {
         _getSubProducts();
       } else {
@@ -63,7 +63,7 @@ class _DonationWidgetState extends State<DonationWidget> {
   }
 
   void _getDonationProducts() {
-    const Set<String> _kIds = {
+    const _kIds = <String>{
       'donation_5',
       'donation_10',
       'donation_15',
@@ -73,7 +73,7 @@ class _DonationWidgetState extends State<DonationWidget> {
     };
 
     InAppPurchaseConnection.instance.queryProductDetails(_kIds).then((value) {
-      final ProductDetailsResponse response = value;
+      final response = value;
       if (response.notFoundIDs.isNotEmpty) {
         _getDonationProducts();
       } else {
@@ -424,9 +424,9 @@ class _DonationWidgetState extends State<DonationWidget> {
               children: <TextSpan>[
                 TextSpan(
                     text: 'Tap here to learn more.',
-                    recognizer: new TapGestureRecognizer()
+                    recognizer: TapGestureRecognizer()
                       ..onTap = () => launchUrl(
-                          "https://meditofoundation.org/about/foundation"),
+                          'https://meditofoundation.org/about/foundation'),
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                     )),
@@ -446,7 +446,7 @@ class _DonationWidgetState extends State<DonationWidget> {
         return subscriptions[index].skuDetail.price;
       }
     } catch (e) {
-      return "oops!";
+      return 'oops!';
     }
   }
 }

@@ -5,27 +5,27 @@ import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 
 class InAppReviewWidget extends StatelessWidget {
-  BuildContext get context => this.context;
+  BuildContext get context => context;
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new Container(
-        child: new Center(
-          child: new Row(
+    return Scaffold(
+      body: Container(
+        child: Center(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              new FloatingActionButton(
-                onPressed: rateUsPopUp,
-                child: new Icon(
+              FloatingActionButton(
+                onPressed: _rateUsPopUp,
+                child: Icon(
                   Icons.thumb_up,
                   color: Colors.black12,
                 ),
                 backgroundColor: Colors.white,
               ),
-              new FloatingActionButton(
-                onPressed: thanksPopUp,
-                child: new Icon(
+              FloatingActionButton(
+                onPressed: _thanksPopUp,
+                child: Icon(
                   Icons.thumb_down,
                   color: Colors.black12,
                 ),
@@ -38,17 +38,17 @@ class InAppReviewWidget extends StatelessWidget {
     );
   }
 
-  void rateUsPopUp() async {
-    final InAppReview inAppReview = InAppReview.instance;
+  void _rateUsPopUp() async {
+    final inAppReview = InAppReview.instance;
 
     if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
+      await inAppReview.requestReview();
     }
   }
 
-  void thanksPopUp() {
-    createSnackBarWithColor("Thanks for the rating", context, Colors.black12);
-    addCurrentDateToSF("UserDeclinedRating");
+  void _thanksPopUp() {
+    createSnackBarWithColor('Thanks for the rating!', context, Colors.black12);
+    addCurrentDateToSF('UserDeclinedRating');
     Navigator.pop(context);
   }
 }

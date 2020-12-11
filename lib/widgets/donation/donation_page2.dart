@@ -12,7 +12,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_purchase/src/in_app_purchase/product_details.dart';
 
 class DonationWidgetPage2 extends StatefulWidget {
   DonationWidgetPage2(this.product);
@@ -25,9 +24,8 @@ class DonationWidgetPage2 extends StatefulWidget {
 
 class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   var _stayInTouchSelected = -1;
-  var _autoValidate = false;
   bool _emailValid = false;
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   StreamSubscription<List<PurchaseDetails>> _subscription;
 
   static const SMALL_SIZE = 56.0;
@@ -61,7 +59,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
       body: Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
         child: CustomScrollView(
-          physics: new ClampingScrollPhysics(),
+          physics: ClampingScrollPhysics(),
           slivers: [
             SliverFillRemaining(
                 hasScrollBody: false, child: _buildColumn(context)),
@@ -227,9 +225,9 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
               children: <TextSpan>[
                 TextSpan(
                     text: 'Tap here to read our privacy policy.',
-                    recognizer: new TapGestureRecognizer()
+                    recognizer: TapGestureRecognizer()
                       ..onTap = () =>
-                          launchUrl("https://meditofoundation.org/privacy"),
+                          launchUrl('https://meditofoundation.org/privacy'),
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                     )),
@@ -243,16 +241,16 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
 
   Widget _getEmailAddressBox() {
     return Form(
-      autovalidate: false,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Container(
         color: MeditoColors.moonlight,
         padding: const EdgeInsets.only(
             top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
         child: TextFormField(
-          autofocus: _emailController.text.length == 0,
+          autofocus: _emailController.text.isEmpty,
           autofillHints: [AutofillHints.email],
           style: Theme.of(context).textTheme.headline2,
-          autovalidate: _autoValidate,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           autocorrect: false,
           keyboardType: TextInputType.emailAddress,
           controller: _emailController,
@@ -263,7 +261,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
                 .textTheme
                 .headline3
                 .copyWith(color: MeditoColors.walterWhite.withAlpha(178)),
-            suffixIcon: _emailController.text.length > 0
+            suffixIcon: _emailController.text.isNotEmpty
                 ? IconButton(
                     onPressed: () => _emailController.clear(),
                     icon: Icon(
@@ -283,8 +281,8 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
 
   String validateEmail(String value) {
     Pattern pattern =
-        "^[_a-z0-9-]+(.[a-z0-9-]+)@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})\$";
-    RegExp regex = new RegExp(pattern);
+        '^[_a-z0-9-]+(.[a-z0-9-]+)@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})\$';
+    var regex = RegExp(pattern);
     if (!regex.hasMatch(value) || value == null) {
       _emailValid = false;
       return 'Enter a valid email address';
@@ -295,7 +293,6 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   void _handleEmail() {
-    _autoValidate = true;
     validateEmail(_emailController.text);
     setState(() {});
   }
@@ -303,7 +300,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   void _next() {
     saveEmailAddress(_emailController.text);
 
-    final PurchaseParam purchaseParam =
+    final purchaseParam =
         PurchaseParam(productDetails: widget.product);
     if (_isConsumable(widget.product)) {
       buyConsumable(purchaseParam);
@@ -325,12 +322,12 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   bool _isConsumable(ProductDetails product) {
-    return !product.id.contains("subscription");
+    return !product.id.contains('subscription');
   }
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) {
     purchases.retainWhere((element) => element.error == null);
-    if (purchases.length > 0) {
+    if (purchases.isNotEmpty) {
       savePurchases(purchases);
       _postToFirebase(purchases);
 
@@ -370,7 +367,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   String _getNewsletterTrueOrFalse() =>
-      _stayInTouchSelected == 0 ? "false" : "true";
+      _stayInTouchSelected == 0 ? 'false' : 'true';
 
   int _getTimeStamp(PurchaseDetails donation) {
     var timeAsString = donation.billingClientPurchase.purchaseTime.toString();
@@ -378,9 +375,10 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   }
 
   dynamic getDonationType(PurchaseDetails donation) {
-    if (donation.productID.contains("donation"))
+    if (donation.productID.contains('donation')) {
       return 1;
-    else
-      return "Subscription update";
+    } else {
+      return 'Subscription update';
+    }
   }
 }

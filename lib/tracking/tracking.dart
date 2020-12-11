@@ -20,39 +20,39 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 
 class Tracking {
-  static const String SCREEN_LOADED = "screen_loaded";
-  static const String FILE_TAPPED = "file_tapped";
-  static const String CTA_TAPPED = "cta_tapped";
-  static const String MAIN_CTA_TAPPED = "main_cta_tapped";
-  static const String SECOND_CTA_TAPPED = "second_cta_tapped";
-  static const String TILE = "tile";
-  static const String TAP = "tap";
+  static const String SCREEN_LOADED = 'screen_loaded';
+  static const String FILE_TAPPED = 'file_tapped';
+  static const String CTA_TAPPED = 'cta_tapped';
+  static const String MAIN_CTA_TAPPED = 'main_cta_tapped';
+  static const String SECOND_CTA_TAPPED = 'second_cta_tapped';
+  static const String TILE = 'tile';
+  static const String TAP = 'tap';
 
-  static const String AUDIO_DOWNLOAD = "audio_download";
-  static const String AUDIO_COMPLETED = "audio_completed";
+  static const String AUDIO_DOWNLOAD = 'audio_download';
+  static const String AUDIO_COMPLETED = 'audio_completed';
   static const String AUDIO_COMPLETED_BUTTON_TAPPED =
-      "audio_completed_button_tapped";
+      'audio_completed_button_tapped';
 
-  static const String PLAYER_PAGE = "player_page";
-  static const String PLAYER_END_PAGE = "player_end_page";
-  static const String FOLDER_PAGE = "folder_page";
-  static const String DONATION_PAGE_1 = "donation_page_1";
-  static const String DONATION_PAGE_2 = "donation_page_2";
-  static const String DONATION_PAGE_3 = "donation_page_3";
-  static const String TEXT_PAGE = "text_page";
-  static const String STREAK_PAGE = "streak_page";
+  static const String PLAYER_PAGE = 'player_page';
+  static const String PLAYER_END_PAGE = 'player_end_page';
+  static const String FOLDER_PAGE = 'folder_page';
+  static const String DONATION_PAGE_1 = 'donation_page_1';
+  static const String DONATION_PAGE_2 = 'donation_page_2';
+  static const String DONATION_PAGE_3 = 'donation_page_3';
+  static const String TEXT_PAGE = 'text_page';
+  static const String STREAK_PAGE = 'streak_page';
 
-  static const String TILE_TAPPED = "tile_tapped";
-  static const String TRACKING_TAPPED = "tracking_tapped";
-  static const String TEXT_TAPPED = "text_tapped";
-  static const String FOLDER_TAPPED = "folder_tapped";
-  static const String SESSION_TAPPED = "session_tapped";
-  static const String PLAY_TAPPED = "play_tapped";
+  static const String TILE_TAPPED = 'tile_tapped';
+  static const String TRACKING_TAPPED = 'tracking_tapped';
+  static const String TEXT_TAPPED = 'text_tapped';
+  static const String FOLDER_TAPPED = 'folder_tapped';
+  static const String SESSION_TAPPED = 'session_tapped';
+  static const String PLAY_TAPPED = 'play_tapped';
 
-  static const String ACCEPT_TRACKING = "accept_tracking";
-  static const String DENY_TRACKING = "deny_tracking";
+  static const String ACCEPT_TRACKING = 'accept_tracking';
+  static const String DENY_TRACKING = 'deny_tracking';
 
-  static const String HOME = "home_page";
+  static const String HOME = 'home_page';
   static FirebaseAnalytics _firebaseAnalytics;
   static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
   static DatabaseReference _dbRef;
@@ -66,11 +66,11 @@ class Tracking {
 
     //dummy event
     _firebaseAnalytics.logEvent(
-      name: "tracker_initialized",
+      name: 'tracker_initialized',
       parameters: {},
     ).then((value) => print('tracking initialized'));
 
-    final FirebaseDatabase database = FirebaseDatabase(app: app);
+    final database = FirebaseDatabase(app: app);
 
     _dbRef = database.reference().child(_dbName);
   }
@@ -81,7 +81,7 @@ class Tracking {
     _firebaseAnalytics.setCurrentScreen(screenName: screenName);
   }
 
-  // like "LoginWidget", "Login button", "Clicked"
+  // like 'LoginWidget', 'Login button', 'Clicked'
   static Future<void> trackEvent(
       String eventName, String action, String destination,
       {Map<String, String> map}) async {
@@ -90,9 +90,9 @@ class Tracking {
     if (Foundation.kReleaseMode && accepted) {
       //only track in release mode, not debug
 
-      Map<String, String> defaultMap = {
-        "action": action.clean(),
-        "destination": destination.clean(),
+      var defaultMap = <String, String>{
+        'action': action.clean(),
+        'destination': destination.clean(),
       };
       if (map != null) defaultMap.addAll(map);
 
@@ -101,7 +101,7 @@ class Tracking {
         parameters: defaultMap,
       );
 
-      print("Event logged: $eventName");
+      print('Event logged: $eventName');
     }
   }
 
@@ -115,16 +115,16 @@ class Tracking {
 
   static Future<void> trackTrackingAnswered(bool track) async {
     await Tracking.trackEvent(
-        Tracking.TRACKING_TAPPED, Tracking.ACCEPT_TRACKING, "");
+        Tracking.TRACKING_TAPPED, Tracking.ACCEPT_TRACKING, '');
   }
 }
 
 extension on String {
-  clean() {
-    var str = this.replaceAll('/', '_').replaceAll('-', '_');
+  String clean() {
+    var str = replaceAll('/', '_').replaceAll('-', '_');
 
-    if (str.isNotEmpty && !str.startsWith(new RegExp(r'[A-Za-z]'))) {
-      str.replaceRange(0, 1, "");
+    if (str.isNotEmpty && !str.startsWith(RegExp(r'[A-Za-z]'))) {
+      str.replaceRange(0, 1, '');
     }
 
     return str;

@@ -59,10 +59,10 @@ class FolderNavWidget extends StatefulWidget {
 
 class _FolderNavWidgetState extends State<FolderNavWidget>
     with TickerProviderStateMixin {
-  final _viewModel = new SubscriptionViewModelImpl();
+  final _viewModel = SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
-  String textFileFromFuture = "";
+  String textFileFromFuture = '';
 
   BuildContext scaffoldContext;
 
@@ -86,7 +86,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.updateNavData(
-          ListItem("Home", "app+content", null, parentId: "app+content"));
+          ListItem('Home', 'app+content', null, parentId: 'app+content'));
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
@@ -99,7 +99,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     ));
 
     return Scaffold(
-      body: new Builder(
+      body: Builder(
         builder: (BuildContext context) {
           scaffoldContext = context;
           return buildSafeAreaBody();
@@ -136,8 +136,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                         snapshot.connectionState != ConnectionState.waiting
                     ? IconButton(
                         tooltip: snapshot?.data != null && snapshot.data
-                            ? "Mark session as unlistened"
-                            : "Mark session as listened",
+                            ? 'Mark session as unlistened'
+                            : 'Mark session as listened',
                         icon: Icon(
                           snapshot?.data != null && snapshot.data
                               ? Icons.undo
@@ -145,7 +145,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                           color: MeditoColors.walterWhite,
                         ),
                         onPressed: () async {
-                          if (!snapshot?.data) {
+                          if (snapshot != null && !snapshot.data) {
                             await markAsListened(selectedItem.id);
                           } else {
                             await markAsNotListened(selectedItem.id);
@@ -200,7 +200,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.none) {
               return Text(
-                "No connection. Please try again later",
+                'No connection. Please try again later',
                 style: Theme.of(context).textTheme.headline3,
               );
             }
@@ -211,7 +211,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               return LoadingListWidget();
             }
 
-            return new ListView.builder(
+            return ListView.builder(
                 itemCount:
                     1 + (snapshot.data == null ? 0 : snapshot.data.length),
                 shrinkWrap: true,
@@ -272,7 +272,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     }
   }
 
-  _showSessionOptionsScreen(ListItem listItem) {
+  void _showSessionOptionsScreen(ListItem listItem) {
     _viewModel.currentlySelectedFile = listItem;
 
     var data;
@@ -299,12 +299,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       return null;
     });
 
-    if (result == "error") {
+    if (result.toString() == 'error') {
       _onPullToRefresh();
     }
   }
 
-  _showPlayer(
+  void _showPlayer(
       Files fileTapped,
       Illustration coverArt,
       dynamic primaryColor,
@@ -353,7 +353,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   Widget getFileListItem(ListItem item) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: new ListItemWidget(
+      child: ListItemWidget(
         item: item,
       ),
     );
@@ -392,7 +392,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       );
     } else {
       return SizedBox(
-          width: 300, child: new ImageListItemWidget(src: item.url));
+          width: 300, child: ImageListItemWidget(src: item.url));
     }
   }
 

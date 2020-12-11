@@ -24,8 +24,8 @@ import 'model/list_item.dart';
 abstract class MainListViewModel {}
 
 class SubscriptionViewModelImpl implements MainListViewModel {
-  String lastId = "";
-  String contentText = "";
+  String lastId = '';
+  String contentText = '';
   ListItem currentlySelectedFile;
   var baseUrl = 'https://medito.space/api/pages';
 
@@ -42,9 +42,9 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   Future<List<ListItem>> getPageChildren(
       {String id = 'app+content', bool skipCache = false}) async {
-    this._skipCache = skipCache;
+    _skipCache = skipCache;
 
-    if (id == null) id = 'app+content';
+    id ??= 'app+content';
 
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
@@ -56,10 +56,10 @@ class SubscriptionViewModelImpl implements MainListViewModel {
   }
 
   Future getPageListFromDataChildren(List<DataChildren> pageList) async {
-    List<ListItem> listItemList = [];
+    var listItemList = <ListItem>[];
     for (var value in pageList) {
       var parentId = value.id.substring(0, value.id.lastIndexOf('/'));
-      var contentText = value.description == null ? "" : value.description;
+      var contentText = value.description ?? '';
 
       if (value.template == 'default') {
         //just a folder
@@ -126,8 +126,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
 
   Future getAudioData({String id = ''}) async {
     var url = baseUrl + '/' + id.replaceAll('/', '+');
-    var response = await httpGet(url, skipCache: this._skipCache);
-    this._skipCache = false;
+    var response = await httpGet(url, skipCache: _skipCache);
+    _skipCache = false;
     return Pages.fromJson(response).data.content;
   }
 
@@ -136,8 +136,8 @@ class SubscriptionViewModelImpl implements MainListViewModel {
     var url = baseUrl + '/' + id.replaceAll('/', '+') + '/children';
 
     List all;
-    var response = await httpGet(url, skipCache: this._skipCache);
-    this._skipCache = false;
+    var response = await httpGet(url, skipCache: _skipCache);
+    _skipCache = false;
     all = PagesChildren.fromJson(response).data;
 
     var index = 0;

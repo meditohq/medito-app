@@ -25,7 +25,7 @@ class SubtitleTextWidget extends StatelessWidget {
           style: getStyle(context),
           text: mediaItem != null
               ? 'By ${mediaItem.extras['attrTitle']}'
-              : "Loading...",
+              : 'Loading...',
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
               final url = mediaItem.extras['attrLinkSource'];
@@ -37,7 +37,7 @@ class SubtitleTextWidget extends StatelessWidget {
         TextSpan(
           style: getStyle(context),
           text:
-              mediaItem != null ? ' under ${mediaItem.extras['attrName']}' : "",
+              mediaItem != null ? ' under ${mediaItem.extras['attrName']}' : '',
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
               final url = mediaItem.extras['attrLinkLicense'];

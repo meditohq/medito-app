@@ -34,16 +34,16 @@ Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('streakCount') ?? 0;
-  List<String> streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = prefs.getStringList('streakList') ?? [];
 
-  if (streakList.length > 0) {
-    DateTime lastDayInStreak =
+  if (streakList.isNotEmpty) {
+    var lastDayInStreak =
         DateTime.fromMillisecondsSinceEpoch(int.parse(streakList.last));
 
     final now = DateTime.now();
 
     if (longerThanOneDayAgo(lastDayInStreak, now)) {
-      updateStreak(streak: "0");
+      await updateStreak(streak: '0');
       streak = 0;
     }
   }
@@ -59,7 +59,7 @@ Future<int> _getCurrentStreakInt() async {
 }
 
 Future<bool> updateMinuteCounter(int additionalSecs) async {
-  print("increase mins counter");
+  print('increase mins counter');
 
   var prefs = await SharedPreferences.getInstance();
 
@@ -70,19 +70,19 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
 }
 
 Future<void> updateStreak({String streak = ''}) async {
-  print("update streak");
+  print('update streak');
 
   var prefs = await SharedPreferences.getInstance();
 
   if (streak.isNotEmpty) {
     await prefs.setInt('streakCount', int.parse(streak));
-    _updateLongestStreak(int.parse(streak), prefs);
+    await _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomSessionToStreakList();
     return;
   }
 
-  List<String> streakList = prefs.getStringList('streakList') ?? [];
-  int streakCount = prefs.getInt('streakCount') ?? 0;
+  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakCount = prefs.getInt('streakCount') ?? 0;
 
   if (streakList.isNotEmpty) {
     //if you have meditated before, was it on today? if not, increase counter
@@ -91,11 +91,11 @@ Future<void> updateStreak({String streak = ''}) async {
     final now = DateTime.now();
 
     if (!isSameDay(lastDayInStreak, now)) {
-      incrementStreakCounter(streakCount);
+      await incrementStreakCounter(streakCount);
     }
   } else {
     //if you've never done one before
-    incrementStreakCounter(streakCount);
+    await incrementStreakCounter(streakCount);
   }
 
   streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
@@ -107,8 +107,8 @@ Future<void> addPhantomSessionToStreakList() async {
   // but keep a note of it in fakeStreakList
 
   var prefs = await SharedPreferences.getInstance();
-  List<String> streakList = prefs.getStringList('streakList') ?? [];
-  List<String> fakeStreakList = prefs.getStringList('fakeStreakList') ?? [];
+  var streakList = prefs.getStringList('streakList') ?? [];
+  var fakeStreakList = prefs.getStringList('fakeStreakList') ?? [];
   var streakTime = DateTime.now().millisecondsSinceEpoch.toString();
   streakList.add(streakTime);
   fakeStreakList.add(streakTime);
@@ -147,20 +147,22 @@ Future<String> getMinutesListened() async {
 
   var streak = prefs.getInt('secsListened');
   print('secsListened $streak');
-  if (streak == null)
+  if (streak == null) {
     return '0';
-  else
+  } else {
     return Duration(seconds: streak).inMinutes.toString();
+  }
 }
 
 Future<int> _getSecondsListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-  if (streak == null)
+  if (streak == null) {
     return 0;
-  else
+  } else {
     return streak;
+  }
 }
 
 Future<String> getLongestStreak() async {
@@ -171,10 +173,11 @@ Future<String> getLongestStreak() async {
   }
 
   var streak = prefs.getInt('longestStreak');
-  if (streak == null)
+  if (streak == null) {
     return '0';
-  else
+  } else {
     return streak.toString();
+  }
 }
 
 Future<int> _getLongestStreakInt() async {
@@ -190,10 +193,11 @@ Future<String> getNumSessions() async {
   if (prefs == null) return '...';
 
   var streak = prefs.getInt('numSessions');
-  if (streak == null)
+  if (streak == null) {
     return '0';
-  else
+  } else {
     return streak.toString();
+  }
 }
 
 Future<int> getNumSessionsInt() async {
@@ -204,7 +208,7 @@ Future<int> getNumSessionsInt() async {
 }
 
 Future<int> incrementNumSessions() async {
-  print("increase number of sessions");
+  print('increase number of sessions');
   var prefs = await SharedPreferences.getInstance();
   var current = await getNumSessionsInt();
   current++;
@@ -213,7 +217,7 @@ Future<int> incrementNumSessions() async {
 }
 
 Future<void> markAsListened(String id) async {
-  print("mark as listened");
+  print('mark as listened');
 
   var prefs = await SharedPreferences.getInstance();
   await prefs?.setBool('listened' + id, true);
@@ -226,7 +230,7 @@ Future<void> markAsNotListened(String id) async {
 }
 
 Future<void> clearBgStats() {
-  return writeJSONToCache("", "stats");
+  return writeJSONToCache('', 'stats');
 }
 
 Future<bool> checkListened(String id) async {
@@ -259,7 +263,7 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
 }
 
 Future updateStatsFromBg() async {
-  var read = await readJSONFromCache("stats");
+  var read = await readJSONFromCache('stats');
   print('read ->$read');
 
   if (read != null && read.isNotEmpty) {

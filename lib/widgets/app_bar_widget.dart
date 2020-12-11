@@ -48,14 +48,15 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
   }
 
   Widget getTitleWidget(BuildContext context) {
-    if (titleWidget == null)
+    if (titleWidget == null) {
       return Text(title ?? '', style: Theme.of(context).textTheme.headline2);
-    else
+    } else {
       return Row(
         children: [
           titleWidget,
         ],
       );
+    }
   }
 
   @override

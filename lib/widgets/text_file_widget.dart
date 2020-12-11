@@ -53,11 +53,11 @@ class TextFileWidget extends StatefulWidget {
 
 class _TextFileWidgetState extends State<TextFileWidget>
     with TickerProviderStateMixin {
-  final _viewModel = new SubscriptionViewModelImpl();
+  final _viewModel = SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
-  String readMoreText = "";
-  String textFileFromFuture = "";
+  String readMoreText = '';
+  String textFileFromFuture = '';
 
   BuildContext scaffoldContext;
 
@@ -76,7 +76,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.updateNavData(
-          ListItem("Home", "app+content", null, parentId: "app+content"));
+          ListItem('Home', 'app+content', null, parentId: 'app+content'));
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
@@ -101,7 +101,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     ));
 
     return Scaffold(
-      body: new Builder(
+      body: Builder(
         builder: (BuildContext context) {
           scaffoldContext = context;
           return buildSafeAreaBody();

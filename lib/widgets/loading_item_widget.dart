@@ -74,14 +74,14 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
                       Container(
                           decoration:
                               buildBoxDecoration(MeditoColors.walterWhiteLine),
-                          child: Text("                      ",
+                          child: Text('                      ',
                               style: Theme.of(context).textTheme.headline6)),
                       Container(height: 5),
                       Container(
                           decoration:
                               buildBoxDecoration(MeditoColors.walterWhiteTrans),
                           child: Text(
-                              "                                            ",
+                              '                                            ',
                               style: Theme.of(context).textTheme.headline6)),
                     ],
                   ))),
@@ -94,9 +94,9 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
   }
 
   BoxDecoration buildBoxDecoration(Color color) {
-    return new BoxDecoration(
+    return BoxDecoration(
         color: color,
-        borderRadius: new BorderRadius.all(
+        borderRadius: BorderRadius.all(
           const Radius.circular(30.0),
         ));
   }
