@@ -316,28 +316,30 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       int durationAsMiliseconds) async {
     await _viewModel
         .getAttributions(fileTapped.attributions)
-        .then((attributionsContent) async =>
-            await MediaLibrary.saveMediaLibrary(
-                description,
-                title,
-                fileTapped,
-                coverArt,
-                textColor,
-                primaryColor,
-                bgMusic,
-                durationAsMiliseconds,
-                _viewModel.currentlySelectedFile,
-                attributionsContent))
-        .then((value) {
-      start(primaryColor).then((value) {
-        Navigator.push(context, MaterialPageRoute(builder: (c) {
-          return PlayerWidget();
-        })).then((value) {
-          setState(() {});
-          return null;
-        });
-        return null;
+        .then((attributionsContent) async {
+      var media = MediaLibrary.saveMediaLibrary(
+          description,
+          title,
+          fileTapped,
+          coverArt,
+          textColor,
+          primaryColor,
+          bgMusic,
+          durationAsMiliseconds,
+          _viewModel.currentlySelectedFile,
+          attributionsContent);
+      startService(media, primaryColor);
+    });
+  }
+
+  void startService(media, primaryColor) {
+    start(media, primaryColor).then((value) {
+      Navigator.push(context, MaterialPageRoute(builder: (c) {
+        return PlayerWidget();
+      })).then((value) {
+        setState(() {});
       });
+      return null;
     });
   }
 
@@ -391,8 +393,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         ),
       );
     } else {
-      return SizedBox(
-          width: 300, child: ImageListItemWidget(src: item.url));
+      return SizedBox(width: 300, child: ImageListItemWidget(src: item.url));
     }
   }
 

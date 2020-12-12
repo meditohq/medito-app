@@ -17,6 +17,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
@@ -469,14 +470,17 @@ void _audioPlayerTaskEntrypoint() async {
   await AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
-Future<bool> start(String primaryColor) {
-  AudioService.connect();
-  return AudioService.start(
+Future<void> start(MediaItem media, String primaryColor) async {
+  var map = {'media': media.toJson()};
+  await AudioService.connect();
+   unawaited(AudioService.start(
+    params: map,
     backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
     androidNotificationChannelName: 'Medito Audio Service',
     // Enable this if you want the Android service to exit the foreground state on pause.
     //androidStopForegroundOnPause: true,
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
-  );
+  ));
+
 }

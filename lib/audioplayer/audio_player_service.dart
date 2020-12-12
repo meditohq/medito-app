@@ -7,8 +7,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'media_lib.dart';
-
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
 
@@ -28,9 +26,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
-    await MediaLibrary.retrieveMediaLibrary().then((value) {
-      mediaItem = value;
-    });
+    var mediaItemJson = params['media'];
+    mediaItem = MediaItem.fromJson(mediaItemJson);
 
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
