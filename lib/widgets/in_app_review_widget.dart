@@ -9,7 +9,7 @@ class InAppReviewWidget extends StatelessWidget {
 
 
   InAppReviewWidget({@required this.thumbsdown});
-  VoidCallback thumbsdown;
+  final VoidCallback thumbsdown;
 
   @override
   Widget build(BuildContext context) {

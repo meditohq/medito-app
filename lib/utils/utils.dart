@@ -159,7 +159,7 @@ void createSnackBar(String message, BuildContext context) {
 void createSnackBarWithColor(
     String message, BuildContext context, Color color) {
   final snackBar =
-      SnackBar(content: Text(message), backgroundColor: color);
+      SnackBar(content: Text(message, style: Theme.of(context).textTheme.caption.copyWith(color: MeditoColors.almostBlack)), backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);

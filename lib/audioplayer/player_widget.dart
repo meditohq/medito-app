@@ -42,6 +42,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   String __loaded;
 
+  BuildContext _scaffoldContext;
+
   bool get loaded => __loaded == 'true';
 
   void setLoaded(bool b) {
@@ -85,7 +87,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         subTitleText = value.subtitle;
         buttonLabel = value.buttonLabel;
         buttonUrl = value.buttonDestination;
-        buttonUrl = 'review';
         buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
       } else {
         defaultText();
@@ -102,127 +103,131 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return Scaffold(
         backgroundColor: MeditoColors.midnight,
-        body: StreamBuilder<ScreenState>(
-            stream: _screenStateStream,
-            builder: (context, snapshot) {
-              final screenState = snapshot.data;
-              final mediaItem = screenState?.mediaItem;
-              final state = screenState?.playbackState;
-              final processingState =
-                  state?.processingState ?? AudioProcessingState.none;
-              final playing = state?.playing ?? false;
+        body: Builder(builder: (BuildContext context) {
+          _scaffoldContext = context;
+          return StreamBuilder<ScreenState>(
+              stream: _screenStateStream,
+              builder: (context, snapshot) {
+                final screenState = snapshot.data;
+                final mediaItem = screenState?.mediaItem;
+                final state = screenState?.playbackState;
+                final processingState =
+                    state?.processingState ?? AudioProcessingState.none;
+                final playing = state?.playing ?? false;
 
-              if (processingState == AudioProcessingState.stopped ||
-                  processingState == AudioProcessingState.completed ||
-                  (loaded && mediaItem == null)) {
-                _complete = true;
-                Tracking.changeScreenName(Tracking.PLAYER_END_PAGE);
-              }
+                if (processingState == AudioProcessingState.stopped ||
+                    processingState == AudioProcessingState.completed ||
+                    (loaded && mediaItem == null)) {
+                  _complete = true;
+                  Tracking.changeScreenName(Tracking.PLAYER_END_PAGE);
+                }
 
-              setLoaded(mediaItem != null);
-              getSecondaryColor(mediaItem);
-              getPrimaryColor(mediaItem);
-              getArtUrl(mediaItem);
+                setLoaded(mediaItem != null);
+                getSecondaryColor(mediaItem);
+                getPrimaryColor(mediaItem);
+                getArtUrl(mediaItem);
 
-              return SafeArea(
-                child: Stack(
-                  children: [
-                    GradientWidget(
-                        primaryColor: primaryColorAsColor, height: 350.0),
-                    (mediaItem != null || _complete)
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              getBigImage(),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 24.0,
-                                    left: 32.0,
-                                    bottom: 4.0,
-                                    right: 32.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        mediaItem?.title ?? titleText,
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1
-                                            .copyWith(
-                                                letterSpacing: 0.2,
-                                                height: 1.5,
-                                                color: Colors.white,
-                                                fontSize: 20.0,
-                                                fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 32.0, right: 32.0),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                return SafeArea(
+                  child: Stack(
+                    children: [
+                      GradientWidget(
+                          primaryColor: primaryColorAsColor, height: 350.0),
+                      (mediaItem != null || _complete)
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                getBigImage(),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 24.0,
+                                      left: 32.0,
+                                      bottom: 4.0,
+                                      right: 32.0),
+                                  child: Row(
                                     children: [
-                                      mediaItem?.extras != null
-                                          ? SubtitleTextWidget(
-                                              mediaItem: mediaItem)
-                                          : Expanded(
-                                              child: Text(
-                                                subTitleText,
-                                                textAlign: TextAlign.center,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline1
-                                                    .copyWith(
-                                                        fontSize: 14.0,
-                                                        letterSpacing: 0.2,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: MeditoColors
-                                                            .walterWhite
-                                                            .withOpacity(0.7),
-                                                        height: 1.5),
+                                      Expanded(
+                                        child: Text(
+                                          mediaItem?.title ?? titleText,
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1
+                                              .copyWith(
+                                                  letterSpacing: 0.2,
+                                                  height: 1.5,
+                                                  color: Colors.white,
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 32.0, right: 32.0),
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        mediaItem?.extras != null
+                                            ? SubtitleTextWidget(
+                                                mediaItem: mediaItem)
+                                            : Expanded(
+                                                child: Text(
+                                                  subTitleText,
+                                                  textAlign: TextAlign.center,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline1
+                                                      .copyWith(
+                                                          fontSize: 14.0,
+                                                          letterSpacing: 0.2,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: MeditoColors
+                                                              .walterWhite
+                                                              .withOpacity(0.7),
+                                                          height: 1.5),
+                                                ),
                                               ),
-                                            ),
-                                    ]),
-                              ),
-                              _complete
-                                  ? getDonateAndShareButton()
-                                  : buildPlayingPauseOrLoadingIndicator(
-                                      processingState, playing),
-                              _complete
-                                  ? Container()
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 24.0,
-                                          right: 24.0,
-                                          bottom: 32.0),
-                                      child: positionIndicator(mediaItem, state,
-                                          primaryColorAsColor),
-                                    ),
-                            ],
-                          )
-                        : buildLoadingScreenWidget(),
-                    SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 4.0, top: 4.0),
-                        child: IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => _onBackPressed(mediaItem),
-                          color: MeditoColors.walterWhite,
+                                      ]),
+                                ),
+                                _complete
+                                    ? getDonateAndShareButton()
+                                    : buildPlayingPauseOrLoadingIndicator(
+                                        processingState, playing),
+                                _complete
+                                    ? Container()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 24.0,
+                                            right: 24.0,
+                                            bottom: 32.0),
+                                        child: positionIndicator(mediaItem,
+                                            state, primaryColorAsColor),
+                                      ),
+                              ],
+                            )
+                          : buildLoadingScreenWidget(),
+                      SafeArea(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 4.0, top: 4.0),
+                          child: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => _onBackPressed(mediaItem),
+                            color: MeditoColors.walterWhite,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }));
+                    ],
+                  ),
+                );
+              });
+        }));
   }
 
   Padding getBigImage() {
@@ -423,9 +428,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _thanksPopUp() {
-    createSnackBarWithColor('Thanks for the rating!', context, Colors.black12);
+    createSnackBarWithColor('Thanks for the feedback!', _scaffoldContext,
+        MeditoColors.peacefulBlue);
     addCurrentDateToSF('UserDeclinedRating');
-    Navigator.pop(context);
+    Future.delayed(Duration(seconds: 3))
+        .then((value) => Navigator.pop(context));
   }
 
   Future<void> _launchPrimaryButton() {
@@ -473,7 +480,7 @@ void _audioPlayerTaskEntrypoint() async {
 Future<void> start(MediaItem media, String primaryColor) async {
   var map = {'media': media.toJson()};
   unawaited(AudioService.connect());
-   unawaited(AudioService.start(
+  unawaited(AudioService.start(
     params: map,
     backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
     androidNotificationChannelName: 'Medito Audio Service',
@@ -482,5 +489,4 @@ Future<void> start(MediaItem media, String primaryColor) async {
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   ));
-
 }
