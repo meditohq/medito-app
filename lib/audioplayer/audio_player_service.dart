@@ -6,6 +6,7 @@ import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:pedantic/pedantic.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
@@ -33,7 +34,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    await AudioServiceBackground.setQueue([mediaItem]);
+    unawaited(AudioServiceBackground.setQueue([mediaItem]));
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
@@ -48,8 +49,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        playBgMusic(mediaItem.extras['bgMusic']);
-        await onPlay();
+        var bgUrl = mediaItem.extras['bgMusic'];
+        if (bgUrl != null) {
+          playBgMusic(mediaItem.extras['bgMusic']);
+        }
+        unawaited(onPlay());
       });
     } catch (e) {
       print('Error: $e');
@@ -62,7 +66,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
         AudioServiceBackground.setMediaItem(
             mediaItem.copyWith(duration: _duration));
       }
-      return null;
     });
 
     _player.positionStream.listen((position) async {
@@ -252,8 +255,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       AudioServiceBackground.sendCustomEvent('stats');
 
-      await Tracking.trackEvent(
-          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, '');
+      unawaited(Tracking.trackEvent(
+          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
     }
   }
 }
