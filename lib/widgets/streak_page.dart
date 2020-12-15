@@ -13,9 +13,9 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:flutter/material.dart';
@@ -30,15 +30,16 @@ class StreakWidget extends StatefulWidget {
 }
 
 class _StreakWidgetState extends State<StreakWidget> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Tracking.changeScreenName(Tracking.STREAK_PAGE);
+  }
 
   @override
   Widget build(BuildContext context) {
-    var list = [
-      ListItem("Back", "", null, parentId: ""),
-      ListItem("Stats", "", null, parentId: "...")
-    ];
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -47,7 +48,7 @@ class _StreakWidgetState extends State<StreakWidget> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              MeditoAppBarWidget(title: "Stats"),
+              MeditoAppBarWidget(title: 'Stats'),
               Container(height: 16),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -107,29 +108,29 @@ class _StreakWidgetState extends State<StreakWidget> {
   //   Navigator.pop(context);
   // }
 
-  openEditDialog() {
+  void openEditDialog() {
     showDialog(
       barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return Theme(
-          data: new ThemeData(
+          data: ThemeData(
             primaryColor: MeditoColors.walterWhite,
           ),
           child: AlertDialog(
-            shape: _roundedRectangleBorder(),
+            shape: roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,
-            title: Text("How many days is your streak?",
+            title: Text('How many days is your streak?',
                 style: Theme.of(context).textTheme.headline5),
-            content: new TextField(
+            content: TextField(
               textAlign: TextAlign.center,
               style: Theme.of(context)
                   .textTheme
                   .subtitle2
                   .copyWith(letterSpacing: 1.5),
-              decoration: new InputDecoration(
-                  border: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.red))),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red))),
               keyboardType: TextInputType.number,
               autofocus: true,
               controller: _controller,
@@ -159,7 +160,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onSaveTap,
-                        shape: _roundedRectangleBorder(),
+                        shape: roundedRectangleBorder(),
                         color: MeditoColors.walterWhite,
                         child: Text(
                           'SAVE',
@@ -176,7 +177,7 @@ class _StreakWidgetState extends State<StreakWidget> {
 //                  shape: RoundedRectangleBorder(
 //                    borderRadius: new BorderRadius.circular(12.0),
 //                  ),
-//                  color: MeditoColors.lightColor,
+//                  color: MeditoColors.walterWhite,
 //                  child: Text(
 //                    "SAVE",
 //                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
@@ -200,20 +201,20 @@ class _StreakWidgetState extends State<StreakWidget> {
     });
   }
 
-  openResetDialog() {
+  void openResetDialog() {
     showDialog(
       barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return Theme(
-          data: new ThemeData(
+          data: ThemeData(
               primaryColor: MeditoColors.walterWhite,
               accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
-            shape: _roundedRectangleBorder(),
+            shape: roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,
-            title: Text("Reset longest streak to your current streak?",
+            title: Text('Reset longest streak to your current streak?',
                 style: Theme.of(context).textTheme.headline5),
             actions: <Widget>[
               Padding(
@@ -225,7 +226,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onCancelTap,
-                        shape: _roundedRectangleBorder(),
+                        shape: roundedRectangleBorder(),
                         color: MeditoColors.moonlight,
                         child: Text(
                           'CANCEL',
@@ -242,7 +243,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                       height: 48,
                       child: FlatButton(
                         onPressed: _onResetTap,
-                        shape: _roundedRectangleBorder(),
+                        shape: roundedRectangleBorder(),
                         color: MeditoColors.walterWhite,
                         child: Text(
                           'RESET',
@@ -259,12 +260,6 @@ class _StreakWidgetState extends State<StreakWidget> {
           ),
         );
       },
-    );
-  }
-
-  RoundedRectangleBorder _roundedRectangleBorder() {
-    return RoundedRectangleBorder(
-      borderRadius: new BorderRadius.circular(12.0),
     );
   }
 

@@ -13,13 +13,17 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
+
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 import 'tracking/tracking.dart';
 import 'utils/colors.dart';
@@ -29,10 +33,21 @@ Future<void> main() async {
       statusBarBrightness: Brightness.dark,
       statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(HomeScreenWidget());
 
-  Tracking.initialiseTracker();
+  var app = await Firebase.initializeApp(
+      options: FirebaseOptions(
+    appId: appId,
+    apiKey: apiKey,
+    messagingSenderId: messagingSenderId,
+    projectId: projectId,
+    databaseURL: databaseURL,
+  ));
+
+  await Tracking.initialiseTracker(app);
+
+  InAppPurchaseConnection.enablePendingPurchases();
+
+  runApp(HomeScreenWidget());
 }
 
 /// This Widget is the main application widget.
@@ -47,8 +62,18 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
+
+    isTrackingAccepted().then((value) async {
+      if (value) {
+        Tracking.enableAnalytics(true);
+      } else {
+        Tracking.enableAnalytics(false);
+      }
+    });
+
+
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -60,15 +85,13 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      print("resuming");
+      print('resuming');
       await updateStatsFromBg();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Tracking.trackEvent(Tracking.HOME, Tracking.SCREEN_LOADED, '');
-
     return MaterialApp(
       initialRoute: '/nav',
       routes: {
@@ -83,7 +106,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: SlideTransitionBuilder(),
           }),
-          accentColor: MeditoColors.lightColor,
+          accentColor: MeditoColors.walterWhite,
           textTheme: buildDMSansTextTheme(context)),
       title: HomeScreenWidget._title,
       navigatorObservers: [Tracking.getObserver()],

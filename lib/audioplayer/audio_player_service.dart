@@ -1,20 +1,20 @@
 import 'dart:async';
 
 import 'package:Medito/audioplayer/player_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-
-import 'media_lib.dart';
+import 'package:pedantic/pedantic.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
 
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
-  AudioPlayer _player = new AudioPlayer(handleInterruptions: false);
-  AudioPlayer _bgPlayer = new AudioPlayer(handleInterruptions: false);
+  final AudioPlayer _player = AudioPlayer(handleInterruptions: false);
+  final AudioPlayer _bgPlayer = AudioPlayer(handleInterruptions: false);
   AudioProcessingState _skipState;
   Seeker _seeker;
   StreamSubscription<PlaybackEvent> _eventSubscription;
@@ -22,20 +22,19 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   int get index => _player.currentIndex;
   MediaItem mediaItem;
-  var initialBgVolume = 0.4;
+  var initialBgVolume = 0.6;
   var _updatedStats = false;
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
-    await MediaLibrary.retrieveMediaLibrary().then((value) {
-      this.mediaItem = value;
-    });
+    var mediaItemJson = params['media'];
+    mediaItem = MediaItem.fromJson(mediaItemJson);
 
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    AudioServiceBackground.setQueue([mediaItem]);
+    unawaited(AudioServiceBackground.setQueue([mediaItem]));
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
@@ -48,23 +47,25 @@ class AudioPlayerTask extends BackgroundAudioTask {
         if (_duration.inMilliseconds < 1000) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
-
         }
 
-        playBgMusic(mediaItem.extras['bgMusic']);
-        onPlay();
+        var bgUrl = mediaItem.extras['bgMusic'];
+        if (bgUrl != null) {
+          playBgMusic(mediaItem.extras['bgMusic']);
+        }
+        unawaited(onPlay());
       });
     } catch (e) {
-      print("Error: $e");
-      onStop();
+      print('Error: $e');
+      await onStop();
     }
 
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
-      if (index != null)
+      if (index != null) {
         AudioServiceBackground.setMediaItem(
             mediaItem.copyWith(duration: _duration));
-      return null;
+      }
     });
 
     _player.positionStream.listen((position) async {
@@ -151,12 +152,24 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // It is important to wait for this state to be broadcast before we shut
     // down the task. If we don't, the background task will be destroyed before
     // the message gets sent to the UI.
-    await _player.stop();
-    await _bgPlayer.stop();
-    await _broadcastState();
-    await _player.dispose();
-    await _bgPlayer.dispose();
-    _eventSubscription.cancel();
+    try {
+      await _eventSubscription.cancel();
+    } catch (e) {
+      print('error cancelling');
+    }
+    try {
+      await _player.stop();
+      await _broadcastState();
+      await _player.dispose();
+    } catch (e) {
+      print('error cancelling player');
+    }
+    try {
+      await _bgPlayer.stop();
+      await _bgPlayer.dispose();
+    } catch (e) {
+      print('error bg player');
+    }
     // Shut down this task
     await super.onStop();
   }
@@ -185,7 +198,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   /// Broadcasts the current state to all clients.
   Future<void> _broadcastState() async {
-    await AudioServiceBackground.setState(
+    return AudioServiceBackground.setState(
       controls: [
         if (_player.playing) MediaControl.pause else MediaControl.play,
         MediaControl.stop,
@@ -217,12 +230,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case ProcessingState.completed:
         return AudioProcessingState.completed;
       default:
-        throw Exception("Invalid state: ${_player.processingState}");
+        throw Exception('Invalid state: ${_player.processingState}');
     }
   }
 
   void playBgMusic(String bgMusic) {
-    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != "null") {
+    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != 'null') {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.one);
@@ -238,9 +251,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
         'id': '${mediaItem.extras['id']}',
       };
 
-      await writeJSONToCache(encoded(dataMap), "stats");
+      await writeJSONToCache(encoded(dataMap), 'stats');
 
       AudioServiceBackground.sendCustomEvent('stats');
+
+      unawaited(Tracking.trackEvent(
+          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
     }
   }
 }
@@ -259,18 +275,18 @@ class Seeker {
     this.mediaItem,
   );
 
-  start() async {
+  void start() async {
     _running = true;
     while (_running) {
-      Duration newPosition = player.position + positionInterval;
+      var newPosition = player.position + positionInterval;
       if (newPosition < Duration.zero) newPosition = Duration.zero;
       if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
-      player.seek(newPosition);
+      await player.seek(newPosition);
       await Future.delayed(stepInterval);
     }
   }
 
-  stop() {
+  void stop() {
     _running = false;
   }
 }

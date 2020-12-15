@@ -16,10 +16,19 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
-class MeditoAppBarWidget extends StatelessWidget {
-  const MeditoAppBarWidget({Key key, this.title, this.transparent = false})
+class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
+  const MeditoAppBarWidget(
+      {Key key,
+      this.title,
+      this.titleWidget,
+      this.transparent = false,
+      this.hasCloseButton = false,
+      this.closePressed})
       : super(key: key);
 
+  final Function closePressed;
+  final Widget titleWidget;
+  final bool hasCloseButton;
   final transparent;
   final String title;
 
@@ -28,11 +37,29 @@ class MeditoAppBarWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: AppBar(
+          // leading: null,  defaults to implied leading
+          leading: hasCloseButton ? CloseButton(onPressed: closePressed ?? closePressed,) : null,
           centerTitle: true,
           elevation: 0,
           backgroundColor:
               transparent ? Colors.transparent : MeditoColors.moonlight,
-          title: Text(title, style: Theme.of(context).textTheme.headline2)),
+          title: getTitleWidget(context)),
     );
   }
+
+  Widget getTitleWidget(BuildContext context) {
+    if (titleWidget == null) {
+      return Text(title ?? '', style: Theme.of(context).textTheme.headline2);
+    } else {
+      return Row(
+        children: [
+          titleWidget,
+        ],
+      );
+    }
+  }
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size.fromHeight(56.0);
 }

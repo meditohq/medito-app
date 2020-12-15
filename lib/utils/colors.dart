@@ -16,11 +16,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:flutter/material.dart';
 
 class MeditoColors {
-  static const lightColor = Color(0xffebe7e4);
   static const red = Colors.red;
   static const lightTextColor = Color(0xffa7aab1);
-  static const lightColorLine = Color(0xff595F65);
-  static const lightColorTrans = Color(0x30595F65);
+  static const walterWhiteLine = Color(0xff595F65);
+  static const walterWhiteTrans = Color(0x30595F65);
   static var darkColor = Color(0xff343b43);
   static var darkBGColor = Color(0xff22282D);
   static var lightBlack = Color(0xb2000000);
@@ -32,4 +31,6 @@ class MeditoColors {
   static const moonlight = Color(0xff282828);
   static const walterWhite = Colors.white;
   static const darkMoon = Color(0xff121212);
+  static const peacefulBlue = Color(0xffd1f6fe);
+  static const peacefulPink = Color(0xffffc2c2);
 }

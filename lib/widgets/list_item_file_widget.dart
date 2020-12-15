@@ -24,7 +24,7 @@ class ListItemWidget extends StatelessWidget {
   final ListItem item;
 
   Widget buildFolderIcon() {
-    return Icon(Icons.folder, color: MeditoColors.lightColor);
+    return Icon(Icons.folder, color: MeditoColors.walterWhite);
   }
 
   Widget getAudioIcon() {
@@ -34,19 +34,19 @@ class ListItemWidget extends StatelessWidget {
           if (!listened.hasError && listened.hasData && listened.data) {
             return Icon(
               Icons.check_circle,
-              color: MeditoColors.lightColor,
+              color: MeditoColors.walterWhite,
             );
           } else {
             return Icon(
               Icons.headset,
-              color: MeditoColors.lightColor,
+              color: MeditoColors.walterWhite,
             );
           }
         });
   }
 
   Widget buildTextIcon() {
-    return Icon(Icons.description, color: MeditoColors.lightColor);
+    return Icon(Icons.description, color: MeditoColors.walterWhite);
   }
 
   @override

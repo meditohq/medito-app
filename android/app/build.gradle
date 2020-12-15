@@ -26,9 +26,38 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+
+def configured = true
+try {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} catch (IOException e) {
+    configured = false
+}
+
+project.ext {
+    // TODO(YOU): Create release keys and a `keystore.properties` file. See
+    // `example/README.md` for more info and `keystore.example.properties` for an
+    // example.
+    APP_ID = keystoreProperties['appId']
+    KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : null
+    KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
+    KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
+    KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
+    VERSION_CODE = 386
+    VERSION_NAME = "1.0.54"
+}
+
+if (project.APP_ID == "DEFAULT_DO_NOT_USE") {
+    configured = false
+    logger.error('Unique package name not set, defaulting to "DEFAULT_DO_NOT_USE".')
+}
+
+// Log a final error message if we're unable to create a release key signed
+// build for an app configured in the Play Developer Console. Apks built in this
+// condition won't be able to call any of the BillingClient APIs.
+if (!configured) {
+    logger.error('The app could not be configured for release signing. In app purchases will not be testable. See `example/README.md` for more info and instructions.')
 }
 
 android {
@@ -40,21 +69,30 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "meditofoundation.medito"
+        applicationId project.APP_ID
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        versionCode project.VERSION_CODE
+        versionName project.VERSION_NAME
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-            storePassword keystoreProperties['storePassword']
+        signingConfigs {
+            release {
+                if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
+                    storeFile file(System.getenv()["FCI_KEYSTORE_PATH"])
+                    storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
+                    keyAlias System.getenv()["FCI_KEY_ALIAS"]
+                    keyPassword System.getenv()["FCI_KEY_PASSWORD"]
+                } else {
+                    storeFile project.KEYSTORE_STORE_FILE
+                    storePassword project.KEYSTORE_STORE_PASSWORD
+                    keyAlias project.KEYSTORE_KEY_ALIAS
+                    keyPassword project.KEYSTORE_KEY_PASSWORD
+                }
+            }
         }
     }
     buildTypes {

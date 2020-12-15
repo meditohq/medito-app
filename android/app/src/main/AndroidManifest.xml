@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="meditofoundation.medito">
+    package="meditofoundation.medito"
+    android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -32,8 +34,12 @@
                 android:value="2" />
 
             <meta-data
+                android:name="google_analytics_automatic_screen_reporting_enabled"
+                android:value="false" />
+
+            <meta-data
                 android:name="assets.audio.player.notification.icon"
-                android:resource="@drawable/logo"/>
+                android:resource="@drawable/logo" />
 
             <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
@@ -43,6 +49,7 @@
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -61,7 +68,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="com.ryanheise.audioservice.MediaButtonReceiver" >
+        <receiver android:name="com.ryanheise.audioservice.MediaButtonReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>

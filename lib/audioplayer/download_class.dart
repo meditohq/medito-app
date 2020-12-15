@@ -5,6 +5,7 @@ import 'package:Medito/data/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:pedantic/pedantic.dart';
 
 class _Download {
   bool isDownloading = false;
@@ -13,7 +14,7 @@ class _Download {
   var downloadListener = ValueNotifier<double>(0);
 
   _Download(Files file) {
-    this._file = file;
+    _file = file;
   }
 
   bool isThisFile(Files file) {
@@ -24,7 +25,7 @@ class _Download {
     if (isDownloading) return;
     isDownloading = true;
     _file = file;
-    this._downloadFileWithProgress(file);
+    _downloadFileWithProgress(file);
   }
 
   bool isDownloadingMe(Files file) {
@@ -34,30 +35,30 @@ class _Download {
   }
 
   Future<dynamic> _downloadFileWithProgress(Files currentFile) async {
-    getAttributions(currentFile.attributions);
-    String dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.filename.replaceAll(" ", "%20");
-    File file = new File('$dir/$name');
+    unawaited( getAttributions(currentFile.attributions));
+    var dir = (await getApplicationSupportDirectory()).path;
+    var name = currentFile.filename.replaceAll(' ', '%20');
+    var file = File('$dir/$name');
     if (file.existsSync()) {
       isDownloading = false;
       return null;
     }
-    http.StreamedResponse _response = await http.Client()
+    var _response = await http.Client()
         .send(http.Request('GET', Uri.parse(currentFile.url)));
-    this._total = _response.contentLength;
-    this._received = 0;
-    List<int> _bytes = [];
+    _total = _response.contentLength;
+    _received = 0;
+    var _bytes = <int>[];
 
     _response.stream.listen((value) {
       _bytes.addAll(value);
       _received += value == null ? 0 : value.length;
       //print("File Progress New: " + getProgress().toString())
       //double progress = getProgress();
-      double progress = 0;
+      var progress = 0.0;
       if (_received == null || _total == null) {
         progress = 0;
-        print("Unexpected State of downloading");
-        if (_received == null) _received = _bytes.length;
+        print('Unexpected State of downloading');
+        _received ??= _bytes.length;
         if (_total == null) {
           http.Client()
               .send(http.Request('GET', Uri.parse(currentFile.url)))
@@ -68,11 +69,11 @@ class _Download {
       } else {
         progress = _received / _total;
       }
-      downloadListener.value = progress;
+      downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      saveFileToDownloadedFilesList(currentFile);
-      print("Saved New: " + file.path);
+      unawaited( saveFileToDownloadedFilesList(currentFile));
+      print('Saved New: ' + file.path);
       isDownloading = false;
     });
   }
@@ -94,7 +95,7 @@ class DownloadSingleton {
 
   DownloadSingleton(Files file) {
     if (file == null) return;
-    _download = new _Download(file);
+    _download = _Download(file);
   }
 
   bool isValid() {
@@ -125,7 +126,7 @@ class DownloadSingleton {
       _download.startDownloading(file);
       return true;
     }
-    _download = new _Download(file);
+    _download = _Download(file);
     _download.startDownloading(file);
     return true;
   }

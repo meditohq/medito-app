@@ -59,10 +59,10 @@ class FolderNavWidget extends StatefulWidget {
 
 class _FolderNavWidgetState extends State<FolderNavWidget>
     with TickerProviderStateMixin {
-  final _viewModel = new SubscriptionViewModelImpl();
+  final _viewModel = SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
-  String textFileFromFuture = "";
+  String textFileFromFuture = '';
 
   BuildContext scaffoldContext;
 
@@ -80,11 +80,13 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   void initState() {
     super.initState();
 
+    Tracking.changeScreenName(Tracking.FOLDER_PAGE);
+
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.updateNavData(
-          ListItem("Home", "app+content", null, parentId: "app+content"));
+          ListItem('Home', 'app+content', null, parentId: 'app+content'));
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
@@ -97,7 +99,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     ));
 
     return Scaffold(
-      body: new Builder(
+      body: Builder(
         builder: (BuildContext context) {
           scaffoldContext = context;
           return buildSafeAreaBody();
@@ -134,8 +136,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                         snapshot.connectionState != ConnectionState.waiting
                     ? IconButton(
                         tooltip: snapshot?.data != null && snapshot.data
-                            ? "Mark session as unlistened"
-                            : "Mark session as listened",
+                            ? 'Mark session as unlistened'
+                            : 'Mark session as listened',
                         icon: Icon(
                           snapshot?.data != null && snapshot.data
                               ? Icons.undo
@@ -143,7 +145,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                           color: MeditoColors.walterWhite,
                         ),
                         onPressed: () async {
-                          if (!snapshot?.data) {
+                          if (snapshot != null && !snapshot.data) {
                             await markAsListened(selectedItem.id);
                           } else {
                             await markAsNotListened(selectedItem.id);
@@ -191,14 +193,14 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   Widget getListView() {
     return RefreshIndicator(
-      color: MeditoColors.lightColor,
+      color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       child: FutureBuilder(
           future: listFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.none) {
               return Text(
-                "No connection. Please try again later",
+                'No connection. Please try again later',
                 style: Theme.of(context).textTheme.headline3,
               );
             }
@@ -209,7 +211,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
               return LoadingListWidget();
             }
 
-            return new ListView.builder(
+            return ListView.builder(
                 itemCount:
                     1 + (snapshot.data == null ? 0 : snapshot.data.length),
                 shrinkWrap: true,
@@ -240,7 +242,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   void folderTap(ListItem i) {
-    Tracking.trackEvent(Tracking.FOLDER_TAPPED, Tracking.SCREEN_LOADED, i.id);
+    Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
     //if you tapped on a folder
 
     Navigator.push(
@@ -260,22 +262,17 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   void fileTap(ListItem item) {
     if (item.fileType == FileType.audiosethourly ||
         item.fileType == FileType.audiosetdaily) {
-      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
-      _showPlayerBottomSheet(item);
+      _showSessionOptionsScreen(item);
     } else if (item.fileType == FileType.audio) {
-      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
-      _showPlayerBottomSheet(item);
+      _showSessionOptionsScreen(item);
     } else if (item.fileType == FileType.both) {
-      Tracking.trackEvent(Tracking.FILE_TAPPED, Tracking.AUDIO_OPENED, item.id);
-      _showPlayerBottomSheet(item);
+      _showSessionOptionsScreen(item);
     } else if (item.fileType == FileType.text) {
-      Tracking.trackEvent(
-          Tracking.FILE_TAPPED, Tracking.TEXT_ONLY_OPENED, item.id);
       _openTextFile(item);
     }
   }
 
-  _showPlayerBottomSheet(ListItem listItem) {
+  void _showSessionOptionsScreen(ListItem listItem) {
     _viewModel.currentlySelectedFile = listItem;
 
     var data;
@@ -287,25 +284,27 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       data = _viewModel.getAudioData(id: listItem.id);
     }
 
+    Tracking.trackEvent(Tracking.TAP, Tracking.SESSION_TAPPED, listItem.id);
+
     final result = Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => SessionOptionsScreen(
-            title: listItem.title,
-            onBeginPressed: _showPlayer,
-            data: data,
-          ),
+              title: listItem.title,
+              onBeginPressed: _showPlayer,
+              data: data,
+              id: listItem.id),
         )).then((value) {
       setState(() {});
       return null;
     });
 
-    if (result == "error") {
+    if (result.toString() == 'error') {
       _onPullToRefresh();
     }
   }
 
-  _showPlayer(
+  void _showPlayer(
       Files fileTapped,
       Illustration coverArt,
       dynamic primaryColor,
@@ -317,28 +316,30 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       int durationAsMiliseconds) async {
     await _viewModel
         .getAttributions(fileTapped.attributions)
-        .then((attributionsContent) async =>
-            await MediaLibrary.saveMediaLibrary(
-                description,
-                title,
-                fileTapped,
-                coverArt,
-                textColor,
-                primaryColor,
-                bgMusic,
-                durationAsMiliseconds,
-                _viewModel.currentlySelectedFile,
-                attributionsContent))
-        .then((value) {
-      start(primaryColor).then((value) {
-        Navigator.push(context, MaterialPageRoute(builder: (c) {
-          return PlayerWidget();
-        })).then((value) {
-          setState(() {});
-          return null;
-        });
-        return null;
+        .then((attributionsContent) async {
+      var media = MediaLibrary.saveMediaLibrary(
+          description,
+          title,
+          fileTapped,
+          coverArt,
+          textColor,
+          primaryColor,
+          bgMusic,
+          durationAsMiliseconds,
+          _viewModel.currentlySelectedFile,
+          attributionsContent);
+      startService(media, primaryColor);
+    });
+  }
+
+  void startService(media, primaryColor) {
+    start(media, primaryColor).then((value) {
+      Navigator.push(context, MaterialPageRoute(builder: (c) {
+        return PlayerWidget();
+      })).then((value) {
+        setState(() {});
       });
+      return null;
     });
   }
 
@@ -354,7 +355,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   Widget getFileListItem(ListItem item) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: new ListItemWidget(
+      child: ListItemWidget(
         item: item,
       ),
     );
@@ -387,21 +388,18 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         child: Ink(
           color: (selectedItem == null || selectedItem.id != item.id)
               ? MeditoColors.darkMoon
-              : MeditoColors.lightColorLine,
+              : MeditoColors.walterWhiteLine,
           child: getFileListItem(item),
         ),
       );
     } else {
-      return SizedBox(
-          width: 300, child: new ImageListItemWidget(src: item.url));
+      return SizedBox(width: 300, child: ImageListItemWidget(src: item.url));
     }
   }
 
-  // void _backPressed(String id) {
-  //   Navigator.pop(context);
-  // }
-
   void _openTextFile(ListItem item) {
+    Tracking.trackEvent(Tracking.TAP, Tracking.TEXT_TAPPED, item.id);
+
     Navigator.push(
       context,
       MaterialPageRoute(

@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/main_view_model.dart';
 import 'package:Medito/viewmodel/model/list_item.dart';
@@ -53,11 +53,11 @@ class TextFileWidget extends StatefulWidget {
 
 class _TextFileWidgetState extends State<TextFileWidget>
     with TickerProviderStateMixin {
-  final _viewModel = new SubscriptionViewModelImpl();
+  final _viewModel = SubscriptionViewModelImpl();
   Future<List<ListItem>> listFuture;
 
-  String readMoreText = "";
-  String textFileFromFuture = "";
+  String readMoreText = '';
+  String textFileFromFuture = '';
 
   BuildContext scaffoldContext;
 
@@ -70,11 +70,13 @@ class _TextFileWidgetState extends State<TextFileWidget>
   void initState() {
     super.initState();
 
+    Tracking.changeScreenName(Tracking.TEXT_PAGE);
+
     listFuture = _viewModel.getPageChildren(id: widget.firstId);
 
     if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
       _viewModel.updateNavData(
-          ListItem("Home", "app+content", null, parentId: "app+content"));
+          ListItem('Home', 'app+content', null, parentId: 'app+content'));
       _viewModel
           .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
     }
@@ -99,7 +101,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     ));
 
     return Scaffold(
-      body: new Builder(
+      body: Builder(
         builder: (BuildContext context) {
           scaffoldContext = context;
           return buildSafeAreaBody();
@@ -174,7 +176,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     );
   }
 
-  // void _backPressed(String value) {
-  //   Navigator.pop(context);
-  // }
+// void _backPressed(String value) {
+//   Navigator.pop(context);
+// }
 }

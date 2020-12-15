@@ -18,16 +18,13 @@ import 'dart:async';
 import '../data/pages_children.dart';
 import 'http_get.dart';
 
-abstract class BottomSheetViewModel {}
+abstract class SessionOptionsViewModel {}
 
-class BottomSheetViewModelImpl implements BottomSheetViewModel {
+class SessionOptionsViewModelImpl implements SessionOptionsViewModel {
   var baseUrl = 'https://medito.space/api/pages/';
   var musicUrl = 'service+backgroundmusic/files';
-
-  bool _skipCache;
-
+  
   Future<List> getBackgroundMusicList({bool skipCache = false}) async {
-    this._skipCache = skipCache;
 
     var url = baseUrl + musicUrl + '/';
 
@@ -35,7 +32,7 @@ class BottomSheetViewModelImpl implements BottomSheetViewModel {
     var pages = PagesChildren.fromJson(response);
     var pageList = pages.data;
 
-    List list = [];
+    var list = [];
 
     for (var value in pageList) {
       var musicMap = MapEntry(value?.content?.title, value.url);

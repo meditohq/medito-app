@@ -17,6 +17,7 @@ import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/data/page.dart';
 import 'package:Medito/data/welcome.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/session_options_screen.dart';
 import 'package:Medito/widgets/text_file_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -24,12 +25,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:package_info/package_info.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../tracking/tracking.dart';
 import '../../utils/colors.dart';
 import '../../utils/stats_utils.dart';
-import '../../utils/utils.dart';
 import '../../viewmodel/model/list_item.dart';
 import '../../viewmodel/model/tile_item.dart';
 import '../../viewmodel/tile_view_model.dart';
@@ -48,20 +49,20 @@ class TileList extends StatefulWidget {
 }
 
 class TileListState extends State<TileList> {
-  final _viewModel = new TileListViewModelImpl();
+  final _viewModel = TileListViewModelImpl();
 
   var listFuture;
   var streak = getCurrentStreak();
 
-  // TextTheme titleTextTheme;
-  // TextTheme horizontalAnnouncementTextTheme;
-
   SharedPreferences prefs;
   String streakValue = '0';
 
+  bool _dialogShown = false;
+
   @override
   void initState() {
-    Tracking.trackEvent(Tracking.TILE, Tracking.SCREEN_LOADED, '');
+    Tracking.changeScreenName(Tracking.HOME);
+
     super.initState();
     listFuture = _viewModel.getTiles();
 
@@ -83,7 +84,7 @@ class TileListState extends State<TileList> {
   Widget tileListWidget() {
     return RefreshIndicator(
       displacement: 80,
-      color: MeditoColors.lightColor,
+      color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       onRefresh: _onPullToRefresh,
       child: FutureBuilder(
@@ -91,7 +92,6 @@ class TileListState extends State<TileList> {
           if ((future.connectionState == ConnectionState.none &&
                   future.hasData == null) ||
               future.hasError) {
-            print("in the if block\n\n");
             return getErrorWidget();
           }
 
@@ -166,7 +166,7 @@ class TileListState extends State<TileList> {
                   child: RaisedButton(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(12.0),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                       color: MeditoColors.darkColor,
                       onPressed: _onPullToRefresh,
@@ -189,6 +189,7 @@ class TileListState extends State<TileList> {
 
   @override
   Widget build(BuildContext context) {
+    _trackingDialog(context);
     return Container(
       color: MeditoColors.darkMoon,
       child: SafeArea(
@@ -196,6 +197,13 @@ class TileListState extends State<TileList> {
         child: tileListWidget(),
       ),
     );
+  }
+
+  Future<void> _trackingDialog(BuildContext context) async {
+    await getTrackingAnswered().then((answered) async {
+      if (!answered && !_dialogShown) showConsentDialog(context);
+      _dialogShown = true;
+    });
   }
 
   Widget getTwoColumns(List<TileItem> data) {
@@ -216,7 +224,7 @@ class TileListState extends State<TileList> {
             child: ColumnBuilder(
                 itemCount: data == null ? 0 : data?.length,
                 itemBuilder: (BuildContext context, int index) {
-                  TileItem tile = data[index];
+                  var tile = data[index];
                   if (index < data.length / 2) {
                     return getTile(tile);
                   } else {
@@ -238,7 +246,7 @@ class TileListState extends State<TileList> {
                     );
                   }
 
-                  TileItem tile = data[index];
+                  var tile = data[index];
                   if (data != null && index >= data.length / 2) {
                     return getTile(tile);
                   } else {
@@ -291,8 +299,8 @@ class TileListState extends State<TileList> {
                             letterSpacing: 0.1,
                             height: 1.3)),
                   ),
-                  Container(height: item.description != "" ? 4 : 0),
-                  item.description != ""
+                  Container(height: item.description != '' ? 4 : 0),
+                  item.description != ''
                       ? SizedBox(
                           width: getColumWidth() - 48, //todo horrible hack
                           child: Opacity(
@@ -327,7 +335,7 @@ class TileListState extends State<TileList> {
     return Material(
         color: Colors.white.withOpacity(0.0),
         child: InkWell(
-          splashColor: MeditoColors.lightColor,
+          splashColor: MeditoColors.walterWhite,
           onTap: () => item != null ? _onTap(item) : null,
           borderRadius: BorderRadius.circular(12.0),
           child: w,
@@ -354,7 +362,7 @@ class TileListState extends State<TileList> {
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                      item.description == null ? "" : item.description,
+                      item.description ?? '',
                       style: Theme.of(context)
                           .textTheme
                           .caption
@@ -392,7 +400,7 @@ class TileListState extends State<TileList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         getTitleText(item),
-                        Container(height: item.description != "" ? 6 : 0),
+                        Container(height: item.description != '' ? 6 : 0),
                         getDescText(item),
                       ],
                     ),
@@ -430,9 +438,9 @@ class TileListState extends State<TileList> {
     );
   }
 
-  _onTap(TileItem tile) {
+  void _onTap(TileItem tile) {
     Tracking.trackEvent(
-        Tracking.TILE, Tracking.TILE_TAPPED, tile.id + ' ' + tile.pathTemplate);
+        Tracking.TAP, Tracking.TILE_TAPPED, tile.id + '_' + tile.pathTemplate);
 
     if (tile.pathTemplate == 'session-single') {
       _openSessionOptionsScreen(
@@ -451,7 +459,7 @@ class TileListState extends State<TileList> {
   }
 
   void _openSessionOptionsScreen(TileItem tile, Future data) {
-    Tracking.trackEvent(Tracking.TILE, Tracking.BOTTOM_SHEET, tile.id);
+    Tracking.trackEvent(Tracking.TAP, Tracking.SESSION_TAPPED, tile.id);
 
     _viewModel.currentTile = tile;
 
@@ -459,10 +467,10 @@ class TileListState extends State<TileList> {
         context,
         MaterialPageRoute(
           builder: (context) => SessionOptionsScreen(
-            title: tile.title,
-            onBeginPressed: _showPlayer,
-            data: data,
-          ),
+              title: tile.title,
+              onBeginPressed: _showPlayer,
+              data: data,
+              id: tile.id),
         )).then((value) {
       setState(() {
         streak = getCurrentStreak();
@@ -470,7 +478,7 @@ class TileListState extends State<TileList> {
     });
   }
 
-  _showPlayer(
+  void _showPlayer(
       Files fileTapped,
       Illustration coverArt,
       dynamic primaryColor,
@@ -489,7 +497,7 @@ class TileListState extends State<TileList> {
         thumbnail: _viewModel.currentTile.thumbnail);
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
-      await MediaLibrary.saveMediaLibrary(
+      var media = MediaLibrary.saveMediaLibrary(
           description,
           title,
           fileTapped,
@@ -500,8 +508,7 @@ class TileListState extends State<TileList> {
           duration,
           listItem,
           att);
-    }).then((value) {
-      start(primaryColor).then((value) => Navigator.push(
+      unawaited(start(media, primaryColor).then((value) => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               return PlayerWidget();
@@ -510,7 +517,7 @@ class TileListState extends State<TileList> {
             setState(() {
               streak = getCurrentStreak();
             });
-          }));
+          })));
     });
   }
 
@@ -538,7 +545,7 @@ class TileListState extends State<TileList> {
     });
   }
 
-  _onStreakTap() {
+  void _onStreakTap() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => StreakWidget()),
@@ -564,7 +571,7 @@ class TileListState extends State<TileList> {
   }
 
   Widget getLoadingWidget() {
-    TileItem item = TileItem("", "", "000000");
+    var item = TileItem('', '', '000000');
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -592,7 +599,7 @@ class TileListState extends State<TileList> {
         children: [
           Expanded(
               child: wrapWithInkWell(
-            MeditoColors.lightColor,
+            MeditoColors.walterWhite,
             item,
             Container(
               decoration: BoxDecoration(
@@ -608,14 +615,14 @@ class TileListState extends State<TileList> {
   }
 
   Future<void> _showVersionPopUp() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var packageInfo = await PackageInfo.fromPlatform();
 
-    String version = packageInfo.version;
-    String buildNumber = packageInfo.buildNumber;
+    var version = packageInfo.version;
+    var buildNumber = packageInfo.buildNumber;
 
-    final snackBar = new SnackBar(
-        content: new Text(
-          "Version: $version - Build Number: $buildNumber",
+    final snackBar = SnackBar(
+        content: Text(
+          'Version: $version - Build Number: $buildNumber',
           style: TextStyle(color: MeditoColors.lightTextColor),
         ),
         backgroundColor: MeditoColors.midnight);
@@ -679,10 +686,10 @@ class _AnnouncementBannerState extends State<AnnouncementBanner> {
                           color: MeditoColors.walterWhite, letterSpacing: 0.2)),
                   onPressed: () {
                     switch (widget.data.buttonDestinationType.toLowerCase()) {
-                      case "folder":
-                      case "text":
-                      case "session-single":
-                      case "url":
+                      case 'folder':
+                      case 'text':
+                      case 'session-single':
+                      case 'url':
                         launchUrl(widget.data.buttonDestinationLink);
                     }
                   },

@@ -29,9 +29,7 @@ Text getTextLabel(String label, int i, int startNumber, BuildContext context) {
 
 //todo these methods have useless parameters. get rid!
 BoxDecoration getBoxDecoration(int i, int startNumber, {Color color}) {
-  if (color == null) {
-    color = i == startNumber ? MeditoColors.darkColor : MeditoColors.lightColor;
-  }
+  color ??= i == startNumber ? MeditoColors.darkColor : MeditoColors.walterWhite;
 
   return BoxDecoration(
     color: color,
@@ -43,14 +41,14 @@ EdgeInsets getEdgeInsets(int i, int startNumber) {
   return EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12);
 }
 
-getLoremMedium() {
+String getLoremMedium() {
   return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis pulvinar magna, non consectetur ante laoreet quis. Praesent consectetur vel quam eu iaculis. Curabitur vitae hendrerit magna, id aliquet erat. Aenean sit amet libero non tellus porta euismod. Curabitur tincidunt mi sed sem volutpat, sed bibendum eros viverra. Cras ac ipsum eu justo vestibulum tincidunt. Quisque augue mi, fringilla vitae dui eu, tristique fermentum orci. Aenean commodo ullamcorper magna, eu finibus dolor sollicitudin quis. Ut placerat tortor aliquet felis mattis gravida. Curabitur lacinia venenatis ullamcorper. ';
 }
 
-getLoremLong() {
+String getLoremLong() {
   return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis pulvinar magna, non consectetur ante laoreet quis. Praesent consectetur vel quam eu iaculis. Curabitur vitae hendrerit magna, id aliquet erat. Aenean sit amet libero non tellus porta euismod. Curabitur tincidunt mi sed sem volutpat, sed bibendum eros viverra. Cras ac ipsum eu justo vestibulum tincidunt. Quisque augue mi, fringilla vitae dui eu, tristique fermentum orci. Aenean commodo ullamcorper magna, eu finibus dolor sollicitudin quis. Ut placerat tortor aliquet felis mattis gravida. Curabitur lacinia venenatis ullamcorper.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis pulvinar magna, non consectetur ante laoreet quis. Praesent consectetur vel quam eu iaculis. Curabitur vitae hendrerit magna, id aliquet erat. Aenean sit amet libero non tellus porta euismod. Curabitur tincidunt mi sed sem volutpat, sed bibendum eros viverra. Cras ac ipsum eu justo vestibulum tincidunt. Quisque augue mi, fringilla vitae dui eu, tristique fermentum orci. Aenean commodo ullamcorper magna, eu finibus dollicitudin quis. Ut placerat tortor aliquet felis mattis gravida. Curabitur lacinia venenatis ullamcorper.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis pulvinar magna, non consectetur ante laoreet quis. Praesent consectetur vel quam eu iaculis. Curabitur vitae hendrerit magna, id aliquet erat. Aenean sit amet libero non tellus porta euismod. Curabitur tincidunt mi sed sem volutpat, sed bibendum eros viverra. Cras ac ipsum eu justo vestibulum tincidunt. Quisque augue mi, fringilla vitae dui eu, tristique fermentum orci. Aenean commodo ullamcorper magna, eu finibus dolor sollicitudin quis. Ut placerat tortor aliquet felis mattis gravida. Curabitur lacinia venenatis ullamcorper.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis pulvinar magna, non consectetur ante laoreet quis. Praesent consectetur vel quam eu iaculis. Curabitur vitae hendrerit magna, id aliquet erat. Aenean sit amet libero non tellus porta euismod. Curabitur tincidunt mi sed sem volutpat, sed bibendum eros viverra. Cras ac ipsum eu justo vestibulum tincidunt. Quisque augue mi, fringilla vitae dui eu, tristique fermentum orci. Aenean commodo ullamcorper magna, eu finibus dolor sollicitudin quis. Ut placerat tortor aliquet felis mattis gravida. Curabitur lacinia venenatis ullamcorper.';
 }
 
-getLoremShort() {
+String getLoremShort() {
   return 'Lorem ipsum dolor';
 }
