@@ -36,11 +36,11 @@ Future<void> main() async {
 
   var app = await Firebase.initializeApp(
       options: FirebaseOptions(
-    appId: 'xx',
-    apiKey: 'xx',
-    messagingSenderId: 'messagingSenderId',
-    projectId: 'projectId',
-    databaseURL: 'databaseURL',
+    appId: appId,
+    apiKey: apiKey,
+    messagingSenderId: messagingSenderID,
+    projectId: projectId,
+    databaseURL: databaseURL,
   ));
 
   await Tracking.initialiseTracker(app);
