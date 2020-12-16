@@ -300,8 +300,7 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
   void _next() {
     saveEmailAddress(_emailController.text);
 
-    final purchaseParam =
-        PurchaseParam(productDetails: widget.product);
+    final purchaseParam = PurchaseParam(productDetails: widget.product);
     if (_isConsumable(widget.product)) {
       buyConsumable(purchaseParam);
     } else {

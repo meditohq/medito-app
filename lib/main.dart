@@ -72,7 +72,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
       }
     });
 
-
     WidgetsBinding.instance.addObserver(this);
   }
 
