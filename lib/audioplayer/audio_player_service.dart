@@ -29,6 +29,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onStart(Map<String, dynamic> params) async {
     var mediaItemJson = params['media'];
     mediaItem = MediaItem.fromJson(mediaItemJson);
+    // this bool var is set to true to avoid the volume increase
+    var avoidVolumeIncreaseAtLastSec = false;
 
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
@@ -70,12 +72,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
     _player.positionStream.listen((position) async {
       //ticks on each position
+      var timeLeft = _duration.inSeconds - position.inSeconds;
+      if (timeLeft == 1) {
+        avoidVolumeIncreaseAtLastSec = true;
+      }
       if (position != null) {
         if (audioPositionIsInEndPeriod(position)) {
-          await setBgVolumeFadeAtEnd(
-              mediaItem, position.inSeconds, _duration.inSeconds);
+          await setBgVolumeFadeAtEnd(timeLeft);
           await updateStats();
-        } else if (audioPositionBeforeEndPeriod(position)) {
+        } else if (audioPositionBeforeEndPeriod(position) &&
+            !avoidVolumeIncreaseAtLastSec) {
           await _bgPlayer.setVolume(initialBgVolume);
         }
       }
@@ -113,9 +119,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         position.inSeconds > _duration.inSeconds - fadeDuration;
   }
 
-  Future<void> setBgVolumeFadeAtEnd(
-      MediaItem mediaItem, int positionSecs, int durSecs) async {
-    var timeLeft = durSecs - positionSecs;
+  Future<void> setBgVolumeFadeAtEnd(int timeLeft) async {
     await _bgPlayer.setVolume(initialBgVolume -
         ((fadeDuration - timeLeft) * (initialBgVolume / fadeDuration)));
   }

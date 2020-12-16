@@ -36,11 +36,11 @@ Future<void> main() async {
 
   var app = await Firebase.initializeApp(
       options: FirebaseOptions(
-    appId: appId,
-    apiKey: apiKey,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    databaseURL: databaseURL,
+    appId: 'xx',
+    apiKey: 'xx',
+    messagingSenderId: 'messagingSenderId',
+    projectId: 'projectId',
+    databaseURL: 'databaseURL',
   ));
 
   await Tracking.initialiseTracker(app);
@@ -71,7 +71,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
         Tracking.enableAnalytics(false);
       }
     });
-
 
     WidgetsBinding.instance.addObserver(this);
   }
