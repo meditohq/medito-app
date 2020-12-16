@@ -38,7 +38,7 @@ Future<void> main() async {
       options: FirebaseOptions(
     appId: appId,
     apiKey: apiKey,
-    messagingSenderId: messagingSenderID,
+    messagingSenderId: messagingSenderId,
     projectId: projectId,
     databaseURL: databaseURL,
   ));
