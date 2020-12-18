@@ -671,7 +671,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       } else {
         _offlineSelected = 0;
         createSnackBarWithColor(
-            'Another Download in Progress', scaffoldContext, Colors.black12);
+            'Another Download in Progress', scaffoldContext, MeditoColors.peacefulBlue);
       }
     } else {
       // 'NO' selected

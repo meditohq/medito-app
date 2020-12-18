@@ -6,8 +6,7 @@ import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-
-import 'media_lib.dart';
+import 'package:pedantic/pedantic.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
@@ -28,15 +27,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
-    await MediaLibrary.retrieveMediaLibrary().then((value) {
-      mediaItem = value;
-    });
+    var mediaItemJson = params['media'];
+    mediaItem = MediaItem.fromJson(mediaItemJson);
+    // this bool var is set to true to avoid the volume increase
+    var avoidVolumeIncreaseAtLastSec = false;
 
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    await AudioServiceBackground.setQueue([mediaItem]);
+    unawaited(AudioServiceBackground.setQueue([mediaItem]));
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
@@ -51,8 +51,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        playBgMusic(mediaItem.extras['bgMusic']);
-        await onPlay();
+        var bgUrl = mediaItem.extras['bgMusic'];
+        if (bgUrl != null) {
+          playBgMusic(mediaItem.extras['bgMusic']);
+        }
+        unawaited(onPlay());
       });
     } catch (e) {
       print('Error: $e');
@@ -65,17 +68,20 @@ class AudioPlayerTask extends BackgroundAudioTask {
         AudioServiceBackground.setMediaItem(
             mediaItem.copyWith(duration: _duration));
       }
-      return null;
     });
 
     _player.positionStream.listen((position) async {
       //ticks on each position
+      var timeLeft = _duration.inSeconds - position.inSeconds;
+      if (timeLeft == 1) {
+        avoidVolumeIncreaseAtLastSec = true;
+      }
       if (position != null) {
         if (audioPositionIsInEndPeriod(position)) {
-          await setBgVolumeFadeAtEnd(
-              mediaItem, position.inSeconds, _duration.inSeconds);
+          await setBgVolumeFadeAtEnd(timeLeft);
           await updateStats();
-        } else if (audioPositionBeforeEndPeriod(position)) {
+        } else if (audioPositionBeforeEndPeriod(position) &&
+            !avoidVolumeIncreaseAtLastSec) {
           await _bgPlayer.setVolume(initialBgVolume);
         }
       }
@@ -113,9 +119,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         position.inSeconds > _duration.inSeconds - fadeDuration;
   }
 
-  Future<void> setBgVolumeFadeAtEnd(
-      MediaItem mediaItem, int positionSecs, int durSecs) async {
-    var timeLeft = durSecs - positionSecs;
+  Future<void> setBgVolumeFadeAtEnd(int timeLeft) async {
     await _bgPlayer.setVolume(initialBgVolume -
         ((fadeDuration - timeLeft) * (initialBgVolume / fadeDuration)));
   }
@@ -255,8 +259,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       AudioServiceBackground.sendCustomEvent('stats');
 
-      await Tracking.trackEvent(
-          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, '');
+      unawaited(Tracking.trackEvent(
+          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
     }
   }
 }

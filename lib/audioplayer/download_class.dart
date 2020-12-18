@@ -5,6 +5,7 @@ import 'package:Medito/data/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:pedantic/pedantic.dart';
 
 class _Download {
   bool isDownloading = false;
@@ -34,7 +35,7 @@ class _Download {
   }
 
   Future<dynamic> _downloadFileWithProgress(Files currentFile) async {
-    await getAttributions(currentFile.attributions);
+    unawaited( getAttributions(currentFile.attributions));
     var dir = (await getApplicationSupportDirectory()).path;
     var name = currentFile.filename.replaceAll(' ', '%20');
     var file = File('$dir/$name');
@@ -53,7 +54,7 @@ class _Download {
       _received += value == null ? 0 : value.length;
       //print("File Progress New: " + getProgress().toString())
       //double progress = getProgress();
-      var progress = 0;
+      var progress = 0.0;
       if (_received == null || _total == null) {
         progress = 0;
         print('Unexpected State of downloading');
@@ -66,12 +67,12 @@ class _Download {
           _received = _bytes.length;
         }
       } else {
-        progress = (_received / _total) as int;
+        progress = _received / _total;
       }
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      await saveFileToDownloadedFilesList(currentFile);
+      unawaited( saveFileToDownloadedFilesList(currentFile));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });

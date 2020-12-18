@@ -25,6 +25,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:package_info/package_info.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../tracking/tracking.dart';
@@ -496,7 +497,7 @@ class TileListState extends State<TileList> {
         thumbnail: _viewModel.currentTile.thumbnail);
 
     await _viewModel.getAttributions(fileTapped.attributions).then((att) async {
-      await MediaLibrary.saveMediaLibrary(
+      var media = MediaLibrary.saveMediaLibrary(
           description,
           title,
           fileTapped,
@@ -507,8 +508,7 @@ class TileListState extends State<TileList> {
           duration,
           listItem,
           att);
-    }).then((value) {
-      start(primaryColor).then((value) => Navigator.push(
+      unawaited(start(media, primaryColor).then((value) => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
               return PlayerWidget();
@@ -517,7 +517,7 @@ class TileListState extends State<TileList> {
             setState(() {
               streak = getCurrentStreak();
             });
-          }));
+          })));
     });
   }
 
@@ -630,7 +630,6 @@ class TileListState extends State<TileList> {
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     Scaffold.of(context).showSnackBar(snackBar);
   }
-
 }
 
 class AnnouncementBanner extends StatefulWidget {
