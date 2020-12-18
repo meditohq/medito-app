@@ -91,8 +91,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     });
 
     widget.data.then((d) {
-      _illustration =
-          d?.illustration != null ? d?.illustration?.first : null;
+      _illustration = d?.illustration != null ? d?.illustration?.first : null;
       _primaryColor = d?.primaryColor;
       _title = d?.title;
       _secondaryColor = d?.secondaryColor;
@@ -520,8 +519,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
     var indexOfMusic = 0;
     if (previousMusicSelected != null) {
-      indexOfMusic = roundedList.indexOf(
-          previousMusicSelected);
+      indexOfMusic = roundedList.indexOf(previousMusicSelected);
     } //find the index of the previous selection in the rounded list
     if (indexOfMusic == -1) indexOfMusic = 0; //if it doesn't exist make it zero
     lengthSelected = lengthList
@@ -628,7 +626,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void onMusicSelected(int index, String url, String name) {
     _musicSelected = index;
-
+    print('bg selected: $name');
     if (index > 0) {
       showIndeterminateSpinner = true;
       downloadBGMusicFromURL(url, name).then((value) {
@@ -663,8 +661,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         downloadSingleton.start(currentFile);
       } else {
         _offlineSelected = 0;
-        createSnackBarWithColor(
-            'Another Download in Progress', scaffoldContext, MeditoColors.peacefulBlue);
+        createSnackBarWithColor('Another Download in Progress', scaffoldContext,
+            MeditoColors.peacefulBlue);
       }
     } else {
       // 'NO' selected

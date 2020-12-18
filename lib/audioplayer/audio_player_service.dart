@@ -53,6 +53,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
         var bgUrl = mediaItem.extras['bgMusic'];
         if (bgUrl != null) {
+          print('bg selected: true');
           playBgMusic(mediaItem.extras['bgMusic']);
         }
         unawaited(onPlay());
