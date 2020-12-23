@@ -12,6 +12,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/in_app_review_widget.dart';
+import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +40,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Color primaryColorAsColor;
   bool _complete = false;
   double _height = 0;
-
   String __loaded;
+  double volume;
 
   BuildContext _scaffoldContext;
 
@@ -69,6 +70,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
+    volume = 100.0;
 
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
@@ -206,6 +208,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                         padding: const EdgeInsets.only(
                                             left: 24.0,
                                             right: 24.0,
+                                            top: 10.0,
                                             bottom: 32.0),
                                         child: positionIndicator(mediaItem,
                                             state, primaryColorAsColor),
@@ -223,12 +226,117 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           ),
                         ),
                       ),
+                      Align(
+                          alignment: Alignment.topRight,
+                          child: getBgVolumeController(mediaItem))
                     ],
                   ),
                 );
               });
         }));
   }
+
+  IconData volumeIconFunction(var volume) {
+    if (volume == 0) {
+      return Icons.volume_off;
+    } else if (volume < 50) {
+      return Icons.volume_down;
+    } else {
+      return Icons.volume_up;
+    }
+  }
+
+  void _onCancelTap() {
+    Navigator.pop(context);
+  }
+
+  Widget getBgVolumeController(MediaItem mediaItem) => mediaItem == null
+      ? Container()
+      : mediaItem.extras['bgMusic'] != null
+          ? _complete
+              ? Container()
+              : Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: IconButton(
+                      icon: StreamBuilder<Object>(
+                          stream: _dragBgVolumeSubject,
+                          builder: (context, snapshot) {
+                            var volume = _dragBgVolumeSubject.value ?? 100;
+                            var volumeIcon = volumeIconFunction(volume);
+
+                            return Icon(volumeIcon, color: Colors.white);
+                          }),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            child: AlertDialog(
+                              shape: roundedRectangleBorder(),
+                              backgroundColor: MeditoColors.darkBGColor,
+                              title: Text('Background sound volume',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline5),
+                              content: SizedBox(
+                                height: 120,
+                                child: StreamBuilder<Object>(
+                                    stream: _dragBgVolumeSubject,
+                                    builder: (context, snapshot) {
+                                      var volume =
+                                          _dragBgVolumeSubject.value ?? 100;
+                                      var volumeIcon =
+                                          volumeIconFunction(volume);
+                                      return Column(
+                                        children: [
+                                          SizedBox(height: 24),
+                                          Icon(volumeIcon,
+                                              size: 30,
+                                              color: MeditoColors.walterWhite),
+                                          SizedBox(height: 16),
+                                          SliderTheme(
+                                            data: SliderThemeData(
+                                              trackShape: CustomTrackShape(),
+                                              thumbShape: RoundSliderThumbShape(
+                                                  enabledThumbRadius: 10.0),
+                                            ),
+                                            child: Slider(
+                                              min: 0.0,
+                                              activeColor: primaryColorAsColor,
+                                              inactiveColor: MeditoColors
+                                                  .walterWhite
+                                                  .withOpacity(0.7),
+                                              max: 100.0,
+                                              value: volume,
+                                              onChanged: (value) {
+                                                _dragBgVolumeSubject.add(value);
+                                                AudioService.customAction(
+                                                    'setBgVolume', value / 100);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                              ),
+                              actions: [
+                                Container(
+                                  height: 48,
+                                  child: FlatButton(
+                                    onPressed: _onCancelTap,
+                                    child: Text(
+                                      'CANCEL',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline3
+                                          .copyWith(
+                                              color: MeditoColors.walterWhite,
+                                              fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ));
+                      },
+                      color: primaryColorAsColor))
+          : Container();
 
   Padding getBigImage() {
     return Padding(
@@ -327,6 +435,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           AudioService.playbackStateStream,
           (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
+
+  /// Tracks the bgVolume while the user drags the bgVolume bar.
+  final BehaviorSubject<double> _dragBgVolumeSubject =
+      BehaviorSubject.seeded(null);
 
   Widget playButton() => Semantics(
         label: 'Play button',
