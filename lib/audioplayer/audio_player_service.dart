@@ -4,6 +4,7 @@ import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_service/js/media_session_web.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pedantic/pedantic.dart';
@@ -134,6 +135,15 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onPause() {
     _bgPlayer.pause();
     return _player.pause();
+  }
+
+  @override
+  Future<void> onCustomAction(String name, dynamic params) async {
+    switch (name) {
+      case 'setBgVolume':
+        initialBgVolume = params;
+        break;
+    }
   }
 
   @override
