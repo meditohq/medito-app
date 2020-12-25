@@ -21,6 +21,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audio_player_service.dart';
 
@@ -42,6 +43,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   double _height = 0;
   String __loaded;
   double volume;
+  var prefs;
 
   BuildContext _scaffoldContext;
 
@@ -63,6 +65,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.dispose();
   }
 
+  void initPref() async {
+    prefs = await SharedPreferences.getInstance();
+    _dragBgVolumeSubject.add(prefs.getInt('bgVolume').toDouble() ?? 100.0);
+    print('shared preferences initialised.');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +79,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
     volume = 100.0;
+    initPref();
 
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
@@ -250,6 +259,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Navigator.pop(context);
   }
 
+  /// Tracks the bgVolume while the user drags the bgVolume bar.
+  final BehaviorSubject<double> _dragBgVolumeSubject =
+      BehaviorSubject.seeded(null);
+
   Widget getBgVolumeController(MediaItem mediaItem) => mediaItem == null
       ? Container()
       : mediaItem.extras['bgMusic'] != null
@@ -261,7 +274,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       icon: StreamBuilder<Object>(
                           stream: _dragBgVolumeSubject,
                           builder: (context, snapshot) {
-                            var volume = _dragBgVolumeSubject.value ?? 100;
+                            volume = _dragBgVolumeSubject.value ?? 100;
                             var volumeIcon = volumeIconFunction(volume);
 
                             return Icon(volumeIcon, color: Colors.white);
@@ -280,7 +293,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                 child: StreamBuilder<Object>(
                                     stream: _dragBgVolumeSubject,
                                     builder: (context, snapshot) {
-                                      var volume =
+                                      volume =
                                           _dragBgVolumeSubject.value ?? 100;
                                       var volumeIcon =
                                           volumeIconFunction(volume);
@@ -309,6 +322,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                                 _dragBgVolumeSubject.add(value);
                                                 AudioService.customAction(
                                                     'setBgVolume', value / 100);
+                                              },
+                                              onChangeEnd: (value) {
+                                                prefs.setInt(
+                                                    'bgVolume', value.toInt());
                                               },
                                             ),
                                           ),
@@ -435,10 +452,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           AudioService.playbackStateStream,
           (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
-
-  /// Tracks the bgVolume while the user drags the bgVolume bar.
-  final BehaviorSubject<double> _dragBgVolumeSubject =
-      BehaviorSubject.seeded(null);
 
   Widget playButton() => Semantics(
         label: 'Play button',
