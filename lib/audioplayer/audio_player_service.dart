@@ -4,7 +4,6 @@ import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:audio_service/js/media_session_web.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pedantic/pedantic.dart';
