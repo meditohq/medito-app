@@ -44,7 +44,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   double _height = 0;
   String __loaded;
   double volume;
-  var prefs;
 
   BuildContext _scaffoldContext;
 
@@ -66,8 +65,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.dispose();
   }
 
-  void initBgVol() async {
-    volume = await initSFAndReturnBgVol() ?? 100;
+  void initBgVolume() async {
+    volume = await retrieveSavedBgVolume() ?? 100;
     _dragBgVolumeSubject.add(volume);
     await AudioService.customAction('setBgVolume', volume / 100);
   }
@@ -79,7 +78,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
-    initBgVol();
+    initBgVolume();
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
         await updateStatsFromBg();
@@ -322,7 +321,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                                     'setBgVolume', value / 100);
                                               },
                                               onChangeEnd: (value) {
-                                                saveBgVolToSF(value);
+                                                saveBgVolume(value);
                                               },
                                             ),
                                           ),
