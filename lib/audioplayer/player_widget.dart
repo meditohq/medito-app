@@ -5,6 +5,7 @@ import 'package:Medito/audioplayer/position_indicator_widget.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
 import 'package:Medito/audioplayer/subtitle_text_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
@@ -65,10 +66,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.dispose();
   }
 
-  void initPref() async {
-    prefs = await SharedPreferences.getInstance();
-    _dragBgVolumeSubject.add(prefs.getInt('bgVolume').toDouble() ?? 100.0);
-    print('shared preferences initialised.');
+  void initBgVol() async {
+    volume = await initSFAndReturnBgVol() ?? 100;
+    _dragBgVolumeSubject.add(volume);
+    await AudioService.customAction('setBgVolume', volume / 100);
   }
 
   @override
@@ -78,9 +79,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.black));
-    volume = 100.0;
-    initPref();
-
+    initBgVol();
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
         await updateStatsFromBg();
@@ -274,7 +273,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       icon: StreamBuilder<Object>(
                           stream: _dragBgVolumeSubject,
                           builder: (context, snapshot) {
-                            volume = _dragBgVolumeSubject.value ?? 100;
+                            volume = _dragBgVolumeSubject.value;
                             var volumeIcon = volumeIconFunction(volume);
 
                             return Icon(volumeIcon, color: Colors.white);
@@ -293,8 +292,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                 child: StreamBuilder<Object>(
                                     stream: _dragBgVolumeSubject,
                                     builder: (context, snapshot) {
-                                      volume =
-                                          _dragBgVolumeSubject.value ?? 100;
+                                      volume = _dragBgVolumeSubject.value;
                                       var volumeIcon =
                                           volumeIconFunction(volume);
                                       return Column(
@@ -324,8 +322,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                                     'setBgVolume', value / 100);
                                               },
                                               onChangeEnd: (value) {
-                                                prefs.setInt(
-                                                    'bgVolume', value.toInt());
+                                                saveBgVolToSF(value);
                                               },
                                             ),
                                           ),
