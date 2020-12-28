@@ -16,14 +16,16 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/widgets/tiles/tile_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'tracking/tracking.dart';
 import 'utils/colors.dart';
@@ -60,6 +62,7 @@ class HomeScreenWidget extends StatefulWidget {
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget>
     with WidgetsBindingObserver {
+
   @override
   void initState() {
     super.initState();
@@ -84,9 +87,20 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      print('resuming');
+      unawaited(checkForUpdate());
       await updateStatsFromBg();
     }
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> checkForUpdate() async {
+    unawaited(InAppUpdate.checkForUpdate().then((info) {
+      setState(() {
+        if (info.flexibleUpdateAllowed && info.updateAvailable) {
+          InAppUpdate.startFlexibleUpdate().catchError(_onError);
+        }
+      });
+    }).catchError(_onError));
   }
 
   @override
@@ -110,6 +124,10 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
       title: HomeScreenWidget._title,
       navigatorObservers: [Tracking.getObserver()],
     );
+  }
+
+  void _onError() {
+    print('update error');
   }
 }
 
