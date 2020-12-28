@@ -66,7 +66,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void initBgVolume() async {
-    volume = await retrieveSavedBgVolume() ?? 100;
+    volume = await retrieveSavedBgVolume();
     _dragBgVolumeSubject.add(volume);
     await AudioService.customAction('setBgVolume', volume / 100);
   }
