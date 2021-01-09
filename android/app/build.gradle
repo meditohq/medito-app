@@ -35,6 +35,10 @@ try {
     configured = false
 }
 
+static int generateVersionCode(String versionName) {
+    def parts = versionName.split("\\.").collect { it.toInteger() }
+    return parts[0] * 10000 + parts[1] * 100 + parts[2]
+}
 project.ext {
     // TODO(YOU): Create release keys and a `keystore.properties` file. See
     // `example/README.md` for more info and `keystore.example.properties` for an
@@ -44,8 +48,8 @@ project.ext {
     KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
     KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
     KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
-    VERSION_CODE = 387
-    VERSION_NAME = "1.0.6"
+    VERSION_CODE = generateVersionCode(flutterVersionName)
+    VERSION_NAME = flutterVersionName
 }
 
 if (project.APP_ID == "DEFAULT_DO_NOT_USE") {
