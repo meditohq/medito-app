@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/packs/packs.dart';
 import 'package:Medito/network/packs/packs_bloc.dart';
+import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
@@ -82,7 +83,7 @@ class PackListWidgetState extends State<PackListWidget> {
                 case Status.LOADING:
                   return getLoadingWidget();
                 case Status.COMPLETED:
-                  return _getScrollWidget(snapshot.data.data);
+                  return _getScrollWidget(snapshot.data.body);
                 case Status.ERROR:
                   return ErrorPacksWidget(
                     onPressed: () => _packsBloc.fetchPacksList(),
@@ -171,59 +172,62 @@ class PackListWidgetState extends State<PackListWidget> {
   double _getColumnWidth() => MediaQuery.of(context).size.width / 2 - 8;
 
   Widget _getTile(PackItem item) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: parseColor(item.colorPrimary),
-        ),
-        child: Padding(
-          padding:
-              const EdgeInsets.only(top: 16.0, bottom: 16, left: 10, right: 10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(height: 8),
-              SizedBox(height: 80, child: getNetworkImageWidget(item.imageUrl)),
-              Container(height: 16),
-              SizedBox(
-                width: _getColumnWidth() - 48, //todo horrible hack
-                child: AutoSizeText(item.title,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    wrapWords: false,
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: parseColor(item.textColor),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.1,
-                        height: 1.3)),
-              ),
-              Container(height: item.subtitle != '' ? 4 : 0),
-              item.subtitle != ''
-                  ? SizedBox(
-                      width: _getColumnWidth() - 48, //todo horrible hack
-                      child: Opacity(
-                        opacity: .7,
-                        child: AutoSizeText(item.subtitle,
-                            maxLines: 2,
-                            textAlign: TextAlign.center,
-                            wrapWords: false,
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle1
-                                .copyWith(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 0.1,
-                                    color: parseColor(item.textColor))),
-                      ),
-                    )
-                  : Container(),
-            ],
+    return GestureDetector(
+      onTap:() => NavigationFactory.navigate(context, Screen.folder, id: item.link),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            color: parseColor(item.colorPrimary),
+          ),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(top: 16.0, bottom: 16, left: 10, right: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(height: 8),
+                SizedBox(height: 80, child: getNetworkImageWidget(item.imageUrl)),
+                Container(height: 16),
+                SizedBox(
+                  width: _getColumnWidth() - 48, //todo horrible hack
+                  child: AutoSizeText(item.title,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      wrapWords: false,
+                      style: Theme.of(context).textTheme.headline6.copyWith(
+                          color: parseColor(item.textColor),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                          height: 1.3)),
+                ),
+                Container(height: item.subtitle != '' ? 4 : 0),
+                item.subtitle != ''
+                    ? SizedBox(
+                        width: _getColumnWidth() - 48, //todo horrible hack
+                        child: Opacity(
+                          opacity: .7,
+                          child: AutoSizeText(item.subtitle,
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                              wrapWords: false,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1
+                                  .copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.1,
+                                      color: parseColor(item.textColor))),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
           ),
         ),
       ),

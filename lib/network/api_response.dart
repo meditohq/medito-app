@@ -15,16 +15,16 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 class ApiResponse<T> {
   Status status;
-  T data;
+  T body;
   String message;
 
   ApiResponse.loading(this.message) : status = Status.LOADING;
-  ApiResponse.completed(this.data) : status = Status.COMPLETED;
+  ApiResponse.completed(this.body) : status = Status.COMPLETED;
   ApiResponse.error(this.message) : status = Status.ERROR;
 
   @override
   String toString() {
-    return 'Status : $status \n Message : $message \n Data : $data';
+    return 'Status : $status \n Message : $message \n Data : $body';
   }
 }
 

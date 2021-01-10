@@ -15,8 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/main_view_model.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -33,17 +31,11 @@ class TextFileStateless extends StatelessWidget {
 
 class TextFileWidget extends StatefulWidget {
   TextFileWidget(
-      {Key key,
-      this.firstId,
-      this.firstTitle,
-      this.text,
-      this.textFuture,
-      this.navItemPair})
+      {Key key, this.firstId, this.firstTitle, this.text, this.textFuture})
       : super(key: key);
 
   final String firstId;
   final String text;
-  final List<ListItem> navItemPair;
   final String firstTitle;
   final Future<String> textFuture;
 
@@ -53,9 +45,6 @@ class TextFileWidget extends StatefulWidget {
 
 class _TextFileWidgetState extends State<TextFileWidget>
     with TickerProviderStateMixin {
-  final _viewModel = SubscriptionViewModelImpl();
-  Future<List<ListItem>> listFuture;
-
   String readMoreText = '';
   String textFileFromFuture = '';
 
@@ -71,20 +60,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
     super.initState();
 
     Tracking.changeScreenName(Tracking.TEXT_PAGE);
-
-    listFuture = _viewModel.getPageChildren(id: widget.firstId);
-
-    if (widget.firstTitle != null && widget.firstTitle.isNotEmpty) {
-      _viewModel.updateNavData(
-          ListItem('Home', 'app+content', null, parentId: 'app+content'));
-      _viewModel
-          .updateNavData(ListItem(widget.firstTitle, widget.firstId, null));
-    }
-
-    if (widget.navItemPair != null) {
-      _viewModel.updateNavData(widget.navItemPair[0]);
-      _viewModel.updateNavData(widget.navItemPair[1]);
-    }
 
     textFileFromFuture = widget.text ?? '';
     widget.textFuture?.then((onValue) {
@@ -141,12 +116,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
   Widget getInnerTextView() {
     String content;
 
-    if (textFileFromFuture.isEmpty) {
-      content = _viewModel?.contentText;
-    } else {
-      content = textFileFromFuture;
-    }
-
     return Container(
       child: Row(
         mainAxisSize: MainAxisSize.max,
@@ -175,8 +144,4 @@ class _TextFileWidgetState extends State<TextFileWidget>
       ),
     );
   }
-
-// void _backPressed(String value) {
-//   Navigator.pop(context);
-// }
 }

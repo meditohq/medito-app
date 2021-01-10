@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/network/folder/folder_items.dart';
+
 class Packs {
   Data data;
 
@@ -76,7 +78,13 @@ class Content {
 class PackItem {
   /// "folder"/"article"/"session"/"daily"
   /// Check this value on tile tap to open correct page
-  String itemType;
+
+  FileType get fileType {
+    if (itemType == 'session') return FileType.audio;
+    if (itemType == 'article') return FileType.text;
+    if (itemType == 'folder') return FileType.folder;
+    return null;
+  }
 
   /// Used to show/hide tile
   bool display;
@@ -104,11 +112,17 @@ class PackItem {
 
   /// IGNORE -----------------------------------------
   /// Ignore. Sometimes the subtitle/title will be missing, so get them from another place
+  ///
+  @Deprecated('Don\'t use.')
   bool overrideData;
-  ///Ignore
-  String itemTitle; //use title above
-  ///Ignore. Use textColor instead
+
+  @Deprecated('Don\'t use. Use [title] instead')
+  String itemTitle;
+  @Deprecated('Don\'t use. Use [textColor] instead')
   String colorSecondary;
+  @Deprecated('Use [fileType] instead')
+  String itemType;
+
   /// END IGNORE --------------------------------------
 
   PackItem(
