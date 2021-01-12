@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+
 import 'package:Medito/network/folder/folder_items.dart';
 
 class Packs {
@@ -80,7 +81,7 @@ class PackItem {
   /// Check this value on tile tap to open correct page
 
   FileType get fileType {
-    if (itemType == 'session') return FileType.audio;
+    if (itemType == 'session') return FileType.session;
     if (itemType == 'article') return FileType.text;
     if (itemType == 'folder') return FileType.folder;
     return null;
