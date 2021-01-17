@@ -158,7 +158,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   Widget _getListView() {
     return RefreshIndicator(
-      onRefresh: () => _bloc.fetchItemsList(widget.contentId),
+      onRefresh: () => _bloc.fetchData(widget.contentId),
       color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       child: StreamBuilder<ApiResponse<List<FolderItem>>>(
@@ -227,11 +227,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         });
   }
 
-  void folderTap(FolderItem i) {
+  void itemTap(FolderItem i) {
     Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
-    //if you tapped on a folder
     NavigationFactory.navigate(
-        context, NavigationFactory.getScreenFromString(i.itemType),
+        context, NavigationFactory.getScreenFromItemType(i.fileType),
         id: i.id);
   }
 
@@ -242,9 +241,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     });
   }
 
-  InkWell _getFileItemWidget(FolderItem item) {
+  InkWell _getItemListWidget(FolderItem item) {
     return InkWell(
-        onTap: () => folderTap(item),
+        onTap: () => itemTap(item),
         splashColor: MeditoColors.moonlight,
         child: ListItemWidget(
           item: item,
@@ -278,7 +277,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         color: (_bloc.selectedItem == null || _bloc.selectedItem.id != item.id)
             ? MeditoColors.darkMoon
             : MeditoColors.walterWhiteLine,
-        child: _getFileItemWidget(item),
+        child: _getItemListWidget(item),
       ),
     );
   }

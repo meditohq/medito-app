@@ -58,7 +58,7 @@ class FolderContent {
   List<FolderItem> items;
   String title;
 
-  ///Do not use. User coverDetails instead
+  @Deprecated('Use coverDetails instead')
   List<FolderCover> cover;
 
   FolderContent({this.subtitle, this.cover, this.items, this.title});
@@ -120,6 +120,7 @@ class FolderCover {
 }
 
 /// DON'T USE
+@Deprecated('No need to use this class')
 class Image {
   String url;
 
@@ -154,10 +155,10 @@ class FolderItem {
     return null;
   }
 
-  @Deprecated('Don\'t use')
+  @Deprecated('Don\'t use directly')
   bool overrideData;
 
-  @Deprecated('Don\'t use')
+  @Deprecated('Don\'t use directly')
   List<ItemPath> itemPath;
 
   @Deprecated('Don\'t use. Use [subtitle] instead')
@@ -166,6 +167,7 @@ class FolderItem {
   @Deprecated('Don\'t use. Use [title] instead')
   String itemTitle;
 
+  @Deprecated('Don\'t use. Use [fileType] instead')
   String itemType;
 
   FolderItem(

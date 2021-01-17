@@ -19,19 +19,8 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/network/folder/folder_items_repo.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:flutter/material.dart';
 
 class FolderItemsBloc {
-  FolderItemsBloc(String id) {
-    itemsListController =
-        StreamController<ApiResponse<List<FolderItem>>>.broadcast();
-    coverController = StreamController<ApiResponse<FolderCover>>.broadcast();
-    appbarStateController = StreamController<AppBarState>.broadcast();
-    titleController = StreamController<ApiResponse<String>>.broadcast();
-    _repo = FolderItemsRepository();
-    fetchItemsList(id);
-  }
-
   FolderItemsRepository _repo;
 
   var appBarType = AppBarState.normal;
@@ -43,25 +32,46 @@ class FolderItemsBloc {
   StreamController<ApiResponse<String>> titleController;
   StreamController<AppBarState> appbarStateController;
 
-  Future<void> fetchItemsList(String id) async {
+  FolderItemsBloc(String id) {
+    itemsListController = StreamController.broadcast();
+    coverController = StreamController.broadcast();
+    appbarStateController = StreamController.broadcast();
+    titleController = StreamController.broadcast();
+    _repo = FolderItemsRepository();
+    fetchData(id);
+  }
+
+  Future<void> fetchData(String id) async {
     itemsListController.sink.add(ApiResponse.loading('Fetching Items'));
-    coverController.add(ApiResponse.loading('Fetching Cover'));
+    coverController.sink.add(ApiResponse.loading('Fetching Cover'));
     titleController.add(ApiResponse.loading('...'));
-    var content = await _repo.fetchItems(id);
+    var content = await _repo.fetchFolderData(id);
+    _postItemList(content);
+    _postTitle(content);
+    _postCoverDetails(content);
+  }
+
+  void _postCoverDetails(FolderContent content) {
     try {
-      itemsListController.sink.add(ApiResponse.completed(content.items));
+      coverController.sink.add(ApiResponse.completed(content.coverDetails));
     } catch (e) {
-      itemsListController.add(ApiResponse.error(e.toString()));
+      coverController.sink.add(ApiResponse.error('Error getting cover'));
     }
+  }
+
+  void _postTitle(FolderContent content) {
     try {
-      titleController.sink.add(ApiResponse.completed(content.title));
+      titleController.add(ApiResponse.completed(content.title));
     } catch (e) {
       titleController.add(ApiResponse.error('Title error'));
     }
+  }
+
+  void _postItemList(FolderContent content) {
     try {
-      coverController.add(ApiResponse.completed(content.coverDetails));
+      itemsListController.sink.add(ApiResponse.completed(content.items));
     } catch (e) {
-      coverController.add(ApiResponse.error('Error getting cover'));
+      itemsListController.sink.add(ApiResponse.error(e.toString()));
     }
   }
 

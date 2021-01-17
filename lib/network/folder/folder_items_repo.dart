@@ -19,7 +19,7 @@ import 'package:Medito/viewmodel/http_get.dart';
 class FolderItemsRepository {
   var baseUrl = 'https://live.medito.app/api';
 
-  Future<FolderContent> fetchItems(String id) async {
+  Future<FolderContent> fetchFolderData(String id) async {
     final response = await httpGet(baseUrl + id);
     return FolderItems.fromJson(response).data.content;
   }

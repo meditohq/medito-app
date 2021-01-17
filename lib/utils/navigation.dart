@@ -1,6 +1,7 @@
+import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
-import 'package:Medito/widgets/session_options_screen.dart';
+import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
 import 'package:Medito/widgets/streak_page.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +13,10 @@ class NavigationFactory {
         _push(context, FolderNavWidget(contentId: id));
         break;
       case Screen.player:
-      //
+        //
         break;
       case Screen.text:
-      // TODO: Handle this case.
+        // TODO: Handle this case.
         break;
       case Screen.stats:
         _push(context, StreakWidget());
@@ -38,17 +39,19 @@ class NavigationFactory {
         ));
   }
 
-  static Screen getScreenFromString(String string) {
-    switch (string) {
-      case 'folder':
-        return Screen.folder;
-      case 'session':
+  static Screen getScreenFromItemType(FileType fileType) {
+    switch (fileType) {
+      case FileType.session:
         return Screen.session_options;
-      case 'article':
+        break;
+      case FileType.text:
         return Screen.text;
-      default:
-        return null;
+        break;
+      case FileType.folder:
+        return Screen.folder;
+        break;
     }
+    return null;
   }
 }
 

@@ -20,7 +20,7 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
-import 'package:Medito/widgets/session_options_screen.dart';
+import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -263,22 +263,6 @@ class PackListWidgetState extends State<PackListWidget> {
         ),
       ),
     );
-  }
-
-  void _openSessionOptionsScreen(TileItem tile, Future data) {
-    Tracking.trackEvent(Tracking.TAP, Tracking.SESSION_TAPPED, tile.id);
-
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SessionOptionsScreen(
-              title: tile.title,
-              //onBeginPressed: _showPlayer,
-              data: data,
-              id: tile.id),
-        )).then((value) {
-      setState(() {});
-    });
   }
 
   void _onStreakTap() {
