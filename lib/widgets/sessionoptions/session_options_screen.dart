@@ -38,12 +38,7 @@ class SessionOptionsScreen extends StatefulWidget {
 }
 
 class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
-  var lengthSelected = 0;
-  var _offlineSelected = 0;
-  var _musicSelected = 0;
-
   List<Files> filesList;
-  var _illustration;
   var _primaryColor;
   String _secondaryColor;
 
@@ -52,7 +47,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   bool _showVoiceChoice = true;
 
   String _availableOfflineIndicatorText = '';
-  
+
   /// deffo need:
   BuildContext scaffoldContext;
   SessionOptionsBloc _bloc;
@@ -62,15 +57,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     super.initState();
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
-    getIntValuesSF(widget.id, 'voiceSelected')
-        .then((value) => _bloc.voiceSelected = value);
-    getIntValuesSF(widget.id, 'lengthSelected')
-        .then((value) => lengthSelected = value);
-    getIntValuesSF(widget.id, 'musicSelected').then((index) {
-      _musicSelected = index;
-    });
-
-    _bloc = SessionOptionsBloc();
+    _bloc = SessionOptionsBloc(widget.id);
   }
 
   @override
@@ -204,8 +191,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       downloadSingleton = DownloadSingleton(currentFile);
     }
     addIntToSF(widget.id, 'voiceSelected', _bloc.voiceSelected);
-    addIntToSF(widget.id, 'lengthSelected', lengthSelected);
-    addIntToSF(widget.id, 'musicSelected', _musicSelected);
+    addIntToSF(widget.id, 'lengthSelected', _bloc.lengthSelected);
+    addIntToSF(widget.id, 'musicSelected', _bloc.musicSelected);
 
     if (downloadSingleton.isDownloadingMe(currentFile) ||
         showIndeterminateSpinner) return null;
@@ -260,7 +247,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildSessionLengthRow() {
-  
     return SizedBox(
       height: 56,
       child: ListView.builder(
@@ -280,7 +266,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 showCheckmark: false,
                 labelPadding: buildInnerChipPadding(),
                 label: Text(formatSessionLength(index)),
-                selected: lengthSelected == index,
+                selected: _bloc.lengthSelected == index,
                 onSelected: (bool value) {
                   onSessionPillTap(value, index);
                 },
@@ -314,7 +300,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (!_showVoiceChoice) {
       return Container();
     }
-    
+
     return SizedBox(
       height: 56,
       child: ListView.builder(
@@ -369,11 +355,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         break;
       }
     }
-    _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
+    _bloc.offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     if (mounted) {
       setState(() {
-        filterLengthsForThisPerson(_bloc.voiceList[_bloc.voiceSelected],
-            clockTimeToDuration(_bloc.lengthList[lengthSelected]).inMinutes);
+        //todo filter lengths for this person
         _updateAvailableOfflineIndicatorText();
       });
     }
@@ -385,9 +370,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               file.voice == (_bloc.voiceList[_bloc.voiceSelected]))
             currentFile = file
         });
-    _offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
+    _bloc.offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
     setState(() {
-      lengthSelected = index;
+      _bloc.lengthSelected = index;
       _updateAvailableOfflineIndicatorText();
     });
   }
@@ -395,7 +380,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   TextStyle getLengthPillTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
-        color: lengthSelected == index
+        color: _bloc.lengthSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
@@ -403,7 +388,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
-        color: _offlineSelected == index
+        color: _bloc.offlineSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
@@ -411,7 +396,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   TextStyle getMusicPillTextStyle(int index) {
     return Theme.of(context).textTheme.headline1.copyWith(
         fontSize: 16.0,
-        color: _musicSelected == index
+        color: _bloc.musicSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
@@ -422,63 +407,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         color: _bloc.voiceSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
-  }
-
-  void compileLists(List files) {
-    filesList = files;
-    _bloc.voiceList.clear();
-    _bloc.lengthList.clear();
-
-    files?.forEach((file) {
-      file.url = file.url.replaceAll(' ', '%20');
-      if (!_bloc.voiceList.contains(file.voice)) {
-        //put Will first
-        if (file.voice.contains('Will')) {
-          _bloc.voiceList.insert(0, file.voice);
-        } else {
-          _bloc.voiceList.add(file.voice);
-        }
-      }
-      if (!_bloc.lengthList.contains(file.length)) {
-        _bloc.lengthList.add(file.length);
-      }
-    });
-
-    _bloc.lengthList.sort((a, b) {
-      if (a.contains(':')) {
-        return clockTimeToDuration(a)
-            .inMilliseconds
-            .compareTo(clockTimeToDuration(b).inMilliseconds);
-      }
-      return double.parse(a).compareTo(double.parse(b));
-    });
-
-    if (_bloc.voiceList != null && _bloc.voiceList.isNotEmpty) {
-      filterLengthsForThisPerson(_bloc.voiceList[0]);
-    }
-  }
-
-  void filterLengthsForThisPerson(String voiceSelected,
-      [int previousMusicSelected]) {
-    lengthSelected = 0;
-    _bloc.lengthFilteredList.clear();
-    filesList?.forEach((file) {
-      if (file.voice == _bloc.voiceSelected) {
-        _bloc.lengthFilteredList.add(file.length);
-      }
-    });
-    var roundedList = <dynamic>[];
-    for (var i = 0; i < _bloc.lengthFilteredList.length; i++) {
-      roundedList.add(clockTimeToDuration(_bloc.lengthFilteredList[i])
-          .inMinutes); //Find the rounded length of the voice of current artist
-    }
-    var indexOfMusic = 0;
-    if (previousMusicSelected != null) {
-      indexOfMusic = roundedList.indexOf(previousMusicSelected);
-    } //find the index of the previous selection in the rounded list
-    if (indexOfMusic == -1) indexOfMusic = 0; //if it doesn't exist make it zero
-    lengthSelected = _bloc.lengthList.indexOf(
-        _bloc.lengthFilteredList[indexOfMusic]); //set the correct index
   }
 
   Widget buildOfflineRow() {
@@ -498,7 +426,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               showCheckmark: false,
               labelPadding: buildInnerChipPadding(),
               label: Text(index == 0 ? 'No' : 'Yes'),
-              selected: _offlineSelected == index,
+              selected: _bloc.offlineSelected == index,
               onSelected: (bool value) {
                 onOfflineSelected(index);
               },
@@ -532,8 +460,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 shape: buildChipBorder(),
                 labelPadding: buildInnerChipPadding(),
                 showCheckmark: false,
-                label: Text(index == 0 ? 'None' : _bloc.bgMusicList[index - 1].key),
-                selected: index == _musicSelected,
+                label: Text(
+                    index == 0 ? 'None' : _bloc.bgMusicList[index - 1].key),
+                selected: index == _bloc.musicSelected,
                 onSelected: (bool value) {
                   onMusicSelected(
                       index,
@@ -577,7 +506,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   void onMusicSelected(int index, String url, String name) {
-    _musicSelected = index;
+    _bloc.musicSelected = index;
     print('bg selected: $name');
     if (index > 0) {
       showIndeterminateSpinner = true;
@@ -588,19 +517,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       }).catchError((onError) {
         print(onError);
         showIndeterminateSpinner = false;
-        _musicSelected = 0;
+        _bloc.musicSelected = 0;
         _bloc.backgroundMusicUrl = null;
       });
     } else {
       showIndeterminateSpinner = false;
-      _musicSelected = 0;
+      _bloc.musicSelected = 0;
       _bloc.backgroundMusicUrl = null;
     }
     setState(() {});
   }
 
   void onOfflineSelected(int index) {
-    _offlineSelected = index;
+    _bloc.offlineSelected = index;
 
     _updateAvailableOfflineIndicatorText();
 
@@ -612,7 +541,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       if (!downloadSingleton.isDownloadingSomething()) {
         downloadSingleton.start(currentFile);
       } else {
-        _offlineSelected = 0;
+        _bloc.offlineSelected = 0;
         createSnackBarWithColor('Another Download in Progress', scaffoldContext,
             MeditoColors.peacefulBlue);
       }
@@ -627,7 +556,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       }).catchError((onError) {
         setState(() {
           print(onError);
-          _offlineSelected = 0;
+          _bloc.offlineSelected = 0;
         });
       });
     }
@@ -635,8 +564,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   void _updateAvailableOfflineIndicatorText() {
-    if (_offlineSelected != 0) {
-      var time = clockTimeToDuration(_bloc.lengthList[lengthSelected]).inMinutes;
+    if (_bloc.offlineSelected != 0) {
+      var time =
+          clockTimeToDuration(_bloc.lengthList[_bloc.lengthSelected]).inMinutes;
       _availableOfflineIndicatorText =
           '(${_bloc.voiceList[_bloc.voiceSelected]} - $time min)';
     } else {
@@ -658,9 +588,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _illustration == null
+            child: _bloc.illustration == null
                 ? Container()
-                : getNetworkImageWidget(_illustration.url),
+                : getNetworkImageWidget(_bloc.illustration.url),
           )),
     );
   }
@@ -675,5 +605,4 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       ),
     );
   }
-
 }
