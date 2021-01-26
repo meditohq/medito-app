@@ -28,7 +28,7 @@ class InAppReviewWidget extends StatelessWidget {
                 Icons.thumb_up,
                 color: MeditoColors.almostBlack,
               ),
-              color: MeditoColors.peacefulBlue,
+              color: MeditoColors.walterWhite,
             ),
           ),
         ),
@@ -47,7 +47,7 @@ class InAppReviewWidget extends StatelessWidget {
                 Icons.thumb_down,
                 color: MeditoColors.almostBlack,
               ),
-              color: MeditoColors.peacefulBlue,
+              color: MeditoColors.moonlight,
             ),
           ),
         ),
@@ -55,12 +55,10 @@ class InAppReviewWidget extends StatelessWidget {
     );
   }
 
-  void _rateUsPopUp() async {
+  void _rateUsPopUp() {
     final inAppReview = InAppReview.instance;
-
-    if (await inAppReview.isAvailable()) {
-      await inAppReview.requestReview();
-    }
+    addCurrentDateToSF('UserAcceptedRating');
+    inAppReview.openStoreListing(appStoreId: '...', microsoftStoreId: '...');
   }
 
 }

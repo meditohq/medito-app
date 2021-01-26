@@ -35,7 +35,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String titleText = 'Loading...';
   String subTitleText = 'Please wait...';
   String buttonLabel = 'Donate';
-  String buttonUrl = 'http://meditofoundation.org/donate';
+  String buttonUrl = 'http://meditofoundation.org/review';
   String buttonIcon = 'assets/images/ic_gift.svg';
   String illustrationUrl;
   Color secondaryColor;
@@ -490,33 +490,38 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           Padding(
             padding: const EdgeInsets.only(
                 left: 32.0, top: 32, bottom: 8, right: 32.0),
-            child: buttonUrl.contains('review')
+            child: checkDaysSinceReview()
                 ? InAppReviewWidget(thumbsdown: _thanksPopUp)
                 : FlatButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    onPressed: _launchPrimaryButton,
-                    color: primaryColorAsColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          buttonIcon,
-                          color: secondaryColor,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            buttonLabel,
-                            style:
-                                TextStyle(color: secondaryColor, fontSize: 16),
-                          ),
-                        ),
-                      ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              onPressed: _launchPrimaryButton,
+              color: primaryColorAsColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    buttonIcon,
+                    color: secondaryColor,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      buttonLabel,
+                      style:
+                      TextStyle(color: secondaryColor, fontSize: 16),
                     ),
                   ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 32.0, top: 32, bottom: 8, right: 32.0),
+            child: InAppReviewWidget(thumbsdown: _thanksPopUp),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 32.0, right: 32.0),
@@ -610,4 +615,10 @@ Future<void> start(MediaItem media, String primaryColor) async {
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   ));
+}
+
+bool checkDaysSinceReview() {
+  var days = 365;
+  daysSinceDate('UserDeclinedReview').then((value) => days = value);
+  return days>10;
 }
