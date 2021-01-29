@@ -89,13 +89,13 @@ class TileListState extends State<TileList> {
       onRefresh: _onPullToRefresh,
       child: FutureBuilder(
         builder: (context, future) {
-          if ((future.connectionState == ConnectionState.none &&
-                  future.hasData == null) ||
-              future.hasError) {
-            return getErrorWidget();
-          }
+          // if ((future.connectionState == ConnectionState.none &&
+          //         future.hasData == null) ||
+          //     future.hasError) {
+          //   return getErrorWidget();
+          // }
 
-          if (future.connectionState == ConnectionState.waiting) {
+          if (future.connectionState != ConnectionState.done) {
             return getLoadingWidget();
           }
 
