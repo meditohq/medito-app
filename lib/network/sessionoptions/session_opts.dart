@@ -5,9 +5,10 @@ class SessionOpts {
   String get coverUrl => data.content.cover.first.url;
   String get colorPrimary => data.content.colorPrimary;
   String get colorSecondary => data.content.colorSecondary;
-  List<Files> get files => data.content.files;
-  bool get hasBackgroundMusic => data.content.serviceBackgroundmusic;
-  
+  List<AudioFile> get files => data.content.files;
+  bool get hasBackgroundMusic => data.content.backgroundSound;
+
+  @Deprecated('Don\'t use')
   Data _data;
 
   Data get data => _data;
@@ -60,16 +61,16 @@ class Content {
   List<Cover> _cover;
   String _colorPrimary;
   String _colorSecondary;
-  List<Files> _files;
-  bool _serviceBackgroundmusic;
+  List<AudioFile> _files;
+  bool _backgroundSound;
   String _title;
 
   String get description => _description;
   List<Cover> get cover => _cover;
   String get colorPrimary => _colorPrimary;
   String get colorSecondary => _colorSecondary;
-  List<Files> get files => _files;
-  bool get serviceBackgroundmusic => _serviceBackgroundmusic;
+  List<AudioFile> get files => _files;
+  bool get backgroundSound => _backgroundSound;
   String get title => _title;
 
   Content({
@@ -77,15 +78,15 @@ class Content {
       List<Cover> cover, 
       String colorPrimary, 
       String colorSecondary, 
-      List<Files> files, 
-      bool serviceBackgroundmusic, 
+      List<AudioFile> files, 
+      bool backgroundSound,
       String title}){
     _description = description;
     _cover = cover;
     _colorPrimary = colorPrimary;
     _colorSecondary = colorSecondary;
     _files = files;
-    _serviceBackgroundmusic = serviceBackgroundmusic;
+    _backgroundSound = backgroundSound;
     _title = title;
 }
 
@@ -102,10 +103,10 @@ class Content {
     if (json['files'] != null) {
       _files = [];
       json['files'].forEach((v) {
-        _files.add(Files.fromJson(v));
+        _files.add(AudioFile.fromJson(v));
       });
     }
-    _serviceBackgroundmusic = json['service_backgroundmusic'];
+    _backgroundSound = json['background_sound'];
     _title = json['title'];
   }
 
@@ -120,28 +121,32 @@ class Content {
     if (_files != null) {
       map['files'] = _files.map((v) => v.toJson()).toList();
     }
-    map['service_backgroundmusic'] = _serviceBackgroundmusic;
+    map['background_sound'] = _backgroundSound;
     map['title'] = _title;
     return map;
   }
 
 }
 
-class Files {
+class AudioFile {
   String _info;
   String _url;
 
-  String get info => _info;
+  String get voice => info.split(',')[0];
+  String get length => info.split(',')[1];
   String get url => _url;
 
-  Files({
+  @Deprecated('Use [voice] and [length]')
+  String get info => _info;
+
+  AudioFile({
       String info, 
       String url}){
     _info = info;
     _url = url;
 }
 
-  Files.fromJson(dynamic json) {
+  AudioFile.fromJson(dynamic json) {
     _info = json['info'];
     _url = json['url'];
   }

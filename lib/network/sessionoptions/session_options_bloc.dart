@@ -14,34 +14,52 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+import 'dart:io';
 
+import 'package:Medito/audioplayer/download_class.dart';
+import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/session_options_repo.dart';
+import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
   bool backgroundMusicAvailable = false;
-  List voiceList = [' ', ' ', ' '];
-  List lengthList = [' ', ' ', ' '];
-  List lengthFilteredList = [];
   List bgMusicList = [];
+  var voiceList = <String>[];
+  var lengthList = <String>[];
   var backgroundMusicUrl;
   var voiceSelected = 0;
+  String availableOfflineIndicatorText = '';
 
   var lengthSelected = 0;
   var offlineSelected = 0;
   var musicSelected = 0;
   var illustration;
 
-  StreamController titleController;
-  StreamController voiceListController;
-  StreamController lengthListController;
-  StreamController backgroundMusicListController;
-  StreamController backgroundMusicShownController;
-  StreamController imageController;
-  StreamController descController;
+  var currentFile;
+
+  var attributesList = [];
+
+  // Download stuff
+  bool bgDownloading = false, removing = false;
+  DownloadSingleton downloadSingleton;
+
+  //Streams
+  StreamController<ApiResponse<String>> titleController;
+  StreamController<ApiResponse<String>> descController;
+  StreamController<ApiResponse<String>> imageController;
+  StreamController<ApiResponse<List<String>>> voiceListController;
+  StreamController<ApiResponse<List<String>>> lengthListController;
+  StreamController<ApiResponse<List<String>>> backgroundMusicListController;
+  StreamController<bool> backgroundMusicShownController;
+
+  List<AudioFile> files;
 
   SessionOptionsBloc(String id) {
     titleController = StreamController.broadcast()
@@ -57,7 +75,7 @@ class SessionOptionsBloc {
       ..sink.add(ApiResponse.loading(''));
 
     backgroundMusicShownController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(false);
 
     imageController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading(''));
@@ -79,29 +97,23 @@ class SessionOptionsBloc {
   Future<void> fetchOptions(String id) async {
     var options = await _repo.fetchOptions(id);
 
-    _post(options.title, titleController);
-    _post(options.description, descController);
-    _post(options.coverUrl, imageController);
-    _post(options.hasBackgroundMusic, backgroundMusicShownController);
+    // Show title, desc and image
+    titleController.sink.add(ApiResponse.completed(options.title));
+    descController.sink.add(ApiResponse.completed(options.description));
+    imageController.sink.add(ApiResponse.completed(options.coverUrl));
 
+    // Show/hide Background music
+    backgroundMusicShownController.sink.add(options.hasBackgroundMusic);
     if (options.hasBackgroundMusic) {
-      var bgMusicList = [];
-      _post(bgMusicList, backgroundMusicListController);
+      // backgroundMusicListController.sink
+      //     .add(ApiResponse.completed(bgMusicList)); // fixme
     }
 
-    var voiceList = [];
-    _post(voiceList, voiceListController);
-
-    var lengthList = [];
-    _post(lengthList, lengthListController);
-  }
-
-  void _post(dynamic content, StreamController controller) {
-    try {
-      controller.sink.add(ApiResponse.completed(content));
-    } catch (e) {
-      controller.sink.add(ApiResponse.error('Error'));
-    }
+    files = options.files;
+    // Info is in the form "info": "No voice,00:05:02"
+    voiceList = files.map((element) => element.voice).toSet().toList();
+    voiceListController.sink.add(ApiResponse.completed(voiceList));
+    filterLengthsForVoice();
   }
 
   void dispose() {
@@ -113,4 +125,87 @@ class SessionOptionsBloc {
     imageController?.close();
     descController?.close();
   }
+
+  Future<void> setCurrentFile() async {
+    var voice = voiceList[voiceSelected];
+    var length = lengthList[lengthSelected];
+
+    currentFile = files.firstWhere((element) {
+      var voiceToMatch = element.voice;
+      var lengthToMatch = _formatSessionLength(element.length);
+      return voiceToMatch == voice && lengthToMatch == length;
+    }, orElse: () => files.firstWhere((element) => element.voice == voice));
+
+    setCurrentFileForDownloadSingleton();
+
+    offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
+  }
+
+  void setCurrentFileForDownloadSingleton() {
+    if (downloadSingleton == null || !downloadSingleton.isValid()) {
+      downloadSingleton = DownloadSingleton(currentFile);
+    }
+  }
+
+  void saveOptionsSelectionsToSharedPreferences(String id) {
+    addIntToSF(id, 'voiceSelected', voiceSelected);
+    addIntToSF(id, 'lengthSelected', lengthSelected);
+    addIntToSF(id, 'musicSelected', musicSelected);
+  }
+
+  bool isDownloading() => downloadSingleton.isDownloadingMe(currentFile);
+
+  Future<dynamic> removeFile(AudioFile currentFile) async {
+    removing = true;
+    var dir = (await getApplicationSupportDirectory()).path;
+    var name = currentFile.url.replaceAll(' ', '%20');
+    var file = File('$dir/$name');
+
+    if (await file.exists()) {
+      await file.delete();
+      await _removeFileFromDownloadedFilesList(currentFile);
+      removing = false;
+    } else {
+      removing = false;
+    }
+  }
+
+  Future<void> _removeFileFromDownloadedFilesList(AudioFile file) async {
+    var prefs = await SharedPreferences.getInstance();
+    var list = prefs.getStringList('listOfSavedFiles') ?? [];
+    list.remove(file?.toJson()?.toString() ?? '');
+    await prefs.setStringList('listOfSavedFiles', list);
+  }
+
+  void filterLengthsForVoice({int voiceIndex = 0}) {
+    //Filter the lengths list for this voice from the original data
+    lengthList = files
+        .where((element) => element.voice == voiceList[voiceIndex])
+        .map((e) => e.length)
+        .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
+        .map((e) => _formatSessionLength(e))
+        .toList();
+
+    // Post to UI
+    lengthListController.sink.add(ApiResponse.completed(lengthList));
+  }
+
+  String _formatSessionLength(String item) {
+    if (item.contains(':')) {
+      var duration = clockTimeToDuration(item);
+      var time = '';
+      if (duration.inMinutes < 1) {
+        time = '<1';
+      } else {
+        time = duration.inMinutes.toString();
+      }
+      return '$time min';
+    }
+    return item + ' min';
+  }
+}
+
+extension MyIterable<E> on Iterable<E> {
+  Iterable<E> sortedBy(Comparable key(E e)) =>
+      toList()..sort((a, b) => key(a).compareTo(key(b)));
 }

@@ -20,7 +20,6 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
-import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -173,7 +172,8 @@ class PackListWidgetState extends State<PackListWidget> {
 
   Widget _getTile(PackItem item) {
     return GestureDetector(
-      onTap:() => NavigationFactory.navigate(context, Screen.folder, id: item.link),
+      onTap: () =>
+          NavigationFactory.navigate(context, Screen.folder, id: item.link),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -182,15 +182,16 @@ class PackListWidgetState extends State<PackListWidget> {
             color: parseColor(item.colorPrimary),
           ),
           child: Padding(
-            padding:
-                const EdgeInsets.only(top: 16.0, bottom: 16, left: 10, right: 10),
+            padding: const EdgeInsets.only(
+                top: 16.0, bottom: 16, left: 10, right: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(height: 8),
-                SizedBox(height: 80, child: getNetworkImageWidget(item.imageUrl)),
+                SizedBox(
+                    height: 80, child: getNetworkImageWidget(item.imageUrl)),
                 Container(height: 16),
                 SizedBox(
                   width: _getColumnWidth() - 48, //todo horrible hack

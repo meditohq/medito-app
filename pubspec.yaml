@@ -36,6 +36,7 @@ dependencies:
   firebase_analytics: ^6.0.2
   firebase_messaging: ^7.0.3
   firebase_database: ^4.3.0
+  flutter_html: ^1.2.0
   provider: ^4.3.2+2
   package_info: ^0.4.3
   in_app_purchase: ^0.3.4+15
