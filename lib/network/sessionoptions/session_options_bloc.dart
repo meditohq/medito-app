@@ -42,7 +42,7 @@ class SessionOptionsBloc {
   var musicSelected = 0;
   var illustration;
 
-  var currentFile;
+  AudioFile currentFile;
 
   var attributesList = [];
 
@@ -128,17 +128,36 @@ class SessionOptionsBloc {
 
   Future<void> setCurrentFile() async {
     var voice = voiceList[voiceSelected];
-    var length = lengthList[lengthSelected];
+    var length;
+    if (lengthList.length > lengthSelected) {
+      length = lengthList[lengthSelected];
+    }
 
     currentFile = files.firstWhere((element) {
       var voiceToMatch = element.voice;
       var lengthToMatch = _formatSessionLength(element.length);
       return voiceToMatch == voice && lengthToMatch == length;
-    }, orElse: () => files.firstWhere((element) => element.voice == voice));
+    },
+        orElse: () => files.firstWhere((element) {
+              // if no matching length found for this voice,
+              // get the first one with this voice
+              lengthSelected = 0;
+              return element.voice == voice;
+            }));
 
     setCurrentFileForDownloadSingleton();
 
     offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
+    updateAvailableOfflineIndicatorText();
+  }
+
+  void updateAvailableOfflineIndicatorText() {
+    if (offlineSelected != 0) {
+      availableOfflineIndicatorText =
+          '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
+    } else {
+      availableOfflineIndicatorText = '';
+    }
   }
 
   void setCurrentFileForDownloadSingleton() {
@@ -154,28 +173,6 @@ class SessionOptionsBloc {
   }
 
   bool isDownloading() => downloadSingleton.isDownloadingMe(currentFile);
-
-  Future<dynamic> removeFile(AudioFile currentFile) async {
-    removing = true;
-    var dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.url.replaceAll(' ', '%20');
-    var file = File('$dir/$name');
-
-    if (await file.exists()) {
-      await file.delete();
-      await _removeFileFromDownloadedFilesList(currentFile);
-      removing = false;
-    } else {
-      removing = false;
-    }
-  }
-
-  Future<void> _removeFileFromDownloadedFilesList(AudioFile file) async {
-    var prefs = await SharedPreferences.getInstance();
-    var list = prefs.getStringList('listOfSavedFiles') ?? [];
-    list.remove(file?.toJson()?.toString() ?? '');
-    await prefs.setStringList('listOfSavedFiles', list);
-  }
 
   void filterLengthsForVoice({int voiceIndex = 0}) {
     //Filter the lengths list for this voice from the original data
@@ -203,9 +200,35 @@ class SessionOptionsBloc {
     }
     return item + ' min';
   }
+
+  /// File handling
+  Future<dynamic> removeFile(AudioFile currentFile) async {
+    removing = true;
+    var dir = (await getApplicationSupportDirectory()).path;
+    var name = currentFile.url.replaceAll(' ', '%20');
+    var file = File('$dir/$name');
+
+    if (await file.exists()) {
+      await file.delete();
+      await _removeFileFromDownloadedFilesList(currentFile);
+      removing = false;
+    } else {
+      removing = false;
+    }
+  }
+
+  Future<void> _removeFileFromDownloadedFilesList(AudioFile file) async {
+    var prefs = await SharedPreferences.getInstance();
+    var list = prefs.getStringList('listOfSavedFiles') ?? [];
+    list.remove(file?.toJson()?.toString() ?? '');
+    await prefs.setStringList('listOfSavedFiles', list);
+  }
+
+  ///End file handling
+
 }
 
 extension MyIterable<E> on Iterable<E> {
-  Iterable<E> sortedBy(Comparable key(E e)) =>
+  Iterable<E> sortedBy(Comparable Function(E e) key) =>
       toList()..sort((a, b) => key(a).compareTo(key(b)));
 }

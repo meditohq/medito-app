@@ -220,6 +220,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         });
   }
 
+  /// Pill rows
   Widget buildTextHeaderForRow(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16),
@@ -260,11 +261,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                     shape: buildChipBorder(),
                     showCheckmark: false,
                     labelPadding: buildInnerChipPadding(),
-                    label:
-                        Text(snapshot.data?.body[index]),
+                    label: Text(snapshot.data?.body[index]),
                     selected: _bloc.lengthSelected == index,
                     onSelected: (bool value) {
-                      onSessionPillTap(value, index);
+                      onSessionLengthPillTap(index);
                     },
                     backgroundColor: MeditoColors.moonlight,
                     selectedColor: MeditoColors.walterWhite,
@@ -275,115 +275,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             ),
           );
         });
-  }
-
-  Widget buildVoiceRow() {
-    return SizedBox(
-      height: 56,
-      child: StreamBuilder<ApiResponse<List<String>>>(
-          stream: _bloc.voiceListController.stream,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
-              return _getEmptyPillRow();
-            }
-
-            return ListView.builder(
-              padding: const EdgeInsets.only(left: 16),
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: snapshot.data.body.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: buildInBetweenChipPadding(index),
-                  child: FilterChip(
-                    shape: buildChipBorder(),
-                    labelPadding: buildInnerChipPadding(),
-                    label: Text(snapshot.data.body[index]),
-                    showCheckmark: false,
-                    selected: _bloc.voiceSelected == index,
-                    onSelected: (bool value) {
-                      onVoicePillTap(value, index);
-                    },
-                    backgroundColor: MeditoColors.moonlight,
-                    selectedColor: MeditoColors.walterWhite,
-                    labelStyle: getVoiceTextStyle(context, index),
-                  ),
-                );
-              },
-            );
-          }),
-    );
-  }
-
-  EdgeInsets buildInnerChipPadding() =>
-      EdgeInsets.only(left: 12, top: 4, bottom: 4, right: 12);
-
-  EdgeInsets buildInBetweenChipPadding(var index) {
-    var leftPadding = index == 0 ? 0.0 : 0.0;
-    return EdgeInsets.only(right: 8, left: leftPadding);
-  }
-
-  RoundedRectangleBorder buildChipBorder() {
-    return RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)));
-  }
-
-  Future<void> onVoicePillTap(bool value, int index) async {
-    _bloc.voiceSelected = index;
-
-    await _bloc.setCurrentFile();
-
-    if (mounted) {
-      setState(() {
-        _bloc.filterLengthsForVoice(voiceIndex: index);
-        _updateAvailableOfflineIndicatorText();
-      });
-    }
-  }
-
-  Future<void> onSessionPillTap(bool value, int index) async {
-    // filesList.forEach((file) => {
-    //       if (file.length == (_bloc.lengthList[index]) &&
-    //           file.voice == (_bloc.voiceList[_bloc.voiceSelected]))
-    //         currentFile = file
-    //     });
-    // _bloc.offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
-    // setState(() {
-    //   _bloc.lengthSelected = index;
-    //   _updateAvailableOfflineIndicatorText();
-    // });
-  }
-
-  TextStyle getLengthPillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
-        color: _bloc.lengthSelected == index
-            ? MeditoColors.darkBGColor
-            : MeditoColors.walterWhite);
-  }
-
-  TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
-        color: _bloc.offlineSelected == index
-            ? MeditoColors.darkBGColor
-            : MeditoColors.walterWhite);
-  }
-
-  TextStyle getMusicPillTextStyle(int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
-        color: _bloc.musicSelected == index
-            ? MeditoColors.darkBGColor
-            : MeditoColors.walterWhite);
-  }
-
-  TextStyle getVoiceTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
-        color: _bloc.voiceSelected == index
-            ? MeditoColors.darkBGColor
-            : MeditoColors.walterWhite);
   }
 
   Widget buildOfflineRow() {
@@ -455,31 +346,66 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         ));
   }
 
-  Padding _getEmptyPillRow() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 4),
-      child: Row(
-        children: [
-          emptyPill(),
-          emptyPill(),
-        ],
-      ),
+  Widget buildVoiceRow() {
+    return SizedBox(
+      height: 56,
+      child: StreamBuilder<ApiResponse<List<String>>>(
+          stream: _bloc.voiceListController.stream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
+              return _getEmptyPillRow();
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.only(left: 16),
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: snapshot.data.body.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: buildInBetweenChipPadding(index),
+                  child: FilterChip(
+                    shape: buildChipBorder(),
+                    labelPadding: buildInnerChipPadding(),
+                    label: Text(snapshot.data.body[index]),
+                    showCheckmark: false,
+                    selected: _bloc.voiceSelected == index,
+                    onSelected: (bool value) {
+                      onVoicePillTap(value, index);
+                    },
+                    backgroundColor: MeditoColors.moonlight,
+                    selectedColor: MeditoColors.walterWhite,
+                    labelStyle: getVoiceTextStyle(context, index),
+                  ),
+                );
+              },
+            );
+          }),
     );
   }
 
-  Widget emptyPill() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: FilterChip(
-        onSelected: (bool value) {},
-        pressElevation: 4,
-        shape: buildChipBorder(),
-        labelPadding: buildInnerChipPadding(),
-        label: Text('        '),
-        backgroundColor: MeditoColors.moonlight,
-        labelStyle: getLengthPillTextStyle(context, 1),
-      ),
-    );
+  ///End pill rows
+
+  /// On tap functions
+  Future<void> onVoicePillTap(bool value, int index) async {
+    _bloc.voiceSelected = index;
+
+    _bloc.filterLengthsForVoice(voiceIndex: index);
+    await _bloc.setCurrentFile();
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> onSessionLengthPillTap(int index) async {
+    _bloc.lengthSelected = index;
+
+    await _bloc.setCurrentFile();
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void onMusicSelected(int index, String url, String name) {
@@ -508,7 +434,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   void onOfflineSelected(int index) {
     _bloc.offlineSelected = index;
 
-    _updateAvailableOfflineIndicatorText();
+    _bloc.updateAvailableOfflineIndicatorText();
     _bloc.setCurrentFileForDownloadSingleton();
 
     if (index == 1) {
@@ -535,15 +461,78 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     setState(() {});
   }
 
-  void _updateAvailableOfflineIndicatorText() {
-    if (_bloc.offlineSelected != 0) {
-      var time =
-          clockTimeToDuration(_bloc.lengthList[_bloc.lengthSelected]).inMinutes;
-      _bloc.availableOfflineIndicatorText =
-          '(${_bloc.voiceList[_bloc.voiceSelected]} - $time min)';
-    } else {
-      _bloc.availableOfflineIndicatorText = '';
-    }
+  /// End on tap functions
+
+  EdgeInsets buildInnerChipPadding() =>
+      EdgeInsets.only(left: 12, top: 4, bottom: 4, right: 12);
+
+  EdgeInsets buildInBetweenChipPadding(var index) {
+    var leftPadding = index == 0 ? 0.0 : 0.0;
+    return EdgeInsets.only(right: 8, left: leftPadding);
+  }
+
+  RoundedRectangleBorder buildChipBorder() {
+    return RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)));
+  }
+
+  TextStyle getLengthPillTextStyle(BuildContext context, int index) {
+    return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
+        color: _bloc.lengthSelected == index
+            ? MeditoColors.darkBGColor
+            : MeditoColors.walterWhite);
+  }
+
+  TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
+    return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
+        color: _bloc.offlineSelected == index
+            ? MeditoColors.darkBGColor
+            : MeditoColors.walterWhite);
+  }
+
+  TextStyle getMusicPillTextStyle(int index) {
+    return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
+        color: _bloc.musicSelected == index
+            ? MeditoColors.darkBGColor
+            : MeditoColors.walterWhite);
+  }
+
+  TextStyle getVoiceTextStyle(BuildContext context, int index) {
+    return Theme.of(context).textTheme.headline1.copyWith(
+        fontSize: 16.0,
+        color: _bloc.voiceSelected == index
+            ? MeditoColors.darkBGColor
+            : MeditoColors.walterWhite);
+  }
+
+  Padding _getEmptyPillRow() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 4),
+      child: Row(
+        children: [
+          emptyPill(),
+          emptyPill(),
+        ],
+      ),
+    );
+  }
+
+  Widget emptyPill() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: FilterChip(
+        onSelected: (bool value) {},
+        pressElevation: 4,
+        shape: buildChipBorder(),
+        labelPadding: buildInnerChipPadding(),
+        label: Text('        '),
+        backgroundColor: MeditoColors.moonlight,
+        labelStyle: getLengthPillTextStyle(context, 1),
+      ),
+    );
   }
 
   Widget buildImage() {
