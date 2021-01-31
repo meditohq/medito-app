@@ -58,7 +58,15 @@ class InAppReviewWidget extends StatelessWidget {
   void _rateUsPopUp() {
     final inAppReview = InAppReview.instance;
     addCurrentDateToSF('UserAcceptedRating');
-    inAppReview.openStoreListing(appStoreId: '...', microsoftStoreId: '...');
+    var isAvailable = false;
+    inAppReview.isAvailable().then((value) => isAvailable = value);
+    if (isAvailable) {
+      inAppReview.requestReview();
+    }
+    else {
+      print('In App Review failed, Opening Store Listing instead');
+      inAppReview.openStoreListing(appStoreId: '...', microsoftStoreId: '...'); //TODO: add these IDs
+    }
   }
 
 }

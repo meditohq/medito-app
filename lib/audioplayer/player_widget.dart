@@ -620,5 +620,5 @@ Future<void> start(MediaItem media, String primaryColor) async {
 bool checkDaysSinceReview() {
   var days = 365;
   daysSinceDate('UserDeclinedReview').then((value) => days = value);
-  return days>10;
+  return days>28;
 }
