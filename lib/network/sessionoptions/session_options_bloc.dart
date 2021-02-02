@@ -126,7 +126,7 @@ class SessionOptionsBloc {
     descController?.close();
   }
 
-  Future<void> setCurrentFile() async {
+  Future<void> updateCurrentFile() async {
     var voice = voiceList[voiceSelected];
     var length;
     if (lengthList.length > lengthSelected) {

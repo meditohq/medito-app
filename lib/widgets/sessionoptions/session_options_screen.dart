@@ -40,6 +40,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   var _primaryColor;
   String _secondaryColor;
 
+  //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
   /// deffo need:
@@ -173,7 +174,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Future<void> _onBeginTap() {
     Tracking.trackEvent(Tracking.TAP, Tracking.PLAY_TAPPED, widget.id);
 
-    _bloc.setCurrentFileForDownloadSingleton(); //fixme can i remove this line?
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
 
     if (_bloc.isDownloading() || showIndeterminateSpinner) return null;
@@ -391,7 +391,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     _bloc.voiceSelected = index;
 
     _bloc.filterLengthsForVoice(voiceIndex: index);
-    await _bloc.setCurrentFile();
+    await _bloc.updateCurrentFile();
 
     if (mounted) {
       setState(() {});
@@ -401,7 +401,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Future<void> onSessionLengthPillTap(int index) async {
     _bloc.lengthSelected = index;
 
-    await _bloc.setCurrentFile();
+    await _bloc.updateCurrentFile();
 
     if (mounted) {
       setState(() {});
@@ -433,13 +433,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void onOfflineSelected(int index) {
     _bloc.offlineSelected = index;
+    _bloc.updateCurrentFile();
 
     _bloc.updateAvailableOfflineIndicatorText();
     _bloc.setCurrentFileForDownloadSingleton();
 
     if (index == 1) {
       // 'YES' selected
-      if (_bloc.downloadSingleton.isDownloadingSomething()) {
+      if (!_bloc.downloadSingleton.isDownloadingSomething()) {
         _bloc.downloadSingleton.start(_bloc.currentFile);
       } else {
         _bloc.offlineSelected = 0;
