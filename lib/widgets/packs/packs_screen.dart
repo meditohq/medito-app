@@ -115,8 +115,8 @@ class PackListWidgetState extends State<PackListWidget> {
   }
 
   Widget _getTwoColumns(List<PackItem> data) {
-    var secondColumnLength =
-        (data == null ? 0 : data?.length) + 1; // + 1 for streak tile
+    var firstCol = data.getRange(0, data.length ~/ 2).toList();
+    var secondCol = data.getRange(data.length ~/ 2 +1, data.length).toList();
 
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
@@ -129,35 +129,28 @@ class PackListWidgetState extends State<PackListWidget> {
           SizedBox(
             width: _getColumnWidth(),
             child: ColumnBuilder(
-                itemCount: data == null ? 0 : data?.length,
+                itemCount: firstCol.length,
                 itemBuilder: (BuildContext context, int index) {
-                  var tile = data[index];
-                  if (index < data.length / 2) {
-                    return _getTile(tile);
-                  } else {
-                    return Container();
-                  }
+                  var tile = firstCol[index];
+                  return _getTile(tile);
                 }),
           ),
           //right column
           SizedBox(
             width: _getColumnWidth(),
             child: ColumnBuilder(
-                itemCount: secondColumnLength,
+                itemCount: secondCol.length + 1,
                 itemBuilder: (BuildContext context, int index) {
-                  if (index == secondColumnLength - 1) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: StreakTileWidget(_streak, 'Current Streak',
-                          optionalText: UnitType.day, onClick: _onStreakTap),
-                    );
-                  }
-
-                  var tile = data[index];
-                  if (data != null && index >= data.length / 2) {
-                    return _getTile(tile);
+                  if (index == secondCol.length ) {
+                    return StreakTileWidget(_streak, 'Current Streak',
+                        optionalText: UnitType.day, onClick: _onStreakTap);
                   } else {
-                    return Container();
+                    try {
+                      var tile = secondCol[index];
+                      return _getTile(tile);
+                    } catch (e) {
+                      return Container();
+                    }
                   }
                 }),
           ),
