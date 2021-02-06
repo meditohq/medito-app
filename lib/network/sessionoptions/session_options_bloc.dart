@@ -17,13 +17,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/download_class.dart';
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
+import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/session_options_repo.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionOptionsBloc {
@@ -59,9 +62,12 @@ class SessionOptionsBloc {
   StreamController<ApiResponse<List<String>>> backgroundMusicListController;
   StreamController<bool> backgroundMusicShownController;
 
-  List<AudioFile> files;
+  MediaLibrary mediaLibrary;
+  SessionOpts _options;
+  String _id;
 
   SessionOptionsBloc(String id) {
+    _id = id;
     titleController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading(''));
 
@@ -96,6 +102,7 @@ class SessionOptionsBloc {
 
   Future<void> fetchOptions(String id) async {
     var options = await _repo.fetchOptions(id);
+    _options = options;
 
     // Show title, desc and image
     titleController.sink.add(ApiResponse.completed(options.title));
@@ -109,9 +116,9 @@ class SessionOptionsBloc {
       //     .add(ApiResponse.completed(bgMusicList)); // fixme
     }
 
-    files = options.files;
+
     // Info is in the form "info": "No voice,00:05:02"
-    voiceList = files.map((element) => element.voice).toSet().toList();
+    voiceList = _options.files.map((element) => element.voice).toSet().toList();
     voiceListController.sink.add(ApiResponse.completed(voiceList));
     filterLengthsForVoice();
   }
@@ -133,12 +140,12 @@ class SessionOptionsBloc {
       length = lengthList[lengthSelected];
     }
 
-    currentFile = files.firstWhere((element) {
+    currentFile = _options.files.firstWhere((element) {
       var voiceToMatch = element.voice;
       var lengthToMatch = _formatSessionLength(element.length);
       return voiceToMatch == voice && lengthToMatch == length;
     },
-        orElse: () => files.firstWhere((element) {
+        orElse: () => _options.files.firstWhere((element) {
               // if no matching length found for this voice,
               // get the first one with this voice
               lengthSelected = 0;
@@ -176,7 +183,7 @@ class SessionOptionsBloc {
 
   void filterLengthsForVoice({int voiceIndex = 0}) {
     //Filter the lengths list for this voice from the original data
-    lengthList = files
+    lengthList = _options.files
         .where((element) => element.voice == voiceList[voiceIndex])
         .map((e) => e.length)
         .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
@@ -224,8 +231,26 @@ class SessionOptionsBloc {
     await prefs.setStringList('listOfSavedFiles', list);
   }
 
-  ///End file handling
+  void startAudioService() {
 
+    if(currentFile == null) updateCurrentFile();
+
+    var media = MediaLibrary.saveMediaLibrary(
+        _options.description,
+        _options.title,
+        _options.coverUrl,
+        _options.colorSecondary,
+        _options.colorPrimary,
+        '',
+        clockTimeToDuration(currentFile.length).inMilliseconds,
+        _id,
+        "attributions");
+
+    unawaited(start(media, _options.colorPrimary));
+
+    ///End file handling
+    ///
+  }
 }
 
 extension MyIterable<E> on Iterable<E> {

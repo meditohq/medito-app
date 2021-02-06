@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
@@ -21,6 +22,7 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -172,11 +174,12 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Future<void> _onBeginTap() {
-    Tracking.trackEvent(Tracking.TAP, Tracking.PLAY_TAPPED, widget.id);
+    if (_bloc.isDownloading() || showIndeterminateSpinner) return null;
 
+    Tracking.trackEvent(Tracking.TAP, Tracking.PLAY_TAPPED, widget.id);
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
 
-    if (_bloc.isDownloading() || showIndeterminateSpinner) return null;
+    _bloc.startAudioService();
 
     NavigationFactory.navigate(context, Screen.player, id: widget.id);
 

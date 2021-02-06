@@ -1,3 +1,4 @@
+import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
@@ -13,7 +14,7 @@ class NavigationFactory {
         _push(context, FolderNavWidget(contentId: id));
         break;
       case Screen.player:
-        //
+        _push(context, PlayerWidget());
         break;
       case Screen.text:
         // TODO: Handle this case.
