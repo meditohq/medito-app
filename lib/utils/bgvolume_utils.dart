@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-const DEFAULT_VOLUME = 100.0;
+const DEFAULT_VOLUME = 60.0;
 
 Future<dynamic> retrieveSavedBgVolume() async {
   var prefs = await SharedPreferences.getInstance();
