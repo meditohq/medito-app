@@ -166,7 +166,7 @@ class PackListWidgetState extends State<PackListWidget> {
   Widget _getTile(PackItem item) {
     return GestureDetector(
       onTap: () =>
-          NavigationFactory.navigate(context, Screen.folder, id: item.link),
+          NavigationFactory.navigate(context, NavigationFactory.getScreenFromItemType(item.fileType), id: item.link),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
