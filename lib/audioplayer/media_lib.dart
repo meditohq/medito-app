@@ -2,7 +2,7 @@ import 'package:audio_service/audio_service.dart';
 
 class MediaLibrary {
   static MediaItem saveMediaLibrary(
-      String description,
+      {String description,
       String title,
       String illustrationUrl,
       String secondaryColor,
@@ -10,7 +10,7 @@ class MediaLibrary {
       String bgMusic,
       int durationAsMilliseconds,
       String id,
-      String attributions) {
+      String attributions}) {
     return MediaItem(
       id: id,
       extras: {

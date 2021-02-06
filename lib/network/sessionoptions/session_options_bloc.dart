@@ -116,7 +116,6 @@ class SessionOptionsBloc {
       //     .add(ApiResponse.completed(bgMusicList)); // fixme
     }
 
-
     // Info is in the form "info": "No voice,00:05:02"
     voiceList = _options.files.map((element) => element.voice).toSet().toList();
     voiceListController.sink.add(ApiResponse.completed(voiceList));
@@ -232,19 +231,19 @@ class SessionOptionsBloc {
   }
 
   void startAudioService() {
-
-    if(currentFile == null) updateCurrentFile();
+    if (currentFile == null) updateCurrentFile();
 
     var media = MediaLibrary.saveMediaLibrary(
-        _options.description,
-        _options.title,
-        _options.coverUrl,
-        _options.colorSecondary,
-        _options.colorPrimary,
-        '',
-        clockTimeToDuration(currentFile.length).inMilliseconds,
-        _id,
-        "attributions");
+        description: _options.description,
+        title: _options.title,
+        illustrationUrl: _options.coverUrl,
+        secondaryColor: _options.colorSecondary,
+        primaryColor: _options.colorPrimary,
+        bgMusic: "",
+        durationAsMilliseconds:
+            clockTimeToDuration(currentFile.length).inMilliseconds,
+        id: currentFile.url,
+        attributions: "attributions");
 
     unawaited(start(media, _options.colorPrimary));
 

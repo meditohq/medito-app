@@ -36,7 +36,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    unawaited(AudioServiceBackground.setQueue([mediaItem]));
+    await AudioServiceBackground.setQueue([mediaItem]);
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded

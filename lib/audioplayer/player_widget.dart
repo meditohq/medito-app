@@ -10,7 +10,6 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/in_app_review_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
@@ -22,7 +21,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audio_player_service.dart';
 
@@ -88,20 +86,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       return true;
     });
 
-    var provider = AudioCompleteCopyProvider();
-
-    provider.fetchCopy().then((value) {
-      if (value != null) {
-        titleText = value.title;
-        subTitleText = value.subtitle;
-        buttonLabel = value.buttonLabel;
-        buttonUrl = value.buttonDestination;
-        buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
-      } else {
-        defaultText();
-      }
-      return null;
-    }).catchError((onError) => defaultText());
+    // var provider = AudioCompleteCopyProvider();
+    //
+    // provider.fetchCopy().then((value) {
+    //   if (value != null) {
+    //     titleText = value.title;
+    //     subTitleText = value.subtitle;
+    //     buttonLabel = value.buttonLabel;
+    //     buttonUrl = value.buttonDestination;
+    //     buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
+    //   } else {
+    //     defaultText();
+    //   }
+    //   return null;
+    // }).catchError((onError) => defaultText());
   }
 
   @override
@@ -275,7 +273,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             volume = _dragBgVolumeSubject.value;
                             var volumeIcon = volumeIconFunction(volume);
 
-                            return Icon(volumeIcon, color: Colors.white);
+                            return Icon(volumeIcon,
+                                semanticLabel: 'Change volume button',
+                                color: Colors.white);
                           }),
                       onPressed: () {
                         showDialog(
