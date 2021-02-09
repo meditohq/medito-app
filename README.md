@@ -45,9 +45,9 @@ Feature requests, feedback and suggestions are welcome. Reach us via Slack/email
 
 ## License
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://gitlab.com/medito/medito-app/-/blob/master/LICENSE)
-- Our original content is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) unless mentioned otherwise. For more information please refer to [meditofoundation.org/license](meditofoundation.org/license).
+- Our original content is licensed under a Creative Commons licence. For more information please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
 - Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito". Make sure to respect the original copyright. 
-Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on telegram or by email.
+Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on slack or by email.
 
 Medito Foundation
 https://meditofoundation.org/
