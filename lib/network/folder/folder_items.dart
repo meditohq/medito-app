@@ -140,9 +140,9 @@ class Image {
 class FolderItem {
   bool display;
 
-  String get title => overrideData ? itemTitle : itemPath.first.text;
+  String get title =>  itemPath.first.text;
 
-  String get subtitle => overrideData ? itemSubtitle : itemPath.first.info;
+  String get subtitle =>  itemPath.first.info;
 
   String get id => itemPath.first.link;
 
@@ -154,9 +154,6 @@ class FolderItem {
     if (itemType == 'folder') return FileType.folder;
     return null;
   }
-
-  @Deprecated('Don\'t use directly')
-  bool overrideData;
 
   @Deprecated('Don\'t use directly')
   List<ItemPath> itemPath;
@@ -173,7 +170,6 @@ class FolderItem {
   FolderItem(
       {this.itemType,
       this.display,
-      this.overrideData,
       this.itemTitle,
       this.itemSubtitle,
       this.itemPath});
@@ -181,7 +177,6 @@ class FolderItem {
   FolderItem.fromJson(Map<String, dynamic> json) {
     itemType = json['item_type'];
     display = json['display'];
-    overrideData = json['override_data'];
     itemTitle = json['item_title'];
     itemSubtitle = json['item_subtitle'];
     if (json['item_path'] != null) {
@@ -196,7 +191,6 @@ class FolderItem {
     final data = <String, dynamic>{};
     data['item_type'] = itemType;
     data['display'] = display;
-    data['override_data'] = overrideData;
     data['item_title'] = itemTitle;
     data['item_subtitle'] = itemSubtitle;
     if (itemPath != null) {
