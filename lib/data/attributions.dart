@@ -144,7 +144,7 @@ class Options {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final data = <String, dynamic>{};
     data['changeSlug'] = changeSlug;
     data['changeStatus'] = this.changeStatus;
     data['changeTemplate'] = this.changeTemplate;

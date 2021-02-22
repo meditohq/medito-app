@@ -1,6 +1,7 @@
 class SessionOpts {
 
   String get title => data.content.title;
+  String get author => data.content.author;
   String get description => data.content.description;
   String get coverUrl => data.content.cover.first.url;
   String get colorPrimary => data.content.colorPrimary;
@@ -64,6 +65,7 @@ class Content {
   List<AudioFile> _files;
   bool _backgroundSound;
   String _title;
+  String _author;
 
   String get description => _description;
   List<Cover> get cover => _cover;
@@ -72,6 +74,7 @@ class Content {
   List<AudioFile> get files => _files;
   bool get backgroundSound => _backgroundSound;
   String get title => _title;
+  String get author => _author;
 
   Content({
       String description, 
@@ -80,7 +83,7 @@ class Content {
       String colorSecondary, 
       List<AudioFile> files, 
       bool backgroundSound,
-      String title}){
+      String title, String author}){
     _description = description;
     _cover = cover;
     _colorPrimary = colorPrimary;
@@ -88,6 +91,7 @@ class Content {
     _files = files;
     _backgroundSound = backgroundSound;
     _title = title;
+    _author = author;
 }
 
   Content.fromJson(dynamic json) {
@@ -108,6 +112,7 @@ class Content {
     }
     _backgroundSound = json['background_sound'];
     _title = json['title'];
+    _author = json['author'];
   }
 
   Map<String, dynamic> toJson() {
@@ -123,6 +128,7 @@ class Content {
     }
     map['background_sound'] = _backgroundSound;
     map['title'] = _title;
+    map['author'] = _author;
     return map;
   }
 

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -72,7 +71,7 @@ class _Download {
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      unawaited( saveFileToDownloadedFilesList(currentFile));
+      unawaited(saveFileToDownloadedFilesList(currentFile));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });
@@ -84,7 +83,6 @@ class _Download {
     list.add(file?.toJson()?.toString() ?? '');
     await prefs.setStringList('listOfSavedFiles', list);
   }
-
 
   double getProgress() {
     if (_total == null) {

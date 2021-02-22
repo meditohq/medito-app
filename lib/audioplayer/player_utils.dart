@@ -16,14 +16,11 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/data/attributions.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
-import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 var downloadListener = ValueNotifier<double>(0);

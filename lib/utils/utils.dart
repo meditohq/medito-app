@@ -217,9 +217,7 @@ void launchDonatePageOrWidget(BuildContext context) {
 
 // ignore: always_declare_return_types
 launchUrl(String url) async {
-  if (await canLaunch(url)) {
     await launch(url);
-  }
 }
 
 Duration clockTimeToDuration(String lengthText) {

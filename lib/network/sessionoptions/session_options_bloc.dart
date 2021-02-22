@@ -239,11 +239,11 @@ class SessionOptionsBloc {
         illustrationUrl: _options.coverUrl,
         secondaryColor: _options.colorSecondary,
         primaryColor: _options.colorPrimary,
-        bgMusic: "",
+        bgMusic: '',
         durationAsMilliseconds:
             clockTimeToDuration(currentFile.length).inMilliseconds,
         id: currentFile.url,
-        attributions: "attributions");
+        attributions: _options.author);
 
     unawaited(start(media, _options.colorPrimary));
 

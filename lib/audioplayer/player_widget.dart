@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/audioplayer/position_indicator_widget.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
@@ -21,8 +22,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
-
-import 'audio_player_service.dart';
 
 class PlayerWidget extends StatefulWidget {
   @override
@@ -178,32 +177,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       left: 32.0, right: 32.0),
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        mediaItem?.extras != null
-                                            ? SubtitleTextWidget(
-                                                mediaItem: mediaItem)
-                                            : Expanded(
-                                                child: Text(
-                                                  subTitleText,
-                                                  textAlign: TextAlign.center,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline1
-                                                      .copyWith(
-                                                          fontSize: 14.0,
-                                                          letterSpacing: 0.2,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: MeditoColors
-                                                              .walterWhite
-                                                              .withOpacity(0.7),
-                                                          height: 1.5),
-                                                ),
-                                              ),
-                                      ]),
+                                  child: getSubtitleWidget(mediaItem),
                                 ),
                                 _complete
                                     ? getDonateAndShareButton()
@@ -241,6 +215,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 );
               });
         }));
+  }
+
+  StatelessWidget getSubtitleWidget(MediaItem mediaItem) {
+    // return Container();
+    return loaded
+        ? SubtitleTextWidget(html: mediaItem?.extras['attr'])
+        : Container();
   }
 
   IconData volumeIconFunction(var volume) {
