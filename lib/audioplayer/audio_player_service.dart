@@ -46,15 +46,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = await _player.setFilePath(data);
         }
 
-        if (_duration.inMilliseconds < 1000) {
+        // ignore: null_aware_before_operator
+        if (_duration?.inMilliseconds < 1000 ?? false) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        var bgUrl = mediaItem.extras['bgMusic'];
-        if (bgUrl != null) {
-          playBgMusic(mediaItem.extras['bgMusic']);
+        var bg = mediaItem.extras['bgMusic'];
+        if (bg != null && bg != '') {
+          playBgMusic(bg);
         }
+
         unawaited(onPlay());
       });
     } catch (e) {
@@ -141,6 +143,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
     switch (name) {
       case 'setBgVolume':
         initialBgVolume = params;
+        break;
+      case 'stop':
+        await _player.stop();
+        await _broadcastState();
         break;
     }
   }
