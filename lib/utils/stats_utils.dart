@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:Medito/utils/utils.dart';
 enum UnitType { day, min }
 
 String getUnits(UnitType type, int value) {
@@ -266,7 +266,7 @@ Future updateStatsFromBg() async {
   var read = await readJSONFromCache('stats');
   print('read ->$read');
 
-  if (read != null && read.isNotEmpty) {
+  if (read.isNotEmptyAndNotNull()) {
     var map = decoded(read);
 
     if (map != null && map.isNotEmpty) {

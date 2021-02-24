@@ -217,7 +217,7 @@ void launchDonatePageOrWidget(BuildContext context) {
 
 // ignore: always_declare_return_types
 launchUrl(String url) async {
-    await launch(url);
+  await launch(url);
 }
 
 Duration clockTimeToDuration(String lengthText) {
@@ -302,3 +302,15 @@ void showConsentDialog(BuildContext context) {
       ));
 }
 
+extension EmptyOrNull on String {
+  bool isEmptyOrNull() {
+    if (this == null) return true;
+    if (isEmpty) return true;
+    return false;
+  }
+
+  bool isNotEmptyAndNotNull() {
+    if (this != null && isNotEmpty) return true;
+    return false;
+  }
+}

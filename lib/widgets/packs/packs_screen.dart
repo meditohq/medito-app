@@ -116,7 +116,7 @@ class PackListWidgetState extends State<PackListWidget> {
 
   Widget _getTwoColumns(List<PackItem> data) {
     var firstCol = data.getRange(0, data.length ~/ 2).toList();
-    var secondCol = data.getRange(data.length ~/ 2 +1, data.length).toList();
+    var secondCol = data.getRange(data.length ~/ 2 + 1, data.length).toList();
 
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
@@ -141,7 +141,7 @@ class PackListWidgetState extends State<PackListWidget> {
             child: ColumnBuilder(
                 itemCount: secondCol.length + 1,
                 itemBuilder: (BuildContext context, int index) {
-                  if (index == secondCol.length ) {
+                  if (index == secondCol.length) {
                     return StreakTileWidget(_streak, 'Current Streak',
                         optionalText: UnitType.day, onClick: _onStreakTap);
                   } else {
@@ -165,8 +165,9 @@ class PackListWidgetState extends State<PackListWidget> {
 
   Widget _getTile(PackItem item) {
     return GestureDetector(
-      onTap: () =>
-          NavigationFactory.navigate(context, NavigationFactory.getScreenFromItemType(item.fileType), id: item.link),
+      onTap: () => NavigationFactory.navigate(
+          context, NavigationFactory.getScreenFromItemType(item.fileType),
+          id: item.link),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -200,7 +201,7 @@ class PackListWidgetState extends State<PackListWidget> {
                           height: 1.3)),
                 ),
                 Container(height: item.subtitle != '' ? 4 : 0),
-                item.subtitle != ''
+                item.subtitle.isNotEmptyAndNotNull()
                     ? SizedBox(
                         width: _getColumnWidth() - 48, //todo horrible hack
                         child: Opacity(

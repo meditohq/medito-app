@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -52,8 +53,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        var bg = mediaItem.extras['bgMusic'];
-        if (bg != null && bg != '') {
+        String bg = mediaItem.extras['bgMusic'];
+        if (bg.isNotEmptyAndNotNull()) {
           playBgMusic(bg);
         }
 
@@ -254,7 +255,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   void playBgMusic(String bgMusic) {
-    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != 'null') {
+    if (bgMusic.isNotEmptyAndNotNull()) {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.one);

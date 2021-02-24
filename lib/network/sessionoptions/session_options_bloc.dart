@@ -50,13 +50,14 @@ class SessionOptionsBloc {
   var attributesList = [];
 
   // Download stuff
-  bool bgDownloading = false, removing = false;
+  bool bgDownloading = false,
+      removing = false;
   DownloadSingleton downloadSingleton;
 
   //Streams
   StreamController<ApiResponse<String>> titleController;
   StreamController<ApiResponse<String>> descController;
-  StreamController<ApiResponse<String>> imageController;
+  StreamController<ApiResponse<Map<String, String>>> imageController;
   StreamController<ApiResponse<List<String>>> voiceListController;
   StreamController<ApiResponse<List<String>>> lengthListController;
   StreamController<ApiResponse<BackgroundSounds>> backgroundMusicListController;
@@ -108,22 +109,23 @@ class SessionOptionsBloc {
     // Show title, desc and image
     titleController.sink.add(ApiResponse.completed(options.title));
     descController.sink.add(ApiResponse.completed(options.description));
-    imageController.sink.add(ApiResponse.completed(options.coverUrl));
+    imageController.sink.add(ApiResponse
+        .completed({'url':options.coverUrl, 'color':options.colorPrimary}));
 
     // Show/hide Background music
     backgroundMusicShownController.sink.add(options.hasBackgroundMusic);
     if (options.hasBackgroundMusic) {
-       backgroundMusicListController.sink
-           .add(ApiResponse.completed(_bgMusicList)); // fixme
+    backgroundMusicListController.sink
+        .add(ApiResponse.completed(_bgMusicList)); // fixme
     }
 
     // Info is in the form "info": "No voice,00:05:02"
     voiceList = _options.files.map((element) => element.voice).toSet().toList();
     voiceListController.sink.add(ApiResponse.completed(voiceList));
     filterLengthsForVoice();
-  }
+    }
 
-  void dispose() {
+    void dispose() {
     titleController?.close();
     voiceListController?.close();
     lengthListController?.close();
@@ -131,129 +133,145 @@ class SessionOptionsBloc {
     backgroundMusicShownController?.close();
     imageController?.close();
     descController?.close();
-  }
-
-  Future<void> updateCurrentFile() async {
-    var voice = voiceList[voiceSelected];
-    var length;
-    if (lengthList.length > lengthSelected) {
-      length = lengthList[lengthSelected];
     }
 
-    currentFile = _options.files.firstWhere((element) {
-      var voiceToMatch = element.voice;
-      var lengthToMatch = _formatSessionLength(element.length);
-      return voiceToMatch == voice && lengthToMatch == length;
-    },
-        orElse: () => _options.files.firstWhere((element) {
-              // if no matching length found for this voice,
-              // get the first one with this voice
-              lengthSelected = 0;
-              return element.voice == voice;
-            }));
-
-    setCurrentFileForDownloadSingleton();
-
-    offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
-    updateAvailableOfflineIndicatorText();
-  }
-
-  void updateAvailableOfflineIndicatorText() {
-    if (offlineSelected != 0) {
-      availableOfflineIndicatorText =
-          '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
-    } else {
-      availableOfflineIndicatorText = '';
-    }
-  }
-
-  void setCurrentFileForDownloadSingleton() {
-    if (downloadSingleton == null || !downloadSingleton.isValid()) {
-      downloadSingleton = DownloadSingleton(currentFile);
-    }
-  }
-
-  void saveOptionsSelectionsToSharedPreferences(String id) {
-    addIntToSF(id, 'voiceSelected', voiceSelected);
-    addIntToSF(id, 'lengthSelected', lengthSelected);
-    addIntToSF(id, 'musicSelected', musicSelected);
-  }
-
-  bool isDownloading() => downloadSingleton.isDownloadingMe(currentFile);
-
-  void filterLengthsForVoice({int voiceIndex = 0}) {
-    //Filter the lengths list for this voice from the original data
-    lengthList = _options.files
-        .where((element) => element.voice == voiceList[voiceIndex])
-        .map((e) => e.length)
-        .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
-        .map((e) => _formatSessionLength(e))
-        .toList();
-
-    // Post to UI
-    lengthListController.sink.add(ApiResponse.completed(lengthList));
-  }
-
-  String _formatSessionLength(String item) {
-    if (item.contains(':')) {
-      var duration = clockTimeToDuration(item);
-      var time = '';
-      if (duration.inMinutes < 1) {
-        time = '<1';
-      } else {
-        time = duration.inMinutes.toString();
+        Future<void> updateCurrentFile()
+    async {
+      var voice = voiceList[voiceSelected];
+      var length;
+      if (lengthList.length > lengthSelected) {
+        length = lengthList[lengthSelected];
       }
-      return '$time min';
+
+      currentFile = _options.files.firstWhere((element) {
+        var voiceToMatch = element.voice;
+        var lengthToMatch = _formatSessionLength(element.length);
+        return voiceToMatch == voice && lengthToMatch == length;
+      },
+          orElse: () =>
+              _options.files.firstWhere((element) {
+                // if no matching length found for this voice,
+                // get the first one with this voice
+                lengthSelected = 0;
+                return element.voice == voice;
+              }));
+
+      setCurrentFileForDownloadSingleton();
+
+      offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
+      updateAvailableOfflineIndicatorText();
     }
-    return item + ' min';
-  }
 
-  /// File handling
-  Future<dynamic> removeFile(AudioFile currentFile) async {
-    removing = true;
-    var dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.url.replaceAll(' ', '%20');
-    var file = File('$dir/$name');
+    void updateAvailableOfflineIndicatorText() {
+      if (offlineSelected != 0) {
+        availableOfflineIndicatorText =
+        '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
+      } else {
+        availableOfflineIndicatorText = '';
+      }
+    }
 
-    if (await file.exists()) {
-      await file.delete();
-      await _removeFileFromDownloadedFilesList(currentFile);
-      removing = false;
-    } else {
-      removing = false;
+    void setCurrentFileForDownloadSingleton() {
+      if (downloadSingleton == null || !downloadSingleton.isValid()) {
+        downloadSingleton = DownloadSingleton(currentFile);
+      }
+    }
+
+    void saveOptionsSelectionsToSharedPreferences(String id) {
+      addIntToSF(id, 'voiceSelected', voiceSelected);
+      addIntToSF(id, 'lengthSelected', lengthSelected);
+      addIntToSF(id, 'musicSelected', musicSelected);
+    }
+
+    bool isDownloading() => downloadSingleton.isDownloadingMe(currentFile);
+
+    void filterLengthsForVoice({int voiceIndex = 0}) {
+      //Filter the lengths list for this voice from the original data
+      lengthList = _options.files
+          .where((element) => element.voice == voiceList[voiceIndex])
+          .map((e) => e.length)
+          .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
+          .map((e) => _formatSessionLength(e))
+          .toList();
+
+      // Post to UI
+      lengthListController.sink.add(ApiResponse.completed(lengthList));
+    }
+
+    String _formatSessionLength(String item) {
+      if (item.contains(':')) {
+        var duration = clockTimeToDuration(item);
+        var time = '';
+        if (duration.inMinutes < 1) {
+          time = '<1';
+        } else {
+          time = duration.inMinutes.toString();
+        }
+        return '$time min';
+      }
+      return item + ' min';
+    }
+
+    /// File handling
+    Future<dynamic> removeFile(AudioFile currentFile) async {
+      removing = true;
+      var dir = (await getApplicationSupportDirectory()).path;
+      var name = currentFile.url.replaceAll(' ', '%20');
+      var file = File('$dir/$name');
+
+      if (await file.exists()) {
+        await file.delete();
+        await _removeFileFromDownloadedFilesList(currentFile);
+        removing = false;
+      } else {
+        removing = false;
+      }
+    }
+
+    Future<void> _removeFileFromDownloadedFilesList(AudioFile file) async {
+      var prefs = await SharedPreferences.getInstance();
+      var list = prefs.getStringList('listOfSavedFiles') ?? [];
+      list.remove(file?.toJson()?.toString() ?? '');
+      await prefs.setStringList('listOfSavedFiles', list);
+    }
+
+    void startAudioService() {
+      if (currentFile == null) updateCurrentFile();
+
+      var media = MediaLibrary.saveMediaLibrary(
+          description: _options.description,
+          title: _options.title,
+          illustrationUrl: _options.coverUrl,
+          secondaryColor: _options.colorSecondary,
+          primaryColor: _options.colorPrimary,
+          bgMusic: '',
+          durationAsMilliseconds:
+          clockTimeToDuration(currentFile.length).inMilliseconds,
+          id: currentFile.url,
+          attributions: _options.author);
+
+      unawaited(start(media, _options.colorPrimary));
+
+      ///End file handling
+      ///
     }
   }
 
-  Future<void> _removeFileFromDownloadedFilesList(AudioFile file) async {
-    var prefs = await SharedPreferences.getInstance();
-    var list = prefs.getStringList('listOfSavedFiles') ?? [];
-    list.remove(file?.toJson()?.toString() ?? '');
-    await prefs.setStringList('listOfSavedFiles', list);
-  }
+  extension MyIterable
 
-  void startAudioService() {
-    if (currentFile == null) updateCurrentFile();
+  <
 
-    var media = MediaLibrary.saveMediaLibrary(
-        description: _options.description,
-        title: _options.title,
-        illustrationUrl: _options.coverUrl,
-        secondaryColor: _options.colorSecondary,
-        primaryColor: _options.colorPrimary,
-        bgMusic: '',
-        durationAsMilliseconds:
-            clockTimeToDuration(currentFile.length).inMilliseconds,
-        id: currentFile.url,
-        attributions: _options.author);
+  E
 
-    unawaited(start(media, _options.colorPrimary));
+  >
 
-    ///End file handling
-    ///
-  }
-}
+  on Iterable
 
-extension MyIterable<E> on Iterable<E> {
+  <
+
+  E
+
+  > {
   Iterable<E> sortedBy(Comparable Function(E e) key) =>
-      toList()..sort((a, b) => key(a).compareTo(key(b)));
-}
+  toList()..sort((a, b) => key(a).compareTo(key(b)));
+  }

@@ -24,6 +24,7 @@ import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 
 import '../../audioplayer/player_utils.dart';
 import '../../utils/colors.dart';
@@ -96,7 +97,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           buildVoiceRow(),
                           buildSpacer(),
                           ////////// spacer
-                          buildTextHeaderForRow('Session length'),
+                          buildTextHeaderForRow('Session Length'),
                           buildSessionLengthRow(),
                           buildSpacer(),
                           ////////// spacer
@@ -118,7 +119,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       }),
     );
   }
-  
+
   Widget getBGMusicItems() => StreamBuilder<bool>(
       stream: _bloc.backgroundMusicShownController.stream,
       initialData: true,
@@ -127,7 +128,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildTextHeaderForRow('Background Sounds'),
+              buildTextHeaderForRow('Background Sound'),
               buildBackgroundMusicRowAndSpacer(),
               buildSpacer(),
             ],
@@ -222,11 +223,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     return StreamBuilder<ApiResponse<String>>(
         stream: _bloc.descController.stream,
         builder: (context, snapshot) {
-          return (snapshot.data?.body?.isNotEmpty ?? false)
+          return (snapshot.hasData && snapshot.data.body.isNotEmptyAndNotNull())
               ? Padding(
                   padding:
-                      const EdgeInsets.only(bottom: 20.0, left: 16, right: 16),
-                  child: Html(data: snapshot.data?.body))
+                      const EdgeInsets.only(bottom: 20.0, left: 12, right: 12),
+                  child: Html(
+                    data: snapshot.data?.body,
+                    shrinkWrap: false,
+                  ))
               : Container();
         });
   }
@@ -333,7 +337,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
               var data = snapshot.data.body?.list;
 
-              if(data.isEmpty) return Container();
+              if (data.isEmpty) return Container();
 
               return ListView.builder(
                 padding: const EdgeInsets.only(left: 16),
@@ -557,7 +561,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildImage() {
-    return StreamBuilder<ApiResponse<String>>(
+    return StreamBuilder<ApiResponse<Map<String, String>>>(
         stream: _bloc.imageController.stream,
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
@@ -573,14 +577,15 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                   color: _primaryColor != null
                       ? parseColor(_primaryColor)
-                      : MeditoColors.moonlight,
+                      : parseColor(snapshot.data?.body['color']),
                 ),
                 child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: snapshot.data?.body != null
-                        ? Image.network(snapshot.data?.body)
-                        : Container() //getNetworkImageWidget(snapshot.data?.body, startHeight: 100),
-                    )),
+                  padding: const EdgeInsets.all(8.0),
+                  child: snapshot.data?.body != null
+                      ? getNetworkImageWidget(snapshot.data?.body['url'],
+                          startHeight: 100)
+                      : Container(),
+                )),
           );
         });
   }

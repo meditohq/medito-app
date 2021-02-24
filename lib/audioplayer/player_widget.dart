@@ -244,7 +244,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Widget getBgVolumeController(MediaItem mediaItem) => mediaItem == null
       ? Container()
-      : mediaItem.extras['bgMusic'] != null
+      : (mediaItem.extras['bgMusic'] as String).isNotEmptyAndNotNull()
           ? _complete
               ? Container()
               : Padding(
@@ -382,7 +382,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void getArtUrl(MediaItem mediaItem) {
     if (illustrationUrl == null &&
         mediaItem != null &&
-        mediaItem.artUri.isNotEmpty) {
+        mediaItem.artUri.isNotEmptyAndNotNull()) {
       illustrationUrl = mediaItem.artUri;
     }
   }
