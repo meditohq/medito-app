@@ -21,6 +21,7 @@ import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/audioplayer/player_widget.dart';
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_repo.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
@@ -33,7 +34,7 @@ class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
   bool backgroundMusicAvailable = false;
-  List bgMusicList = [];
+  BackgroundSounds _bgMusicList;
   var voiceList = <String>[];
   var lengthList = <String>[];
   var backgroundMusicUrl;
@@ -59,7 +60,7 @@ class SessionOptionsBloc {
   StreamController<ApiResponse<String>> imageController;
   StreamController<ApiResponse<List<String>>> voiceListController;
   StreamController<ApiResponse<List<String>>> lengthListController;
-  StreamController<ApiResponse<List<String>>> backgroundMusicListController;
+  StreamController<ApiResponse<BackgroundSounds>> backgroundMusicListController;
   StreamController<bool> backgroundMusicShownController;
 
   MediaLibrary mediaLibrary;
@@ -102,6 +103,7 @@ class SessionOptionsBloc {
 
   Future<void> fetchOptions(String id) async {
     var options = await _repo.fetchOptions(id);
+    _bgMusicList = await _repo.fetchBackgroundSounds();
     _options = options;
 
     // Show title, desc and image
@@ -112,8 +114,8 @@ class SessionOptionsBloc {
     // Show/hide Background music
     backgroundMusicShownController.sink.add(options.hasBackgroundMusic);
     if (options.hasBackgroundMusic) {
-      // backgroundMusicListController.sink
-      //     .add(ApiResponse.completed(bgMusicList)); // fixme
+       backgroundMusicListController.sink
+           .add(ApiResponse.completed(_bgMusicList)); // fixme
     }
 
     // Info is in the form "info": "No voice,00:05:02"

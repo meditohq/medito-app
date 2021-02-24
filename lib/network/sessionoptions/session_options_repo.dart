@@ -14,14 +14,21 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/packs/packs.dart';
+import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class SessionOptionsRepository {
   var baseUrl = 'https://live.medito.app/api';
+  var bgSoundsUrl = 'https://live.medito.app/api/pages/backgroundsounds/files';
 
   Future<SessionOpts> fetchOptions(String id) async {
     final response = await httpGet(baseUrl + id);
     return SessionOpts.fromJson(response);
+  }
+
+  Future<BackgroundSounds> fetchBackgroundSounds() async {
+    final response = await httpGet(bgSoundsUrl);
+    return BackgroundSounds.fromJson(response);
   }
 }

@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/audioplayer/player_button.dart';
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/navigation.dart';
@@ -310,40 +311,49 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildBackgroundMusicRow() {
-    if (!_bloc.backgroundMusicAvailable) return Container();
-
-    if (_bloc.bgMusicList.isEmpty) return _getEmptyPillRow();
-
     return SizedBox(
         height: 56,
-        child: ListView.builder(
-          padding: const EdgeInsets.only(left: 16),
-          shrinkWrap: true,
-          itemCount: 1 + (_bloc.bgMusicList.length ?? 0),
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-              padding: buildInBetweenChipPadding(index),
-              child: FilterChip(
-                pressElevation: 4,
-                shape: buildChipBorder(),
-                labelPadding: buildInnerChipPadding(),
-                showCheckmark: false,
-                label: Text(
-                    index == 0 ? 'None' : _bloc.bgMusicList[index - 1].key),
-                selected: index == _bloc.musicSelected,
-                onSelected: (bool value) {
-                  onMusicSelected(
-                      index,
-                      index > 0 ? _bloc.bgMusicList[index - 1].value : '',
-                      index > 0 ? _bloc.bgMusicList[index - 1].key : '');
-                },
-                backgroundColor: MeditoColors.moonlight,
-                selectedColor: MeditoColors.walterWhite,
-                labelStyle: getMusicPillTextStyle(index),
-              ),
+        child: StreamBuilder<ApiResponse<BackgroundSounds>>(
+          stream: _bloc.backgroundMusicListController.stream,
+          initialData: ApiResponse.loading(''),
+          builder: (context, snapshot) {
+
+            if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
+              return _getEmptyPillRow();
+            }
+
+            var data = snapshot.data.body.list;
+
+            return ListView.builder(
+              padding: const EdgeInsets.only(left: 16),
+              shrinkWrap: true,
+              itemCount: 1 + (data.length ?? 0),
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: buildInBetweenChipPadding(index),
+                  child: FilterChip(
+                    pressElevation: 4,
+                    shape: buildChipBorder(),
+                    labelPadding: buildInnerChipPadding(),
+                    showCheckmark: false,
+                    label: Text(
+                        index == 0 ? 'None' : data[index - 1].name),
+                    selected: index == _bloc.musicSelected,
+                    onSelected: (bool value) {
+                      onMusicSelected(
+                          index,
+                          index > 0 ? data[index - 1].url : '',
+                          index > 0 ? data[index - 1].name : '');
+                    },
+                    backgroundColor: MeditoColors.moonlight,
+                    selectedColor: MeditoColors.walterWhite,
+                    labelStyle: getMusicPillTextStyle(index),
+                  ),
+                );
+              },
             );
-          },
+          }
         ));
   }
 
