@@ -33,7 +33,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
-  bool backgroundMusicAvailable = false;
   BackgroundSounds _bgMusicList;
   var voiceList = <String>[];
   var lengthList = <String>[];

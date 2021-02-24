@@ -98,11 +98,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           ////////// spacer
                           buildTextHeaderForRow('Session length'),
                           buildSessionLengthRow(),
-                          getBGMusicSpacer(),
-                          ////////// spacer
-                          getBGMusicRowOrContainer(),
-                          buildBackgroundMusicRow(),
                           buildSpacer(),
+                          ////////// spacer
+                          getBGMusicItems(),
                           ////////// spacer
                           buildTextHeaderForRow(
                               'Available Offline ${_bloc.availableOfflineIndicatorText}'),
@@ -120,13 +118,24 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       }),
     );
   }
-
-  Widget getBGMusicRowOrContainer() => _bloc.backgroundMusicAvailable
-      ? buildTextHeaderForRow('Background Sounds')
-      : Container();
-
-  Widget getBGMusicSpacer() =>
-      _bloc.backgroundMusicAvailable ? buildSpacer() : Container();
+  
+  Widget getBGMusicItems() => StreamBuilder<bool>(
+      stream: _bloc.backgroundMusicShownController.stream,
+      initialData: true,
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildTextHeaderForRow('Background Sounds'),
+              buildBackgroundMusicRowAndSpacer(),
+              buildSpacer(),
+            ],
+          );
+        } else {
+          return Container();
+        }
+      });
 
   Widget getBeginButtonContent() {
     _bloc.setCurrentFileForDownloadSingleton();
@@ -310,51 +319,51 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget buildBackgroundMusicRow() {
+  Widget buildBackgroundMusicRowAndSpacer() {
     return SizedBox(
         height: 56,
         child: StreamBuilder<ApiResponse<BackgroundSounds>>(
-          stream: _bloc.backgroundMusicListController.stream,
-          initialData: ApiResponse.loading(''),
-          builder: (context, snapshot) {
+            stream: _bloc.backgroundMusicListController.stream,
+            initialData: ApiResponse.loading(''),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData ||
+                  snapshot.data?.status == Status.LOADING) {
+                return _getEmptyPillRow();
+              }
 
-            if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
-              return _getEmptyPillRow();
-            }
+              var data = snapshot.data.body?.list;
 
-            var data = snapshot.data.body.list;
+              if(data.isEmpty) return Container();
 
-            return ListView.builder(
-              padding: const EdgeInsets.only(left: 16),
-              shrinkWrap: true,
-              itemCount: 1 + (data.length ?? 0),
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: buildInBetweenChipPadding(index),
-                  child: FilterChip(
-                    pressElevation: 4,
-                    shape: buildChipBorder(),
-                    labelPadding: buildInnerChipPadding(),
-                    showCheckmark: false,
-                    label: Text(
-                        index == 0 ? 'None' : data[index - 1].name),
-                    selected: index == _bloc.musicSelected,
-                    onSelected: (bool value) {
-                      onMusicSelected(
-                          index,
-                          index > 0 ? data[index - 1].url : '',
-                          index > 0 ? data[index - 1].name : '');
-                    },
-                    backgroundColor: MeditoColors.moonlight,
-                    selectedColor: MeditoColors.walterWhite,
-                    labelStyle: getMusicPillTextStyle(index),
-                  ),
-                );
-              },
-            );
-          }
-        ));
+              return ListView.builder(
+                padding: const EdgeInsets.only(left: 16),
+                shrinkWrap: true,
+                itemCount: 1 + (data.length ?? 0),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: buildInBetweenChipPadding(index),
+                    child: FilterChip(
+                      pressElevation: 4,
+                      shape: buildChipBorder(),
+                      labelPadding: buildInnerChipPadding(),
+                      showCheckmark: false,
+                      label: Text(index == 0 ? 'None' : data[index - 1].name),
+                      selected: index == _bloc.musicSelected,
+                      onSelected: (bool value) {
+                        onMusicSelected(
+                            index,
+                            index > 0 ? data[index - 1].url : '',
+                            index > 0 ? data[index - 1].name : '');
+                      },
+                      backgroundColor: MeditoColors.moonlight,
+                      selectedColor: MeditoColors.walterWhite,
+                      labelStyle: getMusicPillTextStyle(index),
+                    ),
+                  );
+                },
+              );
+            }));
   }
 
   Widget buildVoiceRow() {
