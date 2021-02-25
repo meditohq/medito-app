@@ -29,45 +29,6 @@ var baseUrl = 'https://medito.space/api/pages';
 int bgTotal = 1, bgReceived = 0;
 var backgroundMusicUrl = '';
 
-Container getAttrWidget(BuildContext context, licenseTitle, sourceUrl,
-    licenseName, String licenseURL) {
-  return Container(
-    padding: EdgeInsets.only(top: 16, bottom: 8, left: 16, right: 16),
-    child: RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        children: [
-          // ignore: unnecessary_new
-          new TextSpan(
-            text: 'From ',
-            style: Theme.of(context).textTheme.headline1,
-          ),
-          TextSpan(
-            text: licenseTitle ?? '',
-            style: Theme.of(context).textTheme.bodyText1,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                launch(sourceUrl);
-              },
-          ),
-          TextSpan(
-            text: ' / License: ',
-            style: Theme.of(context).textTheme.headline1,
-          ),
-          TextSpan(
-            text: licenseName ?? '',
-            style: Theme.of(context).textTheme.bodyText1,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                launch(licenseURL);
-              },
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
 Future<dynamic> checkFileExists(AudioFile currentFile) async {
   var dir = (await getApplicationSupportDirectory()).path;
   var name = currentFile.url.replaceAll(' ', '%20');

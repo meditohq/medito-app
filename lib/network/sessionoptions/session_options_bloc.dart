@@ -19,7 +19,7 @@ import 'dart:io';
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_repo.dart';

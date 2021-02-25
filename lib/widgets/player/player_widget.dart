@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:Medito/audioplayer/audio_player_service.dart';
-import 'package:Medito/audioplayer/player_button.dart';
-import 'package:Medito/audioplayer/position_indicator_widget.dart';
+import 'package:Medito/widgets/player/player_button.dart';
+import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
-import 'package:Medito/audioplayer/subtitle_text_widget.dart';
+import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';

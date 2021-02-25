@@ -1,4 +1,4 @@
-import 'package:Medito/audioplayer/player_widget.dart';
+import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
