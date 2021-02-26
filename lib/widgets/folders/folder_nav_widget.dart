@@ -13,7 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_bloc.dart';
 import 'package:Medito/network/folder/folder_items.dart';
@@ -26,6 +25,7 @@ import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/list_item_image_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
+import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,9 +40,9 @@ class FolderStateless extends StatelessWidget {
 }
 
 class FolderNavWidget extends StatefulWidget {
-  FolderNavWidget({Key key, this.contentId}) : super(key: key);
+  FolderNavWidget({Key key}) : super(key: key);
 
-  final String contentId;
+  static const routeName = '/folder';
 
   @override
   _FolderNavWidgetState createState() => _FolderNavWidgetState();
@@ -52,6 +52,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     with TickerProviderStateMixin {
   BuildContext scaffoldContext; //for the snackbar
   FolderItemsBloc _bloc;
+  String _contentID;
 
   @override
   void dispose() {
@@ -63,11 +64,20 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   void initState() {
     super.initState();
     Tracking.changeScreenName(Tracking.FOLDER_PAGE);
-    _bloc = FolderItemsBloc(widget.contentId);
+  }
+
+  @override
+  void didChangeDependencies() {
+    final FolderArguments args = ModalRoute.of(context).settings.arguments;
+    _contentID = args.contentId;
+    _bloc = FolderItemsBloc(_contentID);
+
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
     ));
@@ -158,7 +168,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   Widget _getListView() {
     return RefreshIndicator(
-      onRefresh: () => _bloc.fetchData(widget.contentId),
+      onRefresh: () => _bloc.fetchData(_contentID),
       color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       child: StreamBuilder<ApiResponse<List<FolderItem>>>(
@@ -215,7 +225,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                       case Status.ERROR:
                         return MeditoAppBarWidget(title: '...');
                       case Status.COMPLETED:
-                        return MeditoAppBarWidget(title: coverSnapshot.data?.body);
+                        return MeditoAppBarWidget(
+                            title: coverSnapshot.data?.body);
                       case Status.LOADING:
                         return MeditoAppBarWidget(title: '...');
                       default:
@@ -281,4 +292,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       ),
     );
   }
+}
+
+class FolderArguments {
+  final String contentId;
+
+  FolderArguments(this.contentId);
 }

@@ -1,7 +1,7 @@
-import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
+import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
 import 'package:Medito/widgets/streak_page.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class NavigationFactory {
     switch (key) {
       case Screen.folder:
         assert(id.isNotEmpty);
-        _push(context, FolderNavWidget(contentId: id));
+        Navigator.pushNamed(context, FolderNavWidget.routeName, arguments: FolderArguments(id));
         break;
       case Screen.player:
         _push(context, PlayerWidget());

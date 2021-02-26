@@ -1,18 +1,19 @@
 import 'dart:async';
 
 import 'package:Medito/audioplayer/audio_player_service.dart';
-import 'package:Medito/widgets/player/player_button.dart';
-import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
-import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/in_app_review_widget.dart';
+import 'package:Medito/widgets/player/player_button.dart';
+import 'package:Medito/widgets/player/position_indicator_widget.dart';
+import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -460,7 +461,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _onBackPressed(MediaItem mediaItem) {
     if (mediaItem != null) {
-      Navigator.popUntil(context, ModalRoute.withName('/nav'));
+      Navigator.popUntil(
+          context, ModalRoute.withName(FolderNavWidget.routeName));
     } else {
       Navigator.pop(context);
     }

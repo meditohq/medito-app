@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -62,7 +63,6 @@ class HomeScreenWidget extends StatefulWidget {
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget>
     with WidgetsBindingObserver {
-
   @override
   void initState() {
     super.initState();
@@ -106,11 +106,11 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/nav',
+      initialRoute: '/',
       routes: {
-        '/nav': (context) => Scaffold(
-            appBar: null, //AppBar(title: const Text(_title)),
-            body: AudioServiceWidget(child: PackListWidget())),
+        '/': (context) =>
+            Scaffold(body: AudioServiceWidget(child: PackListWidget())),
+        FolderNavWidget.routeName: (context) => FolderNavWidget()
       },
       theme: ThemeData(
           splashColor: MeditoColors.moonlight,
