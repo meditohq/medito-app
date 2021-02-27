@@ -61,9 +61,9 @@ class FolderItemsBloc {
 
   void _postTitle(FolderContent content) {
     try {
-      titleController.add(ApiResponse.completed(content.title));
+      titleController.sink.add(ApiResponse.completed(content.title));
     } catch (e) {
-      titleController.add(ApiResponse.error('Title error'));
+      titleController.sink.add(ApiResponse.error('Title error'));
     }
   }
 

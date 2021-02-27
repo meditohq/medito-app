@@ -77,7 +77,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   @override
   Widget build(BuildContext context) {
-
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
     ));
@@ -139,30 +138,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   Widget _buildSafeAreaBody() {
-    checkConnectivity().then((connected) {
-      if (!connected) {
-        createSnackBar('Check your connectivity', scaffoldContext);
-      }
-    });
-
     return SafeArea(
       bottom: false,
       maintainBottomViewPadding: false,
-      child: Stack(
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                  child: Stack(
-                children: <Widget>[
-                  _getListView(),
-                ],
-              )),
-            ],
-          ),
-        ],
-      ),
+      child: _getListView(),
     );
   }
 
@@ -171,39 +150,32 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       onRefresh: () => _bloc.fetchData(_contentID),
       color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
-      child: StreamBuilder<ApiResponse<List<FolderItem>>>(
-          stream: _bloc.itemsListController.stream,
-          builder: (context, itemsSnapshot) {
-            if (itemsSnapshot.connectionState == ConnectionState.none) {
-              return Text(
-                'No connection. Please try again later',
-                style: Theme.of(context).textTheme.headline3,
-              );
-            }
-
-            if (itemsSnapshot.connectionState == ConnectionState.waiting ||
-                itemsSnapshot.hasData == false ||
-                itemsSnapshot.hasData == null) {
-              return LoadingListWidget();
-            }
-
-            return ListView.builder(
-                itemCount: 1 +
-                    (itemsSnapshot.data == null
-                        ? 0
-                        : itemsSnapshot.data.body?.length ?? 0),
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int i) {
-                  if (i == 0) {
-                    return _getAppBarStreamBuilder();
+      child: Column(
+        children: [
+          _getAppBarStreamBuilder(),
+          Expanded(
+            child: StreamBuilder<ApiResponse<List<FolderItem>>>(
+                stream: _bloc.itemsListController.stream,
+                builder: (context, itemsSnapshot) {
+                  if (!itemsSnapshot.hasData ||
+                      itemsSnapshot.connectionState == ConnectionState.waiting) {
+                    return LoadingListWidget();
                   }
-                  return Column(
-                    children: <Widget>[
-                      _getItemWidget(itemsSnapshot.data?.body[i - 1]),
-                    ],
-                  );
-                });
-          }),
+
+                  if (itemsSnapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: itemsSnapshot.data.body?.length,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int i) {
+                        return _getItemWidget(itemsSnapshot.data?.body[i]);
+                      });
+                  }
+
+                  return Container();
+                }),
+          ),
+        ],
+      ),
     );
   }
 
@@ -220,20 +192,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             default:
               return StreamBuilder<ApiResponse<String>>(
                   stream: _bloc.titleController.stream,
-                  builder: (context, coverSnapshot) {
-                    switch (coverSnapshot.data?.status) {
-                      case Status.ERROR:
-                        return MeditoAppBarWidget(title: '...');
-                      case Status.COMPLETED:
-                        return MeditoAppBarWidget(
-                            title: coverSnapshot.data?.body);
-                      case Status.LOADING:
-                        return MeditoAppBarWidget(title: '...');
-                      default:
-                        return Container();
-                    }
+                  builder: (context, titleSnapshot) {
+                    return MeditoAppBarWidget(
+                        title: titleSnapshot.data?.body ?? '...');
                   });
-              break;
           }
         });
   }
@@ -261,8 +223,17 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         ));
   }
 
-  SizedBox _getImageListItemWidget(FolderItem item) =>
-      SizedBox(width: 300, child: ImageListItemWidget(src: 'item.'));
+  SizedBox _getImageListItemWidget(FolderItem item) => SizedBox(
+      width: 300,
+      child: StreamBuilder<ApiResponse<FolderCover>>(
+          stream: _bloc.coverController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ImageListItemWidget(src: snapshot.data.body.url);
+            } else {
+              return Container();
+            }
+          }));
 
   InkWell _getItemWidget(FolderItem item) {
     return InkWell(

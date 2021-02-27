@@ -38,9 +38,6 @@ class LoadingListWidget extends StatelessWidget {
     return ListView.builder(
         itemCount: 6,
         itemBuilder: (context, i) {
-          if (i == 0) {
-            return MeditoAppBarWidget(title: '');
-          }
           return LoadingItemWidget(index: i + 1);
         });
   }
