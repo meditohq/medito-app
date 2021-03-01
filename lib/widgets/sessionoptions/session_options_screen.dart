@@ -13,7 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
@@ -22,9 +21,9 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
+import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
 
 import '../../audioplayer/player_utils.dart';
 import '../../utils/colors.dart';
@@ -39,9 +38,6 @@ class SessionOptionsScreen extends StatefulWidget {
 }
 
 class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
-  var _primaryColor;
-  String _secondaryColor;
-
   //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
@@ -59,65 +55,77 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: Semantics(
-        label: 'Play button',
-        child: PlayerButton(
-          onPressed: _onBeginTap,
-          child:
-              SizedBox(width: 24, height: 24, child: getBeginButtonContent()),
-          primaryColor: _primaryColor != null
-              ? parseColor(_primaryColor)
-              : MeditoColors.walterWhite,
-        ),
-      ),
-      body: Builder(builder: (BuildContext context) {
-        scaffoldContext = context;
-        return Container(
-          child: SafeArea(
-            child: Stack(
-              children: <Widget>[
-                SingleChildScrollView(
+    return StreamBuilder<ApiResponse<Map<String, String>>>(
+        stream: _bloc.colourController.stream,
+        builder: (context, colorSnapshot) {
+          var sColor = colorSnapshot.hasData
+              ? colorSnapshot.data.body['secondaryColor']
+              : null;
+          var pColor = colorSnapshot.hasData
+              ? colorSnapshot.data.body['primaryColor']
+              : null;
+
+          return Scaffold(
+            floatingActionButton: Semantics(
+              label: 'Play button',
+              child: PlayerButton(
+                onPressed: _onBeginTap,
+                child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: getBeginButtonContent(sColor)),
+                primaryColor: parseColor(pColor) ?? MeditoColors.walterWhite,
+              ),
+            ),
+            body: Builder(builder: (BuildContext context) {
+              scaffoldContext = context;
+              return Container(
+                child: SafeArea(
                   child: Stack(
-                    children: [
-                      GradientWidget(
-                        height: 250.0,
-                        primaryColor: parseColor(_primaryColor),
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          MeditoAppBarWidget(title: '', transparent: true),
-                          buildImage(),
-                          buildTitleText(),
-                          buildDescriptionText(),
-                          buildSpacer(),
-                          buildTextHeaderForRow('Voice'),
-                          buildVoiceRow(),
-                          buildSpacer(),
-                          ////////// spacer
-                          buildTextHeaderForRow('Session Length'),
-                          buildSessionLengthRow(),
-                          buildSpacer(),
-                          ////////// spacer
-                          getBGMusicItems(),
-                          ////////// spacer
-                          buildTextHeaderForRow(
-                              'Available Offline ${_bloc.availableOfflineIndicatorText}'),
-                          buildOfflineRow(),
-                          Container(height: 80)
-                        ],
+                    children: <Widget>[
+                      SingleChildScrollView(
+                        child: Stack(
+                          children: [
+                            GradientWidget(
+                              height: 250.0,
+                              primaryColor: parseColor(pColor),
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                MeditoAppBarWidget(
+                                    title: '', transparent: true),
+                                buildImage(pColor),
+                                buildTitleText(),
+                                buildDescriptionText(),
+                                buildSpacer(),
+                                buildTextHeaderForRow('Voice'),
+                                buildVoiceRow(),
+                                buildSpacer(),
+                                ////////// spacer
+                                buildTextHeaderForRow('Session Length'),
+                                buildSessionLengthRow(),
+                                buildSpacer(),
+                                ////////// spacer
+                                getBGMusicItems(),
+                                ////////// spacer
+                                buildTextHeaderForRow(
+                                    'Available Offline ${_bloc.availableOfflineIndicatorText}'),
+                                buildOfflineRow(),
+                                Container(height: 80)
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        );
-      }),
-    );
+              );
+            }),
+          );
+        });
   }
 
   Widget getBGMusicItems() => StreamBuilder<bool>(
@@ -138,7 +146,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         }
       });
 
-  Widget getBeginButtonContent() {
+  Widget getBeginButtonContent(String color) {
     _bloc.setCurrentFileForDownloadSingleton();
 
     if (_bloc.isDownloading()) {
@@ -146,7 +154,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           valueListenable: _bloc.downloadSingleton.returnNotifier(),
           builder: (context, value, widget) {
             if (value >= 1) {
-              return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
+              return Icon(Icons.play_arrow, color: parseColor(color));
             } else {
               print('Updated value: ' + (value * 100).toInt().toString());
               return SizedBox(
@@ -162,7 +170,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                       CircularProgressIndicator(
                         value: value,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          parseColor(_secondaryColor),
+                          parseColor(color),
                         ),
                       ),
                     ],
@@ -174,11 +182,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         height: 24,
         width: 24,
         child: CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(parseColor(_secondaryColor))),
+            valueColor: AlwaysStoppedAnimation<Color>(parseColor(color))),
       );
     } else {
-      return Icon(Icons.play_arrow, color: parseColor(_secondaryColor));
+      return Icon(Icons.play_arrow, color: parseColor(color));
     }
   }
 
@@ -560,33 +567,30 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget buildImage() {
+  Widget buildImage(String color) {
     return StreamBuilder<ApiResponse<Map<String, String>>>(
         stream: _bloc.imageController.stream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
-            return _getEmptyPillRow();
+        builder: (context, imageSnapshot) {
+          if (imageSnapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
+              child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                      color: parseColor(color)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: imageSnapshot.data?.body != null
+                        ? getNetworkImageWidget(imageSnapshot.data?.body['url'],
+                            startHeight: 100)
+                        : Container(),
+                  )),
+            );
+          } else {
+            return Container();
           }
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
-            child: Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                  color: _primaryColor != null
-                      ? parseColor(_primaryColor)
-                      : parseColor(snapshot.data?.body['color']),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: snapshot.data?.body != null
-                      ? getNetworkImageWidget(snapshot.data?.body['url'],
-                          startHeight: 100)
-                      : Container(),
-                )),
-          );
         });
   }
 

@@ -219,10 +219,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   StatelessWidget getSubtitleWidget(MediaItem mediaItem) {
-    // return Container();
-    return loaded
-        ? SubtitleTextWidget(html: mediaItem?.extras['attr'])
-        : Container();
+    var attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
+
+    return loaded ? SubtitleTextWidget(html: attr) : Container();
   }
 
   IconData volumeIconFunction(var volume) {

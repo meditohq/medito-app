@@ -106,7 +106,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/main',
+      initialRoute: '/',
       routes: {
         '/': (context) =>
             Scaffold(body: AudioServiceWidget(child: PackListWidget())),
