@@ -7,13 +7,18 @@ class GradientWidget extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          primaryColor?.withOpacity(0.6) ?? MeditoColors.moonlight,
-          MeditoColors.midnight,
-        ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+        gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: colorsList()),
       ),
     );
   }
+
+  List<Color> colorsList() => [
+        primaryColor?.withOpacity(0.6) ?? MeditoColors.moonlight,
+        MeditoColors.midnight,
+      ];
 
   final height;
   final primaryColor;
