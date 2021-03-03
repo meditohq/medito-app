@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/widgets/loading_item_widget.dart';
+import 'package:Medito/widgets/folders/loading_item_widget.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -38,9 +38,6 @@ class LoadingListWidget extends StatelessWidget {
     return ListView.builder(
         itemCount: 6,
         itemBuilder: (context, i) {
-          if (i == 0) {
-            return MeditoAppBarWidget(title: '');
-          }
           return LoadingItemWidget(index: i + 1);
         });
   }

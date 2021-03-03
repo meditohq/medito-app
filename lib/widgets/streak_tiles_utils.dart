@@ -37,75 +37,78 @@ class StreakTileWidget extends StatefulWidget {
 class _StreakTileWidgetState extends State<StreakTileWidget> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: widget.future,
-        builder: (context, snapshot) {
-          var unit;
-          if (snapshot.hasData) {
-            var value = int.parse(snapshot?.data);
-            unit = getUnits(widget.optionalText, value);
-          }
-          return GestureDetector(
-            onTap: widget.onClick,
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                    color: MeditoColors.moonlight,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(height: 4),
-                        Text(widget.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.fade,
-                            style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 18)),
-                        Wrap(
-                          direction: Axis.horizontal,
-                          crossAxisAlignment: WrapCrossAlignment.end,
-                          children: <Widget>[
-                            Text(
-                              _formatSnapshotData(snapshot),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6
-                                  .copyWith(fontSize: 34),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: FutureBuilder<String>(
+          future: widget.future,
+          builder: (context, snapshot) {
+            var unit;
+            if (snapshot.hasData) {
+              var value = int.parse(snapshot?.data);
+              unit = getUnits(widget.optionalText, value);
+            }
+            return GestureDetector(
+              onTap: widget.onClick,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                      color: MeditoColors.moonlight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(height: 4),
+                          Text(widget.title,
+                              maxLines: 2,
                               overflow: TextOverflow.fade,
-                              maxLines: 1,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 4.0, bottom: 7.0),
-                              child: Text(unit ?? ''),
-                            )
-                          ],
-                        )
-                      ],
+                              style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 18)),
+                          Wrap(
+                            direction: Axis.horizontal,
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            children: <Widget>[
+                              Text(
+                                _formatSnapshotData(snapshot),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6
+                                    .copyWith(fontSize: 34),
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 4.0, bottom: 7.0),
+                                child: Text(unit ?? ''),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                widget.editable
-                    ? Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.edit,
-                            size: 16.0,
-                            color: MeditoColors.walterWhiteLine,
-                          ),
-                        ))
-                    : Container(),
-              ],
-            ),
-          );
-        });
+                  widget.editable
+                      ? Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              Icons.edit,
+                              size: 16.0,
+                              color: MeditoColors.walterWhiteLine,
+                            ),
+                          ))
+                      : Container(),
+                ],
+              ),
+            );
+          }),
+    );
   }
 
   String _formatSnapshotData(AsyncSnapshot<String> snapshot) {

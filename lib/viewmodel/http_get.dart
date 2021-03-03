@@ -22,6 +22,8 @@ import 'package:http/http.dart' as http;
 import 'auth.dart';
 import 'cache.dart';
 
+
+//move this to network package later
 Future httpGet(String url, {bool skipCache = false}) async {
   var cache;
 

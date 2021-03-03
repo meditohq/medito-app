@@ -1,18 +1,19 @@
 import 'dart:async';
 
-import 'package:Medito/audioplayer/player_button.dart';
-import 'package:Medito/audioplayer/position_indicator_widget.dart';
+import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
-import 'package:Medito/audioplayer/subtitle_text_widget.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
+import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/in_app_review_widget.dart';
+import 'package:Medito/widgets/player/player_button.dart';
+import 'package:Medito/widgets/player/position_indicator_widget.dart';
+import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,9 +23,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'audio_player_service.dart';
 
 class PlayerWidget extends StatefulWidget {
   @override
@@ -68,7 +66,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void initBgVolume() async {
     volume = await retrieveSavedBgVolume();
     _dragBgVolumeSubject.add(volume);
-    await AudioService.customAction('setBgVolume', volume / 100);
+    if (AudioService.running) {
+      await AudioService.customAction('setBgVolume', volume / 100);
+    }
   }
 
   @override
@@ -88,20 +88,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       return true;
     });
 
-    var provider = AudioCompleteCopyProvider();
-
-    provider.fetchCopy().then((value) {
-      if (value != null) {
-        titleText = value.title;
-        subTitleText = value.subtitle;
-        buttonLabel = value.buttonLabel;
-        buttonUrl = value.buttonDestination;
-        buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
-      } else {
-        defaultText();
-      }
-      return null;
-    }).catchError((onError) => defaultText());
+    // var provider = AudioCompleteCopyProvider();
+    //
+    // provider.fetchCopy().then((value) {
+    //   if (value != null) {
+    //     titleText = value.title;
+    //     subTitleText = value.subtitle;
+    //     buttonLabel = value.buttonLabel;
+    //     buttonUrl = value.buttonDestination;
+    //     buttonIcon = buttonIcon.replaceFirst('ic_gift', value.buttonIcon);
+    //   } else {
+    //     defaultText();
+    //   }
+    //   return null;
+    // }).catchError((onError) => defaultText());
   }
 
   @override
@@ -178,32 +178,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       left: 32.0, right: 32.0),
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        mediaItem?.extras != null
-                                            ? SubtitleTextWidget(
-                                                mediaItem: mediaItem)
-                                            : Expanded(
-                                                child: Text(
-                                                  subTitleText,
-                                                  textAlign: TextAlign.center,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline1
-                                                      .copyWith(
-                                                          fontSize: 14.0,
-                                                          letterSpacing: 0.2,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: MeditoColors
-                                                              .walterWhite
-                                                              .withOpacity(0.7),
-                                                          height: 1.5),
-                                                ),
-                                              ),
-                                      ]),
+                                  child: getSubtitleWidget(mediaItem),
                                 ),
                                 _complete
                                     ? getDonateAndShareButton()
@@ -243,6 +218,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         }));
   }
 
+  StatelessWidget getSubtitleWidget(MediaItem mediaItem) {
+    var attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
+
+    return loaded ? SubtitleTextWidget(html: attr) : Container();
+  }
+
   IconData volumeIconFunction(var volume) {
     if (volume == 0) {
       return Icons.volume_off;
@@ -263,7 +244,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Widget getBgVolumeController(MediaItem mediaItem) => mediaItem == null
       ? Container()
-      : mediaItem.extras['bgMusic'] != null
+      : (mediaItem.extras['bgMusic'] as String).isNotEmptyAndNotNull()
           ? _complete
               ? Container()
               : Padding(
@@ -275,7 +256,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             volume = _dragBgVolumeSubject.value;
                             var volumeIcon = volumeIconFunction(volume);
 
-                            return Icon(volumeIcon, color: Colors.white);
+                            return Icon(volumeIcon,
+                                semanticLabel: 'Change volume button',
+                                color: Colors.white);
                           }),
                       onPressed: () {
                         showDialog(
@@ -399,7 +382,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void getArtUrl(MediaItem mediaItem) {
     if (illustrationUrl == null &&
         mediaItem != null &&
-        mediaItem.artUri.isNotEmpty) {
+        mediaItem.artUri.isNotEmptyAndNotNull()) {
       illustrationUrl = mediaItem.artUri;
     }
   }
@@ -477,7 +460,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _onBackPressed(MediaItem mediaItem) {
     if (mediaItem != null) {
-      Navigator.popUntil(context, ModalRoute.withName('/nav'));
+      Navigator.popUntil(
+          context, ModalRoute.withName(FolderNavWidget.routeName));
     } else {
       Navigator.pop(context);
     }

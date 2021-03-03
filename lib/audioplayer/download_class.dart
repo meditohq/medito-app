@@ -1,43 +1,42 @@
 import 'dart:io';
 
-import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/data/page.dart';
+import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _Download {
   bool isDownloading = false;
-  Files _file;
+  AudioFile _file;
   int _received = 0, _total = 1;
   var downloadListener = ValueNotifier<double>(0);
 
-  _Download(Files file) {
+  _Download(AudioFile file) {
     _file = file;
   }
 
-  bool isThisFile(Files file) {
+  bool isThisFile(AudioFile file) {
     return file == _file;
   }
 
-  void startDownloading(Files file) {
+  void startDownloading(AudioFile file) {
     if (isDownloading) return;
     isDownloading = true;
     _file = file;
     _downloadFileWithProgress(file);
   }
 
-  bool isDownloadingMe(Files file) {
+  bool isDownloadingMe(AudioFile file) {
     if (!isDownloading) return false;
     if (!isThisFile(file)) return false;
     return isDownloading;
   }
 
-  Future<dynamic> _downloadFileWithProgress(Files currentFile) async {
-    unawaited( getAttributions(currentFile.attributions));
+  Future<dynamic> _downloadFileWithProgress(AudioFile currentFile) async {
     var dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.filename.replaceAll(' ', '%20');
+    var name = currentFile.url.replaceAll(' ', '%20');
     var file = File('$dir/$name');
     if (file.existsSync()) {
       isDownloading = false;
@@ -72,10 +71,17 @@ class _Download {
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      unawaited( saveFileToDownloadedFilesList(currentFile));
+      unawaited(saveFileToDownloadedFilesList(currentFile));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });
+  }
+
+  Future<void> saveFileToDownloadedFilesList(AudioFile file) async {
+    var prefs = await SharedPreferences.getInstance();
+    var list = prefs.getStringList('listOfSavedFiles') ?? [];
+    list.add(file?.toJson()?.toString() ?? '');
+    await prefs.setStringList('listOfSavedFiles', list);
   }
 
   double getProgress() {
@@ -93,7 +99,7 @@ class _Download {
 class DownloadSingleton {
   _Download _download;
 
-  DownloadSingleton(Files file) {
+  DownloadSingleton(AudioFile file) {
     if (file == null) return;
     _download = _Download(file);
   }
@@ -107,18 +113,18 @@ class DownloadSingleton {
     return _download.isDownloading;
   }
 
-  bool isDownloadingMe(Files file) {
+  bool isDownloadingMe(AudioFile file) {
     if (_download == null) return false;
     return _download.isDownloadingMe(file);
   }
 
-  double getProgress(Files file) {
+  double getProgress(AudioFile file) {
     if (_download == null) return -1;
     if (isDownloadingMe(file)) return _download.getProgress();
     return -1;
   }
 
-  bool start(Files file) {
+  bool start(AudioFile file) {
     if (_download == null) return false;
     if (_download.isDownloadingMe(file)) return true;
     if (isDownloadingSomething()) return false;

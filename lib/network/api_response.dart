@@ -13,16 +13,19 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:shared_preferences/shared_preferences.dart';
+class ApiResponse<T> {
+  Status status;
+  T body;
+  String message;
 
-const DEFAULT_VOLUME = 60.0;
+  ApiResponse.loading(this.message) : status = Status.LOADING;
+  ApiResponse.completed(this.body) : status = Status.COMPLETED;
+  ApiResponse.error(this.message) : status = Status.ERROR;
 
-Future<dynamic> retrieveSavedBgVolume() async {
-  var prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('bgVolume')?.toDouble() ?? DEFAULT_VOLUME;
+  @override
+  String toString() {
+    return 'Status : $status \n Message : $message \n Data : $body';
+  }
 }
 
-Future<void> saveBgVolume(double volume) async {
-  var prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('bgVolume', volume.toInt());
-}
+enum Status { LOADING, COMPLETED, ERROR }

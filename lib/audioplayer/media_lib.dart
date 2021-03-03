@@ -1,38 +1,30 @@
-import 'package:Medito/data/attributions_content.dart' as AttContent;
-import 'package:Medito/data/page.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:audio_service/audio_service.dart';
 
 class MediaLibrary {
   static MediaItem saveMediaLibrary(
-      String description,
+      {String description,
       String title,
-      Files fileTapped,
-      Illustration illustration,
+      String illustrationUrl,
       String secondaryColor,
       String primaryColor,
       String bgMusic,
-      int durationAsMiliseconds,
-      ListItem listItem,
-      AttContent.Content attributions) {
+      int durationAsMilliseconds,
+      String id,
+      String attributions}) {
     return MediaItem(
-      id: fileTapped.url,
+      id: id,
       extras: {
-        'location': fileTapped.filename,
+        'location': id,
         'bgMusic': bgMusic,
-        'id': listItem.id,
+        'id': id,
         'primaryColor': primaryColor,
         'secondaryColor': secondaryColor,
-        'attrTitle': attributions.title,
-        'attrName': attributions.licenseName,
-        'attrLinkSource': attributions.sourceUrl,
-        'attrLinkLicense': attributions.licenseUrl,
-        'duration': durationAsMiliseconds,
+        'attr': attributions,
+        'duration': durationAsMilliseconds,
       },
       album: description,
       title: title,
-      artist: fileTapped.voice,
-      artUri: illustration.url,
+      artUri: illustrationUrl,
     );
   }
 }

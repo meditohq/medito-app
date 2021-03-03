@@ -13,16 +13,28 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Medito/utils/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
-const DEFAULT_VOLUME = 60.0;
+class MeditoLogo extends StatelessWidget {
+  final onDoubleTap;
+  final onLongPress;
 
-Future<dynamic> retrieveSavedBgVolume() async {
-  var prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('bgVolume')?.toDouble() ?? DEFAULT_VOLUME;
-}
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onDoubleTap: () => onDoubleTap(),
+      onLongPress: () => onLongPress(),
+      child: Padding(
+        padding: const EdgeInsets.all(19.0),
+        child: SvgPicture.asset(
+          'assets/images/icon_ic_logo.svg',
+          color: MeditoColors.walterWhite,
+        ),
+      ),
+    );
+  }
 
-Future<void> saveBgVolume(double volume) async {
-  var prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('bgVolume', volume.toInt());
+  MeditoLogo({this.onDoubleTap, this.onLongPress});
 }
