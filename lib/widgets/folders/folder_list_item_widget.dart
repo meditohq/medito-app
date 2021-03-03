@@ -13,15 +13,15 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/colors.dart';
+import '../../utils/colors.dart';
 
 class ListItemWidget extends StatelessWidget {
   ListItemWidget({Key key, this.item}) : super(key: key);
-  final ListItem item;
+  final FolderItem item;
 
   Widget buildFolderIcon() {
     return Icon(Icons.folder, color: MeditoColors.walterWhite);
@@ -51,18 +51,21 @@ class ListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Opacity(
-            opacity: 0.7,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: getIcon(),
-            )),
-        getTwoTextViewsInColumn(context)
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Opacity(
+              opacity: 0.7,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: getIcon(),
+              )),
+          getTwoTextViewsInColumn(context)
+        ],
+      ),
     );
   }
 
@@ -73,46 +76,47 @@ class ListItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(item.title,
-                style: Theme.of(context)
+                style: Theme
+                    .of(context)
                     .textTheme
                     .headline6
                     .copyWith(fontSize: 18, height: 1.4)),
-            item.description == null || item.description.isEmpty
+            item.subtitle == null || item.subtitle.isEmpty
                 ? Container()
                 : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(height: 4),
-                      Text(
-                        item.description,
-                        style: Theme.of(context).textTheme.subtitle1.copyWith(
-                            fontSize: 14,
-                            letterSpacing: 0.2,
-                            fontWeight: FontWeight.w500,
-                            color: MeditoColors.walterWhite.withOpacity(0.7)),
-                      ),
-                    ],
-                  )
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(height: 4),
+                Text(
+                  item.subtitle,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .subtitle1
+                      .copyWith(
+                      fontSize: 14,
+                      letterSpacing: 0.2,
+                      fontWeight: FontWeight.w500,
+                      color: MeditoColors.walterWhite.withOpacity(0.7)),
+                ),
+              ],
+            )
           ]),
     );
   }
 
   Widget getIcon() {
-    if (item.type == ListItemType.folder) {
-      return buildFolderIcon();
-    }
-
     var iconWidget;
 
     switch (item.fileType) {
-      case FileType.audio:
-      case FileType.audiosetdaily:
-      case FileType.audiosethourly:
-      case FileType.both:
+      case FileType.session:
         iconWidget = getAudioIcon();
         break;
       case FileType.text:
         iconWidget = buildTextIcon();
+        break;
+      case FileType.folder:
+        iconWidget = buildFolderIcon();
         break;
     }
 

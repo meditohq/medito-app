@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -36,7 +37,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    unawaited(AudioServiceBackground.setQueue([mediaItem]));
+    await AudioServiceBackground.setQueue([mediaItem]);
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
@@ -46,15 +47,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = await _player.setFilePath(data);
         }
 
-        if (_duration.inMilliseconds < 1000) {
+        // ignore: null_aware_before_operator
+        if (_duration?.inMilliseconds < 1000 ?? false) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        var bgUrl = mediaItem.extras['bgMusic'];
-        if (bgUrl != null) {
-          playBgMusic(mediaItem.extras['bgMusic']);
+        String bg = mediaItem.extras['bgMusic'];
+        if (bg.isNotEmptyAndNotNull()) {
+          playBgMusic(bg);
         }
+
         unawaited(onPlay());
       });
     } catch (e) {
@@ -141,6 +144,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
     switch (name) {
       case 'setBgVolume':
         initialBgVolume = params;
+        break;
+      case 'stop':
+        await _player.stop();
+        await _broadcastState();
         break;
     }
   }
@@ -232,7 +239,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   AudioProcessingState _getProcessingState() {
     if (_skipState != null) return _skipState;
     switch (_player.processingState) {
-      case ProcessingState.none:
+      case ProcessingState.idle:
         return AudioProcessingState.stopped;
       case ProcessingState.loading:
         return AudioProcessingState.connecting;
@@ -248,7 +255,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   void playBgMusic(String bgMusic) {
-    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != 'null') {
+    if (bgMusic.isNotEmptyAndNotNull()) {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.one);

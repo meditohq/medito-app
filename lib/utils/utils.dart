@@ -158,8 +158,13 @@ void createSnackBar(String message, BuildContext context) {
 
 void createSnackBarWithColor(
     String message, BuildContext context, Color color) {
-  final snackBar =
-      SnackBar(content: Text(message, style: Theme.of(context).textTheme.caption.copyWith(color: MeditoColors.almostBlack)), backgroundColor: color);
+  final snackBar = SnackBar(
+      content: Text(message,
+          style: Theme.of(context)
+              .textTheme
+              .caption
+              .copyWith(color: MeditoColors.almostBlack)),
+      backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   Scaffold.of(context).showSnackBar(snackBar);
@@ -197,37 +202,6 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
   );
 }
 
-MarkdownBody getDescriptionMarkdownBody(String content, BuildContext context) {
-  return MarkdownBody(
-    onTapLink: ((url) {
-      if (url.contains('medito-donate')) {
-        //open the donate page here
-        launchDonatePageOrWidget(context);
-      } else {
-        launch(url);
-      }
-    }),
-    selectable: false,
-    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        a: Theme.of(context)
-            .textTheme
-            .bodyText2
-            .copyWith(decoration: TextDecoration.underline),
-        h1: Theme.of(context).textTheme.headline6,
-        h2: Theme.of(context).textTheme.headline5,
-        h3: Theme.of(context).textTheme.subtitle2,
-        listBullet: Theme.of(context).textTheme.subtitle1,
-        p: Theme.of(context).textTheme.headline1.copyWith(
-            fontSize: 16.0,
-            letterSpacing: 0.2,
-            fontWeight: FontWeight.w500,
-            color: MeditoColors.walterWhite.withOpacity(0.7),
-            height: 1.5)),
-    data: content ?? '',
-    imageDirectory: 'https://raw.githubusercontent.com',
-  );
-}
-
 void launchDonatePageOrWidget(BuildContext context) {
   //open the donate page here
   if (Platform.isAndroid) {
@@ -241,10 +215,9 @@ void launchDonatePageOrWidget(BuildContext context) {
   }
 }
 
+// ignore: always_declare_return_types
 launchUrl(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  }
+  await launch(url);
 }
 
 Duration clockTimeToDuration(String lengthText) {
@@ -301,7 +274,8 @@ void showConsentDialog(BuildContext context) {
               child: Text(
                 'DECLINE',
                 style: Theme.of(context).textTheme.headline3.copyWith(
-                    color: MeditoColors.walterWhite, fontWeight: FontWeight.bold),
+                    color: MeditoColors.walterWhite,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -326,4 +300,17 @@ void showConsentDialog(BuildContext context) {
           ),
         ],
       ));
+}
+
+extension EmptyOrNull on String {
+  bool isEmptyOrNull() {
+    if (this == null) return true;
+    if (isEmpty) return true;
+    return false;
+  }
+
+  bool isNotEmptyAndNotNull() {
+    if (this != null && isNotEmpty) return true;
+    return false;
+  }
 }

@@ -13,16 +13,14 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Medito/network/folder/folder_items.dart';
+import 'package:Medito/viewmodel/http_get.dart';
 
-const DEFAULT_VOLUME = 60.0;
+class FolderItemsRepository {
+  var baseUrl = 'https://live.medito.app/api';
 
-Future<dynamic> retrieveSavedBgVolume() async {
-  var prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('bgVolume')?.toDouble() ?? DEFAULT_VOLUME;
-}
-
-Future<void> saveBgVolume(double volume) async {
-  var prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('bgVolume', volume.toInt());
+  Future<FolderContent> fetchFolderData(String id) async {
+    final response = await httpGet(baseUrl + id);
+    return FolderItems.fromJson(response).data.content;
+  }
 }

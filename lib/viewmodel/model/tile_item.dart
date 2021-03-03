@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+@Deprecated('DON\'T USE. TO BE REMOVED')
 class TileItem {
   String thumbnail;
   String title;
