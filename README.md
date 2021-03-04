@@ -18,7 +18,13 @@ The best way to start is by opening the project with [Android Studio](https://de
 
 You will need an API key to build the project. Please send an email to hi@meditofoundation.org to request one.
 
-Need more details? [Feel free to raise an issue](https://gitlab.com/medito/medito-app/-/issues)
+Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues)
+
+## Contributing
+Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
+
+Don't feel like contributing to the code? 
+Feature requests, feedback and suggestions are welcome. Reach us via Slack/email, or create a new issue.
 
 ## About the Medito Foundation
 
@@ -36,14 +42,6 @@ RSIN: 860222627
 - [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
 - [Join us on Slack](https://join.slack.com/t/meditofoundation/shared_invite/zt-f0viisyt-VdJ7ygqNHt9sIeGzZiatlQ)
 - [Email us](mailto:hi@meditofoundation.org)
-
-
-## Contributing
-Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
-
-Don't feel like contributing to the code? 
-Feature requests, feedback and suggestions are welcome. Reach us via Slack/email, or create a new issue.
-
 
 ## License
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://gitlab.com/medito/medito-app/-/blob/master/LICENSE)
