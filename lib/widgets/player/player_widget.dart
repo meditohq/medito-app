@@ -33,7 +33,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String titleText = 'Loading...';
   String subTitleText = 'Please wait...';
   String buttonLabel = 'Donate';
-  String buttonUrl = 'http://meditofoundation.org/donate';
+  String buttonUrl = 'http://meditofoundation.org/review';
   String buttonIcon = 'assets/images/ic_gift.svg';
   String illustrationUrl;
   Color secondaryColor;
@@ -487,7 +487,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           Padding(
             padding: const EdgeInsets.only(
                 left: 32.0, top: 32, bottom: 8, right: 32.0),
-            child: buttonUrl.contains('review')
+            child: checkDaysSinceReview()
                 ? InAppReviewWidget(thumbsdown: _thanksPopUp)
                 : FlatButton(
               shape: RoundedRectangleBorder(
@@ -607,4 +607,10 @@ Future<void> start(MediaItem media, String primaryColor) async {
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   ));
+}
+
+bool checkDaysSinceReview() {
+  var days = 365;
+  daysSinceDate('UserDeclinedReview').then((value) => days = value);
+  return days>28;
 }
