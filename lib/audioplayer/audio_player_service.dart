@@ -48,7 +48,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         }
 
         // ignore: null_aware_before_operator
-        if (_duration?.inMilliseconds < 1000 ?? false) {
+        if (_duration == null || _duration.inMilliseconds < 1000) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }

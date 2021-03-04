@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
@@ -94,13 +95,15 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> checkForUpdate() async {
-    unawaited(InAppUpdate.checkForUpdate().then((info) {
-      setState(() {
-        if (info.flexibleUpdateAllowed && info.updateAvailable) {
-          InAppUpdate.startFlexibleUpdate().catchError(_onError);
-        }
-      });
-    }).catchError(_onError));
+    if (Platform.isAndroid) {
+      unawaited(InAppUpdate.checkForUpdate().then((info) {
+        setState(() {
+          if (info.flexibleUpdateAllowed && info.updateAvailable) {
+            InAppUpdate.startFlexibleUpdate().catchError(_onError);
+          }
+        });
+      }).catchError(_onError));
+    }
   }
 
   @override
