@@ -229,37 +229,6 @@ class PackListWidgetState extends State<PackListWidget> {
     );
   }
 
-  Widget _getAnnouncementTile(TileItem item) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: MeditoColors.moonlight,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  item.description ?? '',
-                  style: Theme.of(context)
-                      .textTheme
-                      .caption
-                      .copyWith(color: MeditoColors.walterWhite),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   void _onStreakTap() {
     Navigator.push(
       context,
@@ -292,7 +261,7 @@ class PackListWidgetState extends State<PackListWidget> {
         backgroundColor: MeditoColors.midnight);
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
