@@ -76,25 +76,11 @@ class _TextFileWidgetState extends State<TextFileWidget>
   }
 
   Widget buildSafeAreaBody() {
-    checkConnectivity().then((connected) {
-      if (!connected) {
-        createSnackBar('Check your connectivity', scaffoldContext);
-      }
-    });
 
     return SafeArea(
       bottom: false,
       maintainBottomViewPadding: false,
-      child: Stack(
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(child: getInnerTextView()),
-            ],
-          ),
-        ],
-      ),
+      child: getInnerTextView(),
     );
   }
 
