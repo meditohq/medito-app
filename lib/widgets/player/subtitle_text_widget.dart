@@ -24,15 +24,18 @@ class SubtitleTextWidget extends StatelessWidget {
         Expanded(
           child: Wrap(
             children: [
-              Html(
-                data: html != null ? '<p>$html</p>' : '<p>Loading...</p>',
-                onLinkTap: _linkTap,
-                shrinkWrap: true,
-                style: {
-                  'a': Style(color: Colors.white),
-                  'html': Style(
-                      alignment: Alignment.center, textAlign: TextAlign.center)
-                },
+              Opacity(
+                opacity: 0.7,
+                child: Html(
+                  data: html != null ? '<p>$html</p>' : '<p>Loading...</p>',
+                  onLinkTap: _linkTap,
+                  shrinkWrap: true,
+                  style: {
+                    'a': Style(color: Colors.white),
+                    'html': Style(
+                        alignment: Alignment.center, textAlign: TextAlign.center)
+                  },
+                ),
               ),
             ],
           ),

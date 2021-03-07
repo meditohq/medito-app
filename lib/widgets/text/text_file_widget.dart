@@ -13,12 +13,15 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/network/text/text_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 
-import 'app_bar_widget.dart';
+import '../app_bar_widget.dart';
 
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key key}) : super(key: key);
@@ -30,14 +33,9 @@ class TextFileStateless extends StatelessWidget {
 }
 
 class TextFileWidget extends StatefulWidget {
-  TextFileWidget(
-      {Key key, this.firstId, this.firstTitle, this.text, this.textFuture})
-      : super(key: key);
+  TextFileWidget({Key key, this.id}) : super(key: key);
 
-  final String firstId;
-  final String text;
-  final String firstTitle;
-  final Future<String> textFuture;
+  final String id;
 
   @override
   _TextFileWidgetState createState() => _TextFileWidgetState();
@@ -45,28 +43,20 @@ class TextFileWidget extends StatefulWidget {
 
 class _TextFileWidgetState extends State<TextFileWidget>
     with TickerProviderStateMixin {
-  String readMoreText = '';
-  String textFileFromFuture = '';
-
   BuildContext scaffoldContext;
+  var _bloc = TextBloc();
 
   @override
   void dispose() {
+    _bloc.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-
     Tracking.changeScreenName(Tracking.TEXT_PAGE);
-
-    textFileFromFuture = widget.text ?? '';
-    widget.textFuture?.then((onValue) {
-      setState(() {
-        textFileFromFuture = onValue;
-      });
-    });
+    _bloc = TextBloc()..fetchText(widget.id);
   }
 
   @override
@@ -86,59 +76,50 @@ class _TextFileWidgetState extends State<TextFileWidget>
   }
 
   Widget buildSafeAreaBody() {
-    checkConnectivity().then((connected) {
-      if (!connected) {
-        createSnackBar('Check your connectivity', scaffoldContext);
-      }
-    });
 
     return SafeArea(
       bottom: false,
       maintainBottomViewPadding: false,
-      child: Stack(
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                  child: Stack(
-                children: <Widget>[
-                  getInnerTextView(),
-                ],
-              )),
-            ],
-          ),
-        ],
-      ),
+      child: getInnerTextView(),
     );
   }
 
-  Widget getInnerTextView() {
-    String content;
+  void _linkTap(String url) {
+    launchUrl(url);
+  }
 
-    return Container(
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
+  Widget getInnerTextView() {
+    return SingleChildScrollView(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  MeditoAppBarWidget(
-                    title: widget.firstTitle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
-                    child: getMarkdownBody(content, context),
-                  ),
-                ],
-              ),
-            ),
+          StreamBuilder<String>(
+              stream: _bloc.titleController.stream,
+              initialData: '...',
+              builder: (context, snapshot) {
+                return MeditoAppBarWidget(
+                  title: snapshot.data,
+                );
+              }),
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
+            child: StreamBuilder<String>(
+                stream: _bloc.bodyController.stream,
+                initialData: 'Loading...',
+                builder: (context, snapshot) {
+                  return Html(
+                    data: '<p>${snapshot.data}</p>',
+                    onLinkTap: _linkTap,
+                    shrinkWrap: true,
+                    style: {
+                      'a': Style(color: Colors.white),
+                      'html': Style(fontSize: FontSize(18))
+                    },
+                  );
+                }),
           ),
         ],
       ),

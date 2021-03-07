@@ -4,6 +4,7 @@ import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
 import 'package:Medito/widgets/streak_page.dart';
+import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 
 class NavigationFactory {
@@ -17,7 +18,7 @@ class NavigationFactory {
         _push(context, PlayerWidget());
         break;
       case Screen.text:
-        // TODO: Handle this case.
+        _push(context, TextFileWidget(id: id,));
         break;
       case Screen.stats:
         _push(context, StreakWidget());
