@@ -153,7 +153,7 @@ void createSnackBar(String message, BuildContext context) {
       SnackBar(content: Text(message), backgroundColor: Colors.red);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-  Scaffold.of(context).showSnackBar(snackBar);
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 void createSnackBarWithColor(
@@ -167,7 +167,7 @@ void createSnackBarWithColor(
       backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-  Scaffold.of(context).showSnackBar(snackBar);
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 bool isDayBefore(DateTime day1, DateTime day2) {
