@@ -20,7 +20,6 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/list_item_image_widget.dart';
@@ -158,22 +157,26 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                 stream: _bloc.itemsListController.stream,
                 builder: (context, itemsSnapshot) {
                   if (!itemsSnapshot.hasData ||
-                      itemsSnapshot.connectionState == ConnectionState.waiting) {
+                      itemsSnapshot.connectionState ==
+                          ConnectionState.waiting) {
                     return LoadingListWidget();
                   }
 
                   if (itemsSnapshot.hasData) {
                     return ListView.builder(
-                      itemCount: itemsSnapshot.data.body?.length,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int i) {
-                        return _getItemWidget(itemsSnapshot.data?.body[i]);
-                      });
+                        itemCount: itemsSnapshot.data.body?.length,
+                        shrinkWrap: true,
+                        itemBuilder: (BuildContext context, int i) {
+                          return itemsSnapshot.data?.body != null
+                              ? _getItemWidget(itemsSnapshot.data?.body[i])
+                              : Container();
+                        });
                   }
 
                   return Container();
                 }),
           ),
+          _getImageListItemWidget()
         ],
       ),
     );
@@ -223,13 +226,13 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         ));
   }
 
-  SizedBox _getImageListItemWidget(FolderItem item) => SizedBox(
+  SizedBox _getImageListItemWidget() => SizedBox(
       width: 300,
       child: StreamBuilder<ApiResponse<FolderCover>>(
           stream: _bloc.coverController.stream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ImageListItemWidget(src: snapshot.data.body.url);
+              return ImageListItemWidget(src: snapshot.data.body?.url);
             } else {
               return Container();
             }
