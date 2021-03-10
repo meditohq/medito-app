@@ -225,4 +225,4 @@ class ItemPath {
   }
 }
 
-enum FileType { folder, text, session }
+enum FileType { folder, text, session, url }

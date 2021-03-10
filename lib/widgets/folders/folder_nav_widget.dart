@@ -145,40 +145,39 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   Widget _getListView() {
-    return RefreshIndicator(
-      onRefresh: () => _bloc.fetchData(_contentID),
-      color: MeditoColors.walterWhite,
-      backgroundColor: MeditoColors.moonlight,
-      child: Column(
-        children: [
-          _getAppBarStreamBuilder(),
-          Expanded(
-            child: StreamBuilder<ApiResponse<List<FolderItem>>>(
-                stream: _bloc.itemsListController.stream,
-                builder: (context, itemsSnapshot) {
-                  if (!itemsSnapshot.hasData ||
-                      itemsSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                    return LoadingListWidget();
-                  }
+    return Column(
+      children: [
+        _getAppBarStreamBuilder(),
+        Expanded(
+          child: StreamBuilder<ApiResponse<List<FolderItem>>>(
+              stream: _bloc.itemsListController.stream,
+              builder: (context, itemsSnapshot) {
+                if (!itemsSnapshot.hasData ||
+                    itemsSnapshot.connectionState == ConnectionState.waiting) {
+                  return LoadingListWidget();
+                }
 
-                  if (itemsSnapshot.hasData) {
-                    return ListView.builder(
-                        itemCount: itemsSnapshot.data.body?.length,
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, int i) {
-                          return itemsSnapshot.data?.body != null
-                              ? _getItemWidget(itemsSnapshot.data?.body[i])
-                              : Container();
-                        });
-                  }
+                if (itemsSnapshot.hasData) {
+                  return ListView(
+                    children: [
+                      ListView.builder(
+                          physics: ScrollPhysics(),
+                          itemCount: itemsSnapshot.data.body?.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int i) {
+                            return itemsSnapshot.data?.body != null
+                                ? _getItemWidget(itemsSnapshot.data?.body[i])
+                                : Container();
+                          }),
+                      _getImageListItemWidget(),
+                    ],
+                  );
+                }
 
-                  return Container();
-                }),
-          ),
-          _getImageListItemWidget()
-        ],
-      ),
+                return Container();
+              }),
+        ),
+      ],
     );
   }
 
