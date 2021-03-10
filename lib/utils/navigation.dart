@@ -1,4 +1,5 @@
 import 'package:Medito/network/folder/folder_items.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
@@ -12,13 +13,18 @@ class NavigationFactory {
     switch (key) {
       case Screen.folder:
         assert(id.isNotEmpty);
-        Navigator.pushNamed(context, FolderNavWidget.routeName, arguments: FolderArguments(id));
+        Navigator.pushNamed(context, FolderNavWidget.routeName,
+            arguments: FolderArguments(id));
         break;
       case Screen.player:
         _push(context, PlayerWidget());
         break;
       case Screen.text:
-        _push(context, TextFileWidget(id: id,));
+        _push(
+            context,
+            TextFileWidget(
+              id: id,
+            ));
         break;
       case Screen.stats:
         _push(context, StreakWidget());
@@ -54,6 +60,27 @@ class NavigationFactory {
         break;
     }
     return null;
+  }
+
+  static void navigateToScreenFromString(String place, String id, BuildContext context) {
+    if (place == 'session') {
+      navigate(context, Screen.session_options, id: id);
+    }
+    if (place == 'donation') {
+      navigate(context, Screen.donation);
+    }
+    if (place == 'article') {
+      navigate(context, Screen.text, id: id);
+    }
+    if (place == 'donation') {
+      navigate(context, Screen.donation);
+    }
+    if (place == 'folder') {
+      navigate(context, Screen.donation, id: id);
+    }
+    if (place == 'url') {
+      launchUrl(id);
+    }
   }
 }
 
