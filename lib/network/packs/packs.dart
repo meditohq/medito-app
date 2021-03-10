@@ -84,6 +84,7 @@ class PackItem {
     if (itemType == 'session') return FileType.session;
     if (itemType == 'article') return FileType.text;
     if (itemType == 'folder') return FileType.folder;
+    if (itemType == 'url') return FileType.folder;
     return null;
   }
 

@@ -80,7 +80,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             fontWeight: FontWeight.normal),
         headline1: TextStyle(
             //bottom sheet filter chip
-            //horizontal announcement
+            //horizontal announcement_reponse.dart
             fontSize: 16.0,
             height: 1.25,
             color: MeditoColors.walterWhite,
