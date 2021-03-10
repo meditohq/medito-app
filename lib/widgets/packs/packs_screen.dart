@@ -18,6 +18,7 @@ import 'package:Medito/network/packs/packs.dart';
 import 'package:Medito/network/packs/packs_bloc.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/packs/announcment_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -102,7 +103,11 @@ class PackListWidgetState extends State<PackListWidget> {
     return SingleChildScrollView(
       primary: true,
       child: Column(
-        children: <Widget>[_getMeditoLogoWidget(), _getTwoColumns(data)],
+        children: <Widget>[
+          _getMeditoLogoWidget(),
+          AnnouncementBanner(),
+          _getTwoColumns(data)
+        ],
       ),
     );
   }
