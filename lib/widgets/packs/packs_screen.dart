@@ -19,6 +19,7 @@ import 'package:Medito/network/packs/packs_bloc.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/announcment_banner_widget.dart';
+import 'package:Medito/widgets/packs/download_tile_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -31,8 +32,8 @@ import '../../utils/colors.dart';
 import '../../utils/stats_utils.dart';
 import '../../viewmodel/model/tile_item.dart';
 import '../column_builder.dart';
-import '../streak_page.dart';
-import '../streak_tiles_utils.dart';
+import '../streak_widgets/streak_page.dart';
+import '../streak_tile_widget.dart';
 
 class PackListWidget extends StatefulWidget {
   PackListWidget({Key key}) : super(key: key);
@@ -121,7 +122,7 @@ class PackListWidgetState extends State<PackListWidget> {
 
   Widget _getTwoColumns(List<PackItem> data) {
     var firstCol = data.getRange(0, data.length ~/ 2).toList();
-    var secondCol = data.getRange(data.length ~/ 2 + 1, data.length).toList();
+    var secondCol = data.getRange(data.length ~/ 2 + 2, data.length).toList();
 
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
@@ -149,6 +150,8 @@ class PackListWidgetState extends State<PackListWidget> {
                   if (index == secondCol.length) {
                     return StreakTileWidget(_streak, 'Current Streak',
                         optionalText: UnitType.day, onClick: _onStreakTap);
+                  } else if (index == secondCol.length - 1) {
+                    return DownloadTileWidget();
                   } else {
                     try {
                       var tile = secondCol[index];

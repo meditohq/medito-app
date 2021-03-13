@@ -39,6 +39,7 @@ class Tracking {
   static const String DONATION_PAGE_1 = 'donation_page_1';
   static const String DONATION_PAGE_2 = 'donation_page_2';
   static const String DONATION_PAGE_3 = 'donation_page_3';
+  static const String DOWNLOAD_PAGE = 'download_page';
   static const String TEXT_PAGE = 'text_page';
   static const String STREAK_PAGE = 'streak_page';
 
