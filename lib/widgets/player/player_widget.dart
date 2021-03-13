@@ -15,7 +15,7 @@ import 'package:Medito/widgets/in_app_review_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
-import 'package:Medito/widgets/streak_tiles_utils.dart';
+import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

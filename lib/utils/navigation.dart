@@ -4,7 +4,7 @@ import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
-import 'package:Medito/widgets/streak_page.dart';
+import 'package:Medito/widgets/streak_widgets/streak_page.dart';
 import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -36,6 +36,9 @@ class NavigationFactory {
       case Screen.donation:
         _push(context, DonationWidget());
         break;
+      case Screen.downloads:
+        _push(context, DonationWidget());
+        break;
     }
   }
 
@@ -62,7 +65,8 @@ class NavigationFactory {
     return null;
   }
 
-  static void navigateToScreenFromString(String place, String id, BuildContext context) {
+  static void navigateToScreenFromString(
+      String place, String id, BuildContext context) {
     if (place == 'session') {
       navigate(context, Screen.session_options, id: id);
     }
@@ -76,7 +80,7 @@ class NavigationFactory {
       navigate(context, Screen.donation);
     }
     if (place == 'folder') {
-      navigate(context, Screen.donation, id: id);
+      navigate(context, Screen.folder, id: id);
     }
     if (place == 'url') {
       launchUrl(id);
@@ -84,4 +88,12 @@ class NavigationFactory {
   }
 }
 
-enum Screen { folder, player, text, stats, session_options, donation }
+enum Screen {
+  folder,
+  player,
+  text,
+  stats,
+  session_options,
+  donation,
+  downloads
+}
