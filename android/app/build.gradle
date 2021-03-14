@@ -44,8 +44,8 @@ project.ext {
     KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
     KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
     KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
-    VERSION_CODE = 387
-    VERSION_NAME = "1.0.6"
+    VERSION_CODE = 388
+    VERSION_NAME = "1.0.7"
 }
 
 if (project.APP_ID == "DEFAULT_DO_NOT_USE") {
