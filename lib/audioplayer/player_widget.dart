@@ -12,7 +12,6 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/audio_complete_copy_provider.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
-import 'package:Medito/widgets/in_app_review_widget.dart';
 import 'package:Medito/widgets/streak_tiles_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +21,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audio_player_service.dart';
 
@@ -279,8 +277,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           }),
                       onPressed: () {
                         showDialog(
-                            context: context,
-                            child: AlertDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
                               shape: roundedRectangleBorder(),
                               backgroundColor: MeditoColors.darkBGColor,
                               title: Text('Background sound volume',
@@ -346,7 +345,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                   ),
                                 ),
                               ],
-                            ));
+                            );
+                          },
+                        );
                       },
                       color: primaryColorAsColor))
           : Container();
@@ -491,7 +492,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             padding: const EdgeInsets.only(
                 left: 32.0, top: 32, bottom: 8, right: 32.0),
             child: buttonUrl.contains('review')
-                ? InAppReviewWidget(thumbsdown: _thanksPopUp)
+                ? Container()
                 : FlatButton(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
