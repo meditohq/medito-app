@@ -23,7 +23,7 @@ Need more details? [Feel free to raise an issue](https://github.com/meditohq/med
 ## Contributing
 Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
 
-Don't feel like contributing to the code? 
+Don't feel like contributing to the code?
 Feature requests, feedback and suggestions are welcome. Reach us via Slack/email, or create a new issue.
 
 ## About the Medito Foundation

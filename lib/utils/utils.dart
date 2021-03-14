@@ -80,7 +80,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
             fontWeight: FontWeight.normal),
         headline1: TextStyle(
             //bottom sheet filter chip
-            //horizontal announcement_reponse.dart
+            //horizontal announcement
             fontSize: 16.0,
             height: 1.25,
             color: MeditoColors.walterWhite,
@@ -109,9 +109,10 @@ Widget getNetworkImageWidget(String url,
   if (url == null) return null;
   if (url.endsWith('png')) {
     return CachedNetworkImage(
-      placeholder: (context, url) => Container(
-        height: startHeight,
-      ),
+      placeholder: (context, url) =>
+          Container(
+            height: startHeight,
+          ),
       imageUrl: url,
     );
   } else {
@@ -150,7 +151,7 @@ Color parseColor(String color) {
 
 void createSnackBar(String message, BuildContext context) {
   final snackBar =
-      SnackBar(content: Text(message), backgroundColor: Colors.red);
+  SnackBar(content: Text(message), backgroundColor: Colors.red);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -188,15 +189,32 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        a: Theme.of(context)
+        a: Theme
+            .of(context)
             .textTheme
             .bodyText2
             .copyWith(decoration: TextDecoration.underline),
-        h1: Theme.of(context).textTheme.headline6,
-        h2: Theme.of(context).textTheme.headline5,
-        h3: Theme.of(context).textTheme.subtitle2,
-        listBullet: Theme.of(context).textTheme.subtitle1,
-        p: Theme.of(context).textTheme.bodyText2.copyWith(height: 1.5)),
+        h1: Theme
+            .of(context)
+            .textTheme
+            .headline6,
+        h2: Theme
+            .of(context)
+            .textTheme
+            .headline5,
+        h3: Theme
+            .of(context)
+            .textTheme
+            .subtitle2,
+        listBullet: Theme
+            .of(context)
+            .textTheme
+            .subtitle1,
+        p: Theme
+            .of(context)
+            .textTheme
+            .bodyText2
+            .copyWith(height: 1.5)),
     data: content ?? '',
     imageDirectory: 'https://raw.githubusercontent.com',
   );
@@ -281,20 +299,17 @@ void showConsentDialog(BuildContext context) {
             ),
             Container(
               height: 48,
-              child: FlatButton(
-                color: MeditoColors.peacefulBlue,
-                shape: roundedRectangleBorder(),
+              child: TextButton(
                 onPressed: () async {
-                  Tracking.enableAnalytics(true);
-                  await acceptTracking();
-                  await Tracking.trackTrackingAnswered(true);
+                  Tracking.enableAnalytics(false);
                   await trackingAnswered();
                   Navigator.pop(context);
                 },
+                style: TextButton.styleFrom(shape: roundedRectangleBorder()),
                 child: Text(
-                  ' ACCEPT ',
+                  'DECLINE',
                   style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: MeditoColors.darkMoon,
+                      color: MeditoColors.walterWhite,
                       fontWeight: FontWeight.bold),
                 ),
               ),
