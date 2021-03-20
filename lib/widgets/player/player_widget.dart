@@ -11,7 +11,6 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
-import 'package:Medito/widgets/in_app_review_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
@@ -26,12 +25,15 @@ import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
 class PlayerWidget extends StatefulWidget {
+  final normalPop;
+
+  PlayerWidget({this.normalPop});
+
   @override
   _PlayerWidgetState createState() => _PlayerWidgetState();
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-
   String illustrationUrl;
   Color secondaryColor;
   Color primaryColorAsColor;
@@ -94,10 +96,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     if (_height == 0) {
-      _height = MediaQuery
-          .of(context)
-          .size
-          .height;
+      _height = MediaQuery.of(context).size.height;
     }
 
     return Scaffold(
@@ -133,40 +132,40 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           primaryColor: primaryColorAsColor, height: 350.0),
                       (mediaItem != null || _complete)
                           ? Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          getBigImage(),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 24.0,
-                                left: 32.0,
-                                bottom: 4.0,
-                                right: 32.0),
-                            child: buildTitleRow(mediaItem),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 32.0, right: 32.0),
-                            child: getSubtitleWidget(mediaItem),
-                          ),
-                          _complete
-                              ? getDonateAndShareButton()
-                              : buildPlayingPauseOrLoadingIndicator(
-                              processingState, playing),
-                          _complete
-                              ? Container()
-                              : Padding(
-                            padding: const EdgeInsets.only(
-                                left: 24.0,
-                                right: 24.0,
-                                top: 10.0,
-                                bottom: 32.0),
-                            child: positionIndicator(mediaItem,
-                                state, primaryColorAsColor),
-                          ),
-                        ],
-                      )
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                getBigImage(),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 24.0,
+                                      left: 32.0,
+                                      bottom: 4.0,
+                                      right: 32.0),
+                                  child: buildTitleRow(mediaItem),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 32.0, right: 32.0),
+                                  child: getSubtitleWidget(mediaItem),
+                                ),
+                                _complete
+                                    ? getDonateAndShareButton()
+                                    : buildPlayingPauseOrLoadingIndicator(
+                                        processingState, playing),
+                                _complete
+                                    ? Container()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 24.0,
+                                            right: 24.0,
+                                            top: 10.0,
+                                            bottom: 32.0),
+                                        child: positionIndicator(mediaItem,
+                                            state, primaryColorAsColor),
+                                      ),
+                              ],
+                            )
                           : buildLoadingScreenWidget(),
                       SafeArea(
                         child: Padding(
@@ -180,10 +179,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       ),
                       loaded
                           ? Align(
-                          alignment: Alignment.topRight,
-                          child: _complete
-                              ? Container()
-                              : getBgVolumeController(mediaItem))
+                              alignment: Alignment.topRight,
+                              child: _complete
+                                  ? Container()
+                                  : getBgVolumeController(mediaItem))
                           : Container()
                     ],
                   ),
@@ -198,23 +197,23 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         Expanded(
             child: !_complete
                 ? Text(
-              mediaItem?.title ?? 'Loading...',
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: buildTitleTheme(),
-            )
-                : FutureBuilder<String>(
-                future: getVersionTitle(),
-                builder: (context, snapshot) {
-                  return Text(
-                    snapshot.hasData ? snapshot.data : 'Loading...',
+                    mediaItem?.title ?? 'Loading...',
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: buildTitleTheme(),
-                  );
-                })),
+                  )
+                : FutureBuilder<String>(
+                    future: getVersionTitle(),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.hasData ? snapshot.data : 'Loading...',
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: buildTitleTheme(),
+                      );
+                    })),
       ],
     );
   }
@@ -229,11 +228,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   TextStyle buildTitleTheme() {
-    return Theme
-        .of(context)
-        .textTheme
-        .bodyText1
-        .copyWith(
+    return Theme.of(context).textTheme.bodyText1.copyWith(
         letterSpacing: 0.2,
         height: 1.5,
         color: Colors.white,
@@ -268,7 +263,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   /// Tracks the bgVolume while the user drags the bgVolume bar.
   final BehaviorSubject<double> _dragBgVolumeSubject =
-  BehaviorSubject.seeded(null);
+      BehaviorSubject.seeded(null);
 
   Widget getBgVolumeController(MediaItem mediaItem) {
     if ((mediaItem?.extras['bgMusic'] as String)?.isNotEmptyAndNotNull() ??
@@ -295,10 +290,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         backgroundColor: MeditoColors.darkBGColor,
                         title: Text('Background sound volume',
                             textAlign: TextAlign.center,
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline5),
+                            style: Theme.of(context).textTheme.headline5),
                         content: SizedBox(
                           height: 120,
                           child: StreamBuilder<Object>(
@@ -347,13 +339,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               onPressed: _onCancelTap,
                               child: Text(
                                 'CANCEL',
-                                style: Theme
-                                    .of(context)
+                                style: Theme.of(context)
                                     .textTheme
                                     .headline3
                                     .copyWith(
-                                    color: MeditoColors.walterWhite,
-                                    fontWeight: FontWeight.bold),
+                                        color: MeditoColors.walterWhite,
+                                        fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -392,7 +383,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           (processingState == AudioProcessingState.buffering ||
-              processingState == AudioProcessingState.connecting)
+                  processingState == AudioProcessingState.connecting)
               ? buildCircularIndicatorRow()
               : getPlayingOrPausedButton(playing),
         ],
@@ -403,13 +394,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Center buildLoadingScreenWidget() {
     return Center(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            Container(height: 16),
-            Text('Buffering')
-          ],
-        ));
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(),
+        Container(height: 16),
+        Text('Buffering')
+      ],
+    ));
   }
 
   void getArtUrl(MediaItem mediaItem) {
@@ -462,11 +453,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           AudioService.queueStream,
           AudioService.currentMediaItemStream,
           AudioService.playbackStateStream,
-              (queue, mediaItem, playbackState) =>
+          (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  Widget playButton() =>
-      Semantics(
+  Widget playButton() => Semantics(
         label: 'Play button',
         child: PlayerButton(
           icon: Icons.play_arrow,
@@ -476,8 +466,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ),
       );
 
-  Widget pauseButton() =>
-      Semantics(
+  Widget pauseButton() => Semantics(
         label: 'Pause button',
         child: PlayerButton(
           icon: Icons.pause,
@@ -487,18 +476,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ),
       );
 
-  Widget positionIndicator(MediaItem mediaItem, PlaybackState state,
-      Color primaryColorAsColor) {
+  Widget positionIndicator(
+      MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
     return PositionIndicatorWidget(
         mediaItem: mediaItem, state: state, color: primaryColorAsColor);
   }
 
   void _onBackPressed(MediaItem mediaItem) {
-    if (mediaItem != null) {
+    if (mediaItem == null || widget.normalPop?? false) {
+      Navigator.pop(context);
+    } else {
       Navigator.popUntil(
           context, ModalRoute.withName(FolderNavWidget.routeName));
-    } else {
-      Navigator.pop(context);
     }
   }
 
@@ -625,7 +614,7 @@ void _audioPlayerTaskEntrypoint() async {
   unawaited(AudioServiceBackground.run(() => AudioPlayerTask()));
 }
 
-Future<void> start(MediaItem media, String primaryColor) async {
+Future<void> start(MediaItem media) async {
   var map = {'media': media.toJson()};
   unawaited(AudioService.connect());
   unawaited(AudioService.start(

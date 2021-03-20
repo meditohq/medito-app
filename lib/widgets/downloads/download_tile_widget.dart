@@ -28,7 +28,7 @@ class DownloadTileWidget extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
-          NavigationFactory.navigate(context, Screen.donation);
+          NavigationFactory.navigate(context, Screen.downloads);
         },
         child: Stack(
           children: <Widget>[
