@@ -18,7 +18,7 @@ class ApiResponse<T> {
   T body;
   String message;
 
-  ApiResponse.loading(this.message) : status = Status.LOADING;
+  ApiResponse.loading() : status = Status.LOADING;
   ApiResponse.completed(this.body) : status = Status.COMPLETED;
   ApiResponse.error(this.message) : status = Status.ERROR;
 
