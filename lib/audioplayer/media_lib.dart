@@ -1,7 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 
 class MediaLibrary {
-  static MediaItem saveMediaLibrary(
+  static MediaItem getMediaLibrary(
       {String description,
       String title,
       String illustrationUrl,

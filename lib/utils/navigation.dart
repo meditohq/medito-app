@@ -1,6 +1,7 @@
 import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
+import 'package:Medito/widgets/downloads/downloads_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
@@ -9,7 +10,7 @@ import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 
 class NavigationFactory {
-  static void navigate(BuildContext context, Screen key, {String id}) {
+  static void navigate(BuildContext context, Screen key, {String id, bool normalPop}) {
     switch (key) {
       case Screen.folder:
         assert(id.isNotEmpty);
@@ -17,7 +18,7 @@ class NavigationFactory {
             arguments: FolderArguments(id));
         break;
       case Screen.player:
-        _push(context, PlayerWidget());
+        _push(context, PlayerWidget(normalPop: normalPop));
         break;
       case Screen.text:
         _push(
@@ -37,7 +38,7 @@ class NavigationFactory {
         _push(context, DonationWidget());
         break;
       case Screen.downloads:
-        _push(context, DonationWidget());
+        _push(context, DownloadsListWidget());
         break;
     }
   }
@@ -60,7 +61,8 @@ class NavigationFactory {
         break;
       case FileType.folder:
         return Screen.folder;
-        break;
+      case FileType.url:
+        throw Exception('No screen type for URL');
     }
     return null;
   }
@@ -76,8 +78,8 @@ class NavigationFactory {
     if (place == 'article') {
       navigate(context, Screen.text, id: id);
     }
-    if (place == 'donation') {
-      navigate(context, Screen.donation);
+    if (place == 'download') {
+      navigate(context, Screen.downloads);
     }
     if (place == 'folder') {
       navigate(context, Screen.folder, id: id);

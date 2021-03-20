@@ -19,7 +19,7 @@ import 'package:Medito/network/packs/packs_bloc.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/announcment_banner_widget.dart';
-import 'package:Medito/widgets/packs/download_tile_widget.dart';
+import 'package:Medito/widgets/downloads/download_tile_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -121,6 +121,7 @@ class PackListWidgetState extends State<PackListWidget> {
   }
 
   Widget _getTwoColumns(List<PackItem> data) {
+
     var firstCol = data.getRange(0, data.length ~/ 2).toList();
     var secondCol = data.getRange(data.length ~/ 2 + 2, data.length).toList();
 
