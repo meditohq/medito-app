@@ -20,16 +20,20 @@ import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 
 class ListItemWidget extends StatelessWidget {
-  ListItemWidget({Key key, this.item}) : super(key: key);
-  final FolderItem item;
+  ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id}) : super(key: key);
 
+  final title;
+  final subtitle;
+  final fileType;
+  final id;
+  
   Widget buildFolderIcon() {
     return Icon(Icons.folder, color: MeditoColors.walterWhite);
   }
 
   Widget getAudioIcon() {
     return FutureBuilder<bool>(
-        future: checkListened(item.id),
+        future: checkListened(id),
         builder: (context, listened) {
           if (!listened.hasError && listened.hasData && listened.data) {
             return Icon(
@@ -75,20 +79,20 @@ class ListItemWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(item.title,
+            Text(title,
                 style: Theme
                     .of(context)
                     .textTheme
                     .headline6
                     .copyWith(fontSize: 18, height: 1.4)),
-            item.subtitle == null || item.subtitle.isEmpty
+            subtitle == null || subtitle.isEmpty
                 ? Container()
                 : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(height: 4),
                 Text(
-                  item.subtitle,
+                  subtitle,
                   style: Theme
                       .of(context)
                       .textTheme
@@ -108,7 +112,7 @@ class ListItemWidget extends StatelessWidget {
   Widget getIcon() {
     var iconWidget;
 
-    switch (item.fileType) {
+    switch (fileType) {
       case FileType.session:
         iconWidget = getAudioIcon();
         break;

@@ -17,7 +17,7 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
-import 'package:Medito/widgets/streak_tiles_utils.dart';
+import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:flutter/material.dart';
 
 class StreakWidget extends StatefulWidget {

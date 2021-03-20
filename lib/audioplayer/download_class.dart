@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +15,8 @@ class _Download {
   int _received = 0, _total = 1;
   var downloadListener = ValueNotifier<double>(0);
 
+  MediaItem _mediaItem;
+
   _Download(AudioFile file) {
     _file = file;
   }
@@ -21,10 +25,12 @@ class _Download {
     return file == _file;
   }
 
-  void startDownloading(AudioFile file) {
+  void startDownloading(AudioFile file, MediaItem mediaItemForSelectedFile) {
     if (isDownloading) return;
     isDownloading = true;
     _file = file;
+    _mediaItem = mediaItemForSelectedFile;
+
     _downloadFileWithProgress(file);
   }
 
@@ -36,11 +42,12 @@ class _Download {
 
   Future<dynamic> _downloadFileWithProgress(AudioFile currentFile) async {
     var dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.url.replaceAll(' ', '%20');
-    var file = File('$dir/$name');
+    var file = File('$dir/${_mediaItem.id.replaceAll('/', '_')}');
     if (file.existsSync()) {
       isDownloading = false;
       return null;
+    } else {
+      file.createSync();
     }
     var _response = await http.Client()
         .send(http.Request('GET', Uri.parse(currentFile.url)));
@@ -80,8 +87,11 @@ class _Download {
   Future<void> saveFileToDownloadedFilesList(AudioFile file) async {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList('listOfSavedFiles') ?? [];
-    list.add(file?.toJson()?.toString() ?? '');
-    await prefs.setStringList('listOfSavedFiles', list);
+
+    if (_mediaItem != null) {
+      list.add(jsonEncode(_mediaItem));
+      await prefs.setStringList('listOfSavedFiles', list);
+    }
   }
 
   double getProgress() {
@@ -124,16 +134,17 @@ class DownloadSingleton {
     return -1;
   }
 
-  bool start(AudioFile file) {
+  bool start(AudioFile file, MediaItem mediaItemForSelectedFile) {
     if (_download == null) return false;
     if (_download.isDownloadingMe(file)) return true;
     if (isDownloadingSomething()) return false;
+
     if (_download.isThisFile(file)) {
-      _download.startDownloading(file);
+      _download.startDownloading(file, mediaItemForSelectedFile);
       return true;
     }
     _download = _Download(file);
-    _download.startDownloading(file);
+    _download.startDownloading(file, mediaItemForSelectedFile);
     return true;
   }
 

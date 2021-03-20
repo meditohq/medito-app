@@ -18,7 +18,7 @@ import 'dart:io';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
-import 'package:Medito/widgets/streak_tiles_utils.dart';
+import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';

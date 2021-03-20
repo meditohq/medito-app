@@ -210,7 +210,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
   }
 
   void startService(media, primaryColor) {
-    start(media, primaryColor).then((value) {
+    start(media).then((value) {
       NavigationFactory.navigate(context, Screen.player, id: null);
       return null;
     });
@@ -221,7 +221,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         onTap: () => itemTap(item),
         splashColor: MeditoColors.moonlight,
         child: ListItemWidget(
-          item: item,
+          title: item.title,
+          subtitle: item.subtitle,
+          id: item.id,
+          fileType: item.fileType,
         ));
   }
 

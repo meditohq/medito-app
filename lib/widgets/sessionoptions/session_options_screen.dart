@@ -70,11 +70,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               label: 'Play button',
               child: PlayerButton(
                 onPressed: _onBeginTap,
+                primaryColor: parseColor(pColor) ?? MeditoColors.walterWhite,
                 child: SizedBox(
                     width: 24,
                     height: 24,
                     child: getBeginButtonContent(sColor)),
-                primaryColor: parseColor(pColor) ?? MeditoColors.walterWhite,
               ),
             ),
             body: Builder(builder: (BuildContext context) {
@@ -147,7 +147,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       });
 
   Widget getBeginButtonContent(String color) {
-    _bloc.setCurrentFileForDownloadSingleton();
 
     if (_bloc.isDownloading()) {
       return ValueListenableBuilder(
@@ -467,12 +466,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     _bloc.updateCurrentFile();
 
     _bloc.updateAvailableOfflineIndicatorText();
-    _bloc.setCurrentFileForDownloadSingleton();
 
     if (index == 1) {
       // 'YES' selected
       if (!_bloc.downloadSingleton.isDownloadingSomething()) {
-        _bloc.downloadSingleton.start(_bloc.currentFile);
+        _bloc.downloadSingleton.start(_bloc.currentFile, _bloc.getMediaItemForSelectedFile());
       } else {
         _bloc.offlineSelected = 0;
         createSnackBarWithColor('Another Download in Progress', scaffoldContext,
