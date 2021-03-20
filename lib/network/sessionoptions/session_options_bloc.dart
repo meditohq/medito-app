@@ -71,28 +71,28 @@ class SessionOptionsBloc {
   SessionOptionsBloc(String id) {
     _id = id;
     titleController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     voiceListController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     lengthListController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     backgroundMusicListController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     backgroundMusicShownController = StreamController.broadcast()
       ..sink.add(false);
 
     imageController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     colourController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     descController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading(''));
+      ..sink.add(ApiResponse.loading());
 
     _repo = SessionOptionsRepository();
     fetchOptions(id);

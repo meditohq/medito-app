@@ -107,7 +107,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
   if (url == null) return null;
-  if (url.endsWith('png')) {
+  // if (url.endsWith('png')) {
     return CachedNetworkImage(
       placeholder: (context, url) =>
           Container(
@@ -115,12 +115,12 @@ Widget getNetworkImageWidget(String url,
           ),
       imageUrl: url,
     );
-  } else {
-    return SvgPicture.network(
-      url,
-      color: svgColor ?? MeditoColors.darkBGColor,
-    );
-  }
+  // } else {
+  //   return SvgPicture.network(
+  //     url,
+  //     color: svgColor ?? MeditoColors.darkBGColor,
+  //   );
+  // }
 }
 
 Future<bool> checkConnectivity() async {
@@ -146,7 +146,7 @@ int getColorFromHex(String hexColor) {
 Color parseColor(String color) {
   if (color == null || color.isEmpty) return MeditoColors.midnight;
 
-  return Color(int.parse(color?.replaceFirst('#', ''), radix: 16));
+  return Color(int.parse(color?.replaceFirst('#', 'FF'), radix: 16));
 }
 
 void createSnackBar(String message, BuildContext context) {

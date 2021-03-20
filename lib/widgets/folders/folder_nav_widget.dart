@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_bloc.dart';
-import 'package:Medito/network/folder/folder_items.dart';
+import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
@@ -47,11 +47,9 @@ class FolderNavWidget extends StatefulWidget {
   _FolderNavWidgetState createState() => _FolderNavWidgetState();
 }
 
-class _FolderNavWidgetState extends State<FolderNavWidget>
-    with TickerProviderStateMixin {
+class _FolderNavWidgetState extends State<FolderNavWidget> {
   BuildContext scaffoldContext; //for the snackbar
-  FolderItemsBloc _bloc;
-  String _contentID;
+  final FolderItemsBloc _bloc = FolderItemsBloc();
 
   @override
   void dispose() {
@@ -67,10 +65,10 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   @override
   void didChangeDependencies() {
-    final FolderArguments args = ModalRoute.of(context).settings.arguments;
-    _contentID = args.contentId;
-    _bloc = FolderItemsBloc(_contentID);
-
+    if (_bloc.content == null) {
+      final FolderArguments args = ModalRoute.of(context).settings.arguments;
+      _bloc.fetchData(args.contentId);
+    }
     super.didChangeDependencies();
   }
 
@@ -105,7 +103,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                         Icons.close,
                         color: Colors.white,
                       ),
-                      onPressed: () => _bloc.deselectItem())
+                      onPressed: () => deselectItem())
                   : Container(),
               actions: <Widget>[
                 snapshot != null &&
@@ -126,7 +124,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
                           } else {
                             await markAsNotListened(_bloc.selectedItem.id);
                           }
-                          setState(() => _bloc.deselectItem());
+                          deselectItem();
                         })
                     : Container(),
               ],
@@ -134,6 +132,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             ),
           );
         });
+  }
+
+  void deselectItem() {
+    setState(() {
+      _bloc.deselectItem();
+    });
   }
 
   Widget _buildSafeAreaBody() {
@@ -149,7 +153,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
       children: [
         _getAppBarStreamBuilder(),
         Expanded(
-          child: StreamBuilder<ApiResponse<List<FolderItem>>>(
+          child: StreamBuilder<ApiResponse<List<Item>>>(
               stream: _bloc.itemsListController.stream,
               builder: (context, itemsSnapshot) {
                 if (!itemsSnapshot.hasData ||
@@ -193,7 +197,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
             case AppBarState.normal:
             default:
               return StreamBuilder<ApiResponse<String>>(
-                  stream: _bloc.titleController.stream,
+                  stream: _bloc.titleControllerStream,
                   builder: (context, titleSnapshot) {
                     return MeditoAppBarWidget(
                         title: titleSnapshot.data?.body ?? '...');
@@ -202,7 +206,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
         });
   }
 
-  void itemTap(FolderItem i) {
+  void itemTap(Item i) {
     Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
     NavigationFactory.navigate(
         context, NavigationFactory.getScreenFromItemType(i.fileType),
@@ -216,7 +220,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
     });
   }
 
-  InkWell _getItemListWidget(FolderItem item) {
+  InkWell _getItemListWidget(Item item) {
     return InkWell(
         onTap: () => itemTap(item),
         splashColor: MeditoColors.moonlight,
@@ -230,17 +234,18 @@ class _FolderNavWidgetState extends State<FolderNavWidget>
 
   SizedBox _getImageListItemWidget() => SizedBox(
       width: 300,
-      child: StreamBuilder<ApiResponse<FolderCover>>(
-          stream: _bloc.coverController.stream,
+      child: StreamBuilder<ApiResponse<String>>(
+          stream: _bloc.coverControllerStream,
+          initialData: ApiResponse.loading(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ImageListItemWidget(src: snapshot.data.body?.url);
+            if (snapshot.hasData && snapshot.data.status != Status.LOADING) {
+              return ImageListItemWidget(src: snapshot.data.body);
             } else {
               return Container();
             }
           }));
 
-  InkWell _getItemWidget(FolderItem item) {
+  InkWell _getItemWidget(Item item) {
     return InkWell(
       onTap: () {
         if (_bloc.selectedItem != null) {

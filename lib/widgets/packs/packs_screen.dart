@@ -14,11 +14,11 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/packs/packs.dart';
 import 'package:Medito/network/packs/packs_bloc.dart';
+import 'package:Medito/network/packs/packs_response.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/packs/announcment_banner_widget.dart';
+import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/downloads/download_tile_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
@@ -76,8 +76,9 @@ class PackListWidgetState extends State<PackListWidget> {
       color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
       onRefresh: () => _packsBloc.fetchPacksList(),
-      child: StreamBuilder<ApiResponse<List<PackItem>>>(
+      child: StreamBuilder<ApiResponse<List<PacksData>>>(
           stream: _packsBloc.packListStream,
+          initialData: ApiResponse.loading(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               switch (snapshot.data.status) {
@@ -100,7 +101,7 @@ class PackListWidgetState extends State<PackListWidget> {
     );
   }
 
-  Widget _getScrollWidget(List<PackItem> data) {
+  Widget _getScrollWidget(List<PacksData> data) {
     return SingleChildScrollView(
       primary: true,
       child: Column(
@@ -120,10 +121,10 @@ class PackListWidgetState extends State<PackListWidget> {
     });
   }
 
-  Widget _getTwoColumns(List<PackItem> data) {
+  Widget _getTwoColumns(List<PacksData> data) {
 
     var firstCol = data.getRange(0, data.length ~/ 2).toList();
-    var secondCol = data.getRange(data.length ~/ 2 + 2, data.length).toList();
+    var secondCol = data.getRange(data.length ~/ 2, data.length).toList();
 
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
@@ -172,11 +173,11 @@ class PackListWidgetState extends State<PackListWidget> {
   //see here https://stackoverflow.com/questions/53882591/autoresize-text-to-fit-in-container-vertically
   double _getColumnWidth() => MediaQuery.of(context).size.width / 2 - 8;
 
-  Widget _getTile(PackItem item) {
+  Widget _getTile(PacksData item) {
     return GestureDetector(
       onTap: () => NavigationFactory.navigate(
           context, NavigationFactory.getScreenFromItemType(item.fileType),
-          id: item.link),
+          id: item.id),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -194,7 +195,7 @@ class PackListWidgetState extends State<PackListWidget> {
               children: <Widget>[
                 Container(height: 8),
                 SizedBox(
-                    height: 80, child: getNetworkImageWidget(item.imageUrl)),
+                    height: 80, child: getNetworkImageWidget(item.cover)),
                 Container(height: 16),
                 SizedBox(
                   width: _getColumnWidth() - 48, //todo horrible hack
@@ -203,7 +204,7 @@ class PackListWidgetState extends State<PackListWidget> {
                       textAlign: TextAlign.center,
                       wrapWords: false,
                       style: Theme.of(context).textTheme.headline6.copyWith(
-                          color: parseColor(item.textColor),
+                          color: parseColor(item.colorSecondary),
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.1,
@@ -226,7 +227,7 @@ class PackListWidgetState extends State<PackListWidget> {
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       letterSpacing: 0.1,
-                                      color: parseColor(item.textColor))),
+                                      color: parseColor(item.colorSecondary))),
                         ),
                       )
                     : Container(),

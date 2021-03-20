@@ -13,14 +13,22 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/folder/folder_items.dart';
+import 'package:Medito/network/folder/folder_reponse.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class FolderItemsRepository {
-  var baseUrl = 'https://live.medito.app/api';
+  var folderParameters =
+      '?fields=*,items.item:folders.id,items.item:folders.type,items.item:folders.title,items.item:folders.subtitle,items.item:sessions.id,items.item:sessions.type,items.item:sessions.title,items.item:sessions.subtitle,items.item:dailies.id,items.item:dailies.type,items.item:dailies.title,items.item:dailies.subtitle,items.item:articles.id,items.item:articles.type,items.item:articles.title,items.item:articles.subtitle&deep[items][_sort]=position';
+  var ext = 'items/folders/';
 
-  Future<FolderContent> fetchFolderData(String id) async {
-    final response = await httpGet(baseUrl + id);
-    return FolderItems.fromJson(response).data.content;
+  Future<FolderResponse> fetchFolderData(String id) async {
+    try {
+      final response = await httpGet(baseUrl + ext + id + folderParameters, fileNameForCache: baseUrl + id + ext);
+      return FolderResponse.fromJson(response);
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 }
