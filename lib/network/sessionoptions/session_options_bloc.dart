@@ -26,6 +26,7 @@ import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,7 +52,7 @@ class SessionOptionsBloc {
 
   // Download stuff
   bool bgDownloading = false, removing = false;
-  DownloadSingleton downloadSingleton;
+  DownloadSingleton downloadSingleton = DownloadSingleton(null);
 
   //Streams
   StreamController<ApiResponse<String>> titleController;
@@ -177,12 +178,6 @@ class SessionOptionsBloc {
     }
   }
 
-  void setCurrentFileForDownloadSingleton() {
-    if (downloadSingleton == null || !downloadSingleton.isValid()) {
-      downloadSingleton = DownloadSingleton(currentFile);
-    }
-  }
-
   void saveOptionsSelectionsToSharedPreferences(String id) {
     addIntToSF(id, 'voiceSelected', voiceSelected);
     addIntToSF(id, 'lengthSelected', lengthSelected);
@@ -219,6 +214,13 @@ class SessionOptionsBloc {
   }
 
   /// File handling
+  ///
+  void setCurrentFileForDownloadSingleton() {
+    if (downloadSingleton == null || !downloadSingleton.isValid()) {
+      downloadSingleton = DownloadSingleton(currentFile);
+    }
+  }
+
   Future<dynamic> removeFile(AudioFile currentFile) async {
     removing = true;
     var dir = (await getApplicationSupportDirectory()).path;
@@ -244,23 +246,24 @@ class SessionOptionsBloc {
   void startAudioService() {
     if (currentFile == null) updateCurrentFile();
 
-    var media = MediaLibrary.saveMediaLibrary(
-        description: _options.description,
-        title: _options.title,
-        illustrationUrl: _options.coverUrl,
-        secondaryColor: _options.colorSecondary,
-        primaryColor: _options.colorPrimary,
-        bgMusic: '',
-        durationAsMilliseconds:
-            clockTimeToDuration(currentFile.length).inMilliseconds,
-        id: currentFile.url,
-        attributions: _options.author);
-
-    unawaited(start(media, _options.colorPrimary));
+    var media = getMediaItemForSelectedFile();
+    unawaited(start(media));
 
     ///End file handling
     ///
   }
+
+  MediaItem getMediaItemForSelectedFile() => MediaLibrary.getMediaLibrary(
+      description: _options.description,
+      title: _options.title,
+      illustrationUrl: _options.coverUrl,
+      secondaryColor: _options.colorSecondary,
+      primaryColor: _options.colorPrimary,
+      bgMusic: '',
+      durationAsMilliseconds:
+          clockTimeToDuration(currentFile.length).inMilliseconds,
+      id: currentFile.url,
+      attributions: _options.author);
 }
 
 extension MyIterable<E> on Iterable<E> {

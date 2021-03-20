@@ -18,6 +18,8 @@ import 'package:Medito/network/packs/announcement_reponse.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/packs/expand_animate_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -28,8 +30,9 @@ class AnnouncementBanner extends StatefulWidget {
   _AnnouncementBannerState createState() => _AnnouncementBannerState();
 }
 
-class _AnnouncementBannerState extends State<AnnouncementBanner> {
-  var hidden = false;
+class _AnnouncementBannerState extends State<AnnouncementBanner>
+    with SingleTickerProviderStateMixin {
+  var _hidden = false;
   final _bloc = AnnouncementBloc();
 
   @override
@@ -47,30 +50,48 @@ class _AnnouncementBannerState extends State<AnnouncementBanner> {
             return Container();
           }
 
-          return Visibility(
-            visible: !hidden,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                buildSpacer(),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: MaterialBanner(
-                    backgroundColor: MeditoColors.darkMoon,
-                    content: _buildTextColumn(snapshot, context),
-                    leading: snapshot.data.showIcon
-                        ? buildCircleAvatar(snapshot)
-                        : Container(),
-                    actions: [
-                      _buildDismissButton(),
-                      _buildPositiveButton(snapshot),
-                    ],
+          return FutureBuilder<bool>(
+              future: _bloc
+                  .shouldHideAnnouncement(snapshot.data.timestamp.toString()),
+              initialData: false,
+              builder: (context, showSnapshot) {
+                if (showSnapshot.data) {
+                  return Container();
+                }
+
+                return ExpandedSection(
+                  expand: !_hidden,
+                  child: AnimatedOpacity(
+                    onEnd: () => {
+                      _bloc.saveAnnouncementID(
+                          snapshot.data.timestamp.toString())
+                    },
+                    duration: Duration(milliseconds: 250),
+                    opacity: _hidden ? 0 : 1,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        buildSpacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: MaterialBanner(
+                            backgroundColor: MeditoColors.darkMoon,
+                            content: _buildTextColumn(snapshot, context),
+                            leading: snapshot.data.showIcon
+                                ? buildCircleAvatar(snapshot)
+                                : Container(),
+                            actions: [
+                              _buildDismissButton(),
+                              _buildPositiveButton(snapshot),
+                            ],
+                          ),
+                        ),
+                        buildSpacer()
+                      ],
+                    ),
                   ),
-                ),
-                buildSpacer()
-              ],
-            ),
-          );
+                );
+              });
         });
   }
 
@@ -113,7 +134,7 @@ class _AnnouncementBannerState extends State<AnnouncementBanner> {
     return TextButton(
       onPressed: () {
         setState(() {
-          hidden = true;
+          _hidden = true;
         });
       },
       child: const Text(

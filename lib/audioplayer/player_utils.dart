@@ -17,11 +17,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/network/sessionoptions/session_opts.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 var downloadListener = ValueNotifier<double>(0);
 var bgDownloadListener = ValueNotifier<double>(0);

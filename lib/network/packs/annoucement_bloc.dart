@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:Medito/network/packs/announcement_repo.dart';
 import 'package:Medito/network/packs/announcement_reponse.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementBloc {
   AnnouncementRepository _repo;
@@ -40,5 +41,23 @@ class AnnouncementBloc {
 
   void dispose() {
     announcementController?.close();
+  }
+
+  Future<List<String>> _getAnnouncementID() async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('announcementID') ?? [];
+  }
+
+  Future<bool> shouldHideAnnouncement(String id) async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('announcementID')?.contains(id) ?? false;
+  }
+
+  Future<void> saveAnnouncementID(String id) async {
+    var list = await _getAnnouncementID();
+    list.add(id);
+
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('announcementID', list);
   }
 }
