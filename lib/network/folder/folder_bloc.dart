@@ -16,58 +16,77 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/folder/folder_items.dart';
 import 'package:Medito/network/folder/folder_items_repo.dart';
+import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FolderItemsBloc {
   FolderItemsRepository _repo;
 
   var appBarType = AppBarState.normal;
   Future<bool> selectedSessionListenedFuture;
-  FolderItem selectedItem;
+  Item selectedItem;
+  FolderResponse content;
 
-  StreamController<ApiResponse<List<FolderItem>>> itemsListController;
-  StreamController<ApiResponse<FolderCover>> coverController;
-  StreamController<ApiResponse<String>> titleController;
+  StreamController<ApiResponse<List<Item>>> itemsListController;
   StreamController<AppBarState> appbarStateController;
+  StreamController _coverController;
 
-  FolderItemsBloc(String id) {
+  StreamSink<ApiResponse<String>> get coverControllerSink => _coverController.sink;
+  Stream<ApiResponse<String>> get coverControllerStream => _coverController.stream;
+
+
+  final _titleController = BehaviorSubject<ApiResponse<String>>();
+  Stream<ApiResponse<String>> get titleControllerStream =>
+      _titleController.stream;
+  Sink<ApiResponse<String>> get _titleControllerSink => _titleController.sink;
+
+
+
+  FolderItemsBloc() {
     itemsListController = StreamController.broadcast();
-    coverController = StreamController.broadcast();
-    appbarStateController = StreamController.broadcast();
-    titleController = StreamController.broadcast();
+    _coverController = StreamController<ApiResponse<String>>();
+    appbarStateController = BehaviorSubject();
     _repo = FolderItemsRepository();
-    fetchData(id);
   }
 
   Future<void> fetchData(String id) async {
-    itemsListController.sink.add(ApiResponse.loading('Fetching Items'));
-    coverController.sink.add(ApiResponse.loading('Fetching Cover'));
-    titleController.add(ApiResponse.loading('...'));
-    var content = await _repo.fetchFolderData(id);
-    _postItemList(content);
-    _postTitle(content);
-    _postCoverDetails(content);
-  }
+    itemsListController.sink.add(ApiResponse.loading());
+    coverControllerSink.add(ApiResponse.loading());
+    _titleControllerSink.add(ApiResponse.loading());
+    content = await _repo.fetchFolderData(id);
 
-  void _postCoverDetails(FolderContent content) {
-    try {
-      coverController.sink.add(ApiResponse.completed(content.coverDetails));
-    } catch (e) {
-      coverController.sink.add(ApiResponse.error('Error getting cover'));
+    if (content?.hasData == null) {
+      itemsListController.sink.add(ApiResponse.error('Error'));
+      coverControllerSink.add(ApiResponse.error('Error'));
+      _titleControllerSink.add(ApiResponse.error('Error'));
+    } else {
+      _postItemList(content);
+      _postTitle(content);
+      _postCoverDetails(content);
     }
   }
 
-  void _postTitle(FolderContent content) {
+  void _postCoverDetails(FolderResponse content) {
     try {
-      titleController.sink.add(ApiResponse.completed(content.title));
+      _coverController.sink.add(
+          ApiResponse.completed('${baseUrl}assets/${content.cover}?download'));
     } catch (e) {
-      titleController.sink.add(ApiResponse.error('Title error'));
+      _coverController.sink.add(ApiResponse.error('Error getting cover'));
     }
   }
 
-  void _postItemList(FolderContent content) {
+  void _postTitle(FolderResponse content) {
+    try {
+      _titleControllerSink.add(ApiResponse.completed(content.title));
+    } catch (e) {
+      _titleControllerSink.add(ApiResponse.error('Title error'));
+    }
+  }
+
+  void _postItemList(FolderResponse content) {
     try {
       itemsListController.sink.add(ApiResponse.completed(content.items));
     } catch (e) {
@@ -75,7 +94,7 @@ class FolderItemsBloc {
     }
   }
 
-  void itemLongPressed(FolderItem item) {
+  void itemLongPressed(Item item) {
     appbarStateController.sink.add((AppBarState.selected));
     selectedItem = item;
     selectedSessionListenedFuture = checkListened(selectedItem.id);
@@ -84,12 +103,13 @@ class FolderItemsBloc {
   void deselectItem() {
     appbarStateController.sink.add(AppBarState.normal);
     selectedItem = null;
+    _postTitle(content);
   }
 
   void dispose() {
     itemsListController?.close();
-    coverController?.close();
-    titleController?.close();
+    _coverController?.close();
+    _titleController?.close();
     appbarStateController?.close();
   }
 }

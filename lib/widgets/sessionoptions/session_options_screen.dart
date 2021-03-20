@@ -334,7 +334,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         height: 56,
         child: StreamBuilder<ApiResponse<BackgroundSounds>>(
             stream: _bloc.backgroundMusicListController.stream,
-            initialData: ApiResponse.loading(''),
+            initialData: ApiResponse.loading(),
             builder: (context, snapshot) {
               if (!snapshot.hasData ||
                   snapshot.data?.status == Status.LOADING) {

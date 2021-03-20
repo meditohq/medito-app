@@ -16,28 +16,28 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/packs/packs.dart';
 import 'package:Medito/network/packs/packs_repo.dart';
+import 'package:Medito/network/packs/packs_response.dart';
 
 class PacksBloc {
   PacksRepository _repo;
 
   StreamController _packsListController;
 
-  StreamSink<ApiResponse<List<PackItem>>> get packListSink =>
+  StreamSink<ApiResponse<List<PacksData>>> get packListSink =>
       _packsListController.sink;
 
-  Stream<ApiResponse<List<PackItem>>> get packListStream =>
+  Stream<ApiResponse<List<PacksData>>> get packListStream =>
       _packsListController.stream;
 
   PacksBloc() {
-    _packsListController = StreamController<ApiResponse<List<PackItem>>>();
+    _packsListController = StreamController<ApiResponse<List<PacksData>>>();
     _repo = PacksRepository();
     fetchPacksList();
   }
 
   Future<void> fetchPacksList() async {
-    packListSink.add(ApiResponse.loading('Fetching Packs'));
+    packListSink.add(ApiResponse.loading());
     try {
       var packs = await _repo.fetchPacks();
       packListSink.add(ApiResponse.completed(packs));
