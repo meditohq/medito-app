@@ -483,7 +483,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _onBackPressed(MediaItem mediaItem) {
-    if (mediaItem == null || widget.normalPop?? false) {
+    if (mediaItem == null || widget.normalPop ?? false) {
       Navigator.pop(context);
     } else {
       Navigator.popUntil(

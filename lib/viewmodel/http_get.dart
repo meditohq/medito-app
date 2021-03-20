@@ -24,7 +24,7 @@ import 'cache.dart';
 
 
 //move this to network package later
-Future httpGet(String url, {bool skipCache = false}) async {
+Future httpGet(String url, {bool skipCache = false, String fileNameForCache}) async {
   var cache;
 
   if (!await checkConnectivity()) {
@@ -34,7 +34,7 @@ Future httpGet(String url, {bool skipCache = false}) async {
   if (skipCache) {
     cache = null;
   } else {
-    cache = await readJSONFromCache(url);
+    cache = await readJSONFromCache(fileNameForCache ?? url);
   }
 
   if (cache == null) {
@@ -44,7 +44,7 @@ Future httpGet(String url, {bool skipCache = false}) async {
     );
 
     if (response.statusCode == 200) {
-      await writeJSONToCache(response.body, url);
+      await writeJSONToCache(response.body, fileNameForCache ?? url);
     }
     return json.decode(response.body);
   }

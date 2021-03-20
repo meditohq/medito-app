@@ -1,5 +1,5 @@
 import 'package:Medito/network/downloads/downloads_bloc.dart';
-import 'package:Medito/network/folder/folder_items.dart';
+import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
