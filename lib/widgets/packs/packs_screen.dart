@@ -88,7 +88,7 @@ class PackListWidgetState extends State<PackListWidget> {
                   return _getScrollWidget(snapshot.data.body);
                 case Status.ERROR:
                   return ErrorPacksWidget(
-                    onPressed: () => _packsBloc.fetchPacksList(),
+                    onPressed: () => _packsBloc.fetchPacksList(true),
                     widget: _getMeditoLogoWidget(),
                   );
                 default:
