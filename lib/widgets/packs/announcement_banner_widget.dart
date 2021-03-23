@@ -36,12 +36,6 @@ class _AnnouncementBannerState extends State<AnnouncementBanner>
   final _bloc = AnnouncementBloc();
 
   @override
-  void initState() {
-    super.initState();
-    _bloc.fetchAnnouncement();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<AnnouncementContent>(
         stream: _bloc.announcementController.stream,
