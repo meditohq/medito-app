@@ -50,7 +50,7 @@ class _Download {
       file.createSync();
     }
     var _response = await http.Client()
-        .send(http.Request('GET', Uri.parse(currentFile.url)));
+        .send(http.Request('GET', Uri.parse(currentFile.id)));
     _total = _response.contentLength;
     _received = 0;
     var _bytes = <int>[];
@@ -67,7 +67,7 @@ class _Download {
         _received ??= _bytes.length;
         if (_total == null) {
           http.Client()
-              .send(http.Request('GET', Uri.parse(currentFile.url)))
+              .send(http.Request('GET', Uri.parse(currentFile.id)))
               .then((value) => _response = value);
           _total = _response.contentLength;
           _received = _bytes.length;
@@ -98,7 +98,7 @@ class _Download {
     if (_total == null) {
       http.StreamedResponse _throwResponse;
       http.Client()
-          .send(http.Request('GET', Uri.parse(_file.url)))
+          .send(http.Request('GET', Uri.parse(_file.id)))
           .then((value) => _throwResponse = value);
       _total = _throwResponse.contentLength;
     }
