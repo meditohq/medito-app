@@ -29,7 +29,7 @@ var backgroundMusicUrl = '';
 
 Future<dynamic> checkFileExists(AudioFile currentFile) async {
   var dir = (await getApplicationSupportDirectory()).path;
-  var name = currentFile.url.replaceAll(' ', '%20');
+  var name = currentFile.id;
   var file = File('$dir/$name');
   var exists = await file.exists();
   return exists;
