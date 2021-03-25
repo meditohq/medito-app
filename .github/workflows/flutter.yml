@@ -26,7 +26,14 @@ jobs:
       # Uses v1.4.0 
       - uses: subosito/flutter-action@26bf50084a0c218b5b715a3641c36eac84fd2136 
 
-      - run: flutter pub get
+      # Uses v2.4.0
+      - uses: nick-invision/retry@7c68161adf97a48beb850a595b8784ec57a98cbb
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: flutter pub get
+
+      # - run: flutter pub get
 
       # - run: flutter format --set-exit-if-changed .
 
