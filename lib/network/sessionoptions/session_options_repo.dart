@@ -15,19 +15,24 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class SessionOptionsRepository {
-  var baseUrl = 'https://live.medito.app/api';
+  var ext = 'items/sessions/';
   var bgSoundsUrl = 'https://live.medito.app/api/pages/backgroundsounds/files';
+  var parameters =
+      '?fields=*,author.html,audio.file.id,audio.file.voice,audio.file.length';
 
-  Future<SessionOpts> fetchOptions(String id) async {
-    final response = await httpGet(baseUrl + id);
-    return SessionOpts.fromJson(response);
+  Future<SessionData> fetchOptions(String id) async {
+    final response = await httpGet(baseUrl + ext + id + parameters);
+    return SessionOptionsResponse.fromJson(response).data;
   }
 
   Future<BackgroundSounds> fetchBackgroundSounds() async {
     final response = await httpGet(bgSoundsUrl);
     return BackgroundSounds.fromJson(response);
   }
+
+  String getImageBaseUrl(String cover) => '${baseUrl}assets/$cover?download';
 }

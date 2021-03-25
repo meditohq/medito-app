@@ -65,11 +65,9 @@ class SessionOptionsBloc {
   StreamController<bool> backgroundMusicShownController;
 
   MediaLibrary mediaLibrary;
-  SessionOpts _options;
-  String _id;
+  SessionData _options;
 
   SessionOptionsBloc(String id) {
-    _id = id;
     titleController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
@@ -111,27 +109,30 @@ class SessionOptionsBloc {
     _options = options;
 
     // Show title, desc and image
-    titleController.sink.add(ApiResponse.completed(options.title));
-    descController.sink.add(ApiResponse.completed(options.description));
+    titleController.sink.add(ApiResponse.completed(_options.title));
+    descController.sink.add(ApiResponse.completed(_options.description));
     imageController.sink.add(ApiResponse.completed(
-        {'url': options.coverUrl, 'color': options.colorPrimary}));
+        {'url': _getCoverUrl(), 'color': _options.colorPrimary}));
     colourController.sink.add(ApiResponse.completed({
-      'secondaryColor': options.colorSecondary,
-      'primaryColor': options.colorPrimary
+      'secondaryColor': _options.colorSecondary,
+      'primaryColor': _options.colorPrimary
     }));
 
     // Show/hide Background music
-    backgroundMusicShownController.sink.add(options.hasBackgroundMusic);
-    if (options.hasBackgroundMusic) {
+    backgroundMusicShownController.sink.add(_options.backgroundSound);
+    if (_options.backgroundSound) {
       backgroundMusicListController.sink
           .add(ApiResponse.completed(_bgMusicList)); // fixme
     }
 
     // Info is in the form "info": "No voice,00:05:02"
-    voiceList = _options.files.map((element) => element.voice).toSet().toList();
+    voiceList =
+        _options.audio.map((element) => element.file.voice).toSet().toList();
     voiceListController.sink.add(ApiResponse.completed(voiceList));
     filterLengthsForVoice();
   }
+
+  String _getCoverUrl() => _repo.getImageBaseUrl(_options.cover);
 
   void dispose() {
     titleController?.close();
@@ -224,8 +225,7 @@ class SessionOptionsBloc {
   Future<dynamic> removeFile(AudioFile currentFile) async {
     removing = true;
     var dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.url.replaceAll(' ', '%20');
-    var file = File('$dir/$name');
+    var file = File('$dir/${currentFile.id}');
 
     if (await file.exists()) {
       await file.delete();
@@ -256,14 +256,14 @@ class SessionOptionsBloc {
   MediaItem getMediaItemForSelectedFile() => MediaLibrary.getMediaLibrary(
       description: _options.description,
       title: _options.title,
-      illustrationUrl: _options.coverUrl,
+      illustrationUrl: _getCoverUrl(),
       secondaryColor: _options.colorSecondary,
       primaryColor: _options.colorPrimary,
       bgMusic: '',
       durationAsMilliseconds:
           clockTimeToDuration(currentFile.length).inMilliseconds,
-      id: currentFile.url,
-      attributions: _options.author);
+      id: currentFile.id,
+      attributions: _options.attribution);
 }
 
 extension MyIterable<E> on Iterable<E> {
