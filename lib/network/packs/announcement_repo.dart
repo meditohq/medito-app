@@ -18,8 +18,10 @@ import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class AnnouncementRepository {
+  var ext = 'items/announcement';
+
   Future<AnnouncementResponse> fetchAnnouncements() async {
-    final response = await httpGet(baseUrl + 'items/announcement');
+    final response = await httpGet(baseUrl + ext, skipCache: true);
     return AnnouncementResponse.fromJson(response);
   }
 }

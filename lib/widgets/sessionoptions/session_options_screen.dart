@@ -17,6 +17,7 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
@@ -343,7 +344,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
               var data = snapshot.data.body?.list;
 
-              if (data.isEmpty) return Container();
+              if (data?.isEmpty ?? true) return Container();
 
               return ListView.builder(
                 padding: const EdgeInsets.only(left: 16),
