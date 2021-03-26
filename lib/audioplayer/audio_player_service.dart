@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -42,7 +43,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
-          _duration = await _player.setUrl(mediaItem.id);
+          var url = '${baseUrl}assets/${mediaItem.id}';
+          _duration = await _player.setUrl(url);
         } else {
           _duration = await _player.setFilePath(data);
         }

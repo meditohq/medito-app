@@ -23,7 +23,6 @@ import 'package:path_provider/path_provider.dart';
 
 var downloadListener = ValueNotifier<double>(0);
 var bgDownloadListener = ValueNotifier<double>(0);
-var baseUrl = 'https://medito.space/api/pages';
 int bgTotal = 1, bgReceived = 0;
 var backgroundMusicUrl = '';
 
