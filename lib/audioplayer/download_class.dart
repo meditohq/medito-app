@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -49,8 +50,10 @@ class _Download {
     } else {
       file.createSync();
     }
-    var _response = await http.Client()
-        .send(http.Request('GET', Uri.parse(currentFile.id)));
+
+    var url = baseUrl + 'assets/' + currentFile.id;
+    var _response =
+        await http.Client().send(http.Request('GET', Uri.parse(url)));
     _total = _response.contentLength;
     _received = 0;
     var _bytes = <int>[];
