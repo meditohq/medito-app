@@ -1,0 +1,43 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Flutter
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      # Uses v1.4.0 
+      - uses: subosito/flutter-action@26bf50084a0c218b5b715a3641c36eac84fd2136 
+
+      # Uses v2.4.0
+      - uses: nick-invision/retry@7c68161adf97a48beb850a595b8784ec57a98cbb
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: flutter pub get
+
+      # - run: flutter pub get
+
+      # - run: flutter format --set-exit-if-changed .
+
+      - run: flutter analyze --no-fatal-warnings .
+
+      - run: flutter test
+
