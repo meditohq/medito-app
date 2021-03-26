@@ -25,7 +25,7 @@ class AnnouncementBloc {
   StreamController announcementController;
 
   AnnouncementBloc() {
-    announcementController = StreamController<AnnouncementContent>();
+    announcementController = StreamController<AnnouncementResponse>();
     _repo = AnnouncementRepository();
     fetchAnnouncement();
   }
