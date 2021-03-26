@@ -17,7 +17,6 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
@@ -100,8 +99,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                                 buildImage(pColor),
                                 buildTitleText(),
                                 buildDescriptionText(),
-                                buildSpacer(),
-                                buildTextHeaderForRow('Voice'),
                                 buildVoiceRow(),
                                 buildSpacer(),
                                 ////////// spacer
@@ -148,7 +145,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       });
 
   Widget getBeginButtonContent(String color) {
-
     if (_bloc.isDownloading()) {
       return ValueListenableBuilder(
           valueListenable: _bloc.downloadSingleton.returnNotifier(),
@@ -378,16 +374,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildVoiceRow() {
-    return SizedBox(
-      height: 56,
-      child: StreamBuilder<ApiResponse<List<String>>>(
-          stream: _bloc.voiceListController.stream,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
-              return _getEmptyPillRow();
-            }
+    return StreamBuilder<ApiResponse<List<String>>>(
+        stream: _bloc.voiceListController.stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
+            return _buildVoiceColumn(_getEmptyPillRow());
+          }
 
-            return ListView.builder(
+          if (snapshot.data.body.first == null) return Container();
+
+          return _buildVoiceColumn(
+            ListView.builder(
               padding: const EdgeInsets.only(left: 16),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
@@ -410,8 +407,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   ),
                 );
               },
-            );
-          }),
+            ),
+          );
+        });
+  }
+
+  Column _buildVoiceColumn(Widget w) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildSpacer(),
+        buildTextHeaderForRow('Voice'),
+        SizedBox(height: 56, child: w),
+      ],
     );
   }
 
@@ -471,7 +479,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (index == 1) {
       // 'YES' selected
       if (!_bloc.downloadSingleton.isDownloadingSomething()) {
-        _bloc.downloadSingleton.start(_bloc.currentFile, _bloc.getMediaItemForSelectedFile());
+        _bloc.downloadSingleton
+            .start(_bloc.currentFile, _bloc.getMediaItemForSelectedFile());
       } else {
         _bloc.offlineSelected = 0;
         createSnackBarWithColor('Another Download in Progress', scaffoldContext,
