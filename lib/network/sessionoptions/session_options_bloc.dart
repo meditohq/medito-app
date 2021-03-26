@@ -30,6 +30,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Medito/utils/duration_ext.dart';
 
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
@@ -154,7 +155,7 @@ class SessionOptionsBloc {
 
     currentFile = _options.files.firstWhere((element) {
       var voiceToMatch = element.voice;
-      var lengthToMatch = _formatSessionLength(element.length);
+      var lengthToMatch = clockTimeToDuration(element.length).toReadable();
       return voiceToMatch == voice && lengthToMatch == length;
     },
         orElse: () => _options.files.firstWhere((element) {
@@ -193,25 +194,11 @@ class SessionOptionsBloc {
         .where((element) => element.voice == voiceList[voiceIndex])
         .map((e) => e.length)
         .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
-        .map((e) => _formatSessionLength(e))
+        .map((e) => formatSessionLength(e))
         .toList();
 
     // Post to UI
     lengthListController.sink.add(ApiResponse.completed(lengthList));
-  }
-
-  String _formatSessionLength(String item) {
-    if (item.contains(':')) {
-      var duration = clockTimeToDuration(item);
-      var time = '';
-      if (duration.inMinutes < 1) {
-        time = '<1';
-      } else {
-        time = duration.inMinutes.toString();
-      }
-      return '$time min';
-    }
-    return item + ' min';
   }
 
   /// File handling

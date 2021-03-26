@@ -17,7 +17,7 @@ import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../utils/colors.dart';
+import 'package:Medito/utils/colors.dart';
 
 class ListItemWidget extends StatelessWidget {
   ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id}) : super(key: key);

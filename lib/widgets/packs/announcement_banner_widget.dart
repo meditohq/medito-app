@@ -94,7 +94,7 @@ class _AnnouncementBannerState extends State<AnnouncementBanner>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(snapshot.data.body, style: Theme.of(context).textTheme.subtitle1),
+        Text(snapshot.data.body, style: Theme.of(context).textTheme.subtitle1.copyWith(color: MeditoColors.walterWhite)),
       ],
     );
   }

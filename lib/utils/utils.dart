@@ -22,7 +22,6 @@ import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -108,13 +107,12 @@ Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
   if (url == null) return null;
   // if (url.endsWith('png')) {
-    return CachedNetworkImage(
-      placeholder: (context, url) =>
-          Container(
-            height: startHeight,
-          ),
-      imageUrl: url,
-    );
+  return CachedNetworkImage(
+    placeholder: (context, url) => Container(
+      height: startHeight,
+    ),
+    imageUrl: url,
+  );
   // } else {
   //   return SvgPicture.network(
   //     url,
@@ -151,7 +149,7 @@ Color parseColor(String color) {
 
 void createSnackBar(String message, BuildContext context) {
   final snackBar =
-  SnackBar(content: Text(message), backgroundColor: Colors.red);
+      SnackBar(content: Text(message), backgroundColor: Colors.red);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -189,32 +187,15 @@ MarkdownBody getMarkdownBody(String content, BuildContext context) {
     }),
     selectable: false,
     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        a: Theme
-            .of(context)
+        a: Theme.of(context)
             .textTheme
             .bodyText2
             .copyWith(decoration: TextDecoration.underline),
-        h1: Theme
-            .of(context)
-            .textTheme
-            .headline6,
-        h2: Theme
-            .of(context)
-            .textTheme
-            .headline5,
-        h3: Theme
-            .of(context)
-            .textTheme
-            .subtitle2,
-        listBullet: Theme
-            .of(context)
-            .textTheme
-            .subtitle1,
-        p: Theme
-            .of(context)
-            .textTheme
-            .bodyText2
-            .copyWith(height: 1.5)),
+        h1: Theme.of(context).textTheme.headline6,
+        h2: Theme.of(context).textTheme.headline5,
+        h3: Theme.of(context).textTheme.subtitle2,
+        listBullet: Theme.of(context).textTheme.subtitle1,
+        p: Theme.of(context).textTheme.bodyText2.copyWith(height: 1.5)),
     data: content ?? '',
     imageDirectory: 'https://raw.githubusercontent.com',
   );
@@ -236,15 +217,6 @@ void launchDonatePageOrWidget(BuildContext context) {
 // ignore: always_declare_return_types
 launchUrl(String url) async {
   await launch(url);
-}
-
-Duration clockTimeToDuration(String lengthText) {
-  var tempList = lengthText.split(':');
-  var tempListInts = tempList.map(int.parse).toList();
-  return Duration(
-      hours: tempListInts[0],
-      minutes: tempListInts[1],
-      seconds: tempListInts[2]);
 }
 
 Future<void> acceptTracking() async {
