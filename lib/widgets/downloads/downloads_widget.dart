@@ -1,7 +1,9 @@
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
@@ -100,7 +102,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   ListItemWidget _getListItemWidget(MediaItem item, String duration) {
     return ListItemWidget(
       title: item.title,
-      subtitle: duration,
+      subtitle: clockTimeToDuration(duration).toMinutesSeconds(),
       id: item.id,
       fileType: FileType.session,
     );
