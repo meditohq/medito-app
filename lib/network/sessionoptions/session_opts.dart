@@ -26,7 +26,7 @@ class SessionData {
   String cover;
   String colorPrimary;
   String colorSecondary;
-  String get attribution => author.html;
+  String get attribution => author?.html ?? '';
   List<AudioFile> get files => audio.map((e) => e.file).toList();
 
   @Deprecated('use files instead')
