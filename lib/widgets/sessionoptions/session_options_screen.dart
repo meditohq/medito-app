@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
@@ -25,13 +26,14 @@ import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-import '../../audioplayer/player_utils.dart';
-import '../../utils/colors.dart';
+import 'package:Medito/audioplayer/player_utils.dart';
+import 'package:Medito/utils/colors.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
+  final Screen screenKey;
 
-  SessionOptionsScreen({Key key, this.id}) : super(key: key);
+  SessionOptionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
 
   @override
   _SessionOptionsScreenState createState() => _SessionOptionsScreenState();
@@ -50,7 +52,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     super.initState();
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
-    _bloc = SessionOptionsBloc(widget.id);
+    _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
   }
 
   @override

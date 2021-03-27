@@ -133,4 +133,4 @@ class Item {
   }
 }
 
-enum FileType { folder, text, session, url }
+enum FileType { folder, text, session, url, dailies }
