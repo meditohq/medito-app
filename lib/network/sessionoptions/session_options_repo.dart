@@ -15,17 +15,31 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
+  var dailiesExt = 'items/dailies/';
   var bgSoundsUrl = 'https://live.medito.app/api/pages/backgroundsounds/files';
   var parameters =
       '?fields=*,author.html,audio.file.id,audio.file.voice,audio.file.length';
+  var screen;
+
+  SessionOptionsRepository({this.screen});
 
   Future<SessionData> fetchOptions(String id) async {
-    final response = await httpGet(baseUrl + ext + id + parameters);
+    var url;
+
+    if (screen == Screen.dailies) {
+      url = baseUrl + dailiesExt + id + parameters;
+    } else {
+      url = baseUrl + ext + id + parameters;
+    }
+
+    final response = await httpGet(url);
+
     return SessionOptionsResponse.fromJson(response).data;
   }
 

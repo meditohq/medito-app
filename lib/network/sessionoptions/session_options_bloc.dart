@@ -23,14 +23,14 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_repo.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Medito/utils/duration_ext.dart';
 
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
@@ -68,7 +68,7 @@ class SessionOptionsBloc {
   MediaLibrary mediaLibrary;
   SessionData _options;
 
-  SessionOptionsBloc(String id) {
+  SessionOptionsBloc(String id, Screen screen) {
     titleController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
@@ -93,7 +93,7 @@ class SessionOptionsBloc {
     descController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
-    _repo = SessionOptionsRepository();
+    _repo = SessionOptionsRepository(screen: screen);
     fetchOptions(id);
 
     getIntValuesSF(id, 'voiceSelected').then((value) => voiceSelected = value);
