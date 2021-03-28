@@ -26,14 +26,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
-
-import '../../tracking/tracking.dart';
-import '../../utils/colors.dart';
-import '../../utils/stats_utils.dart';
-import '../../viewmodel/model/tile_item.dart';
-import '../column_builder.dart';
-import '../streak_widgets/streak_page.dart';
-import '../streak_tile_widget.dart';
+import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/widgets/column_builder.dart';
+import 'package:Medito/widgets/streak_widgets/streak_page.dart';
+import 'package:Medito/widgets/streak_tile_widget.dart';
 
 class PackListWidget extends StatefulWidget {
   PackListWidget({Key key}) : super(key: key);
@@ -122,7 +120,6 @@ class PackListWidgetState extends State<PackListWidget> {
   }
 
   Widget _getTwoColumns(List<PacksData> data) {
-
     var firstCol = data.getRange(0, data.length ~/ 2).toList();
     var secondCol = data.getRange(data.length ~/ 2, data.length).toList();
 
@@ -194,8 +191,7 @@ class PackListWidgetState extends State<PackListWidget> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(height: 8),
-                SizedBox(
-                    height: 80, child: getNetworkImageWidget(item.cover)),
+                SizedBox(height: 80, child: getNetworkImageWidget(item.cover)),
                 Container(height: 16),
                 SizedBox(
                   width: _getColumnWidth() - 48, //todo horrible hack
@@ -282,27 +278,26 @@ class PackListWidgetState extends State<PackListWidget> {
 
   ///  This is for the skeleton screen
   Widget getLoadingWidget() {
-    var item = TileItem('', '', '000000');
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
           _getMeditoLogoWidget(),
           Container(height: 8),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
-          getBlankTile(item, MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
+          getBlankTile(MeditoColors.moonlight),
         ],
       ),
     );
   }
 
-  Widget getBlankTile(TileItem item, Color color) {
+  Widget getBlankTile(Color color) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0, bottom: 16.0, left: 16.0),
       child: Row(
