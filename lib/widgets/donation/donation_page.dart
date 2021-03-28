@@ -114,8 +114,8 @@ class _DonationWidgetState extends State<DonationWidget> {
       ),
       body: subscriptions != null && subscriptions.isNotEmpty
           ? Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CustomScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: CustomScrollView(
                 slivers: [
                   SliverFillRemaining(
                     hasScrollBody: false,
@@ -141,21 +141,19 @@ class _DonationWidgetState extends State<DonationWidget> {
                   ),
                 ],
               ),
-          )
+            )
           : _loadingWidget(),
     );
   }
 
   Column _loadingWidget() {
     return Column(
-            children: [
-              Center(
-                  child: SizedBox(
-                      height: 32,
-                      width: 32,
-                      child: CircularProgressIndicator())),
-            ],
-          );
+      children: [
+        Center(
+            child: SizedBox(
+                height: 32, width: 32, child: CircularProgressIndicator())),
+      ],
+    );
   }
 
   Widget _donationTypeRow() {
@@ -168,6 +166,8 @@ class _DonationWidgetState extends State<DonationWidget> {
           child: SizedBox(
             height: GIVE_SIZE,
             child: FlatButton(
+              // style: ButtonStyle(
+              // backgroundColor: MaterialStateProperty.resolveAs(value, states)
               color: _giveSelected == ONCE
                   ? MeditoColors.peacefulBlue
                   : MeditoColors.moonlight,
