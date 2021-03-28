@@ -55,7 +55,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        String bg = mediaItem.extras['bgMusic'];
+          String bg = mediaItem.extras['bgMusic'];
         if (bg.isNotEmptyAndNotNull()) {
           playBgMusic(bg);
         }

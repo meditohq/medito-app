@@ -14,13 +14,14 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_response.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class TextRepository {
-  var baseUrl = 'https://live.medito.app/api/';
+  var ext = 'items/articles/';
 
   Future<TextResponse> fetchData(String id) async {
-    final response = await httpGet(baseUrl + id);
+    final response = await httpGet(baseUrl + ext + id);
     return TextResponse.fromJson(response);
   }
 }

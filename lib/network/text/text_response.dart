@@ -1,55 +1,48 @@
 class TextResponse {
+  @Deprecated('use fields instead')
+  Data data;
+  int get id => data.id;
+  String get title => data.title;
+  String get subtitle => data.subtitle;
+  String get html => data.html;
 
-  String get title => data.content.title;
-  String get content => data.content.body;
 
-  TextResponse({
-    this.data,
-  });
+  TextResponse({data});
 
-  final Data data;
+  TextResponse.fromJson(Map<String, dynamic> json) {
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+  }
 
-  factory TextResponse.fromJson(Map<String, dynamic> json) => TextResponse(
-        data: Data.fromJson(json['data']),
-      );
-
-  Map<String, dynamic> toJson() => {
-        'data': data.toJson(),
-      };
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    if (data != null) {
+      data['data'] = this.data.toJson();
+    }
+    return data;
+  }
 }
 
 class Data {
-  Data({
-    this.content,
-  });
+  int id;
+  String title;
+  String subtitle;
+  String html;
 
-  final Content content;
+  Data({id, title, subtitle, html});
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        content: Content.fromJson(json['content']),
-      );
+  Data.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    title = json['title'];
+    subtitle = json['subtitle'];
+    html = json['html'];
+  }
 
-  Map<String, dynamic> toJson() => {
-        'content': content.toJson(),
-      };
-}
-
-class Content {
-  Content({
-    this.body,
-    this.title,
-  });
-
-  final String body;
-  final String title;
-
-  factory Content.fromJson(Map<String, dynamic> json) => Content(
-        body: json['body'],
-        title: json['title'],
-      );
-
-  Map<String, dynamic> toJson() => {
-        'body': body,
-        'title': title,
-      };
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['subtitle'] = subtitle;
+    data['html'] = html;
+    return data;
+  }
 }

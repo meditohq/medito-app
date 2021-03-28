@@ -28,10 +28,10 @@ class TextBloc {
   }
 
   Future<void> fetchText(String id) async {
-    var options = await _repo.fetchData(id);
+    var data = await _repo.fetchData(id);
 
-    titleController.sink.add(options.title);
-    bodyController.sink.add(options.content);
+    titleController.sink.add(data.title);
+    bodyController.sink.add(data.html);
   }
 
   void dispose() {
