@@ -35,10 +35,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
-  BackgroundSounds _bgMusicList;
-  var voiceList = <String>[];
   var lengthList = <String>[];
-  var backgroundMusicUrl;
+  var backgroundSoundsId;
   var voiceSelected = 0;
   String availableOfflineIndicatorText = '';
 
@@ -62,7 +60,8 @@ class SessionOptionsBloc {
   StreamController<ApiResponse<Map<String, String>>> colourController;
   StreamController<ApiResponse<List<String>>> voiceListController;
   StreamController<ApiResponse<List<String>>> lengthListController;
-  StreamController<ApiResponse<BackgroundSounds>> backgroundMusicListController;
+  StreamController<ApiResponse<BackgroundSoundsResponse>>
+      backgroundMusicListController;
   StreamController<bool> backgroundMusicShownController;
 
   MediaLibrary mediaLibrary;
@@ -106,7 +105,7 @@ class SessionOptionsBloc {
 
   Future<void> fetchOptions(String id) async {
     var options = await _repo.fetchOptions(id);
-    _bgMusicList = await _repo.fetchBackgroundSounds();
+    var bgMusicList = await _repo.fetchBackgroundSounds();
     _options = options;
 
     // Show title, desc and image
@@ -123,13 +122,11 @@ class SessionOptionsBloc {
     backgroundMusicShownController.sink.add(_options.backgroundSound);
     if (_options.backgroundSound) {
       backgroundMusicListController.sink
-          .add(ApiResponse.completed(_bgMusicList)); // fixme
+          .add(ApiResponse.completed(bgMusicList));
     }
 
     // Info is in the form "info": "No voice,00:05:02"
-    voiceList =
-        _options.audio.map((element) => element.file.voice).toSet().toList();
-    voiceListController.sink.add(ApiResponse.completed(voiceList));
+    voiceListController.sink.add(ApiResponse.completed(options.voiceList));
     filterLengthsForVoice();
   }
 
@@ -147,7 +144,7 @@ class SessionOptionsBloc {
   }
 
   Future<void> updateCurrentFile() async {
-    var voice = voiceList[voiceSelected];
+    var voice = _options.voiceList[voiceSelected];
     var length;
     if (lengthList.length > lengthSelected) {
       length = lengthList[lengthSelected];
@@ -174,7 +171,7 @@ class SessionOptionsBloc {
   void updateAvailableOfflineIndicatorText() {
     if (offlineSelected != 0) {
       availableOfflineIndicatorText =
-          '(${voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
+          '(${_options.voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
     } else {
       availableOfflineIndicatorText = '';
     }
@@ -191,7 +188,7 @@ class SessionOptionsBloc {
   void filterLengthsForVoice({int voiceIndex = 0}) {
     //Filter the lengths list for this voice from the original data
     lengthList = _options.files
-        .where((element) => element.voice == voiceList[voiceIndex])
+        .where((element) => element.voice == _options.voiceList[voiceIndex])
         .map((e) => e.length)
         .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
         .map((e) => formatSessionLength(e))
@@ -246,7 +243,7 @@ class SessionOptionsBloc {
       illustrationUrl: _getCoverUrl(),
       secondaryColor: _options.colorSecondary,
       primaryColor: _options.colorPrimary,
-      bgMusic: '',
+      bgMusic: backgroundSoundsId,
       durationAsMilliseconds:
           clockTimeToDuration(currentFile.length).inMilliseconds,
       id: currentFile.id,
