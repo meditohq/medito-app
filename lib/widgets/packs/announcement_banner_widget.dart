@@ -36,14 +36,8 @@ class _AnnouncementBannerState extends State<AnnouncementBanner>
   final _bloc = AnnouncementBloc();
 
   @override
-  void initState() {
-    super.initState();
-    _bloc.fetchAnnouncement();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<AnnouncementContent>(
+    return StreamBuilder<AnnouncementResponse>(
         stream: _bloc.announcementController.stream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -77,7 +71,7 @@ class _AnnouncementBannerState extends State<AnnouncementBanner>
                           child: MaterialBanner(
                             backgroundColor: MeditoColors.darkMoon,
                             content: _buildTextColumn(snapshot, context),
-                            leading: snapshot.data.showIcon
+                            leading: snapshot.data.icon.isNotEmptyAndNotNull()
                                 ? buildCircleAvatar(snapshot)
                                 : Container(),
                             actions: [
@@ -96,17 +90,16 @@ class _AnnouncementBannerState extends State<AnnouncementBanner>
   }
 
   Column _buildTextColumn(
-      AsyncSnapshot<AnnouncementContent> snapshot, BuildContext context) {
+      AsyncSnapshot<AnnouncementResponse> snapshot, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(snapshot.data.title),
-        Text(snapshot.data.body, style: Theme.of(context).textTheme.subtitle1),
+        Text(snapshot.data.body, style: Theme.of(context).textTheme.subtitle1.copyWith(color: MeditoColors.walterWhite)),
       ],
     );
   }
 
-  CircleAvatar buildCircleAvatar(AsyncSnapshot<AnnouncementContent> snapshot) {
+  CircleAvatar buildCircleAvatar(AsyncSnapshot<AnnouncementResponse> snapshot) {
     return CircleAvatar(
       backgroundColor: parseColor(snapshot.data.colorPrimary),
       child: SvgPicture.asset(
@@ -116,7 +109,7 @@ class _AnnouncementBannerState extends State<AnnouncementBanner>
     );
   }
 
-  Padding _buildPositiveButton(AsyncSnapshot<AnnouncementContent> snapshot) {
+  Padding _buildPositiveButton(AsyncSnapshot<AnnouncementResponse> snapshot) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: TextButton(
