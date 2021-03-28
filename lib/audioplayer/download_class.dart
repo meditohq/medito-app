@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -49,8 +50,10 @@ class _Download {
     } else {
       file.createSync();
     }
-    var _response = await http.Client()
-        .send(http.Request('GET', Uri.parse(currentFile.url)));
+
+    var url = baseUrl + 'assets/' + currentFile.id;
+    var _response =
+        await http.Client().send(http.Request('GET', Uri.parse(url)));
     _total = _response.contentLength;
     _received = 0;
     var _bytes = <int>[];
@@ -67,7 +70,7 @@ class _Download {
         _received ??= _bytes.length;
         if (_total == null) {
           http.Client()
-              .send(http.Request('GET', Uri.parse(currentFile.url)))
+              .send(http.Request('GET', Uri.parse(currentFile.id)))
               .then((value) => _response = value);
           _total = _response.contentLength;
           _received = _bytes.length;
@@ -98,7 +101,7 @@ class _Download {
     if (_total == null) {
       http.StreamedResponse _throwResponse;
       http.Client()
-          .send(http.Request('GET', Uri.parse(_file.url)))
+          .send(http.Request('GET', Uri.parse(_file.id)))
           .then((value) => _throwResponse = value);
       _total = _throwResponse.contentLength;
     }
