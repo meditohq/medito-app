@@ -14,14 +14,14 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/player/audio_complete_copy_response.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class AudioCompleteCopyRepository {
-  var baseUrl =
-      'https://live.medito.app/api/pages/components+audiocompletecopy';
-
-  Future<AudioCompleteCopyResponse> fetchCopyData() async {
-    final response = await httpGet(baseUrl);
-    return AudioCompleteCopyResponse.fromJson(response);
+  final _ext = 'items/player_copy?fields=*.*';
+  
+  Future<PlayerCopyResponse> fetchCopyData() async {
+    final response = await httpGet(baseUrl + _ext);
+    return PlayerCopyResponse.fromJson(response);
   }
 }

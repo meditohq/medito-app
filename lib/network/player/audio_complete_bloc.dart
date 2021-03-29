@@ -18,22 +18,32 @@ import 'dart:math';
 
 import 'package:Medito/network/player/audio_complete_copy_repo.dart';
 import 'package:Medito/network/player/audio_complete_copy_response.dart';
+import 'package:Medito/utils/stats_utils.dart';
 
 class AudioCompleteCopyBloc {
   AudioCompleteCopyRepository _repo;
-  Version version;
+  PlayerCopyData version;
 
   static final _random = Random();
 
   AudioCompleteCopyBloc() {
     _repo = AudioCompleteCopyRepository();
-    _fetchOptions();
+    _fetchCopy();
   }
 
-  Future<void> _fetchOptions() async {
+  Future<void> _fetchCopy() async {
     var data = await _repo.fetchCopyData();
-    final randomOutOf10 = _random.nextInt(data.list.length);
-    version = data.list[randomOutOf10];
+    final randomOutOf10 = _random.nextInt(data.data.length);
+    version = data.data[randomOutOf10];
+  }
+
+  Future<String> getVersionTitle() async {
+    var title = version?.title;
+    if (title?.contains('%n') ?? false) {
+      var streak = await getCurrentStreak();
+      title = title.replaceAll('%n', streak.toString());
+    }
+    return title;
   }
 
 }

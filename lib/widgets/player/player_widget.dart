@@ -204,7 +204,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     style: buildTitleTheme(),
                   )
                 : FutureBuilder<String>(
-                    future: getVersionTitle(),
+                    future: _bloc.getVersionTitle(),
                     builder: (context, snapshot) {
                       return Text(
                         snapshot.hasData ? snapshot.data : 'Loading...',
@@ -216,15 +216,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     })),
       ],
     );
-  }
-
-  Future<String> getVersionTitle() async {
-    var title = _bloc.version?.title;
-    if (title?.contains('%n') ?? false) {
-      var streak = await getCurrentStreak();
-      title = title.replaceAll('%n', streak.toString());
-    }
-    return title;
   }
 
   TextStyle buildTitleTheme() {
@@ -239,7 +230,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   StatelessWidget getSubtitleWidget(MediaItem mediaItem) {
     var attr = '';
     if (_complete) {
-      attr = _bloc.version.subtitle;
+      attr = _bloc.version.body;
     } else {
       attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
     }
@@ -398,7 +389,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       children: [
         CircularProgressIndicator(),
         Container(height: 16),
-        Text('Buffering')
+        Text('Loading')
       ],
     ));
   }
@@ -487,7 +478,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       Navigator.pop(context);
     } else {
       Navigator.popUntil(
-          context, ModalRoute.withName(FolderNavWidget.routeName));
+          context,
+          (Route<dynamic> route) =>
+              route.settings.name == FolderNavWidget.routeName ||
+              route.isFirst);
     }
   }
 
@@ -498,13 +492,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           Padding(
             padding: const EdgeInsets.only(
                 left: 32.0, top: 32, bottom: 8, right: 32.0),
-            child: FlatButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              padding: const EdgeInsets.all(16.0),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                  shape: roundedRectangleBorder(),
+                  backgroundColor: primaryColorAsColor,
+                  padding: const EdgeInsets.all(16.0)),
               onPressed: () => _launchPrimaryButton(),
-              color: primaryColorAsColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -519,13 +512,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 32.0, right: 32.0),
-            child: FlatButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              padding: const EdgeInsets.all(16.0),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                  shape: roundedRectangleBorder(),
+                  backgroundColor: MeditoColors.moonlight,
+                  padding: const EdgeInsets.all(16.0)),
               onPressed: _share,
-              color: MeditoColors.moonlight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
