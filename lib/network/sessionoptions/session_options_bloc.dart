@@ -37,9 +37,9 @@ class SessionOptionsBloc {
 
   var lengthList = <String>[];
   var backgroundSoundsId;
-  var voiceSelected = 0;
   String availableOfflineIndicatorText = '';
 
+  var voiceSelected = 0;
   var lengthSelected = 0;
   var offlineSelected = 0;
   var musicSelected = 0;
@@ -152,7 +152,7 @@ class SessionOptionsBloc {
 
     currentFile = _options.files.firstWhere((element) {
       var voiceToMatch = element.voice;
-      var lengthToMatch = clockTimeToDuration(element.length).toReadable();
+      var lengthToMatch = formatSessionLength(element.length);
       return voiceToMatch == voice && lengthToMatch == length;
     },
         orElse: () => _options.files.firstWhere((element) {
