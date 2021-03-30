@@ -1,89 +1,47 @@
-class BackgroundSounds {
-  int _code;
-  List<Data> _data;
+class BackgroundSoundsResponse {
+  List<Data> data;
 
-  BackgroundSounds({int code, List<Data> data}) {
-    _code = code;
-    _data = data;
-  }
+  BackgroundSoundsResponse({this.data});
 
-  int get code => _code;
-
-  set code(int code) => _code = code;
-
-  List<Data> get list => _data;
-
-  set data(List<Data> data) => _data = data;
-
-  BackgroundSounds.fromJson(Map<String, dynamic> json) {
-    _code = json['code'];
+  BackgroundSoundsResponse.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      _data = <Data>[];
+      data = <Data>[];
       json['data'].forEach((v) {
-        _data.add(Data.fromJson(v));
+        data.add(Data.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['code'] = _code;
-    if (_data != null) {
-      data['data'] = _data.map((v) => v.toJson()).toList();
+    if (data != null) {
+      data['data'] = this.data.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Data {
-  Content _content;
-  String _url;
+  int id;
+  String name;
+  String file;
+  Null sort;
 
-  Data({Content content, String url}) {
-    _content = content;
-    _url = url;
-  }
-
-  set content(Content content) => _content = content;
-  set url(String url) => _url = url;
-
-  String get name => _content.title;
-  String get url => _url;
+  Data({this.id, this.name, this.file, this.sort});
 
   Data.fromJson(Map<String, dynamic> json) {
-    _content =
-        json['content'] != null ? Content.fromJson(json['content']) : null;
-    _url = json['url'];
+    id = json['id'];
+    name = json['name'];
+    file = json['file'];
+    sort = json['sort'];
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (_content != null) {
-      data['content'] = _content.toJson();
-    }
-    data['url'] = _url;
-    return data;
-  }
-}
-
-class Content {
-  String _title;
-
-  Content({String title}) {
-    _title = title;
-  }
-
-  String get title => _title;
-
-  set title(String title) => _title = title;
-
-  Content.fromJson(Map<String, dynamic> json) {
-    _title = json['title'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['title'] = _title;
+    data['id'] = id;
+    data['name'] = name;
+    data['file'] = file;
+    data['sort'] = sort;
     return data;
   }
 }

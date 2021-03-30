@@ -46,7 +46,7 @@ class NavigationFactory {
       case Screen.downloads:
         _push(context, DownloadsListWidget());
         break;
-      case Screen.dailies:
+      case Screen.daily:
         _push(
             context,
             SessionOptionsScreen(
@@ -75,8 +75,8 @@ class NavigationFactory {
         break;
       case FileType.folder:
         return Screen.folder;
-      case FileType.dailies:
-        return Screen.dailies;
+      case FileType.daily:
+        return Screen.daily;
       case FileType.url:
         throw Exception('No screen type for URL');
         break;
@@ -89,8 +89,8 @@ class NavigationFactory {
     if (place == 'session') {
       navigate(context, Screen.session_options, id: id);
     }
-    if (place == 'dailies') {
-      navigate(context, Screen.dailies, id: id);
+    if (place == 'daily') {
+      navigate(context, Screen.daily, id: id);
     }
     if (place == 'donation') {
       navigate(context, Screen.donation);
@@ -116,7 +116,7 @@ enum Screen {
   text,
   stats,
   session_options,
-  dailies,
+  daily,
   donation,
   downloads
 }

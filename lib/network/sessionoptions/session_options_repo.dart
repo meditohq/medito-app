@@ -22,7 +22,7 @@ import 'package:Medito/viewmodel/http_get.dart';
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
-  var bgSoundsUrl = 'https://live.medito.app/api/pages/backgroundsounds/files';
+  var bgSoundsUrl = 'http://api.medito.app/items/background_sounds';
   var parameters =
       '?fields=*,author.html,audio.file.id,audio.file.voice,audio.file.length';
   var screen;
@@ -32,7 +32,7 @@ class SessionOptionsRepository {
   Future<SessionData> fetchOptions(String id) async {
     var url;
 
-    if (screen == Screen.dailies) {
+    if (screen == Screen.daily) {
       url = baseUrl + dailiesExt + id + parameters;
     } else {
       url = baseUrl + ext + id + parameters;
@@ -43,9 +43,9 @@ class SessionOptionsRepository {
     return SessionOptionsResponse.fromJson(response).data;
   }
 
-  Future<BackgroundSounds> fetchBackgroundSounds() async {
+  Future<BackgroundSoundsResponse> fetchBackgroundSounds() async {
     final response = await httpGet(bgSoundsUrl);
-    return BackgroundSounds.fromJson(response);
+    return BackgroundSoundsResponse.fromJson(response);
   }
 
   String getImageBaseUrl(String cover) => '${baseUrl}assets/$cover?download';

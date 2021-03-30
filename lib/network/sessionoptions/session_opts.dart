@@ -28,6 +28,8 @@ class SessionData {
   String colorSecondary;
   String get attribution => author?.html ?? '';
   List<AudioFile> get files => audio.map((e) => e.file).toList();
+  List<String> get voiceList =>
+  audio.map((element) => element.file.voice).toSet().toList();
 
   @Deprecated('use files instead')
   List<Audio> audio;

@@ -330,7 +330,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Widget buildBackgroundMusicRowAndSpacer() {
     return SizedBox(
         height: 56,
-        child: StreamBuilder<ApiResponse<BackgroundSounds>>(
+        child: StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
             stream: _bloc.backgroundMusicListController.stream,
             initialData: ApiResponse.loading(),
             builder: (context, snapshot) {
@@ -339,7 +339,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 return _getEmptyPillRow();
               }
 
-              var data = snapshot.data.body?.list;
+              var data = snapshot.data.body?.data;
 
               if (data?.isEmpty ?? true) return Container();
 
@@ -361,7 +361,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                       onSelected: (bool value) {
                         onMusicSelected(
                             index,
-                            index > 0 ? data[index - 1].url : '',
+                            index > 0 ? data[index - 1].file : '',
                             index > 0 ? data[index - 1].name : '');
                       },
                       backgroundColor: MeditoColors.moonlight,
@@ -448,25 +448,25 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
   }
 
-  void onMusicSelected(int index, String url, String name) {
+  void onMusicSelected(int index, String id, String name) {
     _bloc.musicSelected = index;
     print('bg selected: $name');
     if (index > 0) {
       showIndeterminateSpinner = true;
-      downloadBGMusicFromURL(url, name).then((value) {
+      downloadBGMusicFromURL(id, name).then((value) {
         showIndeterminateSpinner = false;
-        _bloc.backgroundMusicUrl = value;
+        _bloc.backgroundSoundsId = value;
         setState(() {});
       }).catchError((onError) {
         print(onError);
         showIndeterminateSpinner = false;
         _bloc.musicSelected = 0;
-        _bloc.backgroundMusicUrl = null;
+        _bloc.backgroundSoundsId = null;
       });
     } else {
       showIndeterminateSpinner = false;
       _bloc.musicSelected = 0;
-      _bloc.backgroundMusicUrl = null;
+      _bloc.backgroundSoundsId = null;
     }
     setState(() {});
   }

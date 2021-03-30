@@ -17,6 +17,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -24,7 +25,6 @@ import 'package:path_provider/path_provider.dart';
 var downloadListener = ValueNotifier<double>(0);
 var bgDownloadListener = ValueNotifier<double>(0);
 int bgTotal = 1, bgReceived = 0;
-var backgroundMusicUrl = '';
 
 Future<dynamic> checkFileExists(AudioFile currentFile) async {
   var dir = (await getApplicationSupportDirectory()).path;
@@ -34,12 +34,14 @@ Future<dynamic> checkFileExists(AudioFile currentFile) async {
   return exists;
 }
 
-Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
+Future<dynamic> downloadBGMusicFromURL(String id, String name) async {
   var dir = (await getApplicationSupportDirectory()).path;
   name = name.replaceAll(' ', '%20');
   var file = File('$dir/$name');
 
   if (await file.exists()) return file.path;
+
+  var url = '${baseUrl}assets/$id';
 
   var request = await http.get(url);
   var bytes = request.bodyBytes;
