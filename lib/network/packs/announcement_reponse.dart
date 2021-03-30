@@ -1,80 +1,79 @@
 class AnnouncementResponse {
-  AnnouncementResponse({
-    this.data,
-  });
+  @Deprecated('Use fields instead')
+  Data data;
 
-  final Data data;
+  String get icon => data.icon;
 
-  factory AnnouncementResponse.fromJson(Map<String, dynamic> json) =>
-      AnnouncementResponse(
-        data: Data.fromJson(json['data']),
-      );
+  String get colorPrimary => data.colorPrimary;
 
-  Map<String, dynamic> toJson() => {
-        'data': data.toJson(),
-      };
+  String get body => data.body;
+
+  String get buttonLabel => data.buttonLabel;
+
+  String get buttonType => data.buttonType;
+
+  String get buttonPath => data.buttonPath;
+
+  String get timestamp => data.timestamp;
+
+  String get id => data.id;
+
+  AnnouncementResponse({data});
+
+  AnnouncementResponse.fromJson(Map<String, dynamic> json) {
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    if (data != null) {
+      data['data'] = this.data.toJson();
+    }
+    return data;
+  }
 }
 
 class Data {
-  Data({
-    this.content,
-  });
+  String icon;
+  String colorPrimary;
+  String body;
+  String buttonLabel;
+  String buttonType;
+  String buttonPath;
+  String timestamp;
+  String id;
 
-  final AnnouncementContent content;
+  Data(
+      {icon,
+      colorPrimary,
+      body,
+      buttonLabel,
+      buttonType,
+      buttonPath,
+      timestamp,
+      id});
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        content: AnnouncementContent.fromJson(json['content']),
-      );
+  Data.fromJson(Map<String, dynamic> json) {
+    icon = json['icon'];
+    colorPrimary = json['color_primary'];
+    body = json['body'];
+    buttonLabel = json['button_label'];
+    buttonType = json['button_type'];
+    buttonPath = json['button_path'];
+    timestamp = json['timestamp'];
+    id = json['id'];
+  }
 
-  Map<String, dynamic> toJson() => {
-        'content': content.toJson(),
-      };
-}
-
-class AnnouncementContent {
-  AnnouncementContent({
-    this.showIcon,
-    this.icon,
-    this.colorPrimary,
-    this.timestamp,
-    this.body,
-    this.buttonLabel,
-    this.buttonType,
-    this.buttonPath,
-    this.title,
-  });
-
-  final bool showIcon;
-  final String icon;
-  final String colorPrimary;
-  final int timestamp;
-  final String body;
-  final String buttonLabel;
-  final String buttonType;
-  final String buttonPath;
-  final String title;
-
-  factory AnnouncementContent.fromJson(Map<String, dynamic> json) => AnnouncementContent(
-        showIcon: json['show_icon'],
-        icon: json['icon'],
-        colorPrimary: json['color_primary'],
-        timestamp: json['timestamp'],
-        body: json['body'],
-        buttonLabel: json['button_label'],
-        buttonType: json['button_type'],
-        buttonPath: json['button_path'],
-        title: json['title'],
-      );
-
-  Map<String, dynamic> toJson() => {
-        'show_icon': showIcon,
-        'icon': icon,
-        'color_primary': colorPrimary,
-        'timestamp': timestamp,
-        'body': body,
-        'button_label': buttonLabel,
-        'button_type': buttonType,
-        'button_path': buttonPath,
-        'title': title,
-      };
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['icon'] = icon;
+    data['color_primary'] = colorPrimary;
+    data['body'] = body;
+    data['button_label'] = buttonLabel;
+    data['button_type'] = buttonType;
+    data['button_path'] = buttonPath;
+    data['timestamp'] = timestamp;
+    data['id'] = id;
+    return data;
+  }
 }

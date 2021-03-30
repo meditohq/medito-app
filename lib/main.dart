@@ -97,7 +97,9 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> checkForUpdate() async {
-    if (Platform.isAndroid) {
+    //todo This keeps popping up when you press 'No'
+
+    if (false && Platform.isAndroid) {
       unawaited(InAppUpdate.checkForUpdate().then((info) {
         setState(() {
           if (info.flexibleUpdateAllowed && info.updateAvailable) {
