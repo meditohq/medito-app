@@ -272,16 +272,20 @@ void showConsentDialog(BuildContext context) {
             Container(
               height: 48,
               child: TextButton(
+                style: TextButton.styleFrom(
+                    shape: roundedRectangleBorder(),
+                    backgroundColor: MeditoColors.peacefulBlue),
                 onPressed: () async {
-                  Tracking.enableAnalytics(false);
+                  Tracking.enableAnalytics(true);
+                  await acceptTracking();
+                  await Tracking.trackTrackingAnswered(true);
                   await trackingAnswered();
                   Navigator.pop(context);
                 },
-                style: TextButton.styleFrom(shape: roundedRectangleBorder()),
                 child: Text(
-                  'DECLINE',
+                  ' ACCEPT ',
                   style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: MeditoColors.walterWhite,
+                      color: MeditoColors.darkMoon,
                       fontWeight: FontWeight.bold),
                 ),
               ),

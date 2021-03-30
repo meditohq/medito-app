@@ -52,7 +52,7 @@ class PacksData {
     if (type == 'article') return FileType.text;
     if (type == 'folder') return FileType.folder;
     if (type == 'url') return FileType.folder;
-    if (type == 'dailies') return FileType.dailies;
+    if (type == 'daily') return FileType.daily;
     return null;
   }
 

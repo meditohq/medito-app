@@ -73,7 +73,7 @@ class PackListWidgetState extends State<PackListWidget> {
       displacement: 80,
       color: MeditoColors.walterWhite,
       backgroundColor: MeditoColors.moonlight,
-      onRefresh: () => _packsBloc.fetchPacksList(),
+      onRefresh: () => _packsBloc.fetchPacksList(true),
       child: StreamBuilder<ApiResponse<List<PacksData>>>(
           stream: _packsBloc.packListStream,
           initialData: ApiResponse.loading(),
@@ -249,7 +249,7 @@ class PackListWidgetState extends State<PackListWidget> {
   Widget _getMeditoLogoWidget() {
     return MeditoLogo(
       onDoubleTap: () => _showVersionPopUp(),
-      onLongPress: () => _packsBloc.fetchPacksList(),
+      onLongPress: () => _packsBloc.fetchPacksList(true),
     );
   }
 
