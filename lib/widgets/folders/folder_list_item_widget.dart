@@ -16,17 +16,17 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:flutter/material.dart';
-
-import '../../utils/colors.dart';
+import 'package:Medito/utils/colors.dart';
 
 class ListItemWidget extends StatelessWidget {
-  ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id}) : super(key: key);
+  ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id})
+      : super(key: key);
 
   final title;
   final subtitle;
   final fileType;
   final id;
-  
+
   Widget buildFolderIcon() {
     return Icon(Icons.folder, color: MeditoColors.walterWhite);
   }
@@ -80,31 +80,26 @@ class ListItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(title,
-                style: Theme
-                    .of(context)
+                style: Theme.of(context)
                     .textTheme
                     .headline6
                     .copyWith(fontSize: 18, height: 1.4)),
             subtitle == null || subtitle.isEmpty
                 ? Container()
                 : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .subtitle1
-                      .copyWith(
-                      fontSize: 14,
-                      letterSpacing: 0.2,
-                      fontWeight: FontWeight.w500,
-                      color: MeditoColors.walterWhite.withOpacity(0.7)),
-                ),
-              ],
-            )
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(height: 4),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            fontSize: 14,
+                            letterSpacing: 0.2,
+                            fontWeight: FontWeight.w500,
+                            color: MeditoColors.walterWhite.withOpacity(0.7)),
+                      ),
+                    ],
+                  )
           ]),
     );
   }

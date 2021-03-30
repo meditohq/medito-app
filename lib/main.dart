@@ -28,9 +28,8 @@ import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:pedantic/pedantic.dart';
-
-import 'tracking/tracking.dart';
-import 'utils/colors.dart';
+import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

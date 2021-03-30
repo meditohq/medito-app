@@ -22,8 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-
-import 'donation_page2.dart';
+import 'package:Medito/widgets/donation/donation_page2.dart';
 
 class DonationWidget extends StatefulWidget {
   @override
