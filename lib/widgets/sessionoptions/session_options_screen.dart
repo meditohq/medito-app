@@ -24,9 +24,8 @@ import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-
-import '../../audioplayer/player_utils.dart';
-import '../../utils/colors.dart';
+import 'package:Medito/audioplayer/player_utils.dart';
+import 'package:Medito/utils/colors.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -147,7 +146,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       });
 
   Widget getBeginButtonContent(String color) {
-
     if (_bloc.isDownloading()) {
       return ValueListenableBuilder(
           valueListenable: _bloc.downloadSingleton.returnNotifier(),
@@ -470,7 +468,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (index == 1) {
       // 'YES' selected
       if (!_bloc.downloadSingleton.isDownloadingSomething()) {
-        _bloc.downloadSingleton.start(_bloc.currentFile, _bloc.getMediaItemForSelectedFile());
+        _bloc.downloadSingleton
+            .start(_bloc.currentFile, _bloc.getMediaItemForSelectedFile());
       } else {
         _bloc.offlineSelected = 0;
         createSnackBarWithColor('Another Download in Progress', scaffoldContext,

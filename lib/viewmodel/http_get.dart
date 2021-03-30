@@ -18,13 +18,12 @@ import 'dart:io';
 
 import 'package:Medito/utils/utils.dart';
 import 'package:http/http.dart' as http;
-
-import 'auth.dart';
-import 'cache.dart';
-
+import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/viewmodel/cache.dart';
 
 //move this to network package later
-Future httpGet(String url, {bool skipCache = false, String fileNameForCache}) async {
+Future httpGet(String url,
+    {bool skipCache = false, String fileNameForCache}) async {
   var cache;
 
   if (!await checkConnectivity()) {
