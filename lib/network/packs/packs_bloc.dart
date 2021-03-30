@@ -36,10 +36,10 @@ class PacksBloc {
     fetchPacksList();
   }
 
-  Future<void> fetchPacksList() async {
+  Future<void> fetchPacksList([bool skipCache]) async {
     packListSink.add(ApiResponse.loading());
     try {
-      var packs = await _repo.fetchPacks();
+      var packs = await _repo.fetchPacks(skipCache);
       packListSink.add(ApiResponse.completed(packs));
     } catch (e) {
       packListSink.add(ApiResponse.error(e.toString()));

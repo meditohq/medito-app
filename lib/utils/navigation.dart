@@ -10,7 +10,8 @@ import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 
 class NavigationFactory {
-  static void navigate(BuildContext context, Screen key, {String id, bool normalPop}) {
+  static void navigate(BuildContext context, Screen key,
+      {String id, bool normalPop}) {
     switch (key) {
       case Screen.folder:
         assert(id.isNotEmpty);
@@ -32,13 +33,26 @@ class NavigationFactory {
         break;
       case Screen.session_options:
         assert(id.isNotEmpty);
-        _push(context, SessionOptionsScreen(id: id));
+        _push(
+            context,
+            SessionOptionsScreen(
+              id: id,
+              screenKey: key,
+            ));
         break;
       case Screen.donation:
         _push(context, DonationWidget());
         break;
       case Screen.downloads:
         _push(context, DownloadsListWidget());
+        break;
+      case Screen.dailies:
+        _push(
+            context,
+            SessionOptionsScreen(
+              id: id,
+              screenKey: key,
+            ));
         break;
     }
   }
@@ -61,8 +75,11 @@ class NavigationFactory {
         break;
       case FileType.folder:
         return Screen.folder;
+      case FileType.dailies:
+        return Screen.dailies;
       case FileType.url:
         throw Exception('No screen type for URL');
+        break;
     }
     return null;
   }
@@ -71,6 +88,9 @@ class NavigationFactory {
       String place, String id, BuildContext context) {
     if (place == 'session') {
       navigate(context, Screen.session_options, id: id);
+    }
+    if (place == 'dailies') {
+      navigate(context, Screen.dailies, id: id);
     }
     if (place == 'donation') {
       navigate(context, Screen.donation);
@@ -96,6 +116,7 @@ enum Screen {
   text,
   stats,
   session_options,
+  dailies,
   donation,
   downloads
 }

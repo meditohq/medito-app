@@ -14,13 +14,14 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/packs/announcement_reponse.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class AnnouncementRepository {
-  var baseUrl = 'https://live.medito.app/api/pages/components+announcement';
+  var ext = 'items/announcement';
 
-  Future<AnnouncementContent> fetchAnnouncements() async {
-    final response = await httpGet(baseUrl);
-    return AnnouncementResponse.fromJson(response).data.content;
+  Future<AnnouncementResponse> fetchAnnouncements() async {
+    final response = await httpGet(baseUrl + ext, skipCache: true);
+    return AnnouncementResponse.fromJson(response);
   }
 }

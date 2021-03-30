@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
@@ -29,8 +30,9 @@ import 'package:Medito/utils/colors.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
+  final Screen screenKey;
 
-  SessionOptionsScreen({Key key, this.id}) : super(key: key);
+  SessionOptionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
 
   @override
   _SessionOptionsScreenState createState() => _SessionOptionsScreenState();
@@ -49,7 +51,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     super.initState();
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
-    _bloc = SessionOptionsBloc(widget.id);
+    _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
   }
 
   @override
@@ -98,8 +100,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                                 buildImage(pColor),
                                 buildTitleText(),
                                 buildDescriptionText(),
-                                buildSpacer(),
-                                buildTextHeaderForRow('Voice'),
                                 buildVoiceRow(),
                                 buildSpacer(),
                                 ////////// spacer
@@ -341,7 +341,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
               var data = snapshot.data.body?.list;
 
-              if (data.isEmpty) return Container();
+              if (data?.isEmpty ?? true) return Container();
 
               return ListView.builder(
                 padding: const EdgeInsets.only(left: 16),
@@ -375,16 +375,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildVoiceRow() {
-    return SizedBox(
-      height: 56,
-      child: StreamBuilder<ApiResponse<List<String>>>(
-          stream: _bloc.voiceListController.stream,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
-              return _getEmptyPillRow();
-            }
+    return StreamBuilder<ApiResponse<List<String>>>(
+        stream: _bloc.voiceListController.stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data?.status == Status.LOADING) {
+            return _buildVoiceColumn(_getEmptyPillRow());
+          }
 
-            return ListView.builder(
+          if (snapshot.data.body.first == null) return Container();
+
+          return _buildVoiceColumn(
+            ListView.builder(
               padding: const EdgeInsets.only(left: 16),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
@@ -407,8 +408,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   ),
                 );
               },
-            );
-          }),
+            ),
+          );
+        });
+  }
+
+  Column _buildVoiceColumn(Widget w) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildSpacer(),
+        buildTextHeaderForRow('Voice'),
+        SizedBox(height: 56, child: w),
+      ],
     );
   }
 

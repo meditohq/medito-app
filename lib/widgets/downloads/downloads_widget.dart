@@ -1,6 +1,7 @@
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
@@ -24,7 +25,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _getItems();
   }
@@ -35,13 +35,13 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       body: Column(
         children: [
           MeditoAppBarWidget(title: 'Downloads', actions: _getActions()),
-          getDownloadList(),
+          _getDownloadList(),
         ],
       ),
     );
   }
 
-  Widget getDownloadList() {
+  Widget _getDownloadList() {
     return _list.isNotEmpty
         ? Expanded(
             child: AnimatedList(
@@ -51,7 +51,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
                   var item = _list[i];
 
                   var duration = _getDuration(
-                      Duration(milliseconds: item.extras['duration']));
+(  item.extras['duration']));
 
                   return _slidingItem(animation, item, context, duration, i);
                 }))
@@ -114,11 +114,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     });
   }
 
-  String _getDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    var twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    var twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$twoDigitMinutes:$twoDigitSeconds';
+  String _getDuration(int duration) {
+    return Duration(milliseconds: duration).toReadable();
   }
 
   List<Widget> _getActions() {

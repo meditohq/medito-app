@@ -20,7 +20,7 @@ import 'package:Medito/viewmodel/http_get.dart';
 class PacksRepository {
   String etx = '?sort=position';
 
-  Future<List<PacksData>> fetchPacks() async {
+  Future<List<PacksData>> fetchPacks(bool skipCache) async {
     final response = await httpGet(baseUrl + 'items/packs$etx');
     return PacksResponse.fromJson(response).data;
   }
