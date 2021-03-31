@@ -16,9 +16,13 @@ Medito App is a flutter project available on Android and iOS maintained by the M
 
 The best way to start is by opening the project with [Android Studio](https://developer.android.com/studio) or [Visual Studio](https://visualstudio.microsoft.com/)
 
-You will need an API key to build the project. Please send an email to hi@meditofoundation.org to request one.
+You will need an API key to build the project.
 
-Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues)
+To request one, please email hi [AT] meditofoundation.org with the subject `API KEY REQUEST` .
+
+The API documentation is available on the [wiki](https://github.com/meditohq/medito-app/wiki/).
+
+Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues).
 
 ## Contributing
 Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
