@@ -59,7 +59,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
         if (bg.isNotEmptyAndNotNull()) {
           playBgMusic(bg);
         }
-
         unawaited(onPlay());
       });
     } catch (e) {
