@@ -20,8 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
-
-import '../app_bar_widget.dart';
+import 'package:Medito/widgets/app_bar_widget.dart';
 
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key key}) : super(key: key);
@@ -76,7 +75,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
   }
 
   Widget buildSafeAreaBody() {
-
     return SafeArea(
       bottom: false,
       maintainBottomViewPadding: false,

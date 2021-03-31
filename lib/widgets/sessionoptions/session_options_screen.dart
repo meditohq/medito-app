@@ -25,7 +25,6 @@ import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/utils/colors.dart';
 
