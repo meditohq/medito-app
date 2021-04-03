@@ -125,10 +125,13 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
           flex: 1,
           child: SizedBox(
             height: SMALL_SIZE,
-            child: FlatButton(
-              color: _stayInTouchSelected == 0
-                  ? MeditoColors.peacefulBlue
-                  : MeditoColors.moonlight,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: _stayInTouchSelected == 0
+                    ? MeditoColors.peacefulBlue
+                    : MeditoColors.moonlight,
+              ),
+              onPressed: _noClicked,
               child: Text(
                 'No',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
@@ -136,7 +139,6 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
                         ? MeditoColors.almostBlack
                         : MeditoColors.walterWhite),
               ),
-              onPressed: _noClicked,
             ),
           ),
         ),
@@ -145,10 +147,13 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
           flex: 1,
           child: SizedBox(
             height: SMALL_SIZE,
-            child: FlatButton(
-              color: _stayInTouchSelected == 1
-                  ? MeditoColors.peacefulBlue
-                  : MeditoColors.moonlight,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: _stayInTouchSelected == 1
+                    ? MeditoColors.peacefulBlue
+                    : MeditoColors.moonlight,
+              ),
+              onPressed: _yesClicked,
               child: Text(
                 '💌 Yes',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
@@ -156,7 +161,6 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
                         ? MeditoColors.almostBlack
                         : MeditoColors.walterWhite),
               ),
-              onPressed: _yesClicked,
             ),
           ),
         ),
@@ -170,17 +174,18 @@ class _DonationWidgetPage2State extends State<DonationWidgetPage2> {
         Expanded(
           child: SizedBox(
             height: MEDIUM_SIZE,
-            child: FlatButton(
-              color: MeditoColors.peacefulBlue.withAlpha(
-                  (_emailValid && _stayInTouchSelected != -1) ? 255 : 172),
+      child: TextButton(
+        style: TextButton.styleFrom(
+            backgroundColor: MeditoColors.peacefulBlue.withAlpha(
+                  (_emailValid && _stayInTouchSelected != -1) ? 255 : 172),),
+              onPressed: () {
+                if (_emailValid && _stayInTouchSelected != -1) _next();
+              },
               child: Text(
                 'Donate Now',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
                     color: MeditoColors.moonlight, fontWeight: FontWeight.w500),
               ),
-              onPressed: () {
-                if (_emailValid && _stayInTouchSelected != -1) _next();
-              },
             ),
           ),
         ),

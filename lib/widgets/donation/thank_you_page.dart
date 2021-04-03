@@ -87,16 +87,19 @@ class _ThankYouWidgetState extends State<ThankYouWidget> {
                         Expanded(
                           child: Container(
                             height: 56,
-                            child: FlatButton(
-                                color: MeditoColors.peacefulBlue,
-                                child: Text('Tell us why you\'ve donated',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black)),
-                                onPressed: _tellUs),
+                            child: TextButton(
+                              onPressed: _tellUs,
+                              style: TextButton.styleFrom(
+                                backgroundColor: MeditoColors.peacefulBlue,
+                              ),
+                              child: Text('Tell us why you\'ve donated',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2
+                                      .copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black)),
+                            ),
                           ),
                         ),
                       ],
@@ -107,17 +110,20 @@ class _ThankYouWidgetState extends State<ThankYouWidget> {
                         Expanded(
                           child: Container(
                             height: 56,
-                            child: FlatButton(
-                                color: MeditoColors.peacefulPink,
-                                child: Text(
-                                    'Tell your friends you\'ve helped Medito',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black)),
-                                onPressed: _share),
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: MeditoColors.peacefulPink,
+                              ),
+                              onPressed: _share,
+                              child: Text(
+                                  'Tell your friends you\'ve helped Medito',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2
+                                      .copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black)),
+                            ),
                           ),
                         ),
                       ],

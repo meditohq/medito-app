@@ -17,12 +17,12 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
+import 'package:Medito/widgets/donation/donation_page2.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:Medito/widgets/donation/donation_page2.dart';
 
 class DonationWidget extends StatefulWidget {
   @override
@@ -164,12 +164,12 @@ class _DonationWidgetState extends State<DonationWidget> {
           flex: 1,
           child: SizedBox(
             height: GIVE_SIZE,
-            child: FlatButton(
-              // style: ButtonStyle(
-              // backgroundColor: MaterialStateProperty.resolveAs(value, states)
-              color: _giveSelected == ONCE
-                  ? MeditoColors.peacefulBlue
-                  : MeditoColors.moonlight,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                  backgroundColor: _giveSelected == ONCE
+                      ? MeditoColors.peacefulBlue
+                      : MeditoColors.moonlight),
+              onPressed: _onceClicked,
               child: Text(
                 'Give Once',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
@@ -178,7 +178,6 @@ class _DonationWidgetState extends State<DonationWidget> {
                         ? MeditoColors.almostBlack
                         : MeditoColors.walterWhite),
               ),
-              onPressed: _onceClicked,
             ),
           ),
         ),
@@ -187,10 +186,12 @@ class _DonationWidgetState extends State<DonationWidget> {
           flex: 1,
           child: SizedBox(
             height: GIVE_SIZE,
-            child: FlatButton(
-              color: _giveSelected == MONTHLY
-                  ? MeditoColors.peacefulBlue
-                  : MeditoColors.moonlight,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                  backgroundColor: _giveSelected == MONTHLY
+                      ? MeditoColors.peacefulBlue
+                      : MeditoColors.moonlight),
+              onPressed: _monthlyClicked,
               child: Text(
                 '♥️ Give Monthly',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
@@ -199,7 +200,6 @@ class _DonationWidgetState extends State<DonationWidget> {
                         ? MeditoColors.almostBlack
                         : MeditoColors.walterWhite),
               ),
-              onPressed: _monthlyClicked,
             ),
           ),
         ),
@@ -216,19 +216,21 @@ class _DonationWidgetState extends State<DonationWidget> {
             Expanded(
               child: SizedBox(
                 height: GIVE_SIZE,
-                child: FlatButton(
-                  color: _amountSelect == 0
-                      ? MeditoColors.peacefulBlue
-                      : MeditoColors.moonlight,
-                  child: Text(
-                    getPrice(index: 0),
-                    style: getAmountTextStyle(0),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: _amountSelect == 0
+                        ? MeditoColors.peacefulBlue
+                        : MeditoColors.moonlight,
                   ),
                   onPressed: () {
                     setState(() {
                       return _amountSelect = 0;
                     });
                   },
+                  child: Text(
+                    getPrice(index: 0),
+                    style: getAmountTextStyle(0),
+                  ),
                 ),
               ),
             ),
@@ -236,19 +238,21 @@ class _DonationWidgetState extends State<DonationWidget> {
             Expanded(
               child: SizedBox(
                 height: GIVE_SIZE,
-                child: FlatButton(
-                  color: _amountSelect == 1
-                      ? MeditoColors.peacefulBlue
-                      : MeditoColors.moonlight,
-                  child: Text(
-                    getPrice(index: 1),
-                    style: getAmountTextStyle(1),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: _amountSelect == 1
+                        ? MeditoColors.peacefulBlue
+                        : MeditoColors.moonlight,
                   ),
                   onPressed: () {
                     setState(() {
                       return _amountSelect = 1;
                     });
                   },
+                  child: Text(
+                    getPrice(index: 1),
+                    style: getAmountTextStyle(1),
+                  ),
                 ),
               ),
             ),
@@ -256,19 +260,21 @@ class _DonationWidgetState extends State<DonationWidget> {
             Expanded(
               child: SizedBox(
                 height: GIVE_SIZE,
-                child: FlatButton(
-                  color: _amountSelect == 2
-                      ? MeditoColors.peacefulBlue
-                      : MeditoColors.moonlight,
-                  child: Text(
-                    getPrice(index: 2),
-                    style: getAmountTextStyle(2),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: _amountSelect == 2
+                        ? MeditoColors.peacefulBlue
+                        : MeditoColors.moonlight,
                   ),
                   onPressed: () {
                     setState(() {
                       return _amountSelect = 2;
                     });
                   },
+                  child: Text(
+                    getPrice(index: 2),
+                    style: getAmountTextStyle(2),
+                  ),
                 ),
               ),
             ),
@@ -281,19 +287,20 @@ class _DonationWidgetState extends State<DonationWidget> {
             Expanded(
               child: SizedBox(
                 height: GIVE_SIZE,
-                child: FlatButton(
-                  color: _amountSelect == 3
-                      ? MeditoColors.peacefulBlue
-                      : MeditoColors.moonlight,
-                  child: Text(
-                    getPrice(index: 3),
-                    style: getAmountTextStyle(3),
-                  ),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                      backgroundColor: _amountSelect == 3
+                          ? MeditoColors.peacefulBlue
+                          : MeditoColors.moonlight),
                   onPressed: () {
                     setState(() {
                       return _amountSelect = 3;
                     });
                   },
+                  child: Text(
+                    getPrice(index: 3),
+                    style: getAmountTextStyle(3),
+                  ),
                 ),
               ),
             ),
@@ -301,19 +308,21 @@ class _DonationWidgetState extends State<DonationWidget> {
             Expanded(
               child: SizedBox(
                 height: GIVE_SIZE,
-                child: FlatButton(
-                  color: _amountSelect == 4
-                      ? MeditoColors.peacefulBlue
-                      : MeditoColors.moonlight,
-                  child: Text(
-                    getPrice(index: 4),
-                    style: getAmountTextStyle(4),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: _amountSelect == 4
+                        ? MeditoColors.peacefulBlue
+                        : MeditoColors.moonlight,
                   ),
                   onPressed: () {
                     setState(() {
                       return _amountSelect = 4;
                     });
                   },
+                  child: Text(
+                    getPrice(index: 4),
+                    style: getAmountTextStyle(4),
+                  ),
                 ),
               ),
             ),
@@ -321,19 +330,21 @@ class _DonationWidgetState extends State<DonationWidget> {
             Expanded(
               child: SizedBox(
                 height: GIVE_SIZE,
-                child: FlatButton(
-                  color: _amountSelect == 5
-                      ? MeditoColors.peacefulBlue
-                      : MeditoColors.moonlight,
-                  child: Text(
-                    getPrice(index: 5),
-                    style: getAmountTextStyle(5),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: _amountSelect == 5
+                        ? MeditoColors.peacefulBlue
+                        : MeditoColors.moonlight,
                   ),
                   onPressed: () {
                     setState(() {
                       return _amountSelect = 5;
                     });
                   },
+                  child: Text(
+                    getPrice(index: 5),
+                    style: getAmountTextStyle(5),
+                  ),
                 ),
               ),
             ),
@@ -356,8 +367,11 @@ class _DonationWidgetState extends State<DonationWidget> {
         Expanded(
           child: SizedBox(
             height: NEXT_SIZE,
-            child: FlatButton(
-              color: MeditoColors.peacefulBlue,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: MeditoColors.peacefulBlue,
+              ),
+              onPressed: () => _openPage2(),
               child: Text(
                 'Next',
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
@@ -365,7 +379,6 @@ class _DonationWidgetState extends State<DonationWidget> {
                       fontWeight: FontWeight.w500,
                     ),
               ),
-              onPressed: () => _openPage2(),
             ),
           ),
         ),
