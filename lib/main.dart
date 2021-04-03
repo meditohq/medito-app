@@ -96,6 +96,11 @@ class _ParentWidgetState extends State<ParentWidget>
           '/nav': (context) => Scaffold(
                 body: _children[_currentIndex], // new
                 bottomNavigationBar: BottomNavigationBar(
+                  selectedLabelStyle: Theme.of(context).textTheme.headline6,
+                  unselectedLabelStyle: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(color: MeditoColors.newGrey),
                   currentIndex: _currentIndex,
                   onTap: onTabTapped,
                   items: [

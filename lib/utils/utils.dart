@@ -17,6 +17,7 @@ import 'dart:io';
 
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -105,20 +106,16 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
-  if (url == null) return null;
-  // if (url.endsWith('png')) {
+  if (url == null) return Container();
+  var headers =
+      {}.putIfAbsent(HttpHeaders.authorizationHeader, () => basicAuth);
   return CachedNetworkImage(
+    httpHeaders: headers,
     placeholder: (context, url) => Container(
       height: startHeight,
     ),
     imageUrl: url,
   );
-  // } else {
-  //   return SvgPicture.network(
-  //     url,
-  //     color: svgColor ?? MeditoColors.darkBGColor,
-  //   );
-  // }
 }
 
 Future<bool> checkConnectivity() async {
