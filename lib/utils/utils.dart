@@ -107,8 +107,7 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
   if (url == null) return Container();
-  var headers =
-      {}.putIfAbsent(HttpHeaders.authorizationHeader, () => basicAuth);
+  final headers = {HttpHeaders.authorizationHeader: basicAuth};
   return CachedNetworkImage(
     httpHeaders: headers,
     placeholder: (context, url) => Container(
