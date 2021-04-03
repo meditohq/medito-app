@@ -54,6 +54,9 @@ class NavigationFactory {
               screenKey: key,
             ));
         break;
+      case Screen.url:
+        launchUrl(id);
+        break;
     }
   }
 
@@ -78,7 +81,7 @@ class NavigationFactory {
       case FileType.daily:
         return Screen.daily;
       case FileType.url:
-        throw Exception('No screen type for URL');
+        return Screen.url;
         break;
     }
     return null;
@@ -118,5 +121,6 @@ enum Screen {
   session_options,
   daily,
   donation,
-  downloads
+  downloads,
+  url
 }

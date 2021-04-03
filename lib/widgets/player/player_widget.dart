@@ -360,7 +360,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         padding: EdgeInsets.all(48.0),
         child: Center(
           child: illustrationUrl != null
-              ? Image.network(illustrationUrl)
+              ? getNetworkImageWidget(illustrationUrl)
               : Container(),
         ),
       ),
@@ -617,7 +617,11 @@ Future<void> start(MediaItem media) async {
     //androidStopForegroundOnPause: true,
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
-  ));
+  ).onError((error, stackTrace) => _printError(error)));
+}
+
+_printError(error) {
+  print(error);
 }
 
 bool checkDaysSinceReview() {

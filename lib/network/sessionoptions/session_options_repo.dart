@@ -22,7 +22,7 @@ import 'package:Medito/viewmodel/http_get.dart';
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
-  var bgSoundsUrl = 'http://api.medito.app/items/background_sounds';
+  var bgSoundsUrl = '${baseUrl}items/background_sounds';
   var parameters =
       '?fields=*,author.html,audio.file.id,audio.file.voice,audio.file.length';
   var screen;

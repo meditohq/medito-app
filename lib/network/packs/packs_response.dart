@@ -46,20 +46,19 @@ class PacksData {
   String get cover => '${baseUrl}assets/$coverOld?download';
   String colorPrimary;
   String colorSecondary;
+  String type;
 
   FileType get fileType {
     if (type == 'session') return FileType.session;
     if (type == 'article') return FileType.text;
     if (type == 'folder') return FileType.folder;
-    if (type == 'url') return FileType.folder;
+    if (type == 'url') return FileType.url;
     if (type == 'daily') return FileType.daily;
     return null;
   }
 
   @Deprecated('Use cover instead')
   String coverOld;
-  @Deprecated('Use fileType instead')
-  String type;
 
   PacksData(
       {this.title,

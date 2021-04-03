@@ -28,7 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
-  return GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme.copyWith(
+  return GoogleFonts.lexendDecaTextTheme(Theme.of(context).textTheme.copyWith(
         headline6: TextStyle(
             fontSize: 20.0,
             height: 1.4,
@@ -62,7 +62,6 @@ TextTheme buildDMSansTextTheme(BuildContext context) {
           letterSpacing: 0.1,
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          // fontSize: 16.0,
           height: 1.4,
           color: MeditoColors.walterWhite,
         ),
@@ -109,6 +108,8 @@ Widget getNetworkImageWidget(String url,
   if (url == null) return Container();
   final headers = {HttpHeaders.authorizationHeader: basicAuth};
   return CachedNetworkImage(
+    errorWidget: (context, url, error,) =>
+        Icon(Icons.broken_image_outlined, color: MeditoColors.walterWhiteTrans,),
     httpHeaders: headers,
     placeholder: (context, url) => Container(
       height: startHeight,

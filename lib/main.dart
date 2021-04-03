@@ -21,6 +21,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/btm_nav/library_widget.dart';
+import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -93,6 +94,7 @@ class _ParentWidgetState extends State<ParentWidget>
       child: MaterialApp(
         initialRoute: '/nav',
         routes: {
+          FolderNavWidget.routeName: (context) => FolderNavWidget(),
           '/nav': (context) => Scaffold(
                 body: _children[_currentIndex], // new
                 bottomNavigationBar: BottomNavigationBar(
