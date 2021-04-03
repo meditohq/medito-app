@@ -20,6 +20,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
+import 'package:Medito/widgets/btm_nav/library_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -63,7 +64,7 @@ class ParentWidget extends StatefulWidget {
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
   var _currentIndex = 0;
-  final _children = [HomeWidget(), PackListWidget(), Container()];
+  final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
 
   @override
   void initState() {
