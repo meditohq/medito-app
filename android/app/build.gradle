@@ -62,7 +62,7 @@ if (!configured) {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     lintOptions {
         disable 'InvalidPackage'

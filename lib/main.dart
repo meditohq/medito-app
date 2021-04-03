@@ -14,22 +14,18 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-import 'dart:io';
 
-import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
-import 'package:Medito/widgets/folders/folder_nav_widget.dart';
+import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:pedantic/pedantic.dart';
-import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/colors.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -53,19 +49,22 @@ Future<void> main() async {
 
   InAppPurchaseConnection.enablePendingPurchases();
 
-  runApp(HomeScreenWidget());
+  runApp(ParentWidget());
 }
 
 /// This Widget is the main application widget.
-class HomeScreenWidget extends StatefulWidget {
+class ParentWidget extends StatefulWidget {
   static const String _title = 'Medito';
 
   @override
-  _HomeScreenWidgetState createState() => _HomeScreenWidgetState();
+  _ParentWidgetState createState() => _ParentWidgetState();
 }
 
-class _HomeScreenWidgetState extends State<HomeScreenWidget>
+class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
+  var _currentIndex = 0;
+  final _children = [HomeWidget(), PackListWidget(), Container()];
+
   @override
   void initState() {
     super.initState();
@@ -88,53 +87,53 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   }
 
   @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      unawaited(checkForUpdate());
-      await updateStatsFromBg();
-    }
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> checkForUpdate() async {
-    //todo This keeps popping up when you press 'No'
-
-    if (false && Platform.isAndroid) {
-      unawaited(InAppUpdate.checkForUpdate().then((info) {
-        setState(() {
-          if (info.flexibleUpdateAllowed && info.updateAvailable) {
-            InAppUpdate.startFlexibleUpdate().catchError(_onError);
-          }
-        });
-      }).catchError(_onError));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) =>
-            Scaffold(body: AudioServiceWidget(child: PackListWidget())),
-        FolderNavWidget.routeName: (context) => FolderNavWidget()
-      },
-      theme: ThemeData(
-          splashColor: MeditoColors.moonlight,
-          canvasColor: MeditoColors.darkMoon,
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: SlideTransitionBuilder(),
-          }),
-          accentColor: MeditoColors.walterWhite,
-          textTheme: buildDMSansTextTheme(context)),
-      title: HomeScreenWidget._title,
-      navigatorObservers: [Tracking.getObserver()],
+    return AudioServiceWidget(
+      child: MaterialApp(
+        initialRoute: '/nav',
+        routes: {
+          '/nav': (context) => Scaffold(
+                body: _children[_currentIndex], // new
+                bottomNavigationBar: BottomNavigationBar(
+                  currentIndex: _currentIndex,
+                  onTap: onTabTapped,
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: Container(),
+                      label: 'Home',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(),
+                      label: 'Packs',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(),
+                      label: 'Library',
+                    ),
+                  ],
+                ),
+                appBar: null, //AppBar(title: const Text(_title)),
+              )
+        },
+        theme: ThemeData(
+            splashColor: MeditoColors.moonlight,
+            canvasColor: MeditoColors.darkMoon,
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.android: SlideTransitionBuilder(),
+            }),
+            accentColor: MeditoColors.walterWhite,
+            textTheme: buildDMSansTextTheme(context)),
+        title: ParentWidget._title,
+        navigatorObservers: [Tracking.getObserver()],
+      ),
     );
   }
 
-  void _onError() {
-    print('update error');
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 }
 
