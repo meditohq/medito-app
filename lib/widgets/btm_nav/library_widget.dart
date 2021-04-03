@@ -15,10 +15,9 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:flutter/material.dart';
 
-class HomeWidget extends StatelessWidget {
+class LibraryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-    );
+    return Container();
   }
 }
