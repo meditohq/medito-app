@@ -42,7 +42,7 @@ class PacksResponse {
 class PacksData {
   String title;
   String subtitle;
-  String get id => idOld.toString();
+  String id;
   String get cover => '${baseUrl}assets/$coverOld?download';
   String colorPrimary;
   String colorSecondary;
@@ -60,14 +60,12 @@ class PacksData {
   String coverOld;
   @Deprecated('Use fileType instead')
   String type;
-  @Deprecated('Use id instead')
-  int idOld;
 
   PacksData(
       {this.title,
       this.subtitle,
       this.type,
-      this.idOld,
+      this.id,
       this.colorPrimary,
       this.colorSecondary,
       this.coverOld});
@@ -76,7 +74,7 @@ class PacksData {
     title = json['title'];
     subtitle = json['subtitle'];
     type = json['type'];
-    idOld = json['id'];
+    id = json['id'];
     colorPrimary = json['color_primary'];
     colorSecondary = json['color_secondary'];
     coverOld = json['cover'];
@@ -87,7 +85,7 @@ class PacksData {
     data['title'] = title;
     data['subtitle'] = subtitle;
     data['type'] = type;
-    data['id'] = idOld;
+    data['id'] = id;
     data['color_primary'] = colorPrimary;
     data['color_secondary'] = colorSecondary;
     data['cover'] = coverOld;
