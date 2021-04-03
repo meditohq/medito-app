@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
@@ -44,7 +45,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
           var url = '${baseUrl}assets/${mediaItem.id}';
-          _duration = await _player.setUrl(url);
+          _duration = await _player.setUrl(url,
+              headers: {HttpHeaders.authorizationHeader: basicAuth});
         } else {
           _duration = await _player.setFilePath(data);
         }
@@ -55,7 +57,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-          String bg = mediaItem.extras['bgMusic'];
+        String bg = mediaItem.extras['bgMusic'];
         if (bg.isNotEmptyAndNotNull()) {
           playBgMusic(bg);
         }
