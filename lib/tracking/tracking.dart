@@ -17,7 +17,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 
 class Tracking {
   static const String SCREEN_LOADED = 'screen_loaded';
@@ -58,7 +58,7 @@ class Tracking {
   static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
   static DatabaseReference _dbRef;
 
-  static const String _dbName = Foundation.kReleaseMode ? 'donations' : 'test';
+  static const String _dbName = foundation.kReleaseMode ? 'donations' : 'test';
 
   static Future<void> initialiseTracker(FirebaseApp app) async {
     _firebaseAnalytics = FirebaseAnalytics();
@@ -88,7 +88,7 @@ class Tracking {
       {Map<String, String> map}) async {
     var accepted = await isTrackingAccepted();
 
-    if (Foundation.kReleaseMode && accepted) {
+    if (foundation.kReleaseMode && accepted) {
       //only track in release mode, not debug
 
       var defaultMap = <String, String>{
