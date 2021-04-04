@@ -488,7 +488,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       }
     } else {
       // 'NO' selected
-      _bloc.removeFile(_bloc.currentFile).then((onValue) {
+      _bloc.removeFile(_bloc.getMediaItemForSelectedFile()).then((onValue) {
         print('Removed file');
         _bloc.removing = false;
         setState(() {});

@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/download_class.dart';
@@ -206,7 +207,7 @@ class SessionOptionsBloc {
     }
   }
 
-  Future<dynamic> removeFile(AudioFile currentFile) async {
+  Future<dynamic> removeFile(MediaItem currentFile) async {
     removing = true;
     var dir = (await getApplicationSupportDirectory()).path;
     var file = File('$dir/${currentFile.id}');
@@ -220,10 +221,10 @@ class SessionOptionsBloc {
     }
   }
 
-  Future<void> _removeFileFromDownloadedFilesList(AudioFile file) async {
+  Future<void> _removeFileFromDownloadedFilesList(MediaItem file) async {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList('listOfSavedFiles') ?? [];
-    list.remove(file?.toJson()?.toString() ?? '');
+    list.remove(file.toJson());
     await prefs.setStringList('listOfSavedFiles', list);
   }
 
@@ -241,6 +242,9 @@ class SessionOptionsBloc {
       description: _options.description,
       title: _options.title,
       illustrationUrl: _getCoverUrl(),
+
+      voice: currentFile.voice,
+      length: currentFile.length,
       secondaryColor: _options.colorSecondary,
       primaryColor: _options.colorPrimary,
       bgMusic: backgroundSoundsId,

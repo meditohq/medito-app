@@ -2,7 +2,7 @@ import 'package:Medito/utils/utils.dart';
 
 extension DurationExtensions on Duration {
   /// Converts the duration into a readable string
-  /// 15:35
+  /// 05:35 -> 05 min 35 sec
   String toMinutesSeconds() {
     var twoDigitMinutes = _toTwoDigits(
         inMinutes.remainder(100)); //NB: if it's over 100 mins it'll show 0:00!!
@@ -42,6 +42,7 @@ String formatSessionLength(String item) {
 }
 
 Duration clockTimeToDuration(String lengthText) {
+  //formats 00:00:00
   var tempList = lengthText.split(':');
   var tempListInts = tempList.map(int.parse).toList();
 

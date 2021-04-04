@@ -28,7 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 TextTheme buildDMSansTextTheme(BuildContext context) {
-  return GoogleFonts.lexendDecaTextTheme(Theme.of(context).textTheme.copyWith(
+  return GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme.copyWith(
         headline6: TextStyle(
             fontSize: 20.0,
             height: 1.4,

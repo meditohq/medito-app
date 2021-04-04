@@ -18,4 +18,11 @@ class DownloadsBloc {
 
     return fileList;
   }
+
+  Future<void> removeFileFromDownloadedFilesList(MediaItem file) async {
+    var prefs = await SharedPreferences.getInstance();
+    var list = prefs.getStringList('listOfSavedFiles') ?? [];
+    list.remove(file.toJson());
+    await prefs.setStringList('listOfSavedFiles', list);
+  }
 }
