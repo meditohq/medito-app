@@ -52,8 +52,10 @@ class _Download {
     }
 
     var url = baseUrl + 'assets/' + currentFile.id;
+    var request = http.Request('GET', Uri.parse(url));
+    request.headers[HttpHeaders.authorizationHeader] = basicAuth;
     var _response =
-        await http.Client().send(http.Request('GET', Uri.parse(url)));
+        await http.Client().send(request);
     _total = _response.contentLength;
     _received = 0;
     var _bytes = <int>[];
