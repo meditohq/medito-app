@@ -10,7 +10,7 @@ class MediaLibrary {
       String bgMusic,
       int durationAsMilliseconds,
       String id,
-      String attributions}) {
+      String attributions, String voice, String length}) {
     return MediaItem(
       id: id,
       extras: {
@@ -20,8 +20,10 @@ class MediaLibrary {
         'primaryColor': primaryColor,
         'secondaryColor': secondaryColor,
         'attr': attributions,
+        'length' : length,
         'duration': durationAsMilliseconds,
       },
+      artist: voice,
       album: description,
       title: title,
       artUri: illustrationUrl,

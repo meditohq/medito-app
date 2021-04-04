@@ -13,11 +13,38 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
 import 'package:flutter/material.dart';
 
 class LibraryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return SafeArea(
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: Container(
+              height: 50.0,
+              child: TabBar(
+                isScrollable: false,
+                tabs: [
+                  Tab(icon: Icon(Icons.download_sharp)),
+                  Tab(icon: Icon(Icons.favorite)),
+                ],
+              ),
+            ),
+          ),
+          body: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
+            children: [
+              DownloadsListWidget(),
+              Center(child: Text('Coming soon...')),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
