@@ -36,18 +36,15 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: AppBar(
-          // leading: null,  defaults to implied leading
-          leading: hasCloseButton ? CloseButton(onPressed: closePressed ?? closePressed,) : null,
-          centerTitle: true,
-          actions: actions,
-          elevation: 0,
-          backgroundColor:
-              transparent ? Colors.transparent : MeditoColors.moonlight,
-          title: getTitleWidget(context)),
-    );
+    return AppBar(
+        // leading: null,  defaults to implied leading
+        leading: hasCloseButton ? CloseButton(onPressed: closePressed ?? closePressed,) : null,
+        centerTitle: true,
+        actions: actions,
+        elevation: 0,
+        backgroundColor:
+            transparent ? Colors.transparent : MeditoColors.moonlight,
+        title: getTitleWidget(context));
   }
 
   Widget getTitleWidget(BuildContext context) {

@@ -93,43 +93,40 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     return FutureBuilder<bool>(
         future: _bloc.selectedSessionListenedFuture,
         builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
-            child: AppBar(
-              title: Text(''),
-              leading: snapshot != null
+          return AppBar(
+            title: Text(''),
+            leading: snapshot != null
+                ? IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => deselectItem())
+                : Container(),
+            actions: <Widget>[
+              snapshot != null &&
+                      snapshot.connectionState != ConnectionState.waiting
                   ? IconButton(
+                      tooltip: snapshot?.data != null && snapshot.data
+                          ? 'Mark session as unlistened'
+                          : 'Mark session as listened',
                       icon: Icon(
-                        Icons.close,
-                        color: Colors.white,
+                        snapshot?.data != null && snapshot.data
+                            ? Icons.undo
+                            : Icons.check_circle,
+                        color: MeditoColors.walterWhite,
                       ),
-                      onPressed: () => deselectItem())
+                      onPressed: () async {
+                        if (snapshot != null && !snapshot.data) {
+                          await markAsListened(_bloc.selectedItem.id);
+                        } else {
+                          await markAsNotListened(_bloc.selectedItem.id);
+                        }
+                        deselectItem();
+                      })
                   : Container(),
-              actions: <Widget>[
-                snapshot != null &&
-                        snapshot.connectionState != ConnectionState.waiting
-                    ? IconButton(
-                        tooltip: snapshot?.data != null && snapshot.data
-                            ? 'Mark session as unlistened'
-                            : 'Mark session as listened',
-                        icon: Icon(
-                          snapshot?.data != null && snapshot.data
-                              ? Icons.undo
-                              : Icons.check_circle,
-                          color: MeditoColors.walterWhite,
-                        ),
-                        onPressed: () async {
-                          if (snapshot != null && !snapshot.data) {
-                            await markAsListened(_bloc.selectedItem.id);
-                          } else {
-                            await markAsNotListened(_bloc.selectedItem.id);
-                          }
-                          deselectItem();
-                        })
-                    : Container(),
-              ],
-              backgroundColor: MeditoColors.moonlight,
-            ),
+            ],
+            backgroundColor: MeditoColors.moonlight,
           );
         });
   }
@@ -143,7 +140,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   Widget _buildSafeAreaBody() {
     return SafeArea(
       bottom: false,
-      maintainBottomViewPadding: false,
       child: _getListView(),
     );
   }
@@ -163,6 +159,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
                 if (itemsSnapshot.hasData) {
                   return ListView(
+                    padding: EdgeInsets.only(top: 4),
                     children: [
                       ListView.builder(
                           physics: ScrollPhysics(),
