@@ -96,6 +96,7 @@ class PackListWidgetState extends State<PackListWidget> {
 
   Widget _getListWidget(List<PacksData> data) {
     return ListView.builder(
+      padding: EdgeInsets.only(top: 8, bottom: 8),
       itemCount: data.length,
       itemBuilder: (context, i) {
         return GestureDetector(
