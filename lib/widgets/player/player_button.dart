@@ -35,17 +35,19 @@ class PlayerButton extends StatelessWidget {
             width: 88,
             color: primaryColor,
           ),
-          image ?? Icon(
-                  icon,
-                  size: 24,
-                  color: secondaryColor ?? MeditoColors.darkMoon,
-                ),
+          image ??
+              Icon(
+                icon,
+                size: 24,
+                color: secondaryColor ?? MeditoColors.darkMoon,
+              ),
           child ?? Container()
         ],
       ),
     );
-//      child: FlatButton(
-//          color: bgColor,
+//      child: TextButton(
+//          style: TextButton.styleFrom(
+//          primary: bgColor),
 //          child: Row(
 //            mainAxisAlignment: MainAxisAlignment.center,
 //            children: [
