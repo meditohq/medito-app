@@ -36,12 +36,13 @@ class ErrorPacksWidget extends StatelessWidget {
                 child: Center(
                     child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: RaisedButton(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      color: MeditoColors.darkColor,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          primary: MeditoColors.darkColor),
                       onPressed: () => onPressed(),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
