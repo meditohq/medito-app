@@ -30,7 +30,6 @@ import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import 'utils/colors.dart';
-import 'utils/colors.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -67,7 +66,7 @@ class ParentWidget extends StatefulWidget {
 
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
-  var _currentIndex = 0;
+  var _currentIndex = 1;
   final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
 
   @override
@@ -91,6 +90,12 @@ class _ParentWidgetState extends State<ParentWidget>
     super.dispose();
   }
 
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AudioServiceWidget(
@@ -99,7 +104,10 @@ class _ParentWidgetState extends State<ParentWidget>
         routes: {
           FolderNavWidget.routeName: (context) => FolderNavWidget(),
           '/nav': (context) => Scaffold(
-                body: _children[_currentIndex], // new
+                body: IndexedStack(
+                  index: _currentIndex,
+                  children: _children,
+                ),
                 bottomNavigationBar: BottomNavigationBar(
                   selectedFontSize: 20,
                   unselectedFontSize: 20,
@@ -141,12 +149,6 @@ class _ParentWidgetState extends State<ParentWidget>
         navigatorObservers: [Tracking.getObserver()],
       ),
     );
-  }
-
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
   }
 }
 
