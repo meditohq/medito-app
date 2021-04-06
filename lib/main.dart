@@ -29,6 +29,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import 'utils/colors.dart';
+import 'utils/colors.dart';
+
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
@@ -98,24 +101,26 @@ class _ParentWidgetState extends State<ParentWidget>
           '/nav': (context) => Scaffold(
                 body: _children[_currentIndex], // new
                 bottomNavigationBar: BottomNavigationBar(
-                  selectedLabelStyle: Theme.of(context).textTheme.headline6,
-                  unselectedLabelStyle: Theme.of(context)
-                      .textTheme
-                      .headline6
-                      .copyWith(color: MeditoColors.newGrey),
+                  selectedFontSize: 20,
+                  unselectedFontSize: 20,
+                  selectedItemColor: MeditoColors.walterWhite,
+                  unselectedItemColor: MeditoColors.newGrey,
                   currentIndex: _currentIndex,
                   onTap: onTabTapped,
                   items: [
                     BottomNavigationBarItem(
+                      tooltip: 'Home',
                       icon: Container(),
                       label: 'Home',
                     ),
                     BottomNavigationBarItem(
                       icon: Container(),
+                      tooltip: 'Packs',
                       label: 'Packs',
                     ),
                     BottomNavigationBarItem(
                       icon: Container(),
+                      tooltip: 'Library',
                       label: 'Library',
                     ),
                   ],

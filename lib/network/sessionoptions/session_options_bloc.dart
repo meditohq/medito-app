@@ -214,18 +214,11 @@ class SessionOptionsBloc {
 
     if (await file.exists()) {
       await file.delete();
-      await _removeFileFromDownloadedFilesList(currentFile);
+      await removeFileFromDownloadedFilesList(currentFile);
       removing = false;
     } else {
       removing = false;
     }
-  }
-
-  Future<void> _removeFileFromDownloadedFilesList(MediaItem file) async {
-    var prefs = await SharedPreferences.getInstance();
-    var list = prefs.getStringList('listOfSavedFiles') ?? [];
-    list.remove(file.toJson());
-    await prefs.setStringList('listOfSavedFiles', list);
   }
 
   void startAudioService() {
@@ -257,4 +250,11 @@ class SessionOptionsBloc {
 extension MyIterable<E> on Iterable<E> {
   Iterable<E> sortedBy(Comparable Function(E e) key) =>
       toList()..sort((a, b) => key(a).compareTo(key(b)));
+}
+
+Future<void> removeFileFromDownloadedFilesList(MediaItem file) async {
+  var prefs = await SharedPreferences.getInstance();
+  var list = prefs.getStringList('listOfSavedFiles') ?? [];
+  list.remove(jsonEncode(file));
+  await prefs.setStringList('listOfSavedFiles', list);
 }

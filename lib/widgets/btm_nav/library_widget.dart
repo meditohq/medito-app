@@ -30,8 +30,8 @@ class LibraryWidget extends StatelessWidget {
               child: TabBar(
                 isScrollable: false,
                 tabs: [
-                  Tab(icon: Icon(Icons.download_sharp)),
-                  Tab(icon: Icon(Icons.favorite)),
+                  Tab(icon: Text('Downloads')),
+                  Tab(icon: Text('Favourites')),
                 ],
               ),
             ),
