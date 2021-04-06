@@ -143,7 +143,7 @@ class _StreakWidgetState extends State<StreakWidget> {
                   children: <Widget>[
                     Container(
                       height: 48,
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: _onCancelTap,
                         child: Text(
                           'CANCEL',
@@ -158,10 +158,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                     ),
                     Container(
                       height: 48,
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: _onSaveTap,
-                        shape: roundedRectangleBorder(),
-                        color: MeditoColors.walterWhite,
+                        style: TextButton.styleFrom(
+                            shape: roundedRectangleBorder(),
+                            primary: MeditoColors.walterWhite),
                         child: Text(
                           'SAVE',
                           style: Theme.of(context).textTheme.headline3.copyWith(
@@ -173,11 +174,12 @@ class _StreakWidgetState extends State<StreakWidget> {
                   ],
                 ),
 //
-//                FlatButton(
+//                TextButton(
+//                  style: TextButton.fromStyle(
 //                  shape: RoundedRectangleBorder(
 //                    borderRadius: new BorderRadius.circular(12.0),
 //                  ),
-//                  color: MeditoColors.walterWhite,
+//                  primary: MeditoColors.walterWhite),
 //                  child: Text(
 //                    "SAVE",
 //                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
@@ -224,10 +226,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                   children: <Widget>[
                     Container(
                       height: 48,
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: _onCancelTap,
-                        shape: roundedRectangleBorder(),
-                        color: MeditoColors.moonlight,
+                        style: TextButton.styleFrom(
+                            shape: roundedRectangleBorder(),
+                            primary: MeditoColors.moonlight),
                         child: Text(
                           'CANCEL',
                           style: Theme.of(context).textTheme.headline3.copyWith(
@@ -241,10 +244,11 @@ class _StreakWidgetState extends State<StreakWidget> {
                     ),
                     Container(
                       height: 48,
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: _onResetTap,
-                        shape: roundedRectangleBorder(),
-                        color: MeditoColors.walterWhite,
+                        style: TextButton.styleFrom(
+                            shape: roundedRectangleBorder(),
+                            primary: MeditoColors.walterWhite),
                         child: Text(
                           'RESET',
                           style: Theme.of(context).textTheme.headline3.copyWith(
