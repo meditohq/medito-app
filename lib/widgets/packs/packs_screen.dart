@@ -19,7 +19,6 @@ import 'package:Medito/network/packs/packs_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
@@ -38,7 +37,6 @@ class PackListWidget extends StatefulWidget {
 }
 
 class PackListWidgetState extends State<PackListWidget> {
-  var _streak;
   bool _dialogShown = false;
   PacksBloc _packsBloc;
 
@@ -48,7 +46,6 @@ class PackListWidgetState extends State<PackListWidget> {
 
     super.initState();
     _packsBloc = PacksBloc();
-    _streak = getCurrentStreak();
   }
 
   @override

@@ -33,4 +33,7 @@ class MeditoColors {
   static const darkMoon = Color(0xff121212);
   static const peacefulBlue = Color(0xffd1f6fe);
   static const peacefulPink = Color(0xffffc2c2);
+
+  // V2
+  static const deepNight = Color(0xff272829);
 }
