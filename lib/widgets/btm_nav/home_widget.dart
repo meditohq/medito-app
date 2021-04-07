@@ -26,7 +26,7 @@ class HomeWidget extends StatelessWidget {
           children: [
             AnnouncementBanner(),
             SmallShortcutsRowWidget(),
-            SmallShortcutsRowWidget()
+           // SmallShortcutsRowWidget()
           ],
         ),
       ),
