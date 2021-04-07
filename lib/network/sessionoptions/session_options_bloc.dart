@@ -209,8 +209,8 @@ class SessionOptionsBloc {
 
   Future<dynamic> removeFile(MediaItem currentFile) async {
     removing = true;
-    var dir = (await getApplicationSupportDirectory()).path;
-    var file = File('$dir/${currentFile.id}');
+    var filePath = (await getFilePath(currentFile.id));
+    var file = File(filePath);
 
     if (await file.exists()) {
       await file.delete();
