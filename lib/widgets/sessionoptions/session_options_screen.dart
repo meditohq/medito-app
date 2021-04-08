@@ -472,9 +472,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void onOfflineSelected(int index) {
     _bloc.offlineSelected = index;
-    _bloc.updateCurrentFile();
-
-    _bloc.updateAvailableOfflineIndicatorText();
 
     if (index == 1) {
       // 'YES' selected
@@ -491,6 +488,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       _bloc.removeFile(_bloc.getMediaItemForSelectedFile()).then((onValue) {
         print('Removed file');
         _bloc.removing = false;
+        _bloc.updateCurrentFile();
         setState(() {});
       }).catchError((onError) {
         print(onError);
