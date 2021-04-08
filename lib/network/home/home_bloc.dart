@@ -41,14 +41,14 @@ class HomeBloc {
     }
   }
 
-  void getTitleText() {
+  Future<String> getTitleText() async {
     var now = DateTime.now();
     if (now.hour < 12) {
-      titleText.sink.add('Good Morning');
+      return 'Good Morning';
     } else if (now.hour < 18) {
-      titleText.sink.add('Good Afternoon');
+      return 'Good Afternoon';
     } else {
-      titleText.sink.add('Good Evening');
+      return 'Good Evening';
     }
   }
 }

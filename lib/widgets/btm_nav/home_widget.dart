@@ -28,7 +28,6 @@ class HomeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _bloc.fetchMenu();
-    _bloc.getTitleText();
 
     return SafeArea(
       child: Scaffold(
@@ -71,31 +70,32 @@ class HomeWidget extends StatelessWidget {
     );
   }
 
-  PopupMenuButton<MenuData> _getMenu(BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
+  PopupMenuButton<MenuData> _getMenu(
+      BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
     return PopupMenuButton<MenuData>(
-                  color: MeditoColors.deepNight,
-                  onSelected: (MenuData result) {
-                    NavigationFactory.navigateToScreenFromString(
-                        result.itemType, result.itemPath, context);
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return snapshot.data.body.data.map((MenuData data) {
-                      return PopupMenuItem<MenuData>(
-                        value: data,
-                        child: Text(data.itemLabel,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline3
-                                .copyWith(color: MeditoColors.walterWhite)),
-                      );
-                    }).toList();
-                  },
-                );
+      color: MeditoColors.deepNight,
+      onSelected: (MenuData result) {
+        NavigationFactory.navigateToScreenFromString(
+            result.itemType, result.itemPath, context);
+      },
+      itemBuilder: (BuildContext context) {
+        return snapshot.data.body.data.map((MenuData data) {
+          return PopupMenuItem<MenuData>(
+            value: data,
+            child: Text(data.itemLabel,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline3
+                    .copyWith(color: MeditoColors.walterWhite)),
+          );
+        }).toList();
+      },
+    );
   }
 
-  Widget _getTitleWidget(BuildContext context) => StreamBuilder<String>(
-      stream: _bloc.titleText.stream,
-      initialData: '...',
+  Widget _getTitleWidget(BuildContext context) => FutureBuilder<String>(
+      future: _bloc.getTitleText(),
+      initialData: 'Medito',
       builder: (context, snapshot) {
         return Text(snapshot.data,
             style: Theme.of(context).textTheme.headline5);
