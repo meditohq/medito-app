@@ -86,8 +86,7 @@ class SmallShortcutWidget extends StatelessWidget {
       maxLines: 2,
       style: Theme.of(context)
           .textTheme
-          .subtitle1
-          .copyWith(color: MeditoColors.walterWhite, fontSize: 14));
+          .subtitle2);
 
   Widget _getListItemLeadingImageWidget() => Container(
         color: parseColor(data.colorPrimary),

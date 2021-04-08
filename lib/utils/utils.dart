@@ -23,82 +23,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-TextTheme buildDMSansTextTheme(BuildContext context) {
-  return GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme.copyWith(
-        headline6: TextStyle(
-            fontSize: 20.0,
-            height: 1.4,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.w500),
-        headline5: TextStyle(
-            //h2
-            height: 1.4,
-            fontSize: 20.0,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.w600),
-        subtitle1: TextStyle(
-            fontSize: 16.0,
-            height: 1.4,
-            color: MeditoColors.lightTextColor,
-            fontWeight: FontWeight.normal),
-        headline4: TextStyle(
-            //pill big
-            height: 1.4,
-            fontSize: 18.0,
-            color: MeditoColors.darkBGColor,
-            fontWeight: FontWeight.normal),
-        headline3: TextStyle(
-            //pill small
-            fontSize: 14.0,
-            height: 1.25,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.normal),
-        headline2: TextStyle(
-          //this is for bottom sheet text
-          letterSpacing: 0.1,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          height: 1.4,
-          color: MeditoColors.walterWhite,
-        ),
-        bodyText2: TextStyle(
-            //this is for 'text'
-            fontSize: 16.0,
-            height: 1.4,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.normal),
-        subtitle2: TextStyle(
-            //this is for 'h3' markdown
-            fontSize: 18.0,
-            height: 1.4,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.normal),
-        headline1: TextStyle(
-            //bottom sheet filter chip
-            //horizontal announcement
-            fontSize: 16.0,
-            height: 1.25,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.w400),
-        caption: TextStyle(
-            //attr widget
-            fontSize: 14.0,
-            height: 1.4,
-            color: MeditoColors.walterWhite,
-            fontWeight: FontWeight.w400),
-        bodyText1: TextStyle(
-            //for 'MORE DETAILS'
-            // fontSize: 14.0,
-            // height: 1.4,
-            // color: MeditoColors.walterWhite,
-            letterSpacing: 0.2,
-            height: 1.5,
-            color: Colors.white,
-            fontSize: 24.0,
-            fontWeight: FontWeight.w600),
-      ));
-}
-
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
   if (url == null) return Container();
@@ -174,10 +98,6 @@ bool isDayBefore(DateTime day1, DateTime day2) {
   return day1.year == day2.year &&
       day1.month == day2.month &&
       day1.day == day2.day - 1;
-}
-
-void launchDonatePage() {
-  launch('https://meditofoundation.org/donate');
 }
 
 // ignore: always_declare_return_types

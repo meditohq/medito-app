@@ -27,8 +27,8 @@ class TextBloc {
     bodyController = StreamController.broadcast()..sink.add('...');
   }
 
-  Future<void> fetchText(String id) async {
-    var data = await _repo.fetchData(id);
+  Future<void> fetchText(String id, bool skipCache) async {
+    var data = await _repo.fetchData(id, skipCache);
 
     titleController.sink.add(data.title);
     bodyController.sink.add(data.html);

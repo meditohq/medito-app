@@ -14,15 +14,14 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/home/menu_response.dart';
-import 'package:Medito/network/home/shortcuts_response.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
 class HomeRepo {
   final _ext = 'items/menu';
 
-  Future<MenuResponse> fetchMenu() async {
-    final response = await httpGet(baseUrl + _ext);
+  Future<MenuResponse> fetchMenu(bool skipCache) async {
+    final response = await httpGet(baseUrl + _ext, skipCache: skipCache);
     return MenuResponse.fromJson(response);
   }
 }

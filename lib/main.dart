@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/btm_nav/library_widget.dart';
@@ -90,38 +91,38 @@ class _ParentWidgetState extends State<ParentWidget>
                   index: _currentIndex,
                   children: _children,
                 ),
-                bottomNavigationBar: BottomNavigationBar(
-                  selectedLabelStyle: Theme.of(context)
-                      .textTheme
-                      .headline3
-                      .copyWith(color: MeditoColors.walterWhite, fontSize: 20),
-                  unselectedLabelStyle: Theme.of(context)
-                      .textTheme
-                      .headline3
-                      .copyWith(color: MeditoColors.walterWhite, fontSize: 20),
-                  selectedItemColor: MeditoColors.walterWhite,
-                  unselectedItemColor: MeditoColors.newGrey,
-                  currentIndex: _currentIndex,
-                  onTap: onTabTapped,
-                  items: [
-                    BottomNavigationBarItem(
-                      tooltip: 'Home',
-                      icon: Container(),
-                      label: 'Home',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Container(),
-                      tooltip: 'Packs',
-                      label: 'Packs',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Container(),
-                      tooltip: 'Library',
-                      label: 'Library',
-                    ),
-                  ],
+                bottomNavigationBar: Container(
+                  decoration: BoxDecoration(
+                      color: MeditoColors.softGrey,
+                      border: Border(
+                          top: BorderSide(
+                              color: MeditoColors.softGrey, width: 2.0))),
+                  child: BottomNavigationBar(
+                    selectedLabelStyle: Theme.of(context).textTheme.headline1,
+                    unselectedLabelStyle: Theme.of(context).textTheme.headline2,
+                    selectedItemColor: MeditoColors.walterWhite,
+                    unselectedItemColor: MeditoColors.newGrey,
+                    currentIndex: _currentIndex,
+                    onTap: onTabTapped,
+                    items: [
+                      BottomNavigationBarItem(
+                        tooltip: 'Home',
+                        icon: Container(),
+                        label: 'Home',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Container(),
+                        tooltip: 'Packs',
+                        label: 'Packs',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Container(),
+                        tooltip: 'Library',
+                        label: 'Library',
+                      ),
+                    ],
+                  ),
                 ),
-                appBar: null, //AppBar(title: const Text(_title)),
               )
         },
         theme: ThemeData(
@@ -132,7 +133,7 @@ class _ParentWidgetState extends State<ParentWidget>
               TargetPlatform.android: SlideTransitionBuilder(),
             }),
             accentColor: MeditoColors.walterWhite,
-            textTheme: buildDMSansTextTheme(context)),
+            textTheme: meditoTextTheme(context)),
         title: ParentWidget._title,
       ),
     );

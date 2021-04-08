@@ -20,8 +20,8 @@ import 'package:Medito/viewmodel/http_get.dart';
 class TextRepository {
   var ext = 'items/articles/';
 
-  Future<TextResponse> fetchData(String id) async {
-    final response = await httpGet(baseUrl + ext + id);
+  Future<TextResponse> fetchData(String id, bool skipCache) async {
+    final response = await httpGet(baseUrl + ext + id, skipCache: skipCache);
     return TextResponse.fromJson(response);
   }
 }

@@ -31,13 +31,16 @@ class HomeWidget extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-        body: ListView(
-          children: [
-            _getAppBar(context),
-            AnnouncementBanner(),
-            SmallShortcutsRowWidget(),
-            // SmallShortcutsRowWidget()
-          ],
+        body: RefreshIndicator(
+          onRefresh: () => _bloc.fetchMenu(skipCache: true),
+          child: ListView(
+            children: [
+              _getAppBar(context),
+              AnnouncementBanner(),
+              SmallShortcutsRowWidget(),
+              // SmallShortcutsRowWidget()
+            ],
+          ),
         ),
       ),
     );
@@ -88,8 +91,7 @@ class HomeWidget extends StatelessWidget {
             child: Text(data.itemLabel,
                 style: Theme.of(context)
                     .textTheme
-                    .bodyText2
-                    .copyWith(color: MeditoColors.walterWhite)),
+                    .headline4),
           );
         }).toList();
       },
@@ -101,6 +103,6 @@ class HomeWidget extends StatelessWidget {
       initialData: 'Medito',
       builder: (context, snapshot) {
         return Text(snapshot.data,
-            style: Theme.of(context).textTheme.headline5);
+            style: Theme.of(context).textTheme.headline1);
       });
 }

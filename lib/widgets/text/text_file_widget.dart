@@ -15,12 +15,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
-import 'package:Medito/widgets/app_bar_widget.dart';
 
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key key}) : super(key: key);
@@ -55,7 +55,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
   void initState() {
     super.initState();
     Tracking.changeScreenName(Tracking.TEXT_PAGE);
-    _bloc = TextBloc()..fetchText(widget.id);
+    _bloc = TextBloc()..fetchText(widget.id, false);
   }
 
   @override
@@ -65,11 +65,14 @@ class _TextFileWidgetState extends State<TextFileWidget>
     ));
 
     return Scaffold(
-      body: Builder(
-        builder: (BuildContext context) {
-          scaffoldContext = context;
-          return buildSafeAreaBody();
-        },
+      body: RefreshIndicator(
+        onRefresh: () => _bloc.fetchText(widget.id, true),
+        child: Builder(
+          builder: (BuildContext context) {
+            scaffoldContext = context;
+            return buildSafeAreaBody();
+          },
+        ),
       ),
     );
   }
@@ -109,14 +112,10 @@ class _TextFileWidgetState extends State<TextFileWidget>
                 initialData: 'Loading...',
                 builder: (context, snapshot) {
                   return Html(
-                    data: '<p>${snapshot.data}</p>',
-                    onLinkTap: _linkTap,
-                    shrinkWrap: true,
-                    style: {
-                      'a': Style(color: Colors.white),
-                      'html': Style(fontSize: FontSize(18))
-                    },
-                  );
+                      data: snapshot.data,
+                      onLinkTap: _linkTap,
+                      shrinkWrap: true,
+                      style: htmlTheme(context));
                 }),
           ),
         ],
