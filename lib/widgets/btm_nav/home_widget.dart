@@ -16,20 +16,17 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/home/small_shortcuts/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:flutter/material.dart';
-
-import '../../network/api_response.dart';
-import '../../utils/colors.dart';
 
 class HomeWidget extends StatelessWidget {
   final _bloc = HomeBloc();
 
   @override
   Widget build(BuildContext context) {
-
     _bloc.fetchMenu();
     _bloc.getTitleText();
 
@@ -62,25 +59,7 @@ class HomeWidget extends StatelessWidget {
                   return Container();
                   break;
                 case Status.COMPLETED:
-                  return PopupMenuButton<MenuData>(
-                    color: MeditoColors.deepNight,
-                    onSelected: (MenuData result) {
-                      NavigationFactory.navigateToScreenFromString(
-                          result.itemType, result.itemPath, context);
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return snapshot.data.body.data.map((MenuData data) {
-                        return PopupMenuItem<MenuData>(
-                          value: data,
-                          child: Text(data.itemLabel,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3
-                                  .copyWith(color: MeditoColors.walterWhite)),
-                        );
-                      }).toList();
-                    },
-                  );
+                  return _getMenu(context, snapshot);
                   break;
                 case Status.ERROR:
                   return Container();
@@ -90,6 +69,28 @@ class HomeWidget extends StatelessWidget {
             }),
       ],
     );
+  }
+
+  PopupMenuButton<MenuData> _getMenu(BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
+    return PopupMenuButton<MenuData>(
+                  color: MeditoColors.deepNight,
+                  onSelected: (MenuData result) {
+                    NavigationFactory.navigateToScreenFromString(
+                        result.itemType, result.itemPath, context);
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return snapshot.data.body.data.map((MenuData data) {
+                      return PopupMenuItem<MenuData>(
+                        value: data,
+                        child: Text(data.itemLabel,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline3
+                                .copyWith(color: MeditoColors.walterWhite)),
+                      );
+                    }).toList();
+                  },
+                );
   }
 
   Widget _getTitleWidget(BuildContext context) => StreamBuilder<String>(
