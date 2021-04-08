@@ -96,7 +96,7 @@ class PackListWidgetState extends State<PackListWidget> {
       padding: EdgeInsets.only(top: 8, bottom: 8),
       itemCount: data.length,
       itemBuilder: (context, i) {
-        return GestureDetector(
+        return InkWell(
           onTap: () => NavigationFactory.navigateToScreenFromString(
               data[i].type, data[i].id, context),
           child: PackListItemWidget(data[i]),
@@ -179,7 +179,7 @@ class PackListWidgetState extends State<PackListWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(12)),
                 color: color,
               ),
-              height: 64,
+              height: 54,
             ),
           ),
         ],
