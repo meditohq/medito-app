@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/duration_ext.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:Medito/utils/duration_ext.dart';
 
 class PositionIndicatorWidget extends StatefulWidget {
   final MediaItem mediaItem;
@@ -86,23 +86,16 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      Duration(
-                              milliseconds: widget
-                                      .state?.currentPosition?.inMilliseconds ??
-                                  0)
-                          .toMinutesSeconds(),
-                      style: Theme.of(context).textTheme.headline1.copyWith(
-                          letterSpacing: 0.2,
-                          fontWeight: FontWeight.w500,
-                          color: MeditoColors.walterWhite.withOpacity(0.7),
-                          height: 1.4)),
+                    Duration(
+                            milliseconds:
+                                widget.state?.currentPosition?.inMilliseconds ??
+                                    0)
+                        .toMinutesSeconds(),
+                    style: Theme.of(context).textTheme.subtitle2,
+                  ),
                   Text(
                     Duration(milliseconds: duration).toMinutesSeconds(),
-                    style: Theme.of(context).textTheme.headline1.copyWith(
-                        letterSpacing: 0.2,
-                        fontWeight: FontWeight.w500,
-                        color: MeditoColors.walterWhite.withOpacity(0.7),
-                        height: 1.4),
+                    style: Theme.of(context).textTheme.subtitle2,
                   ),
                 ],
               ),
@@ -125,10 +118,8 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
   }) {
     final trackHeight = sliderTheme.trackHeight;
     final trackLeft = offset.dx;
-    final trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
+    final trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
     final trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }
-

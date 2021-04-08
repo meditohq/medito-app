@@ -120,7 +120,7 @@ class PackListWidgetState extends State<PackListWidget> {
     final snackBar = SnackBar(
         content: Text(
           'Version: $version - Build Number: $buildNumber',
-          style: TextStyle(color: MeditoColors.lightTextColor),
+          style: TextStyle(color: MeditoColors.meditoTextGrey),
         ),
         backgroundColor: MeditoColors.midnight);
 

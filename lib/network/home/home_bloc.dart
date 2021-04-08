@@ -32,9 +32,9 @@ class HomeBloc {
 
   }
 
-  Future<void> fetchMenu() async {
+  Future<void> fetchMenu({bool skipCache = false}) async {
     try {
-      var data = await _repo.fetchMenu();
+      var data = await _repo.fetchMenu(skipCache);
       menuList.sink.add(ApiResponse.completed(data));
     } catch (e) {
       menuList.sink.add(ApiResponse.error('An error occurred!'));

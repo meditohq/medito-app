@@ -219,12 +219,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   TextStyle buildTitleTheme() {
-    return Theme.of(context).textTheme.bodyText1.copyWith(
-        letterSpacing: 0.2,
-        height: 1.5,
-        color: Colors.white,
-        fontSize: 20.0,
-        fontWeight: FontWeight.w600);
+    return Theme.of(context).textTheme.headline1;
   }
 
   StatelessWidget getSubtitleWidget(MediaItem mediaItem) {
