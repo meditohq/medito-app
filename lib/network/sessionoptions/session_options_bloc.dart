@@ -129,6 +129,8 @@ class SessionOptionsBloc {
     // Info is in the form "info": "No voice,00:05:02"
     voiceListController.sink.add(ApiResponse.completed(options.voiceList));
     filterLengthsForVoice();
+
+    await updateCurrentFile();
   }
 
   String _getCoverUrl() => _repo.getImageBaseUrl(_options.cover);
