@@ -73,6 +73,9 @@ class HomeWidget extends StatelessWidget {
   PopupMenuButton<MenuData> _getMenu(
       BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
     return PopupMenuButton<MenuData>(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(4.0),
+      ),
       color: MeditoColors.deepNight,
       onSelected: (MenuData result) {
         NavigationFactory.navigateToScreenFromString(
@@ -85,7 +88,7 @@ class HomeWidget extends StatelessWidget {
             child: Text(data.itemLabel,
                 style: Theme.of(context)
                     .textTheme
-                    .headline3
+                    .bodyText2
                     .copyWith(color: MeditoColors.walterWhite)),
           );
         }).toList();

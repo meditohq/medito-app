@@ -580,13 +580,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           map: {'version_seen': '$version'});
     });
 
-    if (path.contains('medito-donate')) {
-      launchDonatePageOrWidget(context);
-    } else {
-      return launchUrl(path);
-    }
-
-    return null;
+    return launchUrl(path);
   }
 
   Future<void> _share() {

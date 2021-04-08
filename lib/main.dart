@@ -18,16 +18,13 @@ import 'dart:async';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/btm_nav/library_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 
 import 'utils/colors.dart';
 
@@ -40,18 +37,7 @@ Future<void> main() async {
       statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
 
-  var app = await Firebase.initializeApp(
-      options: FirebaseOptions(
-    appId: appId,
-    apiKey: apiKey,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    databaseURL: databaseURL,
-  ));
-
-  await Tracking.initialiseTracker(app);
-
-  InAppPurchaseConnection.enablePendingPurchases();
+  await Tracking.initialiseTracker();
 
   runApp(ParentWidget());
 }
@@ -74,11 +60,7 @@ class _ParentWidgetState extends State<ParentWidget>
     super.initState();
 
     isTrackingAccepted().then((value) async {
-      if (value) {
-        Tracking.enableAnalytics(true);
-      } else {
-        Tracking.enableAnalytics(false);
-      }
+      //todo
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -109,8 +91,14 @@ class _ParentWidgetState extends State<ParentWidget>
                   children: _children,
                 ),
                 bottomNavigationBar: BottomNavigationBar(
-                  selectedFontSize: 20,
-                  unselectedFontSize: 20,
+                  selectedLabelStyle: Theme.of(context)
+                      .textTheme
+                      .headline3
+                      .copyWith(color: MeditoColors.walterWhite, fontSize: 20),
+                  unselectedLabelStyle: Theme.of(context)
+                      .textTheme
+                      .headline3
+                      .copyWith(color: MeditoColors.walterWhite, fontSize: 20),
                   selectedItemColor: MeditoColors.walterWhite,
                   unselectedItemColor: MeditoColors.newGrey,
                   currentIndex: _currentIndex,
@@ -146,7 +134,6 @@ class _ParentWidgetState extends State<ParentWidget>
             accentColor: MeditoColors.walterWhite,
             textTheme: buildDMSansTextTheme(context)),
         title: ParentWidget._title,
-        navigatorObservers: [Tracking.getObserver()],
       ),
     );
   }
