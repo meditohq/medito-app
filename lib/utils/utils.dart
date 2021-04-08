@@ -15,14 +15,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/viewmodel/auth.dart';
-import 'package:Medito/widgets/donation/donation_page.dart';
-import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -109,8 +105,15 @@ Widget getNetworkImageWidget(String url,
   final headers = {HttpHeaders.authorizationHeader: basicAuth};
   return CachedNetworkImage(
     fit: BoxFit.fill,
-    errorWidget: (context, url, error,) =>
-        Icon(Icons.broken_image_outlined, color: MeditoColors.walterWhiteTrans,),
+    errorWidget: (
+      context,
+      url,
+      error,
+    ) =>
+        Icon(
+      Icons.broken_image_outlined,
+      color: MeditoColors.walterWhiteTrans,
+    ),
     httpHeaders: headers,
     placeholder: (context, url) => Container(
       height: startHeight,
@@ -173,43 +176,8 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-MarkdownBody getMarkdownBody(String content, BuildContext context) {
-  return MarkdownBody(
-    onTapLink: ((url) {
-      if (url.contains('medito-donate')) {
-        //open the donate page here
-        launchDonatePageOrWidget(context);
-      } else {
-        launch(url);
-      }
-    }),
-    selectable: false,
-    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        a: Theme.of(context)
-            .textTheme
-            .bodyText2
-            .copyWith(decoration: TextDecoration.underline),
-        h1: Theme.of(context).textTheme.headline6,
-        h2: Theme.of(context).textTheme.headline5,
-        h3: Theme.of(context).textTheme.subtitle2,
-        listBullet: Theme.of(context).textTheme.subtitle1,
-        p: Theme.of(context).textTheme.bodyText2.copyWith(height: 1.5)),
-    data: content ?? '',
-    imageDirectory: 'https://raw.githubusercontent.com',
-  );
-}
-
-void launchDonatePageOrWidget(BuildContext context) {
-  //open the donate page here
-  if (Platform.isAndroid) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DonationWidget(),
-        ));
-  } else {
-    launch('https://meditofoundation.org/donate');
-  }
+void launchDonatePage() {
+  launch('https://meditofoundation.org/donate');
 }
 
 // ignore: always_declare_return_types
@@ -235,62 +203,6 @@ Future<void> trackingAnswered() async {
 Future<bool> getTrackingAnswered() async {
   var prefs = await SharedPreferences.getInstance();
   return prefs.getBool('trackingAnswered') ?? false;
-}
-
-void showConsentDialog(BuildContext context) {
-  showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          actionsPadding: const EdgeInsets.only(right: 12.0, bottom: 12.0),
-          title: Text('👋'),
-          backgroundColor: MeditoColors.moonlight,
-          content: getMarkdownBody(
-              '### We’d like to automatically collect information about your use of Medito so we can make it better.\n ### You don’t have to do anything & the data collected is anonymous.\n [Learn more by tapping here.](https://meditofoundation.org/privacy)',
-              context),
-          actions: [
-            Container(
-              height: 48,
-              child: TextButton(
-                onPressed: () async {
-                  Tracking.enableAnalytics(false);
-                  await trackingAnswered();
-                  Navigator.pop(context);
-                },
-                style: TextButton.styleFrom(shape: roundedRectangleBorder()),
-                child: Text(
-                  'DECLINE',
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: MeditoColors.walterWhite,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Container(
-              height: 48,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                    shape: roundedRectangleBorder(),
-                    backgroundColor: MeditoColors.peacefulBlue),
-                onPressed: () async {
-                  Tracking.enableAnalytics(true);
-                  await acceptTracking();
-                  await Tracking.trackTrackingAnswered(true);
-                  await trackingAnswered();
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  ' ACCEPT ',
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: MeditoColors.darkMoon,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        );
-      });
 }
 
 extension EmptyOrNull on String {

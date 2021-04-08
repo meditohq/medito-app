@@ -50,7 +50,6 @@ class PackListWidgetState extends State<PackListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _trackingDialog(context);
     return Container(
       color: MeditoColors.darkMoon,
       child: SafeArea(
@@ -103,13 +102,6 @@ class PackListWidgetState extends State<PackListWidget> {
         );
       },
     );
-  }
-
-  Future<void> _trackingDialog(BuildContext context) async {
-    await getTrackingAnswered().then((answered) async {
-      if (!answered && !_dialogShown) showConsentDialog(context);
-      _dialogShown = true;
-    });
   }
 
   Widget _getMeditoLogoWidget() {
