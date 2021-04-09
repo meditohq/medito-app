@@ -20,6 +20,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/home/courses/courses_row_widget.dart';
 import 'package:Medito/widgets/home/small_shortcuts/small_shortcuts_row_widget.dart';
+import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,8 @@ class HomeWidget extends StatelessWidget {
               _getAppBar(context),
               AnnouncementBanner(),
               SmallShortcutsRowWidget(),
-              CoursesRowWidget()
+              // SmallShortcutsRowWidget()
+              StatsWidget()
             ],
           ),
         ),
@@ -90,9 +92,7 @@ class HomeWidget extends StatelessWidget {
           return PopupMenuItem<MenuData>(
             value: data,
             child: Text(data.itemLabel,
-                style: Theme.of(context)
-                    .textTheme
-                    .headline4),
+                style: Theme.of(context).textTheme.headline4),
           );
         }).toList();
       },
