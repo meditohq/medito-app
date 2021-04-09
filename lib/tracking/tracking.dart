@@ -13,10 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/utils.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 class Tracking {
@@ -54,33 +50,12 @@ class Tracking {
   static const String DENY_TRACKING = 'deny_tracking';
 
   static const String HOME = 'home_page';
-  static FirebaseAnalytics _firebaseAnalytics;
-  static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
-  static DatabaseReference _dbRef;
 
   static const String _dbName = foundation.kReleaseMode ? 'donations' : 'test';
 
-  static Future<void> initialiseTracker(FirebaseApp app) async {
-    _firebaseAnalytics = FirebaseAnalytics();
-    _firebaseAnalyticsObserver =
-        FirebaseAnalyticsObserver(analytics: _firebaseAnalytics);
+  static Future<void> initialiseTracker() async {}
 
-    //dummy event
-    _firebaseAnalytics.logEvent(
-      name: 'tracker_initialized',
-      parameters: {},
-    ).then((value) => print('tracking initialized'));
-
-    final database = FirebaseDatabase(app: app);
-
-    _dbRef = database.reference().child(_dbName);
-  }
-
-  static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
-
-  static void changeScreenName(String screenName) {
-    _firebaseAnalytics.setCurrentScreen(screenName: screenName);
-  }
+  static void changeScreenName(String screenName) {}
 
   // like 'LoginWidget', 'Login button', 'Clicked'
   static Future<void> trackEvent(
@@ -97,21 +72,13 @@ class Tracking {
       };
       if (map != null) defaultMap.addAll(map);
 
-      _firebaseAnalytics.logEvent(
-        name: eventName.clean(),
-        parameters: defaultMap,
-      );
-
       print('Event logged: $eventName');
     }
   }
 
-  static void enableAnalytics(bool enable) {
-    _firebaseAnalytics.setAnalyticsCollectionEnabled(enable);
-  }
+  static void enableAnalytics(bool enable) {}
 
   static void trackDonation(String recordName, Map<String, dynamic> map) {
-    _dbRef.child(recordName).set(map);
   }
 
   static Future<void> trackTrackingAnswered(bool track) async {

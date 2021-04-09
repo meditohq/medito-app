@@ -32,13 +32,10 @@ dependencies:
   rxdart: ^0.24.1
   share: ^0.6.5+2
   firebase_core: ^0.5.0+1
-  firebase_analytics: ^6.0.2
   firebase_messaging: ^7.0.3
-  firebase_database: ^4.3.0
   flutter_html: ^1.2.0
   provider: ^4.3.2+2
   package_info: ^0.4.3
-  in_app_purchase: ^0.3.4+15
   in_app_update: ^1.1.14
   pedantic: ^1.9.0
   # The following adds the Cupertino Icons font to your application.

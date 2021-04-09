@@ -197,7 +197,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
                   stream: _bloc.titleControllerStream,
                   builder: (context, titleSnapshot) {
                     return MeditoAppBarWidget(
-                        title: titleSnapshot.data?.body ?? '...');
+                        title: titleSnapshot.data?.body ?? '');
                   });
           }
         });

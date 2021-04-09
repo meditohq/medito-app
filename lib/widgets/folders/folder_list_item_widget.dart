@@ -14,9 +14,9 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/folder/folder_reponse.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:Medito/utils/colors.dart';
 
 class ListItemWidget extends StatelessWidget {
   ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id})
@@ -79,25 +79,15 @@ class ListItemWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(title,
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6
-                    .copyWith(fontSize: 18, height: 1.4)),
+            Text(title, style: Theme.of(context).textTheme.headline4),
             subtitle == null || subtitle.isEmpty
                 ? Container()
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(height: 4),
-                      Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.subtitle1.copyWith(
-                            fontSize: 14,
-                            letterSpacing: 0.2,
-                            fontWeight: FontWeight.w500,
-                            color: MeditoColors.walterWhite.withOpacity(0.7)),
-                      ),
+                      Text(subtitle,
+                          style: Theme.of(context).textTheme.subtitle1),
                     ],
                   )
           ]),
