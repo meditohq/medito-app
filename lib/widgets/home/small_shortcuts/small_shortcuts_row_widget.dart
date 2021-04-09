@@ -1,14 +1,12 @@
+import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/shortcuts_bloc.dart';
 import 'package:Medito/network/home/shortcuts_response.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:Medito/network/api_response.dart';
-import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/utils/utils.dart';
 
 class SmallShortcutsRowWidget extends StatelessWidget {
   final _bloc = ShortcutsBloc();
@@ -84,9 +82,7 @@ class SmallShortcutWidget extends StatelessWidget {
       overflow: TextOverflow.visible,
       wrapWords: false,
       maxLines: 2,
-      style: Theme.of(context)
-          .textTheme
-          .subtitle2);
+      style: Theme.of(context).textTheme.subtitle2);
 
   Widget _getListItemLeadingImageWidget() => Container(
         color: parseColor(data.colorPrimary),

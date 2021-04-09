@@ -42,8 +42,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String __loaded;
   double volume;
 
-  BuildContext _scaffoldContext;
-
   AudioCompleteCopyBloc _bloc;
 
   bool get loaded => __loaded == 'true';
@@ -102,7 +100,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Scaffold(
         backgroundColor: MeditoColors.midnight,
         body: Builder(builder: (BuildContext context) {
-          _scaffoldContext = context;
           return StreamBuilder<ScreenState>(
               stream: _screenStateStream,
               builder: (context, screenStateSnapshot) {
@@ -556,17 +553,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  bool shouldShowInAppReview() =>
-      _bloc.version?.buttonPath?.contains('review') ?? false;
-
-  void _thanksPopUp() {
-    createSnackBarWithColor('Thanks for the feedback!', _scaffoldContext,
-        MeditoColors.peacefulBlue);
-    addCurrentDateToSF('UserDeclinedRating');
-    Future.delayed(Duration(seconds: 3))
-        .then((value) => Navigator.pop(context));
-  }
-
   Future<void> _launchPrimaryButton() {
     var path = _bloc.version.buttonPath;
 
@@ -609,8 +595,9 @@ Future<void> start(MediaItem media) async {
   ).onError((error, stackTrace) => _printError(error)));
 }
 
-_printError(error) {
+FutureOr<bool> _printError(error) async {
   print(error);
+  return true;
 }
 
 bool checkDaysSinceReview() {
