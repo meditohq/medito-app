@@ -38,7 +38,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 16.0),
       child: FutureBuilder<String>(
           future: widget.future,
           builder: (context, snapshot) {
@@ -47,27 +47,25 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
               var value = int.parse(snapshot?.data);
               unit = getUnits(widget.optionalText, value);
             }
-            return GestureDetector(
+            return InkWell(
               onTap: widget.onClick,
               child: Container(
                 width: 132,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(0)),
                   color: MeditoColors.moonlight,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(height: 4),
                       Text(widget.title,
                           maxLines: 2,
                           overflow: TextOverflow.fade,
                           style: Theme.of(context).textTheme.subtitle1),
-                      SizedBox(height: 5),
+                      SizedBox(height: 4),
                       Wrap(
                         direction: Axis.horizontal,
                         crossAxisAlignment: WrapCrossAlignment.end,

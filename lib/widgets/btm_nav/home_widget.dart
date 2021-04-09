@@ -40,7 +40,7 @@ class HomeWidget extends StatelessWidget {
               _getAppBar(context),
               AnnouncementBanner(),
               SmallShortcutsRowWidget(),
-              // SmallShortcutsRowWidget()
+              CoursesRowWidget(),
               StatsWidget()
             ],
           ),

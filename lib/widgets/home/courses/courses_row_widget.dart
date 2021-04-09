@@ -28,7 +28,7 @@ class CoursesRowWidget extends StatelessWidget {
                   break;
                 case Status.COMPLETED:
                   return Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
+                    height: MediaQuery.of(context).size.height * 0.3,
                     child: ListView.builder(
                         padding: const EdgeInsets.only(left: 16),
                         scrollDirection: Axis.horizontal,
