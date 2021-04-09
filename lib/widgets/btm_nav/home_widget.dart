@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/widgets/home/small_shortcuts/small_shortcuts_row_widget.dart';
+import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,8 @@ class HomeWidget extends StatelessWidget {
           children: [
             AnnouncementBanner(),
             SmallShortcutsRowWidget(),
-            SmallShortcutsRowWidget()
+            SmallShortcutsRowWidget(),
+            StatsWidget()
           ],
         ),
       ),
