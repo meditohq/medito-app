@@ -40,6 +40,7 @@ class HomeWidget extends StatelessWidget {
               AnnouncementBanner(),
               SmallShortcutsRowWidget(),
               // SmallShortcutsRowWidget()
+              // StreakWidget(),
               StatsWidget()
             ],
           ),

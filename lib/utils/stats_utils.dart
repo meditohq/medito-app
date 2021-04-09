@@ -16,15 +16,13 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/utils/utils.dart';
-enum UnitType { day, min }
+
+enum UnitType { day }
 
 String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:
       return value == 1 ? 'day' : 'days';
-      break;
-    case UnitType.min:
-      return value == 1 ? 'min' : 'mins';
       break;
   }
   return '';
@@ -224,7 +222,6 @@ Future<void> markAsListened(String id) async {
 }
 
 Future<void> markAsNotListened(String id) async {
-
   var prefs = await SharedPreferences.getInstance();
   await prefs?.setBool('listened' + id, false);
 }
@@ -273,7 +270,8 @@ Future updateStatsFromBg() async {
       await updateStreak();
       await incrementNumSessions();
       await markAsListened(map['id']);
-      await updateMinuteCounter(Duration(seconds: map['secsListened']).inSeconds);
+      await updateMinuteCounter(
+          Duration(seconds: map['secsListened']).inSeconds);
     }
     print('clearing bg stats');
     await clearBgStats();
