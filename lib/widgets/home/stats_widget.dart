@@ -69,10 +69,9 @@ class _StatsWidgetState extends State<StatsWidget> {
             primaryColor: MeditoColors.walterWhite,
           ),
           child: AlertDialog(
-            shape: roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,
             title: Text('How many days is your streak?',
-                style: Theme.of(context).textTheme.headline5),
+                style: Theme.of(context).textTheme.headline4),
             content: TextField(
               textAlign: TextAlign.center,
               style: Theme.of(context)
@@ -93,33 +92,29 @@ class _StatsWidgetState extends State<StatsWidget> {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Container(
-                      height: 48,
+                      height: 38,
                       child: TextButton(
                         onPressed: _onCancelTap,
-                        child: Text(
-                          'CANCEL',
-                          style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.walterWhite,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        child: Text('CANCEL',
+                            style: Theme.of(context).textTheme.subtitle1
+                            // .copyWith(fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                     Container(
                       width: 8,
                     ),
                     Container(
-                      height: 48,
+                      height: 38,
                       child: TextButton(
                         onPressed: _onSaveTap,
                         style: TextButton.styleFrom(
-                            shape: roundedRectangleBorder(),
+                            // shape: roundedRectangleBorder(),
                             primary: MeditoColors.walterWhite),
-                        child: Text(
-                          'SAVE',
-                          style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.darkMoon,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        child: Text('SAVE',
+                            style: Theme.of(context).textTheme.headline3
+                            // .copyWith(fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                   ],
@@ -165,10 +160,9 @@ class _StatsWidgetState extends State<StatsWidget> {
               accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
-            shape: roundedRectangleBorder(),
             backgroundColor: MeditoColors.moonlight,
             title: Text('Reset longest streak to your current streak?',
-                style: Theme.of(context).textTheme.headline5),
+                style: Theme.of(context).textTheme.headline4),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
@@ -176,36 +170,32 @@ class _StatsWidgetState extends State<StatsWidget> {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Container(
-                      height: 48,
+                      height: 38,
                       child: TextButton(
                         onPressed: _onCancelTap,
                         style: TextButton.styleFrom(
-                            shape: roundedRectangleBorder(),
+                            // shape: roundedRectangleBorder(),
                             primary: MeditoColors.moonlight),
-                        child: Text(
-                          'CANCEL',
-                          style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.walterWhite,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        child: Text('CANCEL',
+                            style: Theme.of(context).textTheme.subtitle1
+                            // .copyWith(fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                     Container(
                       width: 8,
                     ),
                     Container(
-                      height: 48,
+                      height: 38,
                       child: TextButton(
                         onPressed: _onResetTap,
                         style: TextButton.styleFrom(
-                            shape: roundedRectangleBorder(),
+                            // shape: roundedRectangleBorder(),
                             primary: MeditoColors.walterWhite),
-                        child: Text(
-                          'RESET',
-                          style: Theme.of(context).textTheme.headline3.copyWith(
-                              color: MeditoColors.moonlight,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        child: Text('RESET',
+                            style: Theme.of(context).textTheme.headline3
+                            // .copyWith(fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                   ],
