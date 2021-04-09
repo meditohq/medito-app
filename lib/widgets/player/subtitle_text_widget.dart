@@ -1,8 +1,8 @@
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
 
 class SubtitleTextWidget extends StatelessWidget {
   final String html;
@@ -24,18 +24,11 @@ class SubtitleTextWidget extends StatelessWidget {
         Expanded(
           child: Wrap(
             children: [
-              Opacity(
-                opacity: 0.7,
-                child: Html(
-                  data: html != null ? '<p>$html</p>' : '<p>Loading...</p>',
-                  onLinkTap: _linkTap,
-                  shrinkWrap: true,
-                  style: {
-                    'a': Style(color: Colors.white),
-                    'html': Style(
-                        alignment: Alignment.center, textAlign: TextAlign.center)
-                  },
-                ),
+              Html(
+                data: html ?? '<p>Loading...</p>',
+                onLinkTap: _linkTap,
+                shrinkWrap: true,
+                style: htmlTheme(context),
               ),
             ],
           ),

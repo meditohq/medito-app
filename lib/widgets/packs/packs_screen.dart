@@ -19,7 +19,6 @@ import 'package:Medito/network/packs/packs_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/medito_logo_widget.dart';
@@ -38,7 +37,6 @@ class PackListWidget extends StatefulWidget {
 }
 
 class PackListWidgetState extends State<PackListWidget> {
-  var _streak;
   bool _dialogShown = false;
   PacksBloc _packsBloc;
 
@@ -48,12 +46,10 @@ class PackListWidgetState extends State<PackListWidget> {
 
     super.initState();
     _packsBloc = PacksBloc();
-    _streak = getCurrentStreak();
   }
 
   @override
   Widget build(BuildContext context) {
-    _trackingDialog(context);
     return Container(
       color: MeditoColors.darkMoon,
       child: SafeArea(
@@ -99,20 +95,13 @@ class PackListWidgetState extends State<PackListWidget> {
       padding: EdgeInsets.only(top: 8, bottom: 8),
       itemCount: data.length,
       itemBuilder: (context, i) {
-        return GestureDetector(
+        return InkWell(
           onTap: () => NavigationFactory.navigateToScreenFromString(
               data[i].type, data[i].id, context),
           child: PackListItemWidget(data[i]),
         );
       },
     );
-  }
-
-  Future<void> _trackingDialog(BuildContext context) async {
-    await getTrackingAnswered().then((answered) async {
-      if (!answered && !_dialogShown) showConsentDialog(context);
-      _dialogShown = true;
-    });
   }
 
   Widget _getMeditoLogoWidget() {
@@ -131,7 +120,7 @@ class PackListWidgetState extends State<PackListWidget> {
     final snackBar = SnackBar(
         content: Text(
           'Version: $version - Build Number: $buildNumber',
-          style: TextStyle(color: MeditoColors.lightTextColor),
+          style: TextStyle(color: MeditoColors.meditoTextGrey),
         ),
         backgroundColor: MeditoColors.midnight);
 
@@ -182,7 +171,7 @@ class PackListWidgetState extends State<PackListWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(12)),
                 color: color,
               ),
-              height: 64,
+              height: 54,
             ),
           ),
         ],

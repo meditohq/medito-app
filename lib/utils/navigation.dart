@@ -1,6 +1,5 @@
 import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/donation/donation_page.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
@@ -41,7 +40,6 @@ class NavigationFactory {
             ));
         break;
       case Screen.donation:
-        _push(context, DonationWidget());
         break;
       case Screen.downloads:
         _push(context, DownloadsListWidget());

@@ -76,7 +76,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       );
 
   Widget _getSlidingItem(MediaItem item, BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         _openPlayer(item, context);
       },

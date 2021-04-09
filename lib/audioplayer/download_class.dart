@@ -6,9 +6,9 @@ import 'package:Medito/viewmodel/auth.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'player_utils.dart';
 
 class _Download {
   bool isDownloading = false;
@@ -42,8 +42,8 @@ class _Download {
   }
 
   Future<dynamic> _downloadFileWithProgress(AudioFile currentFile) async {
-    var dir = (await getApplicationSupportDirectory()).path;
-    var file = File('$dir/${_mediaItem.id.replaceAll('/', '_')}');
+    var filePath = (await getFilePath(_mediaItem.id));
+    var file = File(filePath);
     if (file.existsSync()) {
       isDownloading = false;
       return null;

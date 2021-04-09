@@ -13,19 +13,20 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/utils/colors.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -213,10 +214,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         stream: _bloc.titleController.stream,
         builder: (context, snapshot) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
+            padding: const EdgeInsets.only(bottom: 4.0, left: 16, right: 16),
             child: Text(
               snapshot.data?.body ?? '',
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.headline1,
             ),
           );
         });
@@ -233,6 +234,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   child: Html(
                     data: snapshot.data?.body,
                     shrinkWrap: false,
+                    style: htmlTheme(context),
                   ))
               : Container();
         });
@@ -244,10 +246,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.headline3.copyWith(
-            color: MeditoColors.walterWhite.withOpacity(0.7),
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.3),
+        style: Theme.of(context).textTheme.subtitle1,
       ),
     );
   }
@@ -472,9 +471,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void onOfflineSelected(int index) {
     _bloc.offlineSelected = index;
-    _bloc.updateCurrentFile();
-
-    _bloc.updateAvailableOfflineIndicatorText();
 
     if (index == 1) {
       // 'YES' selected
@@ -491,6 +487,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       _bloc.removeFile(_bloc.getMediaItemForSelectedFile()).then((onValue) {
         print('Removed file');
         _bloc.removing = false;
+        _bloc.updateCurrentFile();
         setState(() {});
       }).catchError((onError) {
         print(onError);
@@ -517,32 +514,28 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   TextStyle getLengthPillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
+    return Theme.of(context).textTheme.subtitle2.copyWith(
         color: _bloc.lengthSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
 
   TextStyle getOfflinePillTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
+    return Theme.of(context).textTheme.subtitle2.copyWith(
         color: _bloc.offlineSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
 
   TextStyle getMusicPillTextStyle(int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
+    return Theme.of(context).textTheme.subtitle2.copyWith(
         color: _bloc.musicSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
 
   TextStyle getVoiceTextStyle(BuildContext context, int index) {
-    return Theme.of(context).textTheme.headline1.copyWith(
-        fontSize: 16.0,
+    return Theme.of(context).textTheme.subtitle2.copyWith(
         color: _bloc.voiceSelected == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
@@ -607,7 +600,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(top: 8, bottom: 16.0, left: 16, right: 16),
       child: Row(
         children: <Widget>[
-          Expanded(child: Container(color: MeditoColors.moonlight, height: 1)),
+          Expanded(child: Container(color: MeditoColors.deepNight, height: 1)),
         ],
       ),
     );

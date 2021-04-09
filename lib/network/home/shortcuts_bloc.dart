@@ -15,27 +15,29 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/network/text/text_repo.dart';
+import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/home/shortcuts_repo.dart';
+import 'package:Medito/network/home/shortcuts_response.dart';
 
-class TextBloc {
-  StreamController<String> titleController;
-  StreamController<String> bodyController;
-  final _repo = TextRepository();
+class ShortcutsBloc {
+  ShortcutsRepo _repo;
+  StreamController<ApiResponse<ShortcutsResponse>> shortcutList;
 
-  TextBloc() {
-    titleController = StreamController.broadcast()..sink.add('...');
-    bodyController = StreamController.broadcast()..sink.add('...');
+  ShortcutsBloc() {
+    _repo = ShortcutsRepo();
+
+    shortcutList = StreamController.broadcast()
+      ..sink.add(ApiResponse.loading());
+
+    _fetchShortcuts();
   }
 
-  Future<void> fetchText(String id, bool skipCache) async {
-    var data = await _repo.fetchData(id, skipCache);
-
-    titleController.sink.add(data.title);
-    bodyController.sink.add(data.html);
-  }
-
-  void dispose() {
-    titleController?.close();
-    bodyController?.close();
+  Future<void> _fetchShortcuts() async {
+    try {
+      var data = await _repo.fetchShortcuts();
+      shortcutList.sink.add(ApiResponse.completed(data));
+    } catch (e) {
+      shortcutList.sink.add(ApiResponse.error('An error occurred!'));
+    }
   }
 }
