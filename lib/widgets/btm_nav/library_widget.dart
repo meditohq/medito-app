@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +29,8 @@ class LibraryWidget extends StatelessWidget {
             child: Container(
               height: 50.0,
               child: TabBar(
+                unselectedLabelStyle: Theme.of(context).textTheme.headline4.copyWith(color: MeditoColors.meditoTextGrey),
+                labelStyle: Theme.of(context).textTheme.headline4,
                 isScrollable: false,
                 tabs: [
                   Tab(icon: Text('Downloads')),
