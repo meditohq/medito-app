@@ -6,21 +6,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'colors.dart';
 
 TextTheme meditoTextTheme(BuildContext context) {
-  return GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme.copyWith(
+  return GoogleFonts.manropeTextTheme(Theme.of(context).textTheme.copyWith(
         headline1: TextStyle(
           // greetings text
           // btm bar text selected
-          fontSize: 20,
+          fontSize: 18,
           letterSpacing: 0.5,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w800,
           height: 1.5,
           color: MeditoColors.walterWhite,
         ),
         headline2: TextStyle(
           // btm bar text unselected
-          fontSize: 20,
+          fontSize: 18,
           letterSpacing: 0.5,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w700,
           height: 1.5,
           color: MeditoColors.meditoTextGrey,
         ),
@@ -28,7 +28,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           // header of rows on homepage
           fontSize: 18,
           letterSpacing: 0.5,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.w800,
           height: 1.3,
           color: MeditoColors.walterWhite,
         ),
@@ -39,7 +39,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           // overflow menu
           fontSize: 16,
           letterSpacing: 0.5,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.w600,
           height: 1.3,
           color: MeditoColors.walterWhite,
         ),
@@ -49,7 +49,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           // streak/stats tile title
           fontSize: 14,
           letterSpacing: 0.4,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
           height: 1.5,
           color: MeditoColors.meditoTextGrey,
         ),
@@ -57,7 +57,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           // shortcut title
           fontSize: 14,
           letterSpacing: 0.2,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w700,
           height: 1.5,
           color: MeditoColors.walterWhite,
         ),

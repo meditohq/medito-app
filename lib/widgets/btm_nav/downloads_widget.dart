@@ -93,7 +93,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
             });
 
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('${item.title} removed'),
+              content: Text('"${item.title}" removed'),
             ));
           },
           child: _getListItemWidget(item)),
