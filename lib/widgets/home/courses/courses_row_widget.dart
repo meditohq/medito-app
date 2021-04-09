@@ -14,11 +14,10 @@ class CoursesRowWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 32.0, left: 16),
+          padding: const EdgeInsets.only(top: 32.0, left: 16, bottom: 8.0),
           child:
               Text('Your Path', style: Theme.of(context).textTheme.headline3),
         ),
-        Container(height: 8),
         StreamBuilder<ApiResponse<CoursesResponse>>(
             stream: _bloc.coursesList.stream,
             builder: (context, snapshot) {
