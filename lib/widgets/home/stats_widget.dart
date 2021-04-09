@@ -14,21 +14,27 @@ class _StatsWidgetState extends State<StatsWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+      padding: const EdgeInsets.only(top: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Your Stats', style: Theme.of(context).textTheme.headline3),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+            child: Text('Your Stats',
+                style: Theme.of(context).textTheme.headline3),
+          ),
           SizedBox(height: 8),
-          Container(
-            height: 65,
+          SizedBox(
+            height: 73,
             child: ListView.builder(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
               itemBuilder: (context, i) => statsItem(context, i),
               itemCount: 5,
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
             ),
           ),
+          Container(height: 32)
         ],
       ),
     );
@@ -57,6 +63,7 @@ class _StatsWidgetState extends State<StatsWidget> {
           'No. of sessions',
         );
     }
+    return Container();
   }
 
   void openEditDialog() {
