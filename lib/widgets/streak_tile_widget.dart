@@ -38,7 +38,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(right: 8.0),
       child: FutureBuilder<String>(
           future: widget.future,
           builder: (context, snapshot) {
@@ -49,62 +49,40 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
             }
             return GestureDetector(
               onTap: widget.onClick,
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                      color: MeditoColors.moonlight,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              child: Container(
+                width: 132,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(0)),
+                  color: MeditoColors.moonlight,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(height: 4),
+                      Text(widget.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                          style: Theme.of(context).textTheme.subtitle1),
+                      SizedBox(height: 5),
+                      Wrap(
+                        direction: Axis.horizontal,
+                        crossAxisAlignment: WrapCrossAlignment.end,
                         children: <Widget>[
-                          Container(height: 4),
-                          Text(widget.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.fade,
-                              style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 18)),
-                          Wrap(
-                            direction: Axis.horizontal,
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            children: <Widget>[
-                              Text(
-                                _formatSnapshotData(snapshot),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    .copyWith(fontSize: 34),
-                                overflow: TextOverflow.fade,
-                                maxLines: 1,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 4.0, bottom: 7.0),
-                                child: Text(unit ?? ''),
-                              )
-                            ],
-                          )
+                          Text(
+                            _formatSnapshotData(snapshot) + ' ' + unit ?? '',
+                            style: Theme.of(context).textTheme.headline4,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                          ),
                         ],
-                      ),
-                    ),
+                      )
+                    ],
                   ),
-                  widget.editable
-                      ? Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.edit,
-                              size: 16.0,
-                              color: MeditoColors.walterWhiteLine,
-                            ),
-                          ))
-                      : Container(),
-                ],
+                ),
               ),
             );
           }),
@@ -120,8 +98,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   }
 }
 
-
- RoundedRectangleBorder roundedRectangleBorder() {
+RoundedRectangleBorder roundedRectangleBorder() {
   return RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(12.0),
   );

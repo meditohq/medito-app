@@ -28,7 +28,7 @@ class NavigationFactory {
             ));
         break;
       case Screen.stats:
-        _push(context, StreakWidget());
+        // _push(context, StreakWidget());
         break;
       case Screen.session_options:
         assert(id.isNotEmpty);
