@@ -261,7 +261,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (bgMusic.isNotEmptyAndNotNull()) {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
-      _bgPlayer.setLoopMode(LoopMode.one);
+      _bgPlayer.setLoopMode(LoopMode.all);
     }
   }
 
