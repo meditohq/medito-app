@@ -18,6 +18,7 @@ import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/widgets/home/courses/courses_row_widget.dart';
 import 'package:Medito/widgets/home/small_shortcuts/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
@@ -40,7 +41,6 @@ class HomeWidget extends StatelessWidget {
               AnnouncementBanner(),
               SmallShortcutsRowWidget(),
               // SmallShortcutsRowWidget()
-              // StreakWidget(),
               StatsWidget()
             ],
           ),
