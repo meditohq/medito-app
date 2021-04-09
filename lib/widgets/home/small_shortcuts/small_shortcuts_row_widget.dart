@@ -6,9 +6,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../network/api_response.dart';
-import '../../../utils/navigation.dart';
-import '../../../utils/utils.dart';
+import 'package:Medito/network/api_response.dart';
+import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/utils.dart';
 
 class SmallShortcutsRowWidget extends StatelessWidget {
   final _bloc = ShortcutsBloc();
@@ -69,7 +69,7 @@ class SmallShortcutWidget extends StatelessWidget {
           _getListItemLeadingImageWidget(),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(11.0),
+              padding: const EdgeInsets.only(left: 10.0, right: 4),
               child: _getTitle(context),
             ),
           ),
@@ -81,7 +81,7 @@ class SmallShortcutWidget extends StatelessWidget {
   Widget _getTitle(BuildContext context) => AutoSizeText(data.title,
       maxFontSize: 14,
       stepGranularity: 2,
-      overflow: TextOverflow.fade,
+      overflow: TextOverflow.visible,
       wrapWords: false,
       maxLines: 2,
       style: Theme.of(context)

@@ -18,7 +18,7 @@ The best way to start is by opening the project with [Android Studio](https://de
 
 You will need an API key to build the project.
 
-To request one, please email hi [AT] meditofoundation.org with the subject `API KEY REQUEST` .
+To request one, join the #dev channel on [slack](https://join.slack.com/t/meditofoundation/shared_invite/zt-f0viisyt-VdJ7ygqNHt9sIeGzZiatlQ) and reply to the slackbot questions.
 
 The API documentation is available on the [wiki](https://github.com/meditohq/medito-app/wiki/).
 

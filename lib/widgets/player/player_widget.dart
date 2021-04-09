@@ -255,7 +255,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if ((mediaItem?.extras['bgMusic'] as String)?.isNotEmptyAndNotNull() ??
         false) {
       return Padding(
-          padding: const EdgeInsets.only(right: 12.0),
+          padding: const EdgeInsets.only(right: 12.0, top: 8),
           child: IconButton(
               icon: StreamBuilder<Object>(
                   stream: _dragBgVolumeSubject,

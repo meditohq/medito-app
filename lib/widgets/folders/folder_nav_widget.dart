@@ -20,9 +20,9 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
-import 'package:Medito/widgets/folders/list_item_image_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -229,18 +229,17 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
         ));
   }
 
-  SizedBox _getImageListItemWidget() => SizedBox(
-      width: 300,
-      child: StreamBuilder<ApiResponse<String>>(
-          stream: _bloc.coverControllerStream,
-          initialData: ApiResponse.loading(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data.status != Status.LOADING) {
-              return ImageListItemWidget(src: snapshot.data.body);
-            } else {
-              return Container();
-            }
-          }));
+  Widget _getImageListItemWidget() => StreamBuilder<ApiResponse<String>>(
+      stream: _bloc.coverControllerStream,
+      initialData: ApiResponse.loading(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data.status != Status.LOADING) {
+          return Opacity(
+              opacity: 0.2, child: getNetworkImageWidget(snapshot.data.body));
+        } else {
+          return Container();
+        }
+      });
 
   InkWell _getItemWidget(Item item) {
     return InkWell(
@@ -249,9 +248,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           setState(() {
             _bloc.itemLongPressed(_bloc.selectedItem);
           });
-        } else {
-          //FIXME here
-          // fileTap(item);
         }
       },
       onLongPress: () {
