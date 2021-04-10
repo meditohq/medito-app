@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
@@ -42,14 +44,19 @@ class DownloadsBloc {
     return fileList;
   }
 
-  Future<void> removeFileFromDownloadedFilesList(MediaItem file) async {
+  Future<void> removeSessionFromDownloads(MediaItem mediaFile) async {
+    // Delete the download file from disk for this session
+    var filePath = (await getFilePath(mediaFile.id));
+    var file = File(filePath);
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    // Remove the session from all downloads list
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
-    list.remove(jsonEncode(file));
+    list.remove(jsonEncode(mediaFile));
     await prefs.setStringList(savedFilesKey, list);
-  }
-
-  Future<void> removeFileFromList(MediaItem file) async {
-    return removeFileFromDownloadedFilesList(file);
   }
 }

@@ -88,7 +88,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
             setState(() {
               if (mounted) {
                 _list.remove(item);
-                _bloc.removeFileFromList(item);
+                _bloc.removeSessionFromDownloads(item);
               }
             });
 
