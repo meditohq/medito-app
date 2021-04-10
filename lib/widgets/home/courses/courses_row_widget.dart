@@ -14,9 +14,14 @@ class CoursesRowWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 32.0, left: 16, bottom: 8.0),
+          padding: const EdgeInsets.only(top: 32.0, left: 16),
           child:
               Text('Your Path', style: Theme.of(context).textTheme.headline3),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 0, left: 16, bottom: 8.0),
+          child: Text('FOLLOW IN ORDER',
+              style: Theme.of(context).textTheme.caption),
         ),
         StreamBuilder<ApiResponse<CoursesResponse>>(
             stream: _bloc.coursesList.stream,
@@ -27,7 +32,7 @@ class CoursesRowWidget extends StatelessWidget {
                   break;
                 case Status.COMPLETED:
                   return Container(
-                    height: MediaQuery.of(context).size.height * 0.3,
+                    height: MediaQuery.of(context).size.height * 0.28,
                     child: ListView.builder(
                         padding: const EdgeInsets.only(left: 16),
                         scrollDirection: Axis.horizontal,

@@ -61,6 +61,14 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.5,
           color: MeditoColors.walterWhite,
         ),
+        caption: TextStyle(
+          // shortcut title
+          fontSize: 12,
+          letterSpacing: 0.8,
+          fontWeight: FontWeight.w600,
+          height: 1.5,
+          color: MeditoColors.meditoTextGrey,
+        ),
         bodyText2: TextStyle(
           // shortcut title
           fontSize: 16,

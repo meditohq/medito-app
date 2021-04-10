@@ -25,7 +25,7 @@ class SmallShortcutsRowWidget extends StatelessWidget {
               return GridView.count(
                 crossAxisCount: 2,
                 padding:
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
+                    const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0),
                 scrollDirection: Axis.vertical,
                 childAspectRatio: 2.6,
                 physics: NeverScrollableScrollPhysics(),
