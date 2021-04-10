@@ -26,7 +26,7 @@ class _StatsWidgetState extends State<StatsWidget> {
           SizedBox(
             height: 73,
             child: ListView.builder(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
               itemBuilder: (context, i) => statsItem(context, i),
               itemCount: 5,
               scrollDirection: Axis.horizontal,

@@ -27,6 +27,10 @@ import 'package:flutter/material.dart';
 class HomeWidget extends StatelessWidget {
   final _bloc = HomeBloc();
 
+  final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
+  final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
+  final GlobalKey<CoursesRowWidgetState> _coursesKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     _bloc.fetchMenu();
@@ -34,13 +38,18 @@ class HomeWidget extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         body: RefreshIndicator(
-          onRefresh: () => _bloc.fetchMenu(skipCache: true),
+          onRefresh: () {
+            _announceKey.currentState?.refresh();
+            _shortcutKey.currentState?.refresh();
+            _coursesKey.currentState?.refresh();
+            return _bloc.fetchMenu(skipCache: true);
+          },
           child: ListView(
             children: [
               _getAppBar(context),
-              AnnouncementBanner(),
-              SmallShortcutsRowWidget(),
-              CoursesRowWidget(),
+              AnnouncementBanner(key: _announceKey),
+              SmallShortcutsRowWidget(key: _shortcutKey),
+              CoursesRowWidget(key: _coursesKey),
               StatsWidget()
             ],
           ),
@@ -57,12 +66,10 @@ class HomeWidget extends StatelessWidget {
       actions: <Widget>[
         StreamBuilder<ApiResponse<MenuResponse>>(
             stream: _bloc.menuList.stream,
-            initialData: ApiResponse.loading(),
+            initialData: ApiResponse.completed(MenuResponse(data: [])),
             builder: (context, snapshot) {
               switch (snapshot.data.status) {
                 case Status.LOADING:
-                  return Container();
-                  break;
                 case Status.COMPLETED:
                   return _getMenu(context, snapshot);
                   break;

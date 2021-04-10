@@ -27,13 +27,23 @@ class AnnouncementBanner extends StatefulWidget {
   AnnouncementBanner({Key key}) : super(key: key);
 
   @override
-  _AnnouncementBannerState createState() => _AnnouncementBannerState();
+  AnnouncementBannerState createState() => AnnouncementBannerState();
 }
 
-class _AnnouncementBannerState extends State<AnnouncementBanner>
+class AnnouncementBannerState extends State<AnnouncementBanner>
     with SingleTickerProviderStateMixin {
   var _hidden = false;
   final _bloc = AnnouncementBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc.fetchAnnouncement();
+  }
+
+  void refresh(){
+    _bloc.fetchAnnouncement(skipCache: true);
+  }
 
   @override
   Widget build(BuildContext context) {

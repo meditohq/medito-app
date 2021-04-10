@@ -28,13 +28,11 @@ class ShortcutsBloc {
 
     shortcutList = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
-
-    _fetchShortcuts();
   }
 
-  Future<void> _fetchShortcuts() async {
+  Future<void> fetchShortcuts({bool skipCache = false}) async {
     try {
-      var data = await _repo.fetchShortcuts();
+      var data = await _repo.fetchShortcuts(skipCache: skipCache);
       shortcutList.sink.add(ApiResponse.completed(data));
     } catch (e) {
       shortcutList.sink.add(ApiResponse.error('An error occurred!'));

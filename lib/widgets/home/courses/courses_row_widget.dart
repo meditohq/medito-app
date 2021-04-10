@@ -5,8 +5,20 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
-class CoursesRowWidget extends StatelessWidget {
+class CoursesRowWidget extends StatefulWidget {
+
+  @override
+  CoursesRowWidgetState createState() => CoursesRowWidgetState();
+
+  CoursesRowWidget({Key key}) : super(key: key);
+}
+
+class CoursesRowWidgetState extends State<CoursesRowWidget> {
   final _bloc = CoursesBloc();
+
+  void refresh(){
+    _bloc.fetchCourses(skipCache: true);
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -8,8 +8,25 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SmallShortcutsRowWidget extends StatelessWidget {
+class SmallShortcutsRowWidget extends StatefulWidget {
+  @override
+  SmallShortcutsRowWidgetState createState() => SmallShortcutsRowWidgetState();
+
+  SmallShortcutsRowWidget({Key key}) : super(key: key);
+}
+
+class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
   final _bloc = ShortcutsBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc.fetchShortcuts();
+  }
+
+  void refresh() {
+    _bloc.fetchShortcuts(skipCache: true);
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -38,7 +38,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
+      padding: const EdgeInsets.only(left: 8, right: 8.0),
       child: FutureBuilder<String>(
           future: widget.future,
           builder: (context, snapshot) {
@@ -71,7 +71,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
                         crossAxisAlignment: WrapCrossAlignment.end,
                         children: <Widget>[
                           Text(
-                            _formatSnapshotData(snapshot) + ' ' + unit ?? '',
+                            (snapshot.hasData? _formatSnapshotData(snapshot) : '') + ' ' + unit ?? '',
                             style: Theme.of(context).textTheme.headline4,
                             overflow: TextOverflow.fade,
                             maxLines: 1,
