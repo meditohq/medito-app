@@ -21,6 +21,7 @@ import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/sessionoptions/background_sounds.dart';
 import 'package:Medito/network/sessionoptions/session_options_repo.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
@@ -53,6 +54,7 @@ class SessionOptionsBloc {
   // Download stuff
   bool bgDownloading = false, removing = false;
   DownloadSingleton downloadSingleton = DownloadSingleton(null);
+  final _downloadBloc = DownloadsBloc();
 
   //Streams
   StreamController<ApiResponse<String>> titleController;
@@ -216,7 +218,7 @@ class SessionOptionsBloc {
 
     if (await file.exists()) {
       await file.delete();
-      await removeFileFromDownloadedFilesList(currentFile);
+      await _downloadBloc.removeFileFromDownloadedFilesList(currentFile);
       removing = false;
     } else {
       removing = false;
@@ -252,11 +254,4 @@ class SessionOptionsBloc {
 extension MyIterable<E> on Iterable<E> {
   Iterable<E> sortedBy(Comparable Function(E e) key) =>
       toList()..sort((a, b) => key(a).compareTo(key(b)));
-}
-
-Future<void> removeFileFromDownloadedFilesList(MediaItem file) async {
-  var prefs = await SharedPreferences.getInstance();
-  var list = prefs.getStringList('listOfSavedFiles') ?? [];
-  list.remove(jsonEncode(file));
-  await prefs.setStringList('listOfSavedFiles', list);
 }
