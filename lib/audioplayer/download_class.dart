@@ -85,7 +85,7 @@ class _Download {
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      unawaited(_downloadBloc.saveFileToDownloadedFilesList(_mediaItem));
+      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(_mediaItem));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });

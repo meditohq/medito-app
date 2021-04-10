@@ -20,13 +20,16 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
 
   final key = GlobalKey<AnimatedListState>();
 
-  List<MediaItem> _list = [];
+  ValueNotifier<List<MediaItem>> downloadedSession = DownloadsBloc.downloadedSessions;
 
   @override
   void initState() {
     super.initState();
-
-    _getItems();
+    DownloadsBloc.fetchDownloads().then((value){
+      if (value.isNotEmpty) {
+        showSwipeToDeleteTip();
+      }
+    });
   }
 
   @override
@@ -37,16 +40,21 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getDownloadList() {
-    if (_list.isNotEmpty) {
-      return ListView.builder(
-          itemCount: _list.length,
-          itemBuilder: (context, i) {
-            var item = _list[i];
-            return _getSlidingItem(item, context);
-          });
-    } else {
-      return _getEmptyWidget();
-    }
+    return ValueListenableBuilder(
+        valueListenable: DownloadsBloc.downloadedSessions,
+        builder: (context, sessionList, widget) {
+          print('garu updated with ${sessionList.length}');
+          if (sessionList.isNotEmpty) {
+            return ListView.builder(
+                itemCount: sessionList.length,
+                itemBuilder: (context, i) {
+                  var item = sessionList[i];
+                  return _getSlidingItem(item, context);
+                });
+          } else {
+            return _getEmptyWidget();
+          }
+        });
   }
 
   Widget _getEmptyWidget() => Center(
@@ -81,14 +89,13 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         _openPlayer(item, context);
       },
       child: Dismissible(
-          key: Key(item.id),
+          key: UniqueKey(),
           direction: DismissDirection.endToStart,
           background: _getDismissibleBackgroundWidget(),
           onDismissed: (direction) {
             setState(() {
               if (mounted) {
-                _list.remove(item);
-                _bloc.removeSessionFromDownloads(item);
+                DownloadsBloc.removeSessionFromDownloads(item);
               }
             });
 
@@ -137,11 +144,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     });
   }
 
-  void _getItems() async {
-    await _bloc.fetchDownloads().then((value) => _updateList(value));
-
-    if (_list.isNotEmpty) {
-      await _bloc.seenTip().then((seen) {
+  void showSwipeToDeleteTip() async {
+    await _bloc.seenTip().then((seen) {
         if (!seen) {
           unawaited(_bloc.setSeenTip());
           ScaffoldMessenger.of(context).showSnackBar(
@@ -164,11 +168,5 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         }
         ;
       });
-    }
-  }
-
-  void _updateList(List<MediaItem> value) {
-    _list = value;
-    setState(() {});
-  }
+   }
 }

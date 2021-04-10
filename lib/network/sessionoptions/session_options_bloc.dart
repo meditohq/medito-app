@@ -213,7 +213,7 @@ class SessionOptionsBloc {
 
   Future<dynamic> removeFile(MediaItem currentFile) async {
     removing = true;
-    await _downloadBloc.removeSessionFromDownloads(currentFile);
+    await DownloadsBloc.removeSessionFromDownloads(currentFile);
     removing = false;
   }
 
