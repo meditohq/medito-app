@@ -273,7 +273,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         backgroundColor: MeditoColors.darkBGColor,
                         title: Text('Background sound volume',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline5),
+                            style: Theme.of(context).textTheme.headline2),
                         content: SizedBox(
                           height: 120,
                           child: StreamBuilder<Object>(
