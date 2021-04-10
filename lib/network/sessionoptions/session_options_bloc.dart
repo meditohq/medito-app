@@ -213,16 +213,8 @@ class SessionOptionsBloc {
 
   Future<dynamic> removeFile(MediaItem currentFile) async {
     removing = true;
-    var filePath = (await getFilePath(currentFile.id));
-    var file = File(filePath);
-
-    if (await file.exists()) {
-      await file.delete();
-      await _downloadBloc.removeFileFromDownloadedFilesList(currentFile);
-      removing = false;
-    } else {
-      removing = false;
-    }
+    await _downloadBloc.removeSessionFromDownloads(currentFile);
+    removing = false;
   }
 
   void startAudioService() {
