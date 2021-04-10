@@ -28,12 +28,12 @@ class CoursesBloc {
 
     coursesList = StreamController.broadcast()..sink.add(ApiResponse.loading());
 
-    _fetchCourses();
+    fetchCourses();
   }
 
-  Future<void> _fetchCourses() async {
+  Future<void> fetchCourses({bool skipCache = false}) async {
     try {
-      var data = await _repo.fetchCourses();
+      var data = await _repo.fetchCourses(skipCache);
       coursesList.sink.add(ApiResponse.completed(data));
     } catch (e) {
       coursesList.sink.add(ApiResponse.error('An error occurred!'));

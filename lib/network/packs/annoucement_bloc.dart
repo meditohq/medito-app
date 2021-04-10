@@ -27,12 +27,11 @@ class AnnouncementBloc {
   AnnouncementBloc() {
     announcementController = StreamController<AnnouncementResponse>();
     _repo = AnnouncementRepository();
-    fetchAnnouncement();
   }
 
-  Future<void> fetchAnnouncement() async {
+  Future<void> fetchAnnouncement({bool skipCache}) async {
     try {
-      var data = await _repo.fetchAnnouncements();
+      var data = await _repo.fetchAnnouncements(skipCache);
       announcementController.add(data);
     } catch (e) {
       print(e);

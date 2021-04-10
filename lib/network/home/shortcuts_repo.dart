@@ -20,8 +20,8 @@ import 'package:Medito/viewmodel/http_get.dart';
 class ShortcutsRepo {
   final _ext = 'items/shortcuts';
 
-  Future<ShortcutsResponse> fetchShortcuts() async {
-    final response = await httpGet(baseUrl + _ext);
+  Future<ShortcutsResponse> fetchShortcuts({bool skipCache = false}) async {
+    final response = await httpGet(baseUrl + _ext, skipCache: skipCache);
     return ShortcutsResponse.fromJson(response);
   }
 }

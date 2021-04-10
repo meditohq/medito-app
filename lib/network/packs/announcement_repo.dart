@@ -20,8 +20,8 @@ import 'package:Medito/viewmodel/http_get.dart';
 class AnnouncementRepository {
   var ext = 'items/announcement';
 
-  Future<AnnouncementResponse> fetchAnnouncements() async {
-    final response = await httpGet(baseUrl + ext, skipCache: true);
+  Future<AnnouncementResponse> fetchAnnouncements(bool skipCache) async {
+    final response = await httpGet(baseUrl + ext, skipCache: skipCache);
     return AnnouncementResponse.fromJson(response);
   }
 }
