@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/sessionoptions/session_opts.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:audio_service/audio_service.dart';
@@ -15,6 +16,7 @@ class _Download {
   AudioFile _file;
   int _received = 0, _total = 1;
   var downloadListener = ValueNotifier<double>(0);
+  final _downloadBloc = DownloadsBloc();
 
   MediaItem _mediaItem;
 
@@ -83,20 +85,10 @@ class _Download {
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      unawaited(saveFileToDownloadedFilesList(currentFile));
+      unawaited(_downloadBloc.saveFileToDownloadedFilesList(_mediaItem));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });
-  }
-
-  Future<void> saveFileToDownloadedFilesList(AudioFile file) async {
-    var prefs = await SharedPreferences.getInstance();
-    var list = prefs.getStringList('listOfSavedFiles') ?? [];
-
-    if (_mediaItem != null) {
-      list.add(jsonEncode(_mediaItem));
-      await prefs.setStringList('listOfSavedFiles', list);
-    }
   }
 
   double getProgress() {
