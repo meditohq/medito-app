@@ -43,7 +43,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     return ValueListenableBuilder(
         valueListenable: DownloadsBloc.downloadedSessions,
         builder: (context, sessionList, widget) {
-          print('garu updated with ${sessionList.length}');
           if (sessionList.isNotEmpty) {
             return ListView.builder(
                 itemCount: sessionList.length,
