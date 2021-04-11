@@ -34,15 +34,12 @@ Future<dynamic> checkFileExists(AudioFile currentFile) async {
 }
 
 Future<dynamic> downloadBGMusicFromURL(String id, String name) async {
-  var dir = (await getApplicationSupportDirectory()).path;
-  name = name.replaceAll(' ', '%20');
-  var file = File('$dir/$name');
-
+  var path = (await getFilePath(name));
+  var file = File(path);
   if (await file.exists()) return file.path;
 
   var url = '${baseUrl}assets/$id';
-
-  var request = await http.get(url);
+  var request = await http.get(url, headers: {HttpHeaders.authorizationHeader: basicAuth});
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
 
@@ -51,7 +48,7 @@ Future<dynamic> downloadBGMusicFromURL(String id, String name) async {
 
 Future<String> getFilePath(String mediaItemId) async {
   var dir = (await getApplicationSupportDirectory()).path;
-  return '$dir/${mediaItemId.replaceAll('/', '_')}.mp3';
+  return '$dir/${mediaItemId.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
 }
 
 Future<dynamic> getDownload(String filename) async {
