@@ -34,16 +34,20 @@ class FolderItemsBloc {
   StreamController<AppBarState> appbarStateController;
   StreamController _coverController;
 
-  StreamSink<ApiResponse<String>> get coverControllerSink => _coverController.sink;
-  Stream<ApiResponse<String>> get coverControllerStream => _coverController.stream;
+  String _id;
 
+  StreamSink<ApiResponse<String>> get coverControllerSink =>
+      _coverController.sink;
+
+  Stream<ApiResponse<String>> get coverControllerStream =>
+      _coverController.stream;
 
   final _titleController = BehaviorSubject<ApiResponse<String>>();
+
   Stream<ApiResponse<String>> get titleControllerStream =>
       _titleController.stream;
+
   Sink<ApiResponse<String>> get _titleControllerSink => _titleController.sink;
-
-
 
   FolderItemsBloc() {
     itemsListController = StreamController.broadcast();
@@ -52,20 +56,24 @@ class FolderItemsBloc {
     _repo = FolderItemsRepository();
   }
 
-  Future<void> fetchData(String id) async {
-    itemsListController.sink.add(ApiResponse.loading());
-    coverControllerSink.add(ApiResponse.loading());
-    _titleControllerSink.add(ApiResponse.loading());
-    content = await _repo.fetchFolderData(id);
+  Future<void> fetchData({String id}) async {
 
-    if (content?.hasData == null) {
-      itemsListController.sink.add(ApiResponse.error('Error'));
-      coverControllerSink.add(ApiResponse.error('Error'));
-      _titleControllerSink.add(ApiResponse.error('Error'));
-    } else {
-      _postItemList(content);
-      _postTitle(content);
-      _postCoverDetails(content);
+    _id ??= id;
+    if (_id != null) {
+      itemsListController.sink.add(ApiResponse.loading());
+      coverControllerSink.add(ApiResponse.loading());
+      _titleControllerSink.add(ApiResponse.loading());
+      content = await _repo.fetchFolderData(id);
+
+      if (content?.hasData == null) {
+        itemsListController.sink.add(ApiResponse.error('Error'));
+        coverControllerSink.add(ApiResponse.error('Error'));
+        _titleControllerSink.add(ApiResponse.error('Error'));
+      } else {
+        _postItemList(content);
+        _postTitle(content);
+        _postCoverDetails(content);
+      }
     }
   }
 

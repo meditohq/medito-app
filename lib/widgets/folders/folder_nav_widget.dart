@@ -67,7 +67,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   void didChangeDependencies() {
     if (_bloc.content == null) {
       final FolderArguments args = ModalRoute.of(context).settings.arguments;
-      _bloc.fetchData(args.contentId);
+      _bloc.fetchData(id: args.contentId);
     }
     super.didChangeDependencies();
   }
@@ -145,40 +145,43 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   }
 
   Widget _getListView() {
-    return Column(
-      children: [
-        _getAppBarStreamBuilder(),
-        Expanded(
-          child: StreamBuilder<ApiResponse<List<Item>>>(
-              stream: _bloc.itemsListController.stream,
-              builder: (context, itemsSnapshot) {
-                if (!itemsSnapshot.hasData ||
-                    itemsSnapshot.connectionState == ConnectionState.waiting) {
-                  return LoadingListWidget();
-                }
+    return RefreshIndicator(
+      onRefresh: () => _bloc.fetchData(),
+      child: Column(
+        children: [
+          _getAppBarStreamBuilder(),
+          Expanded(
+            child: StreamBuilder<ApiResponse<List<Item>>>(
+                stream: _bloc.itemsListController.stream,
+                builder: (context, itemsSnapshot) {
+                  if (!itemsSnapshot.hasData ||
+                      itemsSnapshot.connectionState == ConnectionState.waiting) {
+                    return LoadingListWidget();
+                  }
 
-                if (itemsSnapshot.hasData) {
-                  return ListView(
-                    padding: EdgeInsets.only(top: 4),
-                    children: [
-                      ListView.builder(
-                          physics: ScrollPhysics(),
-                          itemCount: itemsSnapshot.data.body?.length,
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int i) {
-                            return itemsSnapshot.data?.body != null
-                                ? _getItemWidget(itemsSnapshot.data?.body[i])
-                                : Container();
-                          }),
-                      _getImageListItemWidget(),
-                    ],
-                  );
-                }
+                  if (itemsSnapshot.hasData) {
+                    return ListView(
+                      padding: EdgeInsets.only(top: 4),
+                      children: [
+                        ListView.builder(
+                            physics: ScrollPhysics(),
+                            itemCount: itemsSnapshot.data.body?.length,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int i) {
+                              return itemsSnapshot.data?.body != null
+                                  ? _getItemWidget(itemsSnapshot.data?.body[i])
+                                  : Container();
+                            }),
+                        _getImageListItemWidget(),
+                      ],
+                    );
+                  }
 
-                return Container();
-              }),
-        ),
-      ],
+                  return Container();
+                }),
+          ),
+        ],
+      ),
     );
   }
 
