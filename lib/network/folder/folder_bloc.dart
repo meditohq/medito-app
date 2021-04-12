@@ -56,14 +56,14 @@ class FolderItemsBloc {
     _repo = FolderItemsRepository();
   }
 
-  Future<void> fetchData({String id}) async {
+  Future<void> fetchData({String id, bool skipCache = false}) async {
 
     _id ??= id;
     if (_id != null) {
       itemsListController.sink.add(ApiResponse.loading());
       coverControllerSink.add(ApiResponse.loading());
       _titleControllerSink.add(ApiResponse.loading());
-      content = await _repo.fetchFolderData(id);
+      content = await _repo.fetchFolderData(_id, skipCache);
 
       if (content?.hasData == null) {
         itemsListController.sink.add(ApiResponse.error('Error'));
@@ -75,6 +75,7 @@ class FolderItemsBloc {
         _postCoverDetails(content);
       }
     }
+    return;
   }
 
   void _postCoverDetails(FolderResponse content) {
