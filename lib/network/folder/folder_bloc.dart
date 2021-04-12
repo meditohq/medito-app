@@ -75,7 +75,6 @@ class FolderItemsBloc {
         _postCoverDetails(content);
       }
     }
-    return;
   }
 
   void _postCoverDetails(FolderResponse content) {
