@@ -14,8 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
@@ -30,9 +28,7 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
@@ -96,7 +92,6 @@ class SessionOptionsBloc {
       ..sink.add(ApiResponse.loading());
 
     _repo = SessionOptionsRepository(screen: screen);
-    fetchOptions(id);
 
     getIntValuesSF(id, 'voiceSelected').then((value) => voiceSelected = value);
     getIntValuesSF(id, 'lengthSelected')
@@ -106,9 +101,9 @@ class SessionOptionsBloc {
     });
   }
 
-  Future<void> fetchOptions(String id) async {
-    var options = await _repo.fetchOptions(id);
-    var bgMusicList = await _repo.fetchBackgroundSounds();
+  Future<void> fetchOptions(String id, {bool skipCache = false}) async {
+    var options = await _repo.fetchOptions(id, skipCache);
+    var bgMusicList = await _repo.fetchBackgroundSounds(skipCache);
     _options = options;
 
     // Show title, desc and image
@@ -231,7 +226,6 @@ class SessionOptionsBloc {
       description: _options.description,
       title: _options.title,
       illustrationUrl: _getCoverUrl(),
-
       voice: currentFile.voice,
       length: currentFile.length,
       secondaryColor: _options.colorSecondary,
