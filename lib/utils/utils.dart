@@ -18,8 +18,8 @@ import 'dart:io';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -47,23 +47,13 @@ Widget getNetworkImageWidget(String url,
 }
 
 Future<bool> checkConnectivity() async {
-  try {
-    final result = await InternetAddress.lookup('google.com');
-    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-      return true;
-    }
-  } on SocketException catch (_) {
-    return false;
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult == ConnectivityResult.mobile) {
+    return true;
+  } else if (connectivityResult == ConnectivityResult.wifi) {
+    return true;
   }
   return false;
-}
-
-int getColorFromHex(String hexColor) {
-  hexColor = hexColor.toUpperCase().replaceAll('#', '');
-  if (hexColor.length == 6) {
-    hexColor = 'FF' + hexColor;
-  }
-  return int.parse(hexColor, radix: 16);
 }
 
 Color parseColor(String color) {
