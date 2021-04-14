@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
@@ -65,6 +66,19 @@ class _TextFileWidgetState extends State<TextFileWidget>
     ));
 
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size(double.infinity, kToolbarHeight),
+        child: StreamBuilder<String>(
+            stream: _bloc.titleController.stream,
+            initialData: '...',
+            builder: (context, snapshot) {
+              return AppBar(
+                backgroundColor: MeditoColors.darkMoon,
+                elevation: 0,
+                title: Text(snapshot.data),
+              );
+            }), // StreamBuilder
+      ),
       body: RefreshIndicator(
         onRefresh: () => _bloc.fetchText(widget.id, true),
         child: Builder(
@@ -96,14 +110,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          StreamBuilder<String>(
-              stream: _bloc.titleController.stream,
-              initialData: '...',
-              builder: (context, snapshot) {
-                return MeditoAppBarWidget(
-                  title: snapshot.data,
-                );
-              }),
           Padding(
             padding: const EdgeInsets.only(
                 left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
