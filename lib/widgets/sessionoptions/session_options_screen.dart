@@ -236,6 +236,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   padding:
                       const EdgeInsets.only(bottom: 20.0, left: 12, right: 12),
                   child: Html(
+                    onLinkTap: _linkTap,
                     data: snapshot.data?.body,
                     shrinkWrap: false,
                     style: htmlTheme(context),
@@ -608,5 +609,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         ],
       ),
     );
+  }
+
+  void _linkTap(String url) {
+      launchUrl(url);
   }
 }
