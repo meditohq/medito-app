@@ -31,17 +31,23 @@ class LibraryWidget extends StatelessWidget {
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: Container(
               height: 50.0,
-              child: TabBar(
-                unselectedLabelStyle: Theme.of(context)
-                    .textTheme
-                    .headline4
-                    .copyWith(color: MeditoColors.meditoTextGrey),
-                labelStyle: Theme.of(context).textTheme.headline4,
-                isScrollable: false,
-                tabs: [
-                  Tab(icon: Text('Downloads')),
-                  Tab(icon: Text('Favourites')),
-                ],
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: MeditoColors.softGrey, width: 1.5))),
+                child: TabBar(
+                  unselectedLabelStyle: Theme.of(context)
+                      .textTheme
+                      .headline4
+                      .copyWith(color: MeditoColors.meditoTextGrey),
+                  labelStyle: Theme.of(context).textTheme.headline4,
+                  isScrollable: false,
+                  tabs: [
+                    Tab(icon: Text('Downloads')),
+                    Tab(icon: Text('Favourites')),
+                  ],
+                ),
               ),
             ),
           ),
