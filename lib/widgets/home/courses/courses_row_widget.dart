@@ -6,7 +6,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class CoursesRowWidget extends StatefulWidget {
-
   @override
   CoursesRowWidgetState createState() => CoursesRowWidgetState();
 
@@ -16,7 +15,7 @@ class CoursesRowWidget extends StatefulWidget {
 class CoursesRowWidgetState extends State<CoursesRowWidget> {
   final _bloc = CoursesBloc();
 
-  void refresh(){
+  void refresh() {
     _bloc.fetchCourses(skipCache: true);
   }
 
@@ -32,7 +31,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 0, left: 16, bottom: 8.0),
-          child: Text('FOLLOW IN ORDER',
+          child: Text('LISTEN IN ORDER',
               style: Theme.of(context).textTheme.caption),
         ),
         StreamBuilder<ApiResponse<CoursesResponse>>(
@@ -44,7 +43,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
                   break;
                 case Status.COMPLETED:
                   return Container(
-                    height: 212,
+                    height: 208,
                     child: ListView.builder(
                         padding: const EdgeInsets.only(left: 16),
                         scrollDirection: Axis.horizontal,
@@ -80,7 +79,7 @@ class CoursesRowItemWidget extends StatelessWidget {
       onTap: () => NavigationFactory.navigateToScreenFromString(
           data.type, data.id, context),
       child: Container(
-        width: 152,
+        width: 148,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,12 +99,19 @@ class CoursesRowItemWidget extends StatelessWidget {
               ],
             ),
             Container(height: 8),
-            Text(
-              data.title,
-              style: Theme.of(context).textTheme.headline4,
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text(
+                data.title,
+                style: Theme.of(context).textTheme.headline4,
+              ),
             ),
-            Container(height: 4),
-            Text(data.subtitle, style: Theme.of(context).textTheme.subtitle1),
+            Container(height: 2),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text(data.subtitle,
+                  style: Theme.of(context).textTheme.subtitle1),
+            ),
           ],
         ),
       ),

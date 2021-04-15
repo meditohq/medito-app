@@ -17,12 +17,18 @@ import 'package:Medito/viewmodel/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/utils/utils.dart';
 
-enum UnitType { day }
+enum UnitType { day, min, sessions}
 
 String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:
       return value == 1 ? 'day' : 'days';
+      break;
+    case UnitType.min:
+      return 'min';
+      break;
+    case UnitType.sessions:
+      return value == 1 ? 'session' : 'sessions';
       break;
   }
   return '';

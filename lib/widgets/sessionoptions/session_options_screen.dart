@@ -52,79 +52,83 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
     _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
+    _bloc.fetchOptions(widget.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<ApiResponse<Map<String, String>>>(
-        stream: _bloc.colourController.stream,
-        builder: (context, colorSnapshot) {
-          var sColor = colorSnapshot.hasData
-              ? colorSnapshot.data.body['secondaryColor']
-              : null;
-          var pColor = colorSnapshot.hasData
-              ? colorSnapshot.data.body['primaryColor']
-              : null;
+    return RefreshIndicator(
+      onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
+      child: StreamBuilder<ApiResponse<Map<String, String>>>(
+          stream: _bloc.colourController.stream,
+          builder: (context, colorSnapshot) {
+            var sColor = colorSnapshot.hasData
+                ? colorSnapshot.data.body['secondaryColor']
+                : null;
+            var pColor = colorSnapshot.hasData
+                ? colorSnapshot.data.body['primaryColor']
+                : null;
 
-          return Scaffold(
-            floatingActionButton: Semantics(
-              label: 'Play button',
-              child: PlayerButton(
-                onPressed: _onBeginTap,
-                primaryColor: parseColor(pColor) ?? MeditoColors.walterWhite,
-                child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: getBeginButtonContent(sColor)),
-              ),
-            ),
-            body: Builder(builder: (BuildContext context) {
-              scaffoldContext = context;
-              return Container(
-                child: SafeArea(
-                  child: Stack(
-                    children: <Widget>[
-                      SingleChildScrollView(
-                        child: Stack(
-                          children: [
-                            GradientWidget(
-                              height: 250.0,
-                              primaryColor: parseColor(pColor),
-                            ),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                MeditoAppBarWidget(
-                                    title: '', transparent: true),
-                                buildImage(pColor),
-                                buildTitleText(),
-                                buildDescriptionText(),
-                                buildVoiceRow(),
-                                buildSpacer(),
-                                ////////// spacer
-                                buildTextHeaderForRow('Session Length'),
-                                buildSessionLengthRow(),
-                                buildSpacer(),
-                                ////////// spacer
-                                getBGMusicItems(),
-                                ////////// spacer
-                                buildTextHeaderForRow(
-                                    'Available Offline ${_bloc.availableOfflineIndicatorText}'),
-                                buildOfflineRow(),
-                                Container(height: 80)
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+            return Scaffold(
+              floatingActionButton: Semantics(
+                label: 'Play button',
+                child: PlayerButton(
+                  onPressed: _onBeginTap,
+                  primaryColor: parseColor(pColor) ?? MeditoColors.walterWhite,
+                  child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: getBeginButtonContent(sColor)),
                 ),
-              );
-            }),
-          );
-        });
+              ),
+              body: Builder(builder: (BuildContext context) {
+                scaffoldContext = context;
+                return Container(
+                  child: SafeArea(
+                    child: Stack(
+                      children: <Widget>[
+                        SingleChildScrollView(
+                          child: Stack(
+                            children: [
+                              GradientWidget(
+                                height: 250.0,
+                                primaryColor: parseColor(pColor),
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  MeditoAppBarWidget(
+                                      title: '', transparent: true),
+                                  buildImage(pColor),
+                                  buildTitleText(),
+                                  buildDescriptionText(),
+                                  buildVoiceRow(),
+                                  buildSpacer(),
+                                  ////////// spacer
+                                  buildTextHeaderForRow('Session Length'),
+                                  buildSessionLengthRow(),
+                                  buildSpacer(),
+                                  ////////// spacer
+                                  getBGMusicItems(),
+                                  ////////// spacer
+                                  buildTextHeaderForRow(
+                                      'Available Offline ${_bloc.availableOfflineIndicatorText}'),
+                                  buildOfflineRow(),
+                                  Container(height: 80)
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            );
+          }),
+    );
   }
 
   Widget getBGMusicItems() => StreamBuilder<bool>(
@@ -232,6 +236,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   padding:
                       const EdgeInsets.only(bottom: 20.0, left: 12, right: 12),
                   child: Html(
+                    onLinkTap: _linkTap,
                     data: snapshot.data?.body,
                     shrinkWrap: false,
                     style: htmlTheme(context),
@@ -604,5 +609,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         ],
       ),
     );
+  }
+
+  void _linkTap(String url) {
+      launchUrl(url);
   }
 }

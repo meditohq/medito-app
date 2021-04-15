@@ -29,7 +29,7 @@ class SessionOptionsRepository {
 
   SessionOptionsRepository({this.screen});
 
-  Future<SessionData> fetchOptions(String id) async {
+  Future<SessionData> fetchOptions(String id, bool skipCache) async {
     var url;
 
     if (screen == Screen.daily) {
@@ -38,13 +38,13 @@ class SessionOptionsRepository {
       url = baseUrl + ext + id + parameters;
     }
 
-    final response = await httpGet(url);
+    final response = await httpGet(url, skipCache: skipCache);
 
     return SessionOptionsResponse.fromJson(response).data;
   }
 
-  Future<BackgroundSoundsResponse> fetchBackgroundSounds() async {
-    final response = await httpGet(bgSoundsUrl);
+  Future<BackgroundSoundsResponse> fetchBackgroundSounds(bool skipCache) async {
+    final response = await httpGet(bgSoundsUrl, skipCache: skipCache);
     return BackgroundSoundsResponse.fromJson(response);
   }
 
