@@ -28,6 +28,7 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pedantic/pedantic.dart';
 
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
@@ -145,43 +146,42 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   }
 
   Widget _getListView() {
-    return RefreshIndicator(
-      onRefresh: () => _bloc.fetchData(),
-      child: Column(
-        children: [
-          _getAppBarStreamBuilder(),
-          Expanded(
-            child: StreamBuilder<ApiResponse<List<Item>>>(
-                stream: _bloc.itemsListController.stream,
-                builder: (context, itemsSnapshot) {
-                  if (!itemsSnapshot.hasData ||
-                      itemsSnapshot.connectionState == ConnectionState.waiting) {
-                    return LoadingListWidget();
-                  }
+    //todo add pull to refresh here
+    return Column(
+      children: [
+        _getAppBarStreamBuilder(),
+        Expanded(
+          child: StreamBuilder<ApiResponse<List<Item>>>(
+              stream: _bloc.itemsListController.stream,
+              builder: (context, itemsSnapshot) {
+                if (!itemsSnapshot.hasData ||
+                    itemsSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                  return LoadingListWidget();
+                }
 
-                  if (itemsSnapshot.hasData) {
-                    return ListView(
-                      padding: EdgeInsets.only(top: 4),
-                      children: [
-                        ListView.builder(
-                            physics: ScrollPhysics(),
-                            itemCount: itemsSnapshot.data.body?.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int i) {
-                              return itemsSnapshot.data?.body != null
-                                  ? _getItemWidget(itemsSnapshot.data?.body[i])
-                                  : Container();
-                            }),
-                        _getImageListItemWidget(),
-                      ],
-                    );
-                  }
+                if (itemsSnapshot.hasData) {
+                  return ListView(
+                    padding: EdgeInsets.only(top: 4),
+                    children: [
+                      ListView.builder(
+                          physics: ScrollPhysics(),
+                          itemCount: itemsSnapshot.data.body?.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int i) {
+                            return itemsSnapshot.data?.body != null
+                                ? _getItemWidget(itemsSnapshot.data?.body[i])
+                                : Container();
+                          }),
+                      _getImageListItemWidget(),
+                    ],
+                  );
+                }
 
-                  return Container();
-                }),
-          ),
-        ],
-      ),
+                return Container();
+              }),
+        ),
+      ],
     );
   }
 

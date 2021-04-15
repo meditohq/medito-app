@@ -42,24 +42,32 @@ class _StatsWidgetState extends State<StatsWidget> {
   Widget statsItem(BuildContext context, int index) {
     switch (index) {
       case 0:
-        return StreakTileWidget(getCurrentStreak(), 'Current streak',
-            onClick: openEditDialog,
-            editable: true,
-            optionalText: UnitType.day);
+        return StreakTileWidget(
+          getCurrentStreak(),
+          'Current streak',
+          onClick: openEditDialog,
+          editable: true,
+          optionalText: UnitType.day,
+        );
       case 1:
         return StreakTileWidget(
           getMinutesListened(),
-          'Min listened',
+          'Listened',
+          optionalText: UnitType.min,
         );
       case 2:
-        return StreakTileWidget(getLongestStreak(), 'Longest streak',
-            editable: true,
-            onClick: openResetDialog,
-            optionalText: UnitType.day);
+        return StreakTileWidget(
+          getLongestStreak(),
+          'Longest streak',
+          editable: true,
+          onClick: openResetDialog,
+          optionalText: UnitType.day,
+        );
       case 3:
         return StreakTileWidget(
           getNumSessions(),
-          'No. of sessions',
+          'Total',
+          optionalText: UnitType.sessions,
         );
     }
     return Container();

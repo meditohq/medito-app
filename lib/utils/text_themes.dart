@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_html/style.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -82,6 +83,9 @@ TextTheme meditoTextTheme(BuildContext context) {
 
 Map<String, Style> htmlTheme(BuildContext context) {
   return {
+    'body': Style(
+      textAlign: TextAlign.center
+    ),
     'h1': Style(
       fontSize: FontSize(20),
       textDecoration: TextDecoration.underline,
@@ -108,6 +112,7 @@ Map<String, Style> htmlTheme(BuildContext context) {
         fontWeight: FontWeight.w600,
         color: MeditoColors.link),
     'p': Style(
+      textAlign: TextAlign.start,
         fontSize: FontSize(16),
         lineHeight: 1.6,
         color: MeditoColors.walterWhite),
