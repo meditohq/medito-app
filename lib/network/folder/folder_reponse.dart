@@ -97,7 +97,8 @@ class Items {
 }
 
 class Item {
-  String get id => idOld.toString();
+  String get id => idInt.toString();
+  String oldId;
   String title;
   String subtitle;
 
@@ -112,12 +113,13 @@ class Item {
   @Deprecated('Use filetype instead')
   String type;
   @Deprecated('Use id instead')
-  int idOld;
+  int idInt;
 
   Item({id, type, title, subtitle});
 
   Item.fromJson(Map<String, dynamic> json) {
-    idOld = json['id'];
+    idInt = json['id'];
+    oldId = json['old_id'];
     type = json['type'];
     title = json['title'];
     subtitle = json['subtitle'];
@@ -125,7 +127,8 @@ class Item {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['id'] = idOld;
+    data['id'] = idInt;
+    data['old_id'] = oldId;
     data['type'] = type;
     data['title'] = title;
     data['subtitle'] = subtitle;
