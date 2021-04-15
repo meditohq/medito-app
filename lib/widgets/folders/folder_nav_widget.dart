@@ -151,35 +151,43 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
       children: [
         _getAppBarStreamBuilder(),
         Expanded(
-          child: StreamBuilder<ApiResponse<List<Item>>>(
-              stream: _bloc.itemsListController.stream,
-              builder: (context, itemsSnapshot) {
-                if (!itemsSnapshot.hasData ||
-                    itemsSnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                  return LoadingListWidget();
-                }
+          child: RefreshIndicator(
+            onRefresh: () {
+              final FolderArguments args = ModalRoute.of(context).settings.arguments;
+              return _bloc.fetchData(id: args.contentId);
+            },
+            child: StreamBuilder<ApiResponse<List<Item>>>(
+                stream: _bloc.itemsListController.stream,
+                builder: (context, itemsSnapshot) {
+                  if (!itemsSnapshot.hasData ||
+                      itemsSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                    return LoadingListWidget();
+                  }
 
-                if (itemsSnapshot.hasData) {
-                  return ListView(
-                    padding: EdgeInsets.only(top: 4),
-                    children: [
-                      ListView.builder(
-                          physics: ScrollPhysics(),
-                          itemCount: itemsSnapshot.data.body?.length,
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int i) {
-                            return itemsSnapshot.data?.body != null
-                                ? _getItemWidget(itemsSnapshot.data?.body[i])
-                                : Container();
-                          }),
-                      _getImageListItemWidget(),
-                    ],
-                  );
-                }
+                  if (itemsSnapshot.hasData) {
+                    return ListView(
+                      padding: EdgeInsets.only(top: 4),
+                      children: [
+                        ListView.builder(
+                            physics: ScrollPhysics(),
+                            itemCount: itemsSnapshot.data.body != null
+                                ? itemsSnapshot.data.body.length
+                                : 0,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int i) {
+                              return itemsSnapshot.data.body != null
+                                  ? _getItemWidget(itemsSnapshot.data.body[i])
+                                  : Container();
+                            }),
+                        _getImageListItemWidget(),
+                      ],
+                    );
+                  }
 
-                return Container();
-              }),
+                  return Container();
+                }),
+          ),
         ),
       ],
     );
