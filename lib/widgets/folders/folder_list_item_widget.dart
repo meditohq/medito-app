@@ -19,10 +19,11 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:flutter/material.dart';
 
 class ListItemWidget extends StatelessWidget {
-  ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id})
+  ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id, this.oldId})
       : super(key: key);
 
   final title;
+  final oldId;
   final subtitle;
   final fileType;
   final id;
@@ -33,7 +34,7 @@ class ListItemWidget extends StatelessWidget {
 
   Widget getAudioIcon() {
     return FutureBuilder<bool>(
-        future: checkListened(id),
+        future: checkListened(id, oldId: oldId),
         builder: (context, listened) {
           if (!listened.hasError && listened.hasData && listened.data) {
             return Icon(
