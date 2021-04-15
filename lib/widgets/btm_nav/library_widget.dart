@@ -14,8 +14,11 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
+import 'package:Medito/widgets/empty_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LibraryWidget extends StatelessWidget {
   @override
@@ -29,7 +32,10 @@ class LibraryWidget extends StatelessWidget {
             child: Container(
               height: 50.0,
               child: TabBar(
-                unselectedLabelStyle: Theme.of(context).textTheme.headline4.copyWith(color: MeditoColors.meditoTextGrey),
+                unselectedLabelStyle: Theme.of(context)
+                    .textTheme
+                    .headline4
+                    .copyWith(color: MeditoColors.meditoTextGrey),
                 labelStyle: Theme.of(context).textTheme.headline4,
                 isScrollable: false,
                 tabs: [
@@ -43,7 +49,13 @@ class LibraryWidget extends StatelessWidget {
             physics: NeverScrollableScrollPhysics(),
             children: [
               DownloadsListWidget(),
-              Center(child: Text('Coming soon...')),
+              EmptyStateWidget(
+                  message: EMPTY_FAVORITES_MESSAGE,
+                  image: SvgPicture.asset(
+                    'assets/images/favorites.svg',
+                    height: 154,
+                    width: 184,
+                  )),
             ],
           ),
         ),
