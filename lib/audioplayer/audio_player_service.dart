@@ -271,7 +271,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       var dataMap = {
         'secsListened': _duration.inSeconds,
-        'id': '${mediaItem.extras['id']}',
+        'id': '${mediaItem.extras['sessionId']}',
       };
 
       await writeJSONToCache(encoded(dataMap), 'stats');

@@ -233,7 +233,8 @@ class SessionOptionsBloc {
       bgMusic: backgroundSoundsId,
       durationAsMilliseconds:
           clockTimeToDuration(currentFile.length).inMilliseconds,
-      id: currentFile.id,
+      fileId: currentFile.id,
+      sessionId: _options.id,
       attributions: _options.attribution);
 }
 

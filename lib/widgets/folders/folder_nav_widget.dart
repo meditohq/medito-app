@@ -28,7 +28,6 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pedantic/pedantic.dart';
 
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
@@ -68,7 +67,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   void didChangeDependencies() {
     if (_bloc.content == null) {
       final FolderArguments args = ModalRoute.of(context).settings.arguments;
-      _bloc.fetchData(id: args.contentId);
+      _bloc.fetchData(id: args.sessionId);
     }
     super.didChangeDependencies();
   }
@@ -121,7 +120,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
                         if (snapshot != null && !snapshot.data) {
                           await markAsListened(_bloc.selectedItem.id);
                         } else {
-                          await markAsNotListened(_bloc.selectedItem.id);
+                          await markAsNotListened(_bloc.selectedItem.id, _bloc.selectedItem.oldId);
                         }
                         deselectItem();
                       })
@@ -152,8 +151,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: () {
-              final FolderArguments args = ModalRoute.of(context).settings.arguments;
-              return _bloc.fetchData(id: args.contentId, skipCache: true);
+              final FolderArguments args =
+                  ModalRoute.of(context).settings.arguments;
+              return _bloc.fetchData(id: args.sessionId, skipCache: true);
             },
             child: StreamBuilder<ApiResponse<List<Item>>>(
                 stream: _bloc.itemsListController.stream,
@@ -280,7 +280,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 }
 
 class FolderArguments {
-  final String contentId;
+  final String sessionId;
 
-  FolderArguments(this.contentId);
+  FolderArguments(this.sessionId);
 }

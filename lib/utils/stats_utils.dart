@@ -227,9 +227,10 @@ Future<void> markAsListened(String id) async {
   await prefs?.setBool('listened' + id, true);
 }
 
-Future<void> markAsNotListened(String id) async {
+Future<void> markAsNotListened(String id, String oldId) async {
   var prefs = await SharedPreferences.getInstance();
   await prefs?.setBool('listened' + id, false);
+  await prefs?.setBool('listened' + oldId, false);
 }
 
 Future<void> clearBgStats() {

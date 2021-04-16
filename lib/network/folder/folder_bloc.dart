@@ -34,7 +34,7 @@ class FolderItemsBloc {
   StreamController<AppBarState> appbarStateController;
   StreamController _coverController;
 
-  String _id;
+  String _sessionId;
 
   StreamSink<ApiResponse<String>> get coverControllerSink =>
       _coverController.sink;
@@ -57,12 +57,12 @@ class FolderItemsBloc {
   }
 
   Future<void> fetchData({String id, bool skipCache = false}) async {
-    _id ??= id;
-    if (_id != null) {
+    _sessionId ??= id;
+    if (_sessionId != null) {
       itemsListController.sink.add(ApiResponse.loading());
       coverControllerSink.add(ApiResponse.loading());
       _titleControllerSink.add(ApiResponse.loading());
-      content = await _repo.fetchFolderData(_id, skipCache);
+      content = await _repo.fetchFolderData(_sessionId, skipCache);
 
       if (content?.hasData == null) {
         itemsListController.sink.add(ApiResponse.error('Error'));
@@ -104,7 +104,8 @@ class FolderItemsBloc {
   void itemLongPressed(Item item) {
     appbarStateController.sink.add((AppBarState.selected));
     selectedItem = item;
-    selectedSessionListenedFuture = checkListened(selectedItem.id, oldId: selectedItem.oldId);
+    selectedSessionListenedFuture =
+        checkListened(selectedItem.id, oldId: selectedItem.oldId);
   }
 
   void deselectItem() {
@@ -112,6 +113,8 @@ class FolderItemsBloc {
     selectedItem = null;
     _postTitle(content);
   }
+
+  String getSessionID() => _sessionId;
 
   void dispose() {
     itemsListController?.close();
