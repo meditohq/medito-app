@@ -37,7 +37,6 @@ class PackListWidget extends StatefulWidget {
 }
 
 class PackListWidgetState extends State<PackListWidget> {
-  bool _dialogShown = false;
   PacksBloc _packsBloc;
 
   @override
@@ -171,7 +170,7 @@ class PackListWidgetState extends State<PackListWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(12)),
                 color: color,
               ),
-              height: 54,
+              height: 84,
             ),
           ),
         ],
