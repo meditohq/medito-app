@@ -105,7 +105,7 @@ class FolderItemsBloc {
   void itemLongPressed(Item item) {
     appbarStateController.sink.add((AppBarState.selected));
     selectedItem = item;
-    selectedSessionListenedFuture = checkListened(selectedItem.id);
+    selectedSessionListenedFuture = checkListened(selectedItem.id, oldId: selectedItem.oldId);
   }
 
   void deselectItem() {

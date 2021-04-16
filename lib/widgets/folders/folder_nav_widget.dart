@@ -236,6 +236,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           title: item.title,
           subtitle: item.subtitle,
           id: item.id,
+          oldId: item.oldId,
           fileType: item.fileType,
         ));
   }

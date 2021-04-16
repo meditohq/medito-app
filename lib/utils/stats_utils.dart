@@ -236,9 +236,15 @@ Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
 }
 
-Future<bool> checkListened(String id) async {
+Future<bool> checkListened(String id, {String oldId}) async {
   var prefs = await SharedPreferences.getInstance();
-  return prefs?.getBool('listened' + id) ?? false;
+  var listened = prefs?.getBool('listened' + id) ?? false;
+
+  if(!listened && oldId.isNotEmptyAndNotNull()){
+    return prefs?.getBool('listened' + id) ?? false;
+  } else {
+    return listened;
+  }
 }
 
 void setVersionCopySeen(int id) async {
