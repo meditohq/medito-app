@@ -241,7 +241,7 @@ Future<bool> checkListened(String id, {String oldId}) async {
   var listened = prefs?.getBool('listened' + id) ?? false;
 
   if(!listened && oldId.isNotEmptyAndNotNull()){
-    return prefs?.getBool('listened' + id) ?? false;
+    return prefs?.getBool('listened' + oldId) ?? false;
   } else {
     return listened;
   }
