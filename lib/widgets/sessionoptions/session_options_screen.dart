@@ -601,17 +601,16 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildSpacer() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 16.0, left: 16, right: 16),
-      child: Row(
-        children: <Widget>[
-          Expanded(child: Container(color: MeditoColors.deepNight, height: 1)),
-        ],
-      ),
+   return Divider(
+      height: 1,
+      indent: 16,
+      color: MeditoColors.deepNight,
+      endIndent: 16,
+      thickness: 1,
     );
   }
 
   void _linkTap(String url) {
-      launchUrl(url);
+    launchUrl(url);
   }
 }
