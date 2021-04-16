@@ -601,7 +601,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildSpacer() {
-   return Divider(
+    return Divider(
       height: 1,
       indent: 16,
       color: MeditoColors.deepNight,
