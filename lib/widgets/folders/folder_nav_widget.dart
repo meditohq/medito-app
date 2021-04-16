@@ -146,7 +146,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   }
 
   Widget _getListView() {
-    //todo add pull to refresh here
     return Column(
       children: [
         _getAppBarStreamBuilder(),
@@ -154,7 +153,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           child: RefreshIndicator(
             onRefresh: () {
               final FolderArguments args = ModalRoute.of(context).settings.arguments;
-              return _bloc.fetchData(id: args.contentId);
+              return _bloc.fetchData(id: args.contentId, skipCache: true);
             },
             child: StreamBuilder<ApiResponse<List<Item>>>(
                 stream: _bloc.itemsListController.stream,
