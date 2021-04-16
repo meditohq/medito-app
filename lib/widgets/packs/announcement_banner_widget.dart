@@ -150,12 +150,8 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     );
   }
 
-  Row buildSpacer() {
-    return Row(
-      children: [
-        Expanded(child: Container(color: MeditoColors.moonlight, height: 1)),
-      ],
-    );
+  Widget buildSpacer() {
+    return Divider(color: MeditoColors.moonlight, height: 1,);
   }
 
   void _openLink(String buttonType, String buttonPath) {
