@@ -51,13 +51,12 @@ class FolderItemsBloc {
 
   FolderItemsBloc() {
     itemsListController = StreamController.broadcast();
-    _coverController = StreamController<ApiResponse<String>>();
+    _coverController = StreamController<ApiResponse<String>>.broadcast();
     appbarStateController = BehaviorSubject();
     _repo = FolderItemsRepository();
   }
 
   Future<void> fetchData({String id, bool skipCache = false}) async {
-
     _id ??= id;
     if (_id != null) {
       itemsListController.sink.add(ApiResponse.loading());
