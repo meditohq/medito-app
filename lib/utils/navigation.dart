@@ -1,10 +1,9 @@
-import 'package:Medito/network/folder/folder_reponse.dart';
+import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
-import 'package:Medito/widgets/sessionoptions/session_options_screen.dart';
-import 'package:Medito/widgets/streak_widgets/streak_page.dart';
+import 'package:Medito/widgets/session_options/session_options_screen.dart';
 import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +33,7 @@ class NavigationFactory {
         assert(id.isNotEmpty);
         _push(
             context,
-            SessionOptionsScreen(
+            session_optionsScreen(
               id: id,
               screenKey: key,
             ));
@@ -47,7 +46,7 @@ class NavigationFactory {
       case Screen.daily:
         _push(
             context,
-            SessionOptionsScreen(
+            session_optionsScreen(
               id: id,
               screenKey: key,
             ));

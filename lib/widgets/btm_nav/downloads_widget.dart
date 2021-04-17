@@ -1,11 +1,9 @@
 import 'package:Medito/network/downloads/downloads_bloc.dart';
-import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/widgets/empty_widget.dart';
-import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';

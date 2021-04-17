@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_bloc.dart';
-import 'package:Medito/network/folder/folder_reponse.dart';
+import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';

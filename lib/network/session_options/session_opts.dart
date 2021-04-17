@@ -1,11 +1,11 @@
 import 'package:Medito/viewmodel/auth.dart';
 
-class SessionOptionsResponse {
+class session_optionsResponse {
   SessionData data;
 
-  SessionOptionsResponse({data});
+  session_optionsResponse({data});
 
-  SessionOptionsResponse.fromJson(Map<String, dynamic> json) {
+  session_optionsResponse.fromJson(Map<String, dynamic> json) {
     data = json['data'] != null ? SessionData.fromJson(json['data']) : null;
   }
 

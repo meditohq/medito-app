@@ -17,7 +17,7 @@ import 'dart:async';
 
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_items_repo.dart';
-import 'package:Medito/network/folder/folder_reponse.dart';
+import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:rxdart/rxdart.dart';
