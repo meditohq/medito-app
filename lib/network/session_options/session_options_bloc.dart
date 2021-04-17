@@ -20,9 +20,9 @@ import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
-import 'package:Medito/network/sessionoptions/background_sounds.dart';
-import 'package:Medito/network/sessionoptions/session_options_repo.dart';
-import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/network/session_options/background_sounds.dart';
+import 'package:Medito/network/session_options/session_options_repo.dart';
+import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
@@ -30,8 +30,8 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:pedantic/pedantic.dart';
 
-class SessionOptionsBloc {
-  SessionOptionsRepository _repo;
+class session_optionsBloc {
+  session_optionsRepository _repo;
 
   var lengthList = <String>[];
   var backgroundSoundsId;
@@ -66,7 +66,7 @@ class SessionOptionsBloc {
   MediaLibrary mediaLibrary;
   SessionData _options;
 
-  SessionOptionsBloc(String id, Screen screen) {
+  session_optionsBloc(String id, Screen screen) {
     titleController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
@@ -91,7 +91,7 @@ class SessionOptionsBloc {
     descController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
-    _repo = SessionOptionsRepository(screen: screen);
+    _repo = session_optionsRepository(screen: screen);
 
     getIntValuesSF(id, 'voiceSelected').then((value) => voiceSelected = value);
     getIntValuesSF(id, 'lengthSelected')

@@ -15,8 +15,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/sessionoptions/background_sounds.dart';
-import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
+import 'package:Medito/network/session_options/background_sounds.dart';
+import 'package:Medito/network/session_options/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
@@ -28,30 +28,30 @@ import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-class SessionOptionsScreen extends StatefulWidget {
+class session_optionsScreen extends StatefulWidget {
   final String id;
   final Screen screenKey;
 
-  SessionOptionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
+  session_optionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
 
   @override
-  _SessionOptionsScreenState createState() => _SessionOptionsScreenState();
+  _session_optionsScreenState createState() => _session_optionsScreenState();
 }
 
-class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
+class _session_optionsScreenState extends State<session_optionsScreen> {
   //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
   /// deffo need:
   BuildContext scaffoldContext;
-  SessionOptionsBloc _bloc;
+  session_optionsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
-    _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
+    _bloc = session_optionsBloc(widget.id, widget.screenKey);
     _bloc.fetchOptions(widget.id);
   }
 

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/network/sessionoptions/session_options_bloc.dart';
-import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/network/session_options/session_options_bloc.dart';
+import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';

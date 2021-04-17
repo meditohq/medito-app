@@ -13,8 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/packs/annoucement_bloc.dart';
-import 'package:Medito/network/packs/announcement_reponse.dart';
+import 'package:Medito/network/packs/announcement_bloc.dart';
+import 'package:Medito/network/packs/announcement_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';

@@ -13,13 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/sessionoptions/background_sounds.dart';
-import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/network/session_options/background_sounds.dart';
+import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
-class SessionOptionsRepository {
+class session_optionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
   var bgSoundsUrl = '${baseUrl}items/background_sounds';
@@ -27,7 +27,7 @@ class SessionOptionsRepository {
       '?fields=*,author.html,audio.file.id,audio.file.voice,audio.file.length';
   var screen;
 
-  SessionOptionsRepository({this.screen});
+  session_optionsRepository({this.screen});
 
   Future<SessionData> fetchOptions(String id, bool skipCache) async {
     var url;
@@ -40,7 +40,7 @@ class SessionOptionsRepository {
 
     final response = await httpGet(url, skipCache: skipCache);
 
-    return SessionOptionsResponse.fromJson(response).data;
+    return session_optionsResponse.fromJson(response).data;
   }
 
   Future<BackgroundSoundsResponse> fetchBackgroundSounds(bool skipCache) async {
