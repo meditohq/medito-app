@@ -18,8 +18,9 @@ import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/widgets/home/courses/courses_row_widget.dart';
-import 'package:Medito/widgets/home/small_shortcuts/small_shortcuts_row_widget.dart';
+import 'package:Medito/widgets/home/courses_row_widget.dart';
+import 'package:Medito/widgets/home/daily_message_widget.dart';
+import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class HomeWidget extends StatelessWidget {
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
   final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
   final GlobalKey<CoursesRowWidgetState> _coursesKey = GlobalKey();
+  final GlobalKey<DailyMessageWidgetState> _dailyMessageKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,7 @@ class HomeWidget extends StatelessWidget {
             _announceKey.currentState?.refresh();
             _shortcutKey.currentState?.refresh();
             _coursesKey.currentState?.refresh();
+            _dailyMessageKey.currentState?.refresh();
             return _bloc.fetchMenu(skipCache: true);
           },
           child: ListView(
@@ -50,7 +53,8 @@ class HomeWidget extends StatelessWidget {
               AnnouncementBanner(key: _announceKey),
               SmallShortcutsRowWidget(key: _shortcutKey),
               CoursesRowWidget(key: _coursesKey),
-              StatsWidget()
+              StatsWidget(),
+              DailyMessageWidget(key: _dailyMessageKey)
             ],
           ),
         ),

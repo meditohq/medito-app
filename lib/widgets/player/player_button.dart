@@ -45,24 +45,5 @@ class PlayerButton extends StatelessWidget {
         ],
       ),
     );
-//      child: TextButton(
-//          style: TextButton.styleFrom(
-//          primary: bgColor),
-//          child: Row(
-//            mainAxisAlignment: MainAxisAlignment.center,
-//            children: [
-//              null
-//                  ? Container()
-//                  : Padding(
-//                      padding: const EdgeInsets.only(left: 8.0),
-//                      child: Text(
-//                        text,
-//                        style: Theme.of(context).textTheme.subtitle1.copyWith(
-//                            color: textColor, fontWeight: FontWeight.w500),
-//                      ),
-//                    )
-//            ],
-//          ),
-//          onPressed: onPressed),
   }
 }

@@ -48,5 +48,4 @@ class SessionOptionsRepository {
     return BackgroundSoundsResponse.fromJson(response);
   }
 
-  String getImageBaseUrl(String cover) => '${baseUrl}assets/$cover?download';
 }
