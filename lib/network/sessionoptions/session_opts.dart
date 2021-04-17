@@ -1,3 +1,5 @@
+import 'package:Medito/viewmodel/auth.dart';
+
 class SessionOptionsResponse {
   SessionData data;
 
@@ -24,6 +26,7 @@ class SessionData {
   String description;
   bool backgroundSound;
   String cover;
+  String get coverUrl => '${baseUrl}assets/$cover?download';
   String colorPrimary;
   String colorSecondary;
   String get attribution => author?.html ?? '';
