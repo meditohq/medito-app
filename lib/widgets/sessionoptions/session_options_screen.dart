@@ -601,12 +601,15 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget buildSpacer() {
-    return Divider(
-      height: 1,
-      indent: 16,
-      color: MeditoColors.deepNight,
-      endIndent: 16,
-      thickness: 1,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Divider(
+        height: 1,
+        indent: 16,
+        color: MeditoColors.deepNight,
+        endIndent: 16,
+        thickness: 1,
+      ),
     );
   }
 
