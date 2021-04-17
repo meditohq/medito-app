@@ -97,7 +97,12 @@ class PackListWidgetState extends State<PackListWidget> {
         return InkWell(
           onTap: () => NavigationFactory.navigateToScreenFromString(
               data[i].type, data[i].id, context),
-          child: PackListItemWidget(data[i]),
+          child: PackListItemWidget(PackImageListItemData(
+              title: data[i].title,
+              subtitle: data[i].subtitle,
+              cover: data[i].cover,
+              colorPrimary: data[i].colorPrimary,
+              coverSize: 72)),
         );
       },
     );
