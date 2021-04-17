@@ -71,21 +71,27 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: MeditoColors.meditoTextGrey,
         ),
         bodyText2: TextStyle(
-          // shortcut title
+        // error widget
           fontSize: 16,
           letterSpacing: 0.5,
           fontWeight: FontWeight.normal,
           height: 1.3,
           color: MeditoColors.meditoTextGrey,
         ),
+        bodyText1: TextStyle(
+          // daily text
+          fontSize: 14,
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w400,
+          height: 1.5,
+          color: MeditoColors.walterWhite,
+        ),
       ));
 }
 
 Map<String, Style> htmlTheme(BuildContext context) {
   return {
-    'body': Style(
-      textAlign: TextAlign.center
-    ),
+    'body': Style(textAlign: TextAlign.center),
     'h1': Style(
       fontSize: FontSize(20),
       textDecoration: TextDecoration.underline,
@@ -112,7 +118,7 @@ Map<String, Style> htmlTheme(BuildContext context) {
         fontWeight: FontWeight.w600,
         color: MeditoColors.link),
     'p': Style(
-      textAlign: TextAlign.start,
+        textAlign: TextAlign.start,
         fontSize: FontSize(16),
         lineHeight: 1.6,
         color: MeditoColors.walterWhite),
