@@ -112,6 +112,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       );
 
   ListItemWidget _getListItemWidget(MediaItem item) {
+    //item.extras['primaryColor']
+    //item.artUri
     return ListItemWidget(
       title: item.title,
       subtitle: '${item.artist} ▴ ${_getDuration(item.extras['length'])}',
