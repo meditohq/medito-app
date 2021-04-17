@@ -110,7 +110,7 @@ class SessionOptionsBloc {
     titleController.sink.add(ApiResponse.completed(_options.title));
     descController.sink.add(ApiResponse.completed(_options.description));
     imageController.sink.add(ApiResponse.completed(
-        {'url': _getCoverUrl(), 'color': _options.colorPrimary}));
+        {'url': _options.coverUrl, 'color': _options.colorPrimary}));
     colourController.sink.add(ApiResponse.completed({
       'secondaryColor': _options.colorSecondary,
       'primaryColor': _options.colorPrimary
@@ -129,8 +129,6 @@ class SessionOptionsBloc {
 
     await updateCurrentFile();
   }
-
-  String _getCoverUrl() => _repo.getImageBaseUrl(_options.cover);
 
   void dispose() {
     titleController?.close();
@@ -225,7 +223,7 @@ class SessionOptionsBloc {
   MediaItem getMediaItemForSelectedFile() => MediaLibrary.getMediaLibrary(
       description: _options.description,
       title: _options.title,
-      illustrationUrl: _getCoverUrl(),
+      illustrationUrl: _options.coverUrl,
       voice: currentFile.voice,
       length: currentFile.length,
       secondaryColor: _options.colorSecondary,
