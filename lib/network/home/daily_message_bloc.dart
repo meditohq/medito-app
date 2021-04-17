@@ -28,10 +28,10 @@ class DailyMessageBloc {
 
     coursesList = StreamController.broadcast()..sink.add(ApiResponse.loading());
 
-    fetchCourses();
+    fetchMessage();
   }
 
-  Future<void> fetchCourses({bool skipCache = false}) async {
+  Future<void> fetchMessage({bool skipCache = false}) async {
     try {
       var data = await _repo.getMessage(skipCache);
       coursesList.sink.add(ApiResponse.completed(data));

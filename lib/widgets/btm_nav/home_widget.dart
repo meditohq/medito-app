@@ -31,6 +31,7 @@ class HomeWidget extends StatelessWidget {
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
   final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
   final GlobalKey<CoursesRowWidgetState> _coursesKey = GlobalKey();
+  final GlobalKey<DailyMessageWidgetState> _dailyMessageKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +44,7 @@ class HomeWidget extends StatelessWidget {
             _announceKey.currentState?.refresh();
             _shortcutKey.currentState?.refresh();
             _coursesKey.currentState?.refresh();
+            _dailyMessageKey.currentState?.refresh();
             return _bloc.fetchMenu(skipCache: true);
           },
           child: ListView(
@@ -52,7 +54,7 @@ class HomeWidget extends StatelessWidget {
               SmallShortcutsRowWidget(key: _shortcutKey),
               CoursesRowWidget(key: _coursesKey),
               StatsWidget(),
-              DailyMessageWidget()
+              DailyMessageWidget(key: _dailyMessageKey)
             ],
           ),
         ),

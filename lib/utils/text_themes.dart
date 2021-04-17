@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/style.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'colors.dart';
@@ -128,4 +129,8 @@ Map<String, Style> htmlTheme(BuildContext context) {
         margin: const EdgeInsets.only(bottom: 24),
         color: MeditoColors.walterWhite),
   };
+}
+
+MarkdownStyleSheet buildMarkdownStyleSheet(BuildContext context) {
+  return MarkdownStyleSheet.fromTheme(Theme.of(context));
 }
