@@ -3,7 +3,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class PackListItemWidget extends StatelessWidget {
-  final PacksData data;
+  final PackImageListItemData data;
 
   PackListItemWidget(this.data);
 
@@ -43,12 +43,27 @@ class PackListItemWidget extends StatelessWidget {
         child: Container(
           color: parseColor(data.colorPrimary),
           child: SizedBox(
-              height: 72,
-              width: 72,
+              height: data.coverSize,
+              width: data.coverSize,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: getNetworkImageWidget(data.cover),
               )),
         ),
       );
+}
+
+class PackImageListItemData {
+  String title;
+  String subtitle;
+  String cover;
+  String colorPrimary;
+  double coverSize;
+
+  PackImageListItemData(
+      {this.title,
+      this.subtitle,
+      this.colorPrimary,
+      this.cover,
+      this.coverSize});
 }
