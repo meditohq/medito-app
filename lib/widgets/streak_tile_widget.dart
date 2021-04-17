@@ -41,6 +41,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
       padding: const EdgeInsets.only(left: 8, right: 8.0),
       child: FutureBuilder<String>(
           future: widget.future,
+          initialData: '0',
           builder: (context, snapshot) {
             var unit;
             if (snapshot.hasData) {
