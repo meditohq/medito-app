@@ -52,7 +52,7 @@ class PackListItemWidget extends StatelessWidget {
       Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
 
   Text _getTitle(BuildContext context) =>
-      Text(data.title, style: Theme.of(context).textTheme.headline4);
+      Text(data.title, style: Theme.of(context).textTheme.headline4, maxLines: 1, overflow: TextOverflow.ellipsis);
 
   Widget _getListItemLeadingImageWidget() => ClipRRect(
         borderRadius: BorderRadius.circular(3.0),
