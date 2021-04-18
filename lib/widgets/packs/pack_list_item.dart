@@ -33,7 +33,7 @@ class PackListItemWidget extends StatelessWidget {
   }
 
   Text _getSubtitle(BuildContext context) =>
-      Text(data.subtitle, style: Theme.of(context).textTheme.subtitle1);
+      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
 
   Text _getTitle(BuildContext context) =>
       Text(data.title, style: Theme.of(context).textTheme.headline4);
@@ -47,7 +47,7 @@ class PackListItemWidget extends StatelessWidget {
               width: data.coverSize,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: getNetworkImageWidget(data.cover),
+                child: data.icon ?? getNetworkImageWidget(data.cover),
               )),
         ),
       );
@@ -59,11 +59,13 @@ class PackImageListItemData {
   String cover;
   String colorPrimary;
   double coverSize;
+  Widget icon;
 
   PackImageListItemData(
       {this.title,
       this.subtitle,
       this.colorPrimary,
       this.cover,
-      this.coverSize});
+      this.coverSize,
+      this.icon});
 }

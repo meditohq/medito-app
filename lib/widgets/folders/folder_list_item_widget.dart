@@ -16,10 +16,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 
 class ListItemWidget extends StatelessWidget {
-  ListItemWidget({Key key, this.title, this.subtitle, this.fileType, this.id, this.oldId})
+  ListItemWidget(
+      {Key key, this.title, this.subtitle, this.fileType, this.id, this.oldId})
       : super(key: key);
 
   final title;
@@ -38,12 +40,12 @@ class ListItemWidget extends StatelessWidget {
         builder: (context, listened) {
           if (!listened.hasError && listened.hasData && listened.data) {
             return Icon(
-              Icons.check_circle,
+              Icons.check,
               color: MeditoColors.walterWhite,
             );
           } else {
             return Icon(
-              Icons.headset,
+              Icons.play_circle_fill,
               color: MeditoColors.walterWhite,
             );
           }
@@ -56,22 +58,12 @@ class ListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Opacity(
-              opacity: 0.7,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: getIcon(),
-              )),
-          getTwoTextViewsInColumn(context)
-        ],
-      ),
-    );
+    return PackListItemWidget(PackImageListItemData(
+        title: title,
+        subtitle: subtitle,
+        colorPrimary: '#171717',
+        icon: getIcon(),
+        coverSize: 56));
   }
 
   Widget getTwoTextViewsInColumn(BuildContext context) {
