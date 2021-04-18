@@ -23,7 +23,7 @@ class PackListItemWidget extends StatelessWidget {
               children: [
                 _getTitle(context),
                 Container(height: 4),
-                _getSubtitle(context)
+                data.subtitle.isNotEmptyAndNotNull() ? _getSubtitle(context) : Container()
               ],
             ),
           ),
