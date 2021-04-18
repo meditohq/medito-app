@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 class GradientWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: colorsList()),
+    return Opacity(
+      opacity: opacity,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: colorsList()),
+        ),
       ),
     );
   }
@@ -22,6 +25,7 @@ class GradientWidget extends StatelessWidget {
 
   final height;
   final primaryColor;
+  final opacity;
 
-  GradientWidget({this.height = 350.0, this.primaryColor});
+  GradientWidget({this.height = 350.0, this.primaryColor, this.opacity = 1.0});
 }

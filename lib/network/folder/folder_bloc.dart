@@ -18,41 +18,30 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_items_repo.dart';
 import 'package:Medito/network/folder/folder_response.dart';
-import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
-import 'package:rxdart/rxdart.dart';
 
 class FolderItemsBloc {
   FolderItemsRepository _repo;
 
-  var appBarType = AppBarState.normal;
   Future<bool> selectedSessionListenedFuture;
   Item selectedItem;
   FolderResponse content;
 
   StreamController<ApiResponse<List<Item>>> itemsListController;
-  StreamController<AppBarState> appbarStateController;
-  StreamController _coverController;
+  StreamController<ApiResponse<String>> coverController;
+  StreamController<String> primaryColorController;
+  StreamController<String> backgroundImageController;
+  StreamController<String> titleController;
+  StreamController<String> descriptionController;
 
   String _sessionId;
 
-  StreamSink<ApiResponse<String>> get coverControllerSink =>
-      _coverController.sink;
-
-  Stream<ApiResponse<String>> get coverControllerStream =>
-      _coverController.stream;
-
-  final _titleController = BehaviorSubject<ApiResponse<String>>();
-
-  Stream<ApiResponse<String>> get titleControllerStream =>
-      _titleController.stream;
-
-  Sink<ApiResponse<String>> get _titleControllerSink => _titleController.sink;
-
   FolderItemsBloc() {
     itemsListController = StreamController.broadcast();
-    _coverController = StreamController<ApiResponse<String>>.broadcast();
-    appbarStateController = BehaviorSubject();
+    primaryColorController = StreamController.broadcast();
+    coverController = StreamController.broadcast();
+    titleController = StreamController.broadcast();
+    backgroundImageController = StreamController.broadcast();
+    descriptionController = StreamController.broadcast();
     _repo = FolderItemsRepository();
   }
 
@@ -60,14 +49,13 @@ class FolderItemsBloc {
     _sessionId ??= id;
     if (_sessionId != null) {
       itemsListController.sink.add(ApiResponse.loading());
-      coverControllerSink.add(ApiResponse.loading());
-      _titleControllerSink.add(ApiResponse.loading());
+      coverController.sink.add(ApiResponse.loading());
       content = await _repo.fetchFolderData(_sessionId, skipCache);
 
       if (content?.hasData == null) {
         itemsListController.sink.add(ApiResponse.error('Error'));
-        coverControllerSink.add(ApiResponse.error('Error'));
-        _titleControllerSink.add(ApiResponse.error('Error'));
+        coverController.sink.add(ApiResponse.error('Error'));
+        titleController.add('Error');
       } else {
         _postItemList(content);
         _postTitle(content);
@@ -78,18 +66,20 @@ class FolderItemsBloc {
 
   void _postCoverDetails(FolderResponse content) {
     try {
-      _coverController.sink.add(
-          ApiResponse.completed('${baseUrl}assets/${content.cover}?download'));
+      coverController.sink.add(ApiResponse.completed(content.coverUrl));
     } catch (e) {
-      _coverController.sink.add(ApiResponse.error('Error getting cover'));
+      coverController.sink.add(ApiResponse.error('Error getting cover'));
     }
+    primaryColorController.sink.add(content.colour);
+    backgroundImageController.sink.add(content.backgroundImageUrl);
   }
 
   void _postTitle(FolderResponse content) {
     try {
-      _titleControllerSink.add(ApiResponse.completed(content.title));
+      titleController.sink.add(content.title);
+      descriptionController.sink.add(content.description);
     } catch (e) {
-      _titleControllerSink.add(ApiResponse.error('Title error'));
+      print('Title error');
     }
   }
 
@@ -101,28 +91,14 @@ class FolderItemsBloc {
     }
   }
 
-  void itemLongPressed(Item item) {
-    appbarStateController.sink.add((AppBarState.selected));
-    selectedItem = item;
-    selectedSessionListenedFuture =
-        checkListened(selectedItem.id, oldId: selectedItem.oldId);
-  }
-
-  void deselectItem() {
-    appbarStateController.sink.add(AppBarState.normal);
-    selectedItem = null;
-    _postTitle(content);
-  }
-
   String getSessionID() => _sessionId;
 
   void dispose() {
     itemsListController?.close();
-    _coverController?.close();
-    _titleController?.close();
-    appbarStateController?.close();
+    coverController?.close();
+    titleController?.close();
+    descriptionController?.close();
+    primaryColorController?.close();
+    backgroundImageController?.close();
   }
 }
-
-// Enum to save the state of appbar.
-enum AppBarState { normal, selected }

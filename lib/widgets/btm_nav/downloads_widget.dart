@@ -49,6 +49,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         builder: (context, sessionList, widget) {
           if (sessionList.isNotEmpty) {
             return ListView.builder(
+                padding: EdgeInsets.symmetric(vertical: 8),
                 itemCount: sessionList.length,
                 itemBuilder: (context, i) {
                   var item = sessionList[i];

@@ -12,6 +12,8 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
+import 'package:Medito/viewmodel/auth.dart';
+
 class FolderResponse {
   @Deprecated('Use values below')
   Data data;
@@ -20,9 +22,11 @@ class FolderResponse {
 
   String get title => data.title;
 
-  String get subtitle => data.subtitle;
-
+  String get description => data.description;
+  String get colour => data.primaryColor;
+  String get backgroundImageUrl =>  data.backgroundImage != null? '${baseUrl}assets/${data.backgroundImage}?download' : null;
   String get cover => data.cover;
+  String get coverUrl => data.cover != null? '${baseUrl}assets/$cover?download' : null;
 
   String get id => data.id.toString();
 
@@ -46,7 +50,9 @@ class FolderResponse {
 class Data {
   int id;
   String title;
-  String subtitle;
+  String description;
+  String primaryColor;
+  String backgroundImage;
   String cover;
   List<Items> items;
 
@@ -55,7 +61,9 @@ class Data {
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
-    subtitle = json['subtitle'];
+    description = json['description'];
+    primaryColor = json['color_primary'];
+    backgroundImage = json['background_image'];
     cover = json['cover'];
     if (json['items'] != null) {
       items = <Items>[];
@@ -69,7 +77,9 @@ class Data {
     final data = <String, dynamic>{};
     data['id'] = id;
     data['title'] = title;
-    data['subtitle'] = subtitle;
+    data['description'] = description;
+    data['background_image'] = backgroundImage;
+    data['color_primary'] = primaryColor;
     data['cover'] = cover;
     if (items != null) {
       data['items'] = items.map((v) => v.toJson()).toList();
