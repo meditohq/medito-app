@@ -1,4 +1,4 @@
-import 'package:Medito/network/packs/packs_response.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -41,7 +41,7 @@ class PackListItemWidget extends StatelessWidget {
   Widget _getListItemLeadingImageWidget() => ClipRRect(
         borderRadius: BorderRadius.circular(3.0),
         child: Container(
-          color: parseColor(data.colorPrimary),
+          color: data.colorPrimary,
           child: SizedBox(
               height: data.coverSize,
               width: data.coverSize,
@@ -57,7 +57,7 @@ class PackImageListItemData {
   String title;
   String subtitle;
   String cover;
-  String colorPrimary;
+  Color colorPrimary;
   double coverSize;
   Widget icon;
 

@@ -3,6 +3,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/empty_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
@@ -115,7 +116,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         title: item.title,
         subtitle: '${item.artist} - ${_getDuration(item.extras['length'])}',
         cover: item.artUri,
-        colorPrimary: item.extras['primaryColor'],
+        colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));
   }
 
