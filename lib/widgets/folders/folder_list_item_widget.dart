@@ -61,7 +61,7 @@ class ListItemWidget extends StatelessWidget {
     return PackListItemWidget(PackImageListItemData(
         title: title,
         subtitle: subtitle,
-        colorPrimary: '#171717',
+        colorPrimary: MeditoColors.intoTheNight,
         icon: getIcon(),
         coverSize: 56));
   }
