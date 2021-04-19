@@ -62,10 +62,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-    ));
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, kToolbarHeight),
@@ -122,7 +118,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
                       data: snapshot.data,
                       onTapLink: _linkTap,
                       physics: NeverScrollableScrollPhysics(),
-                      padding: null,
+                      padding: const EdgeInsets.all(0),
                       shrinkWrap: true,
                       styleSheet: buildMarkdownStyleSheet(context));
                 }),

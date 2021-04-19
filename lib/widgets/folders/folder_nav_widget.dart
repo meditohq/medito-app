@@ -71,10 +71,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-    ));
-
     return Scaffold(
       body: Builder(
         builder: (BuildContext context) {
