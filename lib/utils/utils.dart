@@ -41,7 +41,7 @@ Widget getNetworkImageWidget(String url,
     placeholder: (context, url) => Container(
       height: startHeight,
     ),
-    imageUrl: url,
+    imageUrl: url ?? '',
   );
 }
 

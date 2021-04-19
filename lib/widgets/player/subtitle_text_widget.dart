@@ -2,10 +2,10 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class SubtitleTextWidget extends StatelessWidget {
-  final String html;
+  final String body;
 
   TextStyle getStyle(BuildContext context) =>
       Theme.of(context).textTheme.headline1.copyWith(
@@ -14,7 +14,7 @@ class SubtitleTextWidget extends StatelessWidget {
           color: MeditoColors.walterWhite.withOpacity(0.7),
           height: 1.4);
 
-  SubtitleTextWidget({Key key, this.html}) : super(key: key);
+  SubtitleTextWidget({Key key, this.body}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +24,11 @@ class SubtitleTextWidget extends StatelessWidget {
         Expanded(
           child: Wrap(
             children: [
-              Html(
-                data: html ?? '<p>Loading...</p>',
-                onLinkTap: _linkTap,
-                shrinkWrap: true,
-                style: htmlTheme(context),
-              ),
+              Markdown(
+                  data: body ?? 'Loading...',
+                  onTapLink: _linkTap,
+                  shrinkWrap: true,
+                  styleSheet: buildMarkdownStyleSheet(context)),
             ],
           ),
         ),

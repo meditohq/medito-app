@@ -16,9 +16,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_bloc.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
+import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class FolderBannerWidget extends StatelessWidget {
   FolderBannerWidget({Key key, this.bloc}) : super(key: key);
@@ -26,19 +29,43 @@ class FolderBannerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        MeditoAppBarWidget(transparent: true),
-        Row(
-          children: [_getImageContainer(), _getTitleStream()],
-        ),
-      ],
-    );
+    return StreamBuilder<String>(
+        stream: bloc.primaryColorController.stream,
+        builder: (context, snapshot) {
+          return Container(
+            color: MeditoColors.intoTheNight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  children: [
+                    GradientWidget(
+                      opacity: 0.24,
+                      height: 168.0,
+                      primaryColor: snapshot.hasData
+                          ? parseColor(snapshot.data)
+                          : MeditoColors.transparent,
+                    ),
+                    Column(
+                      children: [
+                        MeditoAppBarWidget(transparent: true),
+                        Row(
+                          children: [_getImageContainer(), _getTitleStream()],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                _getDescriptionWidget()
+              ],
+            ),
+          );
+        });
   }
 
   Widget _getImageContainer() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: SizedBox(
@@ -91,9 +118,10 @@ class FolderBannerWidget extends StatelessWidget {
               break;
 
             case Status.COMPLETED:
-            case Status.ERROR:
               return getNetworkImageWidget(snapshot.data.body);
               break;
+            case Status.ERROR:
+              return Center(child: Icon(Icons.broken_image_outlined));
             default:
               return Container();
           }
@@ -106,6 +134,30 @@ class FolderBannerWidget extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return getNetworkImageWidget(snapshot.data);
+          } else {
+            return Container();
+          }
+        });
+  }
+
+  Widget _getDescriptionWidget() {
+    return StreamBuilder<String>(
+        stream: bloc.descriptionController.stream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Padding(
+              padding:
+                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 20),
+              child: Markdown(
+                data: snapshot.data,
+                padding: null,
+                styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                    .copyWith(
+                    p: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0)
+                ),
+                shrinkWrap: true,
+              ),
+            );
           } else {
             return Container();
           }

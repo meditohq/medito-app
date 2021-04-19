@@ -31,7 +31,7 @@ class TextBloc {
     var data = await _repo.fetchData(id, skipCache);
 
     titleController.sink.add(data.title);
-    bodyController.sink.add(data.html);
+    bodyController.sink.add(data.body);
   }
 
   void dispose() {

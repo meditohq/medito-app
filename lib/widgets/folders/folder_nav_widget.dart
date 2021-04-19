@@ -19,12 +19,9 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_banner_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
-import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -117,6 +114,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
                       ? itemsSnapshot.data.body.length
                       : 0,
                   shrinkWrap: true,
+                  padding: EdgeInsets.only(top: 8),
                   itemBuilder: (BuildContext context, int i) {
                     return itemsSnapshot.data.body != null
                         ? _getItemListWidget(itemsSnapshot.data.body[i])

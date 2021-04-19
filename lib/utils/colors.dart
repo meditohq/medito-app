@@ -30,6 +30,7 @@ class MeditoColors {
   static const peacefulPink = Color(0xffffc2c2);
 
   // V2
+  static const transparent = Color(0x00ffffff);
   static const darkMoon = Color(0xff121212);
   static const walterWhite = Colors.white;
   static const meditoTextGrey = Color(0xffa7aab1);
