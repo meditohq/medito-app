@@ -11,26 +11,15 @@ class SubtitleTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Wrap(
-            children: [
-              Markdown(
-                  data: body ?? 'Loading...',
-                  onTapLink: _linkTap,
-                  shrinkWrap: true,
-                  padding: null,
-                  styleSheet: buildMarkdownStyleSheet(context).copyWith(
-                      p: Theme.of(context).textTheme.subtitle1,
-                      textAlign: WrapAlignment.center,
-                      a: TextStyle(color: MeditoColors.meditoTextGrey))),
-            ],
-          ),
-        ),
-      ],
-    );
+    return Markdown(
+        data: body ?? 'Loading...',
+        onTapLink: _linkTap,
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(0),
+        styleSheet: buildMarkdownStyleSheet(context).copyWith(
+            p: Theme.of(context).textTheme.subtitle1,
+            textAlign: WrapAlignment.center,
+            a: TextStyle(color: MeditoColors.meditoTextGrey)));
   }
 
   void _linkTap(String url) {
