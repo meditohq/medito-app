@@ -29,7 +29,7 @@ class SessionData {
   String get coverUrl => '${baseUrl}assets/$cover?download';
   String colorPrimary;
   String colorSecondary;
-  String get attribution => author?.html ?? '';
+  String get attribution => author?.body ?? '';
   List<AudioFile> get files => audio.map((e) => e.file).toList();
   List<String> get voiceList =>
   audio.map((element) => element.file.voice).toSet().toList();
@@ -94,17 +94,17 @@ class SessionData {
 }
 
 class Author {
-  String html;
+  String body;
 
-  Author({html});
+  Author({body});
 
   Author.fromJson(Map<String, dynamic> json) {
-    html = json['html'];
+    body = json['body'];
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['html'] = html;
+    data['body'] = body;
     return data;
   }
 }

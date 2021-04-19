@@ -26,7 +26,7 @@ import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class session_optionsScreen extends StatefulWidget {
   final String id;
@@ -235,11 +235,15 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
               ? Padding(
                   padding:
                       const EdgeInsets.only(bottom: 20.0, left: 12, right: 12),
-                  child: Html(
-                    onLinkTap: _linkTap,
+                  child: Markdown(
+                    onTapLink: _linkTap,
                     data: snapshot.data?.body,
-                    shrinkWrap: false,
-                    style: htmlTheme(context),
+                    shrinkWrap: true,
+                    padding: null,
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                        .copyWith(
+                        p: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0)
+                    ),
                   ))
               : Container();
         });

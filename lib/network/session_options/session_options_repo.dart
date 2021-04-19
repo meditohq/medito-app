@@ -24,7 +24,7 @@ class session_optionsRepository {
   var dailiesExt = 'items/dailies/';
   var bgSoundsUrl = '${baseUrl}items/background_sounds';
   var parameters =
-      '?fields=*,author.html,audio.file.id,audio.file.voice,audio.file.length';
+      '?fields=*,author.body,audio.file.id,audio.file.voice,audio.file.length';
   var screen;
 
   session_optionsRepository({this.screen});

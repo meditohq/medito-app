@@ -8,6 +8,7 @@ class GradientWidget extends StatelessWidget {
       opacity: opacity,
       child: Container(
         height: height,
+        child: child,
         decoration: BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -19,13 +20,15 @@ class GradientWidget extends StatelessWidget {
   }
 
   List<Color> colorsList() => [
-        primaryColor?.withOpacity(0.6) ?? MeditoColors.moonlight,
-        MeditoColors.midnight,
+        primaryColor ?? MeditoColors.transparent,
+        primaryColor?.withOpacity(0) ?? MeditoColors.transparent,
       ];
 
   final height;
-  final primaryColor;
+  final Color primaryColor;
   final opacity;
+  final child;
 
-  GradientWidget({this.height = 350.0, this.primaryColor, this.opacity = 1.0});
+  GradientWidget(
+      {this.height = 350.0, this.primaryColor, this.opacity = 1.0, this.child});
 }

@@ -22,6 +22,7 @@ import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key key}) : super(key: key);
@@ -117,11 +118,12 @@ class _TextFileWidgetState extends State<TextFileWidget>
                 stream: _bloc.bodyController.stream,
                 initialData: 'Loading...',
                 builder: (context, snapshot) {
-                  return Html(
+                  return Markdown(
                       data: snapshot.data,
-                      onLinkTap: _linkTap,
+                      onTapLink: _linkTap,
+                      padding: null,
                       shrinkWrap: true,
-                      style: htmlTheme(context));
+                      styleSheet: buildMarkdownStyleSheet(context));
                 }),
           ),
         ],

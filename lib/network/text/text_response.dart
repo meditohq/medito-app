@@ -4,7 +4,7 @@ class TextResponse {
   int get id => data.id;
   String get title => data.title;
   String get subtitle => data.subtitle;
-  String get html => data.html;
+  String get body => data.body;
 
 
   TextResponse({data});
@@ -26,15 +26,15 @@ class Data {
   int id;
   String title;
   String subtitle;
-  String html;
+  String body;
 
-  Data({id, title, subtitle, html});
+  Data({id, title, subtitle, body});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
     subtitle = json['subtitle'];
-    html = json['html'];
+    body = json['body'];
   }
 
   Map<String, dynamic> toJson() {
@@ -42,7 +42,7 @@ class Data {
     data['id'] = id;
     data['title'] = title;
     data['subtitle'] = subtitle;
-    data['html'] = html;
+    data['body'] = body;
     return data;
   }
 }
