@@ -121,6 +121,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
                   return Markdown(
                       data: snapshot.data,
                       onTapLink: _linkTap,
+                      physics: NeverScrollableScrollPhysics(),
                       padding: null,
                       shrinkWrap: true,
                       styleSheet: buildMarkdownStyleSheet(context));

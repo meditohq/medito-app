@@ -7,13 +7,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 class SubtitleTextWidget extends StatelessWidget {
   final String body;
 
-  TextStyle getStyle(BuildContext context) =>
-      Theme.of(context).textTheme.headline1.copyWith(
-          letterSpacing: 0.2,
-          fontWeight: FontWeight.w500,
-          color: MeditoColors.walterWhite.withOpacity(0.7),
-          height: 1.4);
-
   SubtitleTextWidget({Key key, this.body}) : super(key: key);
 
   @override
@@ -28,7 +21,11 @@ class SubtitleTextWidget extends StatelessWidget {
                   data: body ?? 'Loading...',
                   onTapLink: _linkTap,
                   shrinkWrap: true,
-                  styleSheet: buildMarkdownStyleSheet(context)),
+                  padding: null,
+                  styleSheet: buildMarkdownStyleSheet(context).copyWith(
+                      p: Theme.of(context).textTheme.subtitle1,
+                      textAlign: WrapAlignment.center,
+                      a: TextStyle(color: MeditoColors.meditoTextGrey))),
             ],
           ),
         ),
