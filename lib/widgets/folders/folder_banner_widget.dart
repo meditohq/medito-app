@@ -150,7 +150,7 @@ class FolderBannerWidget extends StatelessWidget {
                   const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 20),
               child: Markdown(
                 data: snapshot.data,
-                padding: null,
+                padding: const EdgeInsets.all(0),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
                     p: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0)

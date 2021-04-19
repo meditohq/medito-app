@@ -75,9 +75,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.initState();
     Tracking.changeScreenName(Tracking.PLAYER_PAGE);
 
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Colors.black));
-
     initBgVolume();
 
     _stream = AudioService.customEventStream.listen((event) async {
@@ -150,6 +147,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Image.asset(
       'assets/images/texture.png',
       width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       fit: BoxFit.fitWidth,
     );
   }

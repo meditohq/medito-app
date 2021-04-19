@@ -239,7 +239,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
                     onTapLink: _linkTap,
                     data: snapshot.data?.body,
                     shrinkWrap: true,
-                    padding: null,
+                    padding: const EdgeInsets.all(0),
                     styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                         .copyWith(
                         p: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0)
