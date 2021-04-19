@@ -76,7 +76,6 @@ class PackListWidgetState extends State<PackListWidget> {
                 case Status.ERROR:
                   return ErrorPacksWidget(
                     onPressed: () => _packsBloc.fetchPacksList(true),
-                    widget: _getMeditoLogoWidget(),
                   );
                 default:
                   return Container();
@@ -104,13 +103,6 @@ class PackListWidgetState extends State<PackListWidget> {
               coverSize: 72)),
         );
       },
-    );
-  }
-
-  Widget _getMeditoLogoWidget() {
-    return MeditoLogo(
-      onDoubleTap: () => _showVersionPopUp(),
-      onLongPress: () => _packsBloc.fetchPacksList(true),
     );
   }
 
