@@ -52,6 +52,7 @@ class FolderBannerWidget extends StatelessWidget {
                         Row(
                           children: [_getImageContainer(), _getTitleStream()],
                         ),
+                        Container(height: 16)
                       ],
                     ),
                   ],
@@ -96,11 +97,17 @@ class FolderBannerWidget extends StatelessWidget {
       initialData: '',
       stream: bloc.titleController.stream,
       builder: (context, snapshot) {
-        return Text(
-          snapshot.data,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.headline1,
+        return Expanded(
+          child: Wrap(
+            children: [
+              Text(
+                snapshot.data,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.headline1,
+              ),
+            ],
+          ),
         );
       });
 
