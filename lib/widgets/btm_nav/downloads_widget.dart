@@ -95,7 +95,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-        color: MeditoColors.moonlight,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(

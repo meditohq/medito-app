@@ -50,7 +50,6 @@ class PackListWidgetState extends State<PackListWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: MeditoColors.darkMoon,
       child: SafeArea(
         bottom: false,
         child: _streamBuilderWidget(),
