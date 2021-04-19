@@ -54,12 +54,12 @@ class _ParentWidgetState extends State<ParentWidget>
   void initState() {
     super.initState();
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+          statusBarColor: MeditoColors.transparent),
+    );
 
     isTrackingAccepted().then((value) async {
       //todo
