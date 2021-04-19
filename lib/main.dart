@@ -58,6 +58,8 @@ class _ParentWidgetState extends State<ParentWidget>
       SystemUiOverlayStyle(
           statusBarBrightness: Brightness.dark,
           statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: MeditoColors.transparent,
+          systemNavigationBarIconBrightness: Brightness.light,
           statusBarColor: MeditoColors.transparent),
     );
 
