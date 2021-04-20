@@ -50,13 +50,13 @@ class session_optionsBloc {
   // Download stuff
   bool bgDownloading = false, removing = false;
   DownloadSingleton downloadSingleton = DownloadSingleton(null);
-  final _downloadBloc = DownloadsBloc();
 
   //Streams
-  StreamController<ApiResponse<String>> titleController;
-  StreamController<ApiResponse<String>> descController;
-  StreamController<ApiResponse<Map<String, String>>> imageController;
-  StreamController<ApiResponse<Map<String, String>>> colourController;
+  StreamController<String> titleController;
+  StreamController<String> descController;
+  StreamController<ApiResponse<String>> imageController;
+  StreamController<String> primaryColourController;
+  StreamController<String> secondaryColorController;
   StreamController<ApiResponse<List<String>>> voiceListController;
   StreamController<ApiResponse<List<String>>> lengthListController;
   StreamController<ApiResponse<BackgroundSoundsResponse>>
@@ -67,8 +67,7 @@ class session_optionsBloc {
   SessionData _options;
 
   session_optionsBloc(String id, Screen screen) {
-    titleController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading());
+    titleController = StreamController.broadcast();
 
     voiceListController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
@@ -85,11 +84,10 @@ class session_optionsBloc {
     imageController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
-    colourController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading());
+    primaryColourController = StreamController.broadcast();
+    secondaryColorController = StreamController.broadcast();
 
-    descController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading());
+    descController = StreamController.broadcast();
 
     _repo = session_optionsRepository(screen: screen);
 
@@ -107,14 +105,11 @@ class session_optionsBloc {
     _options = options;
 
     // Show title, desc and image
-    titleController.sink.add(ApiResponse.completed(_options.title));
-    descController.sink.add(ApiResponse.completed(_options.description));
-    imageController.sink.add(ApiResponse.completed(
-        {'url': _options.coverUrl, 'color': _options.colorPrimary}));
-    colourController.sink.add(ApiResponse.completed({
-      'secondaryColor': _options.colorSecondary,
-      'primaryColor': _options.colorPrimary
-    }));
+    titleController.sink.add(_options.title);
+    descController.sink.add(_options.description);
+    imageController.sink.add(ApiResponse.completed(_options.coverUrl));
+    primaryColourController.sink.add(_options.colorPrimary);
+    secondaryColorController.sink.add(_options.colorSecondary);
 
     // Show/hide Background music
     backgroundMusicShownController.sink.add(_options.backgroundSound);
@@ -137,7 +132,8 @@ class session_optionsBloc {
     backgroundMusicListController?.close();
     backgroundMusicShownController?.close();
     imageController?.close();
-    colourController?.close();
+    primaryColourController?.close();
+    secondaryColorController?.close();
     descController?.close();
   }
 

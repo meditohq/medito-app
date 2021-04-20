@@ -13,24 +13,37 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
+
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/folder/folder_bloc.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-class FolderBannerWidget extends StatelessWidget {
-  FolderBannerWidget({Key key, this.bloc}) : super(key: key);
-  final FolderItemsBloc bloc;
+class HeaderWidget extends StatelessWidget {
+  HeaderWidget(
+      {Key key,
+      this.primaryColorController,
+      this.titleController,
+      this.coverController,
+      this.backgroundImageController,
+      this.descriptionController,
+      this.vertical = false})
+      : super(key: key);
+  final StreamController<String> primaryColorController;
+  final StreamController<String> titleController;
+  final StreamController<ApiResponse<String>> coverController;
+  final StreamController<String> backgroundImageController;
+  final StreamController<String> descriptionController;
+  final vertical;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<String>(
-        stream: bloc.primaryColorController.stream,
+        stream: primaryColorController.stream,
         builder: (context, snapshot) {
           return Container(
             color: MeditoColors.intoTheNight,
@@ -40,40 +53,73 @@ class FolderBannerWidget extends StatelessWidget {
                 Stack(
                   children: [
                     GradientWidget(
-                      opacity: 0.24,
+                      opacity: 0.32,
                       height: 168.0,
                       primaryColor: snapshot.hasData
                           ? parseColor(snapshot.data)
                           : MeditoColors.transparent,
                     ),
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MeditoAppBarWidget(transparent: true),
-                        Row(
-                          children: [_getImageContainer(), _getTitleStream()],
-                        ),
-                        Container(height: 16)
+                        !vertical ? _getRow() : _getColumn(),
+                        Container(height: vertical ? 0 : 16)
                       ],
                     ),
                   ],
                 ),
-                _getDescriptionWidget()
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: _getDescriptionWidget(),
+                )
               ],
             ),
           );
         });
   }
 
-  Widget _getImageContainer() {
+  Row _getRow() {
+    return Row(
+      children: [
+        _getImageContainer(size: 96),
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: _getTitleStream(),
+          ),
+        )
+      ],
+    );
+  }
+
+  Column _getColumn() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _getImageContainer(size: 72),
+        Container(height: 16.0),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8),
+          child: _getTitleStream(),
+        )
+      ],
+    );
+  }
+
+  Widget _getImageContainer({double size}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(left: 16.0),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(6.0),
         child: SizedBox(
-          height: 96,
-          width: 96,
+          height: size,
+          width: size,
           child: StreamBuilder<String>(
-              stream: bloc.primaryColorController.stream,
+              stream: primaryColorController.stream,
               builder: (context, snapshot) {
                 return Container(
                   color: snapshot.hasData
@@ -95,25 +141,19 @@ class FolderBannerWidget extends StatelessWidget {
 
   StreamBuilder<String> _getTitleStream() => StreamBuilder<String>(
       initialData: '',
-      stream: bloc.titleController.stream,
+      stream: titleController.stream,
       builder: (context, snapshot) {
-        return Expanded(
-          child: Wrap(
-            children: [
-              Text(
-                snapshot.data,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.headline1,
-              ),
-            ],
-          ),
+        return Text(
+          snapshot.data,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.headline1,
         );
       });
 
   StreamBuilder<ApiResponse<String>> _actualImageStream() {
     return StreamBuilder<ApiResponse<String>>(
-        stream: bloc.coverController.stream,
+        stream: coverController.stream,
         initialData: ApiResponse.loading(),
         builder: (context, snapshot) {
           switch (snapshot.data.status) {
@@ -135,33 +175,38 @@ class FolderBannerWidget extends StatelessWidget {
         });
   }
 
-  StreamBuilder<String> _bgImageStream() {
-    return StreamBuilder<String>(
-        stream: bloc.backgroundImageController.stream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return getNetworkImageWidget(snapshot.data);
-          } else {
-            return Container();
-          }
-        });
+  Widget _bgImageStream() {
+    if (backgroundImageController != null) {
+      return StreamBuilder<String>(
+          stream: backgroundImageController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return getNetworkImageWidget(snapshot.data);
+            } else {
+              return Container();
+            }
+          });
+    } else {
+      return Container();
+    }
   }
 
   Widget _getDescriptionWidget() {
     return StreamBuilder<String>(
-        stream: bloc.descriptionController.stream,
+        stream: descriptionController.stream,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data.isNotEmptyAndNotNull()) {
             return Padding(
-              padding:
-                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 20),
+              padding: const EdgeInsets.only(bottom: 20.0),
               child: Markdown(
                 data: snapshot.data,
                 padding: const EdgeInsets.all(0),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
-                    p: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0)
-                ),
+                        p: Theme.of(context)
+                            .textTheme
+                            .subtitle1
+                            .copyWith(fontSize: 14.0)),
                 shrinkWrap: true,
               ),
             );
