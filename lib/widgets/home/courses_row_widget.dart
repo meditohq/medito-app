@@ -1,6 +1,7 @@
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/courses_bloc.dart';
 import 'package:Medito/network/home/courses_response.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -119,6 +120,6 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _buildCardBackground() => data.backgroundImage.isEmptyOrNull()
-      ? Container(color: parseColor(data.colorPrimary))
+      ? Container(color: data.colorPrimary.isEmptyOrNull() ? MeditoColors.moonlight : parseColor(data.colorPrimary))
       : getNetworkImageWidget(data.backgroundImageUrl);
 }
