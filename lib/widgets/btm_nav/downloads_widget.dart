@@ -114,7 +114,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   PackListItemWidget _getListItemWidget(MediaItem item) {
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle: '${item.artist}    〰    ${_getDuration(item.extras['length'])}',
+        subtitle: '${item.artist} 〰 ${_getDuration(item.extras['length'])}',
         cover: item.artUri,
         colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));

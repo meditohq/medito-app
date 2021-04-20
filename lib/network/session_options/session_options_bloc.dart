@@ -163,12 +163,8 @@ class session_optionsBloc {
   }
 
   void updateAvailableOfflineIndicatorText() {
-    if (offlineSelected != 0) {
       availableOfflineIndicatorText =
-          '(${_options.voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
-    } else {
-      availableOfflineIndicatorText = '';
-    }
+          '(${_options.voiceList[voiceSelected]} 〰 ${lengthList[lengthSelected]})';
   }
 
   void saveOptionsSelectionsToSharedPreferences(String id) {
