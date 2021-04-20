@@ -20,6 +20,7 @@ import 'package:Medito/network/session_options/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
@@ -81,14 +82,14 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
                                   buildVoiceRowWithTitle(),
                                   buildSpacer(),
                                   ////////// spacer
-                                  buildTextHeaderForRow('Session Length'),
+                                  buildTextHeaderForRow(DURATION),
                                   buildSessionLengthRow(),
                                   buildSpacer(),
                                   ////////// spacer
                                   getBGMusicItems(),
                                   ////////// spacer
                                   buildTextHeaderForRow(
-                                      'Available Offline ${_bloc.availableOfflineIndicatorText}'),
+                                      '$DOWNLOAD_SESSION ${_bloc.availableOfflineIndicatorText}'),
                                   buildOfflineRow(),
                                   Container(height: 80)
                                 ],
@@ -136,7 +137,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildTextHeaderForRow('Background Sound'),
+              buildTextHeaderForRow(BACKGROUND_SOUND),
               buildBackgroundMusicRowAndSpacer(),
               buildSpacer(),
             ],
@@ -222,8 +223,8 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
-        title,
-        style: Theme.of(context).textTheme.subtitle1,
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.caption,
       ),
     );
   }
@@ -392,8 +393,8 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildSpacer(),
-        buildTextHeaderForRow('Voice'),
+        Container(height: 16),
+        buildTextHeaderForRow(NARRATOR),
         SizedBox(height: 56, child: w),
       ],
     );
@@ -550,9 +551,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Divider(
         height: 1,
-        indent: 16,
         color: MeditoColors.deepNight,
-        endIndent: 16,
         thickness: 1,
       ),
     );
