@@ -157,6 +157,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   Widget _getDismissibleBackgroundWidget(Item item) {
     return Container(
+      color: MeditoColors.moonlight,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Row(
