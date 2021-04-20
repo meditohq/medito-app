@@ -15,13 +15,11 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key key}) : super(key: key);
@@ -61,10 +59,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-    ));
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, kToolbarHeight),
@@ -72,10 +66,9 @@ class _TextFileWidgetState extends State<TextFileWidget>
             stream: _bloc.titleController.stream,
             initialData: '...',
             builder: (context, snapshot) {
-              return AppBar(
-                backgroundColor: MeditoColors.darkMoon,
-                elevation: 0,
-                title: Text(snapshot.data),
+              return MeditoAppBarWidget(
+                transparent: true,
+                title: snapshot.data,
               );
             }), // StreamBuilder
       ),
@@ -117,11 +110,13 @@ class _TextFileWidgetState extends State<TextFileWidget>
                 stream: _bloc.bodyController.stream,
                 initialData: 'Loading...',
                 builder: (context, snapshot) {
-                  return Html(
+                  return Markdown(
                       data: snapshot.data,
-                      onLinkTap: _linkTap,
+                      onTapLink: _linkTap,
+                      physics: NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(0),
                       shrinkWrap: true,
-                      style: htmlTheme(context));
+                      styleSheet: buildMarkdownStyleSheet(context));
                 }),
           ),
         ],

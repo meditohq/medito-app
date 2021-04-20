@@ -24,7 +24,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double> _dragPositionSubject =
-      BehaviorSubject.seeded(null);
+  BehaviorSubject.seeded(null);
 
   @override
   void dispose() {
@@ -40,7 +40,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
       stream: Rx.combineLatest2<double, double, double>(
           _dragPositionSubject.stream,
           Stream.periodic(Duration(milliseconds: 200)),
-          (dragPosition, _) => dragPosition),
+              (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
         double position = snapshot.data ??
             widget.state?.currentPosition?.inMilliseconds?.toDouble() ??
@@ -58,13 +58,14 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                 child: SliderTheme(
                   data: SliderThemeData(
+                    trackHeight: 4,
                     trackShape: CustomTrackShape(),
                     thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
                   ),
                   child: Slider(
                     min: 0.0,
                     activeColor: widget.color,
-                    inactiveColor: MeditoColors.walterWhite.withOpacity(0.7),
+                    inactiveColor: MeditoColors.meditoTextGrey,
                     max: duration.toDouble(),
                     value: seekPos ??
                         max(0.0, min(position.toDouble(), duration.toDouble())),
@@ -87,15 +88,23 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 children: [
                   Text(
                     Duration(
-                            milliseconds:
-                                widget.state?.currentPosition?.inMilliseconds ??
-                                    0)
+                        milliseconds:
+                        widget.state?.currentPosition?.inMilliseconds ??
+                            0)
                         .toMinutesSeconds(),
-                    style: Theme.of(context).textTheme.subtitle2,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .subtitle2
+                        .copyWith(color: MeditoColors.meditoTextGrey),
                   ),
                   Text(
                     Duration(milliseconds: duration).toMinutesSeconds(),
-                    style: Theme.of(context).textTheme.subtitle2,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .subtitle2
+                        .copyWith(color: MeditoColors.meditoTextGrey),
                   ),
                 ],
               ),
@@ -108,6 +117,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 }
 
 class CustomTrackShape extends RoundedRectSliderTrackShape {
+
   @override
   Rect getPreferredRect({
     @required RenderBox parentBox,
@@ -121,5 +131,22 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     final trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
     final trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset,
+      { RenderBox parentBox,
+        SliderThemeData sliderTheme,
+        Animation<double> enableAnimation,
+        TextDirection textDirection,
+        Offset thumbCenter,
+        bool isDiscrete = false,
+        bool isEnabled = false,
+        double additionalActiveTrackHeight = 2}) {
+    super.paint(context, offset, parentBox: parentBox,
+        sliderTheme: sliderTheme,
+        enableAnimation: enableAnimation,
+        textDirection: textDirection,
+        thumbCenter: thumbCenter, additionalActiveTrackHeight: 0);
   }
 }

@@ -25,7 +25,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
-  if (url == null) return Container();
   final headers = {HttpHeaders.authorizationHeader: basicAuth};
   return CachedNetworkImage(
     fit: BoxFit.fill,
@@ -42,7 +41,7 @@ Widget getNetworkImageWidget(String url,
     placeholder: (context, url) => Container(
       height: startHeight,
     ),
-    imageUrl: url,
+    imageUrl: url ?? '',
   );
 }
 

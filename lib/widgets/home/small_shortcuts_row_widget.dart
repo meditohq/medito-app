@@ -76,6 +76,7 @@ class SmallShortcutWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      splashColor: MeditoColors.softGrey,
       onTap: () => NavigationFactory.navigateToScreenFromString(
           data.type, data.id, context),
       child: Row(

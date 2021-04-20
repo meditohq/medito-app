@@ -49,37 +49,43 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
               unit = getUnits(widget.optionalText, value);
             }
             return InkWell(
+              splashColor: MeditoColors.softGrey,
               onTap: widget.onClick,
-              child: Container(
-                width: 132,
-                decoration: BoxDecoration(
-                  color: MeditoColors.moonlight,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(widget.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.fade,
-                          style: Theme.of(context).textTheme.subtitle1),
-                      SizedBox(height: 4),
-                      Wrap(
-                        direction: Axis.horizontal,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        children: <Widget>[
-                          Text(
-                            (snapshot.hasData? _formatSnapshotData(snapshot) : '') + ' ' + unit ?? '',
-                            style: Theme.of(context).textTheme.headline4,
+              child: Ink(
+                color: MeditoColors.moonlight,
+                child: Container(
+                  width: 132,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(widget.title,
+                            maxLines: 2,
                             overflow: TextOverflow.fade,
-                            maxLines: 1,
-                          ),
-                        ],
-                      )
-                    ],
+                            style: Theme.of(context).textTheme.subtitle1),
+                        SizedBox(height: 4),
+                        Wrap(
+                          direction: Axis.horizontal,
+                          crossAxisAlignment: WrapCrossAlignment.end,
+                          children: <Widget>[
+                            Text(
+                              (snapshot.hasData
+                                          ? _formatSnapshotData(snapshot)
+                                          : '') +
+                                      ' ' +
+                                      unit ??
+                                  '',
+                              style: Theme.of(context).textTheme.headline4,
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -99,6 +105,6 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
 
 RoundedRectangleBorder roundedRectangleBorder() {
   return RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12.0),
+    borderRadius: BorderRadius.circular(6.0),
   );
 }

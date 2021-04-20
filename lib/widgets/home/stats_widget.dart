@@ -20,7 +20,7 @@ class _StatsWidgetState extends State<StatsWidget> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
-            child: Text('Your Stats',
+            child: Text('Stats',
                 style: Theme.of(context).textTheme.headline3),
           ),
           SizedBox(

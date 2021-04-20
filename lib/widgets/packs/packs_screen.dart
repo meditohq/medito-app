@@ -50,7 +50,6 @@ class PackListWidgetState extends State<PackListWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: MeditoColors.darkMoon,
       child: SafeArea(
         bottom: false,
         child: _streamBuilderWidget(),
@@ -77,7 +76,6 @@ class PackListWidgetState extends State<PackListWidget> {
                 case Status.ERROR:
                   return ErrorPacksWidget(
                     onPressed: () => _packsBloc.fetchPacksList(true),
-                    widget: _getMeditoLogoWidget(),
                   );
                 default:
                   return Container();
@@ -101,17 +99,10 @@ class PackListWidgetState extends State<PackListWidget> {
               title: data[i].title,
               subtitle: data[i].subtitle,
               cover: data[i].cover,
-              colorPrimary: data[i].colorPrimary,
+              colorPrimary: parseColor(data[i].colorPrimary),
               coverSize: 72)),
         );
       },
-    );
-  }
-
-  Widget _getMeditoLogoWidget() {
-    return MeditoLogo(
-      onDoubleTap: () => _showVersionPopUp(),
-      onLongPress: () => _packsBloc.fetchPacksList(true),
     );
   }
 

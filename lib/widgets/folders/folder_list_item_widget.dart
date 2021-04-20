@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/folder/folder_reponse.dart';
+import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
@@ -30,8 +30,32 @@ class ListItemWidget extends StatelessWidget {
   final fileType;
   final id;
 
-  Widget buildFolderIcon() {
-    return Icon(Icons.folder, color: MeditoColors.walterWhite);
+  @override
+  Widget build(BuildContext context) {
+    return PackListItemWidget(PackImageListItemData(
+        title: title,
+        subtitle: subtitle,
+        colorPrimary: MeditoColors.intoTheNight,
+        icon: getIcon(),
+        coverSize: 56));
+  }
+
+  Widget getIcon() {
+    var iconWidget;
+
+    switch (fileType) {
+      case FileType.session:
+        iconWidget = getAudioIcon();
+        break;
+      case FileType.text:
+        iconWidget = buildTextIcon();
+        break;
+      case FileType.folder:
+        iconWidget = buildFolderIcon();
+        break;
+    }
+
+    return iconWidget;
   }
 
   Widget getAudioIcon() {
@@ -56,52 +80,7 @@ class ListItemWidget extends StatelessWidget {
     return Icon(Icons.description, color: MeditoColors.walterWhite);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return PackListItemWidget(PackImageListItemData(
-        title: title,
-        subtitle: subtitle,
-        colorPrimary: '#171717',
-        icon: getIcon(),
-        coverSize: 56));
-  }
-
-  Widget getTwoTextViewsInColumn(BuildContext context) {
-    return Flexible(
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(title, style: Theme.of(context).textTheme.headline4),
-            subtitle == null || subtitle.isEmpty
-                ? Container()
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(height: 4),
-                      Text(subtitle,
-                          style: Theme.of(context).textTheme.subtitle1),
-                    ],
-                  )
-          ]),
-    );
-  }
-
-  Widget getIcon() {
-    var iconWidget;
-
-    switch (fileType) {
-      case FileType.session:
-        iconWidget = getAudioIcon();
-        break;
-      case FileType.text:
-        iconWidget = buildTextIcon();
-        break;
-      case FileType.folder:
-        iconWidget = buildFolderIcon();
-        break;
-    }
-
-    return iconWidget;
+  Widget buildFolderIcon() {
+    return Icon(Icons.folder, color: MeditoColors.walterWhite);
   }
 }

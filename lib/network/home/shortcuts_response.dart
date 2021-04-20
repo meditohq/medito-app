@@ -43,8 +43,8 @@ class ShortcutData {
   String type;
   String id;
   String cover;
-  String get coverUrl => '${baseUrl}assets/$cover?download';
-  String get bgImageUrl => '${baseUrl}assets/$backgroundImage?download';
+  String get coverUrl => cover != null ? '${baseUrl}assets/$cover?download' : null;
+  String get bgImageUrl => backgroundImage != null ? '${baseUrl}assets/$backgroundImage?download' : null;
   String backgroundImage;
   String groundImage;
   String colorPrimary;

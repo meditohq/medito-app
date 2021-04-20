@@ -1,11 +1,11 @@
 import 'package:Medito/viewmodel/auth.dart';
 
-class SessionOptionsResponse {
+class session_optionsResponse {
   SessionData data;
 
-  SessionOptionsResponse({data});
+  session_optionsResponse({data});
 
-  SessionOptionsResponse.fromJson(Map<String, dynamic> json) {
+  session_optionsResponse.fromJson(Map<String, dynamic> json) {
     data = json['data'] != null ? SessionData.fromJson(json['data']) : null;
   }
 
@@ -29,10 +29,10 @@ class SessionData {
   String get coverUrl => '${baseUrl}assets/$cover?download';
   String colorPrimary;
   String colorSecondary;
-  String get attribution => author?.html ?? '';
+  String get attribution => author?.body ?? '';
   List<AudioFile> get files => audio.map((e) => e.file).toList();
   List<String> get voiceList =>
-  audio.map((element) => element.file.voice).toSet().toList();
+  audio.map((element) => element.file?.voice).toSet().toList();
 
   @Deprecated('use files instead')
   List<Audio> audio;
@@ -94,17 +94,17 @@ class SessionData {
 }
 
 class Author {
-  String html;
+  String body;
 
-  Author({html});
+  Author({body});
 
   Author.fromJson(Map<String, dynamic> json) {
-    html = json['html'];
+    body = json['body'];
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['html'] = html;
+    data['body'] = body;
     return data;
   }
 }

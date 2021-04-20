@@ -63,7 +63,6 @@ Future<int> _getCurrentStreakInt() async {
 }
 
 Future<bool> updateMinuteCounter(int additionalSecs) async {
-  print('increase mins counter');
 
   var prefs = await SharedPreferences.getInstance();
 

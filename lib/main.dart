@@ -30,12 +30,6 @@ import 'package:flutter/services.dart';
 import 'utils/colors.dart';
 
 Future<void> main() async {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.light,
-      statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
 
   await Tracking.initialiseTracker();
@@ -59,6 +53,15 @@ class _ParentWidgetState extends State<ParentWidget>
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: MeditoColors.transparent,
+          systemNavigationBarIconBrightness: Brightness.light,
+          statusBarColor: MeditoColors.transparent),
+    );
 
     isTrackingAccepted().then((value) async {
       //todo

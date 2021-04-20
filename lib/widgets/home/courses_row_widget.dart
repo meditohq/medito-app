@@ -27,7 +27,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
         Padding(
           padding: const EdgeInsets.only(top: 32.0, left: 16),
           child:
-              Text('Your Path', style: Theme.of(context).textTheme.headline3),
+              Text('Courses', style: Theme.of(context).textTheme.headline3),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 0, left: 16, bottom: 8.0),
