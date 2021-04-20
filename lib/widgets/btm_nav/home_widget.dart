@@ -66,6 +66,7 @@ class HomeWidget extends StatelessWidget {
     return AppBar(
       backgroundColor: MeditoColors.darkMoon,
       elevation: 0,
+      actionsIconTheme: IconThemeData(color: MeditoColors.walterWhite),
       title: _getTitleWidget(context),
       actions: <Widget>[
         StreamBuilder<ApiResponse<MenuResponse>>(
@@ -74,11 +75,10 @@ class HomeWidget extends StatelessWidget {
             builder: (context, snapshot) {
               switch (snapshot.data.status) {
                 case Status.LOADING:
+                case Status.ERROR:
+                  return Icon(Icons.more_vert, color: MeditoColors.walterWhite,);
                 case Status.COMPLETED:
                   return _getMenu(context, snapshot);
-                  break;
-                case Status.ERROR:
-                  return Container();
                   break;
               }
               return Container();
