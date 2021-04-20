@@ -13,11 +13,12 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/main.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/utils/utils.dart';
 
-enum UnitType { day, min, sessions}
+enum UnitType { day, min, sessions }
 
 String getUnits(UnitType type, int value) {
   switch (type) {
@@ -63,7 +64,6 @@ Future<int> _getCurrentStreakInt() async {
 }
 
 Future<bool> updateMinuteCounter(int additionalSecs) async {
-
   var prefs = await SharedPreferences.getInstance();
 
   var current = await _getSecondsListened();
@@ -219,29 +219,38 @@ Future<int> incrementNumSessions() async {
   return current;
 }
 
-Future<void> markAsListened(String id) async {
-  print('mark as listened');
-
-  var prefs = await SharedPreferences.getInstance();
-  await prefs?.setBool('listened' + id, true);
+void toggleListenedStatus(String id, String oldId) {
+  var listened = checkListened(id, oldId: oldId);
+  if (listened) {
+    markAsNotListened(id, oldId);
+  } else {
+    markAsListened(id);
+  }
 }
 
-Future<void> markAsNotListened(String id, String oldId) async {
-  var prefs = await SharedPreferences.getInstance();
-  await prefs?.setBool('listened' + id, false);
-  await prefs?.setBool('listened' + oldId, false);
+void markAsListened(String id) {
+  print('mark as listened');
+
+  // ignore: unawaited_futures
+  sharedPreferences.setBool('listened' + id, true);
+}
+
+void markAsNotListened(String id, String oldId) {
+  sharedPreferences.setBool('listened' + id, false);
+  if (oldId != null) {
+    sharedPreferences.setBool('listened' + oldId, false);
+  }
 }
 
 Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
 }
 
-Future<bool> checkListened(String id, {String oldId}) async {
-  var prefs = await SharedPreferences.getInstance();
-  var listened = prefs?.getBool('listened' + id) ?? false;
+bool checkListened(String id, {String oldId}) {
+  var listened = sharedPreferences.getBool('listened' + id) ?? false;
 
-  if(!listened && oldId.isNotEmptyAndNotNull()){
-    return prefs?.getBool('listened' + oldId) ?? false;
+  if (!listened && oldId.isNotEmptyAndNotNull()) {
+    return sharedPreferences.getBool('listened' + oldId) ?? false;
   } else {
     return listened;
   }
