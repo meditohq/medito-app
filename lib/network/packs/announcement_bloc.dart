@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/packs/announcement_repo.dart';
-import 'package:Medito/network/packs/announcement_reponse.dart';
+import 'package:Medito/network/packs/announcement_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementBloc {

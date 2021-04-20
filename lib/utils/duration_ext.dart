@@ -5,14 +5,14 @@ extension DurationExtensions on Duration {
   /// 05:35 -> 05 min 35 sec
   String toMinutesSeconds() {
     var twoDigitMinutes = _toTwoDigits(
-        inMinutes.remainder(100)); //NB: if it's over 100 mins it'll show 0:00!!
+        inMinutes.remainder(100)); //NB: if it's over 100 min it'll show 0:00!!
     var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
     return '$twoDigitMinutes:$twoDigitSeconds';
   }
 
   String toReadable() {
     var twoDigitMinutes = _toTwoDigits(
-        inMinutes.remainder(100)); //NB: if it's over 100 mins it'll show 0:00!!
+        inMinutes.remainder(100)); //NB: if it's over 100 min it'll show 0:00!!
     var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
 
     if (twoDigitSeconds.isNotEmptyAndNotNull() && twoDigitMinutes != '00') {

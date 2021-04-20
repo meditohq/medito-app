@@ -14,52 +14,76 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ErrorPacksWidget extends StatelessWidget {
   final onPressed;
-  final widget;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        widget,
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Center(
-                    child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6.0),
+          child: Container(
+            color: MeditoColors.deepNight,
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  LOADING_ERROR,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+                Container(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            width: 1.0,
+                            color: MeditoColors.walterWhite,
+                            style: BorderStyle.solid,
                           ),
-                          primary: MeditoColors.darkColor),
-                      onPressed: () => onPressed(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'Oops! There was an error.\n Tap to refresh',
-                          style: Theme.of(context).textTheme.bodyText2,
-                          textAlign: TextAlign.center,
                         ),
-                      )),
-                )),
-              ),
-            ],
+                        onPressed: () => onPressed(),
+                        child: Text(
+                          'Try again',
+                          style: Theme.of(context).textTheme.subtitle2,
+                        )),
+              /*      Container(width: 16),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            width: 1.0,
+                            color: MeditoColors.walterWhite,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        onPressed: () => {
+                              NavigationFactory.navigate(
+                                  context, Screen.downloads)
+                            },
+                        child: Text(
+                          'Go to library',
+                          style: Theme.of(context).textTheme.subtitle2,
+                        )),*/
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 
-  ErrorPacksWidget({this.onPressed, this.widget});
+  ErrorPacksWidget({this.onPressed});
 }

@@ -8,9 +8,10 @@ import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/app_bar_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
-import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
@@ -36,9 +37,8 @@ class PlayerWidget extends StatefulWidget {
 class _PlayerWidgetState extends State<PlayerWidget> {
   String illustrationUrl;
   Color secondaryColor;
-  Color primaryColorAsColor;
+  Color primaryColorAsColor = MeditoColors.transparent;
   bool _complete = false;
-  double _height = 0;
   String __loaded;
   double volume;
 
@@ -75,9 +75,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.initState();
     Tracking.changeScreenName(Tracking.PLAYER_PAGE);
 
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Colors.black));
-
     initBgVolume();
 
     _stream = AudioService.customEventStream.listen((event) async {
@@ -93,125 +90,128 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_height == 0) {
-      _height = MediaQuery.of(context).size.height;
-    }
+    return Scaffold(body: Builder(builder: (BuildContext context) {
+      return StreamBuilder<ScreenState>(
+          stream: _screenStateStream,
+          builder: (context, screenStateSnapshot) {
+            final screenState = screenStateSnapshot.data;
+            final mediaItem = screenState?.mediaItem;
+            final state = screenState?.playbackState;
+            final processingState =
+                state?.processingState ?? AudioProcessingState.none;
+            final playing = state?.playing ?? false;
 
-    return Scaffold(
-        backgroundColor: MeditoColors.midnight,
-        body: Builder(builder: (BuildContext context) {
-          return StreamBuilder<ScreenState>(
-              stream: _screenStateStream,
-              builder: (context, screenStateSnapshot) {
-                final screenState = screenStateSnapshot.data;
-                final mediaItem = screenState?.mediaItem;
-                final state = screenState?.playbackState;
-                final processingState =
-                    state?.processingState ?? AudioProcessingState.none;
-                final playing = state?.playing ?? false;
+            if (processingState == AudioProcessingState.stopped ||
+                processingState == AudioProcessingState.completed ||
+                (loaded && mediaItem == null)) {
+              _complete = true;
+              Tracking.changeScreenName(Tracking.PLAYER_END_PAGE);
+            }
 
-                if (processingState == AudioProcessingState.stopped ||
-                    processingState == AudioProcessingState.completed ||
-                    (loaded && mediaItem == null)) {
-                  _complete = true;
-                  Tracking.changeScreenName(Tracking.PLAYER_END_PAGE);
-                }
+            setLoaded(mediaItem != null);
+            getSecondaryColor(mediaItem);
+            getPrimaryColor(mediaItem);
+            getArtUrl(mediaItem);
 
-                setLoaded(mediaItem != null);
-                getSecondaryColor(mediaItem);
-                getPrimaryColor(mediaItem);
-                getArtUrl(mediaItem);
-
-                return SafeArea(
-                  child: Stack(
-                    children: [
-                      GradientWidget(
-                          primaryColor: primaryColorAsColor, height: 350.0),
-                      (mediaItem != null || _complete)
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                getBigImage(),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 24.0,
-                                      left: 32.0,
-                                      bottom: 4.0,
-                                      right: 32.0),
-                                  child: buildTitleRow(mediaItem),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 32.0, right: 32.0),
-                                  child: getSubtitleWidget(mediaItem),
-                                ),
-                                _complete
-                                    ? getDonateAndShareButton()
-                                    : buildPlayingPauseOrLoadingIndicator(
-                                        processingState, playing),
-                                _complete
-                                    ? Container()
-                                    : Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 24.0,
-                                            right: 24.0,
-                                            top: 10.0,
-                                            bottom: 32.0),
-                                        child: positionIndicator(mediaItem,
-                                            state, primaryColorAsColor),
-                                      ),
-                              ],
-                            )
-                          : buildLoadingScreenWidget(),
-                      SafeArea(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 4.0, top: 4.0),
-                          child: IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () => _onBackPressed(mediaItem),
-                            color: MeditoColors.walterWhite,
-                          ),
-                        ),
-                      ),
-                      loaded
-                          ? Align(
-                              alignment: Alignment.topRight,
-                              child: _complete
-                                  ? Container()
-                                  : getBgVolumeController(mediaItem))
-                          : Container()
-                    ],
-                  ),
-                );
-              });
-        }));
+            return Stack(
+              children: [
+                _getGradientWidget(mediaItem, context),
+                _getGradientOverlayWidget(),
+                (mediaItem != null || _complete)
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _getAppBar(mediaItem),
+                          _getTitleRow(mediaItem),
+                          _getSubtitleWidget(mediaItem),
+                          _complete
+                              ? getDonateAndShareButton()
+                              : _getPlayingPauseOrLoadingIndicator(
+                                  processingState, playing),
+                          _complete
+                              ? Container()
+                              : positionIndicator(
+                                  mediaItem, state, primaryColorAsColor),
+                        ],
+                      )
+                    : _getLoadingScreenWidget(),
+              ],
+            );
+          });
+    }));
   }
 
-  Row buildTitleRow(MediaItem mediaItem) {
-    return Row(
-      children: [
-        Expanded(
-            child: !_complete
-                ? Text(
-                    mediaItem?.title ?? 'Loading...',
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: buildTitleTheme(),
-                  )
-                : FutureBuilder<String>(
-                    future: _bloc.getVersionTitle(),
-                    builder: (context, snapshot) {
-                      return Text(
-                        snapshot.hasData ? snapshot.data : 'Loading...',
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: buildTitleTheme(),
-                      );
-                    })),
+  Widget _getGradientOverlayWidget() {
+    if (!loaded) return Container();
+    return Image.asset(
+      'assets/images/texture.png',
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      fit: BoxFit.fitWidth,
+    );
+  }
+
+  Widget _getGradientWidget(MediaItem mediaItem, BuildContext context) {
+    if (!loaded || _complete) return Container();
+    return Align(
+        alignment: Alignment.center,
+        child: Container(
+          decoration: BoxDecoration(
+              gradient: RadialGradient(
+            colors: [
+              primaryColorAsColor.withAlpha(178),
+              primaryColorAsColor.withAlpha(0),
+            ],
+            radius: 1.0,
+          )),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+        ));
+  }
+
+  MeditoAppBarWidget _getAppBar(MediaItem mediaItem) {
+    return MeditoAppBarWidget(
+      transparent: true,
+      hasCloseButton: true,
+      closePressed: _onBackPressed,
+      actions: [
+        loaded
+            ? _complete
+                ? Container()
+                : _getBgVolumeController(mediaItem)
+            : Container()
       ],
+    );
+  }
+
+  Widget _getTitleRow(MediaItem mediaItem) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Row(
+        children: [
+          Expanded(
+              child: !_complete
+                  ? Text(
+                      mediaItem?.title ?? 'Loading...',
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: buildTitleTheme(),
+                    )
+                  : FutureBuilder<String>(
+                      future: _bloc.getVersionTitle(),
+                      builder: (context, snapshot) {
+                        return Text(
+                          snapshot.hasData ? snapshot.data : 'Loading...',
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: buildTitleTheme(),
+                        );
+                      })),
+        ],
+      ),
     );
   }
 
@@ -219,15 +219,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Theme.of(context).textTheme.headline1;
   }
 
-  StatelessWidget getSubtitleWidget(MediaItem mediaItem) {
+  Widget _getSubtitleWidget(MediaItem mediaItem) {
     var attr = '';
     if (_complete) {
-      attr = _bloc.version.body;
+      attr = _bloc.version?.body ?? WELL_DONE_SUBTITLE;
     } else {
       attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
     }
 
-    return loaded ? SubtitleTextWidget(html: attr) : Container();
+    return loaded
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SubtitleTextWidget(body: attr),
+          )
+        : Container();
   }
 
   IconData volumeIconFunction(var volume) {
@@ -248,7 +253,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   final BehaviorSubject<double> _dragBgVolumeSubject =
       BehaviorSubject.seeded(null);
 
-  Widget getBgVolumeController(MediaItem mediaItem) {
+  Widget _getBgVolumeController(MediaItem mediaItem) {
     if ((mediaItem?.extras['bgMusic'] as String)?.isNotEmptyAndNotNull() ??
         false) {
       return Padding(
@@ -258,9 +263,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   stream: _dragBgVolumeSubject,
                   builder: (context, snapshot) {
                     volume = _dragBgVolumeSubject.value;
-                    var volumeIcon = volumeIconFunction(volume);
-
-                    return Icon(volumeIcon,
+                    return Icon(Icons.landscape,
                         semanticLabel: 'Change volume button',
                         color: Colors.white);
                   }),
@@ -341,25 +344,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  Padding getBigImage() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 32.0, right: 32.0, top: 64.0),
-      child: Container(
-        constraints: BoxConstraints(maxHeight: _height / 3, maxWidth: 1000),
-        decoration: BoxDecoration(
-            color: primaryColorAsColor,
-            borderRadius: BorderRadius.circular(12.0)),
-        padding: EdgeInsets.all(48.0),
-        child: Center(
-          child: illustrationUrl != null
-              ? getNetworkImageWidget(illustrationUrl)
-              : Container(),
-        ),
-      ),
-    );
-  }
-
-  Expanded buildPlayingPauseOrLoadingIndicator(
+  Expanded _getPlayingPauseOrLoadingIndicator(
       AudioProcessingState processingState, bool playing) {
     return Expanded(
       child: Row(
@@ -374,14 +359,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Center buildLoadingScreenWidget() {
+  Center _getLoadingScreenWidget() {
     return Center(
         child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         CircularProgressIndicator(),
         Container(height: 16),
-        Text('Loading')
+        Text(loaded ? WELL_DONE_COPY : LOADING)
       ],
     ));
   }
@@ -395,7 +380,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void getPrimaryColor(MediaItem mediaItem) {
-    if (primaryColorAsColor == null && mediaItem != null) {
+    if (mediaItem != null) {
       final primaryColor = mediaItem?.extras['primaryColor'];
       primaryColorAsColor = parseColor(primaryColor);
     }
@@ -405,10 +390,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (secondaryColor == null && mediaItem != null) {
       String secondaryColorString = mediaItem?.extras['secondaryColor'] ?? '';
 
-      if (secondaryColorString.isEmpty && secondaryColor == null) {
-        secondaryColorString = '#FF272829';
+      if (secondaryColorString.isEmptyOrNull()) {
+        secondaryColor = MeditoColors.deepNight;
+      } else {
+        secondaryColor = parseColor(secondaryColorString);
       }
-      secondaryColor = parseColor(secondaryColorString);
     }
   }
 
@@ -461,12 +447,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Widget positionIndicator(
       MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
-    return PositionIndicatorWidget(
-        mediaItem: mediaItem, state: state, color: primaryColorAsColor);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+      child: PositionIndicatorWidget(
+          mediaItem: mediaItem, state: state, color: primaryColorAsColor),
+    );
   }
 
-  void _onBackPressed(MediaItem mediaItem) {
-    if (mediaItem == null || (widget.normalPop != null && widget.normalPop)) {
+  void _onBackPressed() {
+    if (_complete || (widget.normalPop != null && widget.normalPop)) {
       Navigator.pop(context);
     } else {
       Navigator.popUntil(
@@ -483,7 +472,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         children: [
           Padding(
             padding: const EdgeInsets.only(
-                left: 32.0, top: 32, bottom: 8, right: 32.0),
+                left: 16.0, top: 32, bottom: 8, right: 16.0),
             child: TextButton(
               style: TextButton.styleFrom(
                   shape: roundedRectangleBorder(),
@@ -503,7 +492,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 32.0, right: 32.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
             child: TextButton(
               style: TextButton.styleFrom(
                   shape: roundedRectangleBorder(),
@@ -518,8 +507,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
                       'Share',
-                      style: TextStyle(
-                          color: MeditoColors.walterWhite, fontSize: 16),
+                      style: Theme.of(context).textTheme.subtitle2,
                     ),
                   ),
                 ],
@@ -538,7 +526,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return Text(
       label,
-      style: TextStyle(color: secondaryColor, fontSize: 16),
+      style: Theme.of(context)
+          .textTheme
+          .subtitle2
+          .copyWith(color: MeditoColors.darkMoon),
     );
   }
 
@@ -565,8 +556,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<void> _share() {
-    Share.share(
-        "I just meditated with Medito. I ❤️ this app! Try it out - it's 100% free! Download on Android -> https://bit.ly/medito-android & iOS -> https://bit.ly/medito-ios");
+    Share.share(SHARE_TEXT);
     Tracking.trackEvent(
       Tracking.CTA_TAPPED,
       Tracking.SECOND_CTA_TAPPED,

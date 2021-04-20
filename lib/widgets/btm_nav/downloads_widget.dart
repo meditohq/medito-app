@@ -1,11 +1,10 @@
 import 'package:Medito/network/downloads/downloads_bloc.dart';
-import 'package:Medito/network/folder/folder_reponse.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/empty_widget.dart';
-import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
@@ -50,6 +49,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         builder: (context, sessionList, widget) {
           if (sessionList.isNotEmpty) {
             return ListView.builder(
+                padding: EdgeInsets.symmetric(vertical: 8),
                 itemCount: sessionList.length,
                 itemBuilder: (context, i) {
                   var item = sessionList[i];
@@ -95,7 +95,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-        color: MeditoColors.moonlight,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(
@@ -115,9 +114,9 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   PackListItemWidget _getListItemWidget(MediaItem item) {
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle: '${item.artist} - ${_getDuration(item.extras['length'])}',
+        subtitle: '${item.artist}    〰    ${_getDuration(item.extras['length'])}',
         cover: item.artUri,
-        colorPrimary: item.extras['primaryColor'],
+        colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));
   }
 

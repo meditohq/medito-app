@@ -1,4 +1,18 @@
-import 'package:Medito/network/packs/packs_response.dart';
+/*This file is part of Medito App.
+
+Medito App is free software: you can redistribute it and/or modify
+it under the terms of the Affero GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Medito App is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+Affero GNU General Public License for more details.
+
+You should have received a copy of the Affero GNU General Public License
+along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
+
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +37,9 @@ class PackListItemWidget extends StatelessWidget {
               children: [
                 _getTitle(context),
                 Container(height: 4),
-                _getSubtitle(context)
+                data.subtitle.isNotEmptyAndNotNull()
+                    ? _getSubtitle(context)
+                    : Container()
               ],
             ),
           ),
@@ -36,12 +52,12 @@ class PackListItemWidget extends StatelessWidget {
       Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
 
   Text _getTitle(BuildContext context) =>
-      Text(data.title, style: Theme.of(context).textTheme.headline4);
+      Text(data.title, style: Theme.of(context).textTheme.headline4, maxLines: 1, overflow: TextOverflow.ellipsis);
 
   Widget _getListItemLeadingImageWidget() => ClipRRect(
         borderRadius: BorderRadius.circular(3.0),
         child: Container(
-          color: parseColor(data.colorPrimary),
+          color: data.colorPrimary,
           child: SizedBox(
               height: data.coverSize,
               width: data.coverSize,
@@ -57,7 +73,7 @@ class PackImageListItemData {
   String title;
   String subtitle;
   String cover;
-  String colorPrimary;
+  Color colorPrimary;
   double coverSize;
   Widget icon;
 

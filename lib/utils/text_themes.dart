@@ -90,47 +90,6 @@ TextTheme meditoTextTheme(BuildContext context) {
       ));
 }
 
-Map<String, Style> htmlTheme(BuildContext context) {
-  return {
-    'body': Style(textAlign: TextAlign.center),
-    'h1': Style(
-      fontSize: FontSize(20),
-      textDecoration: TextDecoration.underline,
-      color: MeditoColors.walterWhite,
-    ),
-    'h2': Style(
-      fontSize: FontSize(20),
-      fontWeight: FontWeight.w600,
-      color: MeditoColors.walterWhite,
-    ),
-    'h3': Style(
-      fontSize: FontSize(18),
-      color: MeditoColors.walterWhite,
-    ),
-    'hr': Style(
-      height: 1,
-      margin: const EdgeInsets.only(top: 24, bottom: 24),
-      border: Border(
-        bottom: BorderSide(width: 1.0, color: MeditoColors.softGrey),
-      ),
-    ),
-    'p > a, a': Style(
-        fontSize: FontSize(16),
-        fontWeight: FontWeight.w600,
-        color: MeditoColors.link),
-    'p': Style(
-        textAlign: TextAlign.start,
-        fontSize: FontSize(16),
-        lineHeight: 1.6,
-        color: MeditoColors.walterWhite),
-    'li': Style(
-        fontSize: FontSize(16),
-        lineHeight: 1.6,
-        margin: const EdgeInsets.only(bottom: 24),
-        color: MeditoColors.walterWhite),
-  };
-}
-
 MarkdownStyleSheet buildMarkdownStyleSheet(BuildContext context) {
   return MarkdownStyleSheet.fromTheme(Theme.of(context));
 }

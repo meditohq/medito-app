@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/network/sessionoptions/session_opts.dart';
+import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

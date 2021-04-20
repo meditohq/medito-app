@@ -46,7 +46,10 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
                     child: MarkdownBody(
                       data: snapshot.data.body.body,
                       onTapLink: launchUrl,
-                      styleSheet: buildMarkdownStyleSheet(context),
+                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                          .copyWith(
+                          p: Theme.of(context).textTheme.bodyText1
+                      ),
                     ),
                   ),
                 ],
