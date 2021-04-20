@@ -59,21 +59,17 @@ class ListItemWidget extends StatelessWidget {
   }
 
   Widget getAudioIcon() {
-    return FutureBuilder<bool>(
-        future: checkListened(id, oldId: oldId),
-        builder: (context, listened) {
-          if (!listened.hasError && listened.hasData && listened.data) {
-            return Icon(
-              Icons.check,
-              color: MeditoColors.walterWhite,
-            );
-          } else {
-            return Icon(
-              Icons.play_circle_fill,
-              color: MeditoColors.walterWhite,
-            );
-          }
-        });
+    if (checkListened(id, oldId: oldId)) {
+      return Icon(
+        Icons.check,
+        color: MeditoColors.walterWhite,
+      );
+    } else {
+      return Icon(
+        Icons.play_circle_fill,
+        color: MeditoColors.walterWhite,
+      );
+    }
   }
 
   Widget buildTextIcon() {
