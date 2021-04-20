@@ -19,13 +19,12 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/widgets/folders/folder_banner_widget.dart';
+import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
@@ -89,7 +88,13 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   Widget _getScreenContent() => SingleChildScrollView(
           child: Column(
         children: [
-          FolderBannerWidget(bloc: _bloc),
+          HeaderWidget(
+            primaryColorController: _bloc.primaryColorController,
+            titleController: _bloc.titleController,
+            coverController: _bloc.coverController,
+            backgroundImageController: _bloc.backgroundImageController,
+            descriptionController: _bloc.descriptionController,
+          ),
           _getListStream(),
         ],
       ));
