@@ -19,6 +19,7 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/folders/folder_banner_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
@@ -113,7 +114,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
                   padding: EdgeInsets.only(top: 8),
                   itemBuilder: (BuildContext context, int i) {
                     return itemsSnapshot.data.body != null
-                        ? _getItemListWidget(itemsSnapshot.data.body[i])
+                        ? _getSlidingItem(itemsSnapshot.data.body[i], context)
                         : Container();
                   });
             }
@@ -121,17 +122,71 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
             return Container();
           });
 
-  InkWell _getItemListWidget(Item item) {
+  Widget _getSlidingItem(Item item, BuildContext context) {
+    var childWidget;
+
+// Only the audio sessions should have swipable action to toggle the dimissible status
+// Other types like text file and folder should not have this option
+    if (item.fileType != FileType.session) {
+      childWidget = _getItemListWidget(item);
+    } else {
+      childWidget = Dismissible(
+          resizeDuration: null,
+          key: UniqueKey(),
+          direction: DismissDirection.endToStart,
+          background: _getDismissibleBackgroundWidget(item),
+          onDismissed: (direction) {
+            setState(() {
+              toggleListenedStatus(item.id, item.oldId);
+            });
+          },
+          child: _getItemListWidget(item));
+    }
+
     return InkWell(
-        onTap: () => itemTap(item),
-        splashColor: MeditoColors.moonlight,
-        child: ListItemWidget(
-          title: item.title,
-          subtitle: item.subtitle,
-          id: item.id,
-          oldId: item.oldId,
-          fileType: item.fileType,
-        ));
+      onTap: () => itemTap(item),
+      child: childWidget,
+    );
+  }
+
+  Widget _getDismissibleBackgroundWidget(Item item) {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Spacer(),
+            getSwipableActionIcon(item),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget getSwipableActionIcon(Item item) {
+    if (checkListened(item.id, oldId: item.oldId)) {
+      return Icon(
+        Icons.play_circle_fill,
+        color: MeditoColors.walterWhite,
+      );
+    } else {
+      return Icon(
+        Icons.check,
+        color: MeditoColors.walterWhite,
+      );
+    }
+  }
+
+  ListItemWidget _getItemListWidget(Item item) {
+    return ListItemWidget(
+      title: item.title,
+      subtitle: item.subtitle,
+      id: item.id,
+      oldId: item.oldId,
+      fileType: item.fileType,
+    );
   }
 
   void itemTap(Item i) {

@@ -26,13 +26,17 @@ import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'utils/colors.dart';
+
+SharedPreferences sharedPreferences;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Tracking.initialiseTracker();
+  sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(ParentWidget());
 }
