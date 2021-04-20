@@ -19,10 +19,10 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
+import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -71,23 +71,24 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Builder(
-        builder: (BuildContext context) {
-          return RefreshIndicator(
-              onRefresh: () {
-                final FolderArguments args =
-                    ModalRoute.of(context).settings.arguments;
-                return _bloc.fetchData(id: args.sessionId, skipCache: true);
-              },
-              child: _getScreenContent());
-        },
+    return RefreshIndicator(
+      onRefresh: () {
+        final FolderArguments args = ModalRoute.of(context).settings.arguments;
+        return _bloc.fetchData(id: args.sessionId, skipCache: true);
+      },
+      child: Scaffold(
+        body: Builder(
+          builder: (BuildContext context) {
+            return _getScreenContent();
+          },
+        ),
       ),
     );
   }
 
   Widget _getScreenContent() => SingleChildScrollView(
-          child: Column(
+      physics: AlwaysScrollableScrollPhysics(),
+      child: Column(
         children: [
           HeaderWidget(
             primaryColorController: _bloc.primaryColorController,
@@ -163,14 +164,14 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Spacer(),
-            getSwipableActionIcon(item),
+            getSwipeableActionIcon(item),
           ],
         ),
       ),
     );
   }
 
-  Widget getSwipableActionIcon(Item item) {
+  Widget getSwipeableActionIcon(Item item) {
     if (checkListened(item.id, oldId: item.oldId)) {
       return Icon(
         Icons.play_circle_fill,

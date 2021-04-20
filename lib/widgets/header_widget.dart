@@ -201,6 +201,7 @@ class HeaderWidget extends StatelessWidget {
               child: Markdown(
                 data: snapshot.data,
                 padding: const EdgeInsets.all(0),
+                physics: NeverScrollableScrollPhysics(),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
                         p: Theme.of(context)
