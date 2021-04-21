@@ -26,8 +26,10 @@ import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'network/downloads/downloads_bloc.dart';
 import 'utils/colors.dart';
 
 SharedPreferences sharedPreferences;
@@ -53,6 +55,8 @@ class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
   var _currentIndex = 1;
   final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
+  final _bloc = DownloadsBloc();
+  final _messengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -77,12 +81,51 @@ class _ParentWidgetState extends State<ParentWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _bloc.dispose();
     super.dispose();
   }
 
   void onTabTapped(int index) {
     setState(() {
+      _checkToShowSwipeToDeleteTip(index);
+
       _currentIndex = index;
+    });
+  }
+
+  void _checkToShowSwipeToDeleteTip(int index) {
+    if (_children[index] is LibraryWidget) {
+      DownloadsBloc.fetchDownloads().then((value) {
+        if (value.isNotEmpty) {
+          showSwipeToDeleteTip();
+        }
+      });
+    }
+  }
+
+  void showSwipeToDeleteTip() async {
+    await _bloc.seenTip().then((seen) {
+      if (!seen) {
+        unawaited(_bloc.setSeenTip());
+        _messengerKey.currentState.showSnackBar(
+          SnackBar(
+            content: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.info_outline,
+                  color: MeditoColors.walterWhite,
+                ),
+                Container(
+                  width: 16,
+                  height: 10,
+                ),
+                Text('Swipe away a session to delete it')
+              ],
+            ),
+          ),
+        );
+      }
+      ;
     });
   }
 
@@ -90,6 +133,7 @@ class _ParentWidgetState extends State<ParentWidget>
   Widget build(BuildContext context) {
     return AudioServiceWidget(
       child: MaterialApp(
+        scaffoldMessengerKey: _messengerKey,
         initialRoute: '/nav',
         routes: {
           FolderNavWidget.routeName: (context) => FolderNavWidget(),

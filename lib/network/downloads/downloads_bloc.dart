@@ -65,4 +65,8 @@ class DownloadsBloc {
     await prefs.setStringList(savedFilesKey, list);
     downloadedSessions.value = List.from(downloadedSessions.value)..remove(mediaFile);
   }
+
+  void dispose(){
+    downloadedSessions.dispose();
+  }
 }
