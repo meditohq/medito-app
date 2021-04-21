@@ -53,7 +53,7 @@ class ParentWidget extends StatefulWidget {
 
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
-  var _currentIndex = 1;
+  var _currentIndex = 0;
   final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
   final _bloc = DownloadsBloc();
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
