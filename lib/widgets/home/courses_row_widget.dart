@@ -27,8 +27,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 32.0, left: 16),
-          child:
-              Text('Courses', style: Theme.of(context).textTheme.headline3),
+          child: Text('Courses', style: Theme.of(context).textTheme.headline3),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 0, left: 16, bottom: 8.0),
@@ -37,10 +36,11 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
         ),
         StreamBuilder<ApiResponse<CoursesResponse>>(
             stream: _bloc.coursesList.stream,
+            initialData: ApiResponse.loading(),
             builder: (context, snapshot) {
-              switch (snapshot.data?.status) {
+              switch (snapshot.data.status) {
                 case Status.LOADING:
-                  return CircularProgressIndicator();
+                  return _getLoadingWidget();
                   break;
                 case Status.COMPLETED:
                   return Container(
@@ -64,6 +64,15 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
       ],
     );
   }
+
+  Widget _getLoadingWidget() => Row(
+    children: [
+      Container(width: 16),
+      Container(color: MeditoColors.moonlight, height: 132, width: 132),
+      Container(width: 16),
+      Container(color: MeditoColors.moonlight, height: 132, width: 132),
+    ],
+  );
 }
 
 class CoursesRowItemWidget extends StatelessWidget {
@@ -120,6 +129,9 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _buildCardBackground() => data.backgroundImage.isEmptyOrNull()
-      ? Container(color: data.colorPrimary.isEmptyOrNull() ? MeditoColors.moonlight : parseColor(data.colorPrimary))
+      ? Container(
+          color: data.colorPrimary.isEmptyOrNull()
+              ? MeditoColors.moonlight
+              : parseColor(data.colorPrimary))
       : getNetworkImageWidget(data.backgroundImageUrl);
 }
