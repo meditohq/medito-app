@@ -200,6 +200,7 @@ class HeaderWidget extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Markdown(
                 data: snapshot.data,
+                onTapLink: _linkTap,
                 padding: const EdgeInsets.all(0),
                 physics: NeverScrollableScrollPhysics(),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
@@ -215,5 +216,9 @@ class HeaderWidget extends StatelessWidget {
             return Container();
           }
         });
+  }
+
+  void _linkTap(String url) {
+    launchUrl(url);
   }
 }
