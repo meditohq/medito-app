@@ -65,7 +65,21 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
         });
   }
 
-  Center _getLoadingWidget() => Center(child: CircularProgressIndicator());
+  Widget _getLoadingWidget() => GridView.count(
+        crossAxisCount: 2,
+        padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0),
+        scrollDirection: Axis.vertical,
+        childAspectRatio: 2.6,
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        children: List.generate(4, (index) {
+          return Card(
+            clipBehavior: Clip.antiAlias,
+            color: MeditoColors.deepNight,
+            child: Container(),
+          );
+        }),
+      );
 }
 
 class SmallShortcutWidget extends StatelessWidget {
