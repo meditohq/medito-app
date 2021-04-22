@@ -75,6 +75,12 @@ class _ParentWidgetState extends State<ParentWidget>
       //todo
     });
 
+    checkConnectivity().then((value) {
+      if (!value) {
+        _onTabTapped(2);
+      }
+    });
+
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -85,15 +91,14 @@ class _ParentWidgetState extends State<ParentWidget>
     super.dispose();
   }
 
-  void onTabTapped(int index) {
+  void _onTabTapped(int index) {
     setState(() {
       _checkToShowSwipeToDeleteTip(index);
-
       _currentIndex = index;
     });
   }
 
-  void _checkToShowSwipeToDeleteTip(int index) {
+  void  _checkToShowSwipeToDeleteTip(int index) {
     if (_children[index] is LibraryWidget) {
       DownloadsBloc.fetchDownloads().then((value) {
         if (value.isNotEmpty) {
@@ -154,7 +159,7 @@ class _ParentWidgetState extends State<ParentWidget>
                     selectedItemColor: MeditoColors.walterWhite,
                     unselectedItemColor: MeditoColors.newGrey,
                     currentIndex: _currentIndex,
-                    onTap: onTabTapped,
+                    onTap: _onTabTapped,
                     items: [
                       BottomNavigationBarItem(
                         tooltip: 'Home',
