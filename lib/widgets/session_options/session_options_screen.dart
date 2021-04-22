@@ -358,7 +358,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
             return _buildVoiceColumn(_getEmptyPillRow());
           }
 
-          if (snapshot.data.body.first == null) return Container();
+          if (snapshot.data.body.isEmpty || snapshot.data.body.first == null) return Container();
 
           return _buildVoiceColumn(
             ListView.builder(
