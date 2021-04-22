@@ -21,7 +21,6 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
-import 'package:Medito/widgets/packs/medito_logo_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,32 +57,62 @@ class PackListWidgetState extends State<PackListWidget> {
   }
 
   Widget _streamBuilderWidget() {
-    return RefreshIndicator(
-      displacement: 80,
-      color: MeditoColors.walterWhite,
-      backgroundColor: MeditoColors.moonlight,
-      onRefresh: () => _packsBloc.fetchPacksList(true),
-      child: StreamBuilder<ApiResponse<List<PacksData>>>(
-          stream: _packsBloc.packListStream,
-          initialData: ApiResponse.loading(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              switch (snapshot.data.status) {
-                case Status.LOADING:
-                  return getLoadingWidget();
-                case Status.COMPLETED:
-                  return _getListWidget(snapshot.data.body);
-                case Status.ERROR:
-                  return ErrorPacksWidget(
-                    onPressed: () => _packsBloc.fetchPacksList(true),
-                  );
-                default:
-                  return Container();
-              }
-            } else {
-              return Container();
-            }
-          }),
+    return FutureBuilder<bool>(
+        future: checkConnectivity(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data) {
+            return RefreshIndicator(
+              displacement: 80,
+              color: MeditoColors.walterWhite,
+              backgroundColor: MeditoColors.moonlight,
+              onRefresh: () => _packsBloc.fetchPacksList(true),
+              child: StreamBuilder<ApiResponse<List<PacksData>>>(
+                  stream: _packsBloc.packListStream,
+                  initialData: ApiResponse.loading(),
+                  builder: (context, snapshot) {
+                    return FutureBuilder<bool>(
+                        future: checkConnectivity(),
+                        builder: (context, connectionSnapshot) {
+                          if (!connectionSnapshot.hasData) {
+                            return getLoadingWidget();
+                          } else if (connectionSnapshot.hasData &&
+                              connectionSnapshot.data) {
+                            return _getViewMainContent(snapshot);
+                          } else {
+                            return _getErrorPacksWidget();
+                          }
+                        });
+                  }),
+            );
+          } else {
+            return _getErrorPacksWidget();
+          }
+        });
+  }
+
+  Widget _getViewMainContent(
+      AsyncSnapshot<ApiResponse<List<PacksData>>> snapshot) {
+    if (snapshot.hasData) {
+      switch (snapshot.data.status) {
+        case Status.LOADING:
+          return getLoadingWidget();
+        case Status.COMPLETED:
+          return _getListWidget(snapshot.data.body);
+        case Status.ERROR:
+          return _getErrorPacksWidget();
+        default:
+          return Container();
+      }
+    } else {
+      return Container();
+    }
+  }
+
+  ErrorPacksWidget _getErrorPacksWidget() {
+    return ErrorPacksWidget(
+      onPressed: () {
+        return _packsBloc.fetchPacksList();
+      },
     );
   }
 

@@ -23,6 +23,7 @@ import 'package:Medito/widgets/home/daily_message_widget.dart';
 import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
+import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:flutter/material.dart';
 
 class HomeWidget extends StatelessWidget {
@@ -41,25 +42,38 @@ class HomeWidget extends StatelessWidget {
       child: Scaffold(
         body: RefreshIndicator(
           onRefresh: () {
-            _announceKey.currentState?.refresh();
-            _shortcutKey.currentState?.refresh();
-            _coursesKey.currentState?.refresh();
-            _dailyMessageKey.currentState?.refresh();
-            return _bloc.fetchMenu(skipCache: true);
+            return _refresh();
           },
-          child: ListView(
-            children: [
-              _getAppBar(context),
-              AnnouncementBanner(key: _announceKey),
-              SmallShortcutsRowWidget(key: _shortcutKey),
-              CoursesRowWidget(key: _coursesKey),
-              StatsWidget(),
-              DailyMessageWidget(key: _dailyMessageKey)
-            ],
-          ),
+          child: StreamBuilder<bool>(
+              stream: _bloc.connectionStreamController.stream,
+              builder: (context, connectionSnapshot) {
+                if (connectionSnapshot.hasData && !connectionSnapshot.data) {
+                  return ErrorPacksWidget(onPressed: () => _refresh());
+                } else {
+                  return ListView(
+                    children: [
+                      _getAppBar(context),
+                      AnnouncementBanner(key: _announceKey),
+                      SmallShortcutsRowWidget(key: _shortcutKey),
+                      CoursesRowWidget(key: _coursesKey),
+                      StatsWidget(),
+                      DailyMessageWidget(key: _dailyMessageKey)
+                    ],
+                  );
+                }
+              }),
         ),
       ),
     );
+  }
+
+  Future<void> _refresh() {
+    _announceKey.currentState?.refresh();
+    _shortcutKey.currentState?.refresh();
+    _coursesKey.currentState?.refresh();
+    _dailyMessageKey.currentState?.refresh();
+    _bloc.checkConnection();
+    return _bloc.fetchMenu(skipCache: true);
   }
 
   AppBar _getAppBar(BuildContext context) {
@@ -76,7 +90,10 @@ class HomeWidget extends StatelessWidget {
               switch (snapshot.data.status) {
                 case Status.LOADING:
                 case Status.ERROR:
-                  return Icon(Icons.more_vert, color: MeditoColors.walterWhite,);
+                  return Icon(
+                    Icons.more_vert,
+                    color: MeditoColors.walterWhite,
+                  );
                 case Status.COMPLETED:
                   return _getMenu(context, snapshot);
                   break;
