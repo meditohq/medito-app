@@ -8,19 +8,19 @@ import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 
 class NavigationFactory {
-  static void navigate(BuildContext context, Screen key,
+  static Future<void> navigate(BuildContext context, Screen key,
       {String id, bool normalPop}) {
     switch (key) {
       case Screen.folder:
         assert(id.isNotEmpty);
-        Navigator.pushNamed(context, FolderNavWidget.routeName,
+        return Navigator.pushNamed(context, FolderNavWidget.routeName,
             arguments: FolderArguments(id));
         break;
       case Screen.player:
-        _push(context, PlayerWidget(normalPop: normalPop));
+        return _push(context, PlayerWidget(normalPop: normalPop));
         break;
       case Screen.text:
-        _push(
+        return   _push(
             context,
             TextFileWidget(
               id: id,
@@ -31,7 +31,7 @@ class NavigationFactory {
         break;
       case Screen.session_options:
         assert(id.isNotEmpty);
-        _push(
+        return   _push(
             context,
             session_optionsScreen(
               id: id,
@@ -41,10 +41,10 @@ class NavigationFactory {
       case Screen.donation:
         break;
       case Screen.downloads:
-        _push(context, DownloadsListWidget());
+        return    _push(context, DownloadsListWidget());
         break;
       case Screen.daily:
-        _push(
+        return   _push(
             context,
             session_optionsScreen(
               id: id,
@@ -52,18 +52,18 @@ class NavigationFactory {
             ));
         break;
       case Screen.url:
-        launchUrl(id);
+        return launchUrl(id);
         break;
     }
+
+    return null;
   }
 
-  static void _push(BuildContext context, Widget widget) {
-    Navigator.push(
+  static Future<void> _push(BuildContext context, Widget widget) => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => widget,
         ));
-  }
 
   static Screen getScreenFromItemType(FileType fileType) {
     switch (fileType) {
@@ -84,29 +84,30 @@ class NavigationFactory {
     return null;
   }
 
-  static void navigateToScreenFromString(
+  static Future<void> navigateToScreenFromString(
       String place, String id, BuildContext context) {
     if (place == 'session') {
-      navigate(context, Screen.session_options, id: id);
+      return navigate(context, Screen.session_options, id: id);
     }
     if (place == 'daily') {
-      navigate(context, Screen.daily, id: id);
+      return   navigate(context, Screen.daily, id: id);
     }
     if (place == 'donation') {
-      navigate(context, Screen.donation);
+      return    navigate(context, Screen.donation);
     }
     if (place == 'article') {
-      navigate(context, Screen.text, id: id);
+      return    navigate(context, Screen.text, id: id);
     }
     if (place == 'download') {
-      navigate(context, Screen.downloads);
+      return    navigate(context, Screen.downloads);
     }
     if (place == 'folder') {
-      navigate(context, Screen.folder, id: id);
+      return  navigate(context, Screen.folder, id: id);
     }
     if (place == 'url') {
-      launchUrl(id);
+     return launchUrl(id);
     }
+    return null;
   }
 }
 
