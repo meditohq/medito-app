@@ -18,10 +18,12 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
+import 'package:Medito/utils/utils.dart';
 
 class HomeBloc {
   HomeRepo _repo;
   StreamController<ApiResponse<MenuResponse>> menuList;
+  StreamController<bool> connectionStreamController;
   StreamController<String> titleText;
 
   HomeBloc() {
@@ -29,7 +31,14 @@ class HomeBloc {
 
     menuList = StreamController.broadcast()..sink.add(ApiResponse.loading());
     titleText = StreamController.broadcast();
+    connectionStreamController = StreamController.broadcast();
 
+  }
+
+  Future<void> checkConnection() async {
+    var connection= await checkConnectivity();
+    connectionStreamController.sink.add(connection);
+    return;
   }
 
   Future<void> fetchMenu({bool skipCache = false}) async {
