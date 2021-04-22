@@ -163,8 +163,8 @@ class session_optionsBloc {
   }
 
   void updateAvailableOfflineIndicatorText() {
-      availableOfflineIndicatorText =
-          '(${_options.voiceList[voiceSelected]} 〰 ${lengthList[lengthSelected]})';
+    availableOfflineIndicatorText =
+        '(${_options.voiceList[voiceSelected]} 〰 ${lengthList[lengthSelected]})';
   }
 
   void saveOptionsSelectionsToSharedPreferences(String id) {
@@ -178,7 +178,9 @@ class session_optionsBloc {
   void filterLengthsForVoice({int voiceIndex = 0}) {
     //Filter the lengths list for this voice from the original data
     lengthList = _options.files
-        .where((element) => element.voice == _options.voiceList[voiceIndex])
+        .where((element) => _options.voiceList.isNotEmpty
+            ? element.voice == _options.voiceList[voiceIndex]
+            : true)
         .map((e) => e.length)
         .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
         .map((e) => formatSessionLength(e))
