@@ -25,6 +25,7 @@ import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 
 class HomeWidget extends StatelessWidget {
   final _bloc = HomeBloc();
@@ -37,6 +38,7 @@ class HomeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _bloc.fetchMenu();
+    _bloc.checkConnection();
 
     return SafeArea(
       child: Scaffold(
@@ -131,7 +133,27 @@ class HomeWidget extends StatelessWidget {
       future: _bloc.getTitleText(),
       initialData: 'Medito',
       builder: (context, snapshot) {
-        return Text(snapshot.data,
-            style: Theme.of(context).textTheme.headline1);
+        return GestureDetector(
+          onLongPress: () => _showVersionPopUp(context),
+          child: Text(snapshot.data,
+              style: Theme.of(context).textTheme.headline1),
+        );
       });
+
+  Future<void> _showVersionPopUp(BuildContext context) async {
+    var packageInfo = await PackageInfo.fromPlatform();
+
+    var version = packageInfo.version;
+    var buildNumber = packageInfo.buildNumber;
+
+    final snackBar = SnackBar(
+        content: Text(
+          'Version: $version - Build Number: $buildNumber',
+          style: TextStyle(color: MeditoColors.meditoTextGrey),
+        ),
+        backgroundColor: MeditoColors.midnight);
+
+    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 }

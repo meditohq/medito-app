@@ -67,7 +67,7 @@ class PackListWidgetState extends State<PackListWidget> {
               backgroundColor: MeditoColors.moonlight,
               onRefresh: () => _packsBloc.fetchPacksList(true),
               child: StreamBuilder<ApiResponse<List<PacksData>>>(
-                  stream: _packsBloc.packListStream,
+                  stream: _packsBloc.packsListController.stream,
                   initialData: ApiResponse.loading(),
                   builder: (context, snapshot) {
                     return FutureBuilder<bool>(
@@ -111,6 +111,9 @@ class PackListWidgetState extends State<PackListWidget> {
   ErrorPacksWidget _getErrorPacksWidget() {
     return ErrorPacksWidget(
       onPressed: () {
+        setState(() {
+
+        });
         return _packsBloc.fetchPacksList();
       },
     );
@@ -133,23 +136,6 @@ class PackListWidgetState extends State<PackListWidget> {
         );
       },
     );
-  }
-
-  Future<void> _showVersionPopUp() async {
-    var packageInfo = await PackageInfo.fromPlatform();
-
-    var version = packageInfo.version;
-    var buildNumber = packageInfo.buildNumber;
-
-    final snackBar = SnackBar(
-        content: Text(
-          'Version: $version - Build Number: $buildNumber',
-          style: TextStyle(color: MeditoColors.meditoTextGrey),
-        ),
-        backgroundColor: MeditoColors.midnight);
-
-    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
