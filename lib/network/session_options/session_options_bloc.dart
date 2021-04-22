@@ -164,7 +164,7 @@ class session_optionsBloc {
 
   void updateAvailableOfflineIndicatorText() {
     availableOfflineIndicatorText =
-        '(${_options.voiceList[voiceSelected]} 〰 ${lengthList[lengthSelected]})';
+        '(${_options.voiceList[voiceSelected]} — ${lengthList[lengthSelected]})';
   }
 
   void saveOptionsSelectionsToSharedPreferences(String id) {
