@@ -39,7 +39,7 @@ Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('streakCount') ?? 0;
-  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = await getStreakList();
 
   if (streakList.isNotEmpty) {
     var lastDayInStreak =
@@ -54,6 +54,16 @@ Future<String> getCurrentStreak() async {
   }
 
   return streak.toString();
+}
+
+Future<List<String>> getStreakList() async {
+  var prefs = await SharedPreferences.getInstance();
+  return prefs.getStringList('streakList') ?? [];
+}
+
+Future<void> setStreakList(List<String> streakList) async {
+  var prefs = await SharedPreferences.getInstance();
+  return prefs.setStringList('streakList', streakList);
 }
 
 Future<int> _getCurrentStreakInt() async {
@@ -84,7 +94,7 @@ Future<void> updateStreak({String streak = ''}) async {
     return;
   }
 
-  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = await getStreakList();
   var streakCount = prefs.getInt('streakCount') ?? 0;
 
   if (streakList.isNotEmpty) {
@@ -102,7 +112,7 @@ Future<void> updateStreak({String streak = ''}) async {
   }
 
   streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
-  await prefs.setStringList('streakList', streakList);
+  await setStreakList(streakList);
 }
 
 Future<void> addPhantomSessionToStreakList() async {
@@ -110,12 +120,12 @@ Future<void> addPhantomSessionToStreakList() async {
   // but keep a note of it in fakeStreakList
 
   var prefs = await SharedPreferences.getInstance();
-  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = await getStreakList();
   var fakeStreakList = prefs.getStringList('fakeStreakList') ?? [];
   var streakTime = DateTime.now().millisecondsSinceEpoch.toString();
   streakList.add(streakTime);
   fakeStreakList.add(streakTime);
-  await prefs.setStringList('streakList', streakList);
+  await setStreakList(streakList);
   await prefs.setStringList('fakeStreakList', fakeStreakList);
 }
 
@@ -275,9 +285,9 @@ bool isSameDay(DateTime day1, DateTime day2) {
 }
 
 bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
-  var oneDayAfterMidnightThatNight = DateTime(lastDayInStreak.year,
-      lastDayInStreak.month, lastDayInStreak.day + 1, 23, 59, 59);
-  return now.isAfter(oneDayAfterMidnightThatNight);
+  var thirtyTwoHoursAfterTime = DateTime.fromMillisecondsSinceEpoch(
+      lastDayInStreak.millisecondsSinceEpoch + 115200000);
+  return now.isAfter(thirtyTwoHoursAfterTime);
 }
 
 Future updateStatsFromBg() async {

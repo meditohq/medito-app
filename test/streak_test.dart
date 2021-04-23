@@ -27,6 +27,18 @@ void main() {
     expect(b, true);
   });
 
+  test('test less than 32 hours', () {
+    var b = longerThanOneDayAgo(DateTime.parse('2020-07-14 07:00:00'),
+        DateTime.parse('2020-07-15 14:01:00'));
+    expect(b, false);
+  });
+
+  test('test more than 32 hours', () {
+    var b = longerThanOneDayAgo(DateTime.parse('2020-07-14 07:00:00'),
+        DateTime.parse('2020-07-15 15:01:00'));
+    expect(b, true);
+  });
+
   test('test not longerThanOneDayAgo', () {
     var b = longerThanOneDayAgo(DateTime.parse('2020-06-26 18:15:00'),
         DateTime.parse('2020-06-26 19:15:00'));
@@ -39,10 +51,10 @@ void main() {
     expect(b, false);
   });
 
-  test('test not longerThanOneDayAgo', () {
+  test('test longerThanOneDayAgo', () {
     var b = longerThanOneDayAgo(DateTime.parse('2020-06-26 09:00:00'),
         DateTime.parse('2020-06-27 18:15:00'));
-    expect(b, false);
+    expect(b, true);
   });
 
   test('test is same day', () {
@@ -84,6 +96,40 @@ void main() {
 
     var future1 = getLongestStreak();
     expect(future1, completion('5'));
+  });
+
+  test('test updateStreak logic', () async {
+    var thirtyTwoHoursInMillis = 115200000;
+
+    await updateStreak();
+
+    var currentStreak = await getCurrentStreak();
+    expect('1', currentStreak);
+    var streakList = await getStreakList();
+    expect(true, streakList.length == 1);
+
+    // streak count should not increment for same day sessions
+    streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
+    await setStreakList(streakList);
+    await updateStreak();
+    currentStreak = await getCurrentStreak();
+    expect('1', currentStreak);
+    // streak count should increment by 1 if the last session was on previous day and less than 32 hours ago
+    streakList.add(
+        (DateTime.now().millisecondsSinceEpoch - thirtyTwoHoursInMillis + 50000)
+            .toString());
+    await setStreakList(streakList);
+    await updateStreak();
+    currentStreak = await getCurrentStreak();
+    expect('2', currentStreak);
+
+    // reset to 0 if app launched after 32 hours
+    streakList.add(
+        (DateTime.now().millisecondsSinceEpoch - thirtyTwoHoursInMillis)
+            .toString());
+    await setStreakList(streakList);
+    currentStreak = await getCurrentStreak();
+    expect('0', currentStreak);
   });
 
   test('test update min counter', () async {
