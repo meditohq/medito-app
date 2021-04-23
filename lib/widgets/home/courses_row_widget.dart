@@ -34,45 +34,53 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
           child: Text('LISTEN IN ORDER',
               style: Theme.of(context).textTheme.caption),
         ),
-        Container(
-          height: 208,
-          child: StreamBuilder<ApiResponse<CoursesResponse>>(
-              stream: _bloc.coursesList.stream,
-              initialData: ApiResponse.loading(),
-              builder: (context, snapshot) {
-                switch (snapshot.data.status) {
-                  case Status.LOADING:
-                    return _getLoadingWidget();
-                    break;
-                  case Status.COMPLETED:
-                    return ListView.builder(
-                        padding: const EdgeInsets.only(left: 16),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: snapshot.data.body.data.length,
-                        itemBuilder: (context, index) {
-                          return CoursesRowItemWidget(
-                              snapshot.data.body.data[index]);
-                        });
-                    break;
-                  case Status.ERROR:
-                    return Icon(Icons.error);
-                    break;
-                }
-                return Container();
-              }),
-        ),
+        StreamBuilder<ApiResponse<CoursesResponse>>(
+            stream: _bloc.coursesList.stream,
+            initialData: ApiResponse.loading(),
+            builder: (context, snapshot) {
+              switch (snapshot.data.status) {
+                case Status.LOADING:
+                  return _getLoadingWidget();
+                  break;
+                case Status.COMPLETED:
+                  return _horizontalCoursesRow(snapshot);
+
+                  break;
+                case Status.ERROR:
+                  return Icon(Icons.error);
+                  break;
+              }
+              return Container();
+            }),
       ],
     );
   }
 
+  Widget _horizontalCoursesRow(
+      AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot) {
+    var list = <Widget>[Container(width: 16)];
+    snapshot.data.body.data.forEach((element) {
+      list.add(CoursesRowItemWidget(element));
+    });
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: list,
+      ),
+    );
+  }
+
   Widget _getLoadingWidget() => Row(
-    children: [
-      Container(width: 16),
-      Container(color: MeditoColors.moonlight, height: 132, width: 132),
-      Container(width: 16),
-      Container(color: MeditoColors.moonlight, height: 132, width: 132),
-    ],
-  );
+        children: [
+          Container(width: 16),
+          Container(color: MeditoColors.moonlight, height: 132, width: 132),
+          Container(width: 16),
+          Container(color: MeditoColors.moonlight, height: 132, width: 132),
+        ],
+      );
 }
 
 class CoursesRowItemWidget extends StatelessWidget {
@@ -94,20 +102,7 @@ class CoursesRowItemWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                SizedBox(
-                    width: 132, height: 132, child: _buildCardBackground()),
-                Positioned.fill(
-                  child: Center(
-                    child: SizedBox(
-                        width: 92,
-                        height: 92,
-                        child: getNetworkImageWidget(data.coverUrl)),
-                  ),
-                ),
-              ],
-            ),
+            _imageStack(),
             Container(height: 8),
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
@@ -125,6 +120,22 @@ class CoursesRowItemWidget extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Stack _imageStack() {
+    return Stack(
+      children: [
+        SizedBox(width: 132, height: 132, child: _buildCardBackground()),
+        Positioned.fill(
+          child: Center(
+            child: SizedBox(
+                width: 92,
+                height: 92,
+                child: getNetworkImageWidget(data.coverUrl)),
+          ),
+        ),
+      ],
     );
   }
 
