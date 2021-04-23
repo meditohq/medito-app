@@ -40,10 +40,9 @@ class AudioCompleteCopyBloc {
   Future<String> getVersionTitle() async {
     var title = version?.title;
     if (title?.contains('%n') ?? false) {
-      var streak = await getCurrentStreak();
+      var streak = await getNumSessions();
       title = title.replaceAll('%n', streak.toString());
     }
     return title;
   }
-
 }
