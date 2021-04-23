@@ -30,7 +30,7 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:pedantic/pedantic.dart';
 
-class session_optionsBloc {
+class SessionOptionsBloc {
   session_optionsRepository _repo;
 
   var lengthList = <String>[];
@@ -42,6 +42,7 @@ class session_optionsBloc {
   var offlineSelected = 0;
   var musicSelected = 0;
   var illustration;
+  String musicNameSelected = '';
 
   AudioFile currentFile;
 
@@ -50,13 +51,13 @@ class session_optionsBloc {
   // Download stuff
   bool bgDownloading = false, removing = false;
   DownloadSingleton downloadSingleton = DownloadSingleton(null);
-  final _downloadBloc = DownloadsBloc();
 
   //Streams
-  StreamController<ApiResponse<String>> titleController;
-  StreamController<ApiResponse<String>> descController;
-  StreamController<ApiResponse<Map<String, String>>> imageController;
-  StreamController<ApiResponse<Map<String, String>>> colourController;
+  StreamController<String> titleController;
+  StreamController<String> descController;
+  StreamController<ApiResponse<String>> imageController;
+  StreamController<String> primaryColourController;
+  StreamController<String> secondaryColorController;
   StreamController<ApiResponse<List<String>>> voiceListController;
   StreamController<ApiResponse<List<String>>> lengthListController;
   StreamController<ApiResponse<BackgroundSoundsResponse>>
@@ -66,9 +67,8 @@ class session_optionsBloc {
   MediaLibrary mediaLibrary;
   SessionData _options;
 
-  session_optionsBloc(String id, Screen screen) {
-    titleController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading());
+  SessionOptionsBloc(String id, Screen screen) {
+    titleController = StreamController.broadcast();
 
     voiceListController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
@@ -85,11 +85,10 @@ class session_optionsBloc {
     imageController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
-    colourController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading());
+    primaryColourController = StreamController.broadcast();
+    secondaryColorController = StreamController.broadcast();
 
-    descController = StreamController.broadcast()
-      ..sink.add(ApiResponse.loading());
+    descController = StreamController.broadcast();
 
     _repo = session_optionsRepository(screen: screen);
 
@@ -107,14 +106,11 @@ class session_optionsBloc {
     _options = options;
 
     // Show title, desc and image
-    titleController.sink.add(ApiResponse.completed(_options.title));
-    descController.sink.add(ApiResponse.completed(_options.description));
-    imageController.sink.add(ApiResponse.completed(
-        {'url': _options.coverUrl, 'color': _options.colorPrimary}));
-    colourController.sink.add(ApiResponse.completed({
-      'secondaryColor': _options.colorSecondary,
-      'primaryColor': _options.colorPrimary
-    }));
+    titleController.sink.add(_options.title);
+    descController.sink.add(_options.description);
+    imageController.sink.add(ApiResponse.completed(_options.coverUrl));
+    primaryColourController.sink.add(_options.colorPrimary);
+    secondaryColorController.sink.add(_options.colorSecondary);
 
     // Show/hide Background music
     backgroundMusicShownController.sink.add(_options.backgroundSound);
@@ -137,7 +133,8 @@ class session_optionsBloc {
     backgroundMusicListController?.close();
     backgroundMusicShownController?.close();
     imageController?.close();
-    colourController?.close();
+    primaryColourController?.close();
+    secondaryColorController?.close();
     descController?.close();
   }
 
@@ -167,12 +164,8 @@ class session_optionsBloc {
   }
 
   void updateAvailableOfflineIndicatorText() {
-    if (offlineSelected != 0) {
-      availableOfflineIndicatorText =
-          '(${_options.voiceList[voiceSelected]} - ${lengthList[lengthSelected]})';
-    } else {
-      availableOfflineIndicatorText = '';
-    }
+    availableOfflineIndicatorText =
+        '(${_options.voiceList[voiceSelected]} — ${lengthList[lengthSelected]})';
   }
 
   void saveOptionsSelectionsToSharedPreferences(String id) {
@@ -186,7 +179,9 @@ class session_optionsBloc {
   void filterLengthsForVoice({int voiceIndex = 0}) {
     //Filter the lengths list for this voice from the original data
     lengthList = _options.files
-        .where((element) => element.voice == _options.voiceList[voiceIndex])
+        .where((element) => _options.voiceList.isNotEmpty
+            ? element.voice == _options.voiceList[voiceIndex]
+            : true)
         .map((e) => e.length)
         .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
         .map((e) => formatSessionLength(e))
@@ -229,6 +224,7 @@ class session_optionsBloc {
       secondaryColor: _options.colorSecondary,
       primaryColor: _options.colorPrimary,
       bgMusic: backgroundSoundsId,
+      bgMusicTitle: musicNameSelected,
       durationAsMilliseconds:
           clockTimeToDuration(currentFile.length).inMilliseconds,
       fileId: currentFile.id,

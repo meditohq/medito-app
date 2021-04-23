@@ -38,7 +38,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   @override
   void initState() {
     super.initState();
-    _bloc.fetchAnnouncement();
+    _bloc.fetchAnnouncement(skipCache: true);
   }
 
   void refresh(){
@@ -157,5 +157,10 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   void _openLink(String buttonType, String buttonPath) {
     NavigationFactory.navigateToScreenFromString(
         buttonType, buttonPath, context);
+  }
+  @override
+  void dispose() {
+    _bloc.dispose();
+    super.dispose();
   }
 }

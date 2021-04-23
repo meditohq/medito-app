@@ -90,8 +90,8 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 }
 
 // ignore: always_declare_return_types
-launchUrl(String url) async {
-  await launch(url);
+Future<bool> launchUrl(String url) async {
+  return launch(url);
 }
 
 Future<void> acceptTracking() async {

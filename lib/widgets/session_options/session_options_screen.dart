@@ -20,13 +20,11 @@ import 'package:Medito/network/session_options/session_options_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/utils/text_themes.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/app_bar_widget.dart';
-import 'package:Medito/widgets/gradient_widget.dart';
+import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class session_optionsScreen extends StatefulWidget {
   final String id;
@@ -44,76 +42,54 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
 
   /// deffo need:
   BuildContext scaffoldContext;
-  session_optionsBloc _bloc;
+  SessionOptionsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
-    _bloc = session_optionsBloc(widget.id, widget.screenKey);
+    _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
     _bloc.fetchOptions(widget.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
-      child: StreamBuilder<ApiResponse<Map<String, String>>>(
-          stream: _bloc.colourController.stream,
-          builder: (context, colorSnapshot) {
-            var sColor = colorSnapshot.hasData
-                ? colorSnapshot.data.body['secondaryColor']
-                : null;
-            var pColor = colorSnapshot.hasData
-                ? colorSnapshot.data.body['primaryColor']
-                : null;
+    return StreamBuilder<String>(
+        stream: _bloc.primaryColourController.stream,
+        builder: (context, snapshot) {
+          var iconColor = snapshot.hasData
+              ? parseColor(snapshot.data)
+              : MeditoColors.darkMoon;
 
-            return Scaffold(
-              floatingActionButton: Semantics(
-                label: 'Play button',
-                child: PlayerButton(
-                  onPressed: _onBeginTap,
-                  primaryColor: parseColor(pColor) ?? MeditoColors.walterWhite,
-                  child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: getBeginButtonContent(sColor)),
-                ),
-              ),
-              body: Builder(builder: (BuildContext context) {
-                scaffoldContext = context;
-                return Container(
-                  child: SafeArea(
+          return RefreshIndicator(
+              onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
+              child: Scaffold(
+                floatingActionButton: _getPlayerButton(iconColor),
+                body: Builder(builder: (BuildContext context) {
+                  scaffoldContext = context;
+                  return Container(
                     child: Stack(
                       children: <Widget>[
                         SingleChildScrollView(
                           child: Stack(
                             children: [
-                              GradientWidget(
-                                height: 250.0,
-                                primaryColor: parseColor(pColor),
-                              ),
                               Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  MeditoAppBarWidget(
-                                      title: '', transparent: true),
-                                  buildImage(pColor),
-                                  buildTitleText(),
-                                  buildDescriptionText(),
-                                  buildVoiceRow(),
+                                  _getHeaderWidget(),
+                                  buildVoiceRowWithTitle(),
                                   buildSpacer(),
                                   ////////// spacer
-                                  buildTextHeaderForRow('Session Length'),
+                                  buildTextHeaderForRow(DURATION),
                                   buildSessionLengthRow(),
                                   buildSpacer(),
                                   ////////// spacer
                                   getBGMusicItems(),
                                   ////////// spacer
                                   buildTextHeaderForRow(
-                                      'Available Offline ${_bloc.availableOfflineIndicatorText}'),
+                                      '$DOWNLOAD_SESSION ${_bloc.availableOfflineIndicatorText}'),
                                   buildOfflineRow(),
                                   Container(height: 80)
                                 ],
@@ -123,11 +99,33 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
                         ),
                       ],
                     ),
-                  ),
-                );
-              }),
-            );
-          }),
+                  );
+                }),
+              ));
+        });
+  }
+
+  HeaderWidget _getHeaderWidget() {
+    return HeaderWidget(
+        primaryColorController: _bloc.primaryColourController,
+        titleController: _bloc.titleController,
+        coverController: _bloc.imageController,
+        descriptionController: _bloc.descController,
+        vertical: true);
+  }
+
+  Semantics _getPlayerButton(Color iconColor) {
+    return Semantics(
+      label: 'Play button',
+      child: PlayerButton(
+        onPressed: _onBeginTap,
+        primaryColor: iconColor,
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: _getBeginButtonContent(),
+        ),
+      ),
     );
   }
 
@@ -139,7 +137,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildTextHeaderForRow('Background Sound'),
+              buildTextHeaderForRow(BACKGROUND_SOUND),
               buildBackgroundMusicRowAndSpacer(),
               buildSpacer(),
             ],
@@ -149,45 +147,52 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
         }
       });
 
-  Widget getBeginButtonContent(String color) {
-    if (_bloc.isDownloading()) {
-      return ValueListenableBuilder(
-          valueListenable: _bloc.downloadSingleton.returnNotifier(),
-          builder: (context, value, widget) {
-            if (value >= 1) {
-              return Icon(Icons.play_arrow, color: parseColor(color));
-            } else {
-              print('Updated value: ' + (value * 100).toInt().toString());
-              return SizedBox(
-                  height: 12,
-                  width: 12,
-                  child: Stack(
-                    children: [
-                      CircularProgressIndicator(
-                        value: 1,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.black12),
+  Widget _getBeginButtonContent() {
+    return StreamBuilder<String>(
+        stream: _bloc.secondaryColorController.stream,
+        initialData: null,
+        builder: (context, snapshot) {
+          var iconColor = snapshot.data;
+
+          if (_bloc.isDownloading()) {
+            return ValueListenableBuilder(
+                valueListenable: _bloc.downloadSingleton.returnNotifier(),
+                builder: (context, value, widget) {
+                  if (value >= 1) {
+                    return Icon(Icons.play_arrow, color: parseColor(iconColor));
+                  } else {
+                    print('Updated value: ' + (value * 100).toInt().toString());
+                    return SizedBox(
+                      height: 12,
+                      width: 12,
+                      child: Stack(
+                        children: [
+                          CircularProgressIndicator(
+                            value: 1,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.black12),
+                          ),
+                          CircularProgressIndicator(
+                              value: value,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  parseColor(iconColor))),
+                        ],
                       ),
-                      CircularProgressIndicator(
-                        value: value,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          parseColor(color),
-                        ),
-                      ),
-                    ],
-                  ));
-            }
-          });
-    } else if (showIndeterminateSpinner || _bloc.removing) {
-      return SizedBox(
-        height: 24,
-        width: 24,
-        child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(parseColor(color))),
-      );
-    } else {
-      return Icon(Icons.play_arrow, color: parseColor(color));
-    }
+                    );
+                  }
+                });
+          } else if (showIndeterminateSpinner || _bloc.removing) {
+            return SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(parseColor(iconColor))),
+            );
+          } else {
+            return Icon(Icons.play_arrow, color: parseColor(iconColor));
+          }
+        });
   }
 
   Future<void> _onBeginTap() {
@@ -213,49 +218,13 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
     return null;
   }
 
-  Widget buildTitleText() {
-    return StreamBuilder<ApiResponse<String>>(
-        stream: _bloc.titleController.stream,
-        builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 4.0, left: 16, right: 16),
-            child: Text(
-              snapshot.data?.body ?? '',
-              style: Theme.of(context).textTheme.headline1,
-            ),
-          );
-        });
-  }
-
-  Widget buildDescriptionText() {
-    return StreamBuilder<ApiResponse<String>>(
-        stream: _bloc.descController.stream,
-        builder: (context, snapshot) {
-          return (snapshot.hasData && snapshot.data.body.isNotEmptyAndNotNull())
-              ? Padding(
-                  padding:
-                      const EdgeInsets.only(bottom: 20.0, left: 12, right: 12),
-                  child: Markdown(
-                    onTapLink: _linkTap,
-                    data: snapshot.data?.body,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(0),
-                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                        .copyWith(
-                        p: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0)
-                    ),
-                  ))
-              : Container();
-        });
-  }
-
   /// Pill rows
   Widget buildTextHeaderForRow(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
-        title,
-        style: Theme.of(context).textTheme.subtitle1,
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.caption,
       ),
     );
   }
@@ -381,7 +350,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
             }));
   }
 
-  Widget buildVoiceRow() {
+  Widget buildVoiceRowWithTitle() {
     return StreamBuilder<ApiResponse<List<String>>>(
         stream: _bloc.voiceListController.stream,
         builder: (context, snapshot) {
@@ -389,7 +358,9 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
             return _buildVoiceColumn(_getEmptyPillRow());
           }
 
-          if (snapshot.data.body.first == null) return Container();
+          if (snapshot.data.body.isEmpty || snapshot.data.body.first == null) {
+            return Container();
+          }
 
           return _buildVoiceColumn(
             ListView.builder(
@@ -424,8 +395,8 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildSpacer(),
-        buildTextHeaderForRow('Voice'),
+        Container(height: 16),
+        buildTextHeaderForRow(NARRATOR),
         SizedBox(height: 56, child: w),
       ],
     );
@@ -457,6 +428,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
 
   void onMusicSelected(int index, String id, String name) {
     _bloc.musicSelected = index;
+    index > 0 ? _bloc.musicNameSelected = name : _bloc.musicNameSelected = '';
     print('bg selected: $name');
     if (index > 0) {
       showIndeterminateSpinner = true;
@@ -577,47 +549,14 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
     );
   }
 
-  Widget buildImage(String color) {
-    return StreamBuilder<ApiResponse<Map<String, String>>>(
-        stream: _bloc.imageController.stream,
-        builder: (context, imageSnapshot) {
-          if (imageSnapshot.hasData) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 24.0, left: 16, right: 16),
-              child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                      color: parseColor(color)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: imageSnapshot.data?.body != null
-                        ? getNetworkImageWidget(imageSnapshot.data?.body['url'],
-                            startHeight: 100)
-                        : Container(),
-                  )),
-            );
-          } else {
-            return Container();
-          }
-        });
-  }
-
   Widget buildSpacer() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Divider(
         height: 1,
-        indent: 16,
         color: MeditoColors.deepNight,
-        endIndent: 16,
         thickness: 1,
       ),
     );
-  }
-
-  void _linkTap(String url) {
-    launchUrl(url);
   }
 }
