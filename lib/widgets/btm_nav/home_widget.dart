@@ -53,6 +53,7 @@ class HomeWidget extends StatelessWidget {
                   return ErrorPacksWidget(onPressed: () => _refresh());
                 } else {
                   return ListView(
+                    physics: AlwaysScrollableScrollPhysics(),
                     children: [
                       _getAppBar(context),
                       AnnouncementBanner(key: _announceKey),
