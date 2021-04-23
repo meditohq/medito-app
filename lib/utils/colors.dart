@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 class MeditoColors {
   static const walterWhiteLine = Color(0xff595F65);
   static const walterWhiteTrans = Color(0x30595F65);
-  static var darkColor = Color(0xff343b43);
   static var darkBGColor = Color(0xff22282D);
   static var almostBlack = Color(0xEE000000);
 
@@ -27,7 +26,6 @@ class MeditoColors {
 
   static const moonlight = Color(0xff282828);
   static const peacefulBlue = Color(0xffd1f6fe);
-  static const peacefulPink = Color(0xffffc2c2);
 
   // V2
   static const transparent = Color(0x00ffffff);

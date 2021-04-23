@@ -148,7 +148,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       'assets/images/texture.png',
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
-      fit: BoxFit.fitWidth,
+      fit: BoxFit.fill,
     );
   }
 

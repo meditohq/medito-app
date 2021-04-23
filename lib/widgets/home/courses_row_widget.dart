@@ -1,6 +1,7 @@
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/courses_bloc.dart';
 import 'package:Medito/network/home/courses_response.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -26,43 +27,52 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 32.0, left: 16),
-          child:
-              Text('Courses', style: Theme.of(context).textTheme.headline3),
+          child: Text('Courses', style: Theme.of(context).textTheme.headline3),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 0, left: 16, bottom: 8.0),
           child: Text('LISTEN IN ORDER',
               style: Theme.of(context).textTheme.caption),
         ),
-        StreamBuilder<ApiResponse<CoursesResponse>>(
-            stream: _bloc.coursesList.stream,
-            builder: (context, snapshot) {
-              switch (snapshot.data?.status) {
-                case Status.LOADING:
-                  return CircularProgressIndicator();
-                  break;
-                case Status.COMPLETED:
-                  return Container(
-                    height: 208,
-                    child: ListView.builder(
+        Container(
+          height: 208,
+          child: StreamBuilder<ApiResponse<CoursesResponse>>(
+              stream: _bloc.coursesList.stream,
+              initialData: ApiResponse.loading(),
+              builder: (context, snapshot) {
+                switch (snapshot.data.status) {
+                  case Status.LOADING:
+                    return _getLoadingWidget();
+                    break;
+                  case Status.COMPLETED:
+                    return ListView.builder(
                         padding: const EdgeInsets.only(left: 16),
                         scrollDirection: Axis.horizontal,
                         itemCount: snapshot.data.body.data.length,
                         itemBuilder: (context, index) {
                           return CoursesRowItemWidget(
                               snapshot.data.body.data[index]);
-                        }),
-                  );
-                  break;
-                case Status.ERROR:
-                  return Icon(Icons.error);
-                  break;
-              }
-              return Container();
-            }),
+                        });
+                    break;
+                  case Status.ERROR:
+                    return Icon(Icons.error);
+                    break;
+                }
+                return Container();
+              }),
+        ),
       ],
     );
   }
+
+  Widget _getLoadingWidget() => Row(
+    children: [
+      Container(width: 16),
+      Container(color: MeditoColors.moonlight, height: 132, width: 132),
+      Container(width: 16),
+      Container(color: MeditoColors.moonlight, height: 132, width: 132),
+    ],
+  );
 }
 
 class CoursesRowItemWidget extends StatelessWidget {
@@ -119,6 +129,9 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _buildCardBackground() => data.backgroundImage.isEmptyOrNull()
-      ? Container(color: parseColor(data.colorPrimary))
+      ? Container(
+          color: data.colorPrimary.isEmptyOrNull()
+              ? MeditoColors.moonlight
+              : parseColor(data.colorPrimary))
       : getNetworkImageWidget(data.backgroundImageUrl);
 }

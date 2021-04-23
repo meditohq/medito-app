@@ -10,7 +10,6 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:pedantic/pedantic.dart';
 
 class DownloadsListWidget extends StatefulWidget {
   @override
@@ -19,21 +18,11 @@ class DownloadsListWidget extends StatefulWidget {
 
 class _DownloadsListWidgetState extends State<DownloadsListWidget>
     with SingleTickerProviderStateMixin {
-  final _bloc = DownloadsBloc();
-
   final key = GlobalKey<AnimatedListState>();
-
-  ValueNotifier<List<MediaItem>> downloadedSession =
-      DownloadsBloc.downloadedSessions;
 
   @override
   void initState() {
     super.initState();
-    DownloadsBloc.fetchDownloads().then((value) {
-      if (value.isNotEmpty) {
-        showSwipeToDeleteTip();
-      }
-    });
   }
 
   @override
@@ -95,6 +84,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
+    color: MeditoColors.moonlight,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(
@@ -112,9 +102,14 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       );
 
   PackListItemWidget _getListItemWidget(MediaItem item) {
+
+    var backgroundSoundString = '';
+    if ((item.extras['bgMusicTitle'] as String)?.isNotEmptyAndNotNull() ?? false){
+      backgroundSoundString = ' — ${item.extras['bgMusicTitle']}';
+    }
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle: '${item.artist}    〰    ${_getDuration(item.extras['length'])}',
+        subtitle: '${item.artist} — ${_getDuration(item.extras['length'])}$backgroundSoundString',
         cover: item.artUri,
         colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));
@@ -130,29 +125,4 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     });
   }
 
-  void showSwipeToDeleteTip() async {
-    await _bloc.seenTip().then((seen) {
-      if (!seen) {
-        unawaited(_bloc.setSeenTip());
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.info_outline,
-                  color: MeditoColors.walterWhite,
-                ),
-                Container(
-                  width: 16,
-                  height: 10,
-                ),
-                Text('Swipe away a session to delete it')
-              ],
-            ),
-          ),
-        );
-      }
-      ;
-    });
-  }
 }

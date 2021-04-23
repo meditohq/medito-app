@@ -20,13 +20,12 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/widgets/folders/folder_banner_widget.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
+import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class FolderStateless extends StatelessWidget {
   FolderStateless({Key key}) : super(key: key);
@@ -72,25 +71,36 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Builder(
-        builder: (BuildContext context) {
-          return RefreshIndicator(
-              onRefresh: () {
-                final FolderArguments args =
-                    ModalRoute.of(context).settings.arguments;
-                return _bloc.fetchData(id: args.sessionId, skipCache: true);
-              },
-              child: _getScreenContent());
-        },
+    return RefreshIndicator(
+      onRefresh: () {
+        return _refresh(context);
+      },
+      child: Scaffold(
+        body: Builder(
+          builder: (BuildContext context) {
+            return _getScreenContent();
+          },
+        ),
       ),
     );
   }
 
+  Future<void> _refresh(BuildContext context) {
+     final FolderArguments args = ModalRoute.of(context).settings.arguments;
+    return _bloc.fetchData(id: args.sessionId, skipCache: true);
+  }
+
   Widget _getScreenContent() => SingleChildScrollView(
-          child: Column(
+      physics: AlwaysScrollableScrollPhysics(),
+      child: Column(
         children: [
-          FolderBannerWidget(bloc: _bloc),
+          HeaderWidget(
+            primaryColorController: _bloc.primaryColorController,
+            titleController: _bloc.titleController,
+            coverController: _bloc.coverController,
+            backgroundImageController: _bloc.backgroundImageController,
+            descriptionController: _bloc.descriptionController,
+          ),
           _getListStream(),
         ],
       ));
@@ -151,6 +161,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   Widget _getDismissibleBackgroundWidget(Item item) {
     return Container(
+      color: MeditoColors.moonlight,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Row(
@@ -158,14 +169,14 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Spacer(),
-            getSwipableActionIcon(item),
+            getSwipeableActionIcon(item),
           ],
         ),
       ),
     );
   }
 
-  Widget getSwipableActionIcon(Item item) {
+  Widget getSwipeableActionIcon(Item item) {
     if (checkListened(item.id, oldId: item.oldId)) {
       return Icon(
         Icons.play_circle_fill,
@@ -193,7 +204,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
     NavigationFactory.navigate(
         context, NavigationFactory.getScreenFromItemType(i.fileType),
-        id: i.id);
+        id: i.id).then((value) => _refresh(context));
   }
 
   void startService(media, primaryColor) {

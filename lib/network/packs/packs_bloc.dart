@@ -22,32 +22,26 @@ import 'package:Medito/network/packs/packs_response.dart';
 class PacksBloc {
   PacksRepository _repo;
 
-  StreamController _packsListController;
-
-  StreamSink<ApiResponse<List<PacksData>>> get packListSink =>
-      _packsListController.sink;
-
-  Stream<ApiResponse<List<PacksData>>> get packListStream =>
-      _packsListController.stream;
+  StreamController<ApiResponse<List<PacksData>>> packsListController;
 
   PacksBloc() {
-    _packsListController = StreamController<ApiResponse<List<PacksData>>>();
+    packsListController = StreamController.broadcast();
     _repo = PacksRepository();
     fetchPacksList();
   }
 
   Future<void> fetchPacksList([bool skipCache = false]) async {
-    packListSink.add(ApiResponse.loading());
+    packsListController.sink.add(ApiResponse.loading());
     try {
       var packs = await _repo.fetchPacks(skipCache);
-      packListSink.add(ApiResponse.completed(packs));
+      packsListController.sink.add(ApiResponse.completed(packs));
     } catch (e) {
-      packListSink.add(ApiResponse.error(e.toString()));
+      packsListController.sink.add(ApiResponse.error(e.toString()));
       print(e);
     }
   }
 
   void dispose() {
-    _packsListController?.close();
+    packsListController?.close();
   }
 }
