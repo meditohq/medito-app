@@ -68,34 +68,29 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
                 floatingActionButton: _getPlayerButton(iconColor),
                 body: Builder(builder: (BuildContext context) {
                   scaffoldContext = context;
-                  return Container(
+                  return SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
                     child: Stack(
-                      children: <Widget>[
-                        SingleChildScrollView(
-                          child: Stack(
-                            children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  _getHeaderWidget(),
-                                  buildVoiceRowWithTitle(),
-                                  buildSpacer(),
-                                  ////////// spacer
-                                  buildTextHeaderForRow(DURATION),
-                                  buildSessionLengthRow(),
-                                  buildSpacer(),
-                                  ////////// spacer
-                                  getBGMusicItems(),
-                                  ////////// spacer
-                                  buildTextHeaderForRow(
-                                      '$DOWNLOAD_SESSION ${_bloc.availableOfflineIndicatorText}'),
-                                  buildOfflineRow(),
-                                  Container(height: 80)
-                                ],
-                              ),
-                            ],
-                          ),
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            _getHeaderWidget(),
+                            buildVoiceRowWithTitle(),
+                            buildSpacer(),
+                            ////////// spacer
+                            buildTextHeaderForRow(DURATION),
+                            buildSessionLengthRow(),
+                            buildSpacer(),
+                            ////////// spacer
+                            getBGMusicItems(),
+                            ////////// spacer
+                            buildTextHeaderForRow(
+                                '$DOWNLOAD_SESSION ${_bloc.availableOfflineIndicatorText}'),
+                            buildOfflineRow(),
+                            Container(height: 80)
+                          ],
                         ),
                       ],
                     ),
