@@ -10,4 +10,5 @@ const String LOADING_ERROR = "It looks like you're offline or there was little h
 const String NARRATOR = 'Narrator';
 const String DURATION = 'Duration';
 const String BACKGROUND_SOUND = 'Background Sound';
+const String BACKGROUND_SOUND_VOLUME = 'Background Sound Volume';
 const String DOWNLOAD_SESSION = 'Download Session';
