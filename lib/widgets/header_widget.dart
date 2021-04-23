@@ -159,7 +159,13 @@ class HeaderWidget extends StatelessWidget {
             case Status.LOADING:
               return Center(
                 child: SizedBox(
-                    height: 24, width: 24, child: CircularProgressIndicator()),
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      backgroundColor: MeditoColors.transparent,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          MeditoColors.darkMoon),
+                    )),
               );
               break;
 
