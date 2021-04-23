@@ -27,6 +27,7 @@ class SessionData {
   bool backgroundSound;
   String cover;
   String get coverUrl => '${baseUrl}assets/$cover?download';
+  String get backgroundImageUrl => '${baseUrl}assets/$backgroundImage?download';
   String colorPrimary;
   String colorSecondary;
   String get attribution => author?.body ?? '';
@@ -34,6 +35,8 @@ class SessionData {
   List<String> get voiceList =>
   audio.map((element) => element.file?.voice).toSet().toList()..removeWhere((element) => element == null);
 
+  @Deprecated('Use backgroundImageUrl instead')
+  String backgroundImage;
   @Deprecated('use files instead')
   List<Audio> audio;
   @Deprecated('user attribution instead')
@@ -60,6 +63,7 @@ class SessionData {
     description = json['description'];
     backgroundSound = json['background_sound'];
     cover = json['cover'];
+    backgroundImage = json['background_image'];
     colorPrimary = json['color_primary'];
     colorSecondary = json['color_secondary'];
     author =
@@ -80,6 +84,7 @@ class SessionData {
     data['subtitle'] = subtitle;
     data['description'] = description;
     data['background_sound'] = backgroundSound;
+    data['background_image'] = backgroundImage;
     data['cover'] = cover;
     data['color_primary'] = colorPrimary;
     data['color_secondary'] = colorSecondary;
