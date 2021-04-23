@@ -30,7 +30,7 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:pedantic/pedantic.dart';
 
-class session_optionsBloc {
+class SessionOptionsBloc {
   session_optionsRepository _repo;
 
   var lengthList = <String>[];
@@ -42,6 +42,7 @@ class session_optionsBloc {
   var offlineSelected = 0;
   var musicSelected = 0;
   var illustration;
+  String musicNameSelected = '';
 
   AudioFile currentFile;
 
@@ -66,7 +67,7 @@ class session_optionsBloc {
   MediaLibrary mediaLibrary;
   SessionData _options;
 
-  session_optionsBloc(String id, Screen screen) {
+  SessionOptionsBloc(String id, Screen screen) {
     titleController = StreamController.broadcast();
 
     voiceListController = StreamController.broadcast()
@@ -223,6 +224,7 @@ class session_optionsBloc {
       secondaryColor: _options.colorSecondary,
       primaryColor: _options.colorPrimary,
       bgMusic: backgroundSoundsId,
+      bgMusicTitle: musicNameSelected,
       durationAsMilliseconds:
           clockTimeToDuration(currentFile.length).inMilliseconds,
       fileId: currentFile.id,
