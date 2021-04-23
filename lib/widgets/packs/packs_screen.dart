@@ -131,6 +131,7 @@ class PackListWidgetState extends State<PackListWidget> {
               title: data[i].title,
               subtitle: data[i].subtitle,
               cover: data[i].cover,
+              backgroundImage: data[i].backgroundImageUrl,
               colorPrimary: parseColor(data[i].colorPrimary),
               coverSize: 72)),
         );

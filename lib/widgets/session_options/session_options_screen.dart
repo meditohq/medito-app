@@ -110,6 +110,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
         primaryColorController: _bloc.primaryColourController,
         titleController: _bloc.titleController,
         coverController: _bloc.imageController,
+        backgroundImageController: _bloc.backgroundImageController,
         descriptionController: _bloc.descController,
         vertical: true);
   }
