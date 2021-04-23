@@ -69,11 +69,11 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
           direction: DismissDirection.endToStart,
           background: _getDismissibleBackgroundWidget(),
           onDismissed: (direction) {
-            setState(() {
-              if (mounted) {
-                DownloadsBloc.removeSessionFromDownloads(item);
-              }
-            });
+            if (mounted) {
+              DownloadsBloc.removeSessionFromDownloads(item).then((value) {
+                return setState(() {});
+              });
+            }
 
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text('"${item.title}" removed'),
@@ -84,7 +84,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-    color: MeditoColors.moonlight,
+        color: MeditoColors.moonlight,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(
@@ -102,14 +102,15 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       );
 
   PackListItemWidget _getListItemWidget(MediaItem item) {
-
     var backgroundSoundString = '';
-    if ((item.extras['bgMusicTitle'] as String)?.isNotEmptyAndNotNull() ?? false){
+    if ((item.extras['bgMusicTitle'] as String)?.isNotEmptyAndNotNull() ??
+        false) {
       backgroundSoundString = ' — ${item.extras['bgMusicTitle']}';
     }
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle: '${item.artist} — ${_getDuration(item.extras['length'])}$backgroundSoundString',
+        subtitle:
+            '${item.artist} — ${_getDuration(item.extras['length'])}$backgroundSoundString',
         cover: item.artUri,
         colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));
@@ -124,5 +125,4 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       return null;
     });
   }
-
 }
