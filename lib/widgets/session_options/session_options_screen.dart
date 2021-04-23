@@ -42,14 +42,14 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
 
   /// deffo need:
   BuildContext scaffoldContext;
-  session_optionsBloc _bloc;
+  SessionOptionsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     Tracking.changeScreenName(Tracking.SESSION_TAPPED);
 
-    _bloc = session_optionsBloc(widget.id, widget.screenKey);
+    _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
     _bloc.fetchOptions(widget.id);
   }
 
@@ -358,7 +358,9 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
             return _buildVoiceColumn(_getEmptyPillRow());
           }
 
-          if (snapshot.data.body.isEmpty || snapshot.data.body.first == null) return Container();
+          if (snapshot.data.body.isEmpty || snapshot.data.body.first == null) {
+            return Container();
+          }
 
           return _buildVoiceColumn(
             ListView.builder(
@@ -426,6 +428,7 @@ class _session_optionsScreenState extends State<session_optionsScreen> {
 
   void onMusicSelected(int index, String id, String name) {
     _bloc.musicSelected = index;
+    index > 0 ? _bloc.musicNameSelected = name : _bloc.musicNameSelected = '';
     print('bg selected: $name');
     if (index > 0) {
       showIndeterminateSpinner = true;
