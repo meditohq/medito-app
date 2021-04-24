@@ -60,10 +60,16 @@ class HomeWidget extends StatelessWidget {
                     children: [
                       _getAppBar(context),
                       AnnouncementBanner(key: _announceKey),
-                      SmallShortcutsRowWidget(key: _shortcutKey),
-                      CoursesRowWidget(key: _coursesKey),
+                      SmallShortcutsRowWidget(
+                        key: _shortcutKey,
+                        onTap: (type, id) => _navigate(type, id, context),
+                      ),
+                      CoursesRowWidget(
+                          key: _coursesKey,
+                          onTap: (type, id) => _navigate(type, id, context)),
                       DailyMessageWidget(key: _dailyMessageKey),
                       StatsWidget(),
+                      Container(height: 50)
                     ],
                   );
                 }
@@ -73,12 +79,19 @@ class HomeWidget extends StatelessWidget {
     );
   }
 
+  Future<void> _navigate(type, id, BuildContext context) {
+    return NavigationFactory.navigateToScreenFromString(type, id, context)
+        .then((value) {
+      return _refresh();
+    });
+  }
+
   Future<void> _refresh() {
+    _bloc.checkConnection();
     _announceKey.currentState?.refresh();
     _shortcutKey.currentState?.refresh();
     _coursesKey.currentState?.refresh();
     _dailyMessageKey.currentState?.refresh();
-    _bloc.checkConnection();
     return _bloc.fetchMenu(skipCache: true);
   }
 

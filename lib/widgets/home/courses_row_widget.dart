@@ -2,7 +2,6 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/courses_bloc.dart';
 import 'package:Medito/network/home/courses_response.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +9,9 @@ class CoursesRowWidget extends StatefulWidget {
   @override
   CoursesRowWidgetState createState() => CoursesRowWidgetState();
 
-  CoursesRowWidget({Key key}) : super(key: key);
+  CoursesRowWidget({Key key, this.onTap}) : super(key: key);
+
+  final void Function(dynamic, dynamic) onTap;
 }
 
 class CoursesRowWidgetState extends State<CoursesRowWidget> {
@@ -60,7 +61,10 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
       AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot) {
     var list = <Widget>[Container(width: 16)];
     snapshot.data.body.data.forEach((element) {
-      list.add(CoursesRowItemWidget(element));
+      list.add(CoursesRowItemWidget(
+        element,
+        onTap: widget.onTap,
+      ));
     });
 
     return SingleChildScrollView(
@@ -84,18 +88,17 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
 }
 
 class CoursesRowItemWidget extends StatelessWidget {
-  const CoursesRowItemWidget(
-    this.data, {
-    Key key,
-  }) : super(key: key);
+  const CoursesRowItemWidget(this.data, {Key key, this.onTap})
+      : super(key: key);
+
+  final void Function(dynamic, dynamic) onTap;
 
   final Data data;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => NavigationFactory.navigateToScreenFromString(
-          data.type, data.id, context),
+      onTap: () => onTap(data.type, data.id),
       child: Container(
         width: 148,
         child: Column(
