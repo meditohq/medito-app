@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
@@ -81,6 +82,9 @@ class _ParentWidgetState extends State<ParentWidget>
       }
     });
 
+// update stats for any sessions that were listened in the background and after the app was killed
+    updateStatsFromBg();
+    // listend for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -98,7 +102,7 @@ class _ParentWidgetState extends State<ParentWidget>
     });
   }
 
-  void  _checkToShowSwipeToDeleteTip(int index) {
+  void _checkToShowSwipeToDeleteTip(int index) {
     if (_children[index] is LibraryWidget) {
       DownloadsBloc.fetchDownloads().then((value) {
         if (value.isNotEmpty) {
@@ -193,6 +197,14 @@ class _ParentWidgetState extends State<ParentWidget>
         title: ParentWidget._title,
       ),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // update session stats when app comes into foreground
+      updateStatsFromBg();
+    }
   }
 }
 
