@@ -24,6 +24,7 @@ import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 
@@ -37,6 +38,8 @@ class HomeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _observeNetwork();
+
     _bloc.fetchMenu();
     _bloc.checkConnection();
 
@@ -59,8 +62,8 @@ class HomeWidget extends StatelessWidget {
                       AnnouncementBanner(key: _announceKey),
                       SmallShortcutsRowWidget(key: _shortcutKey),
                       CoursesRowWidget(key: _coursesKey),
+                      DailyMessageWidget(key: _dailyMessageKey),
                       StatsWidget(),
-                      DailyMessageWidget(key: _dailyMessageKey)
                     ],
                   );
                 }
@@ -136,8 +139,8 @@ class HomeWidget extends StatelessWidget {
       builder: (context, snapshot) {
         return GestureDetector(
           onLongPress: () => _showVersionPopUp(context),
-          child: Text(snapshot.data,
-              style: Theme.of(context).textTheme.headline1),
+          child:
+              Text(snapshot.data, style: Theme.of(context).textTheme.headline1),
         );
       });
 
@@ -156,5 +159,13 @@ class HomeWidget extends StatelessWidget {
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _observeNetwork() {
+    Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) async {
+      await _refresh();
+    });
   }
 }
