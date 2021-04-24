@@ -80,7 +80,6 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-// ignore: always_declare_return_types
 Future<bool> launchUrl(String url) async {
   return launch(url);
 }
