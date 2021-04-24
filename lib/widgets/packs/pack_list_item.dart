@@ -33,10 +33,13 @@ class PackListItemWidget extends StatelessWidget {
           Flexible(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _getTitle(context),
-                Container(height: 4),
+                data.subtitle.isNotEmptyAndNotNull()
+                    ? Container(height: 4)
+                    : Container(),
                 data.subtitle.isNotEmptyAndNotNull()
                     ? _getSubtitle(context)
                     : Container()
@@ -64,6 +67,7 @@ class PackListItemWidget extends StatelessWidget {
               height: data.coverSize,
               width: data.coverSize,
               child: Stack(
+                alignment: Alignment.center,
                 children: [
                   _backgroundImageWidget(),
                   _coverImageWidget(),
@@ -74,9 +78,9 @@ class PackListItemWidget extends StatelessWidget {
 
   Padding _coverImageWidget() {
     return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: data.icon ?? getNetworkImageWidget(data.cover),
-                );
+      padding: const EdgeInsets.all(8.0),
+      child: data.icon ?? getNetworkImageWidget(data.cover),
+    );
   }
 
   Widget _backgroundImageWidget() {
