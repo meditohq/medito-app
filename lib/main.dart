@@ -82,9 +82,9 @@ class _ParentWidgetState extends State<ParentWidget>
       }
     });
 
-// update stats for any sessions that were listened in the background and after the app was killed
+    // update stats for any sessions that were listened in the background and after the app was killed
     updateStatsFromBg();
-    // listend for app background/foreground events
+    // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
 

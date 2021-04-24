@@ -96,9 +96,12 @@ class HomeWidget extends StatelessWidget {
               switch (snapshot.data.status) {
                 case Status.LOADING:
                 case Status.ERROR:
-                  return Icon(
-                    Icons.more_vert,
-                    color: MeditoColors.walterWhite,
+                  return GestureDetector(
+                    onTap: () => _bloc.fetchMenu(skipCache: true),
+                    child: Icon(
+                      Icons.more_vert,
+                      color: MeditoColors.walterWhite,
+                    ),
                   );
                 case Status.COMPLETED:
                   return _getMenu(context, snapshot);
