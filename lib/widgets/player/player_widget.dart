@@ -273,64 +273,59 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         shape: roundedRectangleBorder(),
-                        backgroundColor: MeditoColors.darkBGColor,
-                        title: Text('Background sound volume',
+                        backgroundColor: MeditoColors.moonlight,
+                        title: Text(BACKGROUND_SOUND_VOLUME,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline2),
-                        content: SizedBox(
-                          height: 120,
-                          child: StreamBuilder<Object>(
-                              stream: _dragBgVolumeSubject,
-                              builder: (context, snapshot) {
-                                volume = _dragBgVolumeSubject.value;
-                                var volumeIcon = volumeIconFunction(volume);
-                                return Column(
-                                  children: [
-                                    SizedBox(height: 24),
-                                    Icon(volumeIcon,
-                                        size: 30,
-                                        color: MeditoColors.walterWhite),
-                                    SizedBox(height: 16),
-                                    SliderTheme(
-                                      data: SliderThemeData(
-                                        trackShape: CustomTrackShape(),
-                                        thumbShape: RoundSliderThumbShape(
-                                            enabledThumbRadius: 10.0),
-                                      ),
-                                      child: Slider(
-                                        min: 0.0,
-                                        activeColor: primaryColorAsColor,
-                                        inactiveColor: MeditoColors.walterWhite
-                                            .withOpacity(0.7),
-                                        max: 100.0,
-                                        value: volume,
-                                        onChanged: (value) {
-                                          _dragBgVolumeSubject.add(value);
-                                          AudioService.customAction(
-                                              'setBgVolume', value / 100);
-                                        },
-                                        onChangeEnd: (value) {
-                                          saveBgVolume(value);
-                                        },
-                                      ),
+                            style: Theme.of(context).textTheme.headline1),
+                        content: StreamBuilder<Object>(
+                            stream: _dragBgVolumeSubject,
+                            builder: (context, snapshot) {
+                              volume = _dragBgVolumeSubject.value;
+                              var volumeIcon = volumeIconFunction(volume);
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(height: 16),
+                                  Icon(volumeIcon,
+                                      size: 24,
+                                      color: MeditoColors.walterWhite),
+                                  SizedBox(height: 8),
+                                  SliderTheme(
+                                    data: SliderThemeData(
+                                      trackShape: CustomTrackShape(),
+                                      thumbShape: RoundSliderThumbShape(
+                                          enabledThumbRadius: 10.0),
                                     ),
-                                  ],
-                                );
-                              }),
-                        ),
+                                    child: Slider(
+                                      min: 0.0,
+                                      activeColor: primaryColorAsColor,
+                                      inactiveColor: MeditoColors.walterWhite
+                                          .withOpacity(0.7),
+                                      max: 100.0,
+                                      value: volume,
+                                      onChanged: (value) {
+                                        _dragBgVolumeSubject.add(value);
+                                        AudioService.customAction(
+                                            'setBgVolume', value / 100);
+                                      },
+                                      onChangeEnd: (value) {
+                                        saveBgVolume(value);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
                         actions: [
                           Container(
                             height: 48,
                             child: TextButton(
                               onPressed: _onCancelTap,
                               child: Text(
-                                'CANCEL',
+                                'CLOSE',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline3
-                                    .copyWith(
-                                        color: MeditoColors.walterWhite,
-                                        fontWeight: FontWeight.bold),
+                                    .subtitle2,
                               ),
                             ),
                           ),

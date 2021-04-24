@@ -51,8 +51,10 @@ class PackListItemWidget extends StatelessWidget {
   Text _getSubtitle(BuildContext context) =>
       Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
 
-  Text _getTitle(BuildContext context) =>
-      Text(data.title, style: Theme.of(context).textTheme.headline4, maxLines: 1, overflow: TextOverflow.ellipsis);
+  Text _getTitle(BuildContext context) => Text(data.title,
+      style: Theme.of(context).textTheme.headline4,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis);
 
   Widget _getListItemLeadingImageWidget() => ClipRRect(
         borderRadius: BorderRadius.circular(3.0),
@@ -61,18 +63,34 @@ class PackListItemWidget extends StatelessWidget {
           child: SizedBox(
               height: data.coverSize,
               width: data.coverSize,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: data.icon ?? getNetworkImageWidget(data.cover),
+              child: Stack(
+                children: [
+                  _backgroundImageWidget(),
+                  _coverImageWidget(),
+                ],
               )),
         ),
       );
+
+  Padding _coverImageWidget() {
+    return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: data.icon ?? getNetworkImageWidget(data.cover),
+                );
+  }
+
+  Widget _backgroundImageWidget() {
+    return data.backgroundImage.isNotEmptyAndNotNull()
+        ? getNetworkImageWidget(data.backgroundImage)
+        : Container();
+  }
 }
 
 class PackImageListItemData {
   String title;
   String subtitle;
   String cover;
+  String backgroundImage;
   Color colorPrimary;
   double coverSize;
   Widget icon;
@@ -83,5 +101,6 @@ class PackImageListItemData {
       this.colorPrimary,
       this.cover,
       this.coverSize,
-      this.icon});
+      this.icon,
+      this.backgroundImage});
 }

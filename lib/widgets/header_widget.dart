@@ -125,7 +125,6 @@ class HeaderWidget extends StatelessWidget {
                   color: snapshot.hasData
                       ? parseColor(snapshot.data)
                       : MeditoColors.intoTheNight,
-                  padding: const EdgeInsets.all(12.0),
                   child: Stack(
                     children: [
                       _bgImageStream(),
@@ -160,12 +159,21 @@ class HeaderWidget extends StatelessWidget {
             case Status.LOADING:
               return Center(
                 child: SizedBox(
-                    height: 24, width: 24, child: CircularProgressIndicator()),
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      backgroundColor: MeditoColors.transparent,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          MeditoColors.darkMoon),
+                    )),
               );
               break;
 
             case Status.COMPLETED:
-              return getNetworkImageWidget(snapshot.data.body);
+              return Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: getNetworkImageWidget(snapshot.data.body),
+              );
               break;
             case Status.ERROR:
               return Center(child: Icon(Icons.broken_image_outlined));

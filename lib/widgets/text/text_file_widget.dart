@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/app_bar_widget.dart';
@@ -88,7 +89,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     return SafeArea(
       bottom: false,
       maintainBottomViewPadding: false,
-      child: getInnerTextView(),
+      child: _getInnerTextView(),
     );
   }
 
@@ -96,8 +97,9 @@ class _TextFileWidgetState extends State<TextFileWidget>
     launchUrl(url);
   }
 
-  Widget getInnerTextView() {
+  Widget _getInnerTextView() {
     return SingleChildScrollView(
+      physics: AlwaysScrollableScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -116,7 +118,9 @@ class _TextFileWidgetState extends State<TextFileWidget>
                       physics: NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(0),
                       shrinkWrap: true,
-                      styleSheet: buildMarkdownStyleSheet(context));
+                      styleSheet: buildMarkdownStyleSheet(context).copyWith(
+                          p: TextStyle(
+                              color: MeditoColors.walterWhite, height: 1.5)));
                 }),
           ),
         ],
