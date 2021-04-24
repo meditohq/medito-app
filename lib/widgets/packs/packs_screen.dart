@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
+
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/packs/packs_bloc.dart';
 import 'package:Medito/network/packs/packs_response.dart';
@@ -22,6 +24,7 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -37,12 +40,24 @@ class PackListWidget extends StatefulWidget {
 class PackListWidgetState extends State<PackListWidget> {
   PacksBloc _packsBloc;
 
+  StreamSubscription<DataConnectionStatus> _connectivitySubscription;
+
   @override
   void initState() {
     Tracking.changeScreenName(Tracking.HOME);
 
+    _observeNetwork();
+
     super.initState();
     _packsBloc = PacksBloc();
+    _packsBloc.fetchPacksList();
+  }
+
+  void _observeNetwork() {
+    _connectivitySubscription =
+        DataConnectionChecker().onStatusChange.listen((status) async {
+      await _packsBloc.fetchPacksList();
+    });
   }
 
   @override
@@ -56,60 +71,55 @@ class PackListWidgetState extends State<PackListWidget> {
   }
 
   Widget _streamBuilderWidget() {
-    return FutureBuilder<bool>(
-        future: checkConnectivity(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data) {
-            return RefreshIndicator(
-              displacement: 80,
-              color: MeditoColors.walterWhite,
-              backgroundColor: MeditoColors.moonlight,
-              onRefresh: () => _packsBloc.fetchPacksList(true),
-              child: StreamBuilder<ApiResponse<List<PacksData>>>(
-                  stream: _packsBloc.packsListController.stream,
-                  initialData: ApiResponse.loading(),
-                  builder: (context, snapshot) {
-                    return FutureBuilder<bool>(
-                        future: checkConnectivity(),
-                        builder: (context, connectionSnapshot) {
-                          if (!connectionSnapshot.hasData) {
-                            return getLoadingWidget();
-                          } else if (connectionSnapshot.hasData &&
-                              connectionSnapshot.data) {
-                            return _getViewMainContent(snapshot);
-                          } else {
-                            return _getErrorPacksWidget();
-                          }
-                        });
-                  }),
-            );
-          } else {
-            return _getErrorPacksWidget();
-          }
-        });
+    return RefreshIndicator(
+      displacement: 80,
+      color: MeditoColors.walterWhite,
+      backgroundColor: MeditoColors.moonlight,
+      onRefresh: () => _packsBloc.fetchPacksList(true),
+      child: StreamBuilder<ApiResponse<List<PacksData>>>(
+          stream: _packsBloc.packsListController.stream,
+          initialData: ApiResponse.loading(),
+          builder: (context, snapshot) {
+            return FutureBuilder<bool>(
+                future: checkConnectivity(),
+                builder: (context, connectionSnapshot) {
+                  if (connectionSnapshot.hasData && !connectionSnapshot.data) {
+                    return _getErrorPacksWidget();
+                  }
+
+                  switch (snapshot.data.status) {
+                    case Status.LOADING:
+                      return getLoadingWidget();
+                      break;
+                    case Status.COMPLETED:
+                      return _getViewMainContent(snapshot);
+                      break;
+                    case Status.ERROR:
+                      return _getErrorPacksWidget();
+                      break;
+                  }
+
+                  return Container();
+                });
+          }),
+    );
+    ;
   }
 
   Widget _getViewMainContent(
       AsyncSnapshot<ApiResponse<List<PacksData>>> snapshot) {
     if (snapshot.hasData) {
-      switch (snapshot.data.status) {
-        case Status.LOADING:
-          return getLoadingWidget();
-        case Status.COMPLETED:
-          return _getListWidget(snapshot.data.body);
-        case Status.ERROR:
-          return _getErrorPacksWidget();
-        default:
-          return Container();
-      }
+      return _getListWidget(snapshot.data.body);
     } else {
       return Container();
     }
   }
 
   ErrorPacksWidget _getErrorPacksWidget() => ErrorPacksWidget(
-      onPressed: () => _packsBloc.fetchPacksList().then((value) => setState(() {})),
-    );
+        onPressed: () => _packsBloc
+            .fetchPacksList()
+            .then((value) => _packsBloc.fetchPacksList()),
+      );
 
   Widget _getListWidget(List<PacksData> data) {
     return ListView.builder(
@@ -144,6 +154,7 @@ class PackListWidgetState extends State<PackListWidget> {
   @override
   void dispose() {
     _packsBloc.dispose();
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
