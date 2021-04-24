@@ -56,6 +56,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void dispose() {
     try {
       AudioService.stop();
+      _stream.cancel();
     } catch (e) {
       print('stop error!');
     }
@@ -323,9 +324,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                               onPressed: _onCancelTap,
                               child: Text(
                                 'CLOSE',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle2,
+                                style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
                           ),
