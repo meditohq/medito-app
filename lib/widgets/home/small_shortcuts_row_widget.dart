@@ -12,7 +12,9 @@ class SmallShortcutsRowWidget extends StatefulWidget {
   @override
   SmallShortcutsRowWidgetState createState() => SmallShortcutsRowWidgetState();
 
-  SmallShortcutsRowWidget({Key key}) : super(key: key);
+  SmallShortcutsRowWidget({Key key, this.onTap}) : super(key: key);
+
+  final void Function(dynamic, dynamic) onTap;
 }
 
 class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
@@ -52,7 +54,8 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                   return Card(
                     clipBehavior: Clip.antiAlias,
                     color: MeditoColors.deepNight,
-                    child: SmallShortcutWidget(snapshot.data.body.data[index]),
+                    child: SmallShortcutWidget(
+                        snapshot.data.body.data[index], widget.onTap),
                   );
                 }),
               );
@@ -84,15 +87,15 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
 
 class SmallShortcutWidget extends StatelessWidget {
   final ShortcutData data;
+  final Function onTap;
 
-  SmallShortcutWidget(this.data);
+  SmallShortcutWidget(this.data, this.onTap);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: MeditoColors.softGrey,
-      onTap: () => NavigationFactory.navigateToScreenFromString(
-          data.type, data.id, context),
+      onTap: () => onTap(data.type, data.id),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
