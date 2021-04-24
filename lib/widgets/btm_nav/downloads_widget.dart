@@ -20,8 +20,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
 
-  final _messengerKey = GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
     super.initState();
@@ -30,7 +28,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _messengerKey,
       body: _getDownloadList(),
     );
   }
@@ -78,7 +75,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
               });
             }
 
-            _messengerKey.currentState.showSnackBar(SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text('"${item.title}" removed'),
             ));
           },
