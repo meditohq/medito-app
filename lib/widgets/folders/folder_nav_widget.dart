@@ -73,7 +73,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () {
-        return _refresh(context);
+        return _refresh(context, skipCache: true);
       },
       child: Scaffold(
         body: Builder(
@@ -85,9 +85,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     );
   }
 
-  Future<void> _refresh(BuildContext context) {
-     final FolderArguments args = ModalRoute.of(context).settings.arguments;
-    return _bloc.fetchData(id: args.sessionId, skipCache: true);
+  Future<void> _refresh(BuildContext context, {bool skipCache}) {
+    final FolderArguments args = ModalRoute.of(context).settings.arguments;
+    return _bloc.fetchData(id: args.sessionId, skipCache: skipCache);
   }
 
   Widget _getScreenContent() => SingleChildScrollView(
@@ -203,8 +203,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   void itemTap(Item i) {
     Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
     NavigationFactory.navigate(
-        context, NavigationFactory.getScreenFromItemType(i.fileType),
-        id: i.id).then((value) => _refresh(context));
+            context, NavigationFactory.getScreenFromItemType(i.fileType),
+            id: i.id)
+        .then((value) => _refresh(context, skipCache: false));
   }
 
   void startService(media, primaryColor) {
