@@ -24,7 +24,6 @@ import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
 
 class PackListWidget extends StatefulWidget {
   PackListWidget({Key key}) : super(key: key);
@@ -108,16 +107,9 @@ class PackListWidgetState extends State<PackListWidget> {
     }
   }
 
-  ErrorPacksWidget _getErrorPacksWidget() {
-    return ErrorPacksWidget(
-      onPressed: () {
-        setState(() {
-
-        });
-        return _packsBloc.fetchPacksList();
-      },
+  ErrorPacksWidget _getErrorPacksWidget() => ErrorPacksWidget(
+      onPressed: () => _packsBloc.fetchPacksList().then((value) => setState(() {})),
     );
-  }
 
   Widget _getListWidget(List<PacksData> data) {
     return ListView.builder(
@@ -125,8 +117,7 @@ class PackListWidgetState extends State<PackListWidget> {
       itemCount: data.length,
       itemBuilder: (context, i) {
         return InkWell(
-          onTap: () => NavigationFactory.navigateToScreenFromString(
-              data[i].type, data[i].id, context),
+          onTap: () => _navigate(data, i, context),
           child: PackListItemWidget(PackImageListItemData(
               title: data[i].title,
               subtitle: data[i].subtitle,
@@ -137,6 +128,17 @@ class PackListWidgetState extends State<PackListWidget> {
         );
       },
     );
+  }
+
+  Future<void> _navigate(List<PacksData> data, int i, BuildContext context) {
+    return checkConnectivity().then((connected) {
+      if (connected) {
+        return NavigationFactory.navigateToScreenFromString(
+            data[i].type, data[i].id, context);
+      } else {
+        _packsBloc.fetchPacksList(true);
+      }
+    });
   }
 
   @override
