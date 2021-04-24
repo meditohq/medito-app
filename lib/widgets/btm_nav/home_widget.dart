@@ -24,7 +24,7 @@ import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 
@@ -178,9 +178,7 @@ class HomeWidget extends StatelessWidget {
   }
 
   void _observeNetwork() {
-    Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) async {
+    DataConnectionChecker().onStatusChange.listen((status) async {
       await _refresh();
     });
   }

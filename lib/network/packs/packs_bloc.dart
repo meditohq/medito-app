@@ -27,7 +27,6 @@ class PacksBloc {
   PacksBloc() {
     packsListController = StreamController.broadcast();
     _repo = PacksRepository();
-    fetchPacksList();
   }
 
   Future<void> fetchPacksList([bool skipCache = false]) async {
