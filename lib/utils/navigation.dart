@@ -20,7 +20,7 @@ class NavigationFactory {
         return _push(context, PlayerWidget(normalPop: normalPop));
         break;
       case Screen.text:
-        return   _push(
+        return _push(
             context,
             TextFileWidget(
               id: id,
@@ -31,7 +31,7 @@ class NavigationFactory {
         break;
       case Screen.session_options:
         assert(id.isNotEmpty);
-        return   _push(
+        return _push(
             context,
             session_optionsScreen(
               id: id,
@@ -41,10 +41,10 @@ class NavigationFactory {
       case Screen.donation:
         break;
       case Screen.downloads:
-        return    _push(context, DownloadsListWidget());
+        return _push(context, DownloadsListWidget());
         break;
       case Screen.daily:
-        return   _push(
+        return _push(
             context,
             session_optionsScreen(
               id: id,
@@ -59,11 +59,12 @@ class NavigationFactory {
     return null;
   }
 
-  static Future<void> _push(BuildContext context, Widget widget) => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => widget,
-        ));
+  static Future<void> _push(BuildContext context, Widget widget) =>
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => widget,
+          ));
 
   static Screen getScreenFromItemType(FileType fileType) {
     switch (fileType) {
@@ -90,22 +91,22 @@ class NavigationFactory {
       return navigate(context, Screen.session_options, id: id);
     }
     if (place == 'daily') {
-      return   navigate(context, Screen.daily, id: id);
+      return navigate(context, Screen.daily, id: id);
     }
     if (place == 'donation') {
-      return    navigate(context, Screen.donation);
+      return navigate(context, Screen.donation);
     }
     if (place == 'article') {
-      return    navigate(context, Screen.text, id: id);
+      return navigate(context, Screen.text, id: id);
     }
     if (place == 'download') {
-      return    navigate(context, Screen.downloads);
+      return navigate(context, Screen.downloads);
     }
     if (place == 'folder') {
-      return  navigate(context, Screen.folder, id: id);
+      return navigate(context, Screen.folder, id: id);
     }
     if (place == 'url') {
-     return launchUrl(id);
+      return launchUrl(id);
     }
     return null;
   }
