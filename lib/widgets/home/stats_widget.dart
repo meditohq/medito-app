@@ -130,22 +130,6 @@ class _StatsWidgetState extends State<StatsWidget> {
                     ),
                   ],
                 ),
-//
-//                TextButton(
-//                  style: TextButton.fromStyle(
-//                  shape: RoundedRectangleBorder(
-//                    borderRadius: new BorderRadius.circular(12.0),
-//                  ),
-//                  primary: MeditoColors.walterWhite),
-//                  child: Text(
-//                    "SAVE",
-//                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
-//                  ),
-//                  onPressed: () {
-//                    Navigator.pop(context, _controller.text);
-//                    _controller.text = '';
-//                  },
-//                ),s
               )
             ],
           ),
@@ -154,7 +138,7 @@ class _StatsWidgetState extends State<StatsWidget> {
     ).then((val) {
       setState(() {
         if (val != null) {
-          updateStreak(streak: val);
+          updateStreak(manualStreak: val);
         }
       });
     });

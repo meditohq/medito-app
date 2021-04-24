@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
@@ -269,6 +270,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (!_updatedStats) {
       _updatedStats = true;
 
+      print('saving stats');
+
       var dataMap = {
         'secsListened': _duration.inSeconds,
         'id': '${mediaItem.extras['sessionId']}',
@@ -276,7 +279,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
       await writeJSONToCache(encoded(dataMap), 'stats');
 
-      AudioServiceBackground.sendCustomEvent('stats');
+      unawaited(updateStatsFromBg());
 
       unawaited(Tracking.trackEvent(
           Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));

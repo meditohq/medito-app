@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/main.dart';
 import 'package:Medito/viewmodel/cache.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/utils/utils.dart';
 
@@ -82,14 +83,14 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
   return true;
 }
 
-Future<void> updateStreak({String streak = ''}) async {
+Future<void> updateStreak({String manualStreak = ''}) async {
   print('update streak');
 
   var prefs = await SharedPreferences.getInstance();
 
-  if (streak.isNotEmpty) {
-    await prefs.setInt('streakCount', int.parse(streak));
-    await _updateLongestStreak(int.parse(streak), prefs);
+  if (manualStreak.isNotEmpty) {
+    await prefs.setInt('streakCount', int.parse(manualStreak));
+    await _updateLongestStreak(int.parse(manualStreak), prefs);
     await addPhantomSessionToStreakList();
     return;
   }
@@ -240,9 +241,7 @@ void toggleListenedStatus(String id, String oldId) {
 
 void markAsListened(String id) {
   print('mark as listened');
-
-  // ignore: unawaited_futures
-  sharedPreferences.setBool('listened' + id, true);
+  unawaited(sharedPreferences.setBool('listened' + id, true));
 }
 
 void markAsNotListened(String id, String oldId) {
@@ -290,9 +289,9 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
   return now.isAfter(thirtyTwoHoursAfterTime);
 }
 
-Future updateStatsFromBg() async {
+Future<void> updateStatsFromBg() async {
   var read = await readJSONFromCache('stats');
-  print('read ->$read');
+  print('reading stats -> $read');
 
   if (read.isNotEmptyAndNotNull()) {
     var map = decoded(read);
@@ -300,7 +299,7 @@ Future updateStatsFromBg() async {
     if (map != null && map.isNotEmpty) {
       await updateStreak();
       await incrementNumSessions();
-      await markAsListened(map['id']);
+      markAsListened(map['id']);
       await updateMinuteCounter(
           Duration(seconds: map['secsListened']).inSeconds);
     }
