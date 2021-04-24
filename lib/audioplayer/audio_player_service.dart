@@ -85,7 +85,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
       if (position != null) {
         if (audioPositionIsInEndPeriod(position)) {
           await setBgVolumeFadeAtEnd(timeLeft);
-          await updateStats();
+          if (!_updatedStats) {
+            _updatedStats = true;
+            await updateStats();
+          }
         } else if (audioPositionBeforeEndPeriod(position) &&
             !avoidVolumeIncreaseAtLastSec) {
           await _bgPlayer.setVolume(initialBgVolume);
@@ -266,21 +269,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   Future<void> updateStats() async {
-    if (!_updatedStats) {
-      _updatedStats = true;
+    var dataMap = {
+      'secsListened': _duration.inSeconds,
+      'id': '${mediaItem.extras['sessionId']}',
+    };
 
-      var dataMap = {
-        'secsListened': _duration.inSeconds,
-        'id': '${mediaItem.extras['sessionId']}',
-      };
+    await writeJSONToCache(encoded(dataMap), 'stats');
 
-      await writeJSONToCache(encoded(dataMap), 'stats');
+    AudioServiceBackground.sendCustomEvent('stats');
 
-      AudioServiceBackground.sendCustomEvent('stats');
-
-      unawaited(Tracking.trackEvent(
-          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
-    }
+    unawaited(Tracking.trackEvent(
+        Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
   }
 }
 
