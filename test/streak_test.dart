@@ -87,12 +87,12 @@ void main() {
   });
 
   test('test updateStreak and check longest', () async {
-    await updateStreak(streak: '5');
+    await updateStreak(manualStreak: '5');
 
     var future2 = getCurrentStreak();
     expect(future2, completion('5'));
 
-    await updateStreak(streak: '2');
+    await updateStreak(manualStreak: '2');
 
     var future1 = getLongestStreak();
     expect(future1, completion('5'));
