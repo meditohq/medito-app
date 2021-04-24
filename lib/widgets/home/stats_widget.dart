@@ -13,29 +13,26 @@ class _StatsWidgetState extends State<StatsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 32.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
-            child: Text('Stats',
-                style: Theme.of(context).textTheme.headline3),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
+          child: Text('Stats',
+              style: Theme.of(context).textTheme.headline3),
+        ),
+        SizedBox(
+          height: 73,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            itemBuilder: (context, i) => statsItem(context, i),
+            itemCount: 5,
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
           ),
-          SizedBox(
-            height: 73,
-            child: ListView.builder(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              itemBuilder: (context, i) => statsItem(context, i),
-              itemCount: 5,
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-            ),
-          ),
-          Container(height: 32)
-        ],
-      ),
+        ),
+        Container(height: 16)
+      ],
     );
   }
 

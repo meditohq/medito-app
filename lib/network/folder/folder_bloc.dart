@@ -55,7 +55,7 @@ class FolderItemsBloc {
       if (content?.hasData == null) {
         itemsListController.sink.add(ApiResponse.error('Error'));
         coverController.sink.add(ApiResponse.error('Error'));
-        titleController.add('Error');
+        titleController.add('Please check your connection');
       } else {
         _postItemList(content);
         _postTitle(content);
