@@ -50,6 +50,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (__loaded == null && b == true) __loaded = 'true';
   }
 
+  StreamSubscription _stream;
+
   @override
   void dispose() {
     try {
@@ -74,6 +76,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Tracking.changeScreenName(Tracking.PLAYER_PAGE);
 
     initBgVolume();
+
+    _stream = AudioService.customEventStream.listen((event) async {
+      if (event == 'stats') {
+        await updateStatsFromBg();
+      }
+      await _stream.cancel();
+      return true;
+    });
+
     _bloc = AudioCompleteCopyBloc();
   }
 

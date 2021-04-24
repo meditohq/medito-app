@@ -15,7 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/main.dart';
 import 'package:Medito/viewmodel/cache.dart';
-import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/utils/utils.dart';
 
@@ -83,14 +82,14 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
   return true;
 }
 
-Future<void> updateStreak({String manualStreak = ''}) async {
+Future<void> updateStreak({String streak = ''}) async {
   print('update streak');
 
   var prefs = await SharedPreferences.getInstance();
 
-  if (manualStreak.isNotEmpty) {
-    await prefs.setInt('streakCount', int.parse(manualStreak));
-    await _updateLongestStreak(int.parse(manualStreak), prefs);
+  if (streak.isNotEmpty) {
+    await prefs.setInt('streakCount', int.parse(streak));
+    await _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomSessionToStreakList();
     return;
   }
@@ -241,7 +240,9 @@ void toggleListenedStatus(String id, String oldId) {
 
 void markAsListened(String id) {
   print('mark as listened');
-  unawaited(sharedPreferences.setBool('listened' + id, true));
+
+  // ignore: unawaited_futures
+  sharedPreferences.setBool('listened' + id, true);
 }
 
 void markAsNotListened(String id, String oldId) {
@@ -289,9 +290,9 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
   return now.isAfter(thirtyTwoHoursAfterTime);
 }
 
-Future<void> updateStatsFromBg() async {
+Future updateStatsFromBg() async {
   var read = await readJSONFromCache('stats');
-  print('reading stats -> $read');
+  print('read ->$read');
 
   if (read.isNotEmptyAndNotNull()) {
     var map = decoded(read);
@@ -299,7 +300,7 @@ Future<void> updateStatsFromBg() async {
     if (map != null && map.isNotEmpty) {
       await updateStreak();
       await incrementNumSessions();
-      markAsListened(map['id']);
+      await markAsListened(map['id']);
       await updateMinuteCounter(
           Duration(seconds: map['secsListened']).inSeconds);
     }
