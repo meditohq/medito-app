@@ -46,6 +46,7 @@ class PacksData {
   String get cover => '${baseUrl}assets/$coverOld?download';
   String colorPrimary;
   String colorSecondary;
+  String get backgroundImageUrl => '${baseUrl}assets/$backgroundImage?download';
   String type;
 
   FileType get fileType {
@@ -57,6 +58,8 @@ class PacksData {
     return null;
   }
 
+  @Deprecated('Use backgroundImageUrl')
+  String backgroundImage;
   @Deprecated('Use cover instead')
   String coverOld;
 
@@ -74,6 +77,7 @@ class PacksData {
     subtitle = json['subtitle'];
     type = json['type'];
     id = json['id'];
+    backgroundImage = json['background_image'];
     colorPrimary = json['color_primary'];
     colorSecondary = json['color_secondary'];
     coverOld = json['cover'];
@@ -85,6 +89,7 @@ class PacksData {
     data['subtitle'] = subtitle;
     data['type'] = type;
     data['id'] = id;
+    data['background_image'] = backgroundImage;
     data['color_primary'] = colorPrimary;
     data['color_secondary'] = colorSecondary;
     data['cover'] = coverOld;

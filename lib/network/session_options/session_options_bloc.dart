@@ -56,6 +56,7 @@ class SessionOptionsBloc {
   StreamController<String> titleController;
   StreamController<String> descController;
   StreamController<ApiResponse<String>> imageController;
+  StreamController<String> backgroundImageController;
   StreamController<String> primaryColourController;
   StreamController<String> secondaryColorController;
   StreamController<ApiResponse<List<String>>> voiceListController;
@@ -85,6 +86,7 @@ class SessionOptionsBloc {
     imageController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
 
+    backgroundImageController = StreamController.broadcast();
     primaryColourController = StreamController.broadcast();
     secondaryColorController = StreamController.broadcast();
 
@@ -109,6 +111,7 @@ class SessionOptionsBloc {
     titleController.sink.add(_options.title);
     descController.sink.add(_options.description);
     imageController.sink.add(ApiResponse.completed(_options.coverUrl));
+    backgroundImageController.sink.add(_options.backgroundImageUrl);
     primaryColourController.sink.add(_options.colorPrimary);
     secondaryColorController.sink.add(_options.colorSecondary);
 
@@ -136,6 +139,7 @@ class SessionOptionsBloc {
     primaryColourController?.close();
     secondaryColorController?.close();
     descController?.close();
+    backgroundImageController?.close();
   }
 
   Future<void> updateCurrentFile() async {

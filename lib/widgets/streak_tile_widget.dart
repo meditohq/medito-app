@@ -53,8 +53,10 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
               onTap: widget.onClick,
               child: Ink(
                 color: MeditoColors.moonlight,
-                child: Container(
-                  width: 132,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: 132.0,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Column(

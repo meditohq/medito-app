@@ -28,15 +28,6 @@ Widget getNetworkImageWidget(String url,
   final headers = {HttpHeaders.authorizationHeader: basicAuth};
   return CachedNetworkImage(
     fit: BoxFit.fill,
-    errorWidget: (
-      context,
-      url,
-      error,
-    ) =>
-        Icon(
-      Icons.broken_image_outlined,
-      color: MeditoColors.walterWhiteTrans,
-    ),
     httpHeaders: headers,
     placeholder: (context, url) => Container(
       height: startHeight,
