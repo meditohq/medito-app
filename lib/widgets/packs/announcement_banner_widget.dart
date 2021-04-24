@@ -31,7 +31,7 @@ class AnnouncementBanner extends StatefulWidget {
 }
 
 class AnnouncementBannerState extends State<AnnouncementBanner>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin  {
   var _hidden = false;
   final _bloc = AnnouncementBloc();
 
@@ -163,4 +163,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     _bloc.dispose();
     super.dispose();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
