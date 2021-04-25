@@ -21,7 +21,6 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/cache.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/btm_nav/library_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
@@ -61,6 +60,8 @@ class _ParentWidgetState extends State<ParentWidget>
   final _bloc = DownloadsBloc();
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
 
+  var _deletingCache = true;
+
   @override
   void initState() {
     super.initState();
@@ -84,7 +85,11 @@ class _ParentWidgetState extends State<ParentWidget>
       }
     });
 
-    clearStorageIfFirstOpen();
+    clearStorageIfFirstOpen().then((value) {
+      setState(() {
+        _deletingCache = false;
+      });
+    });
 
     // update stats for any sessions that were listened in the background and after the app was killed
     updateStatsFromBg();
@@ -150,7 +155,7 @@ class _ParentWidgetState extends State<ParentWidget>
         initialRoute: '/nav',
         routes: {
           FolderNavWidget.routeName: (context) => FolderNavWidget(),
-          '/nav': (context) => Scaffold(
+          '/nav': (context) => _deletingCache ? _getLoadingWidget() : Scaffold(
                 body: IndexedStack(
                   index: _currentIndex,
                   children: _children,
@@ -210,6 +215,10 @@ class _ParentWidgetState extends State<ParentWidget>
       updateStatsFromBg();
     }
   }
+}
+
+Widget _getLoadingWidget() {
+  return CircularProgressIndicator();
 }
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
