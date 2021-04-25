@@ -20,9 +20,7 @@ class Tracking {
   static const String FILE_TAPPED = 'file_tapped';
   static const String CTA_TAPPED = 'cta_tapped';
   static const String MAIN_CTA_TAPPED = 'main_cta_tapped';
-  static const String SECOND_CTA_TAPPED = 'second_cta_tapped';
-  static const String TILE = 'tile';
-  static const String TAP = 'tap';
+  static const String SECOND_CTA_TAPPED = 'share_tapped';
 
   static const String AUDIO_DOWNLOAD = 'audio_download';
   static const String AUDIO_COMPLETED = 'audio_completed';
@@ -45,9 +43,6 @@ class Tracking {
   static const String FOLDER_TAPPED = 'folder_tapped';
   static const String SESSION_TAPPED = 'session_tapped';
   static const String PLAY_TAPPED = 'play_tapped';
-
-  static const String ACCEPT_TRACKING = 'accept_tracking';
-  static const String DENY_TRACKING = 'deny_tracking';
 
   static const String HOME = 'home_page';
 
@@ -76,15 +71,6 @@ class Tracking {
     }
   }
 
-  static void enableAnalytics(bool enable) {}
-
-  static void trackDonation(String recordName, Map<String, dynamic> map) {
-  }
-
-  static Future<void> trackTrackingAnswered(bool track) async {
-    await Tracking.trackEvent(
-        Tracking.TRACKING_TAPPED, Tracking.ACCEPT_TRACKING, '');
-  }
 }
 
 extension on String {
