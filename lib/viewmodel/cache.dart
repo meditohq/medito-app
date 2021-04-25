@@ -27,9 +27,16 @@ const TEXT = 'text';
 Future<void> clearStorage() async {
   final cacheDir = await getApplicationDocumentsDirectory();
 
-  if (cacheDir.existsSync()) {
-    cacheDir.deleteSync(recursive: true);
-  }
+  await cacheDir.list(recursive: true).forEach((element) {
+    print(element.path);
+    try {
+      if (element.path.endsWith('txt') || element.path.endsWith('mp3')) {
+        element.deleteSync(recursive: true);
+      }
+    } catch (e) {
+      print(e);
+    }
+  });
 }
 
 Future<String> get _localPath async {

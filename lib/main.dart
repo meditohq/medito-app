@@ -218,7 +218,7 @@ class _ParentWidgetState extends State<ParentWidget>
 }
 
 Widget _getLoadingWidget() {
-  return CircularProgressIndicator();
+  return Center(child: CircularProgressIndicator());
 }
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
