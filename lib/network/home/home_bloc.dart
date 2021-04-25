@@ -53,11 +53,11 @@ class HomeBloc {
   Future<String> getTitleText() async {
     var now = DateTime.now();
     if (now.hour < 12) {
-      return 'Good Morning';
+      return 'Good morning';
     } else if (now.hour < 18) {
-      return 'Good Afternoon';
+      return 'Good afternoon';
     } else {
-      return 'Good Evening';
+      return 'Good evening';
     }
   }
 }
