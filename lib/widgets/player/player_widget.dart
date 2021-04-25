@@ -523,7 +523,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       style: Theme.of(context)
           .textTheme
           .subtitle2
-          .copyWith(color: MeditoColors.darkMoon),
+          .copyWith(color: secondaryColor ?? MeditoColors.darkMoon),
     );
   }
 
