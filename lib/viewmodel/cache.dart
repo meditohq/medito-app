@@ -24,6 +24,14 @@ const AUDIO_DATA = 'audio-data';
 const ATTRIBUTIONS = 'attrs';
 const TEXT = 'text';
 
+Future<void> clearStorage() async {
+  final cacheDir = await getApplicationDocumentsDirectory();
+
+  if (cacheDir.existsSync()) {
+    cacheDir.deleteSync(recursive: true);
+  }
+}
+
 Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
@@ -52,11 +60,11 @@ Future<String> _readCache(String id) async {
   return await file.readAsString();
 }
 
-String encoded(dynamic obj){
+String encoded(dynamic obj) {
   return json.encode(obj);
 }
 
-dynamic decoded(String obj){
+dynamic decoded(String obj) {
   return json.decode(obj);
 }
 
