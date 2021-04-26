@@ -33,7 +33,7 @@ class NavigationFactory {
         assert(id.isNotEmpty);
         return _push(
             context,
-            session_optionsScreen(
+            SessionOptionsScreen(
               id: id,
               screenKey: key,
             ));
@@ -46,7 +46,7 @@ class NavigationFactory {
       case Screen.daily:
         return _push(
             context,
-            session_optionsScreen(
+            SessionOptionsScreen(
               id: id,
               screenKey: key,
             ));

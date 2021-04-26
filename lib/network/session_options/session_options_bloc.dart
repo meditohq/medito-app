@@ -94,11 +94,18 @@ class SessionOptionsBloc {
 
     _repo = session_optionsRepository(screen: screen);
 
-    getIntValuesSF(id, 'voiceSelected').then((value) => voiceSelected = value);
-    getIntValuesSF(id, 'lengthSelected')
-        .then((value) => lengthSelected = value);
-    getIntValuesSF(id, 'musicSelected').then((index) {
-      musicSelected = index;
+  }
+
+  void _filterOptionsFromPrefs(String id) {
+       getIntValuesSF(id, 'voiceSelected').then((value) {
+      voiceSelected = value;
+      filterLengthsForVoice(voiceIndex: voiceSelected);
+      getIntValuesSF(id, 'lengthSelected').then((value) {
+        lengthSelected = value;
+        getIntValuesSF(id, 'musicSelected').then((index) {
+          musicSelected = index;
+        });
+      });
     });
   }
 
@@ -106,6 +113,7 @@ class SessionOptionsBloc {
     var options = await _repo.fetchOptions(id, skipCache);
     var bgMusicList = await _repo.fetchBackgroundSounds(skipCache);
     _options = options;
+    _filterOptionsFromPrefs(id);
 
     // Show title, desc and image
     titleController.sink.add(_options.title);
@@ -124,7 +132,6 @@ class SessionOptionsBloc {
 
     // Info is in the form "info": "No voice,00:05:02"
     voiceListController.sink.add(ApiResponse.completed(options.voiceList));
-    filterLengthsForVoice();
 
     await updateCurrentFile();
   }
