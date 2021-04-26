@@ -53,7 +53,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
 
   Widget _getMessageWidget(AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot, BuildContext context) {
     return GestureDetector(
-      onTap: () => Share.share('${snapshot.data.body.body} https://medito.app'),
+      onTap: () => Share.share('${snapshot.data.body.body} medito.app'),
       child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
