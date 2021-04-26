@@ -1,7 +1,6 @@
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/daily_message_bloc.dart';
 import 'package:Medito/network/home/daily_message_response.dart';
-import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -45,33 +44,34 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
           }
 
           return Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
+            padding: const EdgeInsets.only(
+                left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
             child: widget,
           );
         });
   }
 
-  Widget _getMessageWidget(AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot, BuildContext context) {
+  Widget _getMessageWidget(
+      AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot,
+      BuildContext context) {
     return GestureDetector(
       onTap: () => Share.share('${snapshot.data.body.body} medito.app'),
       child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(snapshot.data.body.title,
-                      style: Theme.of(context).textTheme.headline3),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: MarkdownBody(
-                      data: snapshot.data.body.body,
-                      onTapLink: launchUrl,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                          .copyWith(
-                          p: Theme.of(context).textTheme.bodyText1
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(snapshot.data.body.title,
+              style: Theme.of(context).textTheme.headline3),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: MarkdownBody(
+              data: snapshot.data.body.body,
+              onTapLink: launchUrl,
+              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                  .copyWith(p: Theme.of(context).textTheme.bodyText1),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

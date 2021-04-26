@@ -13,7 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/home/courses_response.dart';
 import 'package:Medito/network/home/daily_message_response.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';

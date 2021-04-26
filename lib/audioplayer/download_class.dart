@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/network/downloads/downloads_bloc.dart';
@@ -8,7 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedantic/pedantic.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'player_utils.dart';
 
 class _Download {
@@ -16,7 +15,6 @@ class _Download {
   AudioFile _file;
   int _received = 0, _total = 1;
   var downloadListener = ValueNotifier<double>(0);
-  final _downloadBloc = DownloadsBloc();
 
   MediaItem _mediaItem;
 
@@ -56,8 +54,7 @@ class _Download {
     var url = baseUrl + 'assets/' + currentFile.id;
     var request = http.Request('GET', Uri.parse(url));
     request.headers[HttpHeaders.authorizationHeader] = basicAuth;
-    var _response =
-        await http.Client().send(request);
+    var _response = await http.Client().send(request);
     _total = _response.contentLength;
     _received = 0;
     var _bytes = <int>[];

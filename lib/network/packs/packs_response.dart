@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/folder/folder_response.dart';
-import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/utils/utils.dart';
 
 class PacksResponse {
@@ -44,9 +43,11 @@ class PacksData {
   String title;
   String subtitle;
   String id;
+
   String get cover => coverOld?.toAssetUrl();
   String colorPrimary;
   String colorSecondary;
+
   String get backgroundImageUrl => backgroundImage?.toAssetUrl();
   String type;
 
