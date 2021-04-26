@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import '../../viewmodel/auth.dart';
+import 'package:Medito/utils/utils.dart';
 
 class ShortcutsResponse {
   List<ShortcutData> data;
@@ -43,8 +43,8 @@ class ShortcutData {
   String type;
   String id;
   String cover;
-  String get coverUrl => cover != null ? '${baseUrl}assets/$cover?download' : null;
-  String get bgImageUrl => backgroundImage != null ? '${baseUrl}assets/$backgroundImage?download' : null;
+  String get coverUrl => cover?.toAssetUrl();
+  String get bgImageUrl => backgroundImage?.toAssetUrl();
   String backgroundImage;
   String groundImage;
   String colorPrimary;

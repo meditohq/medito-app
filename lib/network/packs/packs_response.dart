@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/utils/utils.dart';
 
 class PacksResponse {
   List<PacksData> data;
@@ -43,10 +44,10 @@ class PacksData {
   String title;
   String subtitle;
   String id;
-  String get cover => '${baseUrl}assets/$coverOld?download';
+  String get cover => coverOld?.toAssetUrl();
   String colorPrimary;
   String colorSecondary;
-  String get backgroundImageUrl => '${baseUrl}assets/$backgroundImage?download';
+  String get backgroundImageUrl => backgroundImage?.toAssetUrl();
   String type;
 
   FileType get fileType {

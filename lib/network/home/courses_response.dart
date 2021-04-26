@@ -1,4 +1,4 @@
-import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/utils/utils.dart';
 
 class CoursesResponse {
   List<Data> data;
@@ -29,8 +29,8 @@ class Data {
   String type;
   String id;
   String cover;
-  String get coverUrl => '${baseUrl}assets/$cover?download';
-  String get backgroundImageUrl => '${baseUrl}assets/$backgroundImage?download';
+  String get coverUrl => cover?.toAssetUrl();
+  String get backgroundImageUrl => backgroundImage?.toAssetUrl();
   String backgroundImage;
   String colorPrimary;
 
