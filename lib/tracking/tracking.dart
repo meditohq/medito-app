@@ -21,6 +21,8 @@ class Tracking {
   static const String CTA_TAPPED = 'cta_tapped';
   static const String MAIN_CTA_TAPPED = 'main_cta_tapped';
   static const String SECOND_CTA_TAPPED = 'share_tapped';
+  static const String TILE = 'tile';
+  static const String TAP = 'tap';
 
   static const String AUDIO_DOWNLOAD = 'audio_download';
   static const String AUDIO_COMPLETED = 'audio_completed';

@@ -36,7 +36,7 @@ class LoadingListWidget extends StatelessWidget {
   ListView getListView() {
     return ListView.builder(
       shrinkWrap: true,
-        itemCount: 6,
+        itemCount: 30,
         itemBuilder: (context, i) {
           return LoadingItemWidget(index: i + 1);
         });
