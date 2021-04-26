@@ -155,44 +155,61 @@ class _ParentWidgetState extends State<ParentWidget>
         initialRoute: '/nav',
         routes: {
           FolderNavWidget.routeName: (context) => FolderNavWidget(),
-          '/nav': (context) => _deletingCache ? _getLoadingWidget() : Scaffold(
-                body: IndexedStack(
-                  index: _currentIndex,
-                  children: _children,
-                ),
-                bottomNavigationBar: Container(
-                  decoration: BoxDecoration(
-                      color: MeditoColors.softGrey,
-                      border: Border(
-                          top: BorderSide(
-                              color: MeditoColors.softGrey, width: 2.0))),
-                  child: BottomNavigationBar(
-                    selectedLabelStyle: Theme.of(context).textTheme.headline1,
-                    unselectedLabelStyle: Theme.of(context).textTheme.headline2,
-                    selectedItemColor: MeditoColors.walterWhite,
-                    unselectedItemColor: MeditoColors.newGrey,
-                    currentIndex: _currentIndex,
-                    onTap: _onTabTapped,
-                    items: [
-                      BottomNavigationBarItem(
-                        tooltip: 'Home',
-                        icon: Container(),
-                        label: 'Home',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Container(),
-                        tooltip: 'Packs',
-                        label: 'Packs',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Container(),
-                        tooltip: 'Library',
-                        label: 'Library',
-                      ),
-                    ],
+          '/nav': (context) => _deletingCache
+              ? _getLoadingWidget()
+              : Scaffold(
+                  body: IndexedStack(
+                    index: _currentIndex,
+                    children: _children,
                   ),
-                ),
-              )
+                  bottomNavigationBar: Container(
+                    decoration: BoxDecoration(
+                        color: MeditoColors.softGrey,
+                        border: Border(
+                            top: BorderSide(
+                                color: MeditoColors.softGrey, width: 2.0))),
+                    child: BottomNavigationBar(
+                      selectedLabelStyle: Theme.of(context)
+                          .textTheme
+                          .headline1
+                          .copyWith(fontSize: 12),
+                      unselectedLabelStyle: Theme.of(context)
+                          .textTheme
+                          .headline2
+                          .copyWith(fontSize: 12),
+                      selectedItemColor: MeditoColors.walterWhite,
+                      unselectedItemColor: MeditoColors.newGrey,
+                      currentIndex: _currentIndex,
+                      onTap: _onTabTapped,
+                      items: [
+                        BottomNavigationBarItem(
+                          tooltip: 'Home',
+                          icon: Icon(
+                            Icons.home_outlined,
+                            size: 20,
+                          ),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.format_list_bulleted_outlined,
+                            size: 20,
+                          ),
+                          tooltip: 'Packs',
+                          label: 'Packs',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.bookmark_border_outlined,
+                            size: 20,
+                          ),
+                          tooltip: 'Library',
+                          label: 'Library',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
         },
         theme: ThemeData(
             splashColor: MeditoColors.moonlight,
