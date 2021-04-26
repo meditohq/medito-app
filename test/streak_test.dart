@@ -104,7 +104,7 @@ void main() {
     await updateStreak();
 
     var currentStreak = await getCurrentStreak();
-    expect('1', currentStreak);
+    expect(currentStreak, '1');
     var streakList = await getStreakList();
     expect(true, streakList.length == 1);
 
@@ -113,7 +113,7 @@ void main() {
     await setStreakList(streakList);
     await updateStreak();
     currentStreak = await getCurrentStreak();
-    expect('1', currentStreak);
+    expect(currentStreak, '1');
     // streak count should increment by 1 if the last session was on previous day and less than 32 hours ago
     streakList.add(
         (DateTime.now().millisecondsSinceEpoch - thirtyTwoHoursInMillis + 50000)
@@ -121,7 +121,7 @@ void main() {
     await setStreakList(streakList);
     await updateStreak();
     currentStreak = await getCurrentStreak();
-    expect('2', currentStreak);
+    expect(currentStreak, '2');
 
     // reset to 0 if app launched after 32 hours
     streakList.add(
@@ -129,7 +129,10 @@ void main() {
             .toString());
     await setStreakList(streakList);
     currentStreak = await getCurrentStreak();
-    expect('0', currentStreak);
+    expect(currentStreak, '0');
+    await updateStreak();
+    currentStreak = await getCurrentStreak();
+    expect(currentStreak, '1');
   });
 
   test('test update min counter', () async {

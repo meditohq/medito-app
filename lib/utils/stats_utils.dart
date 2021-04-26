@@ -48,8 +48,8 @@ Future<String> getCurrentStreak() async {
     final now = DateTime.now();
 
     if (longerThanOneDayAgo(lastDayInStreak, now)) {
-      await updateStreak(streak: '0');
       streak = 0;
+      await prefs.setInt('streakCount', streak);
     }
   }
 
