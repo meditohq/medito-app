@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
@@ -125,23 +126,7 @@ class _ParentWidgetState extends State<ParentWidget>
     await _bloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(_bloc.setSeenTip());
-        _messengerKey.currentState.showSnackBar(
-          SnackBar(
-            content: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.info_outline,
-                  color: MeditoColors.walterWhite,
-                ),
-                Container(
-                  width: 16,
-                  height: 10,
-                ),
-                Text('Swipe away a session to delete it')
-              ],
-            ),
-          ),
-        );
+        createSnackBar(SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
       }
       ;
     });

@@ -18,7 +18,7 @@ import 'dart:io';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,8 +36,10 @@ Widget getNetworkImageWidget(String url,
   );
 }
 
-Future<bool> checkConnectivity() async =>
-    await DataConnectionChecker().hasConnection;
+Future<bool> checkConnectivity() async {
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  return connectivityResult != ConnectivityResult.none;
+}
 
 Color parseColor(String color) {
   if (color == null || color.isEmpty) return MeditoColors.midnight;
@@ -45,9 +47,9 @@ Color parseColor(String color) {
   return Color(int.parse(color?.replaceFirst('#', 'FF'), radix: 16));
 }
 
-void createSnackBar(String message, BuildContext context) {
+void createSnackBar(String message, BuildContext context, {Color color = Colors.red}) {
   final snackBar =
-      SnackBar(content: Text(message), backgroundColor: Colors.red);
+      SnackBar(content: Text(message), backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
