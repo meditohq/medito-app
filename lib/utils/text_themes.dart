@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/style.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -72,7 +71,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: MeditoColors.meditoTextGrey,
         ),
         bodyText2: TextStyle(
-        // error widget
+          // error widget
           fontSize: 16,
           letterSpacing: 0.5,
           fontWeight: FontWeight.normal,

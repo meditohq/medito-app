@@ -51,6 +51,7 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       opacity: animation.value,
+      duration: Duration(seconds: 1),
       child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         Flexible(
           child: Container(
@@ -89,7 +90,6 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
               )),
         )
       ]),
-      duration: Duration(seconds: 1),
     );
   }
 

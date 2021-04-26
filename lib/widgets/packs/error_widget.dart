@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +57,7 @@ class ErrorPacksWidget extends StatelessWidget {
                           'Try again',
                           style: Theme.of(context).textTheme.subtitle2,
                         )),
-              /*      Container(width: 16),
+                    /*      Container(width: 16),
                     OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(

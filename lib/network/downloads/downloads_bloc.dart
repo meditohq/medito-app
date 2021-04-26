@@ -3,15 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/network/session_options/session_options_bloc.dart';
-import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DownloadsBloc {
   static final savedFilesKey = 'listOfSavedFiles';
-  static  ValueNotifier<List<MediaItem>> downloadedSessions = ValueNotifier([]);
+  static ValueNotifier<List<MediaItem>> downloadedSessions = ValueNotifier([]);
 
   Future<bool> seenTip() async {
     var prefs = await SharedPreferences.getInstance();
@@ -23,14 +21,16 @@ class DownloadsBloc {
     return prefs.setBool('seenDownloadsToolTip', true);
   }
 
-  static Future<void> saveFileToDownloadedFilesList(MediaItem _mediaItem) async {
+  static Future<void> saveFileToDownloadedFilesList(
+      MediaItem _mediaItem) async {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
 
     if (_mediaItem != null) {
       list.add(jsonEncode(_mediaItem));
       await prefs.setStringList(savedFilesKey, list);
-      downloadedSessions.value = List.from(downloadedSessions.value)..add(_mediaItem);
+      downloadedSessions.value = List.from(downloadedSessions.value)
+        ..add(_mediaItem);
     }
   }
 
@@ -63,10 +63,11 @@ class DownloadsBloc {
     var list = prefs.getStringList(savedFilesKey) ?? [];
     list.remove(jsonEncode(mediaFile));
     await prefs.setStringList(savedFilesKey, list);
-    downloadedSessions.value = List.from(downloadedSessions.value)..remove(mediaFile);
+    downloadedSessions.value = List.from(downloadedSessions.value)
+      ..remove(mediaFile);
   }
 
-  void dispose(){
+  void dispose() {
     downloadedSessions.dispose();
   }
 }
