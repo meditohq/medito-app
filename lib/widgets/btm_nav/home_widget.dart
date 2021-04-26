@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
+
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
@@ -25,17 +27,27 @@ import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
-import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 
-class HomeWidget extends StatelessWidget {
+class HomeWidget extends StatefulWidget {
+  @override
+  _HomeWidgetState createState() => _HomeWidgetState();
+}
+
+class _HomeWidgetState extends State<HomeWidget> {
   final _bloc = HomeBloc();
 
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
+
   final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
+
   final GlobalKey<CoursesRowWidgetState> _coursesKey = GlobalKey();
+
   final GlobalKey<DailyMessageWidgetState> _dailyMessageKey = GlobalKey();
+
+  StreamSubscription<ConnectivityResult> subscription;
 
   @override
   Widget build(BuildContext context) {
@@ -186,9 +198,17 @@ class HomeWidget extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    subscription.cancel();
+  }
+
   void _observeNetwork() {
-    DataConnectionChecker().onStatusChange.listen((status) async {
-      await _refresh();
+    subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      _refresh();
     });
   }
 }
