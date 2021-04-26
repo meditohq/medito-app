@@ -107,28 +107,31 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   StreamBuilder<ApiResponse<List<Item>>> _getListStream() =>
       StreamBuilder<ApiResponse<List<Item>>>(
+          initialData: ApiResponse.loading(),
           stream: _bloc.itemsListController.stream,
           builder: (context, itemsSnapshot) {
-            if (!itemsSnapshot.hasData ||
-                itemsSnapshot.connectionState == ConnectionState.waiting) {
-              return LoadingListWidget();
+            switch (itemsSnapshot.data.status) {
+              case Status.LOADING:
+                return LoadingListWidget();
+                break;
+              case Status.COMPLETED:
+                return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: itemsSnapshot.data.body != null
+                        ? itemsSnapshot.data.body.length
+                        : 0,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(top: 8),
+                    itemBuilder: (BuildContext context, int i) {
+                      return itemsSnapshot.data.body != null
+                          ? _getSlidingItem(itemsSnapshot.data.body[i], context)
+                          : Container();
+                    });
+                break;
+              case Status.ERROR:
+                return LoadingListWidget();
+                break;
             }
-
-            if (itemsSnapshot.hasData) {
-              return ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: itemsSnapshot.data.body != null
-                      ? itemsSnapshot.data.body.length
-                      : 0,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(top: 8),
-                  itemBuilder: (BuildContext context, int i) {
-                    return itemsSnapshot.data.body != null
-                        ? _getSlidingItem(itemsSnapshot.data.body[i], context)
-                        : Container();
-                  });
-            }
-
             return Container();
           });
 
