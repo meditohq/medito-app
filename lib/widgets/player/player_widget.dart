@@ -19,7 +19,6 @@ import 'package:Medito/widgets/streak_tile_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
@@ -86,7 +85,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       return true;
     });
 
+    _startTimeout();
+
     _bloc = AudioCompleteCopyBloc();
+  }
+
+  void _startTimeout() {
+    var timerMaxSeconds = 10;
+    Timer.periodic(Duration(seconds: timerMaxSeconds), (timer) {
+      if (!loaded) {
+        createSnackBar(TIMEOUT, context);
+        timer.cancel();
+      }
+    });
   }
 
   @override

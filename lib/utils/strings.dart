@@ -7,6 +7,7 @@ const String LOADING = 'Loading';
 const String SHARE_TEXT = "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
 const String LOADING_ERROR = "It looks like you're offline or there was little hiccup from our end.";
 const String CHECK_CONNECTION = 'Please check your connection and try again';
+const String TIMEOUT = 'Oops! It seems like there was an error. If the problem persists, kill the app and try again.';
 
 const String NARRATOR = 'Narrator';
 const String DURATION = 'Duration';
