@@ -59,7 +59,7 @@ class _ParentWidgetState extends State<ParentWidget>
   var _currentIndex = 0;
   final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
   final _bloc = DownloadsBloc();
-  final _messengerKey = GlobalKey<ScaffoldMessengerState>();
+  final _messengerKey = GlobalKey<ScaffoldState>();
 
   var _deletingCache = true;
 
@@ -126,9 +126,9 @@ class _ParentWidgetState extends State<ParentWidget>
     await _bloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(_bloc.setSeenTip());
-        createSnackBar(SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+        createSnackBar(SWIPE_TO_DELETE, _messengerKey.currentContext,
+            color: MeditoColors.darkMoon);
       }
-      ;
     });
   }
 
@@ -136,13 +136,13 @@ class _ParentWidgetState extends State<ParentWidget>
   Widget build(BuildContext context) {
     return AudioServiceWidget(
       child: MaterialApp(
-        scaffoldMessengerKey: _messengerKey,
         initialRoute: '/nav',
         routes: {
           FolderNavWidget.routeName: (context) => FolderNavWidget(),
           '/nav': (context) => _deletingCache
               ? _getLoadingWidget()
               : Scaffold(
+                  key: _messengerKey,
                   body: IndexedStack(
                     index: _currentIndex,
                     children: _children,
