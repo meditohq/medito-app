@@ -12,7 +12,7 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/utils/utils.dart';
 
 class FolderResponse {
   @Deprecated('Use values below')
@@ -24,9 +24,9 @@ class FolderResponse {
 
   String get description => data.description;
   String get colour => data.primaryColor;
-  String get backgroundImageUrl =>  data.backgroundImage != null? '${baseUrl}assets/${data.backgroundImage}?download' : null;
+  String get backgroundImageUrl => data.backgroundImage?.toAssetUrl();
   String get cover => data.cover;
-  String get coverUrl => data.cover != null? '${baseUrl}assets/$cover?download' : null;
+  String get coverUrl => cover?.toAssetUrl();
 
   String get id => data.id.toString();
 

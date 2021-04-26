@@ -29,10 +29,9 @@ Widget getNetworkImageWidget(String url,
   return CachedNetworkImage(
     fit: BoxFit.fill,
     httpHeaders: headers,
-    placeholder: (context, url) =>
-        Container(
-          height: startHeight,
-        ),
+    placeholder: (context, url) => Container(
+      height: startHeight,
+    ),
     imageUrl: url ?? '',
   );
 }
@@ -48,18 +47,17 @@ Color parseColor(String color) {
 
 void createSnackBar(String message, BuildContext context) {
   final snackBar =
-  SnackBar(content: Text(message), backgroundColor: Colors.red);
+      SnackBar(content: Text(message), backgroundColor: Colors.red);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-void createSnackBarWithColor(String message, BuildContext context,
-    Color color) {
+void createSnackBarWithColor(
+    String message, BuildContext context, Color color) {
   final snackBar = SnackBar(
       content: Text(message,
-          style: Theme
-              .of(context)
+          style: Theme.of(context)
               .textTheme
               .caption
               .copyWith(color: MeditoColors.almostBlack)),
@@ -109,5 +107,11 @@ extension EmptyOrNull on String {
   bool isNotEmptyAndNotNull() {
     if (this != null && isNotEmpty) return true;
     return false;
+  }
+}
+
+extension AssetUrl on String {
+  String toAssetUrl() {
+    return '${baseUrl}assets/$this?download';
   }
 }
