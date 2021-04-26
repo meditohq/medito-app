@@ -111,7 +111,11 @@ class PackListWidgetState extends State<PackListWidget> {
   ErrorPacksWidget _getErrorPacksWidget() => ErrorPacksWidget(
         onPressed: () => _packsBloc
             .fetchPacksList()
-            .then((value) => _packsBloc.fetchPacksList()),
+            .then((value) {
+              setState(() {
+              });
+              return _packsBloc.fetchPacksList();
+            }),
       );
 
   Widget _getListWidget(List<PacksData> data) {
