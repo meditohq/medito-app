@@ -67,8 +67,8 @@ class HomeWidget extends StatelessWidget {
                       CoursesRowWidget(
                           key: _coursesKey,
                           onTap: (type, id) => _navigate(type, id, context)),
-                      StatsWidget(),
                       DailyMessageWidget(key: _dailyMessageKey),
+                      StatsWidget(),
                       Container(height: 16)
                     ],
                   );

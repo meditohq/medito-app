@@ -42,7 +42,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
                   Text(snapshot.data.body.title,
                       style: Theme.of(context).textTheme.headline3),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.only(top: 8),
                     child: MarkdownBody(
                       data: snapshot.data.body.body,
                       onTapLink: launchUrl,
@@ -61,7 +61,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
           }
 
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
             child: widget,
           );
         });
