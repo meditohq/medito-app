@@ -5,6 +5,7 @@ import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:share/share.dart';
 
 class DailyMessageWidget extends StatefulWidget {
   @override
@@ -36,7 +37,24 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
               widget = const CircularProgressIndicator();
               break;
             case Status.COMPLETED:
-              widget = Column(
+              widget = _getMessageWidget(snapshot, context);
+              break;
+            case Status.ERROR:
+              widget = Container();
+              break;
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
+            child: widget,
+          );
+        });
+  }
+
+  Widget _getMessageWidget(AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot, BuildContext context) {
+    return GestureDetector(
+      onTap: () => Share.share('${snapshot.data.body.body} https://medito.app'),
+      child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(snapshot.data.body.title,
@@ -53,17 +71,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
                     ),
                   ),
                 ],
-              );
-              break;
-            case Status.ERROR:
-              widget = Container();
-              break;
-          }
-
-          return Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
-            child: widget,
-          );
-        });
+              ),
+    );
   }
 }
