@@ -26,17 +26,17 @@ import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
 
-class session_optionsScreen extends StatefulWidget {
+class SessionOptionsScreen extends StatefulWidget {
   final String id;
   final Screen screenKey;
 
-  session_optionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
+  SessionOptionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
 
   @override
-  _session_optionsScreenState createState() => _session_optionsScreenState();
+  _SessionOptionsScreenState createState() => _SessionOptionsScreenState();
 }
 
-class _session_optionsScreenState extends State<session_optionsScreen> {
+class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
