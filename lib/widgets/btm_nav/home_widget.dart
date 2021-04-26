@@ -18,6 +18,7 @@ import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/courses_row_widget.dart';
 import 'package:Medito/widgets/home/daily_message_widget.dart';
 import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
@@ -80,10 +81,18 @@ class HomeWidget extends StatelessWidget {
   }
 
   Future<void> _navigate(type, id, BuildContext context) {
-    return NavigationFactory.navigateToScreenFromString(type, id, context)
-        .then((value) {
-      return _refresh();
-    });
+    return checkConnectivity().then(
+      (value) {
+        if (value) {
+          return NavigationFactory.navigateToScreenFromString(type, id, context)
+              .then((value) {
+            return _refresh();
+          });
+        } else {
+          _bloc.checkConnection();
+        }
+      },
+    );
   }
 
   Future<void> _refresh() {

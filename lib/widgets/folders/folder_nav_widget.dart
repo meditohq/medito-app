@@ -20,6 +20,8 @@ import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/strings.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
 import 'package:Medito/widgets/header_widget.dart';
@@ -204,11 +206,17 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   }
 
   void itemTap(Item i) {
-    Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
-    NavigationFactory.navigate(
-            context, NavigationFactory.getScreenFromItemType(i.fileType),
-            id: i.id)
-        .then((value) => _refresh(context, skipCache: false));
+    checkConnectivity().then((value) {
+      if (value) {
+        Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
+        NavigationFactory.navigate(
+                context, NavigationFactory.getScreenFromItemType(i.fileType),
+                id: i.id)
+            .then((value) => _refresh(context, skipCache: false));
+      } else {
+        createSnackBar(CHECK_CONNECTION, context);
+      }
+    });
   }
 
   void startService(media, primaryColor) {
