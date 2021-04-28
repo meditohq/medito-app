@@ -31,7 +31,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:pedantic/pedantic.dart';
 
 class SessionOptionsBloc {
-  session_optionsRepository _repo;
+  SessionOptionsRepository _repo;
 
   var lengthList = <String>[];
   var backgroundSoundsId;
@@ -92,21 +92,22 @@ class SessionOptionsBloc {
 
     descController = StreamController.broadcast();
 
-    _repo = session_optionsRepository(screen: screen);
-
+    _repo = SessionOptionsRepository(screen: screen);
   }
 
   void _filterOptionsFromPrefs(String id) {
-       getIntValuesSF(id, 'voiceSelected').then((value) {
+    getIntValuesSF(id, 'voiceSelected').then((value) {
       voiceSelected = value;
       filterLengthsForVoice(voiceIndex: voiceSelected);
       getIntValuesSF(id, 'lengthSelected').then((value) {
         lengthSelected = value;
         getIntValuesSF(id, 'musicSelected').then((index) {
           musicSelected = index;
+          updateCurrentFile();
         });
       });
     });
+
   }
 
   Future<void> fetchOptions(String id, {bool skipCache = false}) async {
@@ -168,13 +169,13 @@ class SessionOptionsBloc {
               return element.voice == voice;
             }));
 
-    setCurrentFileForDownloadSingleton();
+    _setCurrentFileForDownloadSingleton();
 
     offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
-    updateAvailableOfflineIndicatorText();
+    _updateAvailableOfflineIndicatorText();
   }
 
-  void updateAvailableOfflineIndicatorText() {
+  void _updateAvailableOfflineIndicatorText() {
     availableOfflineIndicatorText =
         '(${_options.voiceList[voiceSelected]} — ${lengthList[lengthSelected]})';
   }
@@ -204,7 +205,7 @@ class SessionOptionsBloc {
 
   /// File handling
   ///
-  void setCurrentFileForDownloadSingleton() {
+  void _setCurrentFileForDownloadSingleton() {
     if (downloadSingleton == null || !downloadSingleton.isValid()) {
       downloadSingleton = DownloadSingleton(currentFile);
     }
