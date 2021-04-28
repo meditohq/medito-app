@@ -27,13 +27,8 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 32.0, left: 16),
+          padding: const EdgeInsets.only(top: 32.0, left: 16, bottom: 8.0),
           child: Text('Courses', style: Theme.of(context).textTheme.headline3),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 0, left: 16, bottom: 8.0),
-          child: Text('LISTEN IN ORDER',
-              style: Theme.of(context).textTheme.caption),
         ),
         StreamBuilder<ApiResponse<CoursesResponse>>(
             stream: _bloc.coursesList.stream,
