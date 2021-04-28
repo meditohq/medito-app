@@ -29,7 +29,7 @@ class MediaLibrary {
         'duration': durationAsMilliseconds,
       },
       artist: voice,
-      album: description,
+      album: '',
       title: title,
       artUri: illustrationUrl,
     );
