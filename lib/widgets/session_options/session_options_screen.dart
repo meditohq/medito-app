@@ -25,6 +25,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:flutter/material.dart';
+import 'package:pedantic/pedantic.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -77,18 +78,18 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             _getHeaderWidget(),
-                            buildVoiceRowWithTitle(),
-                            buildSpacer(),
+                            _buildVoiceRowWithTitle(),
+                            _buildSpacer(),
                             ////////// spacer
-                            buildTextHeaderForRow(DURATION),
-                            buildSessionLengthRow(),
-                            buildSpacer(),
+                            _buildTextHeaderForRow(DURATION),
+                            _buildSessionLengthRow(),
+                            _buildSpacer(),
                             ////////// spacer
-                            getBGMusicItems(),
+                            _getBGMusicItems(),
                             ////////// spacer
-                            buildTextHeaderForRow(
-                                '$DOWNLOAD_SESSION ${_bloc.availableOfflineIndicatorText}'),
-                            buildOfflineRow(),
+                            _buildTextHeaderForRow(DOWNLOAD_SESSION),
+                            _buildTextHeaderForRow(_bloc.availableOfflineIndicatorText),
+                            _buildOfflineRow(),
                             Container(height: 80)
                           ],
                         ),
@@ -125,7 +126,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget getBGMusicItems() => StreamBuilder<bool>(
+  Widget _getBGMusicItems() => StreamBuilder<bool>(
       stream: _bloc.backgroundMusicShownController.stream,
       initialData: true,
       builder: (context, snapshot) {
@@ -133,9 +134,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildTextHeaderForRow(BACKGROUND_SOUND),
+              _buildTextHeaderForRow(BACKGROUND_SOUND),
               buildBackgroundMusicRowAndSpacer(),
-              buildSpacer(),
+              _buildSpacer(),
             ],
           );
         } else {
@@ -215,7 +216,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   /// Pill rows
-  Widget buildTextHeaderForRow(String title) {
+  Widget _buildTextHeaderForRow(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Text(
@@ -225,7 +226,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget buildSessionLengthRow() {
+  Widget _buildSessionLengthRow() {
     return StreamBuilder<ApiResponse<List<String>>>(
         stream: _bloc.lengthListController.stream,
         builder: (context, snapshot) {
@@ -268,7 +269,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         });
   }
 
-  Widget buildOfflineRow() {
+  Widget _buildOfflineRow() {
     return SizedBox(
       height: 56,
       child: ListView.builder(
@@ -287,7 +288,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               label: Text(index == 0 ? 'No' : 'Yes'),
               selected: _bloc.offlineSelected == index,
               onSelected: (bool value) {
-                onOfflineSelected(index);
+                !showIndeterminateSpinner ? onOfflineSelected(index) : null;
               },
               backgroundColor: MeditoColors.moonlight,
               selectedColor: MeditoColors.walterWhite,
@@ -329,7 +330,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                       labelPadding: buildInnerChipPadding(),
                       showCheckmark: false,
                       label: Text(index == 0 ? 'None' : data[index - 1].name),
-                      selected: index == _bloc.musicSelected,
+                      selected: index == _bloc.bgSoundSelectedIndex,
                       onSelected: (bool value) {
                         onMusicSelected(
                             index,
@@ -346,7 +347,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             }));
   }
 
-  Widget buildVoiceRowWithTitle() {
+  Widget _buildVoiceRowWithTitle() {
     return StreamBuilder<ApiResponse<List<String>>>(
         stream: _bloc.voiceListController.stream,
         builder: (context, snapshot) {
@@ -392,7 +393,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(height: 16),
-        buildTextHeaderForRow(NARRATOR),
+        _buildTextHeaderForRow(NARRATOR),
         SizedBox(height: 56, child: w),
       ],
     );
@@ -422,25 +423,25 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     }
   }
 
-  void onMusicSelected(int index, String id, String name) {
-    _bloc.musicSelected = index;
-    index > 0 ? _bloc.musicNameSelected = name : _bloc.musicNameSelected = '';
+  Future<void> onMusicSelected(int index, String id, String name) async {
+    _bloc.bgSoundSelectedIndex = index;
+    await _bloc.updateCurrentFile();
     print('bg selected: $name');
     if (index > 0) {
       showIndeterminateSpinner = true;
-      downloadBGMusicFromURL(id, name).then((value) {
+      unawaited(downloadBGMusicFromURL(id, name).then((value) {
         showIndeterminateSpinner = false;
         _bloc.backgroundSoundsId = value;
         setState(() {});
       }).catchError((onError) {
         print(onError);
         showIndeterminateSpinner = false;
-        _bloc.musicSelected = 0;
+        _bloc.bgSoundSelectedIndex = 0;
         _bloc.backgroundSoundsId = null;
-      });
+      }));
     } else {
       showIndeterminateSpinner = false;
-      _bloc.musicSelected = 0;
+      _bloc.bgSoundSelectedIndex = 0;
       _bloc.backgroundSoundsId = null;
     }
     setState(() {});
@@ -506,7 +507,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   TextStyle getMusicPillTextStyle(int index) {
     return Theme.of(context).textTheme.subtitle2.copyWith(
-        color: _bloc.musicSelected == index
+        color: _bloc.bgSoundSelectedIndex == index
             ? MeditoColors.darkBGColor
             : MeditoColors.walterWhite);
   }
@@ -545,7 +546,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget buildSpacer() {
+  Widget _buildSpacer() {
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 16),
       child: Divider(

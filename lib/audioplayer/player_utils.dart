@@ -33,6 +33,13 @@ Future<dynamic> checkFileExists(AudioFile currentFile) async {
   return exists;
 }
 
+Future<dynamic> checkBgSoundExists(String name) async {
+  var filePath = (await getFilePath(name));
+  var file = File(filePath);
+  var exists = await file.exists();
+  return exists;
+}
+
 Future<dynamic> downloadBGMusicFromURL(String id, String name) async {
   var path = (await getFilePath(name));
   var file = File(path);

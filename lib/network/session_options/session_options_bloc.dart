@@ -35,18 +35,17 @@ class SessionOptionsBloc {
 
   var lengthList = <String>[];
   var backgroundSoundsId;
+  BackgroundSoundsResponse bgMusicList;
+  String bgSoundName = '';
   String availableOfflineIndicatorText = '';
 
   var voiceSelected = 0;
   var lengthSelected = 0;
   var offlineSelected = 0;
-  var musicSelected = 0;
+  var bgSoundSelectedIndex = 0;
   var illustration;
-  String musicNameSelected = '';
 
   AudioFile currentFile;
-
-  var attributesList = [];
 
   // Download stuff
   bool bgDownloading = false, removing = false;
@@ -95,26 +94,22 @@ class SessionOptionsBloc {
     _repo = SessionOptionsRepository(screen: screen);
   }
 
-  void _filterOptionsFromPrefs(String id) {
-    getIntValuesSF(id, 'voiceSelected').then((value) {
+  Future<void> _filterOptionsFromPrefs(String id) async {
+    await getIntValuesSF(id, 'voiceSelected').then((value) async {
       voiceSelected = value;
       filterLengthsForVoice(voiceIndex: voiceSelected);
-      getIntValuesSF(id, 'lengthSelected').then((value) {
+      await getIntValuesSF(id, 'lengthSelected').then((value) async {
         lengthSelected = value;
-        getIntValuesSF(id, 'musicSelected').then((index) {
-          musicSelected = index;
-          updateCurrentFile();
-        });
       });
     });
-
   }
 
   Future<void> fetchOptions(String id, {bool skipCache = false}) async {
     var options = await _repo.fetchOptions(id, skipCache);
-    var bgMusicList = await _repo.fetchBackgroundSounds(skipCache);
+    bgMusicList = await _repo.fetchBackgroundSounds(skipCache);
     _options = options;
-    _filterOptionsFromPrefs(id);
+    await _filterOptionsFromPrefs(id);
+    await updateCurrentFile();
 
     // Show title, desc and image
     titleController.sink.add(_options.title);
@@ -133,25 +128,13 @@ class SessionOptionsBloc {
 
     // Info is in the form "info": "No voice,00:05:02"
     voiceListController.sink.add(ApiResponse.completed(options.voiceList));
-
-    await updateCurrentFile();
-  }
-
-  void dispose() {
-    titleController?.close();
-    voiceListController?.close();
-    lengthListController?.close();
-    backgroundMusicListController?.close();
-    backgroundMusicShownController?.close();
-    imageController?.close();
-    primaryColourController?.close();
-    secondaryColorController?.close();
-    descController?.close();
-    backgroundImageController?.close();
   }
 
   Future<void> updateCurrentFile() async {
     var voice = _options.voiceList[voiceSelected];
+    bgSoundName = bgSoundSelectedIndex == 0
+        ? ''
+        : bgMusicList.data[bgSoundSelectedIndex - 1].name;
     var length;
     if (lengthList.length > lengthSelected) {
       length = lengthList[lengthSelected];
@@ -171,19 +154,24 @@ class SessionOptionsBloc {
 
     _setCurrentFileForDownloadSingleton();
 
-    offlineSelected = await checkFileExists(currentFile) ? 1 : 0;
+    offlineSelected =
+        await DownloadsBloc.isDownloadAndBGSoundDownloaded(currentFile, bgSoundName)
+            ? 1
+            : 0;
     _updateAvailableOfflineIndicatorText();
   }
 
   void _updateAvailableOfflineIndicatorText() {
+    var addition = bgSoundName.isNotEmpty ? ' — $bgSoundName' : '';
+
     availableOfflineIndicatorText =
-        '(${_options.voiceList[voiceSelected]} — ${lengthList[lengthSelected]})';
+        '"${_options.voiceList[voiceSelected]} — ${lengthList[lengthSelected]}$addition"';
   }
 
   void saveOptionsSelectionsToSharedPreferences(String id) {
     addIntToSF(id, 'voiceSelected', voiceSelected);
     addIntToSF(id, 'lengthSelected', lengthSelected);
-    addIntToSF(id, 'musicSelected', musicSelected);
+    addIntToSF(id, 'musicSelected', bgSoundSelectedIndex);
   }
 
   bool isDownloading() => downloadSingleton.isDownloadingMe(currentFile);
@@ -236,12 +224,25 @@ class SessionOptionsBloc {
       secondaryColor: _options.colorSecondary,
       primaryColor: _options.colorPrimary,
       bgMusic: backgroundSoundsId,
-      bgMusicTitle: musicNameSelected,
+      bgMusicTitle: bgSoundName,
       durationAsMilliseconds:
           clockTimeToDuration(currentFile.length).inMilliseconds,
       fileId: currentFile.id,
       sessionId: _options.id,
       attributions: _options.attribution);
+
+  void dispose() {
+    titleController?.close();
+    voiceListController?.close();
+    lengthListController?.close();
+    backgroundMusicListController?.close();
+    backgroundMusicShownController?.close();
+    imageController?.close();
+    primaryColourController?.close();
+    secondaryColorController?.close();
+    descController?.close();
+    backgroundImageController?.close();
+  }
 }
 
 extension MyIterable<E> on Iterable<E> {
