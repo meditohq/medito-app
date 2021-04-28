@@ -172,7 +172,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           decoration: BoxDecoration(
               gradient: RadialGradient(
             colors: [
-              primaryColorAsColor.withAlpha(178),
+              primaryColorAsColor.withAlpha(100),
               primaryColorAsColor.withAlpha(0),
             ],
             radius: 1.0,
