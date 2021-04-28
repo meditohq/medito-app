@@ -66,7 +66,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               stream: _bloc.connectionStreamController.stream,
               builder: (context, connectionSnapshot) {
                 if (connectionSnapshot.hasData && !connectionSnapshot.data) {
-                  return ErrorPacksWidget(onPressed: () => _refresh());
+                  return _buildErrorPacksWidget();
                 } else {
                   return ListView(
                     physics: AlwaysScrollableScrollPhysics(),
@@ -90,6 +90,13 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
     );
   }
+
+  Column _buildErrorPacksWidget() => Column(
+    children: [
+      _getAppBar(context),
+      Expanded(child: ErrorPacksWidget(onPressed: () => _refresh())),
+    ],
+  );
 
   Future<void> _navigate(type, id, BuildContext context) {
     return checkConnectivity().then(
