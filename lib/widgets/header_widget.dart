@@ -18,7 +18,7 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/app_bar_widget.dart';
+import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';

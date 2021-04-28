@@ -1,6 +1,6 @@
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/widgets/streak_tile_widget.dart';
+import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:flutter/material.dart';
 
 class StatsWidget extends StatefulWidget {
