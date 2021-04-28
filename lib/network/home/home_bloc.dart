@@ -32,11 +32,10 @@ class HomeBloc {
     menuList = StreamController.broadcast()..sink.add(ApiResponse.loading());
     titleText = StreamController.broadcast();
     connectionStreamController = StreamController.broadcast();
-
   }
 
   Future<void> checkConnection() async {
-    var connection= await checkConnectivity();
+    var connection = await checkConnectivity();
     connectionStreamController.sink.add(connection);
     return;
   }
@@ -52,7 +51,7 @@ class HomeBloc {
 
   Future<String> getTitleText() async {
     var now = DateTime.now();
-    if (now.hour < 12) {
+    if (now.hour < 12 && now.hour > 2) {
       return 'Good morning';
     } else if (now.hour < 18) {
       return 'Good afternoon';
