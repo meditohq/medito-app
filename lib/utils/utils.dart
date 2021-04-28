@@ -47,9 +47,13 @@ Color parseColor(String color) {
   return Color(int.parse(color?.replaceFirst('#', 'FF'), radix: 16));
 }
 
-void createSnackBar(String message, BuildContext context, {Color color = Colors.red}) {
-  final snackBar =
-      SnackBar(content: Text(message), backgroundColor: color);
+void createSnackBar(String message, BuildContext context,
+    {Color color = Colors.red}) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    backgroundColor: color,
+    duration: Duration(seconds: 6),
+  );
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
