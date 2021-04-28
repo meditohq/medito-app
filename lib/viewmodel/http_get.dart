@@ -17,9 +17,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/utils/utils.dart';
-import 'package:http/http.dart' as http;
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
+import 'package:http/http.dart' as http;
 
 //move this to network package later
 Future httpGet(String url,
@@ -48,4 +48,21 @@ Future httpGet(String url,
     return json.decode(response.body);
   }
   return json.decode(cache);
+}
+
+Future httpPost(String url, Map<String, String> body) async {
+  try {
+    final response = await http.post(
+      url,
+      body: encoded(body),
+      headers: {
+        HttpHeaders.authorizationHeader: basicAuth,
+        HttpHeaders.contentTypeHeader: 'application/json'
+      },
+    );
+    return response;
+  } catch (e) {
+    print(e);
+    return null;
+  }
 }

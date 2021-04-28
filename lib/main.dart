@@ -16,11 +16,11 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/text_themes.dart';
-import 'package:Medito/utils/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/btm_nav/library_widget.dart';
@@ -32,8 +32,8 @@ import 'package:flutter/services.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../network/downloads/downloads_bloc.dart';
-import '../../utils/colors.dart';
+import 'network/downloads/downloads_bloc.dart';
+import 'utils/colors.dart';
 
 SharedPreferences sharedPreferences;
 
@@ -86,7 +86,7 @@ class _ParentWidgetState extends State<ParentWidget>
       }
     });
 
-    clearStorageIfFirstOpen().then((value) {
+    firstOpenOperations().then((value) {
       setState(() {
         _deletingCache = false;
       });
