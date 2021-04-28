@@ -19,7 +19,7 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 
-class session_optionsRepository {
+class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
   var bgSoundsUrl = '${baseUrl}items/background_sounds';
@@ -27,7 +27,7 @@ class session_optionsRepository {
       '?fields=*,author.body,audio.file.id,audio.file.voice,audio.file.length';
   var screen;
 
-  session_optionsRepository({this.screen});
+  SessionOptionsRepository({this.screen});
 
   Future<SessionData> fetchOptions(String id, bool skipCache) async {
     var url;
