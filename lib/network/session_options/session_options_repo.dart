@@ -40,7 +40,7 @@ class SessionOptionsRepository {
 
     final response = await httpGet(url, skipCache: skipCache);
 
-    return session_optionsResponse.fromJson(response).data;
+    return SessionOptionsResponse.fromJson(response).data;
   }
 
   Future<BackgroundSoundsResponse> fetchBackgroundSounds(bool skipCache) async {
