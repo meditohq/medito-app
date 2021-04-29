@@ -40,8 +40,6 @@ class PackListWidgetState extends State<PackListWidget> {
 
   @override
   void initState() {
-    Tracking.changeScreenName(Tracking.HOME);
-
     super.initState();
     _packsBloc = PacksBloc();
     _packsBloc.fetchPacksList(true);
@@ -84,96 +82,100 @@ class PackListWidgetState extends State<PackListWidget> {
                 });
           }),
     );
-}
+  }
 
-ErrorPacksWidget _getErrorPacksWidget() =>
-    ErrorPacksWidget(
-      onPressed: () =>
-          _packsBloc
-              .fetchPacksList()
-              .then((value) {
-            setState(() {});
-            return _packsBloc.fetchPacksList();
-          }),
-    );
-
-Widget _getListWidget(List<PacksData> data) {
-  return ListView.builder(
-    padding: EdgeInsets.only(top: 8, bottom: 8),
-    itemCount: data.length,
-    itemBuilder: (context, i) {
-      return InkWell(
-        onTap: () => _navigate(data, i, context),
-        child: PackListItemWidget(PackImageListItemData(
-            title: data[i].title,
-            subtitle: data[i].subtitle,
-            cover: data[i].cover,
-            backgroundImage: data[i].backgroundImageUrl,
-            colorPrimary: parseColor(data[i].colorPrimary),
-            coverSize: 72)),
+  ErrorPacksWidget _getErrorPacksWidget() => ErrorPacksWidget(
+        onPressed: () => _packsBloc.fetchPacksList().then((value) {
+          setState(() {});
+          return _packsBloc.fetchPacksList();
+        }),
       );
-    },
-  );
-}
 
-Future<void> _navigate(List<PacksData> data, int i, BuildContext context) {
-  return checkConnectivity().then((connected) {
-    if (connected) {
-      return NavigationFactory.navigateToScreenFromString(
-          data[i].type, data[i].id, context);
-    } else {
-      createSnackBar(CHECK_CONNECTION, context);
-    }
-  });
-}
+  Widget _getListWidget(List<PacksData> data) {
+    return ListView.builder(
+      padding: EdgeInsets.only(top: 8, bottom: 8),
+      itemCount: data.length,
+      itemBuilder: (context, i) {
+        return InkWell(
+          onTap: () => _navigate(data, i, context),
+          child: PackListItemWidget(PackImageListItemData(
+              title: data[i].title,
+              subtitle: data[i].subtitle,
+              cover: data[i].cover,
+              backgroundImage: data[i].backgroundImageUrl,
+              colorPrimary: parseColor(data[i].colorPrimary),
+              coverSize: 72)),
+        );
+      },
+    );
+  }
 
-@override
-void dispose() {
-  _packsBloc.dispose();
-  super.dispose();
-}
+  Future<void> _navigate(List<PacksData> data, int i, BuildContext context) {
+    return checkConnectivity().then((connected) {
+      if (connected) {
+        var pack = data[i];
+        Tracking.trackEvent({
+          Tracking.TYPE: Tracking.PACK_TAPPED,
+          Tracking.DESTINATION:
+              Tracking.destinationData(pack.fileType.toString(), pack.id)
+        });
 
-///  This is for the skeleton screen
-Widget getLoadingWidget() {
-  return SingleChildScrollView(
-    child: Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Container(height: 8),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-        getBlankTile(MeditoColors.walterWhiteTrans),
-      ],
-    ),
-  );
-}
+        return NavigationFactory.navigateToScreenFromString(
+            pack.type, pack.id, context);
+      } else {
+        createSnackBar(CHECK_CONNECTION, context);
+      }
+    });
+  }
 
-Widget getBlankTile(Color color) {
-  return Padding(
-    padding: const EdgeInsets.only(right: 16.0, bottom: 16.0, left: 16.0),
-    child: Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-              color: color,
+  @override
+  void dispose() {
+    _packsBloc.dispose();
+    super.dispose();
+  }
+
+  ///  This is for the skeleton screen
+  Widget getLoadingWidget() {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Container(height: 8),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+          getBlankTile(MeditoColors.walterWhiteTrans),
+        ],
+      ),
+    );
+  }
+
+  Widget getBlankTile(Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0, bottom: 16.0, left: 16.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                color: color,
+              ),
+              height: 84,
             ),
-            height: 84,
           ),
-        ),
-      ],
-    ),
-  );
-}}
+        ],
+      ),
+    );
+  }
+}

@@ -40,7 +40,6 @@ SharedPreferences sharedPreferences;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Tracking.initialiseTracker();
   sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(ParentWidget());
@@ -75,10 +74,6 @@ class _ParentWidgetState extends State<ParentWidget>
           systemNavigationBarIconBrightness: Brightness.light,
           statusBarColor: MeditoColors.transparent),
     );
-
-    isTrackingAccepted().then((value) async {
-      //todo
-    });
 
     checkConnectivity().then((value) {
       if (!value) {

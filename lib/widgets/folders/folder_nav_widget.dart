@@ -59,7 +59,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   @override
   void initState() {
     super.initState();
-    Tracking.changeScreenName(Tracking.FOLDER_PAGE);
   }
 
   @override
@@ -208,7 +207,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   void itemTap(Item i) {
     checkConnectivity().then((value) {
       if (value) {
-        Tracking.trackEvent(Tracking.TAP, Tracking.FOLDER_TAPPED, i.id);
+
+        Tracking.trackEvent({
+          Tracking.TYPE: Tracking.FOLDER_TAPPED,
+          Tracking.DESTINATION: Tracking.destinationData(i.fileType.toString(), i.id)
+        });
+
         NavigationFactory.navigate(
                 context, NavigationFactory.getScreenFromItemType(i.fileType),
                 id: i.id)
