@@ -18,7 +18,7 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
-import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
@@ -76,11 +76,13 @@ class _HomeWidgetState extends State<HomeWidget> {
                       AnnouncementBanner(key: _announceKey),
                       SmallShortcutsRowWidget(
                         key: _shortcutKey,
-                        onTap: (type, id) => _navigate(type, id, context),
+                        onTap: (type, id) => _navigate(
+                            type, id, context, Tracking.SHORTCUT_TAPPED),
                       ),
                       CoursesRowWidget(
                           key: _coursesKey,
-                          onTap: (type, id) => _navigate(type, id, context)),
+                          onTap: (type, id) => _navigate(
+                              type, id, context, Tracking.COURSE_TAPPED)),
                       DailyMessageWidget(key: _dailyMessageKey),
                       StatsWidget(),
                     ],
@@ -93,13 +95,18 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   Column _buildErrorPacksWidget() => Column(
-    children: [
-      _getAppBar(context),
-      Expanded(child: ErrorPacksWidget(onPressed: () => _refresh())),
-    ],
-  );
+        children: [
+          _getAppBar(context),
+          Expanded(child: ErrorPacksWidget(onPressed: () => _refresh())),
+        ],
+      );
 
-  Future<void> _navigate(type, id, BuildContext context) {
+  Future<void> _navigate(type, id, BuildContext context, String origin) {
+    Tracking.trackEvent({
+      Tracking.TYPE: origin,
+      Tracking.DESTINATION: Tracking.destinationData(Tracking.SESSION, id)
+    });
+
     return checkConnectivity().then(
       (value) {
         if (value) {

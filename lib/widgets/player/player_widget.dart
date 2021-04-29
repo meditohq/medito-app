@@ -37,19 +37,33 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String illustrationUrl;
   Color secondaryColor;
   Color primaryColorAsColor = MeditoColors.transparent;
-  bool _complete = false;
-  String __loaded;
   double volume;
 
+  StreamSubscription _stream;
   AudioCompleteCopyBloc _bloc;
 
   bool get loaded => __loaded == 'true';
+  String __loaded;
+  bool _complete = false;
 
-  void setLoaded(bool b) {
-    if (__loaded == null && b == true) __loaded = 'true';
+  void setLoaded(bool b, MediaItem mediaItem) {
+    if (__loaded == null && b == true) {
+      __loaded = 'true';
+      _trackSessionStart(mediaItem);
+    }
   }
 
-  StreamSubscription _stream;
+  void _trackSessionStart(MediaItem mediaItem) {
+    var data = {
+      Tracking.TYPE: Tracking.AUDIO_STARTED,
+      Tracking.SESSION_VOICE: mediaItem.artist,
+      Tracking.SESSION_LENGTH: mediaItem.extras['length'],
+      Tracking.SESSION_BACKGROUND_SOUND: mediaItem.extras['bgMusic'],
+      Tracking.PLAYER_COPY_VERSION: _bloc.version.id
+    };
+
+    Tracking.trackEvent(data);
+  }
 
   @override
   void dispose() {
@@ -73,14 +87,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   void initState() {
     super.initState();
-    Tracking.changeScreenName(Tracking.PLAYER_PAGE);
-
     initBgVolume();
 
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
         await updateStatsFromBg();
       }
+
+      unawaited(Tracking.trackEvent({Tracking.TYPE: Tracking.AUDIO_COMPLETED}));
+
       await _stream.cancel();
       return true;
     });
@@ -117,13 +132,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 processingState == AudioProcessingState.completed ||
                 (loaded && mediaItem == null)) {
               _complete = true;
-              Tracking.changeScreenName(Tracking.PLAYER_END_PAGE);
             }
 
-            setLoaded(mediaItem != null);
+            setLoaded(mediaItem != null, mediaItem);
             getSecondaryColor(mediaItem);
             getPrimaryColor(mediaItem);
             getArtUrl(mediaItem);
+            _trackSessionStart(mediaItem);
 
             return Stack(
               children: [
@@ -553,8 +568,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var path = _bloc.version.buttonPath;
 
     getVersionCopyInt().then((version) {
-      Tracking.trackEvent(Tracking.CTA_TAPPED, Tracking.MAIN_CTA_TAPPED, path,
-          map: {'version_seen': '$version'});
+      Tracking.trackEvent(
+          {Tracking.TYPE: Tracking.CTA_TAPPED, 'version_seen': '$version'});
     });
 
     return launchUrl(path);
@@ -562,11 +577,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Future<void> _share() {
     Share.share(SHARE_TEXT);
-    Tracking.trackEvent(
-      Tracking.CTA_TAPPED,
-      Tracking.SECOND_CTA_TAPPED,
-      '',
-    );
+    Tracking.trackEvent({Tracking.TYPE: Tracking.SHARE_TAPPED});
     return null;
   }
 }

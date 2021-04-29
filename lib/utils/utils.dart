@@ -94,11 +94,6 @@ Future<void> acceptTracking() async {
   await prefs.setBool('tracking', true);
 }
 
-Future<bool> isTrackingAccepted() async {
-  var prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('tracking') ?? false;
-}
-
 Future<void> trackingAnswered() async {
   var prefs = await SharedPreferences.getInstance();
   await prefs.setBool('trackingAnswered', true);

@@ -54,7 +54,6 @@ class _TextFileWidgetState extends State<TextFileWidget>
   @override
   void initState() {
     super.initState();
-    Tracking.changeScreenName(Tracking.TEXT_PAGE);
     _bloc = TextBloc()..fetchText(widget.id, false);
   }
 

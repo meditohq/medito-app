@@ -274,13 +274,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
       'secsListened': _duration.inSeconds,
       'id': '${mediaItem.extras['sessionId']}',
     };
-
     await writeJSONToCache(encoded(dataMap), 'stats');
-
     AudioServiceBackground.sendCustomEvent('stats');
-
-    unawaited(Tracking.trackEvent(
-        Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
   }
 }
 

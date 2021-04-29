@@ -1,5 +1,6 @@
 import 'dart:io' as io;
 
+import 'package:Medito/main.dart';
 import 'package:Medito/user/user_response.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
@@ -8,20 +9,18 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> firstOpenOperations() async {
-  var prefs = await SharedPreferences.getInstance();
-  _beginClearStorage(prefs);
+  _beginClearStorage();
 
-  await _logAccount(prefs);
+  await _logAccount();
   return;
 }
 
-Future _logAccount(SharedPreferences prefs) async {
-  var user = prefs.getString('userId') ?? '';
+Future _logAccount() async {
+  var user = sharedPreferences.getString('userId') ?? '';
   if (user.isEmpty) {
-    await _createUser(prefs);
+    await _createUser();
   } else {
     unawaited(_postLastAccess());
   }
@@ -38,29 +37,30 @@ Future<void> _postLastAccess() async {
   }
 }
 
-void _beginClearStorage(SharedPreferences prefs) {
-  var opened = prefs.getBool('hasOpened') ?? false;
+void _beginClearStorage() {
+  var opened = sharedPreferences.getBool('hasOpened') ?? false;
   if (!opened) {
-    unawaited(_clearStorage(prefs));
+    unawaited(_clearStorage());
   }
 }
 
-Future<void> _createUser(SharedPreferences prefs) async {
+Future<void> _createUser() async {
   if (!kDebugMode) {
     var map = await UserRepo.createUser();
     if (map != null) {
-      await prefs.setString('userId', map['id']);
-      await prefs.setString('token', map['token']);
+      await sharedPreferences.setString('userId', map['id']);
+      await sharedPreferences.setString('token', map['token']);
     }
   } else {
-    await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
-    await prefs.setString('token', debugToken);
+    await sharedPreferences.setString(
+        'userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
+    await sharedPreferences.setString('token', debugToken);
   }
 }
 
-Future _clearStorage(SharedPreferences prefs) async {
+Future _clearStorage() async {
   await clearStorage();
-  await prefs.setBool('hasOpened', true);
+  await sharedPreferences.setBool('hasOpened', true);
 }
 
 class UserRepo {
@@ -135,6 +135,5 @@ class UserRepo {
 }
 
 Future<String> get token async {
-  var prefs = await SharedPreferences.getInstance();
-  return prefs.getString('token');
+  return sharedPreferences.getString('token');
 }

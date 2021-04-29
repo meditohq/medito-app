@@ -17,7 +17,6 @@ import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/network/session_options/session_options_bloc.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
@@ -41,15 +40,12 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
-  /// deffo need:
   BuildContext scaffoldContext;
   SessionOptionsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
-    Tracking.changeScreenName(Tracking.SESSION_TAPPED);
-
     _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
     _bloc.fetchOptions(widget.id);
   }
@@ -195,7 +191,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Future<void> _onBeginTap() {
     if (_bloc.isDownloading() || showIndeterminateSpinner) return null;
 
-    Tracking.trackEvent(Tracking.TAP, Tracking.PLAY_TAPPED, widget.id);
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
 
     _bloc.startAudioService();
@@ -524,14 +519,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       padding: const EdgeInsets.only(left: 16.0, top: 4),
       child: Row(
         children: [
-          emptyPill(),
-          emptyPill(),
+          _emptyPill(),
+          _emptyPill(),
         ],
       ),
     );
   }
 
-  Widget emptyPill() {
+  Widget _emptyPill() {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: FilterChip(
