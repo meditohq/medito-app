@@ -9,18 +9,20 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> firstOpenOperations() async {
-  _beginClearStorage();
+  var prefs = await SharedPreferences.getInstance();
+  _beginClearStorage(prefs);
 
-  await _logAccount();
+  await _logAccount(prefs);
   return;
 }
 
-Future _logAccount() async {
-  var user = sharedPreferences.getString('userId') ?? '';
+Future _logAccount(SharedPreferences prefs) async {
+  var user = prefs.getString('userId') ?? '';
   if (user.isEmpty) {
-    await _createUser();
+    await _createUser(prefs);
   } else {
     unawaited(_postLastAccess());
   }
@@ -37,30 +39,29 @@ Future<void> _postLastAccess() async {
   }
 }
 
-void _beginClearStorage() {
-  var opened = sharedPreferences.getBool('hasOpened') ?? false;
+void _beginClearStorage(SharedPreferences prefs) {
+  var opened = prefs.getBool('hasOpened') ?? false;
   if (!opened) {
-    unawaited(_clearStorage());
+    unawaited(_clearStorage(prefs));
   }
 }
 
-Future<void> _createUser() async {
+Future<void> _createUser(SharedPreferences prefs) async {
   if (!kDebugMode) {
     var map = await UserRepo.createUser();
     if (map != null) {
-      await sharedPreferences.setString('userId', map['id']);
-      await sharedPreferences.setString('token', map['token']);
+      await prefs.setString('userId', map['id']);
+      await prefs.setString('token', map['token']);
     }
   } else {
-    await sharedPreferences.setString(
-        'userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
-    await sharedPreferences.setString('token', debugToken);
+    await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
+    await prefs.setString('token', debugToken);
   }
 }
 
-Future _clearStorage() async {
+Future _clearStorage(SharedPreferences prefs) async {
   await clearStorage();
-  await sharedPreferences.setBool('hasOpened', true);
+  await prefs.setBool('hasOpened', true);
 }
 
 class UserRepo {
@@ -135,5 +136,6 @@ class UserRepo {
 }
 
 Future<String> get token async {
-  return sharedPreferences.getString('token');
+  var prefs = await SharedPreferences.getInstance();
+  return prefs.getString('token');
 }

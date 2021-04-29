@@ -17,12 +17,12 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
-import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/network/session_options/session_options_repo.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
@@ -34,7 +34,7 @@ class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
   var lengthList = <String>[];
-  var backgroundSoundsId;
+  var backgroundSoundsPath;
   BackgroundSoundsResponse bgMusicList;
   String bgSoundName = '';
   String availableOfflineIndicatorText = '';
@@ -45,6 +45,7 @@ class SessionOptionsBloc {
   var bgSoundSelectedIndex = 0;
   var illustration;
 
+  Screen _screen;
   AudioFile currentFile;
 
   // Download stuff
@@ -68,6 +69,7 @@ class SessionOptionsBloc {
   SessionData _options;
 
   SessionOptionsBloc(String id, Screen screen) {
+    _screen = screen;
     titleController = StreamController.broadcast();
 
     voiceListController = StreamController.broadcast()
@@ -154,10 +156,10 @@ class SessionOptionsBloc {
 
     _setCurrentFileForDownloadSingleton();
 
-    offlineSelected =
-        await DownloadsBloc.isDownloadAndBGSoundDownloaded(currentFile, bgSoundName)
-            ? 1
-            : 0;
+    offlineSelected = await DownloadsBloc.isDownloadAndBGSoundDownloaded(
+            currentFile, bgSoundName)
+        ? 1
+        : 0;
     _updateAvailableOfflineIndicatorText();
   }
 
@@ -209,27 +211,48 @@ class SessionOptionsBloc {
     if (currentFile == null) updateCurrentFile();
 
     var media = getMediaItemForSelectedFile();
+    _trackSessionStart(media);
     unawaited(start(media));
 
     ///End file handling
     ///
   }
 
-  MediaItem getMediaItemForSelectedFile() => MediaLibrary.getMediaLibrary(
-      description: _options.description,
-      title: _options.title,
-      illustrationUrl: _options.coverUrl,
-      voice: currentFile.voice,
-      length: currentFile.length,
-      secondaryColor: _options.colorSecondary,
-      primaryColor: _options.colorPrimary,
-      bgMusic: backgroundSoundsId,
-      bgMusicTitle: bgSoundName,
-      durationAsMilliseconds:
-          clockTimeToDuration(currentFile.length).inMilliseconds,
-      fileId: currentFile.id,
-      sessionId: _options.id,
-      attributions: _options.attribution);
+  void _trackSessionStart(MediaItem mediaItem) {
+    var data = {
+      Tracking.TYPE: Tracking.AUDIO_STARTED,
+      Tracking.SESSION_VOICE: mediaItem.artist,
+      Tracking.SESSION_LENGTH: mediaItem.extras['length'],
+      Tracking.SESSION_BACKGROUND_SOUND: mediaItem.extras['bgMusicId'],
+      Tracking.DESTINATION: Tracking.destinationData(
+          mapToPlural(_screen.toString()), mediaItem.extras['sessionId'].toString())
+    };
+
+    Tracking.trackEvent(data);
+  }
+
+  MediaItem getMediaItemForSelectedFile() {
+    var bgMusicId = bgSoundSelectedIndex > 0
+        ? bgMusicList.data[bgSoundSelectedIndex - 1].id
+        : -1;
+
+    return MediaLibrary.getMediaLibrary(
+        description: _options.description,
+        title: _options.title,
+        illustrationUrl: _options.coverUrl,
+        voice: currentFile.voice,
+        length: currentFile.length,
+        secondaryColor: _options.colorSecondary,
+        primaryColor: _options.colorPrimary,
+        bgMusic: backgroundSoundsPath,
+        bgMusicId: bgMusicId,
+        bgMusicTitle: bgSoundName,
+        durationAsMilliseconds:
+            clockTimeToDuration(currentFile.length).inMilliseconds,
+        fileId: currentFile.id,
+        sessionId: _options.id,
+        attributions: _options.attribution);
+  }
 
   void dispose() {
     titleController?.close();

@@ -49,20 +49,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void setLoaded(bool b, MediaItem mediaItem) {
     if (__loaded == null && b == true) {
       __loaded = 'true';
-      _trackSessionStart(mediaItem);
     }
-  }
-
-  void _trackSessionStart(MediaItem mediaItem) {
-    var data = {
-      Tracking.TYPE: Tracking.AUDIO_STARTED,
-      Tracking.SESSION_VOICE: mediaItem.artist,
-      Tracking.SESSION_LENGTH: mediaItem.extras['length'],
-      Tracking.SESSION_BACKGROUND_SOUND: mediaItem.extras['bgMusic'],
-      Tracking.PLAYER_COPY_VERSION: _bloc.version.id
-    };
-
-    Tracking.trackEvent(data);
   }
 
   @override
@@ -106,7 +93,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _startTimeout() {
-    var timerMaxSeconds = 10;
+    var timerMaxSeconds = 20;
     Timer.periodic(Duration(seconds: timerMaxSeconds), (timer) {
       if (!loaded && mounted) {
         createSnackBar(TIMEOUT, context);
@@ -138,7 +125,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             getSecondaryColor(mediaItem);
             getPrimaryColor(mediaItem);
             getArtUrl(mediaItem);
-            _trackSessionStart(mediaItem);
 
             return Stack(
               children: [
@@ -569,7 +555,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     getVersionCopyInt().then((version) {
       Tracking.trackEvent(
-          {Tracking.TYPE: Tracking.CTA_TAPPED, 'version_seen': '$version'});
+          {Tracking.TYPE: Tracking.CTA_TAPPED, Tracking.PLAYER_COPY_VERSION: '$version'});
     });
 
     return launchUrl(path);

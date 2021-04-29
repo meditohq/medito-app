@@ -19,7 +19,7 @@ class NavigationFactory {
       case Screen.player:
         return _push(context, PlayerWidget(normalPop: normalPop));
         break;
-      case Screen.text:
+      case Screen.article:
         return _push(
             context,
             TextFileWidget(
@@ -29,7 +29,7 @@ class NavigationFactory {
       case Screen.stats:
         // _push(context, StreakWidget());
         break;
-      case Screen.session_options:
+      case Screen.session:
         assert(id.isNotEmpty);
         return _push(
             context,
@@ -69,10 +69,10 @@ class NavigationFactory {
   static Screen getScreenFromItemType(FileType fileType) {
     switch (fileType) {
       case FileType.session:
-        return Screen.session_options;
+        return Screen.session;
         break;
       case FileType.text:
-        return Screen.text;
+        return Screen.article;
         break;
       case FileType.folder:
         return Screen.folder;
@@ -88,7 +88,7 @@ class NavigationFactory {
   static Future<void> navigateToScreenFromString(
       String place, String id, BuildContext context) {
     if (place == 'session') {
-      return navigate(context, Screen.session_options, id: id);
+      return navigate(context, Screen.session, id: id);
     }
     if (place == 'daily') {
       return navigate(context, Screen.daily, id: id);
@@ -97,7 +97,7 @@ class NavigationFactory {
       return navigate(context, Screen.donation);
     }
     if (place == 'article') {
-      return navigate(context, Screen.text, id: id);
+      return navigate(context, Screen.article, id: id);
     }
     if (place == 'download') {
       return navigate(context, Screen.downloads);
@@ -115,9 +115,9 @@ class NavigationFactory {
 enum Screen {
   folder,
   player,
-  text,
+  article,
   stats,
-  session_options,
+  session,
   daily,
   donation,
   downloads,

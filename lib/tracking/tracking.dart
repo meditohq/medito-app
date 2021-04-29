@@ -12,6 +12,7 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
+import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
@@ -28,7 +29,7 @@ class Tracking {
   static const String COURSE_TAPPED = 'course_tapped';
   static const String SHARE_TAPPED = 'share_tapped';
   static const String CTA_TAPPED = 'cta_tapped';
-  static const String SESSION = 'session';
+  static const String SESSION = 'sessions';
 
   //for audio started
   static const String SESSION_VOICE = 'session_voice';
@@ -46,7 +47,7 @@ class Tracking {
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
     //only track in release mode, not debug
-    if (kReleaseMode) {
+    if (!kReleaseMode) {
       unawaited(httpPost(url, body: map, token: await token));
     }
   }
@@ -57,3 +58,43 @@ class Tracking {
     ];
   }
 }
+
+String mapFileTypeToPlural(FileType fileType) {
+  switch (fileType) {
+    case FileType.folder:
+      return 'folders';
+      break;
+    case FileType.text:
+      return 'articles';
+      break;
+    case FileType.session:
+      return 'sessions';
+      break;
+    case FileType.url:
+      return 'urls';
+      break;
+    case FileType.daily:
+      return 'dailies';
+      break;
+  }
+  return '';
+}
+
+String mapToPlural(String fileType) {
+    if (fileType.contains('folder')) {
+      return 'folders';
+    }
+    if (fileType.contains('articles')) {
+      return 'articles';
+    }
+    if (fileType.contains('session')) {
+      return 'sessions';
+    }
+    if (fileType.contains('url')) {
+      return 'urls';
+    }
+    if (fileType.contains('daily')) {
+      return 'dailies';
+    }
+    return '';
+  }

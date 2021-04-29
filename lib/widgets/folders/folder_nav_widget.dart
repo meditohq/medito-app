@@ -207,10 +207,20 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   void itemTap(Item i) {
     checkConnectivity().then((value) {
       if (value) {
+        var type;
+        switch (i.fileType) {
+          case FileType.folder:
+            type = Tracking.FOLDER_TAPPED;
+            break;
+          case FileType.session:
+            type = Tracking.SESSION_TAPPED;
+            break;
+        }
 
         Tracking.trackEvent({
-          Tracking.TYPE: Tracking.FOLDER_TAPPED,
-          Tracking.DESTINATION: Tracking.destinationData(i.fileType.toString(), i.id)
+          Tracking.TYPE: type,
+          Tracking.DESTINATION:
+              Tracking.destinationData(mapFileTypeToPlural(i.fileType), i.id)
         });
 
         NavigationFactory.navigate(

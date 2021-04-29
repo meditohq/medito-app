@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
+import 'package:Medito/network/packs/packs_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
@@ -104,7 +105,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   Future<void> _navigate(type, id, BuildContext context, String origin) {
     Tracking.trackEvent({
       Tracking.TYPE: origin,
-      Tracking.DESTINATION: Tracking.destinationData(Tracking.SESSION, id)
+      Tracking.DESTINATION: Tracking.destinationData(mapToPlural(type), id)
     });
 
     return checkConnectivity().then(

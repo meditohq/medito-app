@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_bloc.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
@@ -118,6 +117,16 @@ class _TextFileWidgetState extends State<TextFileWidget>
                       padding: const EdgeInsets.all(0),
                       shrinkWrap: true,
                       styleSheet: buildMarkdownStyleSheet(context).copyWith(
+                          horizontalRuleDecoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                width: 1.0,
+                                color: MeditoColors.meditoTextGrey,
+                              ),
+                            ),
+                          ),
+                          h2: TextStyle(
+                              color: MeditoColors.walterWhite, height: 1.5),
                           p: TextStyle(
                               color: MeditoColors.walterWhite, height: 1.5)));
                 }),
