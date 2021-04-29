@@ -78,7 +78,6 @@ class UserRepo {
       'device_os': deviceOS,
       'device_platform': devicePlatform,
       'device_language': io.Platform.localeName,
-      'date_joined': now,
     };
 
     try {
