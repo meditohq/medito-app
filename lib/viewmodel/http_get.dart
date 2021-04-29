@@ -16,8 +16,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:http/http.dart' as http;
 
@@ -39,7 +39,7 @@ Future httpGet(String url,
   if (cache == null) {
     final response = await http.get(
       url,
-      headers: {HttpHeaders.authorizationHeader: basicAuth},
+      headers: {HttpHeaders.authorizationHeader: await token},
     );
 
     if (response.statusCode == 200) {
@@ -50,18 +50,18 @@ Future httpGet(String url,
   return json.decode(cache);
 }
 
-Future httpPost(String url, Map<String, String> body) async {
+Future httpPost(String url, {Map<String, String> body = const <String, String>{}, String token}) async {
   try {
     final response = await http.post(
       url,
       body: encoded(body),
       headers: {
-        HttpHeaders.authorizationHeader: basicAuth,
+        HttpHeaders.authorizationHeader: token,
         HttpHeaders.contentTypeHeader: 'application/json'
       },
     );
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.body.isNotEmpty ? json.decode(response.body) : true;
     } else {
       return null;
     }

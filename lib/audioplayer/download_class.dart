@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -53,7 +54,7 @@ class _Download {
 
     var url = baseUrl + 'assets/' + currentFile.id;
     var request = http.Request('GET', Uri.parse(url));
-    request.headers[HttpHeaders.authorizationHeader] = basicAuth;
+    request.headers[HttpHeaders.authorizationHeader] = await token;
     var _response = await http.Client().send(request);
     _total = _response.contentLength;
     _received = 0;

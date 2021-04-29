@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
@@ -46,7 +47,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         if (data == null) {
           var url = '${baseUrl}assets/${mediaItem.id}';
           _duration = await _player.setUrl(url,
-              headers: {HttpHeaders.authorizationHeader: basicAuth});
+              headers: {HttpHeaders.authorizationHeader: await token});
         } else {
           _duration = await _player.setFilePath(data);
         }

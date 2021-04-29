@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -25,15 +26,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
-  final headers = {HttpHeaders.authorizationHeader: basicAuth};
-  return CachedNetworkImage(
-    fit: BoxFit.fill,
-    httpHeaders: headers,
-    placeholder: (context, url) => Container(
-      height: startHeight,
-    ),
-    imageUrl: url ?? '',
-  );
+  return FutureBuilder<String>(
+      future: token,
+      builder: (context, snapshot) {
+        if(!snapshot.hasData) return Container();
+        final headers = {HttpHeaders.authorizationHeader: snapshot.data};
+        return CachedNetworkImage(
+          fit: BoxFit.fill,
+          httpHeaders: headers,
+          placeholder: (context, url) => Container(
+            height: startHeight,
+          ),
+          imageUrl: url ?? '',
+        );
+      });
 }
 
 Future<bool> checkConnectivity() async {

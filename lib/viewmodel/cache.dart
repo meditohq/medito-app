@@ -68,7 +68,11 @@ Future<String> _readCache(String id) async {
 }
 
 String encoded(dynamic obj) {
-  return json.encode(obj);
+  if(obj != null) {
+    return json.encode(obj);
+  } else {
+    return null;
+  }
 }
 
 dynamic decoded(String obj) {
