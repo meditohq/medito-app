@@ -60,7 +60,11 @@ Future httpPost(String url, Map<String, String> body) async {
         HttpHeaders.contentTypeHeader: 'application/json'
       },
     );
-    return response;
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      return null;
+    }
   } catch (e) {
     print(e);
     return null;
