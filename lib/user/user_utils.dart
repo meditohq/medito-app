@@ -14,14 +14,27 @@ Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   _beginClearStorage(prefs);
 
-  await _beginCreateAccount(prefs);
+  await _logAccount(prefs);
   return;
 }
 
-Future _beginCreateAccount(SharedPreferences prefs) async {
+Future _logAccount(SharedPreferences prefs) async {
   var user = prefs.getString('userId') ?? '';
   if (user.isEmpty) {
     await _createUser(prefs);
+  } else {
+    unawaited(_postLastAccess());
+  }
+}
+
+Future<void> _postLastAccess() async {
+  var ext = 'items/usage/';
+  var url = baseUrl + ext;
+  try {
+    unawaited(httpPost(url, token: await token));
+  } catch (e) {
+    print('post last access failed: ' + e);
+    return;
   }
 }
 
@@ -41,7 +54,7 @@ Future<void> _createUser(SharedPreferences prefs) async {
     }
   } else {
     await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
-    await prefs.setString('token', 'debug[#20210429]');
+    await prefs.setString('token', debugToken);
   }
 }
 
@@ -100,7 +113,7 @@ class UserRepo {
 
     var id = '';
     try {
-      final response = await httpPost(url, defaultMap);
+      final response = await httpPost(url, body: defaultMap, token: initToken);
       id = response != null ? UserResponse.fromJson(response).data.id : null;
     } catch (e) {
       return null;
@@ -119,4 +132,9 @@ class UserRepo {
     }
     return '';
   }
+}
+
+Future<String> get token async {
+  var prefs = await SharedPreferences.getInstance();
+  return prefs.getString('token');
 }

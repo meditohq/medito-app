@@ -17,6 +17,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/network/session_options/session_opts.dart';
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -46,7 +47,7 @@ Future<dynamic> downloadBGMusicFromURL(String id, String name) async {
   if (await file.exists()) return file.path;
 
   var url = '${baseUrl}assets/$id';
-  var request = await http.get(url, headers: {HttpHeaders.authorizationHeader: basicAuth});
+  var request = await http.get(url, headers: {HttpHeaders.authorizationHeader: await token});
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
 
