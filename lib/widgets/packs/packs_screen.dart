@@ -117,7 +117,7 @@ class PackListWidgetState extends State<PackListWidget> {
         Tracking.trackEvent({
           Tracking.TYPE: Tracking.PACK_TAPPED,
           Tracking.DESTINATION:
-              Tracking.destinationData(pack.fileType.toString(), pack.id)
+              Tracking.destinationData(mapFileTypeToPlural(pack.fileType), pack.id)
         });
 
         return NavigationFactory.navigateToScreenFromString(

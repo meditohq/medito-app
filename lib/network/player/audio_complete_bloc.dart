@@ -35,6 +35,7 @@ class AudioCompleteCopyBloc {
     var data = await _repo.fetchCopyData();
     final randomOutOf10 = _random.nextInt(data.data.length);
     version = data.data[randomOutOf10];
+    setVersionCopySeen(version.id);
   }
 
   Future<String> getVersionTitle() async {

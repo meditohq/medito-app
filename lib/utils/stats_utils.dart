@@ -14,9 +14,11 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/main.dart';
-import 'package:Medito/viewmodel/cache.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/cache.dart';
+import 'package:pedantic/pedantic.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum UnitType { day, min, sessions }
 
@@ -296,13 +298,14 @@ Future updateStatsFromBg() async {
 
   if (read.isNotEmptyAndNotNull()) {
     var map = decoded(read);
+    var id = map['id'];
+    var secsListened = map['secsListened'];
 
     if (map != null && map.isNotEmpty) {
       await updateStreak();
       await incrementNumSessions();
-      await markAsListened(map['id']);
-      await updateMinuteCounter(
-          Duration(seconds: map['secsListened']).inSeconds);
+      await markAsListened(id);
+      await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
     print('clearing bg stats');
     await clearBgStats();

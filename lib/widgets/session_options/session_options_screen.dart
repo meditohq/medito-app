@@ -426,18 +426,18 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       showIndeterminateSpinner = true;
       unawaited(downloadBGMusicFromURL(id, name).then((value) {
         showIndeterminateSpinner = false;
-        _bloc.backgroundSoundsId = value;
+        _bloc.backgroundSoundsPath = value;
         setState(() {});
       }).catchError((onError) {
         print(onError);
         showIndeterminateSpinner = false;
         _bloc.bgSoundSelectedIndex = 0;
-        _bloc.backgroundSoundsId = null;
+        _bloc.backgroundSoundsPath = null;
       }));
     } else {
       showIndeterminateSpinner = false;
       _bloc.bgSoundSelectedIndex = 0;
-      _bloc.backgroundSoundsId = null;
+      _bloc.backgroundSoundsPath = null;
     }
     setState(() {});
   }

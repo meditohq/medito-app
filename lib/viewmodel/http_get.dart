@@ -50,7 +50,7 @@ Future httpGet(String url,
   return json.decode(cache);
 }
 
-Future httpPost(String url, {Map<String, String> body = const <String, String>{}, String token}) async {
+Future httpPost(String url, {dynamic body = const <String, String>{}, String token}) async {
   try {
     final response = await http.post(
       url,
