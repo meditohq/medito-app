@@ -6,26 +6,42 @@ import 'package:Medito/viewmodel/cache.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
-  var opened = prefs.getBool('hasOpened') ?? false;
-  if (!opened) {
-    unawaited(_clearStorage(prefs));
-  }
+  _beginClearStorage(prefs);
+
+  await _beginCreateAccount(prefs);
+  return;
+}
+
+Future _beginCreateAccount(SharedPreferences prefs) async {
   var user = prefs.getString('userId') ?? '';
   if (user.isEmpty) {
     await _createUser(prefs);
   }
-  return;
+}
+
+void _beginClearStorage(SharedPreferences prefs) {
+  var opened = prefs.getBool('hasOpened') ?? false;
+  if (!opened) {
+    unawaited(_clearStorage(prefs));
+  }
 }
 
 Future<void> _createUser(SharedPreferences prefs) async {
-  var id = await UserRepo.createUser();
-  if (id != null) {
-    await prefs.setString('userId', id);
+  if (!kDebugMode) {
+    var map = await UserRepo.createUser();
+    if (map != null) {
+      await prefs.setString('userId', map['id']);
+      await prefs.setString('token', map['token']);
+    }
+  } else {
+    await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
+    await prefs.setString('token', 'debug[#20210429]');
   }
 }
 
@@ -35,7 +51,7 @@ Future _clearStorage(SharedPreferences prefs) async {
 }
 
 class UserRepo {
-  static Future<String> createUser() async {
+  static Future<Map<String, String>> createUser() async {
     var ext = 'users/';
     var url = baseUrl + ext;
 
@@ -68,11 +84,13 @@ class UserRepo {
       print(e);
     }
 
+    var token = '$now${UniqueKey().toString()}';
+
     var defaultMap = <String, String>{
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
       'role': '97712b9c-db0c-4235-b561-e8b58711d857',
-      'token': '$now${UniqueKey().toString()}',
+      'token': token,
       'ip_address': await getIP(),
       'device_model': deviceModel,
       'device_os': deviceOS,
@@ -80,12 +98,15 @@ class UserRepo {
       'device_language': io.Platform.localeName,
     };
 
+    var id = '';
     try {
       final response = await httpPost(url, defaultMap);
-      return response != null ? UserResponse.fromJson(response).data.id : null;
+      id = response != null ? UserResponse.fromJson(response).data.id : null;
     } catch (e) {
       return null;
     }
+
+    return {'id': id, 'token': token};
   }
 
   static Future<String> getIP() async {
