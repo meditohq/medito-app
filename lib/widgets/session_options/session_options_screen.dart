@@ -312,7 +312,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               if (data?.isEmpty ?? true) return Container();
 
               return ListView.builder(
-                padding: const EdgeInsets.only(left: 16),
+                padding: const EdgeInsets.only(left: 16, right: 16  ),
                 shrinkWrap: true,
                 itemCount: 1 + (data.length ?? 0),
                 scrollDirection: Axis.horizontal,
