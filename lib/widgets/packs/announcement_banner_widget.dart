@@ -31,7 +31,7 @@ class AnnouncementBanner extends StatefulWidget {
 }
 
 class AnnouncementBannerState extends State<AnnouncementBanner>
-    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin  {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   var _hidden = false;
   final _bloc = AnnouncementBloc();
 
@@ -41,7 +41,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     _bloc.fetchAnnouncement(skipCache: true);
   }
 
-  void refresh(){
+  void refresh() {
     _bloc.fetchAnnouncement(skipCache: true);
   }
 
@@ -51,13 +51,13 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     return StreamBuilder<AnnouncementResponse>(
         stream: _bloc.announcementController.stream,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data != null) {
             return Container();
           }
 
           return FutureBuilder<bool>(
               future: _bloc
-                  .shouldHideAnnouncement(snapshot.data.timestamp.toString()),
+                  .shouldHideAnnouncement(snapshot.data?.timestamp.toString()),
               initialData: false,
               builder: (context, showSnapshot) {
                 if (showSnapshot.data) {
@@ -105,7 +105,11 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(snapshot.data.body, style: Theme.of(context).textTheme.subtitle1.copyWith(color: MeditoColors.walterWhite)),
+        Text(snapshot.data.body,
+            style: Theme.of(context)
+                .textTheme
+                .subtitle1
+                .copyWith(color: MeditoColors.walterWhite)),
       ],
     );
   }
@@ -152,13 +156,17 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   }
 
   Widget buildSpacer() {
-    return Divider(color: MeditoColors.moonlight, height: 1,);
+    return Divider(
+      color: MeditoColors.moonlight,
+      height: 1,
+    );
   }
 
   void _openLink(String buttonType, String buttonPath) {
     NavigationFactory.navigateToScreenFromString(
         buttonType, buttonPath, context);
   }
+
   @override
   void dispose() {
     _bloc.dispose();
