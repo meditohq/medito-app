@@ -1,50 +1,62 @@
 import 'dart:io';
 
-import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/data/page.dart';
+import 'package:Medito/network/downloads/downloads_bloc.dart';
+import 'package:Medito/network/session_options/session_opts.dart';
+import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:pedantic/pedantic.dart';
+
+import 'player_utils.dart';
 
 class _Download {
   bool isDownloading = false;
-  Files _file;
+  AudioFile _file;
   int _received = 0, _total = 1;
   var downloadListener = ValueNotifier<double>(0);
 
-  _Download(Files file) {
+  MediaItem _mediaItem;
+
+  _Download(AudioFile file) {
     _file = file;
   }
 
-  bool isThisFile(Files file) {
+  bool isThisFile(AudioFile file) {
     return file == _file;
   }
 
-  void startDownloading(Files file) {
+  void startDownloading(AudioFile file, MediaItem mediaItemForSelectedFile) {
     if (isDownloading) return;
     isDownloading = true;
     _file = file;
+    _mediaItem = mediaItemForSelectedFile;
+
     _downloadFileWithProgress(file);
   }
 
-  bool isDownloadingMe(Files file) {
+  bool isDownloadingMe(AudioFile file) {
     if (!isDownloading) return false;
     if (!isThisFile(file)) return false;
     return isDownloading;
   }
 
-  Future<dynamic> _downloadFileWithProgress(Files currentFile) async {
-    unawaited( getAttributions(currentFile.attributions));
-    var dir = (await getApplicationSupportDirectory()).path;
-    var name = currentFile.filename.replaceAll(' ', '%20');
-    var file = File('$dir/$name');
+  Future<dynamic> _downloadFileWithProgress(AudioFile currentFile) async {
+    var filePath = (await getFilePath(_mediaItem.id));
+    var file = File(filePath);
     if (file.existsSync()) {
+      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(_mediaItem));
       isDownloading = false;
       return null;
+    } else {
+      file.createSync();
     }
-    var _response = await http.Client()
-        .send(http.Request('GET', Uri.parse(currentFile.url)));
+
+    var url = baseUrl + 'assets/' + currentFile.id;
+    var request = http.Request('GET', Uri.parse(url));
+    request.headers[HttpHeaders.authorizationHeader] = await token;
+    var _response = await http.Client().send(request);
     _total = _response.contentLength;
     _received = 0;
     var _bytes = <int>[];
@@ -61,7 +73,7 @@ class _Download {
         _received ??= _bytes.length;
         if (_total == null) {
           http.Client()
-              .send(http.Request('GET', Uri.parse(currentFile.url)))
+              .send(http.Request('GET', Uri.parse(currentFile.id)))
               .then((value) => _response = value);
           _total = _response.contentLength;
           _received = _bytes.length;
@@ -72,7 +84,7 @@ class _Download {
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      unawaited( saveFileToDownloadedFilesList(currentFile));
+      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(_mediaItem));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });
@@ -82,7 +94,7 @@ class _Download {
     if (_total == null) {
       http.StreamedResponse _throwResponse;
       http.Client()
-          .send(http.Request('GET', Uri.parse(_file.url)))
+          .send(http.Request('GET', Uri.parse(_file.id)))
           .then((value) => _throwResponse = value);
       _total = _throwResponse.contentLength;
     }
@@ -93,7 +105,7 @@ class _Download {
 class DownloadSingleton {
   _Download _download;
 
-  DownloadSingleton(Files file) {
+  DownloadSingleton(AudioFile file) {
     if (file == null) return;
     _download = _Download(file);
   }
@@ -107,27 +119,28 @@ class DownloadSingleton {
     return _download.isDownloading;
   }
 
-  bool isDownloadingMe(Files file) {
+  bool isDownloadingMe(AudioFile file) {
     if (_download == null) return false;
     return _download.isDownloadingMe(file);
   }
 
-  double getProgress(Files file) {
+  double getProgress(AudioFile file) {
     if (_download == null) return -1;
     if (isDownloadingMe(file)) return _download.getProgress();
     return -1;
   }
 
-  bool start(Files file) {
+  bool start(AudioFile file, MediaItem mediaItemForSelectedFile) {
     if (_download == null) return false;
     if (_download.isDownloadingMe(file)) return true;
     if (isDownloadingSomething()) return false;
+
     if (_download.isThisFile(file)) {
-      _download.startDownloading(file);
+      _download.startDownloading(file, mediaItemForSelectedFile);
       return true;
     }
     _download = _Download(file);
-    _download.startDownloading(file);
+    _download.startDownloading(file, mediaItemForSelectedFile);
     return true;
   }
 

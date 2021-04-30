@@ -15,120 +15,208 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
+import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/strings.dart';
+import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
-import 'package:Medito/widgets/tiles/tile_screen.dart';
+import 'package:Medito/widgets/btm_nav/home_widget.dart';
+import 'package:Medito/widgets/btm_nav/library_widget.dart';
+import 'package:Medito/widgets/folders/folder_nav_widget.dart';
+import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_update/in_app_update.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'tracking/tracking.dart';
+import 'network/downloads/downloads_bloc.dart';
 import 'utils/colors.dart';
 
+SharedPreferences sharedPreferences;
+
 Future<void> main() async {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
 
-  var app = await Firebase.initializeApp(
-      options: FirebaseOptions(
-    appId: appId,
-    apiKey: apiKey,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    databaseURL: databaseURL,
-  ));
+  sharedPreferences = await SharedPreferences.getInstance();
 
-  await Tracking.initialiseTracker(app);
-
-  InAppPurchaseConnection.enablePendingPurchases();
-
-  runApp(HomeScreenWidget());
+  runApp(ParentWidget());
 }
 
 /// This Widget is the main application widget.
-class HomeScreenWidget extends StatefulWidget {
+class ParentWidget extends StatefulWidget {
   static const String _title = 'Medito';
 
   @override
-  _HomeScreenWidgetState createState() => _HomeScreenWidgetState();
+  _ParentWidgetState createState() => _ParentWidgetState();
 }
 
-class _HomeScreenWidgetState extends State<HomeScreenWidget>
+class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
+  var _currentIndex = 0;
+  final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
+  final _bloc = DownloadsBloc();
+  final _messengerKey = GlobalKey<ScaffoldState>();
+
+  var _deletingCache = true;
 
   @override
   void initState() {
     super.initState();
 
-    isTrackingAccepted().then((value) async {
-      if (value) {
-        Tracking.enableAnalytics(true);
-      } else {
-        Tracking.enableAnalytics(false);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: MeditoColors.transparent,
+          systemNavigationBarIconBrightness: Brightness.light,
+          statusBarColor: MeditoColors.transparent),
+    );
+
+    checkConnectivity().then((value) {
+      if (!value) {
+        _onTabTapped(2);
       }
     });
 
+    firstOpenOperations().then((value) {
+      setState(() {
+        _deletingCache = false;
+      });
+    });
+
+    // update stats for any sessions that were listened in the background and after the app was killed
+    updateStatsFromBg();
+    // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _bloc.dispose();
     super.dispose();
   }
 
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      unawaited(checkForUpdate());
-      await updateStatsFromBg();
+  void _onTabTapped(int index) {
+    if (_currentIndex != index) {
+      setState(() {
+        _checkToShowSwipeToDeleteTip(index);
+        _currentIndex = index;
+      });
     }
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> checkForUpdate() async {
-    unawaited(InAppUpdate.checkForUpdate().then((info) {
-      setState(() {
-        if (info.flexibleUpdateAllowed && info.updateAvailable) {
-          InAppUpdate.startFlexibleUpdate().catchError(_onError);
+  void _checkToShowSwipeToDeleteTip(int index) {
+    if (_children[index] is LibraryWidget) {
+      DownloadsBloc.fetchDownloads().then((value) {
+        if (value.isNotEmpty) {
+          showSwipeToDeleteTip();
         }
       });
-    }).catchError(_onError));
+    }
+  }
+
+  void showSwipeToDeleteTip() async {
+    await _bloc.seenTip().then((seen) {
+      if (!seen) {
+        unawaited(_bloc.setSeenTip());
+        createSnackBar(SWIPE_TO_DELETE, _messengerKey.currentContext,
+            color: MeditoColors.darkMoon);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/nav',
-      routes: {
-        '/nav': (context) => Scaffold(
-            appBar: null, //AppBar(title: const Text(_title)),
-            body: AudioServiceWidget(child: TileList())),
-      },
-      theme: ThemeData(
-          splashColor: MeditoColors.moonlight,
-          canvasColor: MeditoColors.darkMoon,
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: SlideTransitionBuilder(),
-          }),
-          accentColor: MeditoColors.walterWhite,
-          textTheme: buildDMSansTextTheme(context)),
-      title: HomeScreenWidget._title,
-      navigatorObservers: [Tracking.getObserver()],
+    return AudioServiceWidget(
+      child: MaterialApp(
+        initialRoute: '/nav',
+        routes: {
+          FolderNavWidget.routeName: (context) => FolderNavWidget(),
+          '/nav': (context) => _deletingCache
+              ? _getLoadingWidget()
+              : Scaffold(
+                  key: _messengerKey,
+                  body: IndexedStack(
+                    index: _currentIndex,
+                    children: _children,
+                  ),
+                  bottomNavigationBar: Container(
+                    decoration: BoxDecoration(
+                        color: MeditoColors.softGrey,
+                        border: Border(
+                            top: BorderSide(
+                                color: MeditoColors.softGrey, width: 2.0))),
+                    child: BottomNavigationBar(
+                      selectedLabelStyle: Theme.of(context)
+                          .textTheme
+                          .headline1
+                          .copyWith(fontSize: 12),
+                      unselectedLabelStyle: Theme.of(context)
+                          .textTheme
+                          .headline2
+                          .copyWith(fontSize: 12),
+                      selectedItemColor: MeditoColors.walterWhite,
+                      unselectedItemColor: MeditoColors.newGrey,
+                      currentIndex: _currentIndex,
+                      onTap: _onTabTapped,
+                      items: [
+                        BottomNavigationBarItem(
+                          tooltip: 'Home',
+                          icon: Icon(
+                            Icons.home_outlined,
+                            size: 20,
+                          ),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.format_list_bulleted_outlined,
+                            size: 20,
+                          ),
+                          tooltip: 'Packs',
+                          label: 'Packs',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.bookmark_border_outlined,
+                            size: 20,
+                          ),
+                          tooltip: 'Library',
+                          label: 'Library',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+        },
+        theme: ThemeData(
+            splashColor: MeditoColors.moonlight,
+            canvasColor: MeditoColors.darkMoon,
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.android: SlideTransitionBuilder(),
+            }),
+            accentColor: MeditoColors.walterWhite,
+            textTheme: meditoTextTheme(context)),
+        title: ParentWidget._title,
+      ),
     );
   }
 
-  void _onError() {
-    print('update error');
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // update session stats when app comes into foreground
+      updateStatsFromBg();
+    }
   }
+}
+
+Widget _getLoadingWidget() {
+  return Center(child: CircularProgressIndicator());
 }
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
