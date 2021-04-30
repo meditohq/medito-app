@@ -94,7 +94,7 @@ class PackListWidgetState extends State<PackListWidget> {
   Widget _getListWidget(List<PacksData> data) {
     return ListView.builder(
       padding: EdgeInsets.only(top: 8, bottom: 8),
-      itemCount: data.length,
+      itemCount: data?.length ?? 0,
       itemBuilder: (context, i) {
         return InkWell(
           onTap: () => _navigate(data, i, context),

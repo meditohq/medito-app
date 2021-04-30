@@ -15,7 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
@@ -101,10 +100,12 @@ class _ParentWidgetState extends State<ParentWidget>
   }
 
   void _onTabTapped(int index) {
-    setState(() {
-      _checkToShowSwipeToDeleteTip(index);
-      _currentIndex = index;
-    });
+    if (_currentIndex != index) {
+      setState(() {
+        _checkToShowSwipeToDeleteTip(index);
+        _currentIndex = index;
+      });
+    }
   }
 
   void _checkToShowSwipeToDeleteTip(int index) {

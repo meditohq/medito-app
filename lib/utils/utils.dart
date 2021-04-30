@@ -27,6 +27,7 @@ import 'package:url_launcher/url_launcher.dart';
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
   return FutureBuilder<String>(
+    initialData: '',
       future: token,
       builder: (context, snapshot) {
         if(!snapshot.hasData) return Container();
@@ -34,9 +35,6 @@ Widget getNetworkImageWidget(String url,
         return CachedNetworkImage(
           fit: BoxFit.fill,
           httpHeaders: headers,
-          placeholder: (context, url) => Container(
-            height: startHeight,
-          ),
           imageUrl: url ?? '',
         );
       });

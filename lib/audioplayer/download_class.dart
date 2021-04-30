@@ -46,6 +46,7 @@ class _Download {
     var filePath = (await getFilePath(_mediaItem.id));
     var file = File(filePath);
     if (file.existsSync()) {
+      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(_mediaItem));
       isDownloading = false;
       return null;
     } else {
