@@ -180,17 +180,21 @@ class SessionOptionsBloc {
 
   void filterLengthsForVoice({int voiceIndex = 0}) {
     //Filter the lengths list for this voice from the original data
-    lengthList = _options.files
-        .where((element) => _options.voiceList.isNotEmpty
+    lengthList = _options?.files
+        ?.where((element) => _options.voiceList.isNotEmpty
             ? element.voice == _options.voiceList[voiceIndex]
             : true)
-        .map((e) => e.length)
-        .sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
-        .map((e) => formatSessionLength(e))
-        .toList();
+        ?.map((e) => e.length)
+        ?.sortedBy((e) => clockTimeToDuration(e).inMilliseconds)
+        ?.map((e) => formatSessionLength(e))
+        ?.toList();
 
-    // Post to UI
-    lengthListController.sink.add(ApiResponse.completed(lengthList));
+    if (lengthList == null) {
+      lengthListController.sink.add(ApiResponse.loading());
+    } else {
+      // Post to UI
+      lengthListController.sink.add(ApiResponse.completed(lengthList));
+    }
   }
 
   /// File handling
@@ -225,7 +229,8 @@ class SessionOptionsBloc {
       Tracking.SESSION_LENGTH: mediaItem.extras['length'],
       Tracking.SESSION_BACKGROUND_SOUND: mediaItem.extras['bgMusicId'],
       Tracking.DESTINATION: Tracking.destinationData(
-          mapToPlural(_screen.toString()), mediaItem.extras['sessionId'].toString())
+          mapToPlural(_screen.toString()),
+          mediaItem.extras['sessionId'].toString())
     };
 
     Tracking.trackEvent(data);

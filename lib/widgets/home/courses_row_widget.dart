@@ -55,7 +55,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
   Widget _horizontalCoursesRow(
       AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot) {
     var list = <Widget>[Container(width: 16)];
-    snapshot.data.body.data.forEach((element) {
+    snapshot.data?.body?.data?.forEach((element) {
       list.add(CoursesRowItemWidget(
         element,
         onTap: widget.onTap,

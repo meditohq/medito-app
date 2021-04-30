@@ -36,10 +36,11 @@ Future httpGet(String url,
     cache = await readJSONFromCache(fileNameForCache ?? url);
   }
 
+  var auth = await token;
   if (cache == null) {
     final response = await http.get(
       url,
-      headers: {HttpHeaders.authorizationHeader: await token},
+      headers: {HttpHeaders.authorizationHeader: auth},
     );
 
     if (response.statusCode == 200) {

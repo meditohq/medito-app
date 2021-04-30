@@ -34,7 +34,11 @@ class DailyMessageBloc {
   Future<void> fetchMessage({bool skipCache = false}) async {
     try {
       var data = await _repo.getMessage(skipCache);
-      coursesList.sink.add(ApiResponse.completed(data));
+      if(data!=null) {
+        coursesList.sink.add(ApiResponse.completed(data));
+      } else {
+        coursesList.sink.add(ApiResponse.error('An error occurred!'));
+      }
     } catch (e) {
       coursesList.sink.add(ApiResponse.error('An error occurred!'));
     }

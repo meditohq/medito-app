@@ -49,7 +49,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 children:
-                    List.generate(snapshot.data.body.data.length, (index) {
+                    List.generate(snapshot.data.body?.data?.length ?? 0, (index) {
                   return Card(
                     clipBehavior: Clip.antiAlias,
                     color: MeditoColors.deepNight,

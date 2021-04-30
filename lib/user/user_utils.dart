@@ -1,6 +1,5 @@
 import 'dart:io' as io;
 
-import 'package:Medito/main.dart';
 import 'package:Medito/user/user_response.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
@@ -14,17 +13,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   _beginClearStorage(prefs);
-
   await _logAccount(prefs);
   return;
 }
 
 Future _logAccount(SharedPreferences prefs) async {
   var user = prefs.getString('userId') ?? '';
-  if (user.isEmpty) {
-    await _createUser(prefs);
+  var token = prefs.getString('token') ?? '';
+
+  // if the last token was debug, check we haven't installed the release version now
+  if (user.isEmpty || (token.isNotEmpty && user == debugToken)) {
+    await _updateUserCredentials(prefs);
   } else {
     unawaited(_postLastAccess());
+  }
+}
+
+Future<void> _updateUserCredentials(SharedPreferences prefs) async {
+  if (kReleaseMode) {
+    var map = await UserRepo.createUser();
+    if (map != null) {
+      await prefs.setString('userId', map['id']);
+      await prefs.setString('token', map['token']);
+    }
+  } else {
+    await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
+    await prefs.setString('token', debugToken);
   }
 }
 
@@ -43,19 +57,6 @@ void _beginClearStorage(SharedPreferences prefs) {
   var opened = prefs.getBool('hasOpened') ?? false;
   if (!opened) {
     unawaited(_clearStorage(prefs));
-  }
-}
-
-Future<void> _createUser(SharedPreferences prefs) async {
-  if (!kDebugMode) {
-    var map = await UserRepo.createUser();
-    if (map != null) {
-      await prefs.setString('userId', map['id']);
-      await prefs.setString('token', map['token']);
-    }
-  } else {
-    await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
-    await prefs.setString('token', debugToken);
   }
 }
 
@@ -120,7 +121,7 @@ class UserRepo {
       return null;
     }
 
-    return {'id': id, 'token': token};
+    return {'id': id, 'token': 'Bearer $token'};
   }
 
   static Future<String> getIP() async {
