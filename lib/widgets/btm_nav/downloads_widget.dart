@@ -79,6 +79,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
             }
 
             scaffoldKey.currentState.showSnackBar(SnackBar(
+              backgroundColor: MeditoColors.moonlight,
               content: Text('"${item.title}" removed'),
             ));
           },
