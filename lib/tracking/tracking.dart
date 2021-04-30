@@ -12,121 +12,89 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:Medito/utils/utils.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:Medito/network/folder/folder_response.dart';
+import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/viewmodel/http_get.dart';
+import 'package:flutter/foundation.dart';
+import 'package:pedantic/pedantic.dart';
 
 class Tracking {
-  static const String SCREEN_LOADED = 'screen_loaded';
-  static const String FILE_TAPPED = 'file_tapped';
-  static const String CTA_TAPPED = 'cta_tapped';
-  static const String MAIN_CTA_TAPPED = 'main_cta_tapped';
-  static const String SECOND_CTA_TAPPED = 'second_cta_tapped';
-  static const String TILE = 'tile';
-  static const String TAP = 'tap';
-
-  static const String AUDIO_DOWNLOAD = 'audio_download';
-  static const String AUDIO_COMPLETED = 'audio_completed';
-  static const String AUDIO_COMPLETED_BUTTON_TAPPED =
-      'audio_completed_button_tapped';
-
-  static const String PLAYER_PAGE = 'player_page';
-  static const String PLAYER_END_PAGE = 'player_end_page';
-  static const String FOLDER_PAGE = 'folder_page';
-  static const String DONATION_PAGE_1 = 'donation_page_1';
-  static const String DONATION_PAGE_2 = 'donation_page_2';
-  static const String DONATION_PAGE_3 = 'donation_page_3';
-  static const String TEXT_PAGE = 'text_page';
-  static const String STREAK_PAGE = 'streak_page';
-
-  static const String TILE_TAPPED = 'tile_tapped';
-  static const String TRACKING_TAPPED = 'tracking_tapped';
-  static const String TEXT_TAPPED = 'text_tapped';
   static const String FOLDER_TAPPED = 'folder_tapped';
+  static const String PACK_TAPPED = 'pack_tapped';
   static const String SESSION_TAPPED = 'session_tapped';
-  static const String PLAY_TAPPED = 'play_tapped';
+  static const String AUDIO_STARTED = 'audio_started';
+  static const String AUDIO_COMPLETED = 'audio_completed';
+  static const String SHORTCUT_TAPPED = 'shortcut_tapped';
+  static const String COURSE_TAPPED = 'course_tapped';
+  static const String SHARE_TAPPED = 'share_tapped';
+  static const String CTA_TAPPED = 'cta_tapped';
+  static const String SESSION = 'sessions';
 
-  static const String ACCEPT_TRACKING = 'accept_tracking';
-  static const String DENY_TRACKING = 'deny_tracking';
+  //for audio started
+  static const String SESSION_VOICE = 'session_voice';
+  static const String SESSION_LENGTH = 'session_length';
+  static const String SESSION_BACKGROUND_SOUND = 'session_background_sound';
 
-  static const String HOME = 'home_page';
-  static FirebaseAnalytics _firebaseAnalytics;
-  static FirebaseAnalyticsObserver _firebaseAnalyticsObserver;
-  static DatabaseReference _dbRef;
+  //for cta tapped
+  static const String PLAYER_COPY_VERSION = 'player_copy_version';
 
-  static const String _dbName = Foundation.kReleaseMode ? 'donations' : 'test';
+  static const String DESTINATION = 'destination';
+  static const String TYPE = 'type';
+  static const String ITEM = 'item';
 
-  static Future<void> initialiseTracker(FirebaseApp app) async {
-    _firebaseAnalytics = FirebaseAnalytics();
-    _firebaseAnalyticsObserver =
-        FirebaseAnalyticsObserver(analytics: _firebaseAnalytics);
+  static String get url => baseUrl + 'items/actions/';
 
-    //dummy event
-    _firebaseAnalytics.logEvent(
-      name: 'tracker_initialized',
-      parameters: {},
-    ).then((value) => print('tracking initialized'));
-
-    final database = FirebaseDatabase(app: app);
-
-    _dbRef = database.reference().child(_dbName);
-  }
-
-  static FirebaseAnalyticsObserver getObserver() => _firebaseAnalyticsObserver;
-
-  static void changeScreenName(String screenName) {
-    _firebaseAnalytics.setCurrentScreen(screenName: screenName);
-  }
-
-  // like 'LoginWidget', 'Login button', 'Clicked'
-  static Future<void> trackEvent(
-      String eventName, String action, String destination,
-      {Map<String, String> map}) async {
-    var accepted = await isTrackingAccepted();
-
-    if (Foundation.kReleaseMode && accepted) {
-      //only track in release mode, not debug
-
-      var defaultMap = <String, String>{
-        'action': action.clean(),
-        'destination': destination.clean(),
-      };
-      if (map != null) defaultMap.addAll(map);
-
-      _firebaseAnalytics.logEvent(
-        name: eventName.clean(),
-        parameters: defaultMap,
-      );
-
-      print('Event logged: $eventName');
+  static Future<void> trackEvent(Map<String, dynamic> map) async {
+    //only track in release mode, not debug
+    if (kReleaseMode) {
+      unawaited(httpPost(url, body: map, token: await token));
     }
   }
 
-  static void enableAnalytics(bool enable) {
-    _firebaseAnalytics.setAnalyticsCollectionEnabled(enable);
-  }
-
-  static void trackDonation(String recordName, Map<String, dynamic> map) {
-    _dbRef.child(recordName).set(map);
-  }
-
-  static Future<void> trackTrackingAnswered(bool track) async {
-    await Tracking.trackEvent(
-        Tracking.TRACKING_TAPPED, Tracking.ACCEPT_TRACKING, '');
+  static List<Map<String, String>> destinationData(String type, String item) {
+    return [
+      {TYPE: type, ITEM: item}
+    ];
   }
 }
 
-extension on String {
-  String clean() {
-    var str = replaceAll('/', '_').replaceAll('-', '_');
+String mapFileTypeToPlural(FileType fileType) {
+  switch (fileType) {
+    case FileType.folder:
+      return 'folders';
+      break;
+    case FileType.text:
+      return 'articles';
+      break;
+    case FileType.session:
+      return 'sessions';
+      break;
+    case FileType.url:
+      return 'urls';
+      break;
+    case FileType.daily:
+      return 'dailies';
+      break;
+  }
+  return '';
+}
 
-    if (str.isNotEmpty && !str.startsWith(RegExp(r'[A-Za-z]'))) {
-      str.replaceRange(0, 1, '');
+String mapToPlural(String fileType) {
+    if (fileType.contains('folder')) {
+      return 'folders';
     }
-
-    return str;
+    if (fileType.contains('articles')) {
+      return 'articles';
+    }
+    if (fileType.contains('session')) {
+      return 'sessions';
+    }
+    if (fileType.contains('url')) {
+      return 'urls';
+    }
+    if (fileType.contains('daily')) {
+      return 'dailies';
+    }
+    return '';
   }
-}

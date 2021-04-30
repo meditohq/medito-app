@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -36,24 +40,28 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await session.configure(AudioSessionConfiguration.speech());
 
     // Load and broadcast the queue
-    unawaited(AudioServiceBackground.setQueue([mediaItem]));
+    await AudioServiceBackground.setQueue([mediaItem]);
     try {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
-          _duration = await _player.setUrl(mediaItem.id);
+          var url = '${baseUrl}assets/${mediaItem.id}';
+          var auth = await token;
+          _duration = await _player.setUrl(url,
+              headers: {HttpHeaders.authorizationHeader: auth});
         } else {
           _duration = await _player.setFilePath(data);
         }
 
+        // ignore: null_aware_before_operator
         if (_duration == null || _duration.inMilliseconds < 1000) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        var bgUrl = mediaItem.extras['bgMusic'];
-        if (bgUrl != null) {
-          playBgMusic(mediaItem.extras['bgMusic']);
+        String bg = mediaItem.extras['bgMusic'];
+        if (bg.isNotEmptyAndNotNull()) {
+          playBgMusic(bg);
         }
         unawaited(onPlay());
       });
@@ -79,7 +87,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
       if (position != null) {
         if (audioPositionIsInEndPeriod(position)) {
           await setBgVolumeFadeAtEnd(timeLeft);
-          await updateStats();
+          if (!_updatedStats) {
+            _updatedStats = true;
+            await updateStats();
+          }
         } else if (audioPositionBeforeEndPeriod(position) &&
             !avoidVolumeIncreaseAtLastSec) {
           await _bgPlayer.setVolume(initialBgVolume);
@@ -141,6 +152,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
     switch (name) {
       case 'setBgVolume':
         initialBgVolume = params;
+        break;
+      case 'stop':
+        await _player.stop();
+        await _broadcastState();
         break;
     }
   }
@@ -232,7 +247,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   AudioProcessingState _getProcessingState() {
     if (_skipState != null) return _skipState;
     switch (_player.processingState) {
-      case ProcessingState.none:
+      case ProcessingState.idle:
         return AudioProcessingState.stopped;
       case ProcessingState.loading:
         return AudioProcessingState.connecting;
@@ -248,29 +263,20 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   void playBgMusic(String bgMusic) {
-    if (bgMusic != null && bgMusic.isNotEmpty && bgMusic != 'null') {
+    if (bgMusic.isNotEmptyAndNotNull()) {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
-      _bgPlayer.setLoopMode(LoopMode.one);
+      _bgPlayer.setLoopMode(LoopMode.all);
     }
   }
 
   Future<void> updateStats() async {
-    if (!_updatedStats) {
-      _updatedStats = true;
-
-      var dataMap = {
-        'secsListened': _duration.inSeconds,
-        'id': '${mediaItem.extras['id']}',
-      };
-
-      await writeJSONToCache(encoded(dataMap), 'stats');
-
-      AudioServiceBackground.sendCustomEvent('stats');
-
-      unawaited(Tracking.trackEvent(
-          Tracking.AUDIO_COMPLETED, Tracking.AUDIO_COMPLETED, ''));
-    }
+    var dataMap = {
+      'secsListened': _duration.inSeconds,
+      'id': '${mediaItem.extras['sessionId']}',
+    };
+    await writeJSONToCache(encoded(dataMap), 'stats');
+    AudioServiceBackground.sendCustomEvent('stats');
   }
 }
 

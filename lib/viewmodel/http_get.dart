@@ -16,13 +16,14 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/cache.dart';
 import 'package:http/http.dart' as http;
 
-import 'auth.dart';
-import 'cache.dart';
-
-Future httpGet(String url, {bool skipCache = false}) async {
+//move this to network package later
+Future httpGet(String url,
+    {bool skipCache = false, String fileNameForCache}) async {
   var cache;
 
   if (!await checkConnectivity()) {
@@ -32,19 +33,41 @@ Future httpGet(String url, {bool skipCache = false}) async {
   if (skipCache) {
     cache = null;
   } else {
-    cache = await readJSONFromCache(url);
+    cache = await readJSONFromCache(fileNameForCache ?? url);
   }
 
+  var auth = await token;
   if (cache == null) {
     final response = await http.get(
       url,
-      headers: {HttpHeaders.authorizationHeader: basicAuth},
+      headers: {HttpHeaders.authorizationHeader: auth},
     );
 
     if (response.statusCode == 200) {
-      await writeJSONToCache(response.body, url);
+      await writeJSONToCache(response.body, fileNameForCache ?? url);
     }
     return json.decode(response.body);
   }
   return json.decode(cache);
+}
+
+Future httpPost(String url, {dynamic body = const <String, String>{}, String token}) async {
+  try {
+    final response = await http.post(
+      url,
+      body: encoded(body),
+      headers: {
+        HttpHeaders.authorizationHeader: token,
+        HttpHeaders.contentTypeHeader: 'application/json'
+      },
+    );
+    if (response.statusCode == 200) {
+      return response.body.isNotEmpty ? json.decode(response.body) : true;
+    } else {
+      return null;
+    }
+  } catch (e) {
+    print(e);
+    return null;
+  }
 }

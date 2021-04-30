@@ -13,10 +13,14 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/main.dart';
+import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/cache.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum UnitType { day, min }
+enum UnitType { day, min, sessions }
 
 String getUnits(UnitType type, int value) {
   switch (type) {
@@ -24,7 +28,10 @@ String getUnits(UnitType type, int value) {
       return value == 1 ? 'day' : 'days';
       break;
     case UnitType.min:
-      return value == 1 ? 'min' : 'mins';
+      return 'min';
+      break;
+    case UnitType.sessions:
+      return value == 1 ? 'session' : 'sessions';
       break;
   }
   return '';
@@ -34,7 +41,7 @@ Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('streakCount') ?? 0;
-  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = await getStreakList();
 
   if (streakList.isNotEmpty) {
     var lastDayInStreak =
@@ -43,12 +50,22 @@ Future<String> getCurrentStreak() async {
     final now = DateTime.now();
 
     if (longerThanOneDayAgo(lastDayInStreak, now)) {
-      await updateStreak(streak: '0');
       streak = 0;
+      await prefs.setInt('streakCount', streak);
     }
   }
 
   return streak.toString();
+}
+
+Future<List<String>> getStreakList() async {
+  var prefs = await SharedPreferences.getInstance();
+  return prefs.getStringList('streakList') ?? [];
+}
+
+Future<void> setStreakList(List<String> streakList) async {
+  var prefs = await SharedPreferences.getInstance();
+  return prefs.setStringList('streakList', streakList);
 }
 
 Future<int> _getCurrentStreakInt() async {
@@ -59,8 +76,6 @@ Future<int> _getCurrentStreakInt() async {
 }
 
 Future<bool> updateMinuteCounter(int additionalSecs) async {
-  print('increase mins counter');
-
   var prefs = await SharedPreferences.getInstance();
 
   var current = await _getSecondsListened();
@@ -81,7 +96,7 @@ Future<void> updateStreak({String streak = ''}) async {
     return;
   }
 
-  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = await getStreakList();
   var streakCount = prefs.getInt('streakCount') ?? 0;
 
   if (streakList.isNotEmpty) {
@@ -99,7 +114,7 @@ Future<void> updateStreak({String streak = ''}) async {
   }
 
   streakList.add(DateTime.now().millisecondsSinceEpoch.toString());
-  await prefs.setStringList('streakList', streakList);
+  await setStreakList(streakList);
 }
 
 Future<void> addPhantomSessionToStreakList() async {
@@ -107,12 +122,12 @@ Future<void> addPhantomSessionToStreakList() async {
   // but keep a note of it in fakeStreakList
 
   var prefs = await SharedPreferences.getInstance();
-  var streakList = prefs.getStringList('streakList') ?? [];
+  var streakList = await getStreakList();
   var fakeStreakList = prefs.getStringList('fakeStreakList') ?? [];
   var streakTime = DateTime.now().millisecondsSinceEpoch.toString();
   streakList.add(streakTime);
   fakeStreakList.add(streakTime);
-  await prefs.setStringList('streakList', streakList);
+  await setStreakList(streakList);
   await prefs.setStringList('fakeStreakList', fakeStreakList);
 }
 
@@ -216,26 +231,41 @@ Future<int> incrementNumSessions() async {
   return current;
 }
 
-Future<void> markAsListened(String id) async {
-  print('mark as listened');
-
-  var prefs = await SharedPreferences.getInstance();
-  await prefs?.setBool('listened' + id, true);
+void toggleListenedStatus(String id, String oldId) {
+  var listened = checkListened(id, oldId: oldId);
+  if (listened) {
+    markAsNotListened(id, oldId);
+  } else {
+    markAsListened(id);
+  }
 }
 
-Future<void> markAsNotListened(String id) async {
+void markAsListened(String id) {
+  print('mark as listened');
 
-  var prefs = await SharedPreferences.getInstance();
-  await prefs?.setBool('listened' + id, false);
+  // ignore: unawaited_futures
+  sharedPreferences.setBool('listened' + id, true);
+}
+
+void markAsNotListened(String id, String oldId) {
+  sharedPreferences.setBool('listened' + id, false);
+  if (oldId != null) {
+    sharedPreferences.setBool('listened' + oldId, false);
+  }
 }
 
 Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
 }
 
-Future<bool> checkListened(String id) async {
-  var prefs = await SharedPreferences.getInstance();
-  return prefs?.getBool('listened' + id) ?? false;
+bool checkListened(String id, {String oldId}) {
+  var listened = sharedPreferences.getBool('listened' + id) ?? false;
+
+  if (!listened && oldId.isNotEmptyAndNotNull()) {
+    return sharedPreferences.getBool('listened' + oldId) ?? false;
+  } else {
+    return listened;
+  }
 }
 
 void setVersionCopySeen(int id) async {
@@ -257,23 +287,25 @@ bool isSameDay(DateTime day1, DateTime day2) {
 }
 
 bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
-  var oneDayAfterMidnightThatNight = DateTime(lastDayInStreak.year,
-      lastDayInStreak.month, lastDayInStreak.day + 1, 23, 59, 59);
-  return now.isAfter(oneDayAfterMidnightThatNight);
+  var thirtyTwoHoursAfterTime = DateTime.fromMillisecondsSinceEpoch(
+      lastDayInStreak.millisecondsSinceEpoch + 115200000);
+  return now.isAfter(thirtyTwoHoursAfterTime);
 }
 
 Future updateStatsFromBg() async {
   var read = await readJSONFromCache('stats');
   print('read ->$read');
 
-  if (read != null && read.isNotEmpty) {
+  if (read.isNotEmptyAndNotNull()) {
     var map = decoded(read);
+    var id = map['id'];
+    var secsListened = map['secsListened'];
 
     if (map != null && map.isNotEmpty) {
       await updateStreak();
       await incrementNumSessions();
-      await markAsListened(map['id']);
-      await updateMinuteCounter(Duration(seconds: map['secsListened']).inSeconds);
+      await markAsListened(id);
+      await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
     print('clearing bg stats');
     await clearBgStats();

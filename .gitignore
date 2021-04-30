@@ -18,7 +18,8 @@
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-#.vscode/
+# .vscode/
+.vscode/settings.json
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -39,6 +40,7 @@
 **/android/**/GeneratedPluginRegistrant.java
 
 # iOS/XCode related
+ios/*
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside
@@ -58,7 +60,7 @@
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/flutter_export_environment.sh
+ios/Flutter/flutter_export_environment.sh
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/

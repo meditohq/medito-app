@@ -1,38 +1,40 @@
-import 'package:Medito/data/attributions_content.dart' as AttContent;
-import 'package:Medito/data/page.dart';
-import 'package:Medito/viewmodel/model/list_item.dart';
 import 'package:audio_service/audio_service.dart';
 
 class MediaLibrary {
-  static MediaItem saveMediaLibrary(
-      String description,
+  static MediaItem getMediaLibrary(
+      {String description,
       String title,
-      Files fileTapped,
-      Illustration illustration,
+      String illustrationUrl,
       String secondaryColor,
       String primaryColor,
       String bgMusic,
-      int durationAsMiliseconds,
-      ListItem listItem,
-      AttContent.Content attributions) {
+      int durationAsMilliseconds,
+      String fileId,
+      String attributions,
+      String voice,
+      String length,
+      int sessionId,
+      String bgMusicTitle,
+      int bgMusicId}) {
     return MediaItem(
-      id: fileTapped.url,
+      id: fileId,
       extras: {
-        'location': fileTapped.filename,
+        'location': fileId,
         'bgMusic': bgMusic,
-        'id': listItem.id,
+        'bgMusicId': bgMusicId,
+        'bgMusicTitle': bgMusicTitle,
+        'id': fileId,
+        'sessionId': sessionId,
         'primaryColor': primaryColor,
         'secondaryColor': secondaryColor,
-        'attrTitle': attributions.title,
-        'attrName': attributions.licenseName,
-        'attrLinkSource': attributions.sourceUrl,
-        'attrLinkLicense': attributions.licenseUrl,
-        'duration': durationAsMiliseconds,
+        'attr': attributions,
+        'length': length,
+        'duration': durationAsMilliseconds,
       },
-      album: description,
+      artist: voice,
+      album: '',
       title: title,
-      artist: fileTapped.voice,
-      artUri: illustration.url,
+      artUri: illustrationUrl,
     );
   }
 }
