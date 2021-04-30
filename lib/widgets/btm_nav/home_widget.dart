@@ -18,7 +18,6 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
-import 'package:Medito/network/packs/packs_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
@@ -31,7 +30,9 @@ import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeWidget extends StatefulWidget {
   @override
@@ -202,10 +203,24 @@ class _HomeWidgetState extends State<HomeWidget> {
     var version = packageInfo.version;
     var buildNumber = packageInfo.buildNumber;
 
+    var line1 = 'Version: $version - Build Number: $buildNumber';
+
+    var prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('userId');
     final snackBar = SnackBar(
-        content: Text(
-          'Version: $version - Build Number: $buildNumber',
-          style: TextStyle(color: MeditoColors.meditoTextGrey),
+        content: GestureDetector(
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: '$line1 $userID'));
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
+              Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
+            ],
+          ),
         ),
         backgroundColor: MeditoColors.midnight);
 
