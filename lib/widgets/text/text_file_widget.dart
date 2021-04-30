@@ -116,6 +116,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
                       physics: NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(0),
                       shrinkWrap: true,
+                      selectable: true,
                       styleSheet: buildMarkdownStyleSheet(context).copyWith(
                           horizontalRuleDecoration: BoxDecoration(
                             border: Border(
