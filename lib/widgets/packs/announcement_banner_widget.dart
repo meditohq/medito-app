@@ -51,7 +51,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     return StreamBuilder<AnnouncementResponse>(
         stream: _bloc.announcementController.stream,
         builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data != null) {
+          if (!snapshot.hasData || snapshot.data == null) {
             return Container();
           }
 
