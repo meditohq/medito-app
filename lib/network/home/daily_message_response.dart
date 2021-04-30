@@ -2,9 +2,9 @@ class DailyMessageResponse {
   @Deprecated('User title and body instead')
   Data data;
 
-  String get title => data.title;
+  String get title => data?.title ?? '';
 
-  String get body => data.body;
+  String get body => data?.body ?? '';
 
   DailyMessageResponse({this.data});
 

@@ -27,7 +27,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
         builder: (context, snapshot) {
           var widget;
 
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data == null || snapshot.data.body.body.isEmptyOrNull()) {
             return Container();
           }
 
