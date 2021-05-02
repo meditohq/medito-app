@@ -22,7 +22,7 @@ class SubtitleTextWidget extends StatelessWidget {
             a: TextStyle(color: MeditoColors.meditoTextGrey)));
   }
 
-  void _linkTap(String url) {
-    launchUrl(url);
+  void _linkTap(String url, String href, String title) {
+    launchUrl(url, href, title);
   }
 }

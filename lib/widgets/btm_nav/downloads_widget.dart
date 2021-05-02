@@ -115,7 +115,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         title: item.title,
         subtitle:
             '${item.artist} — ${_getDuration(item.extras['length'])}$backgroundSoundString',
-        cover: item.artUri,
+        cover: item.artUri.toString(),
         colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));
   }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
@@ -161,10 +160,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  Future<void> onSeekTo(Duration position) => _player.seek(position);
-
-  @override
-  Future<void> onFastForward() => _seekRelative(fastForwardInterval);
+  Future<Function> onFastForward() => _seekRelative(fastForwardInterval);
 
   @override
   Future<void> onRewind() => _seekRelative(-rewindInterval);

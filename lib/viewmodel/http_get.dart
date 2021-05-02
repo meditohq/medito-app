@@ -39,7 +39,7 @@ Future httpGet(String url,
   var auth = await token;
   if (cache == null) {
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: {HttpHeaders.authorizationHeader: auth},
     );
 
@@ -54,7 +54,7 @@ Future httpGet(String url,
 Future httpPost(String url, {dynamic body = const <String, String>{}, String token}) async {
   try {
     final response = await http.post(
-      url,
+      Uri.parse(url),
       body: encoded(body),
       headers: {
         HttpHeaders.authorizationHeader: token,

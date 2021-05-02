@@ -380,8 +380,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void getArtUrl(MediaItem mediaItem) {
     if (illustrationUrl == null &&
         mediaItem != null &&
-        mediaItem.artUri.isNotEmptyAndNotNull()) {
-      illustrationUrl = mediaItem.artUri;
+        mediaItem.artUri.toString().isNotEmptyAndNotNull()) {
+      illustrationUrl = mediaItem.artUri.toString();
     }
   }
 
@@ -558,7 +558,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           {Tracking.TYPE: Tracking.CTA_TAPPED, Tracking.PLAYER_COPY_VERSION: '$version'});
     });
 
-    return launchUrl(path);
+    return launchUrl(path, '', '');
   }
 
   Future<void> _share() {

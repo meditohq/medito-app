@@ -34,7 +34,7 @@ class MediaLibrary {
       artist: voice,
       album: '',
       title: title,
-      artUri: illustrationUrl,
+      artUri: Uri.parse(illustrationUrl),
     );
   }
 }

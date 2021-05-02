@@ -204,28 +204,25 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     );
   }
 
-  void itemTap(Item i) {
+  void itemTap(Item item) {
     checkConnectivity().then((value) {
       if (value) {
         var type;
-        switch (i.fileType) {
-          case FileType.folder:
-            type = Tracking.FOLDER_TAPPED;
-            break;
-          case FileType.session:
+        if(item.fileType == FileType.folder) {
+          type = Tracking.FOLDER_TAPPED;
+        } else{
             type = Tracking.SESSION_TAPPED;
-            break;
         }
 
         Tracking.trackEvent({
           Tracking.TYPE: type,
           Tracking.DESTINATION:
-              Tracking.destinationData(mapFileTypeToPlural(i.fileType), i.id)
+              Tracking.destinationData(mapFileTypeToPlural(item.fileType), item.id)
         });
 
         NavigationFactory.navigate(
-                context, NavigationFactory.getScreenFromItemType(i.fileType),
-                id: i.id)
+                context, NavigationFactory.getScreenFromItemType(item.fileType),
+                id: item.id)
             .then((value) => _refresh(context, skipCache: false));
       } else {
         createSnackBar(CHECK_CONNECTION, context);
