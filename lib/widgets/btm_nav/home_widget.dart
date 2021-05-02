@@ -187,7 +187,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   Widget _getTitleWidget(BuildContext context) => FutureBuilder<String>(
-      future: _bloc.getTitleText(),
+      future: _bloc.getTitleText(DateTime.now()),
       initialData: 'Medito',
       builder: (context, snapshot) {
         return GestureDetector(

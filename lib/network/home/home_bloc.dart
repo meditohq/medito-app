@@ -49,11 +49,10 @@ class HomeBloc {
     }
   }
 
-  Future<String> getTitleText() async {
-    var now = DateTime.now();
-    if (now.hour < 12 && now.hour > 2) {
+  Future<String> getTitleText(DateTime now) async {
+    if (now.hour < 12 && now.hour >= 2) {
       return 'Good morning';
-    } else if (now.hour < 18 && now.hour > 12) {
+    } else if (now.hour < 18 && now.hour >= 12) {
       return 'Good afternoon';
     } else {
       return 'Good evening';
