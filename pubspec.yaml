@@ -18,25 +18,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^1.1.0
-  flutter_svg: ^0.19.3
-  path_provider: ^1.6.18
+  google_fonts: ^2.0.0
+  flutter_svg: ^0.22.0
+  path_provider: ^2.0.1
   url_launcher: ^6.0.3
-  flutter_markdown: ^0.4.4
-  shared_preferences: 0.5.12
-  cached_network_image: ^2.3.2+1
-  auto_size_text: ^2.1.0
-  just_audio: ^0.6.13
-  audio_session: ^0.0.11
-  audio_service: ^0.16.2
-  rxdart: ^0.24.1
-  share: ^0.6.5+2
-  firebase_core: ^0.5.0+1
-  firebase_messaging: ^7.0.3
-  flutter_html: ^1.2.0
-  provider: ^4.3.2+2
-  package_info: ^0.4.3
-  pedantic: ^1.9.0
+  flutter_markdown: ^0.6.1
+  shared_preferences: ^2.0.5
+  cached_network_image: ^3.0.0
+  auto_size_text: ^3.0.0-nullsafety.0
+  just_audio: ^0.7.4
+  audio_session: ^0.1.0
+  audio_service: ^0.17.0
+  rxdart: ^0.26.0
+  share: ^2.0.1
+  firebase_core: ^1.1.0
+  firebase_messaging: ^9.1.3
+  flutter_html: ^2.0.0-nullsafety.1
+  provider: ^5.0.0
+  package_info: ^2.0.0
+  pedantic: ^1.11.0
   connectivity: ^3.0.3
   device_info: ^2.0.0
 

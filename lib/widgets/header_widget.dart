@@ -18,8 +18,8 @@ import 'dart:async';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/gradient_widget.dart';
+import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -163,8 +163,8 @@ class HeaderWidget extends StatelessWidget {
                     width: 24,
                     child: CircularProgressIndicator(
                       backgroundColor: MeditoColors.transparent,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          MeditoColors.darkMoon),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(MeditoColors.darkMoon),
                     )),
               );
               break;
@@ -207,7 +207,7 @@ class HeaderWidget extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Markdown(
-                data: snapshot.data,
+                data: snapshot?.data ?? '',
                 onTapLink: _linkTap,
                 padding: const EdgeInsets.all(0),
                 physics: NeverScrollableScrollPhysics(),
@@ -226,7 +226,7 @@ class HeaderWidget extends StatelessWidget {
         });
   }
 
-  void _linkTap(String url) {
-    launchUrl(url);
+  void _linkTap(String url, String href, String title) {
+    launchUrl(url, '', '');
   }
 }

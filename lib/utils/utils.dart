@@ -83,7 +83,7 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-Future<bool> launchUrl(String url) async {
+Future<bool> launchUrl(String url, String href, String title) async {
   return launch(url);
 }
 
