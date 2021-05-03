@@ -18,8 +18,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences.setMockInitialValues({});
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
 
   test('test longerThanOneDayAgo', () {
     var b = longerThanOneDayAgo(DateTime.parse('2020-07-14 11:59:00'),
