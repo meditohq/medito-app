@@ -276,7 +276,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   stream: _dragBgVolumeSubject,
                   builder: (context, snapshot) {
                     volume = _dragBgVolumeSubject.value;
-                    return Icon(Icons.landscape,
+                    return Icon(Icons.volume_up_outlined,
                         semanticLabel: 'Change volume button',
                         color: Colors.white);
                   }),
