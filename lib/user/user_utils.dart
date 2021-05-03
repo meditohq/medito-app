@@ -8,6 +8,7 @@ import 'package:dart_ipify/dart_ipify.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -71,7 +72,10 @@ class UserRepo {
     var ext = 'users/';
     var url = BASE_URL + ext;
 
-    var now = DateTime.now().millisecondsSinceEpoch.toString();
+    var now = DateTime
+        .now()
+        .millisecondsSinceEpoch
+        .toString();
 
     var deviceModel;
     var deviceOS;
@@ -100,25 +104,36 @@ class UserRepo {
       print(e);
     }
 
+    var version = '';
+    try {
+      var packageInfo = await PackageInfo.fromPlatform();
+      version = packageInfo.buildNumber;
+    } catch (e) {
+      print(e);
+    }
+
     var token = '$now${UniqueKey().toString()}';
     var ip = await Ipify.ipv4();
-    var defaultMap = <String, String>{
-      'email': '$now@medito.user',
-      'password': UniqueKey().toString(),
-      'token': token,
-      'ip_address': ip,
-      'device_model': deviceModel,
-      'device_os': deviceOS,
-      'device_platform': devicePlatform,
-      'device_language': io.Platform.localeName,
+    var defaultMap = <
+    String
+    , String>{
+    'email': '$now@medito.user',
+    'password': UniqueKey().toString(),
+    'token': token,
+    'ip_address': ip,
+    'device_model': deviceModel,
+    'app_version' : version,
+    'device_os': deviceOS,
+    'device_platform': devicePlatform,
+    'device_language': io.Platform.localeName,
     };
 
     var id = '';
     try {
-      final response = await httpPost(url, body: defaultMap, token: INIT_TOKEN);
-      id = response != null ? UserResponse.fromJson(response).data.id : null;
+    final response = await httpPost(url, body: defaultMap, token: INIT_TOKEN);
+    id = response != null ? UserResponse.fromJson(response).data.id : null;
     } catch (e) {
-      return null;
+    return null;
     }
 
     return {USER_ID: id, TOKEN: 'Bearer $token'};
@@ -132,4 +147,4 @@ Future<String> get token async {
 
 const TOKEN = 'token';
 const USER_ID = 'userId';
-const DEFAULT_USER_ID  = '68f8d7e0-cd18-496a-b92a-9ed0f1068efc';
+const DEFAULT_USER_ID = '68f8d7e0-cd18-496a-b92a-9ed0f1068efc';

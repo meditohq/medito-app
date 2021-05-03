@@ -17,6 +17,7 @@ import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/http_get.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 
 class Tracking {
@@ -47,6 +48,11 @@ class Tracking {
   static String get url => BASE_URL + 'items/actions/';
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
+
+    var packageInfo = await PackageInfo.fromPlatform();
+    var version = packageInfo.buildNumber;
+    map.addAll({'app_version':version});
+
     //only track in release mode, not debug
     if (kReleaseMode) {
       unawaited(httpPost(url, body: map, token: await token));
