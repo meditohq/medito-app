@@ -21,7 +21,7 @@ class CoursesRepo {
   final _ext = 'items/courses';
 
   Future<CoursesResponse> fetchCourses([bool skipCache = false]) async {
-    final response = await httpGet(baseUrl + _ext, skipCache: skipCache);
+    final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
     return CoursesResponse.fromJson(response);
   }
 }

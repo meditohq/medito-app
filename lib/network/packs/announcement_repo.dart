@@ -21,7 +21,7 @@ class AnnouncementRepository {
   var ext = 'items/announcement';
 
   Future<AnnouncementResponse> fetchAnnouncements(bool skipCache) async {
-    final response = await httpGet(baseUrl + ext, skipCache: skipCache);
+    final response = await httpGet(BASE_URL + ext, skipCache: skipCache);
     return AnnouncementResponse.fromJson(response);
   }
 }

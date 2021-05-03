@@ -19,11 +19,11 @@ Future<void> firstOpenOperations() async {
 }
 
 Future _logAccount(SharedPreferences prefs) async {
-  var user = prefs.getString('userId') ?? '';
-  var token = prefs.getString('token') ?? '';
+  var user = prefs.getString(USER_ID) ?? '';
+  var token = prefs.getString(TOKEN) ?? '';
 
   // if the last token was debug, check we haven't installed the release version now
-  if (user.isEmpty || (token.isNotEmpty && user == debugToken)) {
+  if (user.isEmpty || (token.isNotEmpty && user == DEBUG_TOKEN)) {
     await _updateUserCredentials(prefs);
   } else {
     unawaited(_postLastAccess());
@@ -31,21 +31,21 @@ Future _logAccount(SharedPreferences prefs) async {
 }
 
 Future<void> _updateUserCredentials(SharedPreferences prefs) async {
-  if (kReleaseMode) {
+  if (!kReleaseMode) {
     var map = await UserRepo.createUser();
     if (map != null) {
-      await prefs.setString('userId', map['id']);
-      await prefs.setString('token', map['token']);
+      await prefs.setString(USER_ID, map[USER_ID]);
+      await prefs.setString(TOKEN, map[TOKEN]);
     }
   } else {
-    await prefs.setString('userId', '68f8d7e0-cd18-496a-b92a-9ed0f1068efc');
-    await prefs.setString('token', debugToken);
+    await prefs.setString(USER_ID, DEFAULT_USER_ID);
+    await prefs.setString(TOKEN, DEBUG_TOKEN);
   }
 }
 
 Future<void> _postLastAccess() async {
   var ext = 'items/usage/';
-  var url = baseUrl + ext;
+  var url = BASE_URL + ext;
   try {
     unawaited(httpPost(url, token: await token));
   } catch (e) {
@@ -69,7 +69,7 @@ Future _clearStorage(SharedPreferences prefs) async {
 class UserRepo {
   static Future<Map<String, String>> createUser() async {
     var ext = 'users/';
-    var url = baseUrl + ext;
+    var url = BASE_URL + ext;
 
     var now = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -101,13 +101,13 @@ class UserRepo {
     }
 
     var token = '$now${UniqueKey().toString()}';
-
+    var ip = await Ipify.ipv4();
     var defaultMap = <String, String>{
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
       'role': '97712b9c-db0c-4235-b561-e8b58711d857',
       'token': token,
-      'ip_address': await Ipify.ipv4(),
+      'ip_address': ip,
       'device_model': deviceModel,
       'device_os': deviceOS,
       'device_platform': devicePlatform,
@@ -116,18 +116,21 @@ class UserRepo {
 
     var id = '';
     try {
-      final response = await httpPost(url, body: defaultMap, token: initToken);
+      final response = await httpPost(url, body: defaultMap, token: INIT_TOKEN);
       id = response != null ? UserResponse.fromJson(response).data.id : null;
     } catch (e) {
       return null;
     }
 
-    return {'id': id, 'token': 'Bearer $token'};
+    return {USER_ID: id, TOKEN: 'Bearer $token'};
   }
-
 }
 
 Future<String> get token async {
   var prefs = await SharedPreferences.getInstance();
-  return prefs.getString('token');
+  return prefs.getString(TOKEN);
 }
+
+const TOKEN = 'token';
+const USER_ID = 'userId';
+const DEFAULT_USER_ID  = '68f8d7e0-cd18-496a-b92a-9ed0f1068efc';

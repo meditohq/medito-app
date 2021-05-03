@@ -21,7 +21,7 @@ class DailyMessageRepo {
   final _ext = 'items/daily_message';
 
   Future<DailyMessageResponse> getMessage([bool skipCache = false]) async {
-    final response = await httpGet(baseUrl + _ext, skipCache: skipCache);
+    final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
     return DailyMessageResponse.fromJson(response);
   }
 }

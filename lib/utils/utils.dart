@@ -117,6 +117,6 @@ extension EmptyOrNull on String {
 
 extension AssetUrl on String {
   String toAssetUrl() {
-    return '${baseUrl}assets/$this?download';
+    return '${BASE_URL}assets/$this?download';
   }
 }

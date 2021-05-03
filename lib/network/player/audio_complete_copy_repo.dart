@@ -21,7 +21,7 @@ class AudioCompleteCopyRepository {
   final _ext = 'items/player_copy?fields=*.*';
   
   Future<PlayerCopyResponse> fetchCopyData() async {
-    final response = await httpGet(baseUrl + _ext);
+    final response = await httpGet(BASE_URL + _ext);
     return PlayerCopyResponse.fromJson(response);
   }
 }

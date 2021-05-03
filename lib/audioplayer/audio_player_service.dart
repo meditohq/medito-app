@@ -44,7 +44,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       await getDownload(mediaItem.extras['location']).then((data) async {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
-          var url = '${baseUrl}assets/${mediaItem.id}';
+          var url = '${BASE_URL}assets/${mediaItem.id}';
           var auth = await token;
           _duration = await _player.setUrl(url,
               headers: {HttpHeaders.authorizationHeader: auth});

@@ -24,8 +24,8 @@ class FolderItemsRepository {
 
   Future<FolderResponse> fetchFolderData(String id, bool skipCache) async {
     try {
-      final response = await httpGet(baseUrl + ext + id + folderParameters,
-          fileNameForCache: baseUrl + id + '/' + ext, skipCache: skipCache);
+      final response = await httpGet(BASE_URL + ext + id + folderParameters,
+          fileNameForCache: BASE_URL + id + '/' + ext, skipCache: skipCache);
       return FolderResponse.fromJson(response);
     } catch (e) {
       print(e);
