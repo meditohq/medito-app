@@ -208,16 +208,18 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     checkConnectivity().then((value) {
       if (value) {
         var type;
-        if(item.fileType == FileType.folder) {
+        if (item.fileType == FileType.folder) {
           type = Tracking.FOLDER_TAPPED;
-        } else{
-            type = Tracking.SESSION_TAPPED;
+        } else if (item.fileType == FileType.text) {
+          type = Tracking.ARTICLE_TAPPED;
+        } else {
+          type = Tracking.SESSION_TAPPED;
         }
 
         Tracking.trackEvent({
           Tracking.TYPE: type,
-          Tracking.DESTINATION:
-              Tracking.destinationData(mapFileTypeToPlural(item.fileType), item.id)
+          Tracking.DESTINATION: Tracking.destinationData(
+              mapFileTypeToPlural(item.fileType), item.id)
         });
 
         NavigationFactory.navigate(
