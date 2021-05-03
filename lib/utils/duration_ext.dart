@@ -34,7 +34,11 @@ String formatSessionLength(String item) {
     if (duration.inMinutes < 1) {
       time = '<1';
     } else {
-      time = duration.inMinutes.toString();
+      var min = duration.inMinutes;
+      if(duration.inSeconds % 60 > 30){ // round up
+        min++;
+      }
+      time = min.toString();
     }
     return '$time min';
   }
