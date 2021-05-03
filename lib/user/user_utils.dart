@@ -105,7 +105,6 @@ class UserRepo {
     var defaultMap = <String, String>{
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
-      'role': '97712b9c-db0c-4235-b561-e8b58711d857',
       'token': token,
       'ip_address': ip,
       'device_model': deviceModel,
