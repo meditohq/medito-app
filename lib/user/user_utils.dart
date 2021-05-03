@@ -27,7 +27,9 @@ Future _logAccount(SharedPreferences prefs) async {
   if (user.isEmpty || (token.isNotEmpty && user == DEBUG_TOKEN)) {
     await _updateUserCredentials(prefs);
   } else {
-    unawaited(_postLastAccess());
+    if (kReleaseMode) {
+      unawaited(_postLastAccess());
+    }
   }
 }
 
@@ -45,10 +47,14 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
 }
 
 Future<void> _postLastAccess() async {
+  var packageInfo = await PackageInfo.fromPlatform();
+  var version = packageInfo.buildNumber;
+
   var ext = 'items/usage/';
   var url = BASE_URL + ext;
   try {
-    unawaited(httpPost(url, token: await token));
+    unawaited(
+        httpPost(url, token: await token, body: {'app_version': version}));
   } catch (e) {
     print('post last access failed: ' + e);
     return;
@@ -72,10 +78,7 @@ class UserRepo {
     var ext = 'users/';
     var url = BASE_URL + ext;
 
-    var now = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString();
+    var now = DateTime.now().millisecondsSinceEpoch.toString();
 
     var deviceModel;
     var deviceOS;
@@ -114,26 +117,24 @@ class UserRepo {
 
     var token = '$now${UniqueKey().toString()}';
     var ip = await Ipify.ipv4();
-    var defaultMap = <
-    String
-    , String>{
-    'email': '$now@medito.user',
-    'password': UniqueKey().toString(),
-    'token': token,
-    'ip_address': ip,
-    'device_model': deviceModel,
-    'app_version' : version,
-    'device_os': deviceOS,
-    'device_platform': devicePlatform,
-    'device_language': io.Platform.localeName,
+    var defaultMap = <String, String>{
+      'email': '$now@medito.user',
+      'password': UniqueKey().toString(),
+      'token': token,
+      'ip_address': ip,
+      'device_model': deviceModel,
+      'app_version': version,
+      'device_os': deviceOS,
+      'device_platform': devicePlatform,
+      'device_language': io.Platform.localeName,
     };
 
     var id = '';
     try {
-    final response = await httpPost(url, body: defaultMap, token: INIT_TOKEN);
-    id = response != null ? UserResponse.fromJson(response).data.id : null;
+      final response = await httpPost(url, body: defaultMap, token: INIT_TOKEN);
+      id = response != null ? UserResponse.fromJson(response).data.id : null;
     } catch (e) {
-    return null;
+      return null;
     }
 
     return {USER_ID: id, TOKEN: 'Bearer $token'};
