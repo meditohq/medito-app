@@ -4,6 +4,7 @@ import 'package:Medito/user/user_response.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:Medito/viewmodel/http_get.dart';
+import 'package:dart_ipify/dart_ipify.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -106,7 +107,7 @@ class UserRepo {
       'password': UniqueKey().toString(),
       'role': '97712b9c-db0c-4235-b561-e8b58711d857',
       'token': token,
-      'ip_address': await getIP(),
+      'ip_address': await Ipify.ipv4(),
       'device_model': deviceModel,
       'device_os': deviceOS,
       'device_platform': devicePlatform,
@@ -124,16 +125,6 @@ class UserRepo {
     return {'id': id, 'token': 'Bearer $token'};
   }
 
-  static Future<String> getIP() async {
-    try {
-      for (var interface in await io.NetworkInterface.list()) {
-        return interface.addresses.first.address;
-      }
-    } catch (e) {
-      return '';
-    }
-    return '';
-  }
 }
 
 Future<String> get token async {

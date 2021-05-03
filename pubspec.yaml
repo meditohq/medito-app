@@ -39,6 +39,7 @@ dependencies:
   pedantic: ^1.11.0
   connectivity: ^3.0.3
   device_info: ^2.0.0
+  dart_ipify: ^1.0.2
 
 dev_dependencies:
   flutter_test:
