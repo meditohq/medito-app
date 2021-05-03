@@ -6,7 +6,7 @@ class BackgroundSoundsResponse {
   BackgroundSoundsResponse.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
       data = <Data>[];
-      json['data'].forEach((v) {
+      json['data']?.forEach((v) {
         data.add(Data.fromJson(v));
       });
     }
@@ -25,7 +25,7 @@ class Data {
   int id;
   String name;
   String file;
-  Null sort;
+  int sort;
 
   Data({this.id, this.name, this.file, this.sort});
 

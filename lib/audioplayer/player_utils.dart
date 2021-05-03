@@ -46,7 +46,7 @@ Future<dynamic> downloadBGMusicFromURL(String id, String name) async {
   var file = File(path);
   if (await file.exists()) return file.path;
 
-  var url = '${baseUrl}assets/$id';
+  var url = '${BASE_URL}assets/$id';
   var request = await http.get(Uri.parse(url), headers: {HttpHeaders.authorizationHeader: await token});
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);

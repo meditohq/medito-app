@@ -22,7 +22,7 @@ import 'package:Medito/viewmodel/http_get.dart';
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
-  var bgSoundsUrl = '${baseUrl}items/background_sounds';
+  var bgSoundsUrl = '${BASE_URL}items/background_sounds';
   var parameters =
       '?fields=*,author.body,audio.file.id,audio.file.voice,audio.file.length';
   var screen;
@@ -33,9 +33,9 @@ class SessionOptionsRepository {
     var url;
 
     if (screen == Screen.daily) {
-      url = baseUrl + dailiesExt + id + parameters;
+      url = BASE_URL + dailiesExt + id + parameters;
     } else {
-      url = baseUrl + ext + id + parameters;
+      url = BASE_URL + ext + id + parameters;
     }
 
     final response = await httpGet(url, skipCache: skipCache);

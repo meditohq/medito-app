@@ -21,7 +21,7 @@ class ShortcutsRepo {
   final _ext = 'items/shortcuts';
 
   Future<ShortcutsResponse> fetchShortcuts({bool skipCache = false}) async {
-    final response = await httpGet(baseUrl + _ext, skipCache: skipCache);
+    final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
     return ShortcutsResponse.fromJson(response);
   }
 }

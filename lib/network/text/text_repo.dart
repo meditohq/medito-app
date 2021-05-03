@@ -21,7 +21,7 @@ class TextRepository {
   var ext = 'items/articles/';
 
   Future<TextResponse> fetchData(String id, bool skipCache) async {
-    final response = await httpGet(baseUrl + ext + id, skipCache: skipCache);
+    final response = await httpGet(BASE_URL + ext + id, skipCache: skipCache);
     return TextResponse.fromJson(response);
   }
 }

@@ -29,6 +29,7 @@ class Tracking {
   static const String COURSE_TAPPED = 'course_tapped';
   static const String SHARE_TAPPED = 'share_tapped';
   static const String CTA_TAPPED = 'cta_tapped';
+  static const String ARTICLE_TAPPED = 'article_tapped';
   static const String SESSION = 'sessions';
 
   //for audio started
@@ -43,7 +44,7 @@ class Tracking {
   static const String TYPE = 'type';
   static const String ITEM = 'item';
 
-  static String get url => baseUrl + 'items/actions/';
+  static String get url => BASE_URL + 'items/actions/';
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
     //only track in release mode, not debug

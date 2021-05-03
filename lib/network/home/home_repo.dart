@@ -21,7 +21,7 @@ class HomeRepo {
   final _ext = 'items/menu';
 
   Future<MenuResponse> fetchMenu(bool skipCache) async {
-    final response = await httpGet(baseUrl + _ext, skipCache: skipCache);
+    final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
     return MenuResponse.fromJson(response);
   }
 }
