@@ -83,8 +83,8 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-Future<bool> launchUrl(String url, String href, String title) async {
-  return launch(url);
+Future<void> launchUrl(String href) async {
+  return await canLaunch(href) ? await launch(href) : throw 'Could not launch $href';
 }
 
 Future<void> acceptTracking() async {

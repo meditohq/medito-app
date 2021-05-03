@@ -65,7 +65,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
             padding: const EdgeInsets.only(top: 8),
             child: MarkdownBody(
               data: snapshot.data.body.body,
-              onTapLink: launchUrl,
+              onTapLink: _launchUrl,
               styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                   .copyWith(p: Theme.of(context).textTheme.bodyText1),
             ),
@@ -73,5 +73,11 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
         ],
       ),
     );
+  }
+
+
+
+  void _launchUrl(String text, String href, String title) {
+    launchUrl(href);
   }
 }

@@ -91,8 +91,8 @@ class _TextFileWidgetState extends State<TextFileWidget>
     );
   }
 
-  void _linkTap(String url, String href, String title) {
-    launchUrl(url, href, title);
+  void _linkTap(String text, String href, String title) {
+    launchUrl(href);
   }
 
   Widget _getInnerTextView() {
