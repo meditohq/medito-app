@@ -26,11 +26,6 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
   final BehaviorSubject<double> _dragPositionSubject =
   BehaviorSubject.seeded(null);
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   bool tracked = false;
 
   @override

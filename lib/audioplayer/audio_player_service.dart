@@ -19,7 +19,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
   final AudioPlayer _player = AudioPlayer(handleInterruptions: false);
   final AudioPlayer _bgPlayer = AudioPlayer(handleInterruptions: false);
   AudioProcessingState _skipState;
-  Seeker _seeker;
   StreamSubscription<PlaybackEvent> _eventSubscription;
   var _duration = Duration();
 
@@ -46,8 +45,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
         if (data == null) {
           var url = '${BASE_URL}assets/${mediaItem.id}';
           var auth = await token;
-          _duration = await _player.setUrl(url,
-              headers: {HttpHeaders.authorizationHeader: auth});
+          _duration = await _player
+              .setUrl(url, headers: {HttpHeaders.authorizationHeader: auth});
         } else {
           _duration = await _player.setFilePath(data);
         }
@@ -72,8 +71,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
       if (index != null) {
-        AudioServiceBackground.setMediaItem(
-            mediaItem.copyWith(duration: _duration));
+        var newMediaItem = mediaItem.copyWith(duration: _duration);
+        mediaItem = newMediaItem;
+        AudioServiceBackground.setMediaItem(newMediaItem);
       }
     });
 
@@ -166,10 +166,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onRewind() => _seekRelative(-rewindInterval);
 
   @override
-  Future<void> onSeekForward(bool begin) async => _seekContinuously(begin, 1);
-
-  @override
-  Future<void> onSeekBackward(bool begin) async => _seekContinuously(begin, -1);
+  Future<void> onSeekTo(Duration position) {
+    _player.seek(position);
+    return super.onSeekTo(position);
+  }
 
   @override
   Future<void> onStop() async {
@@ -206,18 +206,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
     // Perform the jump via a seek.
     await _player.seek(newPosition);
-  }
-
-  /// Begins or stops a continuous seek in [direction]. After it begins it will
-  /// continue seeking forward or backward by 10 seconds within the audio, at
-  /// intervals of 1 second in app time.
-  void _seekContinuously(bool begin, int direction) {
-    _seeker?.stop();
-    if (begin) {
-      _seeker = Seeker(_player, Duration(seconds: 10 * direction),
-          Duration(seconds: 1), mediaItem)
-        ..start();
-    }
   }
 
   /// Broadcasts the current state to all clients.
@@ -273,35 +261,5 @@ class AudioPlayerTask extends BackgroundAudioTask {
     };
     await writeJSONToCache(encoded(dataMap), 'stats');
     AudioServiceBackground.sendCustomEvent('stats');
-  }
-}
-
-class Seeker {
-  final AudioPlayer player;
-  final Duration positionInterval;
-  final Duration stepInterval;
-  final MediaItem mediaItem;
-  bool _running = false;
-
-  Seeker(
-    this.player,
-    this.positionInterval,
-    this.stepInterval,
-    this.mediaItem,
-  );
-
-  void start() async {
-    _running = true;
-    while (_running) {
-      var newPosition = player.position + positionInterval;
-      if (newPosition < Duration.zero) newPosition = Duration.zero;
-      if (newPosition > mediaItem.duration) newPosition = mediaItem.duration;
-      await player.seek(newPosition);
-      await Future.delayed(stepInterval);
-    }
-  }
-
-  void stop() {
-    _running = false;
   }
 }

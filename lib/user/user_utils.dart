@@ -31,7 +31,7 @@ Future _logAccount(SharedPreferences prefs) async {
 }
 
 Future<void> _updateUserCredentials(SharedPreferences prefs) async {
-  if (!kReleaseMode) {
+  if (kReleaseMode) {
     var map = await UserRepo.createUser();
     if (map != null) {
       await prefs.setString(USER_ID, map[USER_ID]);
