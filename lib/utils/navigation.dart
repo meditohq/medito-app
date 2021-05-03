@@ -52,7 +52,7 @@ class NavigationFactory {
             ));
         break;
       case Screen.url:
-        return launchUrl(id, '', '');
+        return launchUrl(id);
         break;
     }
 
@@ -106,7 +106,7 @@ class NavigationFactory {
       return navigate(context, Screen.folder, id: id);
     }
     if (place == 'url') {
-      return launchUrl(id, '', '');
+      return launchUrl(id);
     }
     return null;
   }

@@ -226,7 +226,7 @@ class HeaderWidget extends StatelessWidget {
         });
   }
 
-  void _linkTap(String url, String href, String title) {
-    launchUrl(url, '', '');
+  void _linkTap(String text, String href, String title) {
+    launchUrl(href);
   }
 }
