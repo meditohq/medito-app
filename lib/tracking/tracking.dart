@@ -48,11 +48,6 @@ class Tracking {
   static String get url => BASE_URL + 'items/actions/';
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
-
-    var packageInfo = await PackageInfo.fromPlatform();
-    var version = packageInfo.buildNumber;
-    map.addAll({'app_version':version});
-
     //only track in release mode, not debug
     if (kReleaseMode) {
       unawaited(httpPost(url, body: map, token: await token));
