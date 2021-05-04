@@ -15,7 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
-import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -26,17 +25,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
-  return FutureBuilder<String>(
-      future: token,
-      builder: (context, snapshot) {
-        if(!snapshot.hasData) return Container();
-        final headers = {HttpHeaders.authorizationHeader: snapshot.data};
-        return CachedNetworkImage(
-          fit: BoxFit.fill,
-          httpHeaders: headers,
-          imageUrl: url ?? '',
-        );
-      });
+  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  return CachedNetworkImage(
+    fit: BoxFit.fill,
+    httpHeaders: headers,
+    imageUrl: url ?? '',
+  );
 }
 
 Future<bool> checkConnectivity() async {
@@ -83,7 +77,9 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 }
 
 Future<void> launchUrl(String href) async {
-  return await canLaunch(href) ? await launch(href) : throw 'Could not launch $href';
+  return await canLaunch(href)
+      ? await launch(href)
+      : throw 'Could not launch $href';
 }
 
 Future<void> acceptTracking() async {
