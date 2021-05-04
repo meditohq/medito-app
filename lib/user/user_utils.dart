@@ -127,11 +127,10 @@ class UserRepo {
     try {
       final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
       id = response != null ? UserResponse.fromJson(response).data.id : null;
-    } catch (e) {
-      return null;
+    } finally {
+      return {USER_ID: id, TOKEN: 'Bearer $token'};
     }
 
-    return {USER_ID: id, TOKEN: 'Bearer $token'};
   }
 }
 
