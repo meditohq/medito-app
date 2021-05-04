@@ -55,7 +55,7 @@ class _Download {
 
     var url = BASE_URL + 'assets/' + currentFile.id;
     var request = http.Request('GET', Uri.parse(url));
-    request.headers[HttpHeaders.authorizationHeader] = await token;
+    request.headers[HttpHeaders.authorizationHeader] = CONTENT_TOKEN;
     var _response = await http.Client().send(request);
     _total = _response.contentLength;
     _received = 0;

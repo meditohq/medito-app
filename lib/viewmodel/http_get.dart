@@ -18,6 +18,7 @@ import 'dart:io';
 
 import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/viewmodel/auth.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -38,7 +39,7 @@ Future httpGet(String url,
     cache = await readJSONFromCache(fileNameForCache ?? url);
   }
 
-  var auth = await token;
+  var auth = CONTENT_TOKEN;
   assert(auth.isNotEmpty);
   assert(auth != null);
 

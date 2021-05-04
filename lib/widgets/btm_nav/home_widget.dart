@@ -19,6 +19,7 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
@@ -206,7 +207,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     var line1 = 'Version: $version - Build Number: $buildNumber';
 
     var prefs = await SharedPreferences.getInstance();
-    var userID = prefs.getString('userId');
+    var userID = prefs.getString(USER_ID);
     final snackBar = SnackBar(
         content: GestureDetector(
           onTap: () {
@@ -218,7 +219,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
-              Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
+              Text(userID ?? '', style: TextStyle(color: MeditoColors.meditoTextGrey))
             ],
           ),
         ),

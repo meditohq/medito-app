@@ -15,38 +15,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   _beginClearStorage(prefs);
-  await _logAccount(prefs);
+  unawaited(_logAccount(prefs));
   return;
 }
 
 Future _logAccount(SharedPreferences prefs) async {
   var user = prefs.getString(USER_ID) ?? '';
-  var token = prefs.getString(TOKEN) ?? '';
 
   // if the last token was debug, check we haven't installed the release version now
-  if (user.isEmpty || (token.isNotEmpty && user == DEBUG_TOKEN)) {
-    await _updateUserCredentials(prefs);
-  } else {
-    if (kReleaseMode) {
-      unawaited(_postLastAccess());
+  if (!kReleaseMode) {
+    if (user.isEmpty) {
+      await _updateUserCredentials(prefs);
+    } else {
+      unawaited(_postUsage());
     }
   }
 }
 
 Future<void> _updateUserCredentials(SharedPreferences prefs) async {
-  if (kReleaseMode) {
-    var map = await UserRepo.createUser();
-    if (map != null) {
-      await prefs.setString(USER_ID, map[USER_ID]);
-      await prefs.setString(TOKEN, map[TOKEN]);
-    }
-  } else {
-    await prefs.setString(USER_ID, DEFAULT_USER_ID);
-    await prefs.setString(TOKEN, 'Bearer 1620112808433[#8755b]');
+  var map = await UserRepo.createUser();
+  if (map != null) {
+    await prefs.setString(USER_ID, map[USER_ID]);
+    await prefs.setString(TOKEN, map[TOKEN]);
   }
 }
 
-Future<void> _postLastAccess() async {
+Future<void> _postUsage() async {
   var packageInfo = await PackageInfo.fromPlatform();
   var version = packageInfo.buildNumber;
 
@@ -54,9 +48,9 @@ Future<void> _postLastAccess() async {
   var url = BASE_URL + ext;
   try {
     unawaited(
-        httpPost(url, token: await token, body: {'app_version': version}));
+        httpPost(url, await generatedToken, body: {'app_version': version}));
   } catch (e) {
-    print('post last access failed: ' + e);
+    print('post usage failed: ' + e);
     return;
   }
 }
@@ -141,11 +135,10 @@ class UserRepo {
   }
 }
 
-Future<String> get token async {
+Future<String> get generatedToken async {
   var prefs = await SharedPreferences.getInstance();
   return prefs.getString(TOKEN);
 }
 
-const TOKEN = 'token';
-const USER_ID = 'userId';
-const DEFAULT_USER_ID = '68f8d7e0-cd18-496a-b92a-9ed0f1068efc';
+const TOKEN = 'token_v2';
+const USER_ID = 'userId_v2';
