@@ -22,7 +22,6 @@ Future<void> firstOpenOperations() async {
 Future _logAccount(SharedPreferences prefs) async {
   var user = prefs.getString(USER_ID) ?? '';
 
-  // if the last token was debug, check we haven't installed the release version now
   if (!kReleaseMode) {
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
