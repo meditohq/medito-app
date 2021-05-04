@@ -42,7 +42,7 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
     }
   } else {
     await prefs.setString(USER_ID, DEFAULT_USER_ID);
-    await prefs.setString(TOKEN, DEBUG_TOKEN);
+    await prefs.setString(TOKEN, 'Bearer 1620112808433[#8755b]');
   }
 }
 
@@ -131,7 +131,7 @@ class UserRepo {
 
     var id = '';
     try {
-      final response = await httpPost(url, body: defaultMap, token: INIT_TOKEN);
+      final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
       id = response != null ? UserResponse.fromJson(response).data.id : null;
     } catch (e) {
       return null;

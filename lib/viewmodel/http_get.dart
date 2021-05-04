@@ -20,6 +20,8 @@ import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/viewmodel/cache.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+
 
 //move this to network package later
 Future httpGet(String url,
@@ -37,23 +39,39 @@ Future httpGet(String url,
   }
 
   var auth = await token;
+  assert(auth.isNotEmpty);
+  assert(auth != null);
+
   if (cache == null) {
-    final response = await http.get(
+    final response = await get(
       Uri.parse(url),
       headers: {HttpHeaders.authorizationHeader: auth},
     );
 
     if (response.statusCode == 200) {
       await writeJSONToCache(response.body, fileNameForCache ?? url);
+    } else {
+      print('----GET----');
+      print('CACHE USED: ${cache != null}');
+      print('FILE NAME FOR CACHE: ${fileNameForCache ?? ''}');
+      print('AUTH: $auth');
+      print('URL: $url');
+      print('STATUS: ${response.statusCode}');
+      print('BODY: ${response.body}');
+      print('REASON PHRASE: ${response.reasonPhrase}');
+      print('HEADERS: ${response.headers}');
+      print('---------');
     }
     return json.decode(response.body);
   }
   return json.decode(cache);
 }
 
-Future httpPost(String url, {dynamic body = const <String, String>{}, String token}) async {
+Future httpPost(String url, String token, {dynamic body = const <String, String>{}}) async {
+  assert(token.isNotEmpty);
+  assert(token != null);
   try {
-    final response = await http.post(
+    final response = await post(
       Uri.parse(url),
       body: encoded(body),
       headers: {
@@ -64,7 +82,14 @@ Future httpPost(String url, {dynamic body = const <String, String>{}, String tok
     if (response.statusCode == 200) {
       return response.body.isNotEmpty ? json.decode(response.body) : true;
     } else {
-      return null;
+      print('----POST-----');
+      print('AUTH: $token');
+      print('URL: $url');
+      print('STATUS: ${response.statusCode}');
+      print('BODY: ${response.body}');
+      print('REASON PHRASE: ${response.reasonPhrase}');
+      print('HEADERS: ${response.headers}');
+      print('---------');
     }
   } catch (e) {
     print(e);
