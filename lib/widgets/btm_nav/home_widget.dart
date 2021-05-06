@@ -207,7 +207,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     var line1 = 'Version: $version - Build Number: $buildNumber';
 
     var prefs = await SharedPreferences.getInstance();
-    var userID = prefs.getString(USER_ID);
+    var userID = prefs.getString(USER_ID) ?? 'None';
     final snackBar = SnackBar(
         content: GestureDetector(
           onTap: () {
