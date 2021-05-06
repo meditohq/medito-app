@@ -161,7 +161,6 @@ Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-  print('secsListened $streak');
   if (streak == null) {
     return '0';
   } else {
@@ -242,9 +241,7 @@ void toggleListenedStatus(String id, String oldId) {
 
 void markAsListened(String id) {
   print('mark as listened');
-
-  // ignore: unawaited_futures
-  sharedPreferences.setBool('listened' + id, true);
+  unawaited(sharedPreferences.setBool('listened' + id, true));
 }
 
 void markAsNotListened(String id, String oldId) {

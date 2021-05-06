@@ -50,7 +50,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = await _player.setFilePath(data);
         }
 
-        // ignore: null_aware_before_operator
         if (_duration == null || _duration.inMilliseconds < 1000) {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
