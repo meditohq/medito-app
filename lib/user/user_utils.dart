@@ -16,6 +16,7 @@ Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   _beginClearStorage(prefs);
   await _logAccount(prefs);
+  unawaited(_postUsage());
   return;
 }
 
@@ -24,8 +25,6 @@ Future _logAccount(SharedPreferences prefs) async {
     var user = prefs.getString(USER_ID) ?? '';
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
-    } else {
-      unawaited(_postUsage());
     }
   }
 }
@@ -136,5 +135,5 @@ Future<String> get generatedToken async {
   return prefs.getString(TOKEN);
 }
 
-const TOKEN = 'token_v2';
-const USER_ID = 'userId_v2';
+const TOKEN = 'token_v3';
+const USER_ID = 'userId_v3';
