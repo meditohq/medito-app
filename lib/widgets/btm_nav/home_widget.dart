@@ -219,7 +219,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
-              Text(userID ?? '', style: TextStyle(color: MeditoColors.meditoTextGrey))
+              Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
             ],
           ),
         ),
