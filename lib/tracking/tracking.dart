@@ -49,7 +49,7 @@ class Tracking {
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
     //only track in release mode, not debug
-    if (!kReleaseMode) {
+    if (kReleaseMode) {
       unawaited(httpPost(url, await generatedToken, body: map));
     }
   }

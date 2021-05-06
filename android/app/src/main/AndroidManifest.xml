@@ -31,8 +31,6 @@
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
-        android:allowBackup="false"
-        android:fullBackupContent="false"
         android:label="Medito">
 
         <meta-data
