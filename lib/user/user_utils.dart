@@ -20,9 +20,8 @@ Future<void> firstOpenOperations() async {
 }
 
 Future _logAccount(SharedPreferences prefs) async {
-  var user = prefs.getString(USER_ID) ?? '';
-
   if (kReleaseMode) {
+    var user = prefs.getString(USER_ID) ?? '';
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
     } else {
@@ -129,7 +128,6 @@ class UserRepo {
     } finally {
       return {USER_ID: id, TOKEN: 'Bearer $token'};
     }
-
   }
 }
 
