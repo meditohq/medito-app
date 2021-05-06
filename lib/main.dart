@@ -56,7 +56,6 @@ class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
   var _currentIndex = 0;
   final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
-  final _bloc = DownloadsBloc();
   final _messengerKey = GlobalKey<ScaffoldState>();
 
   var _deletingCache = true;
@@ -95,7 +94,7 @@ class _ParentWidgetState extends State<ParentWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _bloc.dispose();
+    DownloadsBloc.dispose();
     super.dispose();
   }
 
@@ -119,9 +118,9 @@ class _ParentWidgetState extends State<ParentWidget>
   }
 
   void showSwipeToDeleteTip() async {
-    await _bloc.seenTip().then((seen) {
+    await DownloadsBloc.seenTip().then((seen) {
       if (!seen) {
-        unawaited(_bloc.setSeenTip());
+        unawaited(DownloadsBloc.setSeenTip());
         createSnackBar(SWIPE_TO_DELETE, _messengerKey.currentContext,
             color: MeditoColors.darkMoon);
       }

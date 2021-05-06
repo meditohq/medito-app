@@ -12,12 +12,12 @@ class DownloadsBloc {
   static final savedFilesKey = 'listOfSavedFiles';
   static ValueNotifier<List<MediaItem>> downloadedSessions = ValueNotifier([]);
 
-  Future<bool> seenTip() async {
+  static Future<bool> seenTip() async {
     var prefs = await SharedPreferences.getInstance();
     return prefs.getBool('seenDownloadsToolTip') ?? false;
   }
 
-  Future<void> setSeenTip() async {
+  static Future<void> setSeenTip() async {
     var prefs = await SharedPreferences.getInstance();
     return prefs.setBool('seenDownloadsToolTip', true);
   }
@@ -38,7 +38,7 @@ class DownloadsBloc {
   static Future<List<MediaItem>> fetchDownloads() async {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
-    List<MediaItem> fileList = []; // must declare type, despite warning.
+    var fileList = <MediaItem>[];
 
     list.forEach((element) {
       var file = MediaItem.fromJson(jsonDecode(element));
@@ -55,7 +55,7 @@ class DownloadsBloc {
     var list = await fetchDownloads();
     var exists = false;
 
-    print('"${bgSoundName}"');
+    print('"$bgSoundName"');
     print(file.voice);
     print(file.length);
     print('-----');
@@ -90,7 +90,7 @@ class DownloadsBloc {
       ..remove(mediaFile);
   }
 
-  void dispose() {
+  static void dispose() {
     downloadedSessions.dispose();
   }
 }
