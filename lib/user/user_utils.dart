@@ -15,14 +15,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   _beginClearStorage(prefs);
-  unawaited(_logAccount(prefs));
+  await _logAccount(prefs);
   return;
 }
 
 Future _logAccount(SharedPreferences prefs) async {
   var user = prefs.getString(USER_ID) ?? '';
 
-  if (!kReleaseMode) {
+  if (kReleaseMode) {
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
     } else {
