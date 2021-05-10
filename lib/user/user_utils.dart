@@ -16,7 +16,6 @@ Future<void> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   _beginClearStorage(prefs);
   await _logAccount(prefs);
-  unawaited(_postUsage());
   return;
 }
 
@@ -26,6 +25,7 @@ Future _logAccount(SharedPreferences prefs) async {
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
     }
+    unawaited(_postUsage());
   }
 }
 

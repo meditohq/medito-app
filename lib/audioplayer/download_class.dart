@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
-import 'package:Medito/user/user_utils.dart';
 import 'package:Medito/viewmodel/auth.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,8 +16,6 @@ class _Download {
   int _received = 0, _total = 1;
   var downloadListener = ValueNotifier<double>(0);
 
-  MediaItem _mediaItem;
-
   _Download(AudioFile file) {
     _file = file;
   }
@@ -27,13 +24,12 @@ class _Download {
     return file == _file;
   }
 
-  void startDownloading(AudioFile file, MediaItem mediaItemForSelectedFile) {
+  void startDownloading(AudioFile file, MediaItem mediaItem) {
     if (isDownloading) return;
     isDownloading = true;
     _file = file;
-    _mediaItem = mediaItemForSelectedFile;
 
-    _downloadFileWithProgress(file);
+    _downloadFileWithProgress(file, mediaItem);
   }
 
   bool isDownloadingMe(AudioFile file) {
@@ -42,11 +38,12 @@ class _Download {
     return isDownloading;
   }
 
-  Future<dynamic> _downloadFileWithProgress(AudioFile currentFile) async {
-    var filePath = (await getFilePath(_mediaItem.id));
+  Future<dynamic> _downloadFileWithProgress(
+      AudioFile currentFile, MediaItem mediaItem) async {
+    var filePath = (await getFilePath(currentFile.id));
     var file = File(filePath);
     if (file.existsSync()) {
-      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(_mediaItem));
+      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(mediaItem));
       isDownloading = false;
       return null;
     } else {
@@ -84,7 +81,7 @@ class _Download {
       downloadListener.value = progress as double;
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
-      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(_mediaItem));
+      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(mediaItem));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });
@@ -130,17 +127,17 @@ class DownloadSingleton {
     return -1;
   }
 
-  bool start(AudioFile file, MediaItem mediaItemForSelectedFile) {
+  bool start(AudioFile file, MediaItem mediaItem) {
     if (_download == null) return false;
     if (_download.isDownloadingMe(file)) return true;
     if (isDownloadingSomething()) return false;
 
     if (_download.isThisFile(file)) {
-      _download.startDownloading(file, mediaItemForSelectedFile);
+      _download.startDownloading(file, mediaItem);
       return true;
     }
     _download = _Download(file);
-    _download.startDownloading(file, mediaItemForSelectedFile);
+    _download.startDownloading(file, mediaItem);
     return true;
   }
 

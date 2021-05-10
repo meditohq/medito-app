@@ -32,8 +32,6 @@ class SessionData {
   String colorSecondary;
   String get attribution => author?.body ?? '';
   List<AudioFile> get files => audio.map((e) => e.file).toList()..removeWhere((element) => element == null);
-  List<String> get voiceList =>
-  audio.map((element) => element.file?.voice).toSet().toList()..removeWhere((element) => element == null);
 
   @Deprecated('Use backgroundImageUrl instead')
   String backgroundImage;
