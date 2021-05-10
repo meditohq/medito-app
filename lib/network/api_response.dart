@@ -22,6 +22,10 @@ class ApiResponse<T> {
   ApiResponse.completed(this.body) : status = Status.COMPLETED;
   ApiResponse.error(this.message) : status = Status.ERROR;
 
+  bool hasData(){
+    return status != Status.LOADING && body != null;
+  }
+
   @override
   String toString() {
     return 'Status : $status \n Message : $message \n Data : $body';

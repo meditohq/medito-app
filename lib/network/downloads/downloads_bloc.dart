@@ -50,12 +50,11 @@ class DownloadsBloc {
     return fileList;
   }
 
-  static Future<bool> isDownloadAndBGSoundDownloaded(
-      AudioFile file, String bgSoundName) async {
+  static Future<bool> isAudioFileDownloaded(
+      AudioFile file) async {
     var list = await fetchDownloads();
     var exists = false;
 
-    print('"$bgSoundName"');
     print(file.voice);
     print(file.length);
     print('-----');
@@ -64,8 +63,7 @@ class DownloadsBloc {
       print('"${element.extras['bgMusicTitle']}"');
       print(element.artist);
       print(element.extras['length']);
-      if (element.extras['bgMusicTitle'] == bgSoundName &&
-          element.artist == file.voice &&
+      if (element.artist == file.voice &&
           element.extras['length'] == file.length) exists = true;
     });
 
