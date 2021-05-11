@@ -232,12 +232,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     });
   }
 
-  void startService(media, primaryColor) {
-    start(media).then((value) {
-      NavigationFactory.navigate(context, Screen.player, id: null);
-      return null;
-    });
-  }
 }
 
 class FolderArguments {
