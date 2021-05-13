@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/main.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/cache.dart';
+import 'package:Medito/network/cache.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

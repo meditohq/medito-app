@@ -16,10 +16,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
-import 'package:Medito/viewmodel/cache.dart';
+import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/cache.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 

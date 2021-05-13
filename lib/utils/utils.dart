@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:io';
 
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/network/auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
