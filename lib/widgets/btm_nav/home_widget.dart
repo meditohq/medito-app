@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_bloc.dart';
+import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/network/user/user_utils.dart';
@@ -41,7 +42,7 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  final _bloc = HomeBloc();
+  final _bloc = HomeBloc(repo: HomeRepo());
 
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
 
@@ -233,6 +234,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   void dispose() {
     super.dispose();
     subscription.cancel();
+    _bloc.dispose();
   }
 
   void _observeNetwork() {

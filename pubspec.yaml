@@ -41,10 +41,12 @@ dependencies:
   connectivity: ^3.0.3
   device_info: ^2.0.0
   dart_ipify: ^1.0.2
+  equatable: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mocktail: ^0.1.2
 
 
 # For information on the generic Dart part of this file, see the

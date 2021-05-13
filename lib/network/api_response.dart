@@ -13,7 +13,9 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-class ApiResponse<T> {
+import 'package:equatable/equatable.dart';
+
+class ApiResponse<T> extends Equatable {
   Status status;
   T body;
   String message;
@@ -30,6 +32,9 @@ class ApiResponse<T> {
   String toString() {
     return 'Status : $status \n Message : $message \n Data : $body';
   }
+
+  @override
+  List<Object> get props => [status, body, message];
 }
 
 enum Status { LOADING, COMPLETED, ERROR }
