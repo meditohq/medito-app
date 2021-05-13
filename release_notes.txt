@@ -1,7 +1,0 @@
-- Added ability to donate with Google Pay
-- Added ability to consent to tracking
-- Increased background audio volume and quality
-- Remembers previous session length selection
-- Enable move to SD card
-- Improved support for screen readers
-- UI and bug fixes!
