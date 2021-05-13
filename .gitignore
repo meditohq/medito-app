@@ -13,7 +13,6 @@
 *.iml
 *.ipr
 *.iws
-.idea/
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -79,4 +78,4 @@ ios/Flutter/flutter_export_environment.sh
 gen/
 /pubspec.lock
 /android/keystore.properties
-/android/keystore.properties
+/.vscode
