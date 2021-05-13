@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
@@ -167,7 +166,7 @@ class SessionOptionsBloc {
       var expandableItem = ExpandableItem(
           headerValue: voice,
           expandedValue: listForThisVoice,
-          isExpanded: voice == 'Will');
+          isExpanded: voice == 'Will' || voiceSet.length == 1);
       expandableList.add(expandableItem);
     });
 
