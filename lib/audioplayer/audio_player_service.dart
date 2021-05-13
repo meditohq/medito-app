@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
-import 'package:Medito/viewmodel/cache.dart';
+import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/cache.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';

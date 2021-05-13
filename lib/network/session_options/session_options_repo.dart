@@ -16,8 +16,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/viewmodel/auth.dart';
-import 'package:Medito/viewmodel/http_get.dart';
+import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/http_get.dart';
 
 class SessionOptionsRepository {
   var ext = 'items/sessions/';

@@ -17,8 +17,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/network/session_options/session_opts.dart';
-import 'package:Medito/user/user_utils.dart';
-import 'package:Medito/viewmodel/auth.dart';
+import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/network/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
