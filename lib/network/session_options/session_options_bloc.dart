@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
@@ -26,6 +27,7 @@ import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:pedantic/pedantic.dart';
 
 class SessionOptionsBloc {
@@ -46,7 +48,7 @@ class SessionOptionsBloc {
   StreamController<String> backgroundImageController;
   StreamController<String> primaryColourController;
   StreamController<String> secondaryColorController;
-  StreamController<ApiResponse<List<AudioFile>>> contentListController;
+  StreamController<ApiResponse<List<ExpandableItem>>> contentListController;
 
   MediaLibrary mediaLibrary;
 
@@ -82,8 +84,10 @@ class SessionOptionsBloc {
         .reversed
         .toList();
 
+    var expandableItems = _generateExpandableItems(files);
+
     // Show title, desc and image
-    contentListController.sink.add(ApiResponse.completed(files));
+    contentListController.sink.add(ApiResponse.completed(expandableItems));
     titleController.sink.add(options.title);
     descController.sink.add(options.description);
     imageController.sink.add(ApiResponse.completed(options.coverUrl));
@@ -147,6 +151,29 @@ class SessionOptionsBloc {
         attributions: _options.attribution);
   }
 
+  List<ExpandableItem> _generateExpandableItems(List<AudioFile> items) {
+    var voiceSet = <String>{};
+    var expandableList = <ExpandableItem>[];
+
+    // Get unique voices
+    items.forEach((element) {
+      voiceSet.add(element.voice);
+    });
+
+    // Add file data against each voice
+    voiceSet.toList().forEach((voice) {
+      var listForThisVoice =
+          items.where((element) => element.voice == voice).toList();
+      var expandableItem = ExpandableItem(
+          headerValue: voice,
+          expandedValue: listForThisVoice,
+          isExpanded: voice == 'Will');
+      expandableList.add(expandableItem);
+    });
+
+    return expandableList;
+  }
+
   void dispose() {
     titleController?.close();
     imageController?.close();
@@ -155,6 +182,18 @@ class SessionOptionsBloc {
     descController?.close();
     backgroundImageController?.close();
   }
+}
+
+class ExpandableItem {
+  ExpandableItem({
+    @required this.expandedValue,
+    @required this.headerValue,
+    this.isExpanded = false,
+  });
+
+  List<AudioFile> expandedValue;
+  String headerValue;
+  bool isExpanded;
 }
 
 extension MyIterable<E> on Iterable<E> {
