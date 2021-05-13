@@ -98,53 +98,65 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget _getContentListWidget() {
-    return StreamBuilder<ApiResponse<List<AudioFile>>>(
-      stream: _bloc.contentListController.stream,
-      initialData: ApiResponse.loading(),
-      builder: (context, itemsSnapshot) {
-        return ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          itemCount:
-              itemsSnapshot.data.hasData() ? itemsSnapshot.data.body.length : 0,
-          shrinkWrap: true,
-          padding: EdgeInsets.only(top: 8),
-          itemBuilder: (BuildContext context, int i) {
-            var item = itemsSnapshot.data.body;
+    return StreamBuilder<ApiResponse<List<ExpandableItem>>>(
+        stream: _bloc.contentListController.stream,
+        initialData: ApiResponse.loading(),
+        builder: (context, itemsSnapshot) {
+          if (itemsSnapshot.data.status == Status.LOADING) {
+            return _getLoadingWidget();
+          }
+          return _buildPanel(itemsSnapshot.data.body);
+        });
+  }
 
-            var hideName = false;
-            if (i > 0) {
-              hideName = item[i - 1].voice == item[i].voice;
-            }
-
-            var column = itemsSnapshot.data.hasData()
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      !hideName ? _getVoiceText(item[i]) : Container(),
-                      _getListItem(context, item[i]),
-                    ],
-                  )
-                : Container();
-
-            return column;
-          },
-        );
-      },
+  Padding _getLoadingWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 32.0),
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 
-  Widget _getVoiceText(AudioFile item) => Padding(
-        padding: const EdgeInsets.only(left: 16.0, bottom: 16.0, top: 24.0),
-        child: Column(
-          children: [
-            Text(item.voice, style: Theme.of(context).textTheme.headline1),
-          ],
-        ),
+  Widget _buildPanel(List<ExpandableItem> items) {
+    var childList = <Theme>[];
+
+    items.forEach((value) {
+      var tileList = value.expandedValue
+          .map<ListTile>((e) => _getListItem(context, e))
+          .toList();
+
+      childList.add(Theme(
+        data: Theme.of(context)
+            .copyWith(unselectedWidgetColor: MeditoColors.walterWhite),
+        child: ExpansionTile(
+            backgroundColor: MeditoColors.darkMoon,
+            maintainState: true,
+            title: _getVoiceText(value.headerValue),
+            initiallyExpanded: value.isExpanded,
+            children: tileList),
+      ));
+    });
+
+    return Column(
+      children: childList,
+    );
+  }
+
+  Widget _getVoiceText(String voice) => Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
+            child: Column(
+              children: [
+                Text(voice, style: Theme.of(context).textTheme.headline1),
+              ],
+            ),
+          ),
+        ],
       );
 
   Widget _getListItem(BuildContext context, AudioFile item) {
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 32, right: 16),
+      contentPadding: const EdgeInsets.only(left: 32, right: 32),
       title: Text(formatSessionLength(item.length),
           style: Theme.of(context).textTheme.headline4),
       onTap: () => _onBeginTap(item),
@@ -155,7 +167,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget _getTrailing(AudioFile item) {
-    
     if (_bloc.isDownloading(item)) {
       return IconButton(onPressed: () {}, icon: _getLoadingSpinner());
     }
