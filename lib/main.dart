@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/user/user_utils.dart';
+import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/strings.dart';
