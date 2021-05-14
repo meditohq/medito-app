@@ -19,16 +19,16 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/foundation.dart';
 
 class HomeBloc {
-  HomeRepo _repo;
+  final HomeRepo _repo;
   StreamController<ApiResponse<MenuResponse>> menuList;
   StreamController<bool> connectionStreamController;
   StreamController<String> titleText;
 
-  HomeBloc() {
-    _repo = HomeRepo();
-
+  HomeBloc({@required HomeRepo repo}) : _repo = repo {
     menuList = StreamController.broadcast()..sink.add(ApiResponse.loading());
     titleText = StreamController.broadcast();
     connectionStreamController = StreamController.broadcast();
@@ -57,5 +57,11 @@ class HomeBloc {
     } else {
       return 'Good evening';
     }
+  }
+
+  void dispose() {
+    menuList?.close();
+    connectionStreamController?.close();
+    titleText?.close();
   }
 }
