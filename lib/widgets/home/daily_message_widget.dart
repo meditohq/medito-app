@@ -22,33 +22,37 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<ApiResponse<DailyMessageResponse>>(
-        stream: _bloc.coursesList.stream,
-        builder: (context, snapshot) {
-          var widget;
+    return SizeChangedLayoutNotifier(
+      child: StreamBuilder<ApiResponse<DailyMessageResponse>>(
+          stream: _bloc.coursesList.stream,
+          builder: (context, snapshot) {
+            var widget;
 
-          if (!snapshot.hasData || snapshot.data == null || snapshot.data.body.body.isEmptyOrNull()) {
-            return Container();
-          }
+            if (!snapshot.hasData ||
+                snapshot.data == null ||
+                snapshot.data.body.body.isEmptyOrNull()) {
+              return Container();
+            }
 
-          switch (snapshot.data.status) {
-            case Status.LOADING:
-              widget = const CircularProgressIndicator();
-              break;
-            case Status.COMPLETED:
-              widget = _getMessageWidget(snapshot, context);
-              break;
-            case Status.ERROR:
-              widget = Container();
-              break;
-          }
+            switch (snapshot.data.status) {
+              case Status.LOADING:
+                widget = const CircularProgressIndicator();
+                break;
+              case Status.COMPLETED:
+                widget = _getMessageWidget(snapshot, context);
+                break;
+              case Status.ERROR:
+                widget = Container();
+                break;
+            }
 
-          return Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
-            child: widget,
-          );
-        });
+            return Padding(
+              padding: const EdgeInsets.only(
+                  left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
+              child: widget,
+            );
+          }),
+    );
   }
 
   Widget _getMessageWidget(
@@ -74,8 +78,6 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
       ),
     );
   }
-
-
 
   void _launchUrl(String text, String href, String title) {
     launchUrl(href);

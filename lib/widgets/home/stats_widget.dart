@@ -18,15 +18,14 @@ class _StatsWidgetState extends State<StatsWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
-          child: Text('Stats',
-              style: Theme.of(context).textTheme.headline3),
+          child: Text('Stats', style: Theme.of(context).textTheme.headline3),
         ),
         SizedBox(
           height: 73,
           child: ListView.builder(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0),
             itemBuilder: (context, i) => statsItem(context, i),
-            itemCount: 5,
+            itemCount: 4,
             scrollDirection: Axis.horizontal,
             shrinkWrap: true,
           ),
