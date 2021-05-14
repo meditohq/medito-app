@@ -1,15 +1,19 @@
-class MenuResponse {
-  List<MenuData> data;
+import 'package:equatable/equatable.dart';
+
+class MenuResponse extends Equatable {
+  final List<MenuData> data;
 
   MenuResponse({this.data});
 
-  MenuResponse.fromJson(Map<String, dynamic> json) {
+  factory MenuResponse.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      data = <MenuData>[];
+      var _data = <MenuData>[];
       json['data'].forEach((v) {
-        data.add(MenuData.fromJson(v));
+        _data.add(MenuData.fromJson(v));
       });
+      return MenuResponse(data: _data);
     }
+    return MenuResponse(data: []);
   }
 
   Map<String, dynamic> toJson() {
@@ -19,19 +23,23 @@ class MenuResponse {
     }
     return data;
   }
+
+  @override
+  List<Object> get props => [data];
 }
 
-class MenuData {
-  String itemLabel;
-  String itemType;
-  String itemPath;
+class MenuData extends Equatable {
+  final String itemLabel;
+  final String itemType;
+  final String itemPath;
 
-  MenuData({itemLabel, itemType, itemPath});
+  MenuData({this.itemLabel, this.itemType, this.itemPath});
 
-  MenuData.fromJson(Map<String, dynamic> json) {
-    itemLabel = json['item_label'];
-    itemType = json['item_type'];
-    itemPath = json['item_path'];
+  factory MenuData.fromJson(Map<String, dynamic> json) {
+    var _itemLabel = json['item_label'];
+    var _itemType = json['item_type'];
+    var _itemPath = json['item_path'];
+    return MenuData(itemLabel: _itemLabel, itemType: _itemType, itemPath: _itemPath);
   }
 
   Map<String, dynamic> toJson() {
@@ -41,4 +49,7 @@ class MenuData {
     data['item_path'] = itemPath;
     return data;
   }
+
+  @override
+  List<Object> get props => [itemLabel, itemType, itemPath];
 }
