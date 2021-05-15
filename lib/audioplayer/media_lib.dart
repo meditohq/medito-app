@@ -7,22 +7,16 @@ class MediaLibrary {
       String illustrationUrl,
       String secondaryColor,
       String primaryColor,
-      String bgMusic,
       int durationAsMilliseconds,
       String fileId,
       String attributions,
       String voice,
       String length,
-      int sessionId,
-      String bgMusicTitle,
-      int bgMusicId}) {
+      int sessionId}) {
     return MediaItem(
       id: fileId,
       extras: {
         'location': fileId,
-        'bgMusic': bgMusic,
-        'bgMusicId': bgMusicId,
-        'bgMusicTitle': bgMusicTitle,
         'id': fileId,
         'sessionId': sessionId,
         'primaryColor': primaryColor,

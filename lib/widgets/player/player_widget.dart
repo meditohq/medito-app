@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
-import 'package:Medito/network/player/audio_complete_bloc.dart';
+import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
@@ -40,7 +40,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   double volume;
 
   StreamSubscription _stream;
-  AudioCompleteCopyBloc _bloc;
+  PlayerBloc _bloc;
 
   bool get loaded => __loaded == 'true';
   String __loaded;
@@ -89,7 +89,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     _startTimeout();
 
-    _bloc = AudioCompleteCopyBloc();
+    _bloc = PlayerBloc();
   }
 
   void _startTimeout() {

@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
@@ -44,8 +43,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
           var url = '${BASE_URL}assets/${mediaItem.id}';
-          _duration = await _player
-              .setUrl(url, headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+          _duration = await _player.setUrl(url,
+              headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
         } else {
           _duration = await _player.setFilePath(data);
         }
@@ -55,10 +54,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        String bg = mediaItem.extras['bgMusic'];
-        if (bg.isNotEmptyAndNotNull()) {
-          playBgMusic(bg);
-        }
         unawaited(onPlay());
       });
     } catch (e) {
@@ -134,7 +129,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onPlay() {
-    _bgPlayer.play();
     return _player.play();
   }
 
@@ -245,11 +239,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   void playBgMusic(String bgMusic) {
-    if (bgMusic.isNotEmptyAndNotNull()) {
       _bgPlayer.setFilePath(bgMusic);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.all);
-    }
   }
 
   Future<void> updateStats() async {
