@@ -23,14 +23,13 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 32.0, left: 16, bottom: 8.0),
-          child: Text('Courses', style: Theme.of(context).textTheme.headline3),
-        ),
-        StreamBuilder<ApiResponse<CoursesResponse>>(
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 32.0, left: 16, bottom: 8.0),
+        child: Text('Courses', style: Theme.of(context).textTheme.headline3),
+      ),
+      SizeChangedLayoutNotifier(
+        child: StreamBuilder<ApiResponse<CoursesResponse>>(
             stream: _bloc.coursesList.stream,
             initialData: ApiResponse.loading(),
             builder: (context, snapshot) {
@@ -48,8 +47,8 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
               }
               return Container();
             }),
-      ],
-    );
+      ),
+    ]);
   }
 
   Widget _horizontalCoursesRow(
