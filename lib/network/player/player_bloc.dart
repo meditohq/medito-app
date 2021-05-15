@@ -18,16 +18,20 @@ import 'dart:math';
 
 import 'package:Medito/network/player/audio_complete_copy_repo.dart';
 import 'package:Medito/network/player/audio_complete_copy_response.dart';
+import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/network/api_response.dart';
 
-class AudioCompleteCopyBloc {
-  AudioCompleteCopyRepository _repo;
+
+class PlayerBloc {
+  PlayerRepository _repo;
   PlayerCopyData version;
+  StreamController<ApiResponse<BackgroundSoundsResponse>> bgSoundsListController;
 
   static final _random = Random();
 
-  AudioCompleteCopyBloc() {
-    _repo = AudioCompleteCopyRepository();
+  PlayerBloc() {
+    _repo = PlayerRepository();
     _fetchCopy();
   }
 
@@ -36,6 +40,10 @@ class AudioCompleteCopyBloc {
     final randomOutOf10 = _random.nextInt(data.data.length);
     version = data.data[randomOutOf10];
     setVersionCopySeen(version.id);
+  }
+
+  Future<BackgroundSoundsResponse> fetchBackgroundSounds() async {
+    return _repo.fetchBackgroundSounds(true);
   }
 
   Future<String> getVersionTitle() async {

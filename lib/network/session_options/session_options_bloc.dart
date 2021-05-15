@@ -126,7 +126,6 @@ class SessionOptionsBloc {
       Tracking.TYPE: Tracking.AUDIO_STARTED,
       Tracking.SESSION_VOICE: mediaItem.artist,
       Tracking.SESSION_LENGTH: mediaItem.extras['length'],
-      Tracking.SESSION_BACKGROUND_SOUND: mediaItem.extras['bgMusicId'],
       Tracking.DESTINATION: Tracking.destinationData(
           mapToPlural(_screen.toString()),
           mediaItem.extras['sessionId'].toString())

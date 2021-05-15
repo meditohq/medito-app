@@ -106,15 +106,10 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       );
 
   PackListItemWidget _getListItemWidget(MediaItem item) {
-    var backgroundSoundString = '';
-    if ((item.extras['bgMusicTitle'] as String)?.isNotEmptyAndNotNull() ??
-        false) {
-      backgroundSoundString = ' — ${item.extras['bgMusicTitle']}';
-    }
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
         subtitle:
-            '${item.artist} — ${_getDuration(item.extras['length'])}$backgroundSoundString',
+            '${item.artist} — ${_getDuration(item.extras['length'])}',
         cover: item.artUri.toString(),
         colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));

@@ -22,7 +22,6 @@ import 'package:Medito/network/http_get.dart';
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
-  var bgSoundsUrl = '${BASE_URL}items/background_sounds';
   var parameters =
       '?fields=*,author.body,audio.file.id,audio.file.voice,audio.file.length';
   var screen;
@@ -41,11 +40,6 @@ class SessionOptionsRepository {
     final response = await httpGet(url, skipCache: skipCache);
 
     return SessionOptionsResponse.fromJson(response).data;
-  }
-
-  Future<BackgroundSoundsResponse> fetchBackgroundSounds(bool skipCache) async {
-    final response = await httpGet(bgSoundsUrl, skipCache: skipCache);
-    return BackgroundSoundsResponse.fromJson(response);
   }
 
 }
