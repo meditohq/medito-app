@@ -15,6 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/strings.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -52,9 +53,12 @@ class ErrorPacksWidget extends StatelessWidget {
                             style: BorderStyle.solid,
                           ),
                         ),
-                        onPressed: () => onPressed(),
+                        onPressed: () {
+                          createSnackBar(RETRYING, context, color: MeditoColors.darkBGColor);
+                          onPressed();
+                        },
                         child: Text(
-                          'Try again',
+                          TRY_AGAIN,
                           style: Theme.of(context).textTheme.subtitle2,
                         )),
                     /*      Container(width: 16),
