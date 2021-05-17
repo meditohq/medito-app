@@ -20,6 +20,7 @@ import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -129,6 +130,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
             .copyWith(unselectedWidgetColor: MeditoColors.walterWhite),
         child: ExpansionTile(
             backgroundColor: MeditoColors.darkMoon,
+            collapsedBackgroundColor: MeditoColors.intoTheNight,
             maintainState: true,
             title: _getVoiceText(value.headerValue),
             initiallyExpanded: value.isExpanded,
@@ -156,8 +158,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   Widget _getListItem(BuildContext context, AudioFile item) {
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 32, right: 32),
-      title: Text(formatSessionLength(item.length),
+      contentPadding: const EdgeInsets.only(left: 24, right: 4),
+      title: Text('—  ${formatSessionLength(item.length)}',
           style: Theme.of(context).textTheme.headline4),
       onTap: () => _onBeginTap(item),
       enableFeedback: true,
@@ -178,7 +180,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           return IconButton(
             icon: Icon(
               snapshot.data ? _getDownloadedIcon() : Icons.download_outlined,
-              color: MeditoColors.walterWhite,
+              color: MeditoColors.meditoTextGrey,
             ),
             onPressed: () => _download(snapshot.data, item),
           );

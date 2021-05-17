@@ -136,6 +136,7 @@ class SessionOptionsBloc {
         title: _options.title,
         illustrationUrl: _options.coverUrl,
         voice: file.voice,
+        hasBgSound: _options.backgroundSound,
         length: file.length,
         secondaryColor: _options.colorSecondary,
         primaryColor: _options.colorPrimary,
@@ -151,6 +152,9 @@ class SessionOptionsBloc {
 
     // Get unique voices
     items.forEach((element) {
+      if (element.voice == 'None') {
+        element.voice = 'No Voice';
+      }
       voiceSet.add(element.voice);
     });
 

@@ -12,6 +12,7 @@ class MediaLibrary {
       String attributions,
       String voice,
       String length,
+        bool hasBgSound,
       int sessionId}) {
     return MediaItem(
       id: fileId,
@@ -24,6 +25,7 @@ class MediaLibrary {
         'attr': attributions,
         'length': length,
         'duration': durationAsMilliseconds,
+        'hasBgSound' : hasBgSound,
       },
       artist: voice,
       album: '',
@@ -32,3 +34,5 @@ class MediaLibrary {
     );
   }
 }
+
+const String HAS_BG_SOUND = 'hasBgSound';
