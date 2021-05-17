@@ -12,6 +12,8 @@ import 'package:pedantic/pedantic.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
+const PLAY_BG_SOUND = 'play_bg_sound';
+const SEND_BG_SOUND = 'send_bg_sound';
 
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
@@ -20,6 +22,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   AudioProcessingState _skipState;
   StreamSubscription<PlaybackEvent> _eventSubscription;
   var _duration = Duration();
+
+  var _currentlyPlayingBGSound;
 
   int get index => _player.currentIndex;
   MediaItem mediaItem;
@@ -129,6 +133,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onPlay() {
+    _bgPlayer.play();
     return _player.play();
   }
 
@@ -144,9 +149,19 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case 'setBgVolume':
         initialBgVolume = params;
         break;
+      case PLAY_BG_SOUND:
+        playBgMusic(params);
+        break;
       case 'stop':
         await _player.stop();
         await _broadcastState();
+        break;
+      case SEND_BG_SOUND:
+        if ((params as String).isNotEmptyAndNotNull()) {
+          _currentlyPlayingBGSound = params;
+        }
+        AudioServiceBackground.sendCustomEvent(
+            {SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
     }
   }
@@ -238,10 +253,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  void playBgMusic(String bgMusic) {
-      _bgPlayer.setFilePath(bgMusic);
+  void playBgMusic(String bgMusicPath) {
+    if (bgMusicPath.isEmptyOrNull()) {
+      _bgPlayer.pause();
+    } else {
+      AudioServiceBackground.sendCustomEvent({PLAY_BG_SOUND, bgMusicPath});
+      _bgPlayer.setFilePath(bgMusicPath);
       _bgPlayer.setVolume(initialBgVolume);
       _bgPlayer.setLoopMode(LoopMode.all);
+      _bgPlayer.play();
+    }
   }
 
   Future<void> updateStats() async {

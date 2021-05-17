@@ -16,22 +16,23 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'dart:math';
 
+import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/player/audio_complete_copy_repo.dart';
 import 'package:Medito/network/player/audio_complete_copy_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/network/api_response.dart';
-
 
 class PlayerBloc {
   PlayerRepository _repo;
   PlayerCopyData version;
-  StreamController<ApiResponse<BackgroundSoundsResponse>> bgSoundsListController;
+  StreamController<ApiResponse<BackgroundSoundsResponse>>
+      bgSoundsListController;
 
   static final _random = Random();
 
   PlayerBloc() {
     _repo = PlayerRepository();
+    bgSoundsListController = StreamController.broadcast();
     _fetchCopy();
   }
 
@@ -42,8 +43,13 @@ class PlayerBloc {
     setVersionCopySeen(version.id);
   }
 
-  Future<BackgroundSoundsResponse> fetchBackgroundSounds() async {
-    return _repo.fetchBackgroundSounds(true);
+  Future<void> fetchBackgroundSounds() async {
+    try {
+      var sounds = await _repo.fetchBackgroundSounds(true);
+      bgSoundsListController.sink.add(ApiResponse.completed(sounds));
+    } catch (e) {
+      bgSoundsListController.sink.add(ApiResponse.error(e.toString()));
+    }
   }
 
   Future<String> getVersionTitle() async {
