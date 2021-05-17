@@ -487,13 +487,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _onBgMusicPressed() {
-    _bloc.fetchBackgroundSounds();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => ChooseBackgroundSoundDialog(
           stream: _bloc.bgSoundsListController.stream),
     );
+    // slight delay incase the cache returns before the sheet opens
+    Future.delayed(Duration(milliseconds: 50))
+        .then((value) => _bloc.fetchBackgroundSounds());
   }
 }
 
