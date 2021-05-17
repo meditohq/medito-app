@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Medito/audioplayer/audio_player_service.dart';
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
@@ -133,7 +134,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           _complete
                               ? getDonateAndShareButton()
                               : _getPlayingPauseOrLoadingIndicator(
-                                  processingState, playing),
+                                  mediaItem.extras[HAS_BG_SOUND] ?? true,
+                                  processingState,
+                                  playing),
                           _complete
                               ? Container()
                               : _positionIndicatorRow(
@@ -234,19 +237,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Expanded _getPlayingPauseOrLoadingIndicator(
-      AudioProcessingState processingState, bool playing) {
+      bool hasBgSound, AudioProcessingState processingState, bool playing) {
     return Expanded(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           (processingState == AudioProcessingState.buffering ||
                   processingState == AudioProcessingState.connecting)
-              ? buildCircularIndicatorRow()
+              ? buildCircularIndicatorRow(hasBgSound)
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     getPlayingOrPausedButton(playing),
-                    _getBgMusicIconButton()
+                    _getBgMusicIconButton(hasBgSound)
                   ],
                 ),
         ],
@@ -254,18 +257,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget _getBgMusicIconButton() {
-    return Padding(
-      padding: EdgeInsets.only(top: 32),
-      child: Container(
-        decoration:
-            BoxDecoration(shape: BoxShape.circle, color: MeditoColors.darkMoon),
-        child: IconButton(
-            icon: Icon(
-              Icons.music_note_outlined,
-              color: MeditoColors.walterWhite,
-            ),
-            onPressed: _onBgMusicPressed),
+  Widget _getBgMusicIconButton(bool visible) {
+    return Visibility(
+      visible: visible,
+      child: Padding(
+        padding: EdgeInsets.only(top: 32),
+        child: Container(
+          decoration: BoxDecoration(
+              shape: BoxShape.circle, color: MeditoColors.darkMoon),
+          child: IconButton(
+              icon: Icon(
+                Icons.music_note_outlined,
+                color: MeditoColors.walterWhite,
+              ),
+              onPressed: _onBgMusicPressed),
+        ),
       ),
     );
   }
@@ -309,16 +315,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     }
   }
 
-  Widget buildCircularIndicatorRow() {
-    return PlayerButton(
-      primaryColor: primaryColorAsColor,
-      child: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(primaryColorAsColor),
-            backgroundColor: secondaryColor,
-          )),
+  Widget buildCircularIndicatorRow(bool hasBgSound) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        PlayerButton(
+          primaryColor: primaryColorAsColor,
+          child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(primaryColorAsColor),
+                backgroundColor: secondaryColor,
+              )),
+        ),
+        _getBgMusicIconButton(hasBgSound)
+      ],
     );
   }
 
