@@ -73,10 +73,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if (event == 'stats') {
         await updateStatsFromBg();
       }
-
       unawaited(Tracking.trackEvent({Tracking.TYPE: Tracking.AUDIO_COMPLETED}));
-
-      await _stream.cancel();
       return true;
     });
 
