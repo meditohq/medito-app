@@ -24,7 +24,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double> _dragPositionSubject =
-  BehaviorSubject.seeded(null);
+      BehaviorSubject.seeded(null);
 
   bool tracked = false;
 
@@ -35,7 +35,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
       stream: Rx.combineLatest2<double, double, double>(
           _dragPositionSubject.stream,
           Stream.periodic(Duration(milliseconds: 200)),
-              (dragPosition, _) => dragPosition),
+          (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
         double position = snapshot.data ??
             widget.state?.currentPosition?.inMilliseconds?.toDouble() ??
@@ -83,20 +83,18 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 children: [
                   Text(
                     Duration(
-                        milliseconds:
-                        widget.state?.currentPosition?.inMilliseconds ??
-                            0)
+                            milliseconds:
+                                widget.state?.currentPosition?.inMilliseconds ??
+                                    0)
                         .toMinutesSeconds(),
-                    style: Theme
-                        .of(context)
+                    style: Theme.of(context)
                         .textTheme
                         .subtitle2
                         .copyWith(color: MeditoColors.meditoTextGrey),
                   ),
                   Text(
                     Duration(milliseconds: duration).toMinutesSeconds(),
-                    style: Theme
-                        .of(context)
+                    style: Theme.of(context)
                         .textTheme
                         .subtitle2
                         .copyWith(color: MeditoColors.meditoTextGrey),
@@ -112,6 +110,9 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 }
 
 class CustomTrackShape extends RoundedRectSliderTrackShape {
+  CustomTrackShape({this.addTopPadding = true});
+
+  final addTopPadding;
 
   @override
   Rect getPreferredRect({
@@ -123,25 +124,32 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
   }) {
     final trackHeight = sliderTheme.trackHeight;
     final trackLeft = offset.dx;
-    final trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
+    var trackTop;
+    if (addTopPadding) {
+      trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
+    } else {
+      trackTop = parentBox.size.height / 2 - 2;
+    }
     final trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 
   @override
   void paint(PaintingContext context, Offset offset,
-      { RenderBox parentBox,
-        SliderThemeData sliderTheme,
-        Animation<double> enableAnimation,
-        TextDirection textDirection,
-        Offset thumbCenter,
-        bool isDiscrete = false,
-        bool isEnabled = false,
-        double additionalActiveTrackHeight = 2}) {
-    super.paint(context, offset, parentBox: parentBox,
+      {RenderBox parentBox,
+      SliderThemeData sliderTheme,
+      Animation<double> enableAnimation,
+      TextDirection textDirection,
+      Offset thumbCenter,
+      bool isDiscrete = false,
+      bool isEnabled = false,
+      double additionalActiveTrackHeight = 2}) {
+    super.paint(context, offset,
+        parentBox: parentBox,
         sliderTheme: sliderTheme,
         enableAnimation: enableAnimation,
         textDirection: textDirection,
-        thumbCenter: thumbCenter, additionalActiveTrackHeight: 0);
+        thumbCenter: thumbCenter,
+        additionalActiveTrackHeight: 0);
   }
 }

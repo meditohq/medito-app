@@ -4,7 +4,6 @@ import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
@@ -19,10 +18,13 @@ import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
+
+import 'background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {
   final normalPop;
@@ -37,7 +39,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   String illustrationUrl;
   Color secondaryColor;
   Color primaryColorAsColor = MeditoColors.transparent;
-  double volume;
 
   StreamSubscription _stream;
   PlayerBloc _bloc;
@@ -63,18 +64,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.dispose();
   }
 
-  void initBgVolume() async {
-    volume = await retrieveSavedBgVolume();
-    _dragBgVolumeSubject.add(volume);
-    if (AudioService.running) {
-      await AudioService.customAction('setBgVolume', volume / 100);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    initBgVolume();
 
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
@@ -144,7 +136,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                                   processingState, playing),
                           _complete
                               ? Container()
-                              : positionIndicator(
+                              : _positionIndicatorRow(
                                   mediaItem, state, primaryColorAsColor),
                         ],
                       )
@@ -188,13 +180,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       transparent: true,
       hasCloseButton: true,
       closePressed: _onBackPressed,
-      actions: [
-        loaded
-            ? _complete
-                ? Container()
-                : _getBgVolumeController(mediaItem)
-            : Container()
-      ],
     );
   }
 
@@ -248,108 +233,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         : Container();
   }
 
-  IconData volumeIconFunction(var volume) {
-    if (volume == 0) {
-      return Icons.volume_off;
-    } else if (volume < 50) {
-      return Icons.volume_down;
-    } else {
-      return Icons.volume_up;
-    }
-  }
-
-  void _onCancelTap() {
-    Navigator.pop(context);
-  }
-
-  /// Tracks the bgVolume while the user drags the bgVolume bar.
-  final BehaviorSubject<double> _dragBgVolumeSubject =
-      BehaviorSubject.seeded(null);
-
-  Widget _getBgVolumeController(MediaItem mediaItem) {
-    if ((mediaItem?.extras['bgMusic'] as String)?.isNotEmptyAndNotNull() ??
-        false) {
-      return Padding(
-          padding: const EdgeInsets.only(right: 12.0, top: 8),
-          child: IconButton(
-              icon: StreamBuilder<Object>(
-                  stream: _dragBgVolumeSubject,
-                  builder: (context, snapshot) {
-                    volume = _dragBgVolumeSubject.value;
-                    return Icon(Icons.volume_up_outlined,
-                        semanticLabel: 'Change volume button',
-                        color: Colors.white);
-                  }),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        shape: roundedRectangleBorder(),
-                        backgroundColor: MeditoColors.moonlight,
-                        title: Text(BACKGROUND_SOUND_VOLUME,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline1),
-                        content: StreamBuilder<Object>(
-                            stream: _dragBgVolumeSubject,
-                            builder: (context, snapshot) {
-                              volume = _dragBgVolumeSubject.value;
-                              var volumeIcon = volumeIconFunction(volume);
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(height: 16),
-                                  Icon(volumeIcon,
-                                      size: 24,
-                                      color: MeditoColors.walterWhite),
-                                  SizedBox(height: 8),
-                                  SliderTheme(
-                                    data: SliderThemeData(
-                                      trackShape: CustomTrackShape(),
-                                      thumbShape: RoundSliderThumbShape(
-                                          enabledThumbRadius: 10.0),
-                                    ),
-                                    child: Slider(
-                                      min: 0.0,
-                                      activeColor: primaryColorAsColor,
-                                      inactiveColor: MeditoColors.walterWhite
-                                          .withOpacity(0.7),
-                                      max: 100.0,
-                                      value: volume,
-                                      onChanged: (value) {
-                                        _dragBgVolumeSubject.add(value);
-                                        AudioService.customAction(
-                                            'setBgVolume', value / 100);
-                                      },
-                                      onChangeEnd: (value) {
-                                        saveBgVolume(value);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-                        actions: [
-                          Container(
-                            height: 48,
-                            child: TextButton(
-                              onPressed: _onCancelTap,
-                              child: Text(
-                                'CLOSE',
-                                style: Theme.of(context).textTheme.subtitle2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    });
-              },
-              color: primaryColorAsColor));
-    } else {
-      return Container();
-    }
-  }
-
   Expanded _getPlayingPauseOrLoadingIndicator(
       AudioProcessingState processingState, bool playing) {
     return Expanded(
@@ -359,8 +242,30 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           (processingState == AudioProcessingState.buffering ||
                   processingState == AudioProcessingState.connecting)
               ? buildCircularIndicatorRow()
-              : getPlayingOrPausedButton(playing),
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    getPlayingOrPausedButton(playing),
+                    _getBgMusicIconButton()
+                  ],
+                ),
         ],
+      ),
+    );
+  }
+
+  Widget _getBgMusicIconButton() {
+    return Padding(
+      padding: EdgeInsets.only(top: 32),
+      child: Container(
+        decoration:
+            BoxDecoration(shape: BoxShape.circle, color: MeditoColors.darkMoon),
+        child: IconButton(
+            icon: Icon(
+              Icons.music_note_outlined,
+              color: MeditoColors.walterWhite,
+            ),
+            onPressed: _onBgMusicPressed),
       ),
     );
   }
@@ -451,7 +356,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ),
       );
 
-  Widget positionIndicator(
+  Widget _positionIndicatorRow(
       MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
@@ -554,8 +459,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var path = _bloc.version.buttonPath;
 
     getVersionCopyInt().then((version) {
-      Tracking.trackEvent(
-          {Tracking.TYPE: Tracking.CTA_TAPPED, Tracking.PLAYER_COPY_VERSION: '$version'});
+      Tracking.trackEvent({
+        Tracking.TYPE: Tracking.CTA_TAPPED,
+        Tracking.PLAYER_COPY_VERSION: '$version'
+      });
     });
 
     return launchUrl(path);
@@ -565,6 +472,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Share.share(SHARE_TEXT);
     Tracking.trackEvent({Tracking.TYPE: Tracking.SHARE_TAPPED});
     return null;
+  }
+
+  void _onBgMusicPressed() {
+    _bloc.fetchBackgroundSounds();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ChooseBackgroundSoundDialog(
+          stream: _bloc.bgSoundsListController.stream),
+    );
   }
 }
 

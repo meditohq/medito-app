@@ -33,7 +33,6 @@ class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
   var illustration;
-
   Screen _screen;
 
   // Download stuff
@@ -50,22 +49,19 @@ class SessionOptionsBloc {
   StreamController<ApiResponse<List<ExpandableItem>>> contentListController;
 
   MediaLibrary mediaLibrary;
-
   SessionData _options;
 
   SessionOptionsBloc(String id, Screen screen) {
     _screen = screen;
-    titleController = StreamController.broadcast();
 
+    titleController = StreamController.broadcast();
     imageController = StreamController.broadcast()
       ..sink.add(ApiResponse.loading());
-
     backgroundImageController = StreamController.broadcast();
     primaryColourController = StreamController.broadcast();
     secondaryColorController = StreamController.broadcast();
     contentListController = StreamController.broadcast()
       ..add(ApiResponse.loading());
-
     descController = StreamController.broadcast();
 
     _repo = SessionOptionsRepository(screen: screen);
@@ -162,10 +158,12 @@ class SessionOptionsBloc {
     voiceSet.toList().forEach((voice) {
       var listForThisVoice =
           items.where((element) => element.voice == voice).toList();
+
       var expandableItem = ExpandableItem(
           headerValue: voice,
           expandedValue: listForThisVoice,
-          isExpanded: voice == 'Will' || voiceSet.length == 1);
+          isExpanded:
+              expandableList.isEmpty); //keep the first one in the list expanded
       expandableList.add(expandableItem);
     });
 

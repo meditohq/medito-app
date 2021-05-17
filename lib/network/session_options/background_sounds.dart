@@ -1,13 +1,13 @@
 class BackgroundSoundsResponse {
-  List<Data> data;
+  List<BackgroundSoundData> data;
 
   BackgroundSoundsResponse({this.data});
 
   BackgroundSoundsResponse.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <BackgroundSoundData>[];
       json['data']?.forEach((v) {
-        data.add(Data.fromJson(v));
+        data.add(BackgroundSoundData.fromJson(v));
       });
     }
   }
@@ -21,15 +21,15 @@ class BackgroundSoundsResponse {
   }
 }
 
-class Data {
+class BackgroundSoundData {
   int id;
   String name;
   String file;
   int sort;
 
-  Data({this.id, this.name, this.file, this.sort});
+  BackgroundSoundData({this.id, this.name, this.file, this.sort});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  BackgroundSoundData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     file = json['file'];
