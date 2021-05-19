@@ -31,6 +31,7 @@ import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
@@ -205,7 +206,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     var version = packageInfo.version;
     var buildNumber = packageInfo.buildNumber;
 
-    var line1 = 'Version: $version - Build Number: $buildNumber';
+    var line1 = 'Version: $version - Build Number: $buildNumber - ReleaseMode: $kReleaseMode';
 
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';
