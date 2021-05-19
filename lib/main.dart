@@ -29,8 +29,10 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'network/auth.dart';
 import 'network/downloads/downloads_bloc.dart';
 import 'utils/colors.dart';
 
@@ -41,7 +43,9 @@ Future<void> main() async {
 
   sharedPreferences = await SharedPreferences.getInstance();
 
-  runApp(ParentWidget());
+  await SentryFlutter.init((options) {
+    options.dsn = SENTRY_URL;
+  }, appRunner: () => runApp(ParentWidget()));
 }
 
 /// This Widget is the main application widget.
