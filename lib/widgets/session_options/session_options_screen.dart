@@ -183,7 +183,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   : Icons.download_outlined,
               color: MeditoColors.meditoTextGrey,
             ),
-            onPressed: () => _download(snapshot.data, item),
+            onPressed: () => _download(snapshot.hasData && snapshot.data, item),
           );
         });
   }
