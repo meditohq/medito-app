@@ -55,14 +55,7 @@ class DownloadsBloc {
     var list = await fetchDownloads();
     var exists = false;
 
-    print(file.voice);
-    print(file.length);
-    print('-----');
-
     list.forEach((element) {
-      print('"${element.extras['bgMusicTitle']}"');
-      print(element.artist);
-      print(element.extras['length']);
       if (element.artist == file.voice &&
           element.extras['length'] == file.length) exists = true;
     });
