@@ -58,7 +58,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
 
-        unawaited(onPlay());
       });
     } catch (e) {
       print('Error: $e');
