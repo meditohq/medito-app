@@ -20,7 +20,6 @@ import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -159,7 +158,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Widget _getListItem(BuildContext context, AudioFile item) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 24, right: 4),
-      title: Text('—  ${formatSessionLength(item.length)}',
+      title: Text('-  ${formatSessionLength(item.length)}',
           style: Theme.of(context).textTheme.headline4),
       onTap: () => _onBeginTap(item),
       enableFeedback: true,
@@ -170,7 +169,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   Widget _getTrailing(AudioFile item) {
     if (_bloc.isDownloading(item)) {
-      return IconButton(onPressed: () {}, icon: _getLoadingSpinner());
+      return IconButton(onPressed: () {}, icon: _getLoadingSpinner(item));
     }
 
     return FutureBuilder<bool>(
@@ -179,7 +178,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         builder: (context, snapshot) {
           return IconButton(
             icon: Icon(
-              snapshot.data ? _getDownloadedIcon() : Icons.download_outlined,
+              snapshot.hasData && snapshot.data
+                  ? _getDownloadedIcon()
+                  : Icons.download_outlined,
               color: MeditoColors.meditoTextGrey,
             ),
             onPressed: () => _download(snapshot.data, item),
@@ -189,12 +190,15 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   IconData _getDownloadedIcon() => Icons.file_download_done;
 
-  Widget _getLoadingSpinner() {
+  Widget _getLoadingSpinner(AudioFile item) {
     return ValueListenableBuilder(
         valueListenable: _bloc.downloadSingleton.returnNotifier(),
         builder: (context, value, widget) {
           if (value >= 1) {
-            return Icon(_getDownloadedIcon(), color: MeditoColors.walterWhite);
+            return GestureDetector(
+                onTap: () => _download(true, item),
+                child: Icon(_getDownloadedIcon(),
+                    color: MeditoColors.walterWhite));
           } else {
             print('Updated value: ' + (value * 100).toInt().toString());
             return SizedBox(
@@ -211,14 +215,15 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   void _download(bool downloaded, AudioFile file) {
-    setState(() {
-      var mediaItem = _bloc.getMediaItemForAudioFile(file);
-      if (downloaded) {
-        DownloadsBloc.removeSessionFromDownloads(mediaItem);
-      } else {
-        _bloc.setFileForDownloadSingleton(file);
-        _bloc.downloadSingleton.start(file, mediaItem);
-      }
-    });
+    var mediaItem = _bloc.getMediaItemForAudioFile(file);
+    if (downloaded) {
+      DownloadsBloc.removeSessionFromDownloads(mediaItem).then((value) {
+        setState(() {});
+      });
+    } else {
+      _bloc.setFileForDownloadSingleton(file);
+      _bloc.downloadSingleton.start(file, mediaItem);
+      setState(() {});
+    }
   }
 }
