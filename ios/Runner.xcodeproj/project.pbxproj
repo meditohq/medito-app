@@ -434,7 +434,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				MARKETING_VERSION = 2.0.13;
+				MARKETING_VERSION = 2.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = Runner;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -572,7 +572,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				MARKETING_VERSION = 2.0.13;
+				MARKETING_VERSION = 2.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = Runner;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -605,7 +605,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				MARKETING_VERSION = 2.0.13;
+				MARKETING_VERSION = 2.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = Runner;
 				PROVISIONING_PROFILE_SPECIFIER = "";
