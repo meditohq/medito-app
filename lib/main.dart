@@ -26,6 +26,7 @@ import 'package:Medito/widgets/btm_nav/library_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pedantic/pedantic.dart';
@@ -43,9 +44,11 @@ Future<void> main() async {
 
   sharedPreferences = await SharedPreferences.getInstance();
 
-  await SentryFlutter.init((options) {
-    options.dsn = SENTRY_URL;
-  }, appRunner: () => runApp(ParentWidget()));
+  if (kReleaseMode) {
+    await SentryFlutter.init((options) {
+      options.dsn = SENTRY_URL;
+    }, appRunner: () => runApp(ParentWidget()));
+  }
 }
 
 /// This Widget is the main application widget.
