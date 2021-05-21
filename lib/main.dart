@@ -48,6 +48,8 @@ Future<void> main() async {
     await SentryFlutter.init((options) {
       options.dsn = SENTRY_URL;
     }, appRunner: () => runApp(ParentWidget()));
+  } else {
+    runApp(ParentWidget());
   }
 }
 
