@@ -25,14 +25,9 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
     return SizeChangedLayoutNotifier(
       child: StreamBuilder<ApiResponse<DailyMessageResponse>>(
           stream: _bloc.coursesList.stream,
+          initialData: ApiResponse.loading(),
           builder: (context, snapshot) {
             var widget;
-
-            if (!snapshot.hasData ||
-                snapshot.data == null ||
-                snapshot.data.body.body.isEmptyOrNull()) {
-              return Container();
-            }
 
             switch (snapshot.data.status) {
               case Status.LOADING:
@@ -59,16 +54,16 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
       AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot,
       BuildContext context) {
     return GestureDetector(
-      onTap: () => Share.share('${snapshot.data.body.body} https://medito.app'),
+      onTap: () => Share.share('${snapshot.data.body?.body} https://medito.app'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(snapshot.data.body.title,
+          Text(snapshot.data.body?.title,
               style: Theme.of(context).textTheme.headline3),
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: MarkdownBody(
-              data: snapshot.data.body.body,
+              data: snapshot.data.body?.body,
               onTapLink: _launchUrl,
               styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                   .copyWith(p: Theme.of(context).textTheme.bodyText1),
