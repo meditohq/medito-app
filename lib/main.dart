@@ -221,6 +221,12 @@ class _ParentWidgetState extends State<ParentWidget>
       // update session stats when app comes into foreground
       updateStatsFromBg();
     }
+    if (state == AppLifecycleState.paused) {
+      unawaited(Sentry.captureException(
+        Exception,
+        stackTrace: 'closing app',
+      ));
+    }
   }
 }
 
