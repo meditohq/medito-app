@@ -22,6 +22,7 @@ import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -200,7 +201,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 child: Icon(_getDownloadedIcon(),
                     color: MeditoColors.walterWhite));
           } else {
-            print('Updated value: ' + (value * 100).toInt().toString());
+            print('Updated value: ' + value.toString());
             return SizedBox(
               height: 24,
               width: 24,
@@ -216,11 +217,23 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   void _download(bool downloaded, AudioFile file) {
     var mediaItem = _bloc.getMediaItemForAudioFile(file);
+
+    Sentry.addBreadcrumb(
+        Breadcrumb(message: mediaItem.toString(), category: '_download'));
+
     if (downloaded) {
+      Sentry.addBreadcrumb(
+          Breadcrumb(message: 'removing session', category: '_download'));
+
       DownloadsBloc.removeSessionFromDownloads(mediaItem).then((value) {
         setState(() {});
       });
     } else {
+      Sentry.addBreadcrumb(Breadcrumb(
+          message:
+              'setting file for download singleton ${file.voice} ${file.length}',
+          category: '_download'));
+
       _bloc.setFileForDownloadSingleton(file);
       _bloc.downloadSingleton.start(file, mediaItem);
       setState(() {});

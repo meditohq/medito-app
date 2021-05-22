@@ -7,6 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'player_utils.dart';
 
@@ -82,6 +83,7 @@ class _Download {
     }).onDone(() async {
       await file.writeAsBytes(_bytes);
       unawaited(DownloadsBloc.saveFileToDownloadedFilesList(mediaItem));
+      Sentry.addBreadcrumb(Breadcrumb(message: file.path, category: '_downloadFileWithProgress file path'));
       print('Saved New: ' + file.path);
       isDownloading = false;
     });

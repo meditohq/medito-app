@@ -10,6 +10,7 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DownloadsListWidget extends StatefulWidget {
   @override
@@ -39,6 +40,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     return ValueListenableBuilder(
         valueListenable: DownloadsBloc.downloadedSessions,
         builder: (context, sessionList, widget) {
+          _fireSentry(sessionList);
+
           if (sessionList.isNotEmpty) {
             return ListView.builder(
                 padding: EdgeInsets.symmetric(vertical: 8),
@@ -51,6 +54,13 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
             return _getEmptyWidget();
           }
         });
+  }
+
+  void _fireSentry(sessionList) {
+    Sentry.addBreadcrumb(Breadcrumb(
+        message:
+        'building download list widget, list len: ${sessionList.length}',
+        category: '_getDownloadList'));
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(

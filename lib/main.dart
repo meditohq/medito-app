@@ -140,6 +140,7 @@ class _ParentWidgetState extends State<ParentWidget>
   Widget build(BuildContext context) {
     return AudioServiceWidget(
       child: MaterialApp(
+        navigatorObservers: [SentryNavigatorObserver()],
         initialRoute: '/nav',
         routes: {
           FolderNavWidget.routeName: (context) => FolderNavWidget(),
