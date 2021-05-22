@@ -43,6 +43,7 @@ dependencies:
   dart_ipify: ^1.0.2
   equatable: ^2.0.0
   sentry_flutter: ^5.0.0
+  back_button_interceptor: ^5.0.0
 
 dev_dependencies:
   flutter_test:

@@ -23,6 +23,7 @@ import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -52,6 +53,12 @@ class _ChooseBackgroundSoundDialogState
     super.initState();
     initBgVolume();
     AudioService.customAction(SEND_BG_SOUND);
+    BackButtonInterceptor.add(backInterceptor);
+  }
+
+  bool backInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    Navigator.pop(context);
+    return true;
   }
 
   void initBgVolume() async {
@@ -195,10 +202,10 @@ class _ChooseBackgroundSoundDialogState
   bool _isDownloading(BackgroundSoundData item) =>
       _downloadingItem == item.name;
 
-  Widget _getSmallLoadingWidget() =>
-      Padding(
+  Widget _getSmallLoadingWidget() => Padding(
         padding: const EdgeInsets.only(right: 6.0),
-        child: SizedBox(height: 16, width: 16, child: CircularProgressIndicator()),
+        child:
+            SizedBox(height: 16, width: 16, child: CircularProgressIndicator()),
       );
 
   void _noneSelected() {
@@ -272,5 +279,12 @@ class _ChooseBackgroundSoundDialogState
     } else {
       return Icons.volume_up;
     }
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(backInterceptor);
+    _dragBgVolumeSubject.close();
+    super.dispose();
   }
 }
