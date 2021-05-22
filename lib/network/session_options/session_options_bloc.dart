@@ -100,6 +100,7 @@ class SessionOptionsBloc {
   /// File handling
   ///
   void setFileForDownloadSingleton(AudioFile file) {
+
     if (downloadSingleton == null || !downloadSingleton.isValid()) {
       downloadSingleton = DownloadSingleton(file);
     }

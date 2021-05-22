@@ -6,6 +6,8 @@ import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DownloadsBloc {
@@ -27,8 +29,15 @@ class DownloadsBloc {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
 
+    Sentry.addBreadcrumb(Breadcrumb(message: list.length.toString(), category: 'saveFileToDownloadedFilesList list length'));
+    Sentry.addBreadcrumb(Breadcrumb(message: list.first, category: 'saveFileToDownloadedFilesList list first'));
+
     if (_mediaItem != null) {
-      list.add(jsonEncode(_mediaItem));
+      var item = _mediaItem.toString();
+      list.add(item);
+      Sentry.addBreadcrumb(Breadcrumb(message: item, category: 'saveFileToDownloadedFilesList media item as string'));
+      Sentry.addBreadcrumb(Breadcrumb(message: list.length.toString(), category: 'saveFileToDownloadedFilesList list length now'));
+
       await prefs.setStringList(savedFilesKey, list);
       downloadedSessions.value = List.from(downloadedSessions.value)
         ..add(_mediaItem);
@@ -41,8 +50,17 @@ class DownloadsBloc {
     var fileList = <MediaItem>[];
 
     list.forEach((element) {
-      var file = MediaItem.fromJson(jsonDecode(element));
-      fileList.add(file);
+      try {
+        Sentry.addBreadcrumb(Breadcrumb(message: element, category: 'fetchDownloads element!'));
+        var file = MediaItem.fromJson(jsonDecode(element));
+        fileList.add(file);
+      } catch (exception, stackTrace) {
+        unawaited(Sentry.captureException(
+          exception,
+          stackTrace: stackTrace,
+          hint: element
+        ));
+      }
     });
 
     downloadedSessions.value = fileList;
@@ -50,12 +68,19 @@ class DownloadsBloc {
     return fileList;
   }
 
-  static Future<bool> isAudioFileDownloaded(
-      AudioFile file) async {
+  static Future<bool> isAudioFileDownloaded(AudioFile file) async {
     var list = await fetchDownloads();
     var exists = false;
 
+    Sentry.addBreadcrumb(Breadcrumb(message: file.voice, category: 'isAudioFileDownloaded (audiofile)'));
+    Sentry.addBreadcrumb(Breadcrumb(message: file.length, category: 'isAudioFileDownloaded (audiofile)'));
+
     list.forEach((element) {
+      Sentry.addBreadcrumb(Breadcrumb(message: element.artist, category: 'isAudioFileDownloaded element'));
+      Sentry.addBreadcrumb(Breadcrumb(message: element.title, category: 'isAudioFileDownloaded element'));
+      Sentry.addBreadcrumb(Breadcrumb(message: element.extras['length'], category: 'isAudioFileDownloaded element'));
+      Sentry.addBreadcrumb(Breadcrumb(message: '-----', category: 'isAudioFileDownloaded element'));
+
       if (element.artist == file.voice &&
           element.extras['length'] == file.length) exists = true;
     });
@@ -82,6 +107,11 @@ class DownloadsBloc {
   }
 
   static void dispose() {
+    Sentry.addBreadcrumb(Breadcrumb(
+        message:
+        'disposing valuenotifier',
+        category: 'dispose (dl bloc)'));
+
     downloadedSessions.dispose();
   }
 }

@@ -56,6 +56,7 @@ class _ChooseBackgroundSoundDialogState
     BackButtonInterceptor.add(backInterceptor);
   }
 
+  //  On some android phones, the back button kills the session :/
   bool backInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pop(context);
     return true;
