@@ -182,7 +182,9 @@ class _ParentWidgetState extends State<ParentWidget>
   }
 
   void _onTabTapped(int value) {
-    _currentIndex = value;
+    setState(() {
+      _currentIndex = value;
+    });
   }
 }
 
