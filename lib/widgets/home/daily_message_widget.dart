@@ -2,11 +2,11 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/daily_message_bloc.dart';
 import 'package:Medito/network/home/daily_message_response.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/home/daily_message_item_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:share/share.dart';
 
 class DailyMessageWidget extends StatefulWidget {
+
   @override
   DailyMessageWidgetState createState() => DailyMessageWidgetState();
 
@@ -27,52 +27,38 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
           stream: _bloc.coursesList.stream,
           initialData: ApiResponse.loading(),
           builder: (context, snapshot) {
-            var widget;
-
-            switch (snapshot.data.status) {
-              case Status.LOADING:
-                widget = Center(child: const CircularProgressIndicator());
-                break;
-              case Status.COMPLETED:
-                widget = _getMessageWidget(snapshot, context);
-                break;
-              case Status.ERROR:
-                widget = Container();
-                break;
-            }
-
-            return Padding(
-              padding: const EdgeInsets.only(
-                  left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
-              child: widget,
+            return AnimatedSwitcher(
+              duration: Duration(milliseconds: 100),
+              child: _buildDailyMessageItemWidget(snapshot),
             );
           }),
     );
   }
 
-  Widget _getMessageWidget(
-      AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot,
-      BuildContext context) {
-    return GestureDetector(
-      onTap: () =>
-          Share.share('${snapshot.data.body?.body} https://medito.app'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(snapshot.data.body?.title,
-              style: Theme.of(context).textTheme.headline3),
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: MarkdownBody(
-              data: snapshot.data.body?.body,
-              onTapLink: _launchUrl,
-              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                  .copyWith(p: Theme.of(context).textTheme.bodyText1),
-            ),
-          ),
-        ],
-      ),
-    );
+  Widget _buildDailyMessageItemWidget(
+      AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot) {
+    if (!snapshot.hasData ||
+        snapshot.data == null ||
+        snapshot.data.body == null ||
+        snapshot.data.body.body.isEmptyOrNull()) {
+      return DailyMessageItemWidget.loading(
+          key: ValueKey('DailyMessageLoading'));
+    } else {
+      switch (snapshot.data.status) {
+        case Status.LOADING:
+          return DailyMessageItemWidget.loading(
+            key: ValueKey('DailyMessageLoading'),
+          );
+        case Status.COMPLETED:
+          return DailyMessageItemWidget(
+            data: snapshot.data.body,
+            key: ValueKey('DailyMessageCompleted'),
+          );
+        case Status.ERROR:
+        default:
+          return Container();
+      }
+    }
   }
 
   void _launchUrl(String text, String href, String title) {
