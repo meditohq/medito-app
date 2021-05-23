@@ -40,7 +40,7 @@ class NavigationFactory {
         break;
       case Screen.donation:
         break;
-      case Screen.downloads:
+      case Screen.collection:
         return _push(context, DownloadsListWidget());
         break;
       case Screen.daily:
@@ -81,6 +81,9 @@ class NavigationFactory {
       case FileType.url:
         return Screen.url;
         break;
+      case FileType.app:
+        Screen.collection;
+        break;
     }
     return null;
   }
@@ -99,14 +102,14 @@ class NavigationFactory {
     if (place == 'article') {
       return navigate(context, Screen.article, id: id);
     }
-    if (place == 'download') {
-      return navigate(context, Screen.downloads);
-    }
     if (place == 'folder') {
       return navigate(context, Screen.folder, id: id);
     }
     if (place == 'url') {
       return launchUrl(id);
+    }
+    if(place == 'app'){
+      return navigate(context, Screen.collection, id: id);
     }
     return null;
   }
@@ -120,6 +123,6 @@ enum Screen {
   session,
   daily,
   donation,
-  downloads,
-  url
+  url,
+  collection
 }

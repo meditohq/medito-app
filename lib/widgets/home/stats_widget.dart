@@ -2,6 +2,8 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class StatsWidget extends StatefulWidget {
   @override
@@ -230,7 +232,12 @@ class _StatsWidgetState extends State<StatsWidget> {
   }
 
   void _onCancelTap() {
-    Navigator.pop(context);
-    _controller.text = '';
+    try {
+      Navigator.pop(context);
+      _controller.text = '';
+    } catch (e, st) {
+      unawaited(Sentry.captureException(e,
+          stackTrace: st, hint: 'cancel stats widget ${_controller.text}'));
+    }
   }
 }

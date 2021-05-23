@@ -5,12 +5,12 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/empty_widget.dart';
+import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DownloadsListWidget extends StatefulWidget {
   @override
@@ -20,47 +20,41 @@ class DownloadsListWidget extends StatefulWidget {
 class _DownloadsListWidgetState extends State<DownloadsListWidget>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
-
   var scaffoldKey = GlobalKey<ScaffoldState>();
+
+  List<MediaItem> _downloadList = [];
 
   @override
   void initState() {
     super.initState();
+    _refreshDownloadList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const MeditoAppBarWidget(
+        title: DOWNLOADS,
+        transparent: true,
+        hasCloseButton: true,
+      ),
       key: scaffoldKey,
       body: _getDownloadList(),
     );
   }
 
   Widget _getDownloadList() {
-    return ValueListenableBuilder(
-        valueListenable: DownloadsBloc.downloadedSessions,
-        builder: (context, sessionList, widget) {
-          _fireSentry(sessionList);
-
-          if (sessionList.isNotEmpty) {
-            return ListView.builder(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                itemCount: sessionList.length,
-                itemBuilder: (context, i) {
-                  var item = sessionList[i];
-                  return _getSlidingItem(item, context);
-                });
-          } else {
-            return _getEmptyWidget();
-          }
-        });
-  }
-
-  void _fireSentry(sessionList) {
-    Sentry.addBreadcrumb(Breadcrumb(
-        message:
-        'building download list widget, list len: ${sessionList.length}',
-        category: '_getDownloadList'));
+    if (_downloadList.isEmpty) {
+      return _getEmptyWidget();
+    } else {
+      return ListView.builder(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          itemCount: _downloadList.length,
+          itemBuilder: (context, i) {
+            var item = _downloadList[i];
+            return _getSlidingItem(item, context);
+          });
+    }
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
@@ -83,15 +77,15 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
           background: _getDismissibleBackgroundWidget(),
           onDismissed: (direction) {
             if (mounted) {
-              DownloadsBloc.removeSessionFromDownloads(item).then((value) {
-                return setState(() {});
-              });
+              _downloadList.removeWhere((element) => element == item);
+              DownloadsBloc.removeSessionFromDownloads(context, item);
             }
 
-            scaffoldKey.currentState.showSnackBar(SnackBar(
-              backgroundColor: MeditoColors.moonlight,
-              content: Text('"${item.title}" removed'),
-            ));
+            createSnackBar(
+              '"${item.title}" removed',
+              context,
+              color: MeditoColors.moonlight,
+            );
           },
           child: _getListItemWidget(item)),
     );
@@ -118,8 +112,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   PackListItemWidget _getListItemWidget(MediaItem item) {
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle:
-            '${item.artist} — ${_getDuration(item.extras['length'])}',
+        subtitle: '${item.artist} — ${_getDuration(item.extras['length'])}',
         cover: item.artUri.toString(),
         colorPrimary: parseColor(item.extras['primaryColor']),
         coverSize: 56));
@@ -132,6 +125,17 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
       NavigationFactory.navigate(context, Screen.player,
           id: null, normalPop: true);
       return null;
+    });
+  }
+
+  void showSwipeToDeleteTip() {
+    createSnackBar(SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+  }
+
+  void _refreshDownloadList() {
+    DownloadsBloc.fetchDownloads().then((value) {
+      _downloadList = value;
+      setState(() {});
     });
   }
 }

@@ -16,13 +16,15 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/courses_row_widget.dart';
 import 'package:Medito/widgets/home/daily_message_widget.dart';
@@ -35,6 +37,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -206,7 +209,8 @@ class _HomeWidgetState extends State<HomeWidget> {
     var version = packageInfo.version;
     var buildNumber = packageInfo.buildNumber;
 
-    var line1 = 'Version: $version - Build Number: $buildNumber - ReleaseMode: $kReleaseMode';
+    var line1 =
+        'Version: $version - Build Number: $buildNumber - ReleaseMode: $kReleaseMode';
 
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';
@@ -243,6 +247,15 @@ class _HomeWidgetState extends State<HomeWidget> {
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
       _refresh();
+    });
+  }
+
+  void showSwipeToDeleteTip() async {
+    await DownloadsBloc.seenTip().then((seen) {
+      if (!seen) {
+        unawaited(DownloadsBloc.setSeenTip());
+        createSnackBar(SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+      }
     });
   }
 }

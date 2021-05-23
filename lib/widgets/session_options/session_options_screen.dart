@@ -224,10 +224,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     if (downloaded) {
       Sentry.addBreadcrumb(
           Breadcrumb(message: 'removing session', category: '_download'));
-
-      DownloadsBloc.removeSessionFromDownloads(mediaItem).then((value) {
-        setState(() {});
-      });
+      DownloadsBloc.removeSessionFromDownloads(context, mediaItem);
     } else {
       Sentry.addBreadcrumb(Breadcrumb(
           message:
@@ -235,7 +232,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           category: '_download'));
 
       _bloc.setFileForDownloadSingleton(file);
-      _bloc.downloadSingleton.start(file, mediaItem);
+      _bloc.downloadSingleton.start(context, file, mediaItem);
       setState(() {});
     }
   }
