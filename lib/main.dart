@@ -18,11 +18,9 @@ import 'dart:async';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
-import 'package:Medito/widgets/btm_nav/library_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
@@ -34,7 +32,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'network/auth.dart';
-import 'network/downloads/downloads_bloc.dart';
 import 'utils/colors.dart';
 
 SharedPreferences sharedPreferences;
@@ -64,7 +61,7 @@ class ParentWidget extends StatefulWidget {
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
   var _currentIndex = 0;
-  final _children = [HomeWidget(), PackListWidget(), LibraryWidget()];
+  final _children = [HomeWidget(), PackListWidget()];
   final _messengerKey = GlobalKey<ScaffoldState>();
 
   var _deletingCache = true;
@@ -82,12 +79,6 @@ class _ParentWidgetState extends State<ParentWidget>
           statusBarColor: MeditoColors.transparent),
     );
 
-    checkConnectivity().then((value) {
-      if (!value) {
-        _onTabTapped(2);
-      }
-    });
-
     firstOpenOperations().then((value) {
       setState(() {
         _deletingCache = false;
@@ -103,37 +94,7 @@ class _ParentWidgetState extends State<ParentWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    DownloadsBloc.dispose();
     super.dispose();
-  }
-
-  void _onTabTapped(int index) {
-    if (_currentIndex != index) {
-      setState(() {
-        _checkToShowSwipeToDeleteTip(index);
-        _currentIndex = index;
-      });
-    }
-  }
-
-  void _checkToShowSwipeToDeleteTip(int index) {
-    if (_children[index] is LibraryWidget) {
-      DownloadsBloc.fetchDownloads().then((value) {
-        if (value.isNotEmpty) {
-          showSwipeToDeleteTip();
-        }
-      });
-    }
-  }
-
-  void showSwipeToDeleteTip() async {
-    await DownloadsBloc.seenTip().then((seen) {
-      if (!seen) {
-        unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(SWIPE_TO_DELETE, _messengerKey.currentContext,
-            color: MeditoColors.darkMoon);
-      }
-    });
   }
 
   @override
@@ -227,6 +188,10 @@ class _ParentWidgetState extends State<ParentWidget>
         stackTrace: 'closing app',
       ));
     }
+  }
+
+  void _onTabTapped(int value) {
+    _currentIndex = value;
   }
 }
 

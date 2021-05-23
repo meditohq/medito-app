@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
-import 'package:Medito/network/auth.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -15,7 +15,7 @@ class _Download {
   bool isDownloading = false;
   AudioFile _file;
   int _received = 0, _total = 1;
-  var downloadListener = ValueNotifier<double>(0);
+  var downloadAmountListener = ValueNotifier<double>(0);
 
   _Download(AudioFile file) {
     _file = file;
@@ -25,12 +25,12 @@ class _Download {
     return file == _file;
   }
 
-  void startDownloading(AudioFile file, MediaItem mediaItem) {
+  Future<void> startDownloading(AudioFile file, MediaItem mediaItem) async {
     if (isDownloading) return;
     isDownloading = true;
     _file = file;
 
-    _downloadFileWithProgress(file, mediaItem);
+    await _downloadFileWithProgress(file, mediaItem);
   }
 
   bool isDownloadingMe(AudioFile file) {
@@ -39,6 +39,8 @@ class _Download {
     return isDownloading;
   }
 
+  // returns false if file already exists on in file system
+  // returns true otherwise, after file is downloaded
   Future<dynamic> _downloadFileWithProgress(
       AudioFile currentFile, MediaItem mediaItem) async {
     var filePath = (await getFilePath(currentFile.id));
@@ -46,7 +48,7 @@ class _Download {
     if (file.existsSync()) {
       unawaited(DownloadsBloc.saveFileToDownloadedFilesList(mediaItem));
       isDownloading = false;
-      return null;
+      return false;
     } else {
       file.createSync();
     }
@@ -62,8 +64,7 @@ class _Download {
     _response.stream.listen((value) {
       _bytes.addAll(value);
       _received += value == null ? 0 : value.length;
-      //print("File Progress New: " + getProgress().toString())
-      //double progress = getProgress();
+
       var progress = 0.0;
       if (_received == null || _total == null) {
         progress = 0;
@@ -79,13 +80,21 @@ class _Download {
       } else {
         progress = _received / _total;
       }
-      downloadListener.value = progress as double;
+      downloadAmountListener.value = progress as double;
     }).onDone(() async {
-      await file.writeAsBytes(_bytes);
-      unawaited(DownloadsBloc.saveFileToDownloadedFilesList(mediaItem));
-      Sentry.addBreadcrumb(Breadcrumb(message: file.path, category: '_downloadFileWithProgress file path'));
-      print('Saved New: ' + file.path);
-      isDownloading = false;
+      try {
+        await file.writeAsBytes(_bytes);
+        await DownloadsBloc.saveFileToDownloadedFilesList(mediaItem);
+        Sentry.addBreadcrumb(Breadcrumb(
+            message: file.path,
+            category: '_downloadFileWithProgress file path'));
+        print('Saved New: ' + file.path);
+        isDownloading = false;
+      } catch (e, st){
+        unawaited(Sentry.captureException(e, stackTrace: st,
+            hint: 'onDone, writing file failed, ${file.path}'));
+      }
+      return true;
     });
   }
 
@@ -129,7 +138,7 @@ class DownloadSingleton {
     return -1;
   }
 
-  bool start(AudioFile file, MediaItem mediaItem) {
+  bool start(BuildContext context, AudioFile file, MediaItem mediaItem) {
     if (_download == null) return false;
     if (_download.isDownloadingMe(file)) return true;
     if (isDownloadingSomething()) return false;
@@ -144,6 +153,6 @@ class DownloadSingleton {
   }
 
   ValueNotifier<double> returnNotifier() {
-    return _download.downloadListener;
+    return _download.downloadAmountListener;
   }
 }

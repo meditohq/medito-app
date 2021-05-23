@@ -117,6 +117,7 @@ class Item {
     if (type == 'article') return FileType.text;
     if (type == 'folder') return FileType.folder;
     if (type == 'url') return FileType.folder;
+    if (type == 'app') return FileType.app;
     return null;
   }
 
@@ -146,4 +147,4 @@ class Item {
   }
 }
 
-enum FileType { folder, text, session, url, daily }
+enum FileType { folder, text, session, url, daily, app }

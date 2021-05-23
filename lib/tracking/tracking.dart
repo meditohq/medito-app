@@ -78,6 +78,9 @@ String mapFileTypeToPlural(FileType fileType) {
     case FileType.daily:
       return 'dailies';
       break;
+    case FileType.app:
+      return 'collection';
+      break;
   }
   return '';
 }

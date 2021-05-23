@@ -36,7 +36,7 @@ class SessionOptionsBloc {
   Screen _screen;
 
   // Download stuff
-  bool bgDownloading = false, removing = false;
+  bool bgDownloading = false;
   DownloadSingleton downloadSingleton = DownloadSingleton(null);
 
   //Streams
@@ -104,12 +104,6 @@ class SessionOptionsBloc {
     if (downloadSingleton == null || !downloadSingleton.isValid()) {
       downloadSingleton = DownloadSingleton(file);
     }
-  }
-
-  Future<dynamic> removeFile(MediaItem currentFile) async {
-    removing = true;
-    await DownloadsBloc.removeSessionFromDownloads(currentFile);
-    removing = false;
   }
 
   void startAudioService(AudioFile item) {
