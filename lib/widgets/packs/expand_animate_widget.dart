@@ -27,7 +27,7 @@ class ExpandedSection extends StatefulWidget {
 
 class _ExpandedSectionState extends State<ExpandedSection> with SingleTickerProviderStateMixin {
   AnimationController expandController;
-  Animation<double> animation; 
+  Animation<double> animation;
 
   @override
   void initState() {
