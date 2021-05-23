@@ -1,6 +1,7 @@
 import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
+import 'package:Medito/widgets/btm_nav/library_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:Medito/widgets/session_options/session_options_screen.dart';
@@ -41,7 +42,7 @@ class NavigationFactory {
       case Screen.donation:
         break;
       case Screen.collection:
-        return _push(context, DownloadsListWidget());
+        return _push(context, id == 'downloads' ? DownloadsListWidget() : FavouriteListWidget());
         break;
       case Screen.daily:
         return _push(
