@@ -60,8 +60,4 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
       }
     }
   }
-
-  void _launchUrl(String text, String href, String title) {
-    launchUrl(href);
-  }
 }
