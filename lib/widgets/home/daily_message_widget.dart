@@ -31,7 +31,7 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
 
             switch (snapshot.data.status) {
               case Status.LOADING:
-                widget = const CircularProgressIndicator();
+                widget = Center(child: const CircularProgressIndicator());
                 break;
               case Status.COMPLETED:
                 widget = _getMessageWidget(snapshot, context);
@@ -54,7 +54,8 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
       AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot,
       BuildContext context) {
     return GestureDetector(
-      onTap: () => Share.share('${snapshot.data.body?.body} https://medito.app'),
+      onTap: () =>
+          Share.share('${snapshot.data.body?.body} https://medito.app'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
