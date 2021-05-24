@@ -27,19 +27,8 @@ class DownloadsBloc {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
 
-    Sentry.addBreadcrumb(Breadcrumb(
-        message: list?.length.toString(),
-        category: 'saveFileToDownloadedFilesList list length'));
-    Sentry.addBreadcrumb(Breadcrumb(
-        message: list.isNotEmpty ? list?.first ?? '' : '',
-        category: 'saveFileToDownloadedFilesList list first'));
-
     if (_mediaItem != null) {
       list.add(jsonEncode(_mediaItem));
-      Sentry.addBreadcrumb(Breadcrumb(
-          message: list?.length.toString(),
-          category: 'saveFileToDownloadedFilesList list length now'));
-
       await prefs.setStringList(savedFilesKey, list);
     }
   }
@@ -51,8 +40,6 @@ class DownloadsBloc {
 
     list.forEach((element) {
       try {
-        Sentry.addBreadcrumb(
-            Breadcrumb(message: element, category: 'fetchDownloads element!'));
         var file = MediaItem.fromJson(jsonDecode(element));
         fileList.add(file);
       } catch (exception, stackTrace) {
@@ -68,22 +55,7 @@ class DownloadsBloc {
     var list = await fetchDownloads();
     var exists = false;
 
-    Sentry.addBreadcrumb(Breadcrumb(
-        message: file.voice, category: 'isAudioFileDownloaded (audiofile)'));
-    Sentry.addBreadcrumb(Breadcrumb(
-        message: file.length, category: 'isAudioFileDownloaded (audiofile)'));
-
     list.forEach((element) {
-      Sentry.addBreadcrumb(Breadcrumb(
-          message: element.artist, category: 'isAudioFileDownloaded element'));
-      Sentry.addBreadcrumb(Breadcrumb(
-          message: element.title, category: 'isAudioFileDownloaded element'));
-      Sentry.addBreadcrumb(Breadcrumb(
-          message: element.extras['length'],
-          category: 'isAudioFileDownloaded element'));
-      Sentry.addBreadcrumb(Breadcrumb(
-          message: '-----', category: 'isAudioFileDownloaded element'));
-
       if (element.artist == file.voice &&
           element.extras['length'] == file.length) exists = true;
     });

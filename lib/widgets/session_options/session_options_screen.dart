@@ -218,19 +218,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   void _download(bool downloaded, AudioFile file) {
     var mediaItem = _bloc.getMediaItemForAudioFile(file);
 
-    Sentry.addBreadcrumb(
-        Breadcrumb(message: mediaItem.toString(), category: '_download'));
-
     if (downloaded) {
-      Sentry.addBreadcrumb(
-          Breadcrumb(message: 'removing session', category: '_download'));
       DownloadsBloc.removeSessionFromDownloads(context, mediaItem);
     } else {
-      Sentry.addBreadcrumb(Breadcrumb(
-          message:
-              'setting file for download singleton ${file.voice} ${file.length}',
-          category: '_download'));
-
       _bloc.setFileForDownloadSingleton(file);
       _bloc.downloadSingleton.start(context, file, mediaItem);
       setState(() {});
