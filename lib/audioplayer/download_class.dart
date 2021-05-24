@@ -85,9 +85,6 @@ class _Download {
       try {
         await file.writeAsBytes(_bytes);
         await DownloadsBloc.saveFileToDownloadedFilesList(mediaItem);
-        Sentry.addBreadcrumb(Breadcrumb(
-            message: '${mediaItem.title} -- ${mediaItem.artist}',
-            category: 'downloaded'));
         print('Saved New: ' + file.path);
         isDownloading = false;
       } catch (e, st){
