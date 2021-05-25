@@ -8,11 +8,13 @@ import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:pedantic/pedantic.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
 const PLAY_BG_SOUND = 'play_bg_sound';
 const SEND_BG_SOUND = 'send_bg_sound';
+const SET_BG_SOUND_VOL = 'set_bg_sound_vol';
 
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
@@ -56,7 +58,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
           //sometimes this library returns incorrect durations
           _duration = Duration(milliseconds: mediaItem.extras['duration']);
         }
-
       });
     } catch (e) {
       print('Error: $e');
@@ -94,7 +95,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
     // Propagate all events from the audio player to AudioService clients.
     _eventSubscription = _player.playbackEventStream.listen((event) {
-        _broadcastState();
+      _broadcastState();
     });
     // Special processing for state transitions.
     _player.processingStateStream.listen((state) {
@@ -144,7 +145,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onCustomAction(String name, dynamic params) async {
     switch (name) {
-      case 'setBgVolume':
+      case SET_BG_SOUND_VOL:
+        await _bgPlayer.setVolume(params);
         initialBgVolume = params;
         break;
       case PLAY_BG_SOUND:

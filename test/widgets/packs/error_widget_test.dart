@@ -22,13 +22,13 @@ void main() {
     ));
     await tester.pumpWidget(testingWidget);
 
-    var button = find.byType(OutlinedButton);
-    expect(button, findsOneWidget);
+    var buttons = find.byType(OutlinedButton);
+    expect(buttons, findsNWidgets(2));
 
     // Make sure the retrying text is not showing until tapping the button
     expect(find.text(RETRYING), findsNothing);
 
-    await tester.tap(button);
+    await tester.tap(buttons.first);
     // fast-forward the button animation
     await tester.pumpAndSettle();
     expect(find.text(RETRYING), findsOneWidget);
@@ -48,8 +48,8 @@ void main() {
     ));
     await tester.pumpWidget(testingWidget);
 
-    var button = find.byType(OutlinedButton);
-    await tester.tap(button);
+    var buttons = find.byType(OutlinedButton);
+    await tester.tap(buttons.first);
     // fast-forward the button animation
     await tester.pumpAndSettle();
     expect(counterCallback, 1);
