@@ -13,7 +13,9 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,14 +56,15 @@ class ErrorPacksWidget extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          createSnackBar(RETRYING, context, color: MeditoColors.darkBGColor);
+                          createSnackBar(RETRYING, context,
+                              color: MeditoColors.darkBGColor);
                           onPressed();
                         },
                         child: Text(
                           TRY_AGAIN,
                           style: Theme.of(context).textTheme.subtitle2,
                         )),
-                    /*      Container(width: 16),
+                    Container(width: 16),
                     OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
@@ -72,12 +75,13 @@ class ErrorPacksWidget extends StatelessWidget {
                         ),
                         onPressed: () => {
                               NavigationFactory.navigate(
-                                  context, Screen.downloads)
+                                  context,
+                                 Screen.collection, id: 'downloads')
                             },
                         child: Text(
-                          'Go to library',
+                          SHOW_DOWNLOADS,
                           style: Theme.of(context).textTheme.subtitle2,
-                        )),*/
+                        )),
                   ],
                 )
               ],

@@ -1,4 +1,5 @@
 const String DOWNLOADS = 'Downloads';
+const String SHOW_DOWNLOADS = 'Show downloads';
 const String FAVOURITES = 'Favouites';
 const String EMPTY_DOWNLOADS_MESSAGE =
     'It looks like you haven’t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
