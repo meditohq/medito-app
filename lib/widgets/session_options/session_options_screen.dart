@@ -59,15 +59,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 body: Builder(builder: (BuildContext context) {
                   scaffoldContext = context;
                   return SingleChildScrollView(
-                    child: Stack(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            _getHeaderWidget(),
-                            _getContentListWidget()
-                          ],
-                        ),
+                      
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _getHeaderWidget(),
+                        _getContentListWidget()
                       ],
                     ),
                   );
