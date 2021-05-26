@@ -149,7 +149,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         initialBgVolume = params;
         break;
       case PLAY_BG_SOUND:
-        playBgMusic(params);
+        await playBgMusic(params);
         break;
       case 'stop':
         await _player.stop();
@@ -252,15 +252,15 @@ class AudioPlayerTask extends BackgroundAudioTask {
     }
   }
 
-  void playBgMusic(String bgMusicPath) {
+  Future<void> playBgMusic(String bgMusicPath) async {
     if (bgMusicPath.isEmptyOrNull()) {
-      _bgPlayer.pause();
+      await _bgPlayer.pause();
     } else {
       AudioServiceBackground.sendCustomEvent({PLAY_BG_SOUND, bgMusicPath});
-      _bgPlayer.setFilePath(bgMusicPath);
-      _bgPlayer.setVolume(initialBgVolume);
-      _bgPlayer.setLoopMode(LoopMode.all);
-      _bgPlayer.play();
+      await _bgPlayer.setFilePath(bgMusicPath);
+      await _bgPlayer.setVolume(initialBgVolume);
+      await _bgPlayer.setLoopMode(LoopMode.all);
+      await _bgPlayer.play();
     }
   }
 
