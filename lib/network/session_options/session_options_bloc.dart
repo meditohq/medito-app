@@ -18,7 +18,6 @@ import 'dart:async';
 import 'package:Medito/audioplayer/download_class.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_options_repo.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/tracking/tracking.dart';
@@ -100,7 +99,6 @@ class SessionOptionsBloc {
   /// File handling
   ///
   void setFileForDownloadSingleton(AudioFile file) {
-
     if (downloadSingleton == null || !downloadSingleton.isValid()) {
       downloadSingleton = DownloadSingleton(file);
     }
