@@ -59,11 +59,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 body: Builder(builder: (BuildContext context) {
                   scaffoldContext = context;
                   return SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
                     child: Stack(
                       children: [
                         Column(
-                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             _getHeaderWidget(),
@@ -219,7 +217,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     var mediaItem = _bloc.getMediaItemForAudioFile(file);
 
     if (downloaded) {
-      DownloadsBloc.removeSessionFromDownloads(context, mediaItem);
+      DownloadsBloc.removeSessionFromDownloads(context, mediaItem).then((value) {
+        setState(() {
+
+        });
+      });
     } else {
       _bloc.setFileForDownloadSingleton(file);
       _bloc.downloadSingleton.start(context, file, mediaItem);

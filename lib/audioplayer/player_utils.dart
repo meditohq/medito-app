@@ -16,9 +16,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/network/session_options/session_opts.dart';
-import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -46,7 +45,8 @@ Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
   var file = File(path);
   if (await file.exists()) return file.path;
 
-  var request = await http.get(Uri.parse(url), headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+  var request = await http.get(Uri.parse(url),
+      headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
   var bytes = request.bodyBytes;
   await file.writeAsBytes(bytes);
 

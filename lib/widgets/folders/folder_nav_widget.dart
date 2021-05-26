@@ -25,7 +25,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
 import 'package:Medito/widgets/header_widget.dart';
-import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -231,7 +230,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
       }
     });
   }
-
 }
 
 class FolderArguments {

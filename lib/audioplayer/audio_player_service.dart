@@ -8,7 +8,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:pedantic/pedantic.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
