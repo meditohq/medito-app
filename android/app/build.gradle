@@ -82,7 +82,7 @@ android {
     signingConfigs {
         signingConfigs {
             release {
-                if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
+                if (System.getenv()["CI"]) { // CI=true is exported by Codemagic or GH Actions
                     storeFile file(System.getenv()["FCI_KEYSTORE_PATH"])
                     storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
                     keyAlias System.getenv()["FCI_KEY_ALIAS"]
