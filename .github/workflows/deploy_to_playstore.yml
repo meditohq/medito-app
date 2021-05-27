@@ -30,10 +30,10 @@ jobs:
       - name: Create auth.dart
         run: sh ./.github/scripts/create_auth_dart.sh
         env:
-          - BASE_URL: ${{ secrets.AUTH_BASE_URL }}
-          - SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          - CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
-          - INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
+          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
+          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
+          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
       - name: Get dependencies
         run: flutter pub get
