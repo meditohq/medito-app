@@ -97,7 +97,11 @@ class _ChooseBackgroundSoundDialogState
                       builder: (context, snapshot) {
                         switch (snapshot.data.status) {
                           case Status.LOADING:
-                            return Center(child: CircularProgressIndicator());
+                            return Center(
+                                child: CircularProgressIndicator(
+                                    backgroundColor: Colors.black,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        MeditoColors.walterWhite)));
                             break;
                           case Status.COMPLETED:
                             var list = snapshot.data.body.data;

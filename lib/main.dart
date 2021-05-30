@@ -182,7 +182,10 @@ class _ParentWidgetState extends State<ParentWidget>
 }
 
 Widget _getLoadingWidget() {
-  return Center(child: CircularProgressIndicator());
+  return Center(
+      child: CircularProgressIndicator(
+          backgroundColor: Colors.black,
+          valueColor: AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)));
 }
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {

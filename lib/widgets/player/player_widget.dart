@@ -293,7 +293,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircularProgressIndicator(),
+        CircularProgressIndicator(
+            backgroundColor: Colors.black,
+            valueColor:
+                AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)),
         Container(height: 16),
         Text(loaded ? WELL_DONE_COPY : LOADING)
       ],

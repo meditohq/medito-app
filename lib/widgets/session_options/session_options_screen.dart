@@ -22,7 +22,6 @@ import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -59,7 +58,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                 body: Builder(builder: (BuildContext context) {
                   scaffoldContext = context;
                   return SingleChildScrollView(
-                      
                     physics: AlwaysScrollableScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +107,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   Padding _getLoadingWidget() {
     return Padding(
       padding: const EdgeInsets.only(top: 32.0),
-      child: Center(child: CircularProgressIndicator()),
+      child: Center(
+          child: CircularProgressIndicator(
+              backgroundColor: Colors.black,
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite))),
     );
   }
 
@@ -215,10 +217,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     var mediaItem = _bloc.getMediaItemForAudioFile(file);
 
     if (downloaded) {
-      DownloadsBloc.removeSessionFromDownloads(context, mediaItem).then((value) {
-        setState(() {
-
-        });
+      DownloadsBloc.removeSessionFromDownloads(context, mediaItem)
+          .then((value) {
+        setState(() {});
       });
     } else {
       _bloc.setFileForDownloadSingleton(file);
