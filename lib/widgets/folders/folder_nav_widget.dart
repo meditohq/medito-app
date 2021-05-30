@@ -112,7 +112,11 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           builder: (context, itemsSnapshot) {
             switch (itemsSnapshot.data.status) {
               case Status.LOADING:
-                return Center(child: CircularProgressIndicator());
+                return Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.black,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            MeditoColors.walterWhite)));
                 break;
               case Status.COMPLETED:
                 return ListView.builder(
