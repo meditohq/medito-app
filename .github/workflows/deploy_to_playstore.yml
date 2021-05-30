@@ -52,7 +52,7 @@ jobs:
 
       - name: Create Upload Keystore file
         run: |
-          echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
+          echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/meditokey.jks
         env:
           PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
         working-directory: android
