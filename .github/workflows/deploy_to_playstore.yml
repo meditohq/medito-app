@@ -62,7 +62,7 @@ jobs:
       - run: bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
-          FCI_KEYSTORE_PATH: 'upload-keystore.jks' # The file is created in the previous step
+          FCI_KEYSTORE_PATH: 'meditokey.jks' # The file is created in the previous step
           FCI_KEY_ALIAS: ${{ secrets.FCI_KEY_ALIAS }}
           FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
           FCI_KEYSTORE_PASSWORD: ${{ secrets.FCI_KEYSTORE_PASSWORD }}
