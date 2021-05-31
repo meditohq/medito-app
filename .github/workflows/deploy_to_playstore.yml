@@ -14,8 +14,8 @@ on:
 
 jobs:
   fastlane-deploy:
-    environment: prod
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       # Set up Flutter.
       - name: Clone Flutter repository with stable channel
