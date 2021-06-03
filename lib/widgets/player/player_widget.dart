@@ -313,14 +313,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void getPrimaryColor(MediaItem mediaItem) {
     if (mediaItem != null) {
-      final primaryColor = mediaItem?.extras['primaryColor'];
+      final primaryColor = mediaItem?.extras[PRIMARY_COLOUR];
       primaryColorAsColor = parseColor(primaryColor);
     }
   }
 
   void getSecondaryColor(MediaItem mediaItem) {
     if (secondaryColor == null && mediaItem != null) {
-      String secondaryColorString = mediaItem?.extras['secondaryColor'] ?? '';
+      String secondaryColorString = mediaItem?.extras[SECONDARY_COLOUR] ?? '';
 
       if (secondaryColorString.isEmptyOrNull()) {
         secondaryColor = MeditoColors.deepNight;

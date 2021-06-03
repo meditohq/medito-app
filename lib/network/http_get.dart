@@ -23,7 +23,6 @@ import 'package:Medito/network/cache.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-
 //move this to network package later
 Future httpGet(String url,
     {bool skipCache = false, String fileNameForCache}) async {

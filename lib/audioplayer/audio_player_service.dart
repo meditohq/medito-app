@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
@@ -43,7 +44,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // Load and broadcast the queue
     await AudioServiceBackground.setQueue([mediaItem]);
     try {
-      await getDownload(mediaItem.extras['location']).then((data) async {
+      await getDownload(mediaItem.extras[LOCATION]).then((data) async {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
           var url = '${BASE_URL}assets/${mediaItem.id}';
@@ -267,7 +268,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> updateStats() async {
     var dataMap = {
       'secsListened': _duration.inSeconds,
-      'id': '${mediaItem.extras['sessionId']}',
+      'id': '${mediaItem.extras[SESSION_ID]}',
     };
     await writeJSONToCache(encoded(dataMap), 'stats');
     AudioServiceBackground.sendCustomEvent('stats');

@@ -114,10 +114,10 @@ class SessionOptionsBloc {
     var data = {
       Tracking.TYPE: Tracking.AUDIO_STARTED,
       Tracking.SESSION_VOICE: mediaItem.artist,
-      Tracking.SESSION_LENGTH: mediaItem.extras['length'],
+      Tracking.SESSION_LENGTH: mediaItem.extras[LENGTH],
       Tracking.DESTINATION: Tracking.destinationData(
           mapToPlural(_screen.toString()),
-          mediaItem.extras['sessionId'].toString())
+          mediaItem.extras[SESSION_ID].toString())
     };
 
     Tracking.trackEvent(data);

@@ -1,3 +1,4 @@
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
@@ -112,9 +113,9 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   PackListItemWidget _getListItemWidget(MediaItem item) {
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle: '${item.artist} — ${_getDuration(item.extras['length'])}',
+        subtitle: '${item.artist} — ${_getDuration(item.extras[LENGTH])}',
         cover: item.artUri.toString(),
-        colorPrimary: parseColor(item.extras['primaryColor']),
+        colorPrimary: parseColor(item.extras[PRIMARY_COLOUR]),
         coverSize: 56));
   }
 
