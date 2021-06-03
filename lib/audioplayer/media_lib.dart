@@ -17,15 +17,15 @@ class MediaLibrary {
     return MediaItem(
       id: fileId,
       extras: {
-        'location': fileId,
-        'id': fileId,
-        'sessionId': sessionId,
-        'primaryColor': primaryColor,
-        'secondaryColor': secondaryColor,
-        'attr': attributions,
-        'length': length,
-        'duration': durationAsMilliseconds,
-        'hasBgSound' : hasBgSound,
+        LOCATION: fileId,
+        ID: fileId,
+        SESSION_ID: sessionId,
+        PRIMARY_COLOUR: primaryColor,
+        SECONDARY_COLOUR: secondaryColor,
+        ATTR: attributions,
+        LENGTH: length,
+        DURATION: durationAsMilliseconds,
+        HAS_BG_SOUND : hasBgSound,
       },
       artist: voice,
       album: '',
@@ -36,3 +36,12 @@ class MediaLibrary {
 }
 
 const String HAS_BG_SOUND = 'hasBgSound';
+const String APP_VERSION = 'appVersion';
+const String DURATION = 'duration';
+const String LENGTH = 'length';
+const String ATTR = 'attr';
+const String SECONDARY_COLOUR = 'secondaryColor';
+const String PRIMARY_COLOUR = 'primaryColor';
+const String ID = 'id';
+const String SESSION_ID = 'sessionId';
+const String LOCATION = 'location';

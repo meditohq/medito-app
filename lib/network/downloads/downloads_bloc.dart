@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +29,7 @@ class DownloadsBloc {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
 
+    _mediaItem.extras['app_version'] =  await PackageInfo.fromPlatform()..buildNumber;
     if (_mediaItem != null) {
       list.add(jsonEncode(_mediaItem));
       await prefs.setStringList(savedFilesKey, list);
@@ -57,7 +60,7 @@ class DownloadsBloc {
 
     list.forEach((element) {
       if (element.artist == file.voice &&
-          element.extras['length'] == file.length) exists = true;
+          element.extras[LENGTH] == file.length) exists = true;
     });
 
     return exists;
