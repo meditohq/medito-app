@@ -20,7 +20,7 @@ Future<void> firstOpenOperations() async {
 }
 
 Future _logAccount(SharedPreferences prefs) async {
-  if (kReleaseMode) {
+  if (!kReleaseMode) {
     var user = prefs.getString(USER_ID) ?? '';
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
@@ -107,7 +107,14 @@ class UserRepo {
     }
 
     var token = '$now${UniqueKey().toString()}';
-    var ip = await Ipify.ipv4();
+
+    var ip = '';
+    try {
+      ip = await Ipify.ipv4();
+    } catch (e){
+      print(e);
+    }
+
     var defaultMap = <String, String>{
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
