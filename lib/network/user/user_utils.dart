@@ -21,7 +21,7 @@ Future<void> firstOpenOperations() async {
 }
 
 Future _logAccount(SharedPreferences prefs) async {
-  if (!kReleaseMode) {
+  if (kReleaseMode) {
     var user = prefs.getString(USER_ID) ?? '';
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
