@@ -1,15 +1,16 @@
 import 'dart:io' as io;
 
-import 'package:Medito/network/user/user_response.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
 import 'package:Medito/network/http_get.dart';
+import 'package:Medito/network/user/user_response.dart';
 import 'package:dart_ipify/dart_ipify.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> firstOpenOperations() async {
@@ -108,18 +109,11 @@ class UserRepo {
 
     var token = '$now${UniqueKey().toString()}';
 
-    var ip = '';
-    try {
-      ip = await Ipify.ipv4();
-    } catch (e){
-      print(e);
-    }
-
     var defaultMap = <String, String>{
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
       'token': token,
-      'ip_address': ip,
+      'ip_address': await getIP(),
       'device_model': deviceModel,
       'app_version': version,
       'device_os': deviceOS,
@@ -130,10 +124,22 @@ class UserRepo {
     var id = '';
     try {
       final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
-      id = response != null ? UserResponse.fromJson(response).data.id : null;
+      id = response != null ? UserResponse.fromJson(response).data.id : 'EMPTY';
+    } catch (e, st) {
+      unawaited(Sentry.captureException(e, stackTrace: st, hint: token));
     } finally {
       return {USER_ID: id, TOKEN: 'Bearer $token'};
     }
+  }
+
+  static Future<String> getIP() async {
+    var ip = '';
+    try {
+      ip = await Ipify.ipv4();
+    } catch (e) {
+      print(e);
+    }
+    return ip;
   }
 }
 
