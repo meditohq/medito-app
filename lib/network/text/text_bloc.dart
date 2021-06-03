@@ -30,8 +30,12 @@ class TextBloc {
   Future<void> fetchText(String id, bool skipCache) async {
     var data = await _repo.fetchData(id, skipCache);
 
-    titleController.sink.add(data.title);
-    bodyController.sink.add(data.body);
+    if(!titleController.isClosed) {
+      titleController.sink.add(data.title);
+    }
+    if(!bodyController.isClosed) {
+      bodyController.sink.add(data.body);
+    }
   }
 
   void dispose() {

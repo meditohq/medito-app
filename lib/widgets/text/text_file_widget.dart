@@ -42,7 +42,7 @@ class TextFileWidget extends StatefulWidget {
 class _TextFileWidgetState extends State<TextFileWidget>
     with TickerProviderStateMixin {
   BuildContext scaffoldContext;
-  var _bloc = TextBloc();
+  var _bloc;
 
   @override
   void dispose() {
