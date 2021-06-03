@@ -28,7 +28,7 @@ class MediaLibrary {
         HAS_BG_SOUND : hasBgSound,
       },
       artist: voice,
-      album: '',
+      album: '', //empty to remove it from the notification
       title: title,
       artUri: Uri.parse(illustrationUrl),
     );
