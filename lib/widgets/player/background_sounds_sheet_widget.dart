@@ -98,7 +98,7 @@ class _ChooseBackgroundSoundDialogState
                         switch (snapshot.data.status) {
                           case Status.LOADING:
                             return Center(
-                                child: CircularProgressIndicator(
+                                child: const CircularProgressIndicator(
                                     backgroundColor: Colors.black,
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         MeditoColors.walterWhite)));
@@ -209,8 +209,13 @@ class _ChooseBackgroundSoundDialogState
 
   Widget _getSmallLoadingWidget() => Padding(
         padding: const EdgeInsets.only(right: 6.0),
-        child:
-            SizedBox(height: 16, width: 16, child: CircularProgressIndicator()),
+        child: SizedBox(
+            height: 16,
+            width: 16,
+            child: const CircularProgressIndicator(
+                backgroundColor: Colors.black,
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite))),
       );
 
   void _noneSelected() {
