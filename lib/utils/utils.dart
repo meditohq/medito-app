@@ -15,11 +15,13 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
-import 'package:Medito/utils/colors.dart';
 import 'package:Medito/network/auth.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -77,9 +79,37 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 }
 
 Future<void> launchUrl(String href) async {
-  return await canLaunch(href)
-      ? await launch(href)
-      : throw 'Could not launch $href';
+  if (href.startsWith('mailto')) {
+    _launchEmailSubmission(href);
+  } else {
+    return await canLaunch(href)
+        ? await launch(href)
+        : throw 'Could not launch $href';
+  }
+}
+
+void _launchEmailSubmission(String href) async {
+  var version;
+  try {
+    var packageInfo = await PackageInfo.fromPlatform();
+    version = packageInfo.buildNumber;
+  } catch (e) {
+    print(e);
+  }
+
+  var info = '--- Please write email below this line v$version ----';
+
+  final params = Uri(
+      scheme: 'mailto',
+      path: href.replaceAll('mailto:', ''),
+      query: 'body=$info');
+
+  var url = params.toString();
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    print('Could not launch $url');
+  }
 }
 
 Future<void> acceptTracking() async {
