@@ -47,7 +47,8 @@ Future<void> _postUsage() async {
   try {
     unawaited(
         httpPost(url, await generatedToken, body: {'app_version': version}));
-  } catch (e) {
+  } catch (e, str) {
+    unawaited(Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
     print('post usage failed: ' + e);
     return;
   }

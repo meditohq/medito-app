@@ -28,8 +28,8 @@ class DownloadsBloc {
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
 
-    _mediaItem.extras['app_version'] = await PackageInfo.fromPlatform()
-      ..buildNumber;
+    var info = await PackageInfo.fromPlatform();
+    _mediaItem.extras[APP_VERSION] = info.buildNumber;
     if (_mediaItem != null) {
       list.add(jsonEncode(_mediaItem));
       await prefs.setStringList(savedFilesKey, list);
