@@ -53,13 +53,13 @@ class FolderItemsBloc {
       content = await _repo.fetchFolderData(_sessionId, skipCache);
 
       if (content?.hasData == null) {
-        if(!itemsListController.isClosed) {
+        if (!itemsListController.isClosed) {
           itemsListController.sink.add(ApiResponse.error('Error'));
         }
-        if(!coverController.isClosed) {
+        if (!coverController.isClosed) {
           coverController.sink.add(ApiResponse.error('Error'));
         }
-        if(!titleController.isClosed) {
+        if (!titleController.isClosed) {
           titleController.add('Please check your connection');
         }
       } else {
@@ -90,10 +90,12 @@ class FolderItemsBloc {
   }
 
   void _postItemList(FolderResponse content) {
-    try {
-      itemsListController.sink.add(ApiResponse.completed(content.items));
-    } catch (e) {
-      itemsListController.sink.add(ApiResponse.error(e.toString()));
+    if (!itemsListController.isClosed) {
+      try {
+        itemsListController.sink.add(ApiResponse.completed(content.items));
+      } catch (e) {
+        itemsListController.sink.add(ApiResponse.error(e.toString()));
+      }
     }
   }
 
