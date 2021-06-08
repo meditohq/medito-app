@@ -19,6 +19,7 @@ import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
@@ -184,9 +185,10 @@ class _ChooseBackgroundSoundDialogState
           setState(() {
             _downloadingItem = item.name;
           });
-          downloadBGMusicFromURL(assetUrl, item.name).then((value) {
+          downloadBGMusicFromURL(assetUrl, item.name).then((filePath) {
             _downloadingItem = '';
-            AudioService.customAction(PLAY_BG_SOUND, value);
+            addBgSoundSelectionToSharedPrefs(filePath, item.name);
+            AudioService.customAction(PLAY_BG_SOUND, filePath);
             return AudioService.customAction(SEND_BG_SOUND, item.name);
           });
         },
