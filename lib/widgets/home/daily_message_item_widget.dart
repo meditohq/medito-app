@@ -43,7 +43,7 @@ class DailyMessageItemWidget extends StatelessWidget {
   Widget _buildMarkdownBody(BuildContext context) {
     if (data != null) {
       return MarkdownBody(
-        data: 'data.body',
+        data: data.body,
         onTapLink: _launchUrl,
         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
             .copyWith(p: Theme.of(context).textTheme.bodyText1),
