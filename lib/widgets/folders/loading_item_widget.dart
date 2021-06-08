@@ -42,7 +42,10 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
           // The state that has changed here is the animation object’s value.
         });
       });
-    controller.repeat(reverse: true);
+    try{controller.repeat(reverse: true);}
+    catch(e){
+      print('animation repeat error');
+    }
   }
 
   int getDuration() => (250 - (10 * widget.index));
