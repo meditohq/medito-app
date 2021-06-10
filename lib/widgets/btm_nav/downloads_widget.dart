@@ -40,22 +40,20 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         hasCloseButton: true,
       ),
       key: scaffoldKey,
-      body: _getDownloadList(),
+      body: _downloadList.isEmpty
+      ?  _getEmptyWidget()
+      : _getDownloadList(),
     );
   }
 
   Widget _getDownloadList() {
-    if (_downloadList.isEmpty) {
-      return _getEmptyWidget();
-    } else {
-      return ListView.builder(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          itemCount: _downloadList.length,
-          itemBuilder: (context, i) {
-            var item = _downloadList[i];
-            return _getSlidingItem(item, context);
-          });
-    }
+    return ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        itemCount: _downloadList.length,
+        itemBuilder: (context, i) {
+          var item = _downloadList[i];
+          return _getSlidingItem(item, context);
+        });
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
@@ -80,6 +78,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
             if (mounted) {
               _downloadList.removeWhere((element) => element == item);
               DownloadsBloc.removeSessionFromDownloads(context, item);
+              setState(() {});
             }
 
             createSnackBar(
