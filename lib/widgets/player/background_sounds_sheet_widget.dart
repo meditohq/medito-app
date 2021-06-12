@@ -26,6 +26,7 @@ import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ChooseBackgroundSoundDialog extends StatefulWidget {
@@ -52,8 +53,7 @@ class _ChooseBackgroundSoundDialogState
   @override
   void initState() {
     super.initState();
-    initBgVolume();
-    AudioService.customAction(SEND_BG_SOUND);
+    initService();
     BackButtonInterceptor.add(backInterceptor);
   }
 
@@ -63,11 +63,12 @@ class _ChooseBackgroundSoundDialogState
     return true;
   }
 
-  void initBgVolume() async {
+  void initService() async {
     if (AudioService.running) {
       volume = await retrieveSavedBgVolume();
       _dragBgVolumeSubject.add(volume);
       await AudioService.customAction(SET_BG_SOUND_VOL, volume / 100);
+      await AudioService.customAction(SEND_BG_SOUND);
     }
   }
 
@@ -223,6 +224,7 @@ class _ChooseBackgroundSoundDialogState
   void _noneSelected() {
     AudioService.customAction(SEND_BG_SOUND, NONE);
     AudioService.customAction(PLAY_BG_SOUND, '');
+    addBgSoundSelectionToSharedPrefs('', '');
   }
 
   Widget _getHeader() {
