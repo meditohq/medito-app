@@ -389,7 +389,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Future<void> _playPressed() async {
     unawaited(AudioService.play());
-    getSavedBgSoundData();
+    await getSavedBgSoundData();
   }
 
   Widget pauseButton() =>
@@ -412,9 +412,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  void getSavedBgSoundData() {
-    getBgSoundFileFromSharedPrefs()
-        .then((value) => AudioService.customAction(PLAY_BG_SOUND, value));
+  Future<void> getSavedBgSoundData() async {
+      var file = await getBgSoundFileFromSharedPrefs();
+      var name = await getBgSoundNameFromSharedPrefs();
+      unawaited(AudioService.customAction(SEND_BG_SOUND, name));
+      unawaited(AudioService.customAction(PLAY_BG_SOUND, file));
   }
 
   void _onBackPressed() {
