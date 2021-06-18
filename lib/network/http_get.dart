@@ -16,12 +16,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
-import 'package:http/http.dart' as http;
+import 'package:Medito/utils/utils.dart';
 import 'package:http/http.dart';
+import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 //move this to network package later
 Future httpGet(String url,
@@ -62,13 +62,21 @@ Future httpGet(String url,
       print('HEADERS: ${response.headers}');
       print('---------');
     }
-    return json.decode(response.body);
+
+    try {
+      var decode = json.decode(response.body);
+      return decode;
+    } catch (e, str) {
+      unawaited(Sentry.captureException(e,
+          stackTrace: str, hint: 'decode: ${response.body}'));
+      return null;
+    }
   }
   return json.decode(cache);
 }
 
-Future httpPost(String url, String token, {dynamic body = const <String, String>{}}) async {
-
+Future httpPost(String url, String token,
+    {dynamic body = const <String, String>{}}) async {
   assert(token.isNotEmpty);
   assert(token != null);
   try {
