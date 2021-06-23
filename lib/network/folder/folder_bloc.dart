@@ -72,18 +72,30 @@ class FolderItemsBloc {
 
   void _postCoverDetails(FolderResponse content) {
     try {
-      coverController.sink.add(ApiResponse.completed(content.coverUrl));
+      if (!coverController.isClosed) {
+        coverController.sink.add(ApiResponse.completed(content.coverUrl));
+      }
     } catch (e) {
-      coverController.sink.add(ApiResponse.error('Error getting cover'));
+      if (!coverController.isClosed) {
+        coverController.sink.add(ApiResponse.error('Error getting cover'));
+      }
     }
-    primaryColorController.sink.add(content.colour);
-    backgroundImageController.sink.add(content.backgroundImageUrl);
+    if (!primaryColorController.isClosed) {
+      primaryColorController.sink.add(content.colour);
+    }
+    if (backgroundImageController.isClosed) {
+      backgroundImageController.sink.add(content.backgroundImageUrl);
+    }
   }
 
   void _postTitle(FolderResponse content) {
     try {
-      titleController.sink.add(content.title);
-      descriptionController.sink.add(content.description);
+      if (!titleController.isClosed) {
+        titleController.sink.add(content.title);
+      }
+      if (!descriptionController.isClosed) {
+        descriptionController.sink.add(content.description);
+      }
     } catch (e) {
       print('Title error');
     }
