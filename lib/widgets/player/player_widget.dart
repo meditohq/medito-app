@@ -135,24 +135,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 _getGradientOverlayWidget(),
                 (mediaItem != null || _complete)
                     ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _getAppBar(mediaItem),
-                    _getTitleRow(mediaItem),
-                    _getSubtitleWidget(mediaItem),
-                    _complete
-                        ? getDonateAndShareButton()
-                        : _getPlayingPauseOrLoadingIndicator(
-                        mediaItem.extras[HAS_BG_SOUND] ?? true,
-                        processingState,
-                        playing),
-                    _complete
-                        ? Container()
-                        : _positionIndicatorRow(
-                        mediaItem, state, primaryColorAsColor),
-                  ],
-                )
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _getAppBar(mediaItem),
+                          _getTitleRow(mediaItem),
+                          _getSubtitleWidget(mediaItem),
+                          _complete
+                              ? getDonateAndShareButton()
+                              : _getPlayingPauseOrLoadingIndicator(
+                                  mediaItem.extras[HAS_BG_SOUND] ?? true,
+                                  processingState,
+                                  playing),
+                          _complete
+                              ? Container()
+                              : _positionIndicatorRow(
+                                  mediaItem, state, primaryColorAsColor),
+                        ],
+                      )
                     : _getLoadingScreenWidget(),
               ],
             );
@@ -164,14 +164,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (!loaded) return Container();
     return Image.asset(
       'assets/images/texture.png',
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       fit: BoxFit.fill,
     );
   }
@@ -183,20 +177,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         child: Container(
           decoration: BoxDecoration(
               gradient: RadialGradient(
-                colors: [
-                  primaryColorAsColor.withAlpha(100),
-                  primaryColorAsColor.withAlpha(0),
-                ],
-                radius: 1.0,
-              )),
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
+            colors: [
+              primaryColorAsColor.withAlpha(100),
+              primaryColorAsColor.withAlpha(0),
+            ],
+            radius: 1.0,
+          )),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
         ));
   }
 
@@ -216,33 +204,30 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           Expanded(
               child: !_complete
                   ? Text(
-                mediaItem?.title ?? 'Loading...',
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: buildTitleTheme(),
-              )
-                  : FutureBuilder<String>(
-                  future: _bloc.getVersionTitle(),
-                  builder: (context, snapshot) {
-                    return Text(
-                      snapshot.hasData ? snapshot.data : 'Loading...',
+                      mediaItem?.title ?? 'Loading...',
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: buildTitleTheme(),
-                    );
-                  })),
+                    )
+                  : FutureBuilder<String>(
+                      future: _bloc.getVersionTitle(),
+                      builder: (context, snapshot) {
+                        return Text(
+                          snapshot.hasData ? snapshot.data : 'Loading...',
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: buildTitleTheme(),
+                        );
+                      })),
         ],
       ),
     );
   }
 
   TextStyle buildTitleTheme() {
-    return Theme
-        .of(context)
-        .textTheme
-        .headline1;
+    return Theme.of(context).textTheme.headline1;
   }
 
   Widget _getSubtitleWidget(MediaItem mediaItem) {
@@ -255,28 +240,28 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return loaded
         ? Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SubtitleTextWidget(body: attr),
-    )
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SubtitleTextWidget(body: attr),
+          )
         : Container();
   }
 
-  Expanded _getPlayingPauseOrLoadingIndicator(bool hasBgSound,
-      AudioProcessingState processingState, bool playing) {
+  Expanded _getPlayingPauseOrLoadingIndicator(
+      bool hasBgSound, AudioProcessingState processingState, bool playing) {
     return Expanded(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           (processingState == AudioProcessingState.buffering ||
-              processingState == AudioProcessingState.connecting)
+                  processingState == AudioProcessingState.connecting)
               ? buildCircularIndicatorRow(hasBgSound)
               : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              getPlayingOrPausedButton(playing),
-              _getBgMusicIconButton(hasBgSound)
-            ],
-          ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    getPlayingOrPausedButton(playing, hasBgSound),
+                    _getBgMusicIconButton(hasBgSound)
+                  ],
+                ),
         ],
       ),
     );
@@ -304,16 +289,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Center _getLoadingScreenWidget() {
     return Center(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(
-                backgroundColor: Colors.black,
-                valueColor:
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(
+            backgroundColor: Colors.black,
+            valueColor:
                 AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)),
-            Container(height: 16),
-            Text(loaded ? WELL_DONE_COPY : LOADING)
-          ],
-        ));
+        Container(height: 16),
+        Text(loaded ? WELL_DONE_COPY : LOADING)
+      ],
+    ));
   }
 
   void getArtUrl(MediaItem mediaItem) {
@@ -362,8 +347,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget getPlayingOrPausedButton(bool playing) {
-    return playing ? pauseButton() : playButton();
+  Widget getPlayingOrPausedButton(bool playing, bool hasBgSound) {
+    return playing ? pauseButton() : playButton(hasBgSound);
   }
 
   /// Encapsulate all the different data we're interested in into a single
@@ -373,27 +358,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           AudioService.queueStream,
           AudioService.currentMediaItemStream,
           AudioService.playbackStateStream,
-              (queue, mediaItem, playbackState) =>
+          (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  Widget playButton() =>
-      Semantics(
+  Widget playButton(bool hasBgSound) => Semantics(
         label: 'Play button',
         child: PlayerButton(
           icon: Icons.play_arrow,
-          onPressed: () => _playPressed(),
+          onPressed: () => _playPressed(hasBgSound),
           secondaryColor: secondaryColor,
           primaryColor: primaryColorAsColor,
         ),
       );
 
-  Future<void> _playPressed() async {
+  Future<void> _playPressed(bool hasBgSound) async {
     unawaited(AudioService.play());
-    await getSavedBgSoundData();
+    if (hasBgSound) await getSavedBgSoundData();
   }
 
-  Widget pauseButton() =>
-      Semantics(
+  Widget pauseButton() => Semantics(
         label: 'Pause button',
         child: PlayerButton(
           icon: Icons.pause,
@@ -403,8 +386,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ),
       );
 
-  Widget _positionIndicatorRow(MediaItem mediaItem, PlaybackState state,
-      Color primaryColorAsColor) {
+  Widget _positionIndicatorRow(
+      MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
       child: PositionIndicatorWidget(
@@ -413,10 +396,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<void> getSavedBgSoundData() async {
-      var file = await getBgSoundFileFromSharedPrefs();
-      var name = await getBgSoundNameFromSharedPrefs();
-      unawaited(AudioService.customAction(SEND_BG_SOUND, name));
-      unawaited(AudioService.customAction(PLAY_BG_SOUND, file));
+    var file = await getBgSoundFileFromSharedPrefs();
+    var name = await getBgSoundNameFromSharedPrefs();
+    unawaited(AudioService.customAction(SEND_BG_SOUND, name));
+    unawaited(AudioService.customAction(PLAY_BG_SOUND, file));
   }
 
   void _onBackPressed() {
@@ -425,8 +408,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     } else {
       Navigator.popUntil(
           context,
-              (Route<dynamic> route) =>
-          route.settings.name == FolderNavWidget.routeName ||
+          (Route<dynamic> route) =>
+              route.settings.name == FolderNavWidget.routeName ||
               route.isFirst);
     }
   }
@@ -472,10 +455,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
                       'Share',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .subtitle2,
+                      style: Theme.of(context).textTheme.subtitle2,
                     ),
                   ),
                 ],
@@ -494,8 +474,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return Text(
       label,
-      style: Theme
-          .of(context)
+      style: Theme.of(context)
           .textTheme
           .subtitle2
           .copyWith(color: secondaryColor ?? MeditoColors.darkMoon),
@@ -536,9 +515,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) =>
-          ChooseBackgroundSoundDialog(
-              stream: _bloc.bgSoundsListController.stream),
+      builder: (context) => ChooseBackgroundSoundDialog(
+          stream: _bloc.bgSoundsListController.stream),
     );
     // slight delay incase the cache returns before the sheet opens
     Future.delayed(Duration(milliseconds: 50))
