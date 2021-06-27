@@ -37,7 +37,6 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
-  BuildContext scaffoldContext;
   SessionOptionsBloc _bloc;
 
   @override
@@ -55,19 +54,16 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           return RefreshIndicator(
               onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
               child: Scaffold(
-                body: Builder(builder: (BuildContext context) {
-                  scaffoldContext = context;
-                  return SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _getHeaderWidget(),
-                        _getContentListWidget()
-                      ],
-                    ),
-                  );
-                }),
+                body: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      _getHeaderWidget(),
+                      _getContentListWidget()
+                    ],
+                  ),
+                ),
               ));
         });
   }
@@ -93,7 +89,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget _getContentListWidget() {
-    return StreamBuilder<ApiResponse<List<ExpandableItem>>>(
+    return StreamBuilder<ApiResponse<List<VoiceItem>>>(
         stream: _bloc.contentListController.stream,
         initialData: ApiResponse.loading(),
         builder: (context, itemsSnapshot) {
@@ -115,56 +111,73 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget _buildPanel(List<ExpandableItem> items) {
-    var childList = <Theme>[];
+  Widget _buildPanel(List<VoiceItem> items) {
+    var childList = <Widget>[];
 
     items.forEach((value) {
-      var tileList = value.expandedValue
-          .map<ListTile>((e) => _getListItem(context, e))
-          .toList();
+      var section = _getListItem(context, value);
 
-      childList.add(Theme(
-        data: Theme.of(context)
-            .copyWith(unselectedWidgetColor: MeditoColors.walterWhite),
-        child: ExpansionTile(
-            backgroundColor: MeditoColors.darkMoon,
-            collapsedBackgroundColor: MeditoColors.intoTheNight,
-            maintainState: true,
-            title: _getVoiceText(value.headerValue),
-            initiallyExpanded: value.isExpanded,
-            children: tileList),
-      ));
+      childList.add(section);
     });
 
-    return Column(
-      children: childList,
-    );
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Container(
+            decoration: BoxDecoration(
+                color: MeditoColors.deepNight,
+                borderRadius: BorderRadius.all(Radius.circular(16))),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 20),
+                  Padding(
+                      padding: EdgeInsets.only(left: 16),
+                      child: Text('PICK A NARRATOR & DURATION')),
+                  Container(height: 12),
+                  Column(children: childList),
+                ])));
   }
 
-  Widget _getVoiceText(String voice) => Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
-            child: Column(
-              children: [
-                Text(voice, style: Theme.of(context).textTheme.headline1),
-              ],
+  Widget _getListItem(BuildContext context, VoiceItem item) {
+    return Padding(
+        padding: EdgeInsets.only(bottom: 20),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _getVoiceTextWidget(item),
+              Container(height: 8),
+              SingleChildScrollView(
+                  padding: EdgeInsets.only(left: 16),
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                      children: item.listForVoice
+                          .map<Widget>((e) => _getVoiceChipRow(e))
+                          .toList()))
+            ]));
+  }
+
+  Widget _getVoiceChipRow(AudioFile e) => Row(children: [
+        Chip(
+          label: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+            child: Text(
+              formatSessionLength(e.length),
+              style: Theme.of(context).textTheme.headline1,
             ),
           ),
-        ],
-      );
+          backgroundColor: MeditoColors.softGrey,
+        ),
+        Container(width: 8)
+      ]);
 
-  Widget _getListItem(BuildContext context, AudioFile item) {
-    return ListTile(
-      contentPadding: const EdgeInsets.only(left: 24, right: 4),
-      title: Text('-  ${formatSessionLength(item.length)}',
-          style: Theme.of(context).textTheme.headline4),
-      onTap: () => _onBeginTap(item),
-      enableFeedback: true,
-      minVerticalPadding: 1,
-      trailing: _getTrailing(item),
-    );
-  }
+  Widget _getVoiceTextWidget(VoiceItem item) => Padding(
+      padding: EdgeInsets.only(left: 16),
+      child: Text(
+        '${item.headerValue}',
+        style: Theme.of(context).textTheme.headline4,
+      ));
 
   Widget _getTrailing(AudioFile item) {
     if (_bloc.isDownloading(item)) {

@@ -45,7 +45,7 @@ class SessionOptionsBloc {
   StreamController<String> backgroundImageController;
   StreamController<String> primaryColourController;
   StreamController<String> secondaryColorController;
-  StreamController<ApiResponse<List<ExpandableItem>>> contentListController;
+  StreamController<ApiResponse<List<VoiceItem>>> contentListController;
 
   MediaLibrary mediaLibrary;
   SessionData _options;
@@ -78,10 +78,10 @@ class SessionOptionsBloc {
         .reversed
         .toList();
 
-    var expandableItems = _generateExpandableItems(files);
+    var voiceGroups = _generateVoiceGroups(files);
 
     // Show title, desc and image
-    contentListController.sink.add(ApiResponse.completed(expandableItems));
+    contentListController.sink.add(ApiResponse.completed(voiceGroups));
     titleController.sink.add(options.title);
     descController.sink.add(options.description);
     imageController.sink.add(ApiResponse.completed(options.coverUrl));
@@ -139,14 +139,14 @@ class SessionOptionsBloc {
         attributions: _options.attribution);
   }
 
-  List<ExpandableItem> _generateExpandableItems(List<AudioFile> items) {
+  List<VoiceItem> _generateVoiceGroups(List<AudioFile> items) {
     var voiceSet = <String>{};
-    var expandableList = <ExpandableItem>[];
+    var voiceList = <VoiceItem>[];
 
     // Get unique voices
     items.forEach((element) {
       if (element.voice == 'None') {
-        element.voice = 'No Voice';
+        element.voice = '';
       }
       voiceSet.add(element.voice);
     });
@@ -156,15 +156,13 @@ class SessionOptionsBloc {
       var listForThisVoice =
           items.where((element) => element.voice == voice).toList();
 
-      var expandableItem = ExpandableItem(
+      var voiceItem = VoiceItem(
           headerValue: voice,
-          expandedValue: listForThisVoice,
-          isExpanded:
-              expandableList.isEmpty); //keep the first one in the list expanded
-      expandableList.add(expandableItem);
+          listForVoice: listForThisVoice);
+      voiceList.add(voiceItem);
     });
 
-    return expandableList;
+    return voiceList;
   }
 
   void dispose() {
@@ -177,16 +175,14 @@ class SessionOptionsBloc {
   }
 }
 
-class ExpandableItem {
-  ExpandableItem({
-    @required this.expandedValue,
+class VoiceItem {
+  VoiceItem({
     @required this.headerValue,
-    this.isExpanded = false,
+    @required this.listForVoice,
   });
 
-  List<AudioFile> expandedValue;
+  List<AudioFile> listForVoice;
   String headerValue;
-  bool isExpanded;
 }
 
 extension MyIterable<E> on Iterable<E> {
