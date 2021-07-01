@@ -182,7 +182,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   Container(height: 20),
                   Padding(
                       padding: EdgeInsets.only(left: 16),
-                      child: Text('PICK A NARRATOR & DURATION')),
+                      child: Text(PICK_NARRATOR.toUpperCase(),
+                          style: Theme.of(context).textTheme.bodyText2)),
                   Container(height: 12),
                   Column(children: childList),
                 ])));
@@ -271,13 +272,13 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(DOWNLOAD, style: Theme.of(context).textTheme.bodyText2),
+                Text(DOWNLOAD.toUpperCase(),
+                    style: Theme.of(context).textTheme.bodyText2),
                 Container(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                        '${widget.item.voice} - ${formatSessionLength(widget.item.length)}',
+                    Text(_getDownloadLabel(),
                         style: Theme.of(context).textTheme.bodyText1),
                     _getTrailing()
                   ],
@@ -286,6 +287,14 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
             )),
       ),
     );
+  }
+
+  String _getDownloadLabel() {
+    if (widget.item.voice.isNotEmptyAndNotNull()) {
+      return '${widget.item.voice} - ${formatSessionLength(widget.item.length)}';
+    } else {
+      return formatSessionLength(widget.item.length);
+    }
   }
 
   Widget _getTrailing() {
@@ -301,8 +310,8 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
             icon: Icon(
               snapshot.hasData && snapshot.data
                   ? _getDownloadedIcon()
-                  : Icons.download_outlined,
-              color: MeditoColors.meditoTextGrey,
+                  : Icons.download_for_offline_rounded,
+              color: MeditoColors.walterWhite,
             ),
             onPressed: () => _download(snapshot.hasData && snapshot.data),
           );
@@ -333,7 +342,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
         });
   }
 
-  IconData _getDownloadedIcon() => Icons.file_download_done;
+  IconData _getDownloadedIcon() => Icons.highlight_off;
 
   void _download(
     bool downloaded,
