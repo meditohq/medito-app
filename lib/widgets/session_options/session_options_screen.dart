@@ -21,8 +21,10 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -55,23 +57,64 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           return RefreshIndicator(
               onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
               child: Scaffold(
-                body: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _getHeaderWidget(),
-                      _getContentListWidget(),
-                      _bloc.getCurrentlySelectedFile() != null
-                          ? DownloadPanelWidget(
-                              item: _bloc.getCurrentlySelectedFile(),
-                              bloc: _bloc)
-                          : Container()
-                    ],
+                body: Stack(children: [
+                  SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _getHeaderWidget(),
+                        _getContentListWidget(),
+                        _bloc.getCurrentlySelectedFile() != null
+                            ? DownloadPanelWidget(
+                                item: _bloc.getCurrentlySelectedFile(),
+                                bloc: _bloc)
+                            : Container(),
+                        Container(
+                          height: 68,
+                        )
+                      ],
+                    ),
                   ),
-                ),
+                  _getBeginButton(snapshot.data),
+                ]),
               ));
         });
+  }
+
+  Align _getBeginButton(String color) {
+    return Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Colors.black,
+                Colors.transparent,
+              ],
+            )),
+            child: Row(children: [
+              Expanded(
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 32, 16, 16),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24.0),
+                          ),
+                          backgroundColor: parseColor(color),
+                          padding: const EdgeInsets.all(16.0)),
+                      onPressed: _onBeginTap,
+                      child: Text(BEGIN,
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .copyWith(color: MeditoColors.almostBlack)),
+                    )),
+              )
+            ])));
   }
 
   HeaderWidget _getHeaderWidget() => HeaderWidget(
@@ -82,7 +125,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       descriptionController: _bloc.descController,
       vertical: true);
 
-  Future<void> _onBeginTap(AudioFile item) {
+  Future<void> _onBeginTap() {
+    var item = _bloc.getCurrentlySelectedFile();
     if (_bloc.isDownloading(item) || showIndeterminateSpinner) return null;
 
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
