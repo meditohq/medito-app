@@ -40,20 +40,29 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
         hasCloseButton: true,
       ),
       key: scaffoldKey,
-      body: _downloadList.isEmpty
-      ?  _getEmptyWidget()
-      : _getDownloadList(),
+      body: _downloadList.isEmpty ? _getEmptyWidget() : _getDownloadList(),
     );
   }
 
   Widget _getDownloadList() {
-    return ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        itemCount: _downloadList.length,
-        itemBuilder: (context, i) {
-          var item = _downloadList[i];
-          return _getSlidingItem(item, context);
+    // In order for the Dismissible action still to work on the list items,
+    // the default ReorderableListView is used (instead of the .builder one)
+    return ReorderableListView(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      onReorder: (int oldIndex, int newIndex) {
+        setState(() {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          var reorderedItem = _downloadList.removeAt(oldIndex);
+          _downloadList.insert(newIndex, reorderedItem);
+          // To ensure, that the new list order is saved
+          DownloadsBloc.saveDownloads(_downloadList);
         });
+      },
+      children:
+          _downloadList.map((item) => _getSlidingItem(item, context)).toList(),
+    );
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
@@ -67,6 +76,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
 
   Widget _getSlidingItem(MediaItem item, BuildContext context) {
     return InkWell(
+      // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
+      key: ValueKey(item.id),
       onTap: () {
         _openPlayer(item, context);
       },
@@ -80,7 +91,6 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
               DownloadsBloc.removeSessionFromDownloads(context, item);
               setState(() {});
             }
-
             createSnackBar(
               '"${item.title}" removed',
               context,
