@@ -58,8 +58,7 @@ class DownloadsBloc {
     var exists = false;
 
     list.forEach((element) {
-      if (element.artist == file.voice && element.extras[LENGTH] == file.length)
-        exists = true;
+      if (element.id == file.id) exists = true;
     });
 
     return exists;
@@ -78,7 +77,7 @@ class DownloadsBloc {
     // Remove the session from all downloads list
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
-    list.remove(jsonEncode(mediaFile));
+    list.removeWhere((element) => MediaItem.fromJson(jsonDecode(element)).id == mediaFile.id);
     await prefs.setStringList(savedFilesKey, list);
   }
 }

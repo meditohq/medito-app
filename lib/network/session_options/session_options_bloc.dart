@@ -47,8 +47,10 @@ class SessionOptionsBloc {
   StreamController<String> secondaryColorController;
   StreamController<ApiResponse<List<VoiceItem>>> contentListController;
 
-  MediaLibrary mediaLibrary;
+  MediaLibrary _mediaLibrary;
   SessionData _options;
+
+  var currentSelectedFileIndex = 0;
 
   SessionOptionsBloc(String id, Screen screen) {
     _screen = screen;
@@ -64,6 +66,14 @@ class SessionOptionsBloc {
     descController = StreamController.broadcast();
 
     _repo = SessionOptionsRepository(screen: screen);
+  }
+
+  int getSessionsCount(){
+    return _options.files.length;
+  }
+
+  List<AudioFile> getAudioList(){
+    return _options.files;
   }
 
   Future<void> fetchOptions(String id, {bool skipCache = false}) async {
@@ -172,6 +182,10 @@ class SessionOptionsBloc {
     secondaryColorController?.close();
     descController?.close();
     backgroundImageController?.close();
+  }
+
+  AudioFile getCurrentlySelectedFile() {
+    return _options?.files != null ? _options?.files[currentSelectedFileIndex] : null;
   }
 }
 

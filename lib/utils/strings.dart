@@ -1,4 +1,5 @@
 const String DOWNLOADS = 'Downloads';
+const String DOWNLOAD = 'Download';
 const String SHOW_DOWNLOADS = 'Show downloads';
 const String FAVOURITES = 'Favouites';
 const String EMPTY_DOWNLOADS_MESSAGE =
