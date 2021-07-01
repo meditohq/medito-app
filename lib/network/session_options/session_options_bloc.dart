@@ -68,11 +68,11 @@ class SessionOptionsBloc {
     _repo = SessionOptionsRepository(screen: screen);
   }
 
-  int getSessionsCount(){
+  int getSessionsCount() {
     return _options.files.length;
   }
 
-  List<AudioFile> getAudioList(){
+  List<AudioFile> getAudioList() {
     return _options.files;
   }
 
@@ -89,6 +89,8 @@ class SessionOptionsBloc {
         .toList();
 
     var voiceGroups = _generateVoiceGroups(files);
+
+    currentSelectedFileIndex = options.files.indexOf(files.first);
 
     // Show title, desc and image
     contentListController.sink.add(ApiResponse.completed(voiceGroups));
@@ -166,9 +168,8 @@ class SessionOptionsBloc {
       var listForThisVoice =
           items.where((element) => element.voice == voice).toList();
 
-      var voiceItem = VoiceItem(
-          headerValue: voice,
-          listForVoice: listForThisVoice);
+      var voiceItem =
+          VoiceItem(headerValue: voice, listForVoice: listForThisVoice);
       voiceList.add(voiceItem);
     });
 
@@ -185,7 +186,9 @@ class SessionOptionsBloc {
   }
 
   AudioFile getCurrentlySelectedFile() {
-    return _options?.files != null ? _options?.files[currentSelectedFileIndex] : null;
+    return _options?.files != null
+        ? _options?.files[currentSelectedFileIndex]
+        : null;
   }
 }
 

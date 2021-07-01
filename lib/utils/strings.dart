@@ -1,6 +1,7 @@
 const String DOWNLOADS = 'Downloads';
 const String DOWNLOAD = 'Download';
 const String BEGIN = 'Begin';
+const String PICK_NARRATOR = 'PICK A NARRATOR & DURATION';
 const String SHOW_DOWNLOADS = 'Show downloads';
 const String FAVOURITES = 'Favouites';
 const String EMPTY_DOWNLOADS_MESSAGE =
