@@ -31,14 +31,14 @@ class HeaderWidget extends StatelessWidget {
       this.coverController,
       this.backgroundImageController,
       this.descriptionController,
-      this.vertical = false})
+      this.whiteText = false})
       : super(key: key);
   final StreamController<String> primaryColorController;
   final StreamController<String> titleController;
   final StreamController<ApiResponse<String>> coverController;
   final StreamController<String> backgroundImageController;
   final StreamController<String> descriptionController;
-  final vertical;
+  final whiteText;
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +65,8 @@ class HeaderWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MeditoAppBarWidget(transparent: true),
-                        !vertical ? _getRow() : _getColumn(),
-                        Container(height: vertical ? 0 : 16)
+                        _getColumn(),
+                        Container(height: whiteText ? 0 : 16)
                       ],
                     ),
                   ],
@@ -79,20 +79,6 @@ class HeaderWidget extends StatelessWidget {
             ),
           );
         });
-  }
-
-  Row _getRow() {
-    return Row(
-      children: [
-        _getImageContainer(size: 96),
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: _getTitleStream(),
-          ),
-        )
-      ],
-    );
   }
 
   Column _getColumn() {
@@ -213,10 +199,11 @@ class HeaderWidget extends StatelessWidget {
                 physics: NeverScrollableScrollPhysics(),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
-                        p: Theme.of(context)
-                            .textTheme
-                            .subtitle1
-                            .copyWith(fontSize: 14.0)),
+                        p: Theme.of(context).textTheme.subtitle1.copyWith(
+                            fontSize: 14.0,
+                            color: whiteText
+                                ? MeditoColors.walterWhite
+                                : MeditoColors.meditoTextGrey)),
                 shrinkWrap: true,
               ),
             );

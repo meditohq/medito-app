@@ -123,7 +123,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       coverController: _bloc.imageController,
       backgroundImageController: _bloc.backgroundImageController,
       descriptionController: _bloc.descController,
-      vertical: true);
+      whiteText: true);
 
   Future<void> _onBeginTap() {
     var item = _bloc.getCurrentlySelectedFile();
