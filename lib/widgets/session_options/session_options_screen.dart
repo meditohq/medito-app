@@ -20,6 +20,7 @@ import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/strings.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +61,12 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       _getHeaderWidget(),
-                      _getContentListWidget()
+                      _getContentListWidget(),
+                      _bloc.getCurrentlySelectedFile() != null
+                          ? DownloadPanelWidget(
+                              item: _bloc.getCurrentlySelectedFile(),
+                              bloc: _bloc)
+                          : Container()
                     ],
                   ),
                 ),
@@ -96,7 +102,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           if (itemsSnapshot.data.status == Status.LOADING) {
             return _getLoadingWidget();
           }
-          return _buildPanel(itemsSnapshot.data.body);
+          return _buildOptionsPanel(itemsSnapshot.data.body);
         });
   }
 
@@ -111,12 +117,11 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget _buildPanel(List<VoiceItem> items) {
+  Widget _buildOptionsPanel(List<VoiceItem> items) {
     var childList = <Widget>[];
 
     items.forEach((value) {
       var section = _getListItem(context, value);
-
       childList.add(section);
     });
 
@@ -153,18 +158,33 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                       children: item.listForVoice
-                          .map<Widget>((e) => _getVoiceChipRow(e))
+                          .map<Widget>((e) => _getVoiceChipWithPadding(
+                              e,
+                              _bloc.getAudioList().indexOf(_bloc
+                                  .getAudioList()
+                                  .firstWhere(
+                                      (element) => element.id == e.id))))
                           .toList()))
             ]));
   }
 
-  Widget _getVoiceChipRow(AudioFile e) => Row(children: [
-        Chip(
+  Widget _getVoiceChipWithPadding(AudioFile e, int index) => Row(children: [
+        ChoiceChip(
+          selected: _bloc.currentSelectedFileIndex == index,
+          onSelected: (bool selected) {
+            setState(() {
+              _bloc.currentSelectedFileIndex = index;
+            });
+          },
+          selectedColor: MeditoColors.walterWhite,
           label: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
             child: Text(
               formatSessionLength(e.length),
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.subtitle2.copyWith(
+                  color: _bloc.currentSelectedFileIndex == index
+                      ? MeditoColors.intoTheNight
+                      : MeditoColors.walterWhite),
             ),
           ),
           backgroundColor: MeditoColors.softGrey,
@@ -178,14 +198,59 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         '${item.headerValue}',
         style: Theme.of(context).textTheme.headline4,
       ));
+}
 
-  Widget _getTrailing(AudioFile item) {
-    if (_bloc.isDownloading(item)) {
-      return IconButton(onPressed: () {}, icon: _getLoadingSpinner(item));
+class DownloadPanelWidget extends StatefulWidget {
+  const DownloadPanelWidget({Key key, this.item, this.bloc}) : super(key: key);
+
+  final bloc;
+  final AudioFile item;
+
+  @override
+  _DownloadPanelWidgetState createState() => _DownloadPanelWidgetState();
+}
+
+class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: MeditoColors.deepNight,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(DOWNLOAD, style: Theme.of(context).textTheme.bodyText2),
+                Container(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                        '${widget.item.voice} - ${formatSessionLength(widget.item.length)}',
+                        style: Theme.of(context).textTheme.bodyText1),
+                    _getTrailing()
+                  ],
+                )
+              ],
+            )),
+      ),
+    );
+  }
+
+  Widget _getTrailing() {
+    if (widget.bloc.isDownloading(widget.item)) {
+      return IconButton(onPressed: () {}, icon: _getLoadingSpinner());
     }
 
     return FutureBuilder<bool>(
-        future: DownloadsBloc.isAudioFileDownloaded(item),
+        future: DownloadsBloc.isAudioFileDownloaded(widget.item),
         initialData: false,
         builder: (context, snapshot) {
           return IconButton(
@@ -195,20 +260,18 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   : Icons.download_outlined,
               color: MeditoColors.meditoTextGrey,
             ),
-            onPressed: () => _download(snapshot.hasData && snapshot.data, item),
+            onPressed: () => _download(snapshot.hasData && snapshot.data),
           );
         });
   }
 
-  IconData _getDownloadedIcon() => Icons.file_download_done;
-
-  Widget _getLoadingSpinner(AudioFile item) {
+  Widget _getLoadingSpinner() {
     return ValueListenableBuilder(
-        valueListenable: _bloc.downloadSingleton.returnNotifier(),
+        valueListenable: widget.bloc.downloadSingleton.returnNotifier(),
         builder: (context, value, widget) {
           if (value >= 1) {
             return GestureDetector(
-                onTap: () => _download(true, item),
+                onTap: () => _download(true),
                 child: Icon(_getDownloadedIcon(),
                     color: MeditoColors.walterWhite));
           } else {
@@ -226,8 +289,12 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         });
   }
 
-  void _download(bool downloaded, AudioFile file) {
-    var mediaItem = _bloc.getMediaItemForAudioFile(file);
+  IconData _getDownloadedIcon() => Icons.file_download_done;
+
+  void _download(
+    bool downloaded,
+  ) {
+    var mediaItem = widget.bloc.getMediaItemForAudioFile(widget.item);
 
     if (downloaded) {
       DownloadsBloc.removeSessionFromDownloads(context, mediaItem)
@@ -235,8 +302,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         setState(() {});
       });
     } else {
-      _bloc.setFileForDownloadSingleton(file);
-      _bloc.downloadSingleton.start(context, file, mediaItem);
+      widget.bloc.setFileForDownloadSingleton(widget.item);
+      widget.bloc.downloadSingleton.start(context, widget.item, mediaItem);
       setState(() {});
     }
   }
