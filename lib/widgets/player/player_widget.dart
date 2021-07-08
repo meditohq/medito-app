@@ -276,9 +276,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           decoration: BoxDecoration(
               shape: BoxShape.circle, color: MeditoColors.darkMoon),
           child: IconButton(
-              icon: Icon(
-                Icons.music_note_outlined,
-                color: MeditoColors.walterWhite,
+              icon: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Icon(
+                    Icons.music_note_outlined,
+                    color: MeditoColors.walterWhite,
+                  ),
+                  Text(SOUNDS),
+                ],
               ),
               onPressed: _onBgMusicPressed),
         ),
