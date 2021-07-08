@@ -268,28 +268,26 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget _getBgMusicIconButton(bool visible) {
-    return Visibility(
+    return (Visibility(
       visible: visible,
       child: Padding(
         padding: EdgeInsets.only(top: 32),
-        child: Container(
-          decoration: BoxDecoration(
-              shape: BoxShape.circle, color: MeditoColors.darkMoon),
-          child: IconButton(
-              icon: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Icon(
-                    Icons.music_note_outlined,
-                    color: MeditoColors.walterWhite,
-                  ),
-                  Text(SOUNDS),
-                ],
+        child: MaterialButton(
+            enableFeedback: true,
+            textColor: MeditoColors.walterWhite,
+            color: MeditoColors.walterWhiteTrans,
+            onPressed: _onBgMusicPressed,
+            child: Row(children: [
+              Icon(
+                Icons.music_note_outlined,
+                color: MeditoColors.walterWhite,
               ),
-              onPressed: _onBgMusicPressed),
-        ),
+              Container(width: 8),
+              Text(SOUNDS),
+              Container(width: 8),
+            ])),
       ),
-    );
+    ));
   }
 
   Center _getLoadingScreenWidget() {
