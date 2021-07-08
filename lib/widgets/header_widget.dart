@@ -24,14 +24,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class HeaderWidget extends StatelessWidget {
-  HeaderWidget(
-      {Key key,
-      this.primaryColorController,
-      this.titleController,
-      this.coverController,
-      this.backgroundImageController,
-      this.descriptionController,
-      this.whiteText = false})
+  HeaderWidget({Key key,
+    this.primaryColorController,
+    this.titleController,
+    this.coverController,
+    this.backgroundImageController,
+    this.descriptionController,
+    this.whiteText = false,
+  })
       : super(key: key);
   final StreamController<String> primaryColorController;
   final StreamController<String> titleController;
@@ -65,7 +65,7 @@ class HeaderWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MeditoAppBarWidget(transparent: true),
-                        _getColumn(),
+                        _getRow(),
                         Container(height: whiteText ? 0 : 16)
                       ],
                     ),
@@ -81,16 +81,15 @@ class HeaderWidget extends StatelessWidget {
         });
   }
 
-  Column _getColumn() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Row _getRow() {
+    return Row(
       children: [
         _getImageContainer(size: 96),
-        Container(height: 16.0),
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8),
-          child: _getTitleStream(),
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: _getTitleStream(),
+          ),
         )
       ],
     );
@@ -124,17 +123,21 @@ class HeaderWidget extends StatelessWidget {
     );
   }
 
-  StreamBuilder<String> _getTitleStream() => StreamBuilder<String>(
-      initialData: '',
-      stream: titleController.stream,
-      builder: (context, snapshot) {
-        return Text(
-          snapshot.data,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.headline1,
-        );
-      });
+  StreamBuilder<String> _getTitleStream() =>
+      StreamBuilder<String>(
+          initialData: '',
+          stream: titleController.stream,
+          builder: (context, snapshot) {
+            return Text(
+              snapshot.data,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headline1,
+            );
+          });
 
   StreamBuilder<ApiResponse<String>> _actualImageStream() {
     return StreamBuilder<ApiResponse<String>>(
@@ -150,7 +153,7 @@ class HeaderWidget extends StatelessWidget {
                     child: CircularProgressIndicator(
                       backgroundColor: MeditoColors.transparent,
                       valueColor:
-                          AlwaysStoppedAnimation<Color>(MeditoColors.darkMoon),
+                      AlwaysStoppedAnimation<Color>(MeditoColors.darkMoon),
                     )),
               );
               break;
@@ -199,11 +202,15 @@ class HeaderWidget extends StatelessWidget {
                 physics: NeverScrollableScrollPhysics(),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
-                        p: Theme.of(context).textTheme.subtitle1.copyWith(
-                            fontSize: 14.0,
-                            color: whiteText
-                                ? MeditoColors.walterWhite
-                                : MeditoColors.meditoTextGrey)),
+                    p: Theme
+                        .of(context)
+                        .textTheme
+                        .subtitle1
+                        .copyWith(
+                        fontSize: 14.0,
+                        color: whiteText
+                            ? MeditoColors.walterWhite
+                            : MeditoColors.meditoTextGrey)),
                 shrinkWrap: true,
               ),
             );

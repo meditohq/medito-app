@@ -82,7 +82,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         });
   }
 
-  Align _getBeginButton(String color) {
+  Align _getBeginButton(String primaryColor) {
     return Align(
         alignment: Alignment.bottomCenter,
         child: Container(
@@ -104,14 +104,18 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24.0),
                           ),
-                          backgroundColor: parseColor(color),
+                          backgroundColor: parseColor(primaryColor),
                           padding: const EdgeInsets.all(16.0)),
                       onPressed: _onBeginTap,
-                      child: Text(BEGIN,
-                          style: Theme.of(context)
-                              .textTheme
-                              .subtitle2
-                              .copyWith(color: MeditoColors.almostBlack)),
+                      child: StreamBuilder<String>(
+                          stream: _bloc.secondaryColorController.stream,
+                          builder: (context, snapshot) {
+                            return Text(BEGIN,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle2
+                                    .copyWith(color: parseColor(snapshot.data)));
+                          }),
                     )),
               )
             ])));
@@ -183,7 +187,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   Padding(
                       padding: EdgeInsets.only(left: 16),
                       child: Text(PICK_NARRATOR.toUpperCase(),
-                          style: Theme.of(context).textTheme.bodyText2)),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1
+                              .copyWith(color: MeditoColors.meditoTextGrey))),
                   Container(height: 12),
                   Column(children: childList),
                 ])));
@@ -199,7 +206,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               _getVoiceTextWidget(item),
               Container(height: 8),
               SingleChildScrollView(
-                  padding: EdgeInsets.only(left: 16),
+                  padding: EdgeInsets.only(left: 16, right: 8),
                   scrollDirection: Axis.horizontal,
                   child: Row(
                       children: item.listForVoice
@@ -237,12 +244,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         Container(width: 8)
       ]);
 
-  Widget _getVoiceTextWidget(VoiceItem item) => Padding(
-      padding: EdgeInsets.only(left: 16),
-      child: Text(
-        '${item.headerValue}',
-        style: Theme.of(context).textTheme.headline4,
-      ));
+  Widget _getVoiceTextWidget(VoiceItem item) => item.headerValue.isEmptyOrNull()
+      ? Container()
+      : Padding(
+          padding: EdgeInsets.only(left: 16),
+          child: Text(
+            '${item.headerValue}',
+            style: Theme.of(context).textTheme.headline4,
+          ));
 }
 
 class DownloadPanelWidget extends StatefulWidget {
@@ -279,7 +288,10 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(_getDownloadLabel(),
-                        style: Theme.of(context).textTheme.bodyText1),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: MeditoColors.meditoTextGrey)),
                     _getTrailing()
                   ],
                 )
@@ -291,7 +303,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
 
   String _getDownloadLabel() {
     if (widget.item.voice.isNotEmptyAndNotNull()) {
-      return '${widget.item.voice} - ${formatSessionLength(widget.item.length)}';
+      return '${widget.item.voice} — ${formatSessionLength(widget.item.length)}';
     } else {
       return formatSessionLength(widget.item.length);
     }
