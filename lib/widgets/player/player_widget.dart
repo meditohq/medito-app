@@ -277,7 +277,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             textColor: MeditoColors.walterWhite,
             color: MeditoColors.walterWhiteTrans,
             onPressed: _onBgMusicPressed,
-            child: Row(children: [
+            child: Padding(
+              padding: EdgeInsets.only(top: 4),
+                child: Row(children: [
               Icon(
                 Icons.music_note_outlined,
                 color: MeditoColors.walterWhite,
@@ -285,7 +287,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               Container(width: 8),
               Text(SOUNDS),
               Container(width: 8),
-            ])),
+            ]))),
       ),
     ));
   }
