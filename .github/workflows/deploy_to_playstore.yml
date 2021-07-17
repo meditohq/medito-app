@@ -7,6 +7,9 @@ on:
         description: 'Fastlane lane to use (beta OR promote_to_production OR production)'
         required: true
         default: 'beta'
+      version:
+        description: 'Version for creating GH release. It does not change the version in the app itself.'
+        required: true
   push:
     # Sequence of patterns matched against refs/tags
     tags:
@@ -68,5 +71,34 @@ jobs:
           FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
           FCI_KEYSTORE_PASSWORD: ${{ secrets.FCI_KEYSTORE_PASSWORD }}
         working-directory: android
-
-      # TODO: Build APK, create GH release and upload APK
+      # The aab bundle cannot install easily on device. Build an APK to publish on GH
+      - name: Build APK
+        run: flutter build apk -v
+        env:
+          FCI_KEYSTORE_PATH: 'meditokey.jks' # The file is created in the previous step
+          FCI_KEY_ALIAS: ${{ secrets.FCI_KEY_ALIAS }}
+          FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
+          FCI_KEYSTORE_PASSWORD: ${{ secrets.FCI_KEYSTORE_PASSWORD }}
+      - name: Create release version
+        id: release_version
+        run: echo "::set-output name=version::$(echo ${{ github.event.inputs.version || github.ref }} | sed 's#refs/tags/##')"
+      - name: Upload app APK to github action artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: medito-${{ steps.release_version.outputs.version }}.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+      - name: Rename the output APK
+        run: mv app-release.apk medito-${{ steps.release_version.outputs.version }}.apk
+        working-directory: build/app/outputs/flutter-apk
+      - name: Create GH Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: |
+            # Medito ${{ steps.release_version.outputs.version }}
+            ## What's New?
+            NOTE: If you install Medito app using APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
+          draft: true
+          files: build/app/outputs/flutter-apk/medito-${{ steps.release_version.outputs.version }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
