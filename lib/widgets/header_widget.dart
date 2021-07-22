@@ -24,15 +24,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class HeaderWidget extends StatelessWidget {
-  HeaderWidget({Key key,
+  HeaderWidget({
+    Key key,
     this.primaryColorController,
     this.titleController,
     this.coverController,
     this.backgroundImageController,
     this.descriptionController,
     this.whiteText = false,
-  })
-      : super(key: key);
+  }) : super(key: key);
   final StreamController<String> primaryColorController;
   final StreamController<String> titleController;
   final StreamController<ApiResponse<String>> coverController;
@@ -66,15 +66,11 @@ class HeaderWidget extends StatelessWidget {
                       children: [
                         MeditoAppBarWidget(transparent: true),
                         _getRow(),
-                        Container(height: whiteText ? 0 : 16)
                       ],
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: _getDescriptionWidget(),
-                )
+                _getDescriptionWidget(),
               ],
             ),
           );
@@ -123,21 +119,17 @@ class HeaderWidget extends StatelessWidget {
     );
   }
 
-  StreamBuilder<String> _getTitleStream() =>
-      StreamBuilder<String>(
-          initialData: '',
-          stream: titleController.stream,
-          builder: (context, snapshot) {
-            return Text(
-              snapshot.data,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headline1,
-            );
-          });
+  StreamBuilder<String> _getTitleStream() => StreamBuilder<String>(
+      initialData: '',
+      stream: titleController.stream,
+      builder: (context, snapshot) {
+        return Text(
+          snapshot.data,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.headline1,
+        );
+      });
 
   StreamBuilder<ApiResponse<String>> _actualImageStream() {
     return StreamBuilder<ApiResponse<String>>(
@@ -153,7 +145,7 @@ class HeaderWidget extends StatelessWidget {
                     child: CircularProgressIndicator(
                       backgroundColor: MeditoColors.transparent,
                       valueColor:
-                      AlwaysStoppedAnimation<Color>(MeditoColors.darkMoon),
+                          AlwaysStoppedAnimation<Color>(MeditoColors.darkMoon),
                     )),
               );
               break;
@@ -194,7 +186,8 @@ class HeaderWidget extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data.isNotEmptyAndNotNull()) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Markdown(
                 data: snapshot?.data ?? '',
                 onTapLink: _linkTap,
@@ -202,15 +195,11 @@ class HeaderWidget extends StatelessWidget {
                 physics: NeverScrollableScrollPhysics(),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
-                    p: Theme
-                        .of(context)
-                        .textTheme
-                        .subtitle1
-                        .copyWith(
-                        fontSize: 14.0,
-                        color: whiteText
-                            ? MeditoColors.walterWhite
-                            : MeditoColors.meditoTextGrey)),
+                        p: Theme.of(context).textTheme.subtitle1.copyWith(
+                            fontSize: 14.0,
+                            color: whiteText
+                                ? MeditoColors.walterWhite
+                                : MeditoColors.meditoTextGrey)),
                 shrinkWrap: true,
               ),
             );
