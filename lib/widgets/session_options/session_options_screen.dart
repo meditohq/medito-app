@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:ui';
+
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_options_bloc.dart';
@@ -190,7 +192,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1
-                              .copyWith(color: MeditoColors.meditoTextGrey))),
+                              .copyWith(color: MeditoColors.meditoTextGrey, fontWeight: FontWeight.w600))),
                   Container(height: 12),
                   Column(children: childList),
                 ])));
@@ -282,7 +284,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(DOWNLOAD.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodyText1),
+                    style: Theme.of(context).textTheme.bodyText1.copyWith(color: MeditoColors.meditoTextGrey, fontWeight: FontWeight.w600)),
                 Container(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,8 +292,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
                     Text(_getDownloadLabel(),
                         style: Theme.of(context)
                             .textTheme
-                            .bodyText1
-                            .copyWith(color: MeditoColors.meditoTextGrey)),
+                            .bodyText1),
                     _getTrailing()
                   ],
                 )
