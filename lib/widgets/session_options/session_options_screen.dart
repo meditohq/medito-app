@@ -276,7 +276,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: EdgeInsets.only(top: 20, bottom: 16, left: 16, right: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
