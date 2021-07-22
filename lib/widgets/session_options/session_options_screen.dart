@@ -282,7 +282,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(DOWNLOAD.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodyText2),
+                    style: Theme.of(context).textTheme.bodyText1),
                 Container(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
