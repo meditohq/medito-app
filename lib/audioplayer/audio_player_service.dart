@@ -29,7 +29,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   int get index => _player.currentIndex;
   MediaItem mediaItem;
-  var initialBgVolume = 0.6;
+  var initialBgVolume = 0.4;
   var _updatedStats = false;
 
   @override
