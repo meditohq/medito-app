@@ -80,4 +80,13 @@ class DownloadsBloc {
     list.removeWhere((element) => MediaItem.fromJson(jsonDecode(element)).id == mediaFile.id);
     await prefs.setStringList(savedFilesKey, list);
   }
+
+  // This method is used to save the updated order of the list of downloaded sessions
+  /// Saves a given `List` of `MediaItem` elements (downloaded sessions)
+  static Future<void> saveDownloads(List<MediaItem> mediaList) async {
+    var prefs = await SharedPreferences.getInstance();
+    var list =
+        mediaList.map((MediaItem mediaItem) => jsonEncode(mediaItem)).toList();
+    await prefs.setStringList(savedFilesKey, list);
+  }
 }
