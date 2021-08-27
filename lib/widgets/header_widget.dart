@@ -204,7 +204,7 @@ class HeaderWidget extends StatelessWidget {
               ),
             );
           } else {
-            return Container();
+            return Container(height: 20);
           }
         });
   }
