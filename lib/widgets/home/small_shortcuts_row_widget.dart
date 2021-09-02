@@ -18,7 +18,7 @@ class SmallShortcutsRowWidget extends StatefulWidget {
 
 class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
   final _bloc = ShortcutsBloc();
-
+  bool isLandscape = false;
   @override
   void initState() {
     super.initState();
@@ -31,46 +31,52 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizeChangedLayoutNotifier(
-      child: StreamBuilder<ApiResponse<ShortcutsResponse>>(
-          stream: _bloc.shortcutList.stream,
-          initialData: ApiResponse.loading(),
-          builder: (context, snapshot) {
-            switch (snapshot.data.status) {
-              case Status.LOADING:
-                return _getLoadingWidget();
-                break;
-              case Status.COMPLETED:
-                return GridView.count(
-                  crossAxisCount: 2,
-                  padding:
-                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0),
-                  scrollDirection: Axis.vertical,
-                  childAspectRatio: 2.6,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  children: List.generate(snapshot.data.body?.data?.length ?? 0,
-                      (index) {
-                    return Card(
-                      clipBehavior: Clip.antiAlias,
-                      color: MeditoColors.deepNight,
-                      child: SmallShortcutWidget(
-                          snapshot.data.body.data[index], widget.onTap),
+    return OrientationBuilder(builder: (context, orientation) {
+      if (MediaQuery.of(context).size.width > 600) {
+        isLandscape = true;
+      } else {
+        isLandscape = false;
+      }
+      return SizeChangedLayoutNotifier(
+          child: StreamBuilder<ApiResponse<ShortcutsResponse>>(
+              stream: _bloc.shortcutList.stream,
+              initialData: ApiResponse.loading(),
+              builder: (context, snapshot) {
+                switch (snapshot.data.status) {
+                  case Status.LOADING:
+                    return _getLoadingWidget();
+                    break;
+                  case Status.COMPLETED:
+                    return GridView.count(
+                      crossAxisCount: isLandscape ? 4 : 2,
+                      padding: const EdgeInsets.only(
+                          left: 12.0, right: 12.0, top: 8.0),
+                      scrollDirection: Axis.vertical,
+                      childAspectRatio: 2.6,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      children: List.generate(
+                          snapshot.data.body?.data?.length ?? 0, (index) {
+                        return Card(
+                          clipBehavior: Clip.antiAlias,
+                          color: MeditoColors.deepNight,
+                          child: SmallShortcutWidget(
+                              snapshot.data.body.data[index], widget.onTap),
+                        );
+                      }),
                     );
-                  }),
-                );
-                break;
-              case Status.ERROR:
-                return Icon(Icons.error);
-                break;
-            }
-            return Container();
-          }),
-    );
+                    break;
+                  case Status.ERROR:
+                    return Icon(Icons.error);
+                    break;
+                }
+                return Container();
+              }));
+    });
   }
 
   Widget _getLoadingWidget() => GridView.count(
-        crossAxisCount: 2,
+        crossAxisCount: isLandscape ? 4 : 2,
         padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0),
         scrollDirection: Axis.vertical,
         childAspectRatio: 2.6,
