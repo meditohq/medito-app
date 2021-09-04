@@ -9,8 +9,11 @@ The app is free, forever: no ads, no spam, no need to sign up or pay.
 Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and the community.
 
 ## Download the app
-- Play Store: https://play.google.com/store/apps/details?id=meditofoundation.medito
-- App Store: https://apps.apple.com/us/app/medito/id1500780518
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/meditohq/medito-app?label=latest%20version&sort=semver)](https://github.com/meditohq/medito-app/releases)
+
+| Android | iOS |
+| :--: | :--: |
+| <a href="https://play.google.com/store/apps/details?id=meditofoundation.medito"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"/></a><br/>|<a href="https://apps.apple.com/us/app/medito/id1500780518"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="55"/></a> |
 
 ## How to use this code
 
