@@ -8,7 +8,7 @@ The app is free, forever: no ads, no spam, no need to sign up or pay.
 
 Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and the community.
 
-## Download the app
+## Install
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/meditohq/medito-app?label=latest%20version&sort=semver)](https://github.com/meditohq/medito-app/releases)
 
 | Android | iOS |
