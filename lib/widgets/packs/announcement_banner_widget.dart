@@ -85,10 +85,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                             leading: snapshot.data.icon.isNotEmptyAndNotNull()
                                 ? buildCircleAvatar(snapshot)
                                 : Container(),
-                            actions: [
-                              _buildDismissButton(),
-                              _buildPositiveButton(snapshot),
-                            ],
+                            actions: buildActionsRow(snapshot),
                           ),
                         ),
                         buildSpacer()
@@ -98,6 +95,14 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                 );
               });
         });
+  }
+
+  List<Widget> buildActionsRow(AsyncSnapshot<AnnouncementResponse> snapshot) {
+    var actions = [_buildDismissButton()];
+    if (!snapshot.data.buttonLabel.isEmptyOrNull()) {
+      actions.add(_buildPositiveButton(snapshot));
+    }
+    return actions;
   }
 
   Column _buildTextColumn(
@@ -124,17 +129,17 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     );
   }
 
-  Padding _buildPositiveButton(AsyncSnapshot<AnnouncementResponse> snapshot) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: TextButton(
-        onPressed: () {
-          _openLink(snapshot.data.buttonType, snapshot.data.buttonPath);
-        },
-        child: Text(snapshot.data.buttonLabel.toUpperCase(),
-            style:
-                TextStyle(color: MeditoColors.walterWhite, letterSpacing: 0.2)),
-      ),
+  TextButton _buildPositiveButton(
+      AsyncSnapshot<AnnouncementResponse> snapshot) {
+    return TextButton(
+      style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.only(right: 8.0))),
+      onPressed: () {
+        _openLink(snapshot.data.buttonType, snapshot.data.buttonPath);
+      },
+      child: Text(snapshot.data.buttonLabel.toUpperCase(),
+          style:
+              TextStyle(color: MeditoColors.walterWhite, letterSpacing: 0.2)),
     );
   }
 

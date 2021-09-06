@@ -50,7 +50,7 @@ class CoursesRowItemWidget extends StatelessWidget {
     if (data != null) {
       return Text(data.subtitle, style: Theme.of(context).textTheme.subtitle1);
     } else {
-      return LoadingTextBoxWidget(height: 21);
+      return Container(height: 0, width: 0); //LoadingTextBoxWidget(height: 21);
     }
   }
 
