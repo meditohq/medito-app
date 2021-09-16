@@ -14,6 +14,7 @@ import 'package:just_audio/just_audio.dart';
 const fadeDuration = 20;
 const PLAY_BG_SOUND = 'play_bg_sound';
 const SEND_BG_SOUND = 'send_bg_sound';
+const INIT_BG_SOUND = 'init_bg_sound';
 const SET_BG_SOUND_VOL = 'set_bg_sound_vol';
 
 /// This task defines logic for playing a list of podcast episodes.
@@ -24,11 +25,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
   StreamSubscription<PlaybackEvent> _eventSubscription;
   var _duration = Duration();
 
-  var _currentlyPlayingBGSound;
+  var _currentlyPlayingBGSound = '';
 
   int get index => _player.currentIndex;
   MediaItem mediaItem;
-  var initialBgVolume = 0.6;
+  var initialBgVolume = 0.4;
   var _updatedStats = false;
 
   @override
@@ -132,7 +133,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onPlay() {
-    _bgPlayer.play();
+    if(_currentlyPlayingBGSound.isNotEmptyAndNotNull()) {
+      _bgPlayer.play();
+    }
     return _player.play();
   }
 
@@ -156,10 +159,12 @@ class AudioPlayerTask extends BackgroundAudioTask {
         await _player.stop();
         await _broadcastState();
         break;
+      case INIT_BG_SOUND:
+        AudioServiceBackground.sendCustomEvent(
+            {SEND_BG_SOUND: _currentlyPlayingBGSound});
+        break;
       case SEND_BG_SOUND:
-        if ((params as String).isNotEmptyAndNotNull()) {
-          _currentlyPlayingBGSound = params;
-        }
+          _currentlyPlayingBGSound = params ?? '';
         AudioServiceBackground.sendCustomEvent(
             {SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;

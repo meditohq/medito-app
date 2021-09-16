@@ -13,6 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:ui';
+
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_options_bloc.dart';
@@ -114,7 +116,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle2
-                                    .copyWith(color: parseColor(snapshot.data)));
+                                    .copyWith(
+                                        color: parseColor(snapshot.data)));
                           }),
                     )),
               )
@@ -167,6 +170,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   Widget _buildOptionsPanel(List<VoiceItem> items) {
     var childList = <Widget>[];
+    // To check whether any of the VoiceItems contains a narrator
+    var containsNarrator =
+        items.any((voiceItem) => voiceItem.headerValue.isNotEmptyAndNotNull());
 
     items.forEach((value) {
       var section = _getListItem(context, value);
@@ -186,11 +192,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   Container(height: 20),
                   Padding(
                       padding: EdgeInsets.only(left: 16),
-                      child: Text(PICK_NARRATOR.toUpperCase(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1
-                              .copyWith(color: MeditoColors.meditoTextGrey))),
+                      child: Text(
+                          containsNarrator
+                              ? PICK_NARRATOR_AND_DURATION.toUpperCase()
+                              : PICK_DURATION.toUpperCase(),
+                          style: Theme.of(context).textTheme.bodyText1.copyWith(
+                              color: MeditoColors.meditoTextGrey,
+                              fontWeight: FontWeight.w600))),
                   Container(height: 12),
                   Column(children: childList),
                 ])));
@@ -276,22 +284,21 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: EdgeInsets.only(top: 20, bottom: 16, left: 16, right: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(DOWNLOAD.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodyText2),
+                    style: Theme.of(context).textTheme.bodyText1.copyWith(
+                        color: MeditoColors.meditoTextGrey,
+                        fontWeight: FontWeight.w600)),
                 Container(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(_getDownloadLabel(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: MeditoColors.meditoTextGrey)),
+                        style: Theme.of(context).textTheme.bodyText1),
                     _getTrailing()
                   ],
                 )
