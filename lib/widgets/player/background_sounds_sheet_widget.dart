@@ -67,7 +67,7 @@ class _ChooseBackgroundSoundDialogState
       volume = await retrieveSavedBgVolume();
       _dragBgVolumeSubject.add(volume);
       await AudioService.customAction(SET_BG_SOUND_VOL, volume / 100);
-      await AudioService.customAction(INIT_BG_SOUND, "");
+      await AudioService.customAction(INIT_BG_SOUND, '');
     }
   }
 
