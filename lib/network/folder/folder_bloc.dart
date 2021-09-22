@@ -83,7 +83,7 @@ class FolderItemsBloc {
     if (!primaryColorController.isClosed) {
       primaryColorController.sink.add(content.colour);
     }
-    if (backgroundImageController.isClosed) {
+    if (!backgroundImageController.isClosed) {
       backgroundImageController.sink.add(content.backgroundImageUrl);
     }
   }
