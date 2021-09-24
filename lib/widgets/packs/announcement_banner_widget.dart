@@ -48,6 +48,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    _hidden = false;
     return StreamBuilder<AnnouncementResponse>(
         stream: _bloc.announcementController.stream,
         builder: (context, snapshot) {
@@ -78,16 +79,17 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                       children: [
                         buildSpacer(),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: MaterialBanner(
-                            backgroundColor: MeditoColors.darkMoon,
-                            content: _buildTextColumn(snapshot, context),
-                            leading: snapshot.data.icon.isNotEmptyAndNotNull()
-                                ? buildCircleAvatar(snapshot)
-                                : Container(),
-                            actions: buildActionsRow(snapshot),
-                          ),
-                        ),
+                            padding:
+                                const EdgeInsets.only(top: 20.0, bottom: 10.0),
+                            child: MaterialBanner(
+                                backgroundColor: MeditoColors.darkMoon,
+                                content: _buildTextAndButtonColumn(
+                                    snapshot, context),
+                                leading:
+                                    snapshot.data.icon.isNotEmptyAndNotNull()
+                                        ? buildCircleAvatar(snapshot)
+                                        : Container(),
+                                actions: [Container()])),
                         buildSpacer()
                       ],
                     ),
@@ -105,7 +107,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     return actions;
   }
 
-  Column _buildTextColumn(
+  Column _buildTextAndButtonColumn(
       AsyncSnapshot<AnnouncementResponse> snapshot, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,6 +117,9 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                 .textTheme
                 .subtitle1
                 .copyWith(color: MeditoColors.walterWhite)),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: buildActionsRow(snapshot))
       ],
     );
   }
@@ -133,7 +138,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
       AsyncSnapshot<AnnouncementResponse> snapshot) {
     return TextButton(
       style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.only(right: 8.0))),
+          padding: MaterialStateProperty.all(EdgeInsets.only(right: 30.0))),
       onPressed: () {
         _openLink(snapshot.data.buttonType, snapshot.data.buttonPath);
       },
@@ -145,6 +150,9 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
 
   TextButton _buildDismissButton() {
     return TextButton(
+      style: ButtonStyle(
+          padding: MaterialStateProperty.all(
+              EdgeInsets.only(left: 30.0, right: 30.0))),
       onPressed: () {
         setState(() {
           _hidden = true;
