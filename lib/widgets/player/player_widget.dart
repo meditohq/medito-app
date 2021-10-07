@@ -20,6 +20,7 @@ import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
+import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
@@ -83,6 +84,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   void initState() {
     super.initState();
+
+    retrieveSavedBgVolume().then((value) async =>
+        await AudioService.customAction(SET_BG_SOUND_VOL, value / 100));
 
     _stream = AudioService.customEventStream.listen((event) async {
       if (event == 'stats') {
