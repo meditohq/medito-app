@@ -48,7 +48,6 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    _hidden = false;
     return StreamBuilder<AnnouncementResponse>(
         stream: _bloc.announcementController.stream,
         builder: (context, snapshot) {
