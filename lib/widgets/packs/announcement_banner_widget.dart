@@ -78,19 +78,17 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                       children: [
                         buildSpacer(),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: MaterialBanner(
-                            backgroundColor: MeditoColors.darkMoon,
-                            content: _buildTextColumn(snapshot, context),
-                            leading: snapshot.data.icon.isNotEmptyAndNotNull()
-                                ? buildCircleAvatar(snapshot)
-                                : Container(),
-                            actions: [
-                              _buildDismissButton(),
-                              _buildPositiveButton(snapshot),
-                            ],
-                          ),
-                        ),
+                            padding:
+                                const EdgeInsets.only(top: 20.0, bottom: 10.0),
+                            child: MaterialBanner(
+                                backgroundColor: MeditoColors.darkMoon,
+                                content: _buildTextAndButtonColumn(
+                                    snapshot, context),
+                                leading:
+                                    snapshot.data.icon.isNotEmptyAndNotNull()
+                                        ? buildCircleAvatar(snapshot)
+                                        : Container(),
+                                actions: [Container()])),
                         buildSpacer()
                       ],
                     ),
@@ -100,7 +98,15 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
         });
   }
 
-  Column _buildTextColumn(
+  List<Widget> buildActionsRow(AsyncSnapshot<AnnouncementResponse> snapshot) {
+    var actions = [_buildDismissButton()];
+    if (!snapshot.data.buttonLabel.isEmptyOrNull()) {
+      actions.add(_buildPositiveButton(snapshot));
+    }
+    return actions;
+  }
+
+  Column _buildTextAndButtonColumn(
       AsyncSnapshot<AnnouncementResponse> snapshot, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,6 +116,9 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                 .textTheme
                 .subtitle1
                 .copyWith(color: MeditoColors.walterWhite)),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: buildActionsRow(snapshot))
       ],
     );
   }
@@ -124,22 +133,25 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     );
   }
 
-  Padding _buildPositiveButton(AsyncSnapshot<AnnouncementResponse> snapshot) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: TextButton(
-        onPressed: () {
-          _openLink(snapshot.data.buttonType, snapshot.data.buttonPath);
-        },
-        child: Text(snapshot.data.buttonLabel.toUpperCase(),
-            style:
-                TextStyle(color: MeditoColors.walterWhite, letterSpacing: 0.2)),
-      ),
+  TextButton _buildPositiveButton(
+      AsyncSnapshot<AnnouncementResponse> snapshot) {
+    return TextButton(
+      style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.only(right: 30.0))),
+      onPressed: () {
+        _openLink(snapshot.data.buttonType, snapshot.data.buttonPath);
+      },
+      child: Text(snapshot.data.buttonLabel.toUpperCase(),
+          style:
+              TextStyle(color: MeditoColors.walterWhite, letterSpacing: 0.2)),
     );
   }
 
   TextButton _buildDismissButton() {
     return TextButton(
+      style: ButtonStyle(
+          padding: MaterialStateProperty.all(
+              EdgeInsets.only(left: 30.0, right: 30.0))),
       onPressed: () {
         setState(() {
           _hidden = true;
