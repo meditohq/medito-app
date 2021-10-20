@@ -23,7 +23,7 @@ dependencies:
   flutter_svg: ^0.22.0
   path_provider: ^2.0.1
   url_launcher: ^6.0.3
-  flutter_markdown: ^0.6.1
+  flutter_markdown: ^0.6.7
   shared_preferences: ^2.0.5
   cached_network_image: ^3.0.0
   auto_size_text: ^3.0.0-nullsafety.0
