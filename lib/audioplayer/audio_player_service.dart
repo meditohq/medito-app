@@ -47,7 +47,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     try {
       await getDownload(mediaItem.extras[LOCATION]).then((data) async {
         // (data == null) is true if this session has not been downloaded
-        if (data == null) { 
+        if (data == null) {
           var url = '${BASE_URL}assets/${mediaItem.id}';
           _duration = await _player.setUrl(url,
               headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
@@ -133,7 +133,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onPlay() {
-    if(_currentlyPlayingBGSound.isNotEmptyAndNotNull()) {
+    if (_currentlyPlayingBGSound.isNotEmptyAndNotNull()) {
       _bgPlayer.play();
     }
     return _player.play();
@@ -164,7 +164,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
             {SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
       case SEND_BG_SOUND:
-          _currentlyPlayingBGSound = params ?? '';
+        _currentlyPlayingBGSound = params ?? '';
+        print('bg sound set to: ' + _currentlyPlayingBGSound);
         AudioServiceBackground.sendCustomEvent(
             {SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;

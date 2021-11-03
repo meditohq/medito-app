@@ -55,7 +55,11 @@ void createSnackBar(String message, BuildContext context,
   );
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  try {
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  } catch (e) {
+    print(e);
+  }
 }
 
 void createSnackBarWithColor(
