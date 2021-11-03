@@ -47,7 +47,6 @@ RSIN: 860222627
 - [Why we started Medito](https://meditofoundation.org/blog/why-meditation-should-be-free)
 - [Press release](https://meditofoundation.org/blog/medito-foundation-launches-app-to-free-meditation-from-clutches-of-big-business)
 - [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
-- [Join us on Slack](https://join.slack.com/t/meditofoundation/shared_invite/zt-f0viisyt-VdJ7ygqNHt9sIeGzZiatlQ)
 - [Email us](mailto:hi@meditofoundation.org)
 
 ## License
