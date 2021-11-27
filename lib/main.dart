@@ -164,6 +164,7 @@ class _ParentWidgetState extends State<ParentWidget>
                   TargetPlatform.android: SlideTransitionBuilder(),
                 }),
                 accentColor: MeditoColors.walterWhite,
+                focusColor: MeditoColors.softGrey,
                 textTheme: meditoTextTheme(context)),
             title: ParentWidget._title,
           ),
