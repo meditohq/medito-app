@@ -25,6 +25,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -41,6 +42,7 @@ class ChooseBackgroundSoundDialog extends StatefulWidget {
 class _ChooseBackgroundSoundDialogState
     extends State<ChooseBackgroundSoundDialog> {
   static const NONE = 'No Sound';
+  bool isOffline = false;
 
   /// Tracks the bgVolume while the user drags the bgVolume bar.
   final BehaviorSubject<double> _dragBgVolumeSubject =
@@ -73,68 +75,131 @@ class _ChooseBackgroundSoundDialogState
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<dynamic>(
-        stream: AudioService.customEventStream,
-        initialData: NONE,
+    return StreamBuilder(
+        stream: Stream.fromFuture(Connectivity()
+            .checkConnectivity()), // figure out how to refresh the stream periodically
         builder: (context, snapshot) {
-          var currentSounds;
-          try {
-            currentSounds = (snapshot.data[SEND_BG_SOUND] as String).isNotEmptyAndNotNull() ? snapshot.data[SEND_BG_SOUND] : NONE;
-          } catch (e) {
-            currentSounds = NONE;
+          if (snapshot.hasData) {
+            if (snapshot.data == ConnectivityResult.none) {
+              isOffline = true;
+            }
+            return StreamBuilder<dynamic>(
+                stream: AudioService.customEventStream,
+                initialData: NONE,
+                builder: (context, snapshot) {
+                  var currentSounds;
+                  try {
+                    if (snapshot.hasData) {
+                      if (snapshot.data.runtimeType.toString() ==
+                          '_InternalLinkedHashMap<String, String>') {
+                        currentSounds = snapshot.data[SEND_BG_SOUND]
+                                .toString()
+                                .isNotEmptyAndNotNull()
+                            ? snapshot.data[SEND_BG_SOUND]
+                            : NONE;
+                      } else {
+                        // do nothing
+                      }
+                    }
+                  } catch (e) {
+                    print(e);
+                    currentSounds = NONE;
+                  }
+                  return DraggableScrollableSheet(
+                    expand: false,
+                    builder: (BuildContext context,
+                        ScrollController scrollController) {
+                      return SafeArea(
+                        top: true,
+                        bottom: false,
+                        child: Material(
+                            color: MeditoColors.moonlight,
+                            child: isOffline
+                                ? offlineBackgroundSounds(
+                                    currentSounds, scrollController)
+                                : onlineBackgroundSounds(
+                                    currentSounds, scrollController)),
+                      );
+                    },
+                  );
+                });
+          } else {
+            return Container(); // return a spinner
           }
+        });
+  }
 
-          return DraggableScrollableSheet(
-            expand: false,
-            builder: (BuildContext context, ScrollController scrollController) {
-              return SafeArea(
-                top: true,
-                bottom: false,
-                child: Material(
-                  color: MeditoColors.moonlight,
-                  child: StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
-                      stream: widget.stream,
-                      initialData: ApiResponse.loading(),
-                      builder: (context, snapshot) {
-                        switch (snapshot.data.status) {
-                          case Status.LOADING:
-                            return Center(
-                                child: const CircularProgressIndicator(
-                                    backgroundColor: Colors.black,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        MeditoColors.walterWhite)));
-                            break;
-                          case Status.COMPLETED:
-                            var list = snapshot.data.body.data;
+  Widget onlineBackgroundSounds(
+      String currentSounds, ScrollController scrollController) {
+    return StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
+        stream: widget.stream,
+        initialData: ApiResponse.loading(),
+        builder: (context, snapshot) {
+          switch (snapshot.data.status) {
+            case Status.LOADING:
+              return Center(
+                  child: const CircularProgressIndicator(
+                      backgroundColor: Colors.black,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          MeditoColors.walterWhite)));
+              break;
+            case Status.COMPLETED:
+              var list = snapshot.data.body.data;
 
-                            var widgetList = <Widget>[
-                              Divider(height: 16),
-                              _getHeader(),
-                              Divider(height: 16),
-                              _getVolumeWidget(),
-                              Divider(height: 16),
-                              _getNoneListItem(currentSounds)
-                            ];
-                            widgetList.addAll(list
-                                .map<Widget>((e) => _getBackgroundSoundListTile(
-                                    e, currentSounds))
-                                .toList());
+              var widgetList = <Widget>[
+                Divider(height: 16),
+                _getHeader(),
+                Divider(height: 16),
+                _getVolumeWidget(),
+                Divider(height: 16),
+                _getNoneListItem(currentSounds)
+              ];
+              widgetList.addAll(list
+                  .map<Widget>((e) =>
+                      _getBackgroundSoundListTile(e, currentSounds, context))
+                  .toList());
 
-                            return ListView(
-                                controller: scrollController,
-                                children: widgetList);
+              return ListView(
+                  controller: scrollController, children: widgetList);
 
-                            break;
-                          case Status.ERROR:
-                            return _getErrorWidget();
-                            break;
-                        }
-                        return Container();
-                      }),
-                ),
-              );
-            },
-          );
+              break;
+            case Status.ERROR:
+              return _getErrorWidget();
+              break;
+          }
+          return Container();
+        });
+  }
+
+  Widget offlineBackgroundSounds(
+      String currentSounds, ScrollController scrollController) {
+    return FutureBuilder<List<BackgroundSoundData>>(
+        future: getBgSoundFromOfflineSharedPrefs(),
+        initialData: [],
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var list = snapshot.data;
+            var widgetList = <Widget>[
+              Divider(height: 16),
+              _getHeader(),
+              Divider(height: 16),
+              _getVolumeWidget(),
+              Divider(height: 16),
+              _getNoneListItem(currentSounds)
+            ];
+            widgetList.addAll(list
+                .map((e) =>
+                    _getBackgroundSoundListTile(e, currentSounds, context))
+                .toList());
+
+            return ListView(controller: scrollController, children: widgetList);
+          } else {
+            return Center(
+                child: const CircularProgressIndicator(
+                    backgroundColor: Colors.black,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        MeditoColors.walterWhite)));
+          }
         });
   }
 
@@ -177,15 +242,25 @@ class _ChooseBackgroundSoundDialogState
 
   bool _isSelected(String current, String name) => current == name;
 
-  Widget _getBackgroundSoundListTile(BackgroundSoundData item, String current) {
+  Widget _getBackgroundSoundListTile(
+      BackgroundSoundData item, String current, BuildContext context) {
     var assetUrl = item.file.toAssetUrl();
-
     return InkWell(
         onTap: () {
           setState(() {
             _downloadingItem = item.name;
           });
+
           downloadBGMusicFromURL(assetUrl, item.name).then((filePath) {
+            if (filePath == 'Connectivity lost') {
+              _downloadingItem = '';
+              isOffline = true;
+              setState(() {});
+              createSnackBar(
+                  'Connectivity lost. Displaying offline background sounds.',
+                  context);
+              _noneSelected();
+            }
             _downloadingItem = '';
             addBgSoundSelectionToSharedPrefs(filePath, item.name);
             AudioService.customAction(PLAY_BG_SOUND, filePath);
@@ -221,6 +296,7 @@ class _ChooseBackgroundSoundDialogState
       );
 
   void _noneSelected() {
+    print('selecting NONE');
     AudioService.customAction(SEND_BG_SOUND, '');
     AudioService.customAction(PLAY_BG_SOUND, '');
     addBgSoundSelectionToSharedPrefs('', '');
