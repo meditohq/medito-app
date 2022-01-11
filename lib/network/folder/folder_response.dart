@@ -20,17 +20,17 @@ class FolderResponse {
 
   bool get hasData => data != null;
 
-  String get title => data.title;
+  String get title => data?.title;
 
-  String get description => data.description;
-  String get colour => data.primaryColor;
-  String get backgroundImageUrl => data.backgroundImage?.toAssetUrl();
-  String get cover => data.cover;
+  String get description => data?.description;
+  String get colour => data?.primaryColor;
+  String get backgroundImageUrl => data?.backgroundImage?.toAssetUrl();
+  String get cover => data?.cover;
   String get coverUrl => cover?.toAssetUrl();
 
-  String get id => data.id.toString();
+  String get id => data?.id.toString();
 
-  List<Item> get items => data.items.map((e) => e.item).toList();
+  List<Item> get items => data?.items?.map((e) => e.item)?.toList();
 
   FolderResponse({data});
 
