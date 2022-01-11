@@ -83,7 +83,6 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         children: List.generate(4, (index) {
-          return Card(
           if (index == 0) {
             // Show a link to the downloads page when the app is loading
             return _getLocalDownloadsWidget();
