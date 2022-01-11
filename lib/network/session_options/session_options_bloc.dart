@@ -27,13 +27,11 @@ import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionOptionsBloc {
   SessionOptionsRepository _repo;
 
   var illustration;
-  final LAST_SPEAKER_SELECTED = 'LAST_SPEAKER_SELECTED';
   Screen _screen;
 
   // Download stuff
@@ -91,9 +89,8 @@ class SessionOptionsBloc {
         .toList();
 
     var voiceGroups = _generateVoiceGroups(files);
-    var prefs = await SharedPreferences.getInstance();
-    var lastSelectedVoice = prefs.getInt(LAST_SPEAKER_SELECTED);
-    currentSelectedFileIndex = lastSelectedVoice.isNaN ? options.files.indexOf(files.first): lastSelectedVoice;
+
+    currentSelectedFileIndex = options.files.indexOf(files.first);
 
     // Show title, desc and image
     contentListController.sink.add(ApiResponse.completed(voiceGroups));
@@ -107,11 +104,7 @@ class SessionOptionsBloc {
     _options = options;
   }
 
-  Future<void> saveOptionsSelectionsToSharedPreferences(String id) async {
-    var options = await _repo.fetchOptions(id, false);
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(LAST_SPEAKER_SELECTED, currentSelectedFileIndex);
-  }
+  void saveOptionsSelectionsToSharedPreferences(String id) {}
 
   bool isDownloading(AudioFile file) => downloadSingleton.isDownloadingMe(file);
 
