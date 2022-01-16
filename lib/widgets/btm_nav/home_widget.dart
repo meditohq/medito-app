@@ -80,19 +80,19 @@ class _HomeWidgetState extends State<HomeWidget> {
                   return ListView(
                     physics: AlwaysScrollableScrollPhysics(),
                     children: [
-                      _getAppBar(context),
-                      AnnouncementBanner(key: _announceKey),
-                      SmallShortcutsRowWidget(
+                      InkWell(child: _getAppBar(context)),
+                      InkWell(child: AnnouncementBanner(key: _announceKey)),
+                      InkWell(child: SmallShortcutsRowWidget(
                         key: _shortcutKey,
                         onTap: (type, id) => _navigate(
                             type, id, context, Tracking.SHORTCUT_TAPPED),
-                      ),
-                      CoursesRowWidget(
+                      )),
+                      InkWell(child: CoursesRowWidget(
                           key: _coursesKey,
                           onTap: (type, id) => _navigate(
-                              type, id, context, Tracking.COURSE_TAPPED)),
-                      DailyMessageWidget(key: _dailyMessageKey),
-                      StatsWidget(),
+                              type, id, context, Tracking.COURSE_TAPPED))),
+                      InkWell(child: DailyMessageWidget(key: _dailyMessageKey)),
+                      InkWell(child: StatsWidget()),
                     ],
                   );
                 }

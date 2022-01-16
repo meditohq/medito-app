@@ -67,6 +67,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void setLoaded(bool b, MediaItem mediaItem) {
     if (__loaded == null && b == true) {
       __loaded = 'true';
+      _playPressed(false);
     }
   }
 

@@ -24,7 +24,7 @@ class PlayerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onPressed,
       child: Stack(
         alignment: Alignment.center,

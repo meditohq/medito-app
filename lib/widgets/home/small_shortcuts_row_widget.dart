@@ -57,12 +57,13 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                       shrinkWrap: true,
                       children: List.generate(
                           snapshot.data.body?.data?.length ?? 0, (index) {
-                        return Card(
+                        return InkWell(
+                            child: Card(
                           clipBehavior: Clip.antiAlias,
                           color: MeditoColors.deepNight,
                           child: SmallShortcutWidget(
                               snapshot.data.body.data[index], widget.onTap),
-                        );
+                        ));
                       }),
                     );
                     break;
