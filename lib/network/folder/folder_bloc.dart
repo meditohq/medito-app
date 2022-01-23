@@ -52,7 +52,7 @@ class FolderItemsBloc {
       coverController.sink.add(ApiResponse.loading());
       content = await _repo.fetchFolderData(_sessionId, skipCache);
 
-      if (content?.hasData == null) {
+      if (content?.hasData == false) {
         if (!itemsListController.isClosed) {
           itemsListController.sink.add(ApiResponse.error('Error'));
         }
@@ -60,7 +60,7 @@ class FolderItemsBloc {
           coverController.sink.add(ApiResponse.error('Error'));
         }
         if (!titleController.isClosed) {
-          titleController.add('Please check your connection');
+          titleController.add('An error occurred, please try again later');
         }
       } else {
         _postItemList(content);
