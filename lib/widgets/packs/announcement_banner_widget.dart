@@ -123,12 +123,15 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     );
   }
 
-  CircleAvatar buildCircleAvatar(AsyncSnapshot<AnnouncementResponse> snapshot) {
-    return CircleAvatar(
-      backgroundColor: parseColor(snapshot.data.colorPrimary),
-      child: SvgPicture.asset(
-        'assets/images/${snapshot.data.icon}.svg',
-        color: MeditoColors.darkMoon,
+  Widget buildCircleAvatar(AsyncSnapshot<AnnouncementResponse> snapshot) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 42.0),
+      child: CircleAvatar(
+        backgroundColor: parseColor(snapshot.data.colorPrimary),
+        child: SvgPicture.asset(
+          'assets/images/${snapshot.data.icon}.svg',
+          color: MeditoColors.darkMoon,
+        ),
       ),
     );
   }
