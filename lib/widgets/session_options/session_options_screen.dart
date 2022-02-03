@@ -234,6 +234,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           onSelected: (bool selected) {
             setState(() {
               _bloc.currentSelectedFileIndex = index;
+              _bloc.saveOptionsSelectionsToSharedPreferences(super.widget.id);
             });
           },
           selectedColor: MeditoColors.walterWhite,
