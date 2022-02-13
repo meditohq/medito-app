@@ -23,7 +23,8 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizeChangedLayoutNotifier(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: StreamBuilder<ApiResponse<DailyMessageResponse>>(
           stream: _bloc.coursesList.stream,
           initialData: ApiResponse.loading(),

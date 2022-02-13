@@ -70,17 +70,21 @@ class CoursesRowItemWidget extends StatelessWidget {
     }
   }
 
-  Stack _imageStack() {
-    return Stack(
-      children: [
-        SizedBox(width: 132, height: 132, child: _buildCardBackground()),
-        Positioned.fill(
-          child: Center(
-            child: SizedBox(
-                width: 92, height: 92, child: _getNetworkImageWidget()),
+  Widget _imageStack() {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      child: Stack(
+        children: [
+          SizedBox(width: 132, height: 132, child: _buildCardBackground()),
+          Positioned.fill(
+            child: Center(
+              child: SizedBox(
+                  width: 92, height: 92, child: _getNetworkImageWidget()),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
