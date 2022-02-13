@@ -24,7 +24,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AnnouncementBanner extends StatefulWidget {
-  AnnouncementBanner({Key key}) : super(key: key);
+  AnnouncementBanner({Key key, this.hasOpened}) : super(key: key);
+
+  final bool hasOpened;
 
   @override
   AnnouncementBannerState createState() => AnnouncementBannerState();
@@ -38,11 +40,11 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   @override
   void initState() {
     super.initState();
-    _bloc.fetchAnnouncement(skipCache: true);
+    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened);
   }
 
   void refresh() {
-    _bloc.fetchAnnouncement(skipCache: true);
+    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened);
   }
 
   @override

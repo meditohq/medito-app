@@ -13,11 +13,11 @@ import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> firstOpenOperations() async {
+Future<bool> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
-  _beginClearStorage(prefs);
+  var opened = _beginClearStorage(prefs);
   await _logAccount(prefs);
-  return;
+  return opened;
 }
 
 Future _logAccount(SharedPreferences prefs) async {
@@ -54,11 +54,13 @@ Future<void> _postUsage() async {
   }
 }
 
-void _beginClearStorage(SharedPreferences prefs) {
+//clears storage if this is first open, and returns true if the user has opened the app before
+bool _beginClearStorage(SharedPreferences prefs) {
   var opened = prefs.getBool('hasOpened') ?? false;
   if (!opened) {
     unawaited(_clearStorage(prefs));
   }
+  return opened;
 }
 
 Future _clearStorage(SharedPreferences prefs) async {

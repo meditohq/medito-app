@@ -29,9 +29,9 @@ class AnnouncementBloc {
     _repo = AnnouncementRepository();
   }
 
-  Future<void> fetchAnnouncement({bool skipCache}) async {
+  Future<void> fetchAnnouncement({bool skipCache, bool hasOpened}) async {
     try {
-      var data = await _repo.fetchAnnouncements(skipCache);
+      var data = await _repo.fetchAnnouncements(skipCache, hasOpened);
       announcementController.add(data);
     } catch (e) {
       print(e);
