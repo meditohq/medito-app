@@ -16,10 +16,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:io';
 
 import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -83,6 +83,10 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 }
 
 Future<void> launchUrl(String href) async {
+  var prefs = await SharedPreferences.getInstance();
+  var userId = prefs.getString(USER_ID);
+  href = href.replaceAll('{{user_id}}', userId);
+
   if (href.startsWith('mailto')) {
     _launchEmailSubmission(href);
   } else {
@@ -101,7 +105,10 @@ void _launchEmailSubmission(String href) async {
     print(e);
   }
 
-  var info = '--- Please write email below this line v$version ----';
+  var prefs = await SharedPreferences.getInstance();
+  var userId = prefs.getString(USER_ID);
+  var info =
+      '--- Please write email below this line v$version, id:$userId ----';
 
   final params = Uri(
       scheme: 'mailto',
