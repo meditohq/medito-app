@@ -97,6 +97,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                               type, id, context, Tracking.COURSE_TAPPED)),
                       DailyMessageWidget(key: _dailyMessageKey),
                       StatsWidget(),
+                      SizedBox(height: 24)
                     ],
                   );
                 }

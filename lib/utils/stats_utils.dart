@@ -25,13 +25,13 @@ enum UnitType { day, min, sessions }
 String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:
-      return value == 1 ? 'day' : 'days';
+      return 'd';
       break;
     case UnitType.min:
-      return 'min';
+      return '';
       break;
     case UnitType.sessions:
-      return value == 1 ? 'session' : 'sessions';
+      return '';
       break;
   }
   return '';
