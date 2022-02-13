@@ -36,6 +36,8 @@ class Tracking {
   //for audio started
   static const String SESSION_VOICE = 'session_voice';
   static const String SESSION_LENGTH = 'session_length';
+  static const String SESSION_TITLE = 'session_title';
+  static const String SESSION_ID = 'session_id';
   static const String SESSION_BACKGROUND_SOUND = 'session_background_sound';
 
   //for cta tapped
@@ -45,11 +47,11 @@ class Tracking {
   static const String TYPE = 'type';
   static const String ITEM = 'item';
 
-  static String get url => BASE_URL + 'items/actions/';
+  static String get url => BASE_URL + 'items/analytics_sessions/';
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
     //only track in release mode, not debug
-    if (kReleaseMode) {
+    if (!kReleaseMode) {
       unawaited(httpPost(url, await generatedToken, body: map));
     }
   }

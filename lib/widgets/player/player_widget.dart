@@ -60,6 +60,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   StreamSubscription _stream;
   PlayerBloc _bloc;
 
+  MediaItem _mediaItem;
+
   bool get loaded => __loaded == 'true';
   String __loaded;
   bool _complete = false;
@@ -67,6 +69,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void setLoaded(bool b, MediaItem mediaItem) {
     if (__loaded == null && b == true) {
       __loaded = 'true';
+      _mediaItem = mediaItem;
     }
   }
 
@@ -78,6 +81,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     } catch (e) {
       print('stop error!');
     }
+    _bloc.dispose();
     super.dispose();
   }
 
@@ -89,11 +93,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         await AudioService.customAction(SET_BG_SOUND_VOL, value / 100));
 
     _stream = AudioService.customEventStream.listen((event) async {
-      if (event == 'stats') {
+      if (event == STATS) {
         await updateStatsFromBg();
+        unawaited(Tracking.trackEvent({
+          Tracking.TYPE: Tracking.AUDIO_COMPLETED,
+          Tracking.SESSION_ID: _mediaItem.id,
+          Tracking.SESSION_TITLE: _mediaItem.title,
+          Tracking.SESSION_LENGTH: _mediaItem.extras[LENGTH],
+          Tracking.SESSION_VOICE: _mediaItem.artist
+        }));
+        return true;
       }
-      unawaited(Tracking.trackEvent({Tracking.TYPE: Tracking.AUDIO_COMPLETED}));
-      return true;
     });
     _startTimeout();
     _bloc = PlayerBloc();
@@ -506,10 +516,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var path = _bloc.version.buttonPath;
 
     getVersionCopyInt().then((version) {
-      Tracking.trackEvent({
-        Tracking.TYPE: Tracking.CTA_TAPPED,
-        Tracking.PLAYER_COPY_VERSION: '$version'
-      });
+      //todo fix once screen is changed
+      // Tracking.trackEvent({
+      //   Tracking.TYPE: Tracking.CTA_TAPPED,
+      //   Tracking.PLAYER_COPY_VERSION: '$version'
+      // });
     });
 
     return launchUrl(path);
@@ -517,7 +528,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Future<void> _share() {
     Share.share(SHARE_TEXT);
-    Tracking.trackEvent({Tracking.TYPE: Tracking.SHARE_TAPPED});
+    // Tracking.trackEvent({Tracking.TYPE: Tracking.SHARE_TAPPED});
     return null;
   }
 

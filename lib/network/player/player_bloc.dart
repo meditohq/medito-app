@@ -60,4 +60,8 @@ class PlayerBloc {
     }
     return title;
   }
+
+  void dispose() {
+    bgSoundsListController.close();
+  }
 }

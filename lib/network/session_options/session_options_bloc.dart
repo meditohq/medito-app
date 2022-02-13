@@ -49,7 +49,6 @@ class SessionOptionsBloc {
   StreamController<String> secondaryColorController;
   StreamController<ApiResponse<List<VoiceItem>>> contentListController;
 
-  MediaLibrary _mediaLibrary;
   SessionData _options;
 
   var currentSelectedFileIndex = 0;
@@ -130,16 +129,13 @@ class SessionOptionsBloc {
   }
 
   void _trackSessionStart(MediaItem mediaItem) {
-    var data = {
+    unawaited(Tracking.trackEvent({
       Tracking.TYPE: Tracking.AUDIO_STARTED,
-      Tracking.SESSION_VOICE: mediaItem.artist,
+      Tracking.SESSION_ID: mediaItem.id,
+      Tracking.SESSION_TITLE: mediaItem.title,
       Tracking.SESSION_LENGTH: mediaItem.extras[LENGTH],
-      Tracking.DESTINATION: Tracking.destinationData(
-          mapToPlural(_screen.toString()),
-          mediaItem.extras[SESSION_ID].toString())
-    };
-
-    Tracking.trackEvent(data);
+      Tracking.SESSION_VOICE: mediaItem.artist
+    }));
   }
 
   MediaItem getMediaItemForAudioFile(AudioFile file) {
