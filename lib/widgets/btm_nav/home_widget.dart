@@ -114,11 +114,6 @@ class _HomeWidgetState extends State<HomeWidget> {
       );
 
   Future<void> _navigate(type, id, BuildContext context, String origin) {
-    Tracking.trackEvent({
-      Tracking.TYPE: origin,
-      Tracking.DESTINATION: Tracking.destinationData(mapToPlural(type), id)
-    });
-
     return checkConnectivity().then(
       (value) {
         if (value) {

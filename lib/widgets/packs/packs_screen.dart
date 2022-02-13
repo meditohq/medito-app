@@ -114,12 +114,6 @@ class PackListWidgetState extends State<PackListWidget> {
     return checkConnectivity().then((connected) {
       if (connected) {
         var pack = data[i];
-        Tracking.trackEvent({
-          Tracking.TYPE: Tracking.PACK_TAPPED,
-          Tracking.DESTINATION:
-              Tracking.destinationData(mapFileTypeToPlural(pack.fileType), pack.id)
-        });
-
         return NavigationFactory.navigateToScreenFromString(
             pack.type, pack.id, context);
       } else {

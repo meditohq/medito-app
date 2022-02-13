@@ -16,6 +16,9 @@ const PLAY_BG_SOUND = 'play_bg_sound';
 const SEND_BG_SOUND = 'send_bg_sound';
 const INIT_BG_SOUND = 'init_bg_sound';
 const SET_BG_SOUND_VOL = 'set_bg_sound_vol';
+const STOP = 'stop';
+const STATS = 'stats';
+
 
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
@@ -155,7 +158,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       case PLAY_BG_SOUND:
         await playBgMusic(params);
         break;
-      case 'stop':
+      case STOP:
         await _player.stop();
         await _broadcastState();
         break;
@@ -276,7 +279,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       'secsListened': _duration.inSeconds,
       'id': '${mediaItem.extras[SESSION_ID]}',
     };
-    await writeJSONToCache(encoded(dataMap), 'stats');
-    AudioServiceBackground.sendCustomEvent('stats');
+    await writeJSONToCache(encoded(dataMap), STATS);
+    AudioServiceBackground.sendCustomEvent(STATS);
   }
 }

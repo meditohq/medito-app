@@ -219,12 +219,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           type = Tracking.SESSION_TAPPED;
         }
 
-        Tracking.trackEvent({
-          Tracking.TYPE: type,
-          Tracking.DESTINATION: Tracking.destinationData(
-              mapFileTypeToPlural(item.fileType), item.id)
-        });
-
         NavigationFactory.navigate(
                 context, NavigationFactory.getScreenFromItemType(item.fileType),
                 id: item.id)
