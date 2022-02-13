@@ -77,11 +77,10 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   }
 
   Text getDescriptionWidget(BuildContext context) {
-    return Text(widget.title.toUpperCase(),
+    return Text(widget.title,
         maxLines: 2,
         textAlign: TextAlign.center,
-        overflow: TextOverflow.fade,
-        style: Theme.of(context).textTheme.subtitle2);
+        style: Theme.of(context).textTheme.subtitle1);
   }
 
   String _formatSnapshotData(AsyncSnapshot<String> snapshot) {
