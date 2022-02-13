@@ -30,7 +30,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
-        padding: const EdgeInsets.only(top: 32.0, left: 16, bottom: 8.0),
+        padding: const EdgeInsets.only(top: 24.0, left: 16, bottom: 8.0),
         child: Text('Courses', style: Theme.of(context).textTheme.headline3),
       ),
       SizeChangedLayoutNotifier(
@@ -44,6 +44,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
               );
             }),
       ),
+      SizedBox(height: 24)
     ]);
   }
 
