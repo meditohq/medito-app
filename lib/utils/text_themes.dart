@@ -46,7 +46,7 @@ TextTheme meditoTextTheme(BuildContext context) {
         ),
         headline5: TextStyle(
           // stats widget
-          fontSize: 24,
+          fontSize: 20,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.2,

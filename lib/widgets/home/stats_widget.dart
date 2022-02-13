@@ -93,6 +93,8 @@ class _StatsWidgetState extends State<StatsWidget> {
             primaryColor: MeditoColors.walterWhite,
           ),
           child: AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             backgroundColor: MeditoColors.moonlight,
             title: Text('How many days is your streak?',
                 style: Theme.of(context).textTheme.headline4),
@@ -111,9 +113,10 @@ class _StatsWidgetState extends State<StatsWidget> {
             ),
             actions: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                padding: const EdgeInsets.only(right: 8.0, bottom: 8.0),
                 child: Row(
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Container(
                       height: 38,
@@ -121,8 +124,8 @@ class _StatsWidgetState extends State<StatsWidget> {
                         onPressed: _onCancelTap,
                         child: Text('CANCEL',
                             style: Theme.of(context).textTheme.subtitle1
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     Container(
@@ -133,32 +136,16 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onSaveTap,
                         style: TextButton.styleFrom(
-                            // shape: roundedRectangleBorder(),
+                          // shape: roundedRectangleBorder(),
                             primary: MeditoColors.walterWhite),
                         child: Text('SAVE',
                             style: Theme.of(context).textTheme.headline3
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
                 ),
-//
-//                TextButton(
-//                  style: TextButton.fromStyle(
-//                  shape: RoundedRectangleBorder(
-//                    borderRadius: new BorderRadius.circular(12.0),
-//                  ),
-//                  primary: MeditoColors.walterWhite),
-//                  child: Text(
-//                    "SAVE",
-//                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
-//                  ),
-//                  onPressed: () {
-//                    Navigator.pop(context, _controller.text);
-//                    _controller.text = '';
-//                  },
-//                ),s
               )
             ],
           ),
