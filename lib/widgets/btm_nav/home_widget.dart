@@ -38,6 +38,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -217,7 +218,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     final snackBar = SnackBar(
         content: GestureDetector(
           onTap: () {
-            Clipboard.setData(ClipboardData(text: '$line1 $userID'));
+            Share.share('$line1 $userID');
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
