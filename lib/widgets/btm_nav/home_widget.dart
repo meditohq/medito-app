@@ -41,6 +41,10 @@ import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeWidget extends StatefulWidget {
+  const HomeWidget(this.hasOpened);
+
+  final bool hasOpened;
+
   @override
   _HomeWidgetState createState() => _HomeWidgetState();
 }
@@ -81,7 +85,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     physics: AlwaysScrollableScrollPhysics(),
                     children: [
                       _getAppBar(context),
-                      AnnouncementBanner(key: _announceKey),
+                      AnnouncementBanner(key: _announceKey, hasOpened: widget.hasOpened),
                       SmallShortcutsRowWidget(
                         key: _shortcutKey,
                         onTap: (type, id) => _navigate(

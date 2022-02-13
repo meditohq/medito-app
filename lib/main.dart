@@ -59,10 +59,11 @@ class ParentWidget extends StatefulWidget {
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
   var _currentIndex = 0;
-  final _children = [HomeWidget(), PackListWidget()];
   final _messengerKey = GlobalKey<ScaffoldState>();
 
   var _deletingCache = true;
+
+  bool _hasOpened;
 
   @override
   void initState() {
@@ -77,7 +78,8 @@ class _ParentWidgetState extends State<ParentWidget>
           statusBarColor: MeditoColors.transparent),
     );
 
-    firstOpenOperations().then((value) {
+    firstOpenOperations().then((hasOpened) {
+      _hasOpened = hasOpened;
       setState(() {
         _deletingCache = false;
       });
@@ -109,7 +111,7 @@ class _ParentWidgetState extends State<ParentWidget>
                   key: _messengerKey,
                   body: IndexedStack(
                     index: _currentIndex,
-                    children: _children,
+                    children:  [HomeWidget(_hasOpened), PackListWidget()],
                   ),
                   bottomNavigationBar: Container(
                     decoration: BoxDecoration(
