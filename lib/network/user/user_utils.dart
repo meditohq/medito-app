@@ -42,7 +42,7 @@ Future<void> _postUsage() async {
   var packageInfo = await PackageInfo.fromPlatform();
   var version = packageInfo.buildNumber;
 
-  var ext = 'items/analytics_usage/';
+  var ext = 'items/usage/';
   var url = BASE_URL + ext;
   try {
     unawaited(
