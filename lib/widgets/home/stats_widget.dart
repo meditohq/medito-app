@@ -15,34 +15,36 @@ class _StatsWidgetState extends State<StatsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
-          child: Text('Stats', style: Theme.of(context).textTheme.headline3),
+    return Padding(
+      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+      child: Card(
+        color: MeditoColors.deepNight,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Table(columnWidths: const {
+            0: FlexColumnWidth(),
+            1: FlexColumnWidth(),
+          }, children: [
+            TableRow(children: [
+              statsItem(0),
+              statsItem(1),
+              statsItem(2),
+              statsItem(3)
+            ]),
+          ]),
         ),
-        SizedBox(
-          height: 73,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            itemBuilder: (context, i) => statsItem(context, i),
-            itemCount: 4,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-          ),
-        ),
-        Container(height: 16)
-      ],
+      ),
     );
   }
 
-  Widget statsItem(BuildContext context, int index) {
+  Widget statsItem(int index) {
     switch (index) {
       case 0:
         return StreakTileWidget(
           getCurrentStreak(),
-          'Current streak',
+          'Current\nstreak',
           onClick: openEditDialog,
           editable: true,
           optionalText: UnitType.day,
@@ -50,23 +52,33 @@ class _StatsWidgetState extends State<StatsWidget> {
       case 1:
         return StreakTileWidget(
           getMinutesListened(),
-          'Listened',
+          'Minutes Listened',
           optionalText: UnitType.min,
         );
       case 2:
         return StreakTileWidget(
           getLongestStreak(),
-          'Longest streak',
+          'Longest\nstreak',
           editable: true,
           onClick: openResetDialog,
           optionalText: UnitType.day,
         );
       case 3:
-        return StreakTileWidget(
-          getNumSessions(),
-          'Total',
-          optionalText: UnitType.sessions,
-        );
+        return FutureBuilder<String>(
+            future: getNumSessions(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return StreakTileWidget(
+                  getNumSessions(),
+                  snapshot.data == '1'
+                      ? 'Session\nListened'
+                      : 'Sessions\nListened',
+                  optionalText: UnitType.sessions,
+                );
+              } else {
+                return Container();
+              }
+            });
     }
     return Container();
   }

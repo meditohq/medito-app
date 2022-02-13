@@ -5,6 +5,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/daily_message_item_widget.dart';
 import 'package:flutter/material.dart';
 
+//This widget is the quote box on the home screen
 class DailyMessageWidget extends StatefulWidget {
 
   @override
