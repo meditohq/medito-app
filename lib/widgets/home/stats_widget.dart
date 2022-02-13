@@ -176,13 +176,16 @@ class _StatsWidgetState extends State<StatsWidget> {
               hintColor: Colors.green),
           child: AlertDialog(
             backgroundColor: MeditoColors.moonlight,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text('Reset longest streak to your current streak?',
                 style: Theme.of(context).textTheme.headline4),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
                 child: Row(
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Container(
                       height: 38,
