@@ -58,6 +58,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                       children: List.generate(
                           snapshot.data.body?.data?.length ?? 0, (index) {
                         return Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                           clipBehavior: Clip.antiAlias,
                           color: MeditoColors.deepNight,
                           child: SmallShortcutWidget(
@@ -100,6 +101,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
     return Card(
         clipBehavior: Clip.antiAlias,
         color: MeditoColors.almostBlack,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: SmallShortcutWidget(
             ShortcutData(
                 title: 'Downloads',
