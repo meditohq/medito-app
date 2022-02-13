@@ -22,7 +22,7 @@ class _StatsWidgetState extends State<StatsWidget> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16.0))),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Table(columnWidths: const {
             0: FlexColumnWidth(),
             1: FlexColumnWidth(),
@@ -49,12 +49,14 @@ class _StatsWidgetState extends State<StatsWidget> {
           editable: true,
           optionalText: UnitType.day,
         );
+        break;
       case 1:
         return StreakTileWidget(
           getMinutesListened(),
           'Minutes Listened',
           optionalText: UnitType.min,
         );
+        break;
       case 2:
         return StreakTileWidget(
           getLongestStreak(),
@@ -63,6 +65,7 @@ class _StatsWidgetState extends State<StatsWidget> {
           onClick: openResetDialog,
           optionalText: UnitType.day,
         );
+        break;
       case 3:
         return FutureBuilder<String>(
             future: getNumSessions(),
@@ -79,6 +82,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                 return Container();
               }
             });
+        break;
     }
     return Container();
   }

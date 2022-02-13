@@ -96,8 +96,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                           key: _coursesKey,
                           onTap: (type, id) => _navigate(
                               type, id, context, Tracking.COURSE_TAPPED)),
-                      DailyMessageWidget(key: _dailyMessageKey),
                       StatsWidget(),
+                      SizedBox(height: 16),
+                      DailyMessageWidget(key: _dailyMessageKey),
                       SizedBox(height: 24)
                     ],
                   );

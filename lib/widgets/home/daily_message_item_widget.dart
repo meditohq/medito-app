@@ -21,9 +21,7 @@ class DailyMessageItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-          left: 12.0, right: 12.0, bottom: 8.0, top: 16.0),
+    return SizeChangedLayoutNotifier(
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

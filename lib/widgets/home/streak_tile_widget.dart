@@ -51,14 +51,17 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
             splashColor: MeditoColors.softGrey,
             onTap: widget.onClick,
             child: Ink(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  _getDataTextWidget(snapshot, unit, context),
-                  SizedBox(height: 6),
-                  getDescriptionWidget(context)
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _getDataTextWidget(snapshot, unit, context),
+                    SizedBox(height: 6),
+                    getDescriptionWidget(context)
+                  ],
+                ),
               ),
             ),
           );
