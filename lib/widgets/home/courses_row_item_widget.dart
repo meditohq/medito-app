@@ -71,9 +71,10 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _imageStack() {
-    return Card(
+    return Container(
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(2))),
       child: Stack(
         children: [
           SizedBox(width: 132, height: 132, child: _buildCardBackground()),
