@@ -562,6 +562,7 @@ Future<void> start(MediaItem media) async {
     androidNotificationIcon: 'drawable/logo',
     androidEnableQueue: true,
   ).onError((error, stackTrace) => _printError(error)));
+  unawaited(AudioService.play());
 }
 
 FutureOr<bool> _printError(error) async {
