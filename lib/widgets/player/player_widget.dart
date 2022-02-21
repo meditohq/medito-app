@@ -548,6 +548,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 // NOTE: Your entrypoint MUST be a top-level function.
 void _audioPlayerTaskEntrypoint() async {
   unawaited(AudioServiceBackground.run(() => AudioPlayerTask()));
+  unawaited(AudioService.play());
 }
 
 Future<void> start(MediaItem media) async {
