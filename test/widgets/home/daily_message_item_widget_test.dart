@@ -19,7 +19,7 @@ void main() {
 
     await tester.pumpWidget(testingWidget);
 
-    var title = find.text('test_title');
+    var title = find.text('test_title'.toUpperCase());
     expect(title, findsOneWidget);
 
     var body = find.byType(MarkdownBody);
