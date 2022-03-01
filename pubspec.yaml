@@ -13,14 +13,14 @@ description: A meditation learning tool
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 2.0.33+20033
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.10.0-0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
-  google_fonts: ^2.0.0
-  flutter_svg: ^0.22.0
+  google_fonts: ^2.3.1
+  flutter_svg: ^1.0.3
   path_provider: ^2.0.1
   url_launcher: ^6.0.3
   flutter_markdown: ^0.6.7
@@ -29,12 +29,12 @@ dependencies:
   auto_size_text: ^3.0.0-nullsafety.0
   just_audio: ^0.9.5
   audio_session: ^0.1.0
-  audio_service: ^0.17.0
+  audio_service: ^0.18.3
   rxdart: ^0.27.1
   share: ^2.0.1
   firebase_core: ^1.1.0
-  firebase_messaging: ^10.0.0
-  flutter_html: ^2.0.0-nullsafety.1
+  firebase_messaging: ^11.2.6
+  flutter_html: ^3.0.0-alpha.2
   provider: ^6.0.0
   package_info: ^2.0.0
   pedantic: ^1.11.0
@@ -48,7 +48,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^0.1.2
+  mocktail: ^0.2.0
 
 
 # For information on the generic Dart part of this file, see the

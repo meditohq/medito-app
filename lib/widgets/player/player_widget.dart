@@ -123,17 +123,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(body: Builder(builder: (BuildContext context) {
       return StreamBuilder<ScreenState>(
-          stream: _screenStateStream,
+          // stream: _screenStateStream,
           builder: (context, screenStateSnapshot) {
             final screenState = screenStateSnapshot.data;
             final mediaItem = screenState?.mediaItem;
             final state = screenState?.playbackState;
             final processingState =
-                state?.processingState ?? AudioProcessingState.none;
+                state?.processingState ?? AudioProcessingState.idle;
             final playing = state?.playing ?? false;
 
-            if (processingState == AudioProcessingState.stopped ||
-                processingState == AudioProcessingState.completed ||
+            if (processingState == AudioProcessingState.completed ||
                 (loaded && mediaItem == null)) {
               _complete = true;
             }
@@ -252,12 +251,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
     }
 
-    return loaded
-        ? Padding(
+    return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SubtitleTextWidget(body: attr),
-          )
-        : Container();
+          );
   }
 
   Expanded _getPlayingPauseOrLoadingIndicator(
@@ -267,7 +264,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           (processingState == AudioProcessingState.buffering ||
-                  processingState == AudioProcessingState.connecting)
+                  processingState == AudioProcessingState.loading)
               ? buildCircularIndicatorRow(hasBgSound)
               : Column(
                   mainAxisSize: MainAxisSize.min,
@@ -373,13 +370,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   /// Encapsulate all the different data we're interested in into a single
   /// stream so we don't have to nest StreamBuilders.
-  Stream<ScreenState> get _screenStateStream =>
-      Rx.combineLatest3<List<MediaItem>, MediaItem, PlaybackState, ScreenState>(
-          AudioService.queueStream,
-          AudioService.currentMediaItemStream,
-          AudioService.playbackStateStream,
-          (queue, mediaItem, playbackState) =>
-              ScreenState(queue, mediaItem, playbackState));
+  // Stream<ScreenState> get _screenStateStream =>
+  //     Rx.combineLatest3<List<MediaItem>, MediaItem, PlaybackState, ScreenState>(
+  //         AudioService.queueStream,
+  //         AudioService.currentMediaItemStream,
+  //         AudioService.playbackStateStream,
+  //         (queue, mediaItem, playbackState) =>
+  //             ScreenState(queue, mediaItem, playbackState));
 
   Widget playButton(bool hasBgSound) => Semantics(
         label: 'Play button',
@@ -392,7 +389,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       );
 
   Future<void> _playPressed(bool hasBgSound) async {
-    unawaited(AudioService.play());
+    // unawaited(AudioService.play());
     if (hasBgSound) await getSavedBgSoundData();
   }
 
@@ -401,7 +398,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         child: PlayerButton(
           icon: Icons.pause,
           secondaryColor: secondaryColor,
-          onPressed: AudioService.pause,
+          // onPressed: AudioService.pause,
           primaryColor: primaryColorAsColor,
         ),
       );
@@ -410,20 +407,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       MediaItem mediaItem, PlaybackState state, Color primaryColorAsColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-      child: PositionIndicatorWidget(
-          mediaItem: mediaItem, state: state, color: primaryColorAsColor),
     );
   }
 
   Future<void> getSavedBgSoundData() async {
     var file = await getBgSoundFileFromSharedPrefs();
     var name = await getBgSoundNameFromSharedPrefs();
-    unawaited(AudioService.customAction(SEND_BG_SOUND, name));
-    unawaited(AudioService.customAction(PLAY_BG_SOUND, file));
+    // unawaited(AudioService.customAction(SEND_BG_SOUND, name));
+    // unawaited(AudioService.customAction(PLAY_BG_SOUND, file));
   }
 
   void _onBackPressed() {
-    if (_complete || (widget.normalPop != null && widget.normalPop)) {
+    if (widget.normalPop != null && widget.normalPop) {
       Navigator.pop(context);
     } else {
       Navigator.popUntil(
@@ -543,25 +538,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Future.delayed(Duration(milliseconds: 50))
         .then((value) => _bloc.fetchBackgroundSounds());
   }
-}
-
-// NOTE: Your entrypoint MUST be a top-level function.
-void _audioPlayerTaskEntrypoint() async {
-  unawaited(AudioServiceBackground.run(() => AudioPlayerTask()));
-}
-
-Future<void> start(MediaItem media) async {
-  var map = {'media': media.toJson()};
-  unawaited(AudioService.connect());
-  unawaited(AudioService.start(
-    params: map,
-    backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-    androidNotificationChannelName: 'Medito Audio Service',
-    // Enable this if you want the Android service to exit the foreground state on pause.
-    //androidStopForegroundOnPause: true,
-    androidNotificationIcon: 'drawable/logo',
-    androidEnableQueue: true,
-  ).onError((error, stackTrace) => _printError(error)));
 }
 
 FutureOr<bool> _printError(error) async {

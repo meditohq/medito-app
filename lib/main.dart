@@ -16,12 +16,14 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
+import 'package:Medito/widgets/player/player2/medito_audio_handler.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,24 +31,61 @@ import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'audioplayer/audio_player_service.dart';
+import 'audioplayer/media_lib.dart';
 import 'network/auth.dart';
 import 'utils/colors.dart';
 
 SharedPreferences sharedPreferences;
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   sharedPreferences = await SharedPreferences.getInstance();
 
+  var _audioHandler = await AudioService.init(
+    builder: () => MeditoAudioHandler(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'com.medito.app.channel.audio',
+      androidNotificationChannelName: 'Medito Session',
+    ),
+  );
+
+  _audioHandler.customEvent.stream.listen((event) async {
+    if (event == STATS) {
+      await updateStatsFromBg();
+    }
+  });
+
   if (kReleaseMode) {
     await SentryFlutter.init((options) {
       options.dsn = SENTRY_URL;
     }, appRunner: () => runApp(ParentWidget()));
   } else {
-    runApp(ParentWidget());
+    runApp(AudioHandlerInheritedWidget(audioHandler: _audioHandler, child: ParentWidget()));
   }
 }
+
+class AudioHandlerInheritedWidget extends InheritedWidget {
+  const AudioHandlerInheritedWidget({
+    Key key,
+    @required this.audioHandler,
+    @required Widget child,
+  }) : super(key: key, child: child);
+
+  final MeditoAudioHandler audioHandler;
+
+  static AudioHandlerInheritedWidget of(BuildContext context) {
+    final result = context.dependOnInheritedWidgetOfExactType<AudioHandlerInheritedWidget>();
+    assert(result != null, 'No FrogColor found in context');
+    return result;
+  }
+
+  @override
+  bool updateShouldNotify(AudioHandlerInheritedWidget old) => audioHandler != old.audioHandler;
+}
+
 
 /// This Widget is the main application widget.
 class ParentWidget extends StatefulWidget {

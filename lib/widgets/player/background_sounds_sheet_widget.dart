@@ -22,17 +22,20 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/player/player2/medito_audio_handler.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../main.dart';
+
 class ChooseBackgroundSoundDialog extends StatefulWidget {
   final stream;
+  final MeditoAudioHandler handler;
 
-  ChooseBackgroundSoundDialog({this.stream});
+  ChooseBackgroundSoundDialog({this.handler, this.stream});
 
   @override
   _ChooseBackgroundSoundDialogState createState() =>
@@ -49,6 +52,7 @@ class _ChooseBackgroundSoundDialogState
       BehaviorSubject.seeded(null);
   var volume;
 
+  MeditoAudioHandler _handler;
   String _downloadingItem;
 
   @override
@@ -65,16 +69,16 @@ class _ChooseBackgroundSoundDialogState
   }
 
   void initService() async {
-    if (AudioService.running) {
-      volume = await retrieveSavedBgVolume();
-      _dragBgVolumeSubject.add(volume);
-      await AudioService.customAction(SET_BG_SOUND_VOL, volume / 100);
-      await AudioService.customAction(INIT_BG_SOUND, '');
-    }
+    volume = await retrieveSavedBgVolume();
+    _dragBgVolumeSubject.add(volume);
+    await widget.handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume / 100});
+    // await AudioService.customAction(INIT_BG_SOUND, '');
   }
 
   @override
   Widget build(BuildContext context) {
+    _handler = AudioHandlerInheritedWidget.of(context).audioHandler;
+
     return StreamBuilder(
         stream: Stream.fromFuture(Connectivity()
             .checkConnectivity()), // figure out how to refresh the stream periodically
@@ -84,7 +88,7 @@ class _ChooseBackgroundSoundDialogState
               isOffline = true;
             }
             return StreamBuilder<dynamic>(
-                stream: AudioService.customEventStream,
+                stream: widget.handler.customEvent.stream,
                 initialData: NONE,
                 builder: (context, snapshot) {
                   var currentSounds;
@@ -263,8 +267,8 @@ class _ChooseBackgroundSoundDialogState
             }
             _downloadingItem = '';
             addBgSoundSelectionToSharedPrefs(filePath, item.name);
-            AudioService.customAction(PLAY_BG_SOUND, filePath);
-            return AudioService.customAction(SEND_BG_SOUND, item.name);
+            widget.handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: filePath});
+            return widget.handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: item.name});
           });
         },
         child: ListTile(
@@ -297,8 +301,8 @@ class _ChooseBackgroundSoundDialogState
 
   void _noneSelected() {
     print('selecting NONE');
-    AudioService.customAction(SEND_BG_SOUND, '');
-    AudioService.customAction(PLAY_BG_SOUND, '');
+    // AudioService.customAction(SEND_BG_SOUND, '');
+    // AudioService.customAction(PLAY_BG_SOUND, '');
     addBgSoundSelectionToSharedPrefs('', '');
   }
 
@@ -343,8 +347,8 @@ class _ChooseBackgroundSoundDialogState
                           value: volume,
                           onChanged: (value) {
                             _dragBgVolumeSubject.add(value);
-                            AudioService.customAction(
-                                SET_BG_SOUND_VOL, value / 100);
+                            _handler.customAction(
+                                SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: value / 100});
                           },
                           onChangeEnd: (value) {
                             saveBgVolume(value);

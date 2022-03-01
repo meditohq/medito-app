@@ -75,11 +75,14 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
       onRefresh: () {
         return _refresh(context, skipCache: true);
       },
-      child: Scaffold(
-        body: Builder(
-          builder: (BuildContext context) {
-            return _getScreenContent();
-          },
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) {
+              return _getScreenContent();
+            },
+          ),
         ),
       ),
     );
@@ -144,7 +147,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
 // Only the audio sessions should have swipable action to toggle the dimissible status
 // Other types like text file and folder should not have this option
-    if (item.fileType != FileType.session) {
+    if (item?.fileType != FileType.session) {
       childWidget = _getItemListWidget(item);
     } else {
       childWidget = Dismissible(

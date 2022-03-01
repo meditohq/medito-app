@@ -31,9 +31,21 @@ class DownloadsBloc {
     var info = await PackageInfo.fromPlatform();
     _mediaItem.extras[APP_VERSION] = info.buildNumber;
     if (_mediaItem != null) {
-      list.add(jsonEncode(_mediaItem));
+      var json = _jsonEncodeMediaItem(_mediaItem);
+      list.add(json);
       await prefs.setStringList(savedFilesKey, list);
     }
+  }
+
+  static String _jsonEncodeMediaItem(MediaItem _mediaItem) {
+    return jsonEncode({
+      'id': _mediaItem.id,
+      'title': _mediaItem.title,
+      'artist': _mediaItem.artist,
+      'duration': _mediaItem.duration?.inMilliseconds,
+      'artUri': _mediaItem.artUri.toString(),
+      'extras': _mediaItem.extras
+    });
   }
 
   static Future<List<MediaItem>> fetchDownloads() async {
@@ -43,7 +55,8 @@ class DownloadsBloc {
 
     list.forEach((element) {
       try {
-        var file = MediaItem.fromJson(jsonDecode(element));
+        var json = jsonDecode(element);
+        var file = _getMediaItemFromMap(json);
         fileList.add(file);
       } catch (exception, stackTrace) {
         print(stackTrace);
@@ -51,6 +64,16 @@ class DownloadsBloc {
     });
 
     return fileList;
+  }
+
+  static MediaItem _getMediaItemFromMap(json) {
+    return MediaItem(
+          id: json['id'],
+          title: json['title'],
+          artist: json['artist'],
+          duration: Duration(milliseconds: json['duration'] ?? 0),
+          artUri: Uri.parse(json['artUri']),
+          extras: json['extras']);
   }
 
   static Future<bool> isAudioFileDownloaded(AudioFile file) async {
@@ -77,7 +100,7 @@ class DownloadsBloc {
     // Remove the session from all downloads list
     var prefs = await SharedPreferences.getInstance();
     var list = prefs.getStringList(savedFilesKey) ?? [];
-    list.removeWhere((element) => MediaItem.fromJson(jsonDecode(element)).id == mediaFile.id);
+    list.removeWhere((element) => _getMediaItemFromMap(jsonDecode(element)).id == mediaFile.id);
     await prefs.setStringList(savedFilesKey, list);
   }
 
@@ -86,7 +109,7 @@ class DownloadsBloc {
   static Future<void> saveDownloads(List<MediaItem> mediaList) async {
     var prefs = await SharedPreferences.getInstance();
     var list =
-        mediaList.map((MediaItem mediaItem) => jsonEncode(mediaItem)).toList();
+        mediaList.map((MediaItem mediaItem) => _jsonEncodeMediaItem(mediaItem)).toList();
     await prefs.setStringList(savedFilesKey, list);
   }
 }

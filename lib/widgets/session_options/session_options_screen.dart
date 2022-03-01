@@ -25,8 +25,11 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+import '../../main.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -43,6 +46,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   bool showIndeterminateSpinner = false;
 
   SessionOptionsBloc _bloc;
+  AudioHandler _audioHandler;
 
   @override
   void initState() {
@@ -53,34 +57,39 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _audioHandler = AudioHandlerInheritedWidget.of(context)?.audioHandler;
+
     return StreamBuilder<String>(
         stream: _bloc.primaryColourController.stream,
         builder: (context, snapshot) {
-          return RefreshIndicator(
-              onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
-              child: Scaffold(
-                body: Stack(children: [
-                  SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _getHeaderWidget(),
-                        _getContentListWidget(),
-                        _bloc.getCurrentlySelectedFile() != null
-                            ? DownloadPanelWidget(
-                                item: _bloc.getCurrentlySelectedFile(),
-                                bloc: _bloc)
-                            : Container(),
-                        Container(
-                          height: 68,
-                        )
-                      ],
+          return SafeArea(
+            top: false,
+            child: RefreshIndicator(
+                onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
+                child: Scaffold(
+                  body: Stack(children: [
+                    SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _getHeaderWidget(),
+                          _getContentListWidget(),
+                          _bloc.getCurrentlySelectedFile() != null
+                              ? DownloadPanelWidget(
+                                  item: _bloc.getCurrentlySelectedFile(),
+                                  bloc: _bloc)
+                              : Container(),
+                          Container(
+                            height: 68,
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  _getBeginButton(snapshot.data),
-                ]),
-              ));
+                    _getBeginButton(snapshot.data),
+                  ]),
+                )),
+          );
         });
   }
 
@@ -138,10 +147,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
 
-    _bloc.startAudioService(item);
-
+    var mediaItem = _bloc.startAudioService(item);
+    _audioHandler.playMediaItem(mediaItem);
     NavigationFactory.navigate(context, Screen.player, id: widget.id);
-
     return null;
   }
 
