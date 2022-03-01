@@ -6,15 +6,16 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'media_lib.dart';
-import 'player_utils.dart';
 import '../network/auth.dart';
 import '../network/cache.dart';
+import 'media_lib.dart';
+import 'player_utils.dart';
 
 //This is the duration of bgSound fade towards the end.
 const fadeDuration = 20;
 const PLAY_BG_SOUND = 'play_bg_sound';
 const SEND_BG_SOUND = 'send_bg_sound';
+const AUDIO_COMPLETE = 'audio_complete';
 const INIT_BG_SOUND = 'init_bg_sound';
 const SET_BG_SOUND_VOL = 'set_bg_sound_vol';
 const STOP = 'stop';
@@ -74,35 +75,29 @@ class MeditoAudioHandler extends BaseAudioHandler
     } catch (e) {
       print(e);
     }
-    unawaited(_player.play());
+    unawaited(_player
+        .play()
+        .then((value) => customEvent.add({AUDIO_COMPLETE: true})));
   }
 
   @override
   Future<void> pause() async {
-    try {
-      unawaited(_bgPlayer.pause());
-    } catch (e) {
-      print(e);
-    }
-    unawaited(_player.pause());
+    await _bgPlayer.pause();
+    await _player.pause();
   }
 
   @override
   Future<void> stop() async {
     _updatedStats = false;
-    try {
-      unawaited(_bgPlayer.stop());
-    } catch (e) {
-      print(e);
-    }
-    unawaited(_player.stop());
-    await _player.dispose();
-    await _bgPlayer.dispose();
+    await _bgPlayer.pause();
+    await _bgPlayer.seek(Duration.zero);
+    await _player.pause();
+    await _player.seek(Duration.zero);
   }
 
   @override
   Future<void> seek(Duration position) async {
-    unawaited(_player.seek(position));
+    await _player.seek(position);
   }
 
   @override

@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/main.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
@@ -27,7 +28,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
@@ -36,7 +36,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
 import '../background_sounds_sheet_widget.dart';
@@ -91,6 +90,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var mediaItem = _handler.mediaItem.value;
 
     if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
+
+    _handler.customEvent.stream.listen((event) {
+      if (event[AUDIO_COMPLETE]) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('done'),
+              );
+            });
+      }
+    });
 
     return Material(
       child: SafeArea(
