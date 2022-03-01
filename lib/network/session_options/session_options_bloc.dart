@@ -23,7 +23,6 @@ import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation.dart';
-import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pedantic/pedantic.dart';
