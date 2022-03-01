@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PlayerButton extends StatelessWidget {
+  final Widget child;
   final IconData icon;
   final Future<void> Function() onPressed;
   final Color primaryColor;
-  final Widget child;
-  final String text;
   final Color secondaryColor;
+  final String text;
   final SvgPicture image;
 
   PlayerButton(

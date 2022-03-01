@@ -30,7 +30,7 @@ class FolderResponse {
 
   String get id => data?.id.toString();
 
-  List<Item> get items => data?.items?.map((e) => e.item)?.toList();
+  List<Item> get items => data?.items?.map((e) => e.item)?.toList()?.whereType<Item>()?.toList(); //removes nulls
 
   FolderResponse({data});
 

@@ -3,7 +3,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
 import 'package:Medito/widgets/btm_nav/favourites_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
-import 'package:Medito/widgets/player/player_widget.dart';
+import 'package:Medito/widgets/player/player2/player_widget_2.dart';
 import 'package:Medito/widgets/session_options/session_options_screen.dart';
 import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';

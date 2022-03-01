@@ -38,7 +38,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
     var mediaItemJson = params['media'];
-    mediaItem = MediaItem.fromJson(mediaItemJson);
+    mediaItem = null; //MediaItem.fromJson(mediaItemJson);
     // this bool var is set to true to avoid the volume increase
     var avoidVolumeIncreaseAtLastSec = false;
 
@@ -232,7 +232,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
         MediaControl.stop,
       ],
       systemActions: [
-        MediaAction.seekTo,
+        MediaAction.seek,
       ],
       processingState: _getProcessingState(),
       playing: _player.playing,
@@ -248,9 +248,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (_skipState != null) return _skipState;
     switch (_player.processingState) {
       case ProcessingState.idle:
-        return AudioProcessingState.stopped;
+        return AudioProcessingState.idle;
       case ProcessingState.loading:
-        return AudioProcessingState.connecting;
+        return AudioProcessingState.loading;
       case ProcessingState.buffering:
         return AudioProcessingState.buffering;
       case ProcessingState.ready:
@@ -280,6 +280,5 @@ class AudioPlayerTask extends BackgroundAudioTask {
       'id': '${mediaItem.extras[SESSION_ID]}',
     };
     await writeJSONToCache(encoded(dataMap), STATS);
-    AudioServiceBackground.sendCustomEvent(STATS);
   }
 }
