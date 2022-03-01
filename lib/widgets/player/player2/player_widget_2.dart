@@ -27,7 +27,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
-import 'package:Medito/widgets/player/player2/medito_audio_handler.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
@@ -39,7 +39,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
-import '../../../audioplayer/audio_player_service.dart';
 import '../background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {

@@ -16,14 +16,13 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/text_themes.dart';
 import 'package:Medito/widgets/btm_nav/home_widget.dart';
 import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/packs/packs_screen.dart';
-import 'package:Medito/widgets/player/player2/medito_audio_handler.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +30,6 @@ import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'audioplayer/audio_player_service.dart';
-import 'audioplayer/media_lib.dart';
 import 'network/auth.dart';
 import 'utils/colors.dart';
 

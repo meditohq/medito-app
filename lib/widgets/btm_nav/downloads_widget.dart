@@ -8,7 +8,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/empty_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
-import 'package:Medito/widgets/player/player2/medito_audio_handler.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

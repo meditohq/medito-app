@@ -1,16 +1,24 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../../audioplayer/media_lib.dart';
-import '../../../audioplayer/player_utils.dart';
-import '../../../network/auth.dart';
-import '../../../network/cache.dart';
+import 'media_lib.dart';
+import 'player_utils.dart';
+import '../network/auth.dart';
+import '../network/cache.dart';
+
+//This is the duration of bgSound fade towards the end.
+const fadeDuration = 20;
+const PLAY_BG_SOUND = 'play_bg_sound';
+const SEND_BG_SOUND = 'send_bg_sound';
+const INIT_BG_SOUND = 'init_bg_sound';
+const SET_BG_SOUND_VOL = 'set_bg_sound_vol';
+const STOP = 'stop';
+const STATS = 'stats';
 
 class MeditoAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
