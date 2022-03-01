@@ -39,10 +39,8 @@ class MeditoAudioHandler extends BaseAudioHandler
   PlaybackState _transformEvent(PlaybackEvent event) {
     return PlaybackState(
       controls: [
-        MediaControl.rewind,
         if (_player.playing) MediaControl.pause else MediaControl.play,
         MediaControl.stop,
-        MediaControl.fastForward,
       ],
       systemActions: const {
         MediaAction.seek,
