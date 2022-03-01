@@ -135,72 +135,70 @@ class _ParentWidgetState extends State<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    return AudioServiceWidget(
-      child: MaterialApp(
-        navigatorObservers: [SentryNavigatorObserver()],
-        initialRoute: '/nav',
-        routes: {
-          FolderNavWidget.routeName: (context) => FolderNavWidget(),
-          '/nav': (context) => _deletingCache
-              ? _getLoadingWidget()
-              : Scaffold(
-                  key: _messengerKey,
-                  body: IndexedStack(
-                    index: _currentIndex,
-                    children:  [HomeWidget(_hasOpened), PackListWidget()],
-                  ),
-                  bottomNavigationBar: Container(
-                    decoration: BoxDecoration(
-                        color: MeditoColors.softGrey,
-                        border: Border(
-                            top: BorderSide(
-                                color: MeditoColors.softGrey, width: 2.0))),
-                    child: BottomNavigationBar(
-                      selectedLabelStyle: Theme.of(context)
-                          .textTheme
-                          .headline1
-                          .copyWith(fontSize: 12),
-                      unselectedLabelStyle: Theme.of(context)
-                          .textTheme
-                          .headline2
-                          .copyWith(fontSize: 12),
-                      selectedItemColor: MeditoColors.walterWhite,
-                      unselectedItemColor: MeditoColors.newGrey,
-                      currentIndex: _currentIndex,
-                      onTap: _onTabTapped,
-                      items: [
-                        BottomNavigationBarItem(
-                          tooltip: 'Home',
-                          icon: Icon(
-                            Icons.home_outlined,
-                            size: 20,
-                          ),
-                          label: 'Home',
+    return MaterialApp(
+      navigatorObservers: [SentryNavigatorObserver()],
+      initialRoute: '/nav',
+      routes: {
+        FolderNavWidget.routeName: (context) => FolderNavWidget(),
+        '/nav': (context) => _deletingCache
+            ? _getLoadingWidget()
+            : Scaffold(
+                key: _messengerKey,
+                body: IndexedStack(
+                  index: _currentIndex,
+                  children:  [HomeWidget(_hasOpened), PackListWidget()],
+                ),
+                bottomNavigationBar: Container(
+                  decoration: BoxDecoration(
+                      color: MeditoColors.softGrey,
+                      border: Border(
+                          top: BorderSide(
+                              color: MeditoColors.softGrey, width: 2.0))),
+                  child: BottomNavigationBar(
+                    selectedLabelStyle: Theme.of(context)
+                        .textTheme
+                        .headline1
+                        .copyWith(fontSize: 12),
+                    unselectedLabelStyle: Theme.of(context)
+                        .textTheme
+                        .headline2
+                        .copyWith(fontSize: 12),
+                    selectedItemColor: MeditoColors.walterWhite,
+                    unselectedItemColor: MeditoColors.newGrey,
+                    currentIndex: _currentIndex,
+                    onTap: _onTabTapped,
+                    items: [
+                      BottomNavigationBarItem(
+                        tooltip: 'Home',
+                        icon: Icon(
+                          Icons.home_outlined,
+                          size: 20,
                         ),
-                        BottomNavigationBarItem(
-                          icon: Icon(
-                            Icons.format_list_bulleted_outlined,
-                            size: 20,
-                          ),
-                          tooltip: 'Packs',
-                          label: 'Packs',
+                        label: 'Home',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(
+                          Icons.format_list_bulleted_outlined,
+                          size: 20,
                         ),
-                      ],
-                    ),
+                        tooltip: 'Packs',
+                        label: 'Packs',
+                      ),
+                    ],
                   ),
-                )
-        },
-        theme: ThemeData(
-            splashColor: MeditoColors.moonlight,
-            canvasColor: MeditoColors.darkMoon,
-            pageTransitionsTheme: PageTransitionsTheme(builders: {
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.android: SlideTransitionBuilder(),
-            }),
-            accentColor: MeditoColors.walterWhite,
-            textTheme: meditoTextTheme(context)),
-        title: ParentWidget._title,
-      ),
+                ),
+              )
+      },
+      theme: ThemeData(
+          splashColor: MeditoColors.moonlight,
+          canvasColor: MeditoColors.darkMoon,
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: SlideTransitionBuilder(),
+          }),
+          accentColor: MeditoColors.walterWhite,
+          textTheme: meditoTextTheme(context)),
+      title: ParentWidget._title,
     );
   }
 
