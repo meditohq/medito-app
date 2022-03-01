@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
@@ -21,7 +22,6 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
@@ -70,8 +70,9 @@ class _ChooseBackgroundSoundDialogState
   void initService() async {
     volume = await retrieveSavedBgVolume();
     _dragBgVolumeSubject.add(volume);
-    await widget.handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume / 100});
-    // await AudioService.customAction(INIT_BG_SOUND, '');
+    await widget.handler
+        .customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume / 100});
+    await _handler.customAction(INIT_BG_SOUND, {INIT_BG_SOUND: ''});
   }
 
   @override
@@ -300,8 +301,8 @@ class _ChooseBackgroundSoundDialogState
 
   void _noneSelected() {
     print('selecting NONE');
-    // AudioService.customAction(SEND_BG_SOUND, '');
-    // AudioService.customAction(PLAY_BG_SOUND, '');
+    _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: ''});
+    _handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: ''});
     addBgSoundSelectionToSharedPrefs('', '');
   }
 
