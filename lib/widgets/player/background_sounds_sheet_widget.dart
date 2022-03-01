@@ -13,7 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
@@ -22,7 +21,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/player/player2/medito_audio_handler.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
