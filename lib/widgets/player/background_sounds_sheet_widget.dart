@@ -28,6 +28,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../audioplayer/audio_inherited_widget.dart';
 import '../../main.dart';
 
 class ChooseBackgroundSoundDialog extends StatefulWidget {

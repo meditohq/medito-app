@@ -29,6 +29,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../audioplayer/audio_inherited_widget.dart';
 import '../../main.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
