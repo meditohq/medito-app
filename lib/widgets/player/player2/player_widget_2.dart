@@ -38,6 +38,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:share/share.dart';
 
+import '../../../audioplayer/audio_inherited_widget.dart';
 import '../background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {
