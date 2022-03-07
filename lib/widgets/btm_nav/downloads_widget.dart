@@ -13,6 +13,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../audioplayer/audio_inherited_widget.dart';
 import '../../main.dart';
 
 class DownloadsListWidget extends StatefulWidget {

@@ -30,6 +30,7 @@ import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'audioplayer/audio_inherited_widget.dart';
 import 'network/auth.dart';
 import 'utils/colors.dart';
 
@@ -63,26 +64,6 @@ Future<void> main() async {
     runApp(AudioHandlerInheritedWidget(audioHandler: _audioHandler, child: ParentWidget()));
   }
 }
-
-class AudioHandlerInheritedWidget extends InheritedWidget {
-  const AudioHandlerInheritedWidget({
-    Key key,
-    @required this.audioHandler,
-    @required Widget child,
-  }) : super(key: key, child: child);
-
-  final MeditoAudioHandler audioHandler;
-
-  static AudioHandlerInheritedWidget of(BuildContext context) {
-    final result = context.dependOnInheritedWidgetOfExactType<AudioHandlerInheritedWidget>();
-    assert(result != null, 'No FrogColor found in context');
-    return result;
-  }
-
-  @override
-  bool updateShouldNotify(AudioHandlerInheritedWidget old) => audioHandler != old.audioHandler;
-}
-
 
 /// This Widget is the main application widget.
 class ParentWidget extends StatefulWidget {
