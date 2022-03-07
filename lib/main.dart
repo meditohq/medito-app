@@ -15,14 +15,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/text_themes.dart';
-import 'package:Medito/widgets/btm_nav/home_widget.dart';
-import 'package:Medito/widgets/folders/folder_nav_widget.dart';
-import 'package:Medito/widgets/packs/packs_screen.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -75,12 +71,6 @@ class ParentWidget extends StatefulWidget {
 
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
-  var _currentIndex = 0;
-  final _messengerKey = GlobalKey<ScaffoldState>();
-
-  var _deletingCache = true;
-
-  bool _hasOpened;
 
   @override
   void initState() {
@@ -95,15 +85,6 @@ class _ParentWidgetState extends State<ParentWidget>
           statusBarColor: MeditoColors.transparent),
     );
 
-    firstOpenOperations().then((hasOpened) {
-      _hasOpened = hasOpened;
-      setState(() {
-        _deletingCache = false;
-      });
-    });
-
-    // update stats for any sessions that were listened in the background and after the app was killed
-    updateStatsFromBg();
     // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
@@ -116,60 +97,7 @@ class _ParentWidgetState extends State<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorObservers: [SentryNavigatorObserver()],
-      initialRoute: '/nav',
-      routes: {
-        FolderNavWidget.routeName: (context) => FolderNavWidget(),
-        '/nav': (context) => _deletingCache
-            ? _getLoadingWidget()
-            : Scaffold(
-                key: _messengerKey,
-                body: IndexedStack(
-                  index: _currentIndex,
-                  children:  [HomeWidget(_hasOpened), PackListWidget()],
-                ),
-                bottomNavigationBar: Container(
-                  decoration: BoxDecoration(
-                      color: MeditoColors.softGrey,
-                      border: Border(
-                          top: BorderSide(
-                              color: MeditoColors.softGrey, width: 2.0))),
-                  child: BottomNavigationBar(
-                    selectedLabelStyle: Theme.of(context)
-                        .textTheme
-                        .headline1
-                        .copyWith(fontSize: 12),
-                    unselectedLabelStyle: Theme.of(context)
-                        .textTheme
-                        .headline2
-                        .copyWith(fontSize: 12),
-                    selectedItemColor: MeditoColors.walterWhite,
-                    unselectedItemColor: MeditoColors.newGrey,
-                    currentIndex: _currentIndex,
-                    onTap: _onTabTapped,
-                    items: [
-                      BottomNavigationBarItem(
-                        tooltip: 'Home',
-                        icon: Icon(
-                          Icons.home_outlined,
-                          size: 20,
-                        ),
-                        label: 'Home',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(
-                          Icons.format_list_bulleted_outlined,
-                          size: 20,
-                        ),
-                        tooltip: 'Packs',
-                        label: 'Packs',
-                      ),
-                    ],
-                  ),
-                ),
-              )
-      },
+    return MaterialApp.router(
       theme: ThemeData(
           splashColor: MeditoColors.moonlight,
           canvasColor: MeditoColors.darkMoon,
@@ -191,19 +119,8 @@ class _ParentWidgetState extends State<ParentWidget>
     }
   }
 
-  void _onTabTapped(int value) {
-    setState(() {
-      _currentIndex = value;
-    });
-  }
 }
 
-Widget _getLoadingWidget() {
-  return Center(
-      child: CircularProgressIndicator(
-          backgroundColor: Colors.black,
-          valueColor: AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)));
-}
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
   @override
