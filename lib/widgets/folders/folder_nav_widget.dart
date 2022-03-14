@@ -16,9 +16,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/folder/folder_bloc.dart';
 import 'package:Medito/network/folder/folder_response.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
@@ -27,20 +26,13 @@ import 'package:Medito/widgets/folders/loading_list_widget.dart';
 import 'package:Medito/widgets/header_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-class FolderStateless extends StatelessWidget {
-  FolderStateless({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FolderNavWidget();
-  }
-}
+import 'package:go_router/go_router.dart';
 
 class FolderNavWidget extends StatefulWidget {
-  FolderNavWidget({Key key}) : super(key: key);
+  FolderNavWidget({Key key, this.id}) : super(key: key);
 
   static const routeName = '/folder';
+  final String id;
 
   @override
   _FolderNavWidgetState createState() => _FolderNavWidgetState();
@@ -63,8 +55,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   @override
   void didChangeDependencies() {
     if (_bloc.content == null) {
-      final FolderArguments args = ModalRoute.of(context).settings.arguments;
-      _bloc.fetchData(id: args.sessionId);
+      _bloc.fetchData(id: widget.id);
     }
     super.didChangeDependencies();
   }
@@ -89,8 +80,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   }
 
   Future<void> _refresh(BuildContext context, {bool skipCache}) {
-    final FolderArguments args = ModalRoute.of(context).settings.arguments;
-    return _bloc.fetchData(id: args.sessionId, skipCache: skipCache);
+    return _bloc.fetchData(id: widget.id, skipCache: skipCache);
   }
 
   Widget _getScreenContent() => SingleChildScrollView(
@@ -212,29 +202,21 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   void itemTap(Item item) {
     checkConnectivity().then((value) {
-      if (value) {
-        var type;
-        if (item.fileType == FileType.folder) {
-          type = Tracking.FOLDER_TAPPED;
-        } else if (item.fileType == FileType.text) {
-          type = Tracking.ARTICLE_TAPPED;
-        } else {
-          type = Tracking.SESSION_TAPPED;
-        }
 
-        NavigationFactory.navigate(
-                context, NavigationFactory.getScreenFromItemType(item.fileType),
-                id: item.id)
-            .then((value) => _refresh(context, skipCache: false));
+      if (value) {
+          var location = GoRouter.of(context).location;
+        if (item.type == 'folder') {
+          if (location.contains('folder2')) {
+            context.go(getPathFromString(Folder3Path, [location.split('/')[2], widget.id, item.id]));
+          } else {
+            context.go(getPathFromString(Folder2Path, [widget.id, item.id]));
+          }
+        } else {
+          context.go(location + getPathFromString(item.type, [item.id]));
+        }
       } else {
         createSnackBar(CHECK_CONNECTION, context);
       }
     });
   }
-}
-
-class FolderArguments {
-  final String sessionId;
-
-  FolderArguments(this.sessionId);
 }

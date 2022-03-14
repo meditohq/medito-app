@@ -121,7 +121,6 @@ class Item {
     return null;
   }
 
-  @Deprecated('Use filetype instead')
   String type;
   @Deprecated('Use id instead')
   int idInt;

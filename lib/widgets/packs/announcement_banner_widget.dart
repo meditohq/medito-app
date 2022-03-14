@@ -16,12 +16,14 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/packs/announcement_bloc.dart';
 import 'package:Medito/network/packs/announcement_response.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/expand_animate_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../utils/navigation_extra.dart';
 
 class AnnouncementBanner extends StatefulWidget {
   AnnouncementBanner({Key key, this.hasOpened}) : super(key: key);
@@ -180,8 +182,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   }
 
   void _openLink(String buttonType, String buttonPath) {
-    NavigationFactory.navigateToScreenFromString(
-        buttonType, buttonPath, context);
+    context.go(getPathFromString(buttonType, [buttonPath]));
   }
 
   @override

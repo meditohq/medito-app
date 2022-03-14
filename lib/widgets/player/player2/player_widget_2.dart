@@ -17,7 +17,6 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
-import 'package:Medito/main.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
@@ -25,7 +24,6 @@ import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/folders/folder_nav_widget.dart';
 import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/player/player_button.dart';
@@ -36,6 +34,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share/share.dart';
 
 import '../../../audioplayer/audio_inherited_widget.dart';
@@ -93,7 +92,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
 
     _handler.customEvent.stream.listen((event) {
-      if (event[AUDIO_COMPLETE]) {
+      if (mounted && event[AUDIO_COMPLETE] == true) {
         showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -327,15 +326,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _onBackPressed() {
-    if (widget.normalPop != null && widget.normalPop) {
-      Navigator.pop(context);
-    } else {
-      Navigator.popUntil(
-          context,
-          (Route<dynamic> route) =>
-              route.settings.name == FolderNavWidget.routeName ||
-              route.isFirst);
-    }
+    GoRouter.of(context).pop();
   }
 
   Widget getDonateAndShareButton(MediaItem mediaItem) {
