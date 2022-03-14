@@ -17,10 +17,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/player/audio_complete_copy_repo.dart';
+import 'package:Medito/network/player/player_repo.dart';
 import 'package:Medito/network/player/audio_complete_copy_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:audio_service/audio_service.dart';
 
 class PlayerBloc {
   PlayerRepository _repo;
@@ -59,6 +60,10 @@ class PlayerBloc {
       title = title.replaceAll('%n', streak.toString());
     }
     return title;
+  }
+
+  void postRating(int rating, MediaItem mediaItem){
+    _repo.postRating(rating, mediaItem);
   }
 
   void dispose() {
