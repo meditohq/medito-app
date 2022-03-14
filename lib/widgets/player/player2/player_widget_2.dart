@@ -97,7 +97,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         showDialog(
             context: context,
             builder: (BuildContext context) {
-              return AudioCompleteDialog(bloc: _bloc);
+              return AudioCompleteDialog(
+                  bloc: _bloc, mediaItem: _handler.mediaItem.value);
             });
       }
     });

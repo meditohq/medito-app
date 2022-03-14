@@ -3,13 +3,17 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../utils/colors.dart';
 
 class AudioCompleteDialog extends StatefulWidget {
   final PlayerBloc bloc;
 
-  const AudioCompleteDialog({Key key, this.bloc}) : super(key: key);
+  final mediaItem;
+
+  const AudioCompleteDialog({Key key, this.bloc, this.mediaItem})
+      : super(key: key);
 
   @override
   _AudioCompleteDialogState createState() => _AudioCompleteDialogState();
@@ -27,13 +31,21 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                 hasCloseButton: true,
                 closePressed: _closePressed,
                 transparent: true),
-            _buildDonateCard(),
-            Container(height: 16),
-            _buildRatingCard(),
-            Container(height: 16),
-            _buildFollowUsCard(),
-            Container(height: 16),
-            _buildCloseButton()
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  _buildDonateCard(),
+                  Container(height: 16),
+                  _buildRatingCard(),
+                  Container(height: 16),
+                  _buildFollowUsCard(),
+                  Container(height: 16),
+                  _buildCloseButton(),
+                  Container(height: 42),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -55,6 +67,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
             Container(height: 16),
             Text(
                 'Medito is keeping access to meditation free, forever. Say thanks by donating.',
+                textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white)),
             Container(height: 16),
             TextButton.icon(
@@ -92,6 +105,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
               children: [
                 MaterialButton(
                   height: 48,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -105,6 +119,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                 Container(width: 12),
                 MaterialButton(
                   height: 48,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -117,6 +132,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                 ),
                 Container(width: 12),
                 MaterialButton(
+                  elevation: 0,
                   height: 48,
                   minWidth: 68,
                   shape: RoundedRectangleBorder(
@@ -222,38 +238,50 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
   }
 
   void _closePressed() {
-    // context.pop();
+    GoRouter.of(context).pop();
   }
 
   Widget _buildCloseButton() {
-    return TextButton(
-        onPressed: _closePressed,
-        child: Text('Close', style: TextStyle(color: Colors.white)));
+    return Row(
+      children: [
+        Expanded(
+          child: TextButton(
+              onPressed: _closePressed,
+              child: Text('Close', style: TextStyle(color: Colors.white))),
+        ),
+      ],
+    );
   }
 
   void _onDonateTap() {
-    launchUrl('https://meditofoundation.org/donate');
+    launchUrl('https://bit.ly/3vRoz8N');
   }
 
-  void _sadPressed() {}
+  void _sadPressed() {
+    widget.bloc.postRating(1, widget.mediaItem);
+  }
 
-  void _neutralFacePressed() {}
+  void _neutralFacePressed() {
+    widget.bloc.postRating(2, widget.mediaItem);
+  }
 
-  void _happyFacePressed() {}
+  void _happyFacePressed() {
+    widget.bloc.postRating(3, widget.mediaItem);
+  }
 
   void _onTwitterTap() {
-    launchUrl('https://twitter.com/meditohq');
+    launchUrl('https://bit.ly/3vRR4TS');
   }
 
   void _onYoutubeTap() {
-    launchUrl('https://www.youtube.com/c/Medito');
+    launchUrl('https://bit.ly/3IVUSHC');
   }
 
   void _onInstaTap() {
-    launchUrl('https://www.instagram.com/meditohq/');
+    launchUrl('https://bit.ly/3sST5xm');
   }
 
   void _onRedditTap() {
-    launchUrl('https://www.reddit.com/r/medito/');
+    launchUrl('https://bit.ly/3hOity1');
   }
 }
