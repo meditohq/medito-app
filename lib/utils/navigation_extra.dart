@@ -71,8 +71,13 @@ final router = GoRouter(
 GoRoute _getDailyRoute() {
   return GoRoute(
     path: 'daily/:did',
-    pageBuilder: (context, state) =>
-        getSessionOptionsDailyPage(state),
+    routes: [
+      GoRoute(
+        path: 'player',
+        pageBuilder: (context, state) => getPlayerMaterialPage(state),
+      )
+    ],
+    pageBuilder: (context, state) => getSessionOptionsDailyPage(state),
   );
 }
 
