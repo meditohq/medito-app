@@ -26,6 +26,7 @@ import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
+import 'package:Medito/widgets/player/player2/audio_complete_dialog.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
@@ -96,9 +97,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         showDialog(
             context: context,
             builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('done'),
-              );
+              return AudioCompleteDialog(bloc: _bloc);
             });
       }
     });
