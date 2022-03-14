@@ -20,6 +20,8 @@ class AudioCompleteDialog extends StatefulWidget {
 }
 
 class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
+  var rated = false;
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -42,7 +44,6 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                   _buildFollowUsCard(),
                   Container(height: 16),
                   _buildCloseButton(),
-                  Container(height: 42),
                 ],
               ),
             ),
@@ -95,60 +96,80 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
       color: MeditoColors.easterYellow,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Text('How do you feel after this session?',
-                style: TextStyle(color: Colors.black)),
-            Container(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MaterialButton(
-                  height: 48,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minWidth: 68,
-                  color: MeditoColors.darkMoon,
-                  onPressed: _sadPressed,
-                  child: SvgPicture.asset(
-                    'assets/images/ic_sad_face.svg',
-                  ),
-                ),
-                Container(width: 12),
-                MaterialButton(
-                  height: 48,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minWidth: 68,
-                  color: MeditoColors.darkMoon,
-                  onPressed: _neutralFacePressed,
-                  child: SvgPicture.asset(
-                    'assets/images/ic_neutral_face.svg',
-                  ),
-                ),
-                Container(width: 12),
-                MaterialButton(
-                  elevation: 0,
-                  height: 48,
-                  minWidth: 68,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  color: MeditoColors.darkMoon,
-                  onPressed: _happyFacePressed,
-                  child: SvgPicture.asset(
-                    'assets/images/ic_happy_face.svg',
-                  ),
-                ),
-              ],
-            )
-          ],
+        child: AnimatedCrossFade(
+          firstChild: _notRatedContent(),
+          secondChild: _ratedContent(),
+          duration: Duration(milliseconds: 250),
+          crossFadeState:
+              rated ? CrossFadeState.showSecond : CrossFadeState.showFirst,
         ),
       ),
+    );
+  }
+
+  Widget _ratedContent() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Thanks for your rating!', style: TextStyle(color: Colors.black)),
+      ],
+    );
+  }
+
+  Column _notRatedContent() {
+    return Column(
+      children: [
+        Text('How do you feel after this session?',
+            style: TextStyle(color: Colors.black)),
+        Container(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            MaterialButton(
+              height: 48,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              minWidth: 68,
+              color: MeditoColors.darkMoon,
+              onPressed: _sadPressed,
+              child: SvgPicture.asset(
+                'assets/images/ic_sad_face.svg',
+              ),
+            ),
+            Container(width: 12),
+            MaterialButton(
+              height: 48,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              minWidth: 68,
+              color: MeditoColors.darkMoon,
+              onPressed: _neutralFacePressed,
+              child: SvgPicture.asset(
+                'assets/images/ic_neutral_face.svg',
+              ),
+            ),
+            Container(width: 12),
+            MaterialButton(
+              elevation: 0,
+              height: 48,
+              minWidth: 68,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: MeditoColors.darkMoon,
+              onPressed: _happyFacePressed,
+              child: SvgPicture.asset(
+                'assets/images/ic_happy_face.svg',
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 
@@ -258,14 +279,23 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
   }
 
   void _sadPressed() {
+    setState(() {
+      rated = true;
+    });
     widget.bloc.postRating(1, widget.mediaItem);
   }
 
   void _neutralFacePressed() {
+    setState(() {
+      rated = true;
+    });
     widget.bloc.postRating(2, widget.mediaItem);
   }
 
   void _happyFacePressed() {
+    setState(() {
+      rated = true;
+    });
     widget.bloc.postRating(3, widget.mediaItem);
   }
 
