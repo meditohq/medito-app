@@ -44,16 +44,19 @@ final router = GoRouter(
             path: 'folder/:fid',
             routes: [
               _getSessionRoute(),
+              _getArticleRoute(),
               GoRoute(
                 path: 'folder2/:f2id',
                 routes: [
                   _getSessionRoute(),
+                  _getArticleRoute(),
                   GoRoute(
                     path: 'folder3/:f3id',
                     pageBuilder: (context, state) =>
                         getFolderMaterialPage(state),
                     routes: [
                       _getSessionRoute(),
+                      _getArticleRoute(),
                     ],
                   ),
                 ],
