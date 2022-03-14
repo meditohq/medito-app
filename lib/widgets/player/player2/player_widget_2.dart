@@ -94,9 +94,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     _handler.customEvent.stream.listen((event) {
       if (mounted && event[AUDIO_COMPLETE] == true) {
-        showDialog(
+        showGeneralDialog(
+            transitionDuration: Duration(milliseconds: 400),
             context: context,
-            builder: (BuildContext context) {
+            barrierColor: MeditoColors.darkMoon,
+            pageBuilder: (_,  __, ___) {
               return AudioCompleteDialog(
                   bloc: _bloc, mediaItem: _handler.mediaItem.value);
             });
