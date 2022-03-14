@@ -47,5 +47,20 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>FlutterDeepLinkingEnabled</key>
+    <true/>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>medito.app</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+        <string>customscheme</string>
+        </array>
+        </dict>
+    </array>
 </dict>
 </plist>
