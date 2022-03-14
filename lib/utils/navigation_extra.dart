@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/folders/folder_nav_widget.dart';
+import '../widgets/home/home_wrapper_widget.dart';
 import '../widgets/player/player2/player_widget_2.dart';
 
 const String SessionPath = '/session/:sid';
@@ -22,6 +23,78 @@ const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
 const String UrlPath = '/url';
 const String CollectionPath = '/app';
 const String HomePath = '/';
+
+final router = GoRouter(
+  urlPathStrategy: UrlPathStrategy.path,
+  debugLogDiagnostics: true,
+  routes: [
+    GoRoute(
+        path: HomePath,
+        builder: (context, state) => HomeWrapperWidget(),
+        routes: [
+          _getSessionRoute(),
+          _getArticleRoute(),
+          _getDailyRoute(),
+          GoRoute(
+            path: 'app',
+            pageBuilder: (context, state) =>
+                getCollectionMaterialPage(state),
+          ),
+          GoRoute(
+            path: 'folder/:fid',
+            routes: [
+              _getSessionRoute(),
+              GoRoute(
+                path: 'folder2/:f2id',
+                routes: [
+                  _getSessionRoute(),
+                  GoRoute(
+                    path: 'folder3/:f3id',
+                    pageBuilder: (context, state) =>
+                        getFolderMaterialPage(state),
+                    routes: [
+                      _getSessionRoute(),
+                    ],
+                  ),
+                ],
+                pageBuilder: (context, state) =>
+                    getFolderMaterialPage(state),
+              ),
+            ],
+            pageBuilder: (context, state) => getFolderMaterialPage(state),
+          ),
+        ]),
+  ],
+);
+
+
+GoRoute _getDailyRoute() {
+  return GoRoute(
+    path: 'daily/:did',
+    pageBuilder: (context, state) =>
+        getSessionOptionsDailyPage(state),
+  );
+}
+
+GoRoute _getArticleRoute() {
+  return GoRoute(
+    path: 'article/:aid',
+    pageBuilder: (context, state) => getArticleMaterialPAge(state),
+  );
+}
+
+GoRoute _getSessionRoute() {
+  return GoRoute(
+    path: 'session/:sid',
+    routes: [
+      GoRoute(
+        path: 'player',
+        pageBuilder: (context, state) => getPlayerMaterialPage(state),
+      )
+    ],
+    pageBuilder: (context, state) => getSessionOptionsMaterialPage(state),
+  );
+}
 
 enum Screen {
   folder,
