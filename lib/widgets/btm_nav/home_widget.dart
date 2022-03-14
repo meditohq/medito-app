@@ -23,7 +23,7 @@ import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/courses_row_widget.dart';
@@ -35,7 +35,7 @@ import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:share/share.dart';
@@ -120,10 +120,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     return checkConnectivity().then(
       (value) {
         if (value) {
-          return NavigationFactory.navigateToScreenFromString(type, id, context)
-              .then((value) {
-            return _refresh();
-          });
+         context.go(getPathFromString(type, [id]));
         } else {
           _bloc.checkConnection();
         }
@@ -179,8 +176,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       color: MeditoColors.deepNight,
       onSelected: (MenuData result) {
-        NavigationFactory.navigateToScreenFromString(
-            result.itemType, result.itemPath, context);
+        context.go(getPathFromString(result.itemType, [result.itemPath]));
       },
       itemBuilder: (BuildContext context) {
         return snapshot.data.body.data.map((MenuData data) {

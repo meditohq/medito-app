@@ -14,11 +14,13 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../utils/navigation_extra.dart';
 
 class ErrorPacksWidget extends StatelessWidget {
   final onPressed;
@@ -73,10 +75,7 @@ class ErrorPacksWidget extends StatelessWidget {
                           ),
                         ),
                         onPressed: () => {
-                              NavigationFactory.navigate(
-                                  context,
-                                 Screen.collection, id: 'downloads')
-                            },
+                          context.go(CollectionPath)},
                         child: Text(
                           SHOW_DOWNLOADS,
                           style: Theme.of(context).textTheme.subtitle2,

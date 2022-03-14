@@ -85,7 +85,9 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 Future<void> launchUrl(String href) async {
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
-  href = href.replaceAll('{{user_id}}', userId);
+  if(userId != null) {
+    href = href.replaceAll('{{user_id}}', userId);
+  }
 
   if (href.startsWith('mailto')) {
     _launchEmailSubmission(href);
