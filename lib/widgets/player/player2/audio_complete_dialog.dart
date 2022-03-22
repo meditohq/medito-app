@@ -112,7 +112,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Thanks for your rating!', style: TextStyle(color: Colors.black)),
+        Text('Thanks for your feedback!', style: TextStyle(color: Colors.black)),
       ],
     );
   }
