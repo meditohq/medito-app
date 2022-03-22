@@ -13,7 +13,7 @@ description: A meditation learning tool
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 2.0.33+20033
 environment:
-  sdk: ">=2.10.0-0 <3.0.0"
+  sdk: ">=2.4.0-0.0.pre <3.0.0"
 
 dependencies:
   flutter:
