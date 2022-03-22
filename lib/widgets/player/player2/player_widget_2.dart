@@ -39,6 +39,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share/share.dart';
 
 import '../../../audioplayer/audio_inherited_widget.dart';
+import '../../../tracking/tracking.dart';
 import '../background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {
@@ -94,6 +95,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     _handler.customEvent.stream.listen((event) {
       if (mounted && event[AUDIO_COMPLETE] == true) {
+        _trackSessionEnd(_handler.mediaItem.value);
         showGeneralDialog(
             transitionDuration: Duration(milliseconds: 400),
             context: context,
@@ -427,6 +429,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Share.share(SHARE_TEXT);
     // Tracking.trackEvent({Tracking.TYPE: Tracking.SHARE_TAPPED});
     return null;
+  }
+
+  void _trackSessionEnd(MediaItem mediaItem) {
+    unawaited(Tracking.trackEvent({
+      Tracking.TYPE: Tracking.AUDIO_COMPLETED,
+      Tracking.SESSION_ID: mediaItem.id,
+      Tracking.SESSION_TITLE: mediaItem.title,
+      Tracking.SESSION_LENGTH: mediaItem.extras[LENGTH],
+      Tracking.SESSION_VOICE: mediaItem.artist
+    }));
   }
 
   void _onBgMusicPressed() {
