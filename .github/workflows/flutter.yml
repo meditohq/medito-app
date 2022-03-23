@@ -26,7 +26,7 @@ jobs:
       - uses: subosito/flutter-action@v2
 
       # Uses v2.4.0
-      - uses: nick-invision/retry@7c68161adf97a48beb850a595b8784ec57a98cbb
+      - uses: nick-invision/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 2
