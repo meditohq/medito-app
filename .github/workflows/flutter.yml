@@ -17,35 +17,35 @@ jobs:
     timeout-minutes: 20
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - uses: actions/setup-java@v2
-      with:
-        distribution: 'zulu'
-        java-version: '12.x'
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '12.x'
 
-    - uses: subosito/flutter-action@v2
-      with:
-        channel: 'stable'
-      - run: flutter --version
-        
-      # Uses v2.4.0
-    - uses: nick-invision/retry@v2
-      with:
-        timeout_minutes: 5
-        max_attempts: 2
-        command: flutter pub get
+      - uses: subosito/flutter-action@v2
+        with:
+           channel: 'stable'
+          - run: flutter --version
 
-      # This is a quick workaround to make the Github workflow happy.
-      # There should be a better way to handle the keys to improve DX.
-    - name: "Create a dummy auth.dart"
-      run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > ./lib/network/auth.dart
+        # Uses v2.4.0
+      - uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: flutter pub get
 
-      # - run: flutter pub get
+        # This is a quick workaround to make the Github workflow happy.
+        # There should be a better way to handle the keys to improve DX.
+      - name: "Create a dummy auth.dart"
+        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > ./lib/network/auth.dart
 
-      # - run: flutter format --set-exit-if-changed .
+        # - run: flutter pub get
 
-    - run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+        # - run: flutter format --set-exit-if-changed .
 
-    - run: flutter test
+      - run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+
+      - run: flutter test
 
