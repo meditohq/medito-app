@@ -23,7 +23,7 @@ jobs:
         with:
           java-version: '12.x'
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2.3.0
 
         # Uses v2.4.0
       - uses: nick-invision/retry@v2
