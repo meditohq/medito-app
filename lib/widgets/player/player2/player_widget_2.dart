@@ -21,22 +21,17 @@ import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/player/player2/audio_complete_dialog.dart';
 import 'package:Medito/widgets/player/player_button.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share/share.dart';
 
 import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
@@ -283,20 +278,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Center _getLoadingScreenWidget() {
-    return Center(
-        child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircularProgressIndicator(
-            backgroundColor: Colors.black,
-            valueColor: AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)),
-        Container(height: 16),
-        // Text(loaded ? WELL_DONE_COPY : LOADING)
-      ],
-    ));
-  }
-
   Widget _playButton(MediaItem mediaItem) => Semantics(
         label: 'Play button',
         child: PlayerButton(
@@ -333,60 +314,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     GoRouter.of(context).pop();
   }
 
-  Widget getDonateAndShareButton(MediaItem mediaItem) {
-    return Expanded(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, top: 32, bottom: 8, right: 16.0),
-            child: TextButton(
-              style: TextButton.styleFrom(
-                  shape: roundedRectangleBorder(),
-                  backgroundColor: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
-                  padding: const EdgeInsets.all(16.0)),
-              onPressed: () => _launchPrimaryButton(),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  buildSvgPicture(
-                      parseColor(mediaItem.extras[SECONDARY_COLOUR])),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: buildButtonLabel(mediaItem),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: TextButton(
-              style: TextButton.styleFrom(
-                  shape: roundedRectangleBorder(),
-                  backgroundColor: MeditoColors.moonlight,
-                  padding: const EdgeInsets.all(16.0)),
-              onPressed: _share,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.share, color: MeditoColors.walterWhite),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      'Share',
-                      style: Theme.of(context).textTheme.subtitle2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget buildButtonLabel(MediaItem mediaItem) {
     var label = _bloc.version?.buttonLabel;
 
@@ -409,26 +336,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       'assets/images/' + icon + '.svg',
       color: secondaryColor,
     );
-  }
-
-  Future<void> _launchPrimaryButton() {
-    var path = _bloc.version.buttonPath;
-
-    getVersionCopyInt().then((version) {
-      //todo fix once screen is changed
-      // Tracking.trackEvent({
-      //   Tracking.TYPE: Tracking.CTA_TAPPED,
-      //   Tracking.PLAYER_COPY_VERSION: '$version'
-      // });
-    });
-
-    return launchUrl(path);
-  }
-
-  Future<void> _share() {
-    Share.share(SHARE_TEXT);
-    // Tracking.trackEvent({Tracking.TYPE: Tracking.SHARE_TAPPED});
-    return null;
   }
 
   void _trackSessionEnd(MediaItem mediaItem) {

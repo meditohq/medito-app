@@ -56,11 +56,14 @@ Future<void> main() async {
   if (kReleaseMode) {
     await SentryFlutter.init((options) {
       options.dsn = SENTRY_URL;
-    }, appRunner: () => runApp(ParentWidget()));
+    },
+        appRunner: () => _runApp(_audioHandler));
   } else {
-    runApp(AudioHandlerInheritedWidget(audioHandler: _audioHandler, child: ParentWidget()));
+    _runApp(_audioHandler);
   }
 }
+
+void _runApp(MeditoAudioHandler _audioHandler) => runApp(AudioHandlerInheritedWidget(audioHandler: _audioHandler, child: ParentWidget()));
 
 /// This Widget is the main application widget.
 class ParentWidget extends StatefulWidget {

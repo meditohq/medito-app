@@ -139,7 +139,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
 
   void _openPlayer(MediaItem item, BuildContext context) {
     _audioHandler.playMediaItem(item);
-    context.go(PlayerPath);
+    context.go(GoRouter.of(context).location + PlayerPath);
   }
 
   void showSwipeToDeleteTip() {
