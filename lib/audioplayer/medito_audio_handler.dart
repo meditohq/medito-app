@@ -73,9 +73,11 @@ class MeditoAudioHandler extends BaseAudioHandler
     } catch (e) {
       print(e);
     }
-    unawaited(_player
-        .play()
-        .then((value) => customEvent.add({AUDIO_COMPLETE: true})));
+    unawaited(_player.play().then((value) {
+      if (_player.processingState == ProcessingState.completed) {
+        customEvent.add({AUDIO_COMPLETE: true});
+      }
+    }));
   }
 
   @override
