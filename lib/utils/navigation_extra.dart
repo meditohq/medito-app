@@ -37,8 +37,8 @@ final router = GoRouter(
           _getDailyRoute(),
           GoRoute(
             path: 'app',
-            pageBuilder: (context, state) =>
-                getCollectionMaterialPage(state),
+            routes: [_getPlayerRoute()],
+            pageBuilder: (context, state) => getCollectionMaterialPage(state),
           ),
           GoRoute(
             path: 'folder/:fid',
@@ -75,10 +75,7 @@ GoRoute _getDailyRoute() {
   return GoRoute(
     path: 'daily/:did',
     routes: [
-      GoRoute(
-        path: 'player',
-        pageBuilder: (context, state) => getPlayerMaterialPage(state),
-      )
+      _getPlayerRoute()
     ],
     pageBuilder: (context, state) => getSessionOptionsDailyPage(state),
   );
@@ -95,13 +92,17 @@ GoRoute _getSessionRoute() {
   return GoRoute(
     path: 'session/:sid',
     routes: [
-      GoRoute(
-        path: 'player',
-        pageBuilder: (context, state) => getPlayerMaterialPage(state),
-      )
+      _getPlayerRoute()
     ],
     pageBuilder: (context, state) => getSessionOptionsMaterialPage(state),
   );
+}
+
+GoRoute _getPlayerRoute() {
+  return GoRoute(
+      path: 'player',
+      pageBuilder: (context, state) => getPlayerMaterialPage(state),
+    );
 }
 
 enum Screen {
