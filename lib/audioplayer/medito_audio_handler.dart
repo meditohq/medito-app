@@ -179,7 +179,7 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future<void> _playBgSound(Map<String, dynamic> extras) async {
     var bgSound = extras[PLAY_BG_SOUND];
     if (bgSound != null) {
-      unawaited(_bgPlayer.setUrl(extras[PLAY_BG_SOUND]));
+      unawaited(_bgPlayer.setFilePath(extras[PLAY_BG_SOUND]));
       unawaited(_bgPlayer.play());
     }
   }
