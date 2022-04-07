@@ -25,10 +25,6 @@
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
 			<string>medito.app</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>customscheme</string>
-			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
