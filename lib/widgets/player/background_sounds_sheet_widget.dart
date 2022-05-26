@@ -29,7 +29,6 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../audioplayer/audio_inherited_widget.dart';
-import '../../main.dart';
 
 class ChooseBackgroundSoundDialog extends StatefulWidget {
   final stream;
@@ -69,6 +68,10 @@ class _ChooseBackgroundSoundDialogState
   }
 
   void initService() async {
+    var bgSound = await getBgSoundNameFromSharedPrefs();
+    await Future.delayed(Duration(milliseconds: 200)).then((value) =>
+        _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound})
+    );
     _volume = await retrieveSavedBgVolume();
   }
 
