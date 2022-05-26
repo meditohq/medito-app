@@ -202,14 +202,8 @@ class _HomeWidgetState extends State<HomeWidget> {
       });
 
   Future<void> _showVersionPopUp(BuildContext context) async {
-    var packageInfo = await PackageInfo.fromPlatform();
 
-    var version = packageInfo.version;
-    var buildNumber = packageInfo.buildNumber;
-
-    var line1 =
-        'Version: $version - Build Number: $buildNumber - ReleaseMode: $kReleaseMode';
-
+    var line1 = await getDeviceInfoString();
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';
     final snackBar = SnackBar(
@@ -222,6 +216,8 @@ class _HomeWidgetState extends State<HomeWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('Tap here to copy',
+                  style: TextStyle(color: MeditoColors.walterWhite)),
               Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
               Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
             ],
