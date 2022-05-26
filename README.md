@@ -8,6 +8,14 @@ The app is free, forever: no ads, no spam, no need to sign up or pay.
 
 Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and its community.
 
+
+## Download the app
+- Play Store: https://play.google.com/store/apps/details?id=meditofoundation.medito
+- App Store: https://apps.apple.com/us/app/medito/id1500780518
+- APK: <a href="https://github.com/meditohq/medito-app/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/meditohq/medito-app?color=success&label=APK"></a>
+
+NOTE: If you install Medito app using APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
+
 ## Install
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/meditohq/medito-app?label=latest%20version&sort=semver)](https://github.com/meditohq/medito-app/releases)
 
