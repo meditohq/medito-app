@@ -61,10 +61,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   void initState() {
     super.initState();
-    retrieveSavedBgVolume().then((value) async => {
-          _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: value})
-        });
-
     _startTimeout();
     _bloc = PlayerBloc();
   }
