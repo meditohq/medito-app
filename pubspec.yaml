@@ -32,8 +32,6 @@ dependencies:
   audio_service: ^0.18.3
   rxdart: ^0.27.1
   share: ^2.0.1
-  firebase_core: ^1.1.0
-  firebase_messaging: ^11.2.6
   flutter_html: ^3.0.0-alpha.2
   provider: ^6.0.0
   package_info: ^2.0.0
