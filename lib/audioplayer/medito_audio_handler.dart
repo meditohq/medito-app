@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -12,7 +13,7 @@ import 'media_lib.dart';
 import 'player_utils.dart';
 
 //This is the duration of bgSound fade towards the end.
-const fadeDuration = 20;
+const FADE_DURATION = 20;
 const PLAY_BG_SOUND = 'play_bg_sound';
 const SEND_BG_SOUND = 'send_bg_sound';
 const AUDIO_COMPLETE = 'audio_complete';
@@ -20,6 +21,7 @@ const INIT_BG_SOUND = 'init_bg_sound';
 const SET_BG_SOUND_VOL = 'set_bg_sound_vol';
 const STOP = 'stop';
 const STATS = 'stats';
+const NONE = 'No Sound';
 
 class MeditoAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
@@ -28,7 +30,7 @@ class MeditoAudioHandler extends BaseAudioHandler
   Duration _duration;
   var _currentlyPlayingBGSound = '';
   var _updatedStats = false;
-  var _initialBgVolume = 0.4;
+  var _bgVolume;
 
   MeditoAudioHandler() {
     AudioSession.instance.then(
@@ -102,7 +104,6 @@ class MeditoAudioHandler extends BaseAudioHandler
 
   @override
   Future<Function> playMediaItem(MediaItem mediaItem) async {
-    var avoidVolumeIncreaseAtLastSec = false;
 
     try {
       super.mediaItem.add(mediaItem);
@@ -131,9 +132,6 @@ class MeditoAudioHandler extends BaseAudioHandler
       _player.positionStream.listen((position) async {
         //ticks on each position
         var timeLeft = _duration.inSeconds - position.inSeconds;
-        if (timeLeft == 1) {
-          avoidVolumeIncreaseAtLastSec = true;
-        }
         if (position != null) {
           if (_audioPositionIsInEndPeriod(position)) {
             await _setBgVolumeFadeAtEnd(timeLeft);
@@ -141,9 +139,9 @@ class MeditoAudioHandler extends BaseAudioHandler
               _updatedStats = true;
               await _updateStats();
             }
-          } else if (_audioPositionBeforeEndPeriod(position) &&
-              !avoidVolumeIncreaseAtLastSec) {
-            unawaited(_bgPlayer.setVolume(_initialBgVolume));
+          } else {
+            var vol = await retrieveSavedBgVolume();
+            unawaited(_bgPlayer.setVolume(vol));
           }
         }
       });
@@ -158,7 +156,7 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future customAction(String name, [Map<String, dynamic> extras]) async {
     switch (name) {
       case SET_BG_SOUND_VOL:
-        _initialBgVolume = extras[SET_BG_SOUND_VOL];
+        _bgVolume = extras[SET_BG_SOUND_VOL];
         unawaited(_bgPlayer.setVolume(extras[SET_BG_SOUND_VOL]));
         break;
       case PLAY_BG_SOUND:
@@ -193,19 +191,13 @@ class MeditoAudioHandler extends BaseAudioHandler
     customEvent.add(STATS);
   }
 
-  bool _audioPositionBeforeEndPeriod(Duration position) {
-    //also makes sure the audio has started
-    return _duration.inSeconds > 0 &&
-        position.inSeconds <= _duration.inSeconds - fadeDuration;
-  }
-
   bool _audioPositionIsInEndPeriod(Duration position) {
     return _duration.inSeconds > 0 &&
-        position.inSeconds > _duration.inSeconds - fadeDuration;
+        position.inSeconds > _duration.inSeconds - FADE_DURATION;
   }
 
   Future<void> _setBgVolumeFadeAtEnd(int timeLeft) async {
-    unawaited(_bgPlayer.setVolume(_initialBgVolume -
-        ((fadeDuration - timeLeft) * (_initialBgVolume / fadeDuration))));
+    unawaited(_bgPlayer.setVolume(_bgVolume -
+        ((FADE_DURATION - timeLeft) * (_bgVolume / FADE_DURATION))));
   }
 }
