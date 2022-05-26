@@ -82,7 +82,7 @@ class _ChooseBackgroundSoundDialogState
 
     return StreamBuilder(
         stream: Stream.fromFuture(Connectivity()
-            .checkConnectivity()), // figure out how to refresh the stream periodically
+            .checkConnectivity()),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data == ConnectivityResult.none) {

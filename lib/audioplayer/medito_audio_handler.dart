@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -25,7 +24,7 @@ const NONE = 'No Sound';
 
 class MeditoAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
-  final _player = AudioPlayer();
+  final _player = AudioPlayer(handleInterruptions: false);
   final _bgPlayer = AudioPlayer();
   Duration _duration;
   var _currentlyPlayingBGSound = '';
