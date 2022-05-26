@@ -99,18 +99,12 @@ Future<void> launchUrl(String href) async {
 }
 
 void _launchEmailSubmission(String href) async {
-  var version;
-  try {
-    var packageInfo = await PackageInfo.fromPlatform();
-    version = packageInfo.buildNumber;
-  } catch (e) {
-    print(e);
-  }
+  var version = await getDeviceInfoString();
 
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
   var info =
-      '--- Please write email below this line v$version, id:$userId ----';
+      '--- Please write email below this line $version, id:$userId ----';
 
   final params = Uri(
       scheme: 'mailto',
