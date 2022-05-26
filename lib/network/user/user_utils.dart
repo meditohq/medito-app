@@ -13,11 +13,11 @@ import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> firstOpenOperations() async {
+Future<bool> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
-  _beginClearStorage(prefs);
+  var opened = _beginClearStorage(prefs);
   await _logAccount(prefs);
-  return;
+  return opened;
 }
 
 Future _logAccount(SharedPreferences prefs) async {
@@ -54,11 +54,13 @@ Future<void> _postUsage() async {
   }
 }
 
-void _beginClearStorage(SharedPreferences prefs) {
+//clears storage if this is first open, and returns true if the user has opened the app before
+bool _beginClearStorage(SharedPreferences prefs) {
   var opened = prefs.getBool('hasOpened') ?? false;
   if (!opened) {
     unawaited(_clearStorage(prefs));
   }
+  return opened;
 }
 
 Future _clearStorage(SharedPreferences prefs) async {
@@ -77,28 +79,7 @@ class UserRepo {
     var deviceOS;
     var devicePlatform;
 
-    var deviceInfo = DeviceInfoPlugin();
-
-    try {
-      if (io.Platform.isIOS) {
-        var iosInfo = await deviceInfo.iosInfo;
-        deviceModel = iosInfo.utsname.machine;
-        deviceOS = iosInfo.utsname.sysname;
-        devicePlatform = 'iOS';
-      }
-    } catch (e) {
-      print(e);
-    }
-    try {
-      if (io.Platform.isAndroid) {
-        var androidInfo = await deviceInfo.androidInfo;
-        deviceModel = androidInfo.model;
-        deviceOS = androidInfo.version.release;
-        devicePlatform = 'android';
-      }
-    } catch (e) {
-      print(e);
-    }
+    var deviceInfoMap = await getDeviceDetails();
 
     var version = '';
     try {
@@ -110,7 +91,7 @@ class UserRepo {
 
     var token = '$now${UniqueKey().toString()}';
 
-    var defaultMap = <String, String>{
+    var defaultMap = {
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
       'token': token,
@@ -120,7 +101,7 @@ class UserRepo {
       'device_os': deviceOS,
       'device_platform': devicePlatform,
       'device_language': io.Platform.localeName,
-    };
+    }..addAll(deviceInfoMap);
 
     var id = '';
     try {
@@ -149,5 +130,54 @@ Future<String> get generatedToken async {
   return prefs.getString(TOKEN);
 }
 
+Future<Map<String, dynamic>> getDeviceDetails() async {
+  var deviceModel;
+  var deviceOS;
+  var devicePlatform;
+
+  var deviceInfo = DeviceInfoPlugin();
+
+  try {
+    if (io.Platform.isIOS) {
+      var iosInfo = await deviceInfo.iosInfo;
+      deviceModel = iosInfo.utsname.machine;
+      deviceOS = iosInfo.utsname.sysname;
+      devicePlatform = 'iOS';
+    }
+  } catch (e) {
+    print(e);
+  }
+  try {
+    if (io.Platform.isAndroid) {
+      var androidInfo = await deviceInfo.androidInfo;
+      deviceModel = androidInfo.model;
+      deviceOS = androidInfo.version.release;
+      devicePlatform = 'android';
+    }
+  } catch (e) {
+    print(e);
+  }
+
+  return {
+    DEVICE_MODEL: deviceModel,
+    DEVICE_OS: deviceOS,
+    DEVICE_PLATFORM: devicePlatform
+  };
+}
+
+Future<String> getDeviceInfoString() async {
+  var packageInfo = await PackageInfo.fromPlatform();
+
+  var device = await getDeviceDetails();
+  var version = packageInfo.version;
+  var buildNumber = packageInfo.buildNumber;
+
+  return 'Version: $version \n Device: ${device} \n Build Number: $buildNumber \n ReleaseMode: $kReleaseMode';
+
+}
+
+const DEVICE_MODEL = 'device_model';
+const DEVICE_OS = 'device_os';
+const DEVICE_PLATFORM = 'device_platform';
 const TOKEN = 'token_v3';
 const USER_ID = 'userId_v3';

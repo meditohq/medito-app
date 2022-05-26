@@ -80,3 +80,4 @@ gen/
 /pubspec.lock
 /android/keystore.properties
 /.vscode
+android/app/meditokey.jks

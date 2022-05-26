@@ -13,7 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/audioplayer/audio_player_service.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
@@ -23,15 +23,18 @@ import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/player/position_indicator_widget.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../audioplayer/audio_inherited_widget.dart';
+
 class ChooseBackgroundSoundDialog extends StatefulWidget {
   final stream;
+  final MeditoAudioHandler handler;
 
-  ChooseBackgroundSoundDialog({this.stream});
+  ChooseBackgroundSoundDialog({this.handler, this.stream});
 
   @override
   _ChooseBackgroundSoundDialogState createState() =>
@@ -40,14 +43,16 @@ class ChooseBackgroundSoundDialog extends StatefulWidget {
 
 class _ChooseBackgroundSoundDialogState
     extends State<ChooseBackgroundSoundDialog> {
-  static const NONE = 'No Sound';
+
+  bool isOffline = false;
 
   /// Tracks the bgVolume while the user drags the bgVolume bar.
   final BehaviorSubject<double> _dragBgVolumeSubject =
-      BehaviorSubject.seeded(null);
-  var volume;
+  BehaviorSubject.seeded(null);
 
+  MeditoAudioHandler _handler;
   String _downloadingItem;
+  var _volume;
 
   @override
   void initState() {
@@ -63,78 +68,126 @@ class _ChooseBackgroundSoundDialogState
   }
 
   void initService() async {
-    if (AudioService.running) {
-      volume = await retrieveSavedBgVolume();
-      _dragBgVolumeSubject.add(volume);
-      await AudioService.customAction(SET_BG_SOUND_VOL, volume / 100);
-      await AudioService.customAction(INIT_BG_SOUND, "");
-    }
+    var bgSound = await getBgSoundNameFromSharedPrefs();
+    _volume = await retrieveSavedBgVolume();
+    await Future.delayed(Duration(milliseconds: 200)).then((value) {
+      _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: _volume});
+      return _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<dynamic>(
-        stream: AudioService.customEventStream,
-        initialData: NONE,
+    _handler = AudioHandlerInheritedWidget.of(context).audioHandler;
+
+    return StreamBuilder(
+        stream: Stream.fromFuture(Connectivity()
+            .checkConnectivity()),
         builder: (context, snapshot) {
-          var currentSounds;
-          try {
-            currentSounds = (snapshot.data[SEND_BG_SOUND] as String).isNotEmptyAndNotNull() ? snapshot.data[SEND_BG_SOUND] : NONE;
-          } catch (e) {
-            currentSounds = NONE;
+          if (snapshot.hasData) {
+            if (snapshot.data == ConnectivityResult.none) {
+              isOffline = true;
+            }
+            return StreamBuilder<dynamic>(
+                stream: widget.handler.customEvent.stream,
+                initialData: {SEND_BG_SOUND: NONE},
+                builder: (context, snapshot) {
+                  var currentSound = _getCurrentSoundFromSnapshot(snapshot.data);
+                  return DraggableScrollableSheet(
+                    expand: false,
+                    builder: (BuildContext context,
+                        ScrollController scrollController) {
+                      return SafeArea(
+                        top: true,
+                        bottom: false,
+                        child: Material(
+                            color: MeditoColors.moonlight,
+                            child: isOffline
+                                ? offlineBackgroundSounds(
+                                currentSound, scrollController)
+                                : onlineBackgroundSounds(
+                                currentSound, scrollController)),
+                      );
+                    },
+                  );
+                });
+          } else {
+            return Container(); // return a spinner
           }
+        });
+  }
 
-          return DraggableScrollableSheet(
-            expand: false,
-            builder: (BuildContext context, ScrollController scrollController) {
-              return SafeArea(
-                top: true,
-                bottom: false,
-                child: Material(
-                  color: MeditoColors.moonlight,
-                  child: StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
-                      stream: widget.stream,
-                      initialData: ApiResponse.loading(),
-                      builder: (context, snapshot) {
-                        switch (snapshot.data.status) {
-                          case Status.LOADING:
-                            return Center(
-                                child: const CircularProgressIndicator(
-                                    backgroundColor: Colors.black,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        MeditoColors.walterWhite)));
-                            break;
-                          case Status.COMPLETED:
-                            var list = snapshot.data.body.data;
+  Widget onlineBackgroundSounds(String currentSound,
+      ScrollController scrollController) {
+    return StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
+        stream: widget.stream,
+        initialData: ApiResponse.loading(),
+        builder: (context, snapshot) {
+          switch (snapshot.data.status) {
+            case Status.LOADING:
+              return Center(
+                  child: const CircularProgressIndicator(
+                      backgroundColor: Colors.black,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          MeditoColors.walterWhite)));
+              break;
+            case Status.COMPLETED:
+              var list = snapshot.data.body.data;
 
-                            var widgetList = <Widget>[
-                              Divider(height: 16),
-                              _getHeader(),
-                              Divider(height: 16),
-                              _getVolumeWidget(),
-                              Divider(height: 16),
-                              _getNoneListItem(currentSounds)
-                            ];
-                            widgetList.addAll(list
-                                .map<Widget>((e) => _getBackgroundSoundListTile(
-                                    e, currentSounds))
-                                .toList());
+              var widgetList = <Widget>[
+                Divider(height: 16),
+                _getHeader(),
+                Divider(height: 16),
+                _getVolumeWidget(),
+                Divider(height: 16),
+                _getNoneListItem(currentSound)
+              ];
+              widgetList.addAll(list
+                  .map<Widget>((e) =>
+                  _getBackgroundSoundListTile(e, currentSound, context))
+                  .toList());
 
-                            return ListView(
-                                controller: scrollController,
-                                children: widgetList);
+              return ListView(
+                  controller: scrollController, children: widgetList);
 
-                            break;
-                          case Status.ERROR:
-                            return _getErrorWidget();
-                            break;
-                        }
-                        return Container();
-                      }),
-                ),
-              );
-            },
-          );
+              break;
+            case Status.ERROR:
+              return _getErrorWidget();
+              break;
+          }
+          return Container();
+        });
+  }
+
+  Widget offlineBackgroundSounds(String currentSound,
+      ScrollController scrollController) {
+    return FutureBuilder<List<BackgroundSoundData>>(
+        future: getBgSoundFromOfflineSharedPrefs(),
+        initialData: [],
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var list = snapshot.data;
+            var widgetList = <Widget>[
+              Divider(height: 16),
+              _getHeader(),
+              Divider(height: 16),
+              _getVolumeWidget(),
+              Divider(height: 16),
+              _getNoneListItem(currentSound)
+            ];
+            widgetList.addAll(list
+                .map((e) =>
+                _getBackgroundSoundListTile(e, currentSound, context))
+                .toList());
+
+            return ListView(controller: scrollController, children: widgetList);
+          } else {
+            return Center(
+                child: const CircularProgressIndicator(
+                    backgroundColor: Colors.black,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        MeditoColors.walterWhite)));
+          }
         });
   }
 
@@ -177,19 +230,29 @@ class _ChooseBackgroundSoundDialogState
 
   bool _isSelected(String current, String name) => current == name;
 
-  Widget _getBackgroundSoundListTile(BackgroundSoundData item, String current) {
+  Widget _getBackgroundSoundListTile(
+      BackgroundSoundData item, String current, BuildContext context) {
     var assetUrl = item.file.toAssetUrl();
-
     return InkWell(
         onTap: () {
           setState(() {
             _downloadingItem = item.name;
           });
+
           downloadBGMusicFromURL(assetUrl, item.name).then((filePath) {
+            if (filePath == 'Connectivity lost') {
+              _downloadingItem = '';
+              isOffline = true;
+              setState(() {});
+              createSnackBar(
+                  'Connectivity lost. Displaying offline background sounds.',
+                  context);
+              _noneSelected();
+            }
             _downloadingItem = '';
             addBgSoundSelectionToSharedPrefs(filePath, item.name);
-            AudioService.customAction(PLAY_BG_SOUND, filePath);
-            return AudioService.customAction(SEND_BG_SOUND, item.name);
+            widget.handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: filePath});
+            return widget.handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: item.name});
           });
         },
         child: ListTile(
@@ -221,8 +284,9 @@ class _ChooseBackgroundSoundDialogState
       );
 
   void _noneSelected() {
-    AudioService.customAction(SEND_BG_SOUND, '');
-    AudioService.customAction(PLAY_BG_SOUND, '');
+    print('selecting NONE');
+    _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: ''});
+    _handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: ''});
     addBgSoundSelectionToSharedPrefs('', '');
   }
 
@@ -243,7 +307,7 @@ class _ChooseBackgroundSoundDialogState
         child: StreamBuilder<Object>(
             stream: _dragBgVolumeSubject,
             builder: (context, snapshot) {
-              volume = _dragBgVolumeSubject.value;
+              var volume = _dragBgVolumeSubject.value ?? _volume;
               var volumeIcon = _volumeIconFunction(volume);
               return Row(
                 mainAxisSize: MainAxisSize.min,
@@ -262,13 +326,14 @@ class _ChooseBackgroundSoundDialogState
                           min: 0.0,
                           activeColor: MeditoColors.walterWhite,
                           inactiveColor:
-                              MeditoColors.walterWhite.withOpacity(0.7),
+                          MeditoColors.walterWhite.withOpacity(0.7),
                           max: 100.0,
                           value: volume,
                           onChanged: (value) {
                             _dragBgVolumeSubject.add(value);
-                            AudioService.customAction(
-                                SET_BG_SOUND_VOL, value / 100);
+                            _handler.customAction(
+                                SET_BG_SOUND_VOL,
+                                {SET_BG_SOUND_VOL: value / 100});
                           },
                           onChangeEnd: (value) {
                             saveBgVolume(value);
@@ -299,5 +364,9 @@ class _ChooseBackgroundSoundDialogState
     BackButtonInterceptor.remove(backInterceptor);
     _dragBgVolumeSubject.close();
     super.dispose();
+  }
+
+  String _getCurrentSoundFromSnapshot(Map<String, dynamic>  snapshot) {
+    return snapshot[SEND_BG_SOUND];
   }
 }

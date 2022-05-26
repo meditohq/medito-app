@@ -5,6 +5,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/daily_message_item_widget.dart';
 import 'package:flutter/material.dart';
 
+//This widget is the quote box on the home screen
 class DailyMessageWidget extends StatefulWidget {
 
   @override
@@ -22,7 +23,8 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizeChangedLayoutNotifier(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: StreamBuilder<ApiResponse<DailyMessageResponse>>(
           stream: _bloc.coursesList.stream,
           initialData: ApiResponse.loading(),

@@ -62,7 +62,7 @@ if (!configured) {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     lintOptions {
         disable 'InvalidPackage'
@@ -72,7 +72,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId project.APP_ID
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode project.VERSION_CODE
         versionName project.VERSION_NAME
         multiDexEnabled true

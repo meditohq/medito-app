@@ -15,13 +15,11 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/utils/colors.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/text_themes.dart';
-import 'package:Medito/widgets/btm_nav/home_widget.dart';
-import 'package:Medito/widgets/folders/folder_nav_widget.dart';
-import 'package:Medito/widgets/packs/packs_screen.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,24 +27,43 @@ import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'audioplayer/audio_inherited_widget.dart';
 import 'network/auth.dart';
 import 'utils/colors.dart';
 
 SharedPreferences sharedPreferences;
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   sharedPreferences = await SharedPreferences.getInstance();
 
+  var _audioHandler = await AudioService.init(
+    builder: () => MeditoAudioHandler(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'com.medito.app.channel.audio',
+      androidNotificationChannelName: 'Medito Session',
+    ),
+  );
+
+  _audioHandler.customEvent.stream.listen((event) async {
+    if (event == STATS) {
+      await updateStatsFromBg();
+    }
+  });
+
   if (kReleaseMode) {
     await SentryFlutter.init((options) {
       options.dsn = SENTRY_URL;
-    }, appRunner: () => runApp(ParentWidget()));
+    },
+        appRunner: () => _runApp(_audioHandler));
   } else {
-    runApp(ParentWidget());
+    _runApp(_audioHandler);
   }
 }
+
+void _runApp(MeditoAudioHandler _audioHandler) => runApp(AudioHandlerInheritedWidget(audioHandler: _audioHandler, child: ParentWidget()));
 
 /// This Widget is the main application widget.
 class ParentWidget extends StatefulWidget {
@@ -58,11 +75,6 @@ class ParentWidget extends StatefulWidget {
 
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
-  var _currentIndex = 0;
-  final _children = [HomeWidget(), PackListWidget()];
-  final _messengerKey = GlobalKey<ScaffoldState>();
-
-  var _deletingCache = true;
 
   @override
   void initState() {
@@ -77,14 +89,6 @@ class _ParentWidgetState extends State<ParentWidget>
           statusBarColor: MeditoColors.transparent),
     );
 
-    firstOpenOperations().then((value) {
-      setState(() {
-        _deletingCache = false;
-      });
-    });
-
-    // update stats for any sessions that were listened in the background and after the app was killed
-    updateStatsFromBg();
     // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
@@ -97,72 +101,19 @@ class _ParentWidgetState extends State<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    return AudioServiceWidget(
-      child: MaterialApp(
-        navigatorObservers: [SentryNavigatorObserver()],
-        initialRoute: '/nav',
-        routes: {
-          FolderNavWidget.routeName: (context) => FolderNavWidget(),
-          '/nav': (context) => _deletingCache
-              ? _getLoadingWidget()
-              : Scaffold(
-                  key: _messengerKey,
-                  body: IndexedStack(
-                    index: _currentIndex,
-                    children: _children,
-                  ),
-                  bottomNavigationBar: Container(
-                    decoration: BoxDecoration(
-                        color: MeditoColors.softGrey,
-                        border: Border(
-                            top: BorderSide(
-                                color: MeditoColors.softGrey, width: 2.0))),
-                    child: BottomNavigationBar(
-                      selectedLabelStyle: Theme.of(context)
-                          .textTheme
-                          .headline1
-                          .copyWith(fontSize: 12),
-                      unselectedLabelStyle: Theme.of(context)
-                          .textTheme
-                          .headline2
-                          .copyWith(fontSize: 12),
-                      selectedItemColor: MeditoColors.walterWhite,
-                      unselectedItemColor: MeditoColors.newGrey,
-                      currentIndex: _currentIndex,
-                      onTap: _onTabTapped,
-                      items: [
-                        BottomNavigationBarItem(
-                          tooltip: 'Home',
-                          icon: Icon(
-                            Icons.home_outlined,
-                            size: 20,
-                          ),
-                          label: 'Home',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(
-                            Icons.format_list_bulleted_outlined,
-                            size: 20,
-                          ),
-                          tooltip: 'Packs',
-                          label: 'Packs',
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-        },
-        theme: ThemeData(
-            splashColor: MeditoColors.moonlight,
-            canvasColor: MeditoColors.darkMoon,
-            pageTransitionsTheme: PageTransitionsTheme(builders: {
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.android: SlideTransitionBuilder(),
-            }),
-            accentColor: MeditoColors.walterWhite,
-            textTheme: meditoTextTheme(context)),
-        title: ParentWidget._title,
-      ),
+    return MaterialApp.router(
+      routeInformationParser: router.routeInformationParser,
+      routerDelegate: router.routerDelegate,
+      theme: ThemeData(
+          splashColor: MeditoColors.moonlight,
+          canvasColor: MeditoColors.darkMoon,
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: SlideTransitionBuilder(),
+          }),
+          accentColor: MeditoColors.walterWhite,
+          textTheme: meditoTextTheme(context)),
+      title: ParentWidget._title,
     );
   }
 
@@ -173,20 +124,8 @@ class _ParentWidgetState extends State<ParentWidget>
       updateStatsFromBg();
     }
   }
-
-  void _onTabTapped(int value) {
-    setState(() {
-      _currentIndex = value;
-    });
-  }
 }
 
-Widget _getLoadingWidget() {
-  return Center(
-      child: CircularProgressIndicator(
-          backgroundColor: Colors.black,
-          valueColor: AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)));
-}
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
   @override
