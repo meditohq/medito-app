@@ -49,10 +49,10 @@ class _ChooseBackgroundSoundDialogState
   /// Tracks the bgVolume while the user drags the bgVolume bar.
   final BehaviorSubject<double> _dragBgVolumeSubject =
   BehaviorSubject.seeded(null);
-  var _volume = 0.0;
 
   MeditoAudioHandler _handler;
   String _downloadingItem;
+  var _volume;
 
   @override
   void initState() {
@@ -69,10 +69,11 @@ class _ChooseBackgroundSoundDialogState
 
   void initService() async {
     var bgSound = await getBgSoundNameFromSharedPrefs();
-    await Future.delayed(Duration(milliseconds: 200)).then((value) =>
-        _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound})
-    );
     _volume = await retrieveSavedBgVolume();
+    await Future.delayed(Duration(milliseconds: 200)).then((value) {
+      _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: _volume});
+      return _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
+    });
   }
 
   @override
@@ -306,8 +307,8 @@ class _ChooseBackgroundSoundDialogState
         child: StreamBuilder<Object>(
             stream: _dragBgVolumeSubject,
             builder: (context, snapshot) {
-              _volume = _dragBgVolumeSubject.value ?? 0.0;
-              var volumeIcon = _volumeIconFunction(_volume);
+              var volume = _dragBgVolumeSubject.value ?? _volume;
+              var volumeIcon = _volumeIconFunction(volume);
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -327,7 +328,7 @@ class _ChooseBackgroundSoundDialogState
                           inactiveColor:
                           MeditoColors.walterWhite.withOpacity(0.7),
                           max: 100.0,
-                          value: _volume,
+                          value: volume,
                           onChanged: (value) {
                             _dragBgVolumeSubject.add(value);
                             _handler.customAction(

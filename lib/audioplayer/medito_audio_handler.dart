@@ -139,9 +139,6 @@ class MeditoAudioHandler extends BaseAudioHandler
               _updatedStats = true;
               await _updateStats();
             }
-          } else {
-            var vol = await retrieveSavedBgVolume();
-            unawaited(_bgPlayer.setVolume(vol));
           }
         }
       });
