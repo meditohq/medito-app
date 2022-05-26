@@ -50,7 +50,7 @@ class CoursesRowItemWidget extends StatelessWidget {
     if (data != null) {
       return Text(data.subtitle, style: Theme.of(context).textTheme.subtitle1);
     } else {
-      return LoadingTextBoxWidget(height: 21);
+      return Container(height: 0, width: 0); //LoadingTextBoxWidget(height: 21);
     }
   }
 
@@ -70,17 +70,22 @@ class CoursesRowItemWidget extends StatelessWidget {
     }
   }
 
-  Stack _imageStack() {
-    return Stack(
-      children: [
-        SizedBox(width: 132, height: 132, child: _buildCardBackground()),
-        Positioned.fill(
-          child: Center(
-            child: SizedBox(
-                width: 92, height: 92, child: _getNetworkImageWidget()),
+  Widget _imageStack() {
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(2))),
+      child: Stack(
+        children: [
+          SizedBox(width: 132, height: 132, child: _buildCardBackground()),
+          Positioned.fill(
+            child: Center(
+              child: SizedBox(
+                  width: 92, height: 92, child: _getNetworkImageWidget()),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

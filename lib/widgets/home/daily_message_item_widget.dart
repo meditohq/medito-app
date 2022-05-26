@@ -1,4 +1,5 @@
 import 'package:Medito/network/home/daily_message_response.dart';
+import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/loading_text_box_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,21 +21,28 @@ class DailyMessageItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-          left: 16.0, right: 16.0, bottom: 32.0, top: 32.0),
-      child: GestureDetector(
-        onTap: _createShareAction(data),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTitle(context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: _buildMarkdownBody(context),
+    return SizeChangedLayoutNotifier(
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        color: MeditoColors.deepNight,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: GestureDetector(
+            onTap: _createShareAction(data),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildTitle(context),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _buildMarkdownBody(context),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -55,7 +63,7 @@ class DailyMessageItemWidget extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     if (data != null) {
-      return Text(data.title, style: Theme.of(context).textTheme.headline3);
+      return Text(data.title.toUpperCase(), style: Theme.of(context).textTheme.subtitle2);
     } else {
       return LoadingTextBoxWidget(height: 23);
     }

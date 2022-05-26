@@ -1,17 +1,17 @@
 import 'dart:math';
 
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:audio_service/audio_service.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class PositionIndicatorWidget extends StatefulWidget {
-  final MediaItem mediaItem;
-  final PlaybackState state;
   final Color color;
+  final MeditoAudioHandler handler;
 
-  PositionIndicatorWidget({Key key, this.state, this.mediaItem, this.color})
+  PositionIndicatorWidget({Key key, this.handler, this.color})
       : super(key: key);
 
   @override
@@ -26,8 +26,6 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
   final BehaviorSubject<double> _dragPositionSubject =
       BehaviorSubject.seeded(null);
 
-  bool tracked = false;
-
   @override
   Widget build(BuildContext context) {
     double seekPos;
@@ -37,14 +35,13 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
           Stream.periodic(Duration(milliseconds: 200)),
           (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
-        double position = snapshot.data ??
-            widget.state?.currentPosition?.inMilliseconds?.toDouble() ??
+        //snapshot.data will be non null is slider was dragged
+        int position = snapshot.data?.toInt() ??
+            widget.handler.playbackState.value?.position?.inMilliseconds ??
             0;
-        var duration = widget.mediaItem?.duration?.inMilliseconds ?? 0;
 
-        if (position > duration - 10 && !tracked) {
-          tracked = true;
-        }
+        //actual duration of the audio
+        var duration = widget.handler.mediaItem.value?.extras[DURATION] ?? 0;
 
         return Column(
           children: [
@@ -68,43 +65,43 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                       _dragPositionSubject.add(value);
                     },
                     onChangeEnd: (value) {
-                      AudioService.seekTo(
-                          Duration(milliseconds: value.toInt()));
+                      widget.handler
+                          .seek(Duration(milliseconds: value.toInt()));
                       seekPos = value;
                       _dragPositionSubject.add(null);
                     },
                   ),
                 ),
               ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Duration(
-                            milliseconds:
-                                widget.state?.currentPosition?.inMilliseconds ??
-                                    0)
-                        .toMinutesSeconds(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2
-                        .copyWith(color: MeditoColors.meditoTextGrey),
-                  ),
-                  Text(
-                    Duration(milliseconds: duration).toMinutesSeconds(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2
-                        .copyWith(color: MeditoColors.meditoTextGrey),
-                  ),
-                ],
-              ),
-            ),
+            _buildLabels(context, duration, position),
           ],
         );
       },
+    );
+  }
+
+  Padding _buildLabels(BuildContext context, int duration, int position) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            Duration(milliseconds: position).toMinutesSeconds(),
+            style: Theme.of(context)
+                .textTheme
+                .subtitle2
+                .copyWith(color: MeditoColors.meditoTextGrey),
+          ),
+          Text(
+            Duration(milliseconds: duration).toMinutesSeconds(),
+            style: Theme.of(context)
+                .textTheme
+                .subtitle2
+                .copyWith(color: MeditoColors.meditoTextGrey),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -37,7 +37,7 @@ class SessionData {
   String backgroundImage;
   @Deprecated('use files instead')
   List<Audio> audio;
-  @Deprecated('user attribution instead')
+  @Deprecated('use attribution instead')
   Author author;
 
   SessionData(

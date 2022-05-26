@@ -23,7 +23,7 @@ import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/courses_row_widget.dart';
@@ -35,12 +35,17 @@ import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeWidget extends StatefulWidget {
+  const HomeWidget(this.hasOpened);
+
+  final bool hasOpened;
+
   @override
   _HomeWidgetState createState() => _HomeWidgetState();
 }
@@ -81,7 +86,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     physics: AlwaysScrollableScrollPhysics(),
                     children: [
                       _getAppBar(context),
-                      AnnouncementBanner(key: _announceKey),
+                      AnnouncementBanner(key: _announceKey, hasOpened: widget.hasOpened),
                       SmallShortcutsRowWidget(
                         key: _shortcutKey,
                         onTap: (type, id) => _navigate(
@@ -91,8 +96,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                           key: _coursesKey,
                           onTap: (type, id) => _navigate(
                               type, id, context, Tracking.COURSE_TAPPED)),
-                      DailyMessageWidget(key: _dailyMessageKey),
                       StatsWidget(),
+                      SizedBox(height: 16),
+                      DailyMessageWidget(key: _dailyMessageKey),
+                      SizedBox(height: 24)
                     ],
                   );
                 }
@@ -110,18 +117,10 @@ class _HomeWidgetState extends State<HomeWidget> {
       );
 
   Future<void> _navigate(type, id, BuildContext context, String origin) {
-    Tracking.trackEvent({
-      Tracking.TYPE: origin,
-      Tracking.DESTINATION: Tracking.destinationData(mapToPlural(type), id)
-    });
-
     return checkConnectivity().then(
       (value) {
         if (value) {
-          return NavigationFactory.navigateToScreenFromString(type, id, context)
-              .then((value) {
-            return _refresh();
-          });
+         context.go(getPathFromString(type, [id]));
         } else {
           _bloc.checkConnection();
         }
@@ -177,8 +176,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       color: MeditoColors.deepNight,
       onSelected: (MenuData result) {
-        NavigationFactory.navigateToScreenFromString(
-            result.itemType, result.itemPath, context);
+        context.go(getPathFromString(result.itemType, [result.itemPath]));
       },
       itemBuilder: (BuildContext context) {
         return snapshot.data.body.data.map((MenuData data) {
@@ -204,26 +202,22 @@ class _HomeWidgetState extends State<HomeWidget> {
       });
 
   Future<void> _showVersionPopUp(BuildContext context) async {
-    var packageInfo = await PackageInfo.fromPlatform();
 
-    var version = packageInfo.version;
-    var buildNumber = packageInfo.buildNumber;
-
-    var line1 =
-        'Version: $version - Build Number: $buildNumber - ReleaseMode: $kReleaseMode';
-
+    var line1 = await getDeviceInfoString();
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';
     final snackBar = SnackBar(
         content: GestureDetector(
           onTap: () {
-            Clipboard.setData(ClipboardData(text: '$line1 $userID'));
+            Share.share('$line1 $userID');
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('Tap here to copy',
+                  style: TextStyle(color: MeditoColors.walterWhite)),
               Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
               Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
             ],

@@ -1,17 +1,20 @@
 import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/empty_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
-import 'package:Medito/widgets/player/player_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../audioplayer/audio_inherited_widget.dart';
+import '../../utils/navigation_extra.dart';
 
 class DownloadsListWidget extends StatefulWidget {
   @override
@@ -24,6 +27,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<MediaItem> _downloadList = [];
+  MeditoAudioHandler _audioHandler;
 
   @override
   void initState() {
@@ -33,6 +37,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
 
   @override
   Widget build(BuildContext context) {
+    _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
+
     return Scaffold(
       appBar: const MeditoAppBarWidget(
         title: DOWNLOADS,
@@ -132,11 +138,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   String _getDuration(String length) => formatSessionLength(length);
 
   void _openPlayer(MediaItem item, BuildContext context) {
-    start(item).then((value) {
-      NavigationFactory.navigate(context, Screen.player,
-          id: null, normalPop: true);
-      return null;
-    });
+    _audioHandler.playMediaItem(item);
+    context.go(GoRouter.of(context).location + PlayerPath);
   }
 
   void showSwipeToDeleteTip() {

@@ -16,10 +16,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:io';
 
 import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,7 +55,11 @@ void createSnackBar(String message, BuildContext context,
   );
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  try {
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  } catch (e) {
+    print(e);
+  }
 }
 
 void createSnackBarWithColor(
@@ -79,6 +83,12 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 }
 
 Future<void> launchUrl(String href) async {
+  var prefs = await SharedPreferences.getInstance();
+  var userId = prefs.getString(USER_ID);
+  if(userId != null) {
+    href = href.replaceAll('{{user_id}}', userId);
+  }
+
   if (href.startsWith('mailto')) {
     _launchEmailSubmission(href);
   } else {
@@ -89,15 +99,12 @@ Future<void> launchUrl(String href) async {
 }
 
 void _launchEmailSubmission(String href) async {
-  var version;
-  try {
-    var packageInfo = await PackageInfo.fromPlatform();
-    version = packageInfo.buildNumber;
-  } catch (e) {
-    print(e);
-  }
+  var version = await getDeviceInfoString();
 
-  var info = '--- Please write email below this line v$version ----';
+  var prefs = await SharedPreferences.getInstance();
+  var userId = prefs.getString(USER_ID);
+  var info =
+      '--- Please write email below this line $version, id:$userId ----';
 
   final params = Uri(
       scheme: 'mailto',

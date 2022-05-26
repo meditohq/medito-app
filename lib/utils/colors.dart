@@ -36,4 +36,6 @@ class MeditoColors {
   static const softGrey = Color(0xff424345);
   static const deepNight = Color(0xff272829);
   static const intoTheNight = Color(0xff171717);
+  static const easterYellow = Color(0xfffef5c7);
+
 }

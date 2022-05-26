@@ -37,63 +37,53 @@ class StreakTileWidget extends StatefulWidget {
 class _StreakTileWidgetState extends State<StreakTileWidget> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8.0),
-      child: FutureBuilder<String>(
-          future: widget.future,
-          initialData: '0',
-          builder: (context, snapshot) {
-            var unit;
-            if (snapshot.hasData) {
-              var value = int.parse(snapshot?.data);
-              unit = getUnits(widget.optionalText, value);
-            }
-            return InkWell(
-              splashColor: MeditoColors.softGrey,
-              onTap: widget.onClick,
-              child: Ink(
-                color: MeditoColors.moonlight,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 132.0,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(widget.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.fade,
-                            style: Theme.of(context).textTheme.subtitle1),
-                        SizedBox(height: 4),
-                        Wrap(
-                          direction: Axis.horizontal,
-                          crossAxisAlignment: WrapCrossAlignment.end,
-                          children: <Widget>[
-                            Text(
-                              (snapshot.hasData
-                                          ? _formatSnapshotData(snapshot)
-                                          : '') +
-                                      ' ' +
-                                      unit ??
-                                  '',
-                              style: Theme.of(context).textTheme.headline4,
-                              overflow: TextOverflow.fade,
-                              maxLines: 1,
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+    return FutureBuilder<String>(
+        future: widget.future,
+        initialData: '0',
+        builder: (context, snapshot) {
+          var unit;
+          if (snapshot.hasData) {
+            var value = int.parse(snapshot?.data);
+            unit = getUnits(widget.optionalText, value);
+          }
+          return InkWell(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            splashColor: MeditoColors.softGrey,
+            onTap: widget.onClick,
+            child: Ink(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _getDataTextWidget(snapshot, unit, context),
+                    SizedBox(height: 6),
+                    getDescriptionWidget(context)
+                  ],
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        });
+  }
+
+  Text _getDataTextWidget(
+      AsyncSnapshot<String> snapshot, unit, BuildContext context) {
+    return Text(
+      (snapshot.hasData ? _formatSnapshotData(snapshot) : '') + unit ??
+          '',
+      style: Theme.of(context).textTheme.headline5,
+      overflow: TextOverflow.fade,
+      maxLines: 2,
     );
+  }
+
+  Text getDescriptionWidget(BuildContext context) {
+    return Text(widget.title,
+        maxLines: 2,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.subtitle1);
   }
 
   String _formatSnapshotData(AsyncSnapshot<String> snapshot) {

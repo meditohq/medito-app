@@ -15,58 +15,74 @@ class _StatsWidgetState extends State<StatsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
-          child: Text('Stats', style: Theme.of(context).textTheme.headline3),
+    return Padding(
+      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+      child: Card(
+        color: MeditoColors.deepNight,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Table(columnWidths: const {
+            0: FlexColumnWidth(),
+            1: FlexColumnWidth(),
+          }, children: [
+            TableRow(children: [
+              statsItem(0),
+              statsItem(1),
+              statsItem(2),
+              statsItem(3)
+            ]),
+          ]),
         ),
-        SizedBox(
-          height: 73,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            itemBuilder: (context, i) => statsItem(context, i),
-            itemCount: 4,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-          ),
-        ),
-        Container(height: 16)
-      ],
+      ),
     );
   }
 
-  Widget statsItem(BuildContext context, int index) {
+  Widget statsItem(int index) {
     switch (index) {
       case 0:
         return StreakTileWidget(
           getCurrentStreak(),
-          'Current streak',
+          'Current\nstreak',
           onClick: openEditDialog,
           editable: true,
           optionalText: UnitType.day,
         );
+        break;
       case 1:
         return StreakTileWidget(
           getMinutesListened(),
-          'Listened',
+          'Minutes Listened',
           optionalText: UnitType.min,
         );
+        break;
       case 2:
         return StreakTileWidget(
           getLongestStreak(),
-          'Longest streak',
+          'Longest\nstreak',
           editable: true,
           onClick: openResetDialog,
           optionalText: UnitType.day,
         );
+        break;
       case 3:
-        return StreakTileWidget(
-          getNumSessions(),
-          'Total',
-          optionalText: UnitType.sessions,
-        );
+        return FutureBuilder<String>(
+            future: getNumSessions(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return StreakTileWidget(
+                  getNumSessions(),
+                  snapshot.data == '1'
+                      ? 'Session\nListened'
+                      : 'Sessions\nListened',
+                  optionalText: UnitType.sessions,
+                );
+              } else {
+                return Container();
+              }
+            });
+        break;
     }
     return Container();
   }
@@ -81,6 +97,8 @@ class _StatsWidgetState extends State<StatsWidget> {
             primaryColor: MeditoColors.walterWhite,
           ),
           child: AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             backgroundColor: MeditoColors.moonlight,
             title: Text('How many days is your streak?',
                 style: Theme.of(context).textTheme.headline4),
@@ -99,9 +117,10 @@ class _StatsWidgetState extends State<StatsWidget> {
             ),
             actions: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                padding: const EdgeInsets.only(right: 8.0, bottom: 8.0),
                 child: Row(
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Container(
                       height: 38,
@@ -109,8 +128,8 @@ class _StatsWidgetState extends State<StatsWidget> {
                         onPressed: _onCancelTap,
                         child: Text('CANCEL',
                             style: Theme.of(context).textTheme.subtitle1
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     Container(
@@ -121,32 +140,16 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onSaveTap,
                         style: TextButton.styleFrom(
-                            // shape: roundedRectangleBorder(),
+                          // shape: roundedRectangleBorder(),
                             primary: MeditoColors.walterWhite),
                         child: Text('SAVE',
                             style: Theme.of(context).textTheme.headline3
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
                 ),
-//
-//                TextButton(
-//                  style: TextButton.fromStyle(
-//                  shape: RoundedRectangleBorder(
-//                    borderRadius: new BorderRadius.circular(12.0),
-//                  ),
-//                  primary: MeditoColors.walterWhite),
-//                  child: Text(
-//                    "SAVE",
-//                    style: Theme.of(context).textTheme.body1.copyWith(color: MeditoColors.darkBGColor),
-//                  ),
-//                  onPressed: () {
-//                    Navigator.pop(context, _controller.text);
-//                    _controller.text = '';
-//                  },
-//                ),s
               )
             ],
           ),
@@ -173,13 +176,16 @@ class _StatsWidgetState extends State<StatsWidget> {
               hintColor: Colors.green),
           child: AlertDialog(
             backgroundColor: MeditoColors.moonlight,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text('Reset longest streak to your current streak?',
                 style: Theme.of(context).textTheme.headline4),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
                 child: Row(
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Container(
                       height: 38,

@@ -58,6 +58,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                       children: List.generate(
                           snapshot.data.body?.data?.length ?? 0, (index) {
                         return Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                           clipBehavior: Clip.antiAlias,
                           color: MeditoColors.deepNight,
                           child: SmallShortcutWidget(
@@ -83,13 +84,35 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         children: List.generate(4, (index) {
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            color: MeditoColors.deepNight,
-            child: Container(),
-          );
+          if (index == 0) {
+            // Show a link to the downloads page when the app is loading
+            return _getLocalDownloadsWidget();
+          } else {
+            return Card(
+              clipBehavior: Clip.antiAlias,
+              color: MeditoColors.deepNight,
+              child: Container(),
+            );
+          }
         }),
-      );
+  );
+
+  Card _getLocalDownloadsWidget() {
+    return Card(
+        clipBehavior: Clip.antiAlias,
+        color: MeditoColors.almostBlack,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: SmallShortcutWidget(
+            ShortcutData(
+                title: 'Downloads',
+                type: 'app',
+                id: 'downloads',
+                cover: null,
+                backgroundImage: null,
+                colorPrimary: '#ff282828'),
+            widget.onTap)
+    );
+  }
 }
 
 class SmallShortcutWidget extends StatelessWidget {

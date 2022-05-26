@@ -6,7 +6,7 @@ We are the [Medito Foundation](https://meditofoundation.org), and we've built th
 
 The app is free, forever: no ads, no spam, no need to sign up or pay. 
 
-Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and the community.
+Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and its community.
 
 
 ## Download the app
@@ -24,19 +24,23 @@ NOTE: If you install Medito app using APK file, please make sure to verify that 
 | <a href="https://play.google.com/store/apps/details?id=meditofoundation.medito"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"/></a><br/>|<a href="https://apps.apple.com/us/app/medito/id1500780518"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="55"/></a> |
 
 ## How to use this code
-
 The best way to start is by opening the project with [Android Studio](https://developer.android.com/studio) or [Visual Studio](https://visualstudio.microsoft.com/)
 
-You will need an API key to build the project.
-
-To request one, join the #dev channel on [slack](https://join.slack.com/t/meditofoundation/shared_invite/zt-f0viisyt-VdJ7ygqNHt9sIeGzZiatlQ) and reply to the slackbot questions.
+You will need an API key to build the project. (see "Contributing" below)
 
 The API documentation is available on the [wiki](https://github.com/meditohq/medito-app/wiki/).
 
 Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues).
 
 ## Contributing
+
 Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
+
+API keys are generated for regular contributors (called "volunteers")
+
+To volunteer, send an email (preferably with your CV) and how many hours you can contribute to [Katie](mailto:katie@meditofoundation.org) 
+
+Please note that we are looking for people who are interested in investing at least 2 hours a week regularly :)
 
 Don't feel like contributing to the code?
 Feature requests, feedback and suggestions are welcome. Reach us via Slack/email, or create a new issue.
@@ -55,7 +59,6 @@ RSIN: 860222627
 - [Why we started Medito](https://meditofoundation.org/blog/why-meditation-should-be-free)
 - [Press release](https://meditofoundation.org/blog/medito-foundation-launches-app-to-free-meditation-from-clutches-of-big-business)
 - [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
-- [Join us on Slack](https://join.slack.com/t/meditofoundation/shared_invite/zt-f0viisyt-VdJ7ygqNHt9sIeGzZiatlQ)
 - [Email us](mailto:hi@meditofoundation.org)
 
 ## License
