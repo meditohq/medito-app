@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Smartphone (please complete the following information):**
  - Device: [e.g. iPhone6]
  - OS: [e.g. iOS8.1]
- - Version [e.g. 22] (to see the version number double tap on the Medtio logo on the home page of the app)
+ - Version [e.g. 22] (to see the version number long press the Good Morning/Afternoon text on the home page of the app)
 
 **Additional context**
 Add any other context about the problem here.
