@@ -44,4 +44,5 @@ const String SECONDARY_COLOUR = 'secondaryColor';
 const String PRIMARY_COLOUR = 'primaryColor';
 const String ID = 'id';
 const String SESSION_ID = 'sessionId';
+const String SESSION_TITLE = 'sessionTitle';
 const String LOCATION = 'location';

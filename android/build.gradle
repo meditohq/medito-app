@@ -18,6 +18,12 @@ allprojects {
         google()
         jcenter()
     }
+
+    tasks.withType(JavaCompile).configureEach {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = JavaLanguageVersion.of(8)
+        }
+    }
 }
 
 rootProject.buildDir = '../build'

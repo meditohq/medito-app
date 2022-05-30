@@ -18,6 +18,7 @@ import 'dart:io';
 
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
+import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -44,13 +45,17 @@ Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
   var path = (await getFilePath(name));
   var file = File(path);
   if (await file.exists()) return file.path;
-
-  var request = await http.get(Uri.parse(url),
-      headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
-  var bytes = request.bodyBytes;
-  await file.writeAsBytes(bytes);
-
-  return file.path;
+  try {
+    var request = await http.get(Uri.parse(url),
+        headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+    var bytes = request.bodyBytes;
+    await file.writeAsBytes(bytes);
+    await addBgSoundToOfflineSharedPrefs(name, file.path);
+    return file.path;
+  } catch (e) {
+    print(e);
+    return 'Connectivity lost';
+  }
 }
 
 Future<String> getFilePath(String mediaItemId) async {

@@ -44,10 +44,17 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.3,
           color: MeditoColors.walterWhite,
         ),
+        headline5: TextStyle(
+          // stats widget
+          fontSize: 20,
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
+          color: MeditoColors.walterWhite,
+        ),
         subtitle1: TextStyle(
           // packs subtitle on home
           // downloads subtitle
-          // streak/stats tile title
           fontSize: 14,
           letterSpacing: 0.4,
           fontWeight: FontWeight.w500,
@@ -79,7 +86,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: MeditoColors.meditoTextGrey,
         ),
         bodyText1: TextStyle(
-          // daily text
+          // daily text and quote
           fontSize: 14,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,

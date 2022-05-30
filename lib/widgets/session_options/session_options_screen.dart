@@ -13,20 +13,21 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'dart:ui';
-
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_options_bloc.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/utils/navigation.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/header_widget.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../audioplayer/audio_inherited_widget.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String id;
@@ -43,6 +44,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   bool showIndeterminateSpinner = false;
 
   SessionOptionsBloc _bloc;
+  AudioHandler _audioHandler;
 
   @override
   void initState() {
@@ -53,34 +55,39 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _audioHandler = AudioHandlerInheritedWidget.of(context)?.audioHandler;
+
     return StreamBuilder<String>(
         stream: _bloc.primaryColourController.stream,
         builder: (context, snapshot) {
-          return RefreshIndicator(
-              onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
-              child: Scaffold(
-                body: Stack(children: [
-                  SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _getHeaderWidget(),
-                        _getContentListWidget(),
-                        _bloc.getCurrentlySelectedFile() != null
-                            ? DownloadPanelWidget(
-                                item: _bloc.getCurrentlySelectedFile(),
-                                bloc: _bloc)
-                            : Container(),
-                        Container(
-                          height: 68,
-                        )
-                      ],
+          return SafeArea(
+            top: false,
+            child: RefreshIndicator(
+                onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
+                child: Scaffold(
+                  body: Stack(children: [
+                    SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _getHeaderWidget(),
+                          _getContentListWidget(),
+                          _bloc.getCurrentlySelectedFile() != null
+                              ? DownloadPanelWidget(
+                                  item: _bloc.getCurrentlySelectedFile(),
+                                  bloc: _bloc)
+                              : Container(),
+                          Container(
+                            height: 68,
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  _getBeginButton(snapshot.data),
-                ]),
-              ));
+                    _getBeginButton(snapshot.data),
+                  ]),
+                )),
+          );
         });
   }
 
@@ -116,7 +123,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle2
-                                    .copyWith(color: parseColor(snapshot.data)));
+                                    .copyWith(
+                                        color: parseColor(snapshot.data)));
                           }),
                     )),
               )
@@ -137,10 +145,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
 
-    _bloc.startAudioService(item);
-
-    NavigationFactory.navigate(context, Screen.player, id: widget.id);
-
+    var mediaItem = _bloc.startAudioService(item);
+    _audioHandler.playMediaItem(mediaItem);
+    context.go(GoRouter.of(context).location + PlayerPath);
     return null;
   }
 
@@ -169,6 +176,9 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   Widget _buildOptionsPanel(List<VoiceItem> items) {
     var childList = <Widget>[];
+    // To check whether any of the VoiceItems contains a narrator
+    var containsNarrator =
+        items.any((voiceItem) => voiceItem.headerValue.isNotEmptyAndNotNull());
 
     items.forEach((value) {
       var section = _getListItem(context, value);
@@ -188,11 +198,13 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   Container(height: 20),
                   Padding(
                       padding: EdgeInsets.only(left: 16),
-                      child: Text(PICK_NARRATOR.toUpperCase(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1
-                              .copyWith(color: MeditoColors.meditoTextGrey, fontWeight: FontWeight.w600))),
+                      child: Text(
+                          containsNarrator
+                              ? PICK_NARRATOR_AND_DURATION.toUpperCase()
+                              : PICK_DURATION.toUpperCase(),
+                          style: Theme.of(context).textTheme.bodyText1.copyWith(
+                              color: MeditoColors.meditoTextGrey,
+                              fontWeight: FontWeight.w600))),
                   Container(height: 12),
                   Column(children: childList),
                 ])));
@@ -228,6 +240,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           onSelected: (bool selected) {
             setState(() {
               _bloc.currentSelectedFileIndex = index;
+              _bloc.saveOptionsSelectionsToSharedPreferences(super.widget.id);
             });
           },
           selectedColor: MeditoColors.walterWhite,
@@ -284,15 +297,15 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(DOWNLOAD.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodyText1.copyWith(color: MeditoColors.meditoTextGrey, fontWeight: FontWeight.w600)),
+                    style: Theme.of(context).textTheme.bodyText1.copyWith(
+                        color: MeditoColors.meditoTextGrey,
+                        fontWeight: FontWeight.w600)),
                 Container(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(_getDownloadLabel(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1),
+                        style: Theme.of(context).textTheme.bodyText1),
                     _getTrailing()
                   ],
                 )
