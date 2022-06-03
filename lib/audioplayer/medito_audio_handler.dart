@@ -94,8 +94,8 @@ class MeditoAudioHandler extends BaseAudioHandler
     await _bgPlayer.seek(Duration.zero);
     await _player.pause();
     await _player.seek(Duration.zero);
-    await _player.dispose();
-    await _bgPlayer.dispose();
+    // await _player.dispose();
+    // await _bgPlayer.dispose();
   }
 
   @override

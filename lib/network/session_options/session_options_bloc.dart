@@ -122,7 +122,7 @@ class SessionOptionsBloc {
     }
   }
 
-  MediaItem startAudioService(AudioFile item) {
+  MediaItem getMediaItem(AudioFile item) {
     var mediaItem = getMediaItemForAudioFile(item);
     _trackSessionStart(mediaItem);
     return mediaItem;
