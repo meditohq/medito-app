@@ -103,9 +103,9 @@ class _ChooseBackgroundSoundDialogState
                         child: Material(
                             color: MeditoColors.moonlight,
                             child: isOffline
-                                ? offlineBackgroundSounds(
+                                ? _offlineBackgroundSounds(
                                 currentSound, scrollController)
-                                : onlineBackgroundSounds(
+                                : _onlineBackgroundSounds(
                                 currentSound, scrollController)),
                       );
                     },
@@ -117,7 +117,7 @@ class _ChooseBackgroundSoundDialogState
         });
   }
 
-  Widget onlineBackgroundSounds(String currentSound,
+  Widget _onlineBackgroundSounds(String currentSound,
       ScrollController scrollController) {
     return StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
         stream: widget.stream,
@@ -159,7 +159,7 @@ class _ChooseBackgroundSoundDialogState
         });
   }
 
-  Widget offlineBackgroundSounds(String currentSound,
+  Widget _offlineBackgroundSounds(String currentSound,
       ScrollController scrollController) {
     return FutureBuilder<List<BackgroundSoundData>>(
         future: getBgSoundFromOfflineSharedPrefs(),
@@ -228,7 +228,7 @@ class _ChooseBackgroundSoundDialogState
         child: child,
       );
 
-  bool _isSelected(String current, String name) => current == name;
+  bool _isSelected(String current, String name) => current == name || (current == '' && name == NONE);
 
   Widget _getBackgroundSoundListTile(
       BackgroundSoundData item, String current, BuildContext context) {
@@ -333,7 +333,7 @@ class _ChooseBackgroundSoundDialogState
                             _dragBgVolumeSubject.add(value);
                             _handler.customAction(
                                 SET_BG_SOUND_VOL,
-                                {SET_BG_SOUND_VOL: value / 100});
+                                {SET_BG_SOUND_VOL: value});
                           },
                           onChangeEnd: (value) {
                             saveBgVolume(value);

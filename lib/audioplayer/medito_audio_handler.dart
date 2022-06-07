@@ -156,8 +156,8 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future customAction(String name, [Map<String, dynamic> extras]) async {
     switch (name) {
       case SET_BG_SOUND_VOL:
-        _bgVolume = extras[SET_BG_SOUND_VOL];
-        unawaited(_bgPlayer.setVolume(extras[SET_BG_SOUND_VOL]));
+        _bgVolume = extras[SET_BG_SOUND_VOL] / 10;
+        unawaited(_bgPlayer.setVolume(_bgVolume));
         break;
       case PLAY_BG_SOUND:
         await _playBgSound(extras);
