@@ -135,7 +135,9 @@ class MeditoAudioHandler extends BaseAudioHandler
         var timeLeft = _duration.inSeconds - position.inSeconds;
         if (position != null) {
           if (_audioPositionIsInEndPeriod(position)) {
-            await _setBgVolumeFadeAtEnd(timeLeft);
+            if (_bgPlayer.playing) {
+              unawaited(_setBgVolumeFadeAtEnd(timeLeft));
+            }
             if (!_updatedStats) {
               _updatedStats = true;
               await _updateStats();
