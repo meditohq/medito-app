@@ -9,7 +9,7 @@ void main() {
   var testData;
 
   setUp(() {
-    testData = DailyMessageResponse(data: Data(title: 'test_title', body: 'test_body'));
+    testData = DailyMessageResponse(Data(title: 'test_title', body: 'test_body'));
   });
 
   testWidgets('dailyMessageItemWidget should have title and MarkdownBody',

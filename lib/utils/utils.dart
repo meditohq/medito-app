@@ -21,12 +21,11 @@ import 'package:Medito/utils/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Widget getNetworkImageWidget(String url,
-    {Color svgColor, double startHeight = 0.0}) {
+Widget getNetworkImageWidget(String? url,
+    {double startHeight = 0.0}) {
   final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
   return CachedNetworkImage(
     fit: BoxFit.fill,
@@ -40,10 +39,10 @@ Future<bool> checkConnectivity() async {
   return connectivityResult != ConnectivityResult.none;
 }
 
-Color parseColor(String color) {
+Color parseColor(String? color) {
   if (color == null || color.isEmpty) return MeditoColors.midnight;
 
-  return Color(int.parse(color?.replaceFirst('#', 'FF'), radix: 16));
+  return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }
 
 void createSnackBar(String message, BuildContext context,
@@ -66,10 +65,7 @@ void createSnackBarWithColor(
     String message, BuildContext context, Color color) {
   final snackBar = SnackBar(
       content: Text(message,
-          style: Theme.of(context)
-              .textTheme
-              .caption
-              .copyWith(color: MeditoColors.almostBlack)),
+          style: Theme.of(context).textTheme.caption?.copyWith(color: MeditoColors.almostBlack)),
       backgroundColor: color);
 
   // Find the Scaffold in the Widget tree and use it to show a SnackBar!
@@ -82,20 +78,21 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-Future<void> launchUrl(String href) async {
+Future<bool> launchUrl(String? href) async {
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
   if(userId != null) {
-    href = href.replaceAll('{{user_id}}', userId);
+    href = href?.replaceAll('{{user_id}}', userId);
   }
 
-  if (href.startsWith('mailto')) {
+  if (href != null && href.startsWith('mailto') == true) {
     _launchEmailSubmission(href);
-  } else {
+  } else if (href != null) {
     return await canLaunch(href)
         ? await launch(href)
         : throw 'Could not launch $href';
   }
+  return true;
 }
 
 void _launchEmailSubmission(String href) async {
@@ -134,15 +131,15 @@ Future<bool> getTrackingAnswered() async {
   return prefs.getBool('trackingAnswered') ?? false;
 }
 
-extension EmptyOrNull on String {
+extension EmptyOrNull on String? {
   bool isEmptyOrNull() {
     if (this == null) return true;
-    if (isEmpty) return true;
+    if (this?.isEmpty == true) return true;
     return false;
   }
 
   bool isNotEmptyAndNotNull() {
-    if (this != null && isNotEmpty) return true;
+    if (this != null && this?.isNotEmpty == true) return true;
     return false;
   }
 }

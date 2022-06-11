@@ -17,7 +17,6 @@ import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:flutter/foundation.dart';
-import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 
 class Tracking {

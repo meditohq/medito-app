@@ -24,12 +24,11 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/folders/folder_list_item_widget.dart';
 import 'package:Medito/widgets/folders/loading_list_widget.dart';
 import 'package:Medito/widgets/header_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class FolderNavWidget extends StatefulWidget {
-  FolderNavWidget({Key key, this.id}) : super(key: key);
+  FolderNavWidget({Key? key, this.id = ''}) : super(key: key);
 
   static const routeName = '/folder';
   final String id;
@@ -79,7 +78,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
     );
   }
 
-  Future<void> _refresh(BuildContext context, {bool skipCache}) {
+  Future<void> _refresh(BuildContext context, {bool skipCache = false}) {
     return _bloc.fetchData(id: widget.id, skipCache: skipCache);
   }
 
@@ -103,41 +102,43 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           initialData: ApiResponse.loading(),
           stream: _bloc.itemsListController.stream,
           builder: (context, itemsSnapshot) {
-            switch (itemsSnapshot.data.status) {
+            switch (itemsSnapshot.data?.status) {
+              case null:
+                break;
               case Status.LOADING:
                 return Center(
                     child: CircularProgressIndicator(
                         backgroundColor: Colors.black,
                         valueColor: AlwaysStoppedAnimation<Color>(
                             MeditoColors.walterWhite)));
-                break;
               case Status.COMPLETED:
                 return ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: itemsSnapshot.data.body != null
-                        ? itemsSnapshot.data.body.length
+                    itemCount: itemsSnapshot.data?.body != null
+                        ? itemsSnapshot.data?.body?.length
                         : 0,
                     shrinkWrap: true,
                     padding: EdgeInsets.only(top: 8),
                     itemBuilder: (BuildContext context, int i) {
-                      return itemsSnapshot.data.body != null
-                          ? _getSlidingItem(itemsSnapshot.data.body[i], context)
+                      return itemsSnapshot.data?.body != null
+                          ? _getSlidingItem(
+                              itemsSnapshot.data?.body?[i], context)
                           : Container();
                     });
-                break;
               case Status.ERROR:
                 return LoadingListWidget();
-                break;
             }
             return Container();
           });
 
-  Widget _getSlidingItem(Item item, BuildContext context) {
+  Widget _getSlidingItem(Item? item, BuildContext context) {
+    if (item == null) return Container();
+
     var childWidget;
 
 // Only the audio sessions should have swipable action to toggle the dimissible status
 // Other types like text file and folder should not have this option
-    if (item?.fileType != FileType.session) {
+    if (item.fileType != FileType.session) {
       childWidget = _getItemListWidget(item);
     } else {
       childWidget = Dismissible(

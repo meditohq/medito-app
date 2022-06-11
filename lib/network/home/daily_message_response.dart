@@ -1,24 +1,25 @@
 class DailyMessageResponse {
-  @Deprecated('User title and body instead')
-  Data data;
 
-  String get title => data?.title ?? '';
+  Data _data;
 
-  String get body => data?.body ?? '';
+  String get title => _data?.title ?? '';
 
-  DailyMessageResponse({this.data});
+  String get body => _data?.body ?? '';
+
+  DailyMessageResponse(this._data);
 
   DailyMessageResponse.fromJson(Map<String, dynamic> json) {
-    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data.toJson();
+    if (_data != null) {
+      data['data'] = _data.toJson();
     }
     return data;
   }
+
 }
 
 class Data {

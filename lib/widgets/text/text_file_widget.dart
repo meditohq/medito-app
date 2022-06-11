@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class TextFileStateless extends StatelessWidget {
-  TextFileStateless({Key key}) : super(key: key);
+  TextFileStateless({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +31,9 @@ class TextFileStateless extends StatelessWidget {
 }
 
 class TextFileWidget extends StatefulWidget {
-  TextFileWidget({Key key, this.id}) : super(key: key);
+  TextFileWidget({Key? key, this.id}) : super(key: key);
 
-  final String id;
+  final String? id;
 
   @override
   _TextFileWidgetState createState() => _TextFileWidgetState();
@@ -41,7 +41,7 @@ class TextFileWidget extends StatefulWidget {
 
 class _TextFileWidgetState extends State<TextFileWidget>
     with TickerProviderStateMixin {
-  BuildContext scaffoldContext;
+  BuildContext? scaffoldContext;
   var _bloc;
 
   @override
@@ -67,7 +67,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
             builder: (context, snapshot) {
               return MeditoAppBarWidget(
                 transparent: true,
-                title: snapshot.data,
+                title: snapshot.data ?? '',
               );
             }), // StreamBuilder
       ),
@@ -91,7 +91,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     );
   }
 
-  void _linkTap(String text, String href, String title) {
+  void _linkTap(String text, String? href, String? title) {
     launchUrl(href);
   }
 
@@ -111,7 +111,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
                 initialData: 'Loading...',
                 builder: (context, snapshot) {
                   return Markdown(
-                      data: snapshot.data,
+                      data: snapshot.data ?? '',
                       onTapLink: _linkTap,
                       physics: NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(0),

@@ -49,14 +49,14 @@ Future<File> _localFile(String name) async {
   return File('$path/$name.txt');
 }
 
-Future<String> _readCache(String id) async {
+Future<String?> _readCache(String id) async {
   id = id.replaceAll('/', '+');
 
   final file = await _localFile(id);
 
   var lastModified;
   try {
-    lastModified = await file?.lastModified();
+    lastModified = await file.lastModified();
   } on FileSystemException {
     return null;
   }
@@ -67,8 +67,8 @@ Future<String> _readCache(String id) async {
   return await file.readAsString();
 }
 
-String encoded(dynamic obj) {
-  if(obj != null) {
+String? encoded(dynamic obj) {
+  if (obj != null) {
     return json.encode(obj);
   } else {
     return null;
@@ -79,14 +79,17 @@ dynamic decoded(String obj) {
   return json.decode(obj);
 }
 
-Future<File> writeJSONToCache(String body, String id) async {
-  id = id.replaceAll('/', '+');
-  final file = await _localFile(id);
+Future<File?> writeJSONToCache(String? body, String id) async {
+  if (body != null) {
+    id = id.replaceAll('/', '+');
+    final file = await _localFile(id);
 
-  return file.writeAsString('$body');
+    return file.writeAsString('$body');
+  }
+  return null;
 }
 
-Future<String> readJSONFromCache(String url) async {
+Future<String?> readJSONFromCache(String url) async {
   try {
     return await _readCache(url);
   } catch (e) {

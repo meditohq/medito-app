@@ -6,7 +6,6 @@ import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_response.dart';
 import 'package:dart_ipify/dart_ipify.dart';
 import 'package:device_info/device_info.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';

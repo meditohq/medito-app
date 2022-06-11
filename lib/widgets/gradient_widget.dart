@@ -25,7 +25,7 @@ class GradientWidget extends StatelessWidget {
       ];
 
   final height;
-  final Color primaryColor;
+  final Color? primaryColor;
   final opacity;
   final child;
 

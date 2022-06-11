@@ -15,9 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class StreakTileWidget extends StatefulWidget {
   StreakTileWidget(this.future, this.title,

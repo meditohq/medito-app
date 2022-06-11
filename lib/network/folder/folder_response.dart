@@ -15,33 +15,40 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/utils.dart';
 
 class FolderResponse {
-  @Deprecated('Use values below')
-  Data data;
+  Data? _data;
 
-  bool get hasData => data != null;
+  bool get hasData => _data != null;
 
-  String get title => data?.title;
+  String get title => _data?.title;
 
-  String get description => data?.description;
-  String get colour => data?.primaryColor;
-  String get backgroundImageUrl => data?.backgroundImage?.toAssetUrl();
-  String get cover => data?.cover;
+  String get description => _data?.description;
+
+  String get colour => _data?.primaryColor;
+
+  String get backgroundImageUrl => _data?.backgroundImage?.toAssetUrl();
+
+  String get cover => _data?.cover;
+
   String get coverUrl => cover?.toAssetUrl();
 
-  String get id => data?.id.toString();
+  String get id => _data?.id.toString();
 
-  List<Item> get items => data?.items?.map((e) => e.item)?.toList()?.whereType<Item>()?.toList(); //removes nulls
+  List<Item> get items => _data?.items
+      ?.map((e) => e.item)
+      ?.toList()
+      ?.whereType<Item>()
+      ?.toList(); //removes nulls
 
   FolderResponse({data});
 
   FolderResponse.fromJson(Map<String, dynamic> json) {
-    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this._data.toJson();
     }
     return data;
   }
@@ -89,9 +96,7 @@ class Data {
 }
 
 class Items {
-  Item item;
-
-  Items({item});
+  Item? item;
 
   Items.fromJson(Map<String, dynamic> json) {
     item = json['item'] != null ? Item.fromJson(json['item']) : null;
@@ -100,35 +105,36 @@ class Items {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (item != null) {
-      data['item'] = item.toJson();
+      data['item'] = item?.toJson();
     }
     return data;
   }
 }
 
 class Item {
-  String get id => idInt.toString();
-  String oldId;
-  String title;
-  String subtitle;
+  String? get id => _idInt.toString();
+  String? oldId;
+  String? title;
+  String? subtitle;
 
   FileType get fileType {
     if (type == 'session') return FileType.session;
     if (type == 'article') return FileType.text;
     if (type == 'folder') return FileType.folder;
-    if (type == 'url') return FileType.folder;
-    if (type == 'app') return FileType.app;
-    return null;
+    if (type == 'url') {
+      return FileType.folder;
+    } else {
+      return FileType.app;
+    }
   }
 
-  String type;
-  @Deprecated('Use id instead')
-  int idInt;
+  String? type;
+  int? _idInt;
 
   Item({id, type, title, subtitle});
 
   Item.fromJson(Map<String, dynamic> json) {
-    idInt = json['id'];
+    _idInt = json['id'];
     oldId = json['old_id'];
     type = json['type'];
     title = json['title'];
@@ -137,7 +143,7 @@ class Item {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['id'] = idInt;
+    data['id'] = _idInt;
     data['old_id'] = oldId;
     data['type'] = type;
     data['title'] = title;

@@ -58,9 +58,9 @@ Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
   }
 }
 
-Future<String> getFilePath(String mediaItemId) async {
+Future<String> getFilePath(String? mediaItemId) async {
   var dir = (await getApplicationSupportDirectory()).path;
-  return '$dir/${mediaItemId.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
+  return '$dir/${mediaItemId?.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
 }
 
 Future<dynamic> getDownload(String filename) async {

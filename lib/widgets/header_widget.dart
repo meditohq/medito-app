@@ -25,7 +25,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 class HeaderWidget extends StatelessWidget {
   HeaderWidget({
-    Key key,
+    Key? key,
     this.primaryColorController,
     this.titleController,
     this.coverController,
@@ -33,17 +33,17 @@ class HeaderWidget extends StatelessWidget {
     this.descriptionController,
     this.whiteText = false,
   }) : super(key: key);
-  final StreamController<String> primaryColorController;
-  final StreamController<String> titleController;
-  final StreamController<ApiResponse<String>> coverController;
-  final StreamController<String> backgroundImageController;
-  final StreamController<String> descriptionController;
+  final StreamController<String>? primaryColorController;
+  final StreamController<String>? titleController;
+  final StreamController<ApiResponse<String>>? coverController;
+  final StreamController<String>? backgroundImageController;
+  final StreamController<String>? descriptionController;
   final whiteText;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<String>(
-        stream: primaryColorController.stream,
+        stream: primaryColorController?.stream,
         builder: (context, snapshot) {
           return Container(
             color: MeditoColors.intoTheNight,
@@ -80,7 +80,7 @@ class HeaderWidget extends StatelessWidget {
   Row _getRow() {
     return Row(
       children: [
-        _getImageContainer(size: 96),
+        _getImageContainer(96),
         Flexible(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -91,7 +91,7 @@ class HeaderWidget extends StatelessWidget {
     );
   }
 
-  Widget _getImageContainer({double size}) {
+  Widget _getImageContainer(double size) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
       child: ClipRRect(
@@ -100,7 +100,7 @@ class HeaderWidget extends StatelessWidget {
           height: size,
           width: size,
           child: StreamBuilder<String>(
-              stream: primaryColorController.stream,
+              stream: primaryColorController?.stream,
               builder: (context, snapshot) {
                 return Container(
                   color: snapshot.hasData
@@ -121,10 +121,10 @@ class HeaderWidget extends StatelessWidget {
 
   StreamBuilder<String> _getTitleStream() => StreamBuilder<String>(
       initialData: '',
-      stream: titleController.stream,
+      stream: titleController?.stream,
       builder: (context, snapshot) {
         return Text(
-          snapshot.data,
+          snapshot.data ?? '',
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headline1,
@@ -133,10 +133,10 @@ class HeaderWidget extends StatelessWidget {
 
   StreamBuilder<ApiResponse<String>> _actualImageStream() {
     return StreamBuilder<ApiResponse<String>>(
-        stream: coverController.stream,
+        stream: coverController?.stream,
         initialData: ApiResponse.loading(),
         builder: (context, snapshot) {
-          switch (snapshot.data.status) {
+          switch (snapshot.data?.status) {
             case Status.LOADING:
               return Center(
                 child: SizedBox(
@@ -153,7 +153,7 @@ class HeaderWidget extends StatelessWidget {
             case Status.COMPLETED:
               return Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: getNetworkImageWidget(snapshot.data.body),
+                child: getNetworkImageWidget(snapshot.data?.body),
               );
               break;
             case Status.ERROR:
@@ -167,7 +167,7 @@ class HeaderWidget extends StatelessWidget {
   Widget _bgImageStream() {
     if (backgroundImageController != null) {
       return StreamBuilder<String>(
-          stream: backgroundImageController.stream,
+          stream: backgroundImageController?.stream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return getNetworkImageWidget(snapshot.data);
@@ -182,20 +182,20 @@ class HeaderWidget extends StatelessWidget {
 
   Widget _getDescriptionWidget() {
     return StreamBuilder<String>(
-        stream: descriptionController.stream,
+        stream: descriptionController?.stream,
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data.isNotEmptyAndNotNull()) {
             return Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Markdown(
-                data: snapshot?.data ?? '',
+                data: snapshot.data ?? '',
                 onTapLink: _linkTap,
                 padding: const EdgeInsets.all(0),
                 physics: NeverScrollableScrollPhysics(),
                 styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                     .copyWith(
-                        p: Theme.of(context).textTheme.subtitle1.copyWith(
+                        p: Theme.of(context).textTheme.subtitle1?.copyWith(
                             fontSize: 14.0,
                             color: whiteText
                                 ? MeditoColors.walterWhite
@@ -209,7 +209,7 @@ class HeaderWidget extends StatelessWidget {
         });
   }
 
-  void _linkTap(String text, String href, String title) {
+  void _linkTap(String text, String? href, String? title) {
     launchUrl(href);
   }
 }

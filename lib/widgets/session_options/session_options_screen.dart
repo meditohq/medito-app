@@ -30,10 +30,10 @@ import 'package:go_router/go_router.dart';
 import '../../audioplayer/audio_inherited_widget.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
-  final String id;
-  final Screen screenKey;
+  final String? id;
+  final Screen? screenKey;
 
-  SessionOptionsScreen({Key key, this.id, this.screenKey}) : super(key: key);
+  SessionOptionsScreen({Key? key, this.id, this.screenKey}) : super(key: key);
 
   @override
   _SessionOptionsScreenState createState() => _SessionOptionsScreenState();
@@ -43,19 +43,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   //todo move this to the _bloc
   bool showIndeterminateSpinner = false;
 
-  SessionOptionsBloc _bloc;
-  AudioHandler _audioHandler;
+  late SessionOptionsBloc _bloc;
+  late AudioHandler? _audioHandler;
 
   @override
   void initState() {
     super.initState();
-    _bloc = SessionOptionsBloc(widget.id, widget.screenKey);
-    _bloc.fetchOptions(widget.id);
+    _bloc = SessionOptionsBloc(widget.id, widget.screenKey ?? Screen.daily);
+    _bloc.fetchOptions(widget.id ?? '');
   }
 
   @override
   Widget build(BuildContext context) {
-    _audioHandler = AudioHandlerInheritedWidget.of(context)?.audioHandler;
+    _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
     return StreamBuilder<String>(
         stream: _bloc.primaryColourController.stream,
@@ -63,7 +63,8 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
           return SafeArea(
             top: false,
             child: RefreshIndicator(
-                onRefresh: () => _bloc.fetchOptions(widget.id, skipCache: true),
+                onRefresh: () =>
+                    _bloc.fetchOptions(widget.id ?? '', skipCache: true),
                 child: Scaffold(
                   body: Stack(children: [
                     SingleChildScrollView(
@@ -91,7 +92,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         });
   }
 
-  Align _getBeginButton(String primaryColor) {
+  Align _getBeginButton(String? primaryColor) {
     return Align(
         alignment: Alignment.bottomCenter,
         child: Container(
@@ -123,7 +124,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle2
-                                    .copyWith(
+                                    ?.copyWith(
                                         color: parseColor(snapshot.data)));
                           }),
                     )),
@@ -141,25 +142,29 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
   Future<void> _onBeginTap() {
     var item = _bloc.getCurrentlySelectedFile();
-    if (_bloc.isDownloading(item) || showIndeterminateSpinner) return null;
+    if (_bloc.isDownloading(item) || showIndeterminateSpinner) {
+      return Future.value(null);
+    }
 
-    _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
+    if (widget.id != null) {
+      _bloc.saveOptionsSelectionsToSharedPreferences(widget.id!);
+    }
 
     var mediaItem = _bloc.getMediaItem(item);
-    _audioHandler.playMediaItem(mediaItem);
+    _audioHandler?.playMediaItem(mediaItem);
     context.go(GoRouter.of(context).location + PlayerPath);
-    return null;
+    return Future.value(null);
   }
 
   Widget _getContentListWidget() {
-    return StreamBuilder<ApiResponse<List<VoiceItem>>>(
+    return StreamBuilder<ApiResponse<List<VoiceItem?>>>(
         stream: _bloc.contentListController.stream,
         initialData: ApiResponse.loading(),
         builder: (context, itemsSnapshot) {
-          if (itemsSnapshot.data.status == Status.LOADING) {
+          if (itemsSnapshot.data?.status == Status.LOADING) {
             return _getLoadingWidget();
           }
-          return _buildOptionsPanel(itemsSnapshot.data.body);
+          return _buildOptionsPanel(itemsSnapshot.data?.body);
         });
   }
 
@@ -174,15 +179,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
     );
   }
 
-  Widget _buildOptionsPanel(List<VoiceItem> items) {
+  Widget _buildOptionsPanel(List<VoiceItem?>? items) {
     var childList = <Widget>[];
     // To check whether any of the VoiceItems contains a narrator
-    var containsNarrator =
-        items.any((voiceItem) => voiceItem.headerValue.isNotEmptyAndNotNull());
+    var containsNarrator = items?.any(
+        (voiceItem) => voiceItem?.headerValue?.isNotEmptyAndNotNull() ?? false);
 
-    items.forEach((value) {
-      var section = _getListItem(context, value);
-      childList.add(section);
+    items?.forEach((value) {
+      if (value != null) {
+        var section = _getListItem(context, value);
+        childList.add(section);
+      }
     });
 
     return Padding(
@@ -199,12 +206,15 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
                   Padding(
                       padding: EdgeInsets.only(left: 16),
                       child: Text(
-                          containsNarrator
+                          containsNarrator == true
                               ? PICK_NARRATOR_AND_DURATION.toUpperCase()
                               : PICK_DURATION.toUpperCase(),
-                          style: Theme.of(context).textTheme.bodyText1.copyWith(
-                              color: MeditoColors.meditoTextGrey,
-                              fontWeight: FontWeight.w600))),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1
+                              ?.copyWith(
+                                  color: MeditoColors.meditoTextGrey,
+                                  fontWeight: FontWeight.w600))),
                   Container(height: 12),
                   Column(children: childList),
                 ])));
@@ -220,35 +230,39 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
               _getVoiceTextWidget(item),
               Container(height: 8),
               SingleChildScrollView(
-                  padding: EdgeInsets.only(left: 16, right: 8),
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      children: item.listForVoice
-                          .map<Widget>((e) => _getVoiceChipWithPadding(
-                              e,
-                              _bloc.getAudioList().indexOf(_bloc
-                                  .getAudioList()
-                                  .firstWhere(
-                                      (element) => element.id == e.id))))
-                          .toList()))
+                padding: EdgeInsets.only(left: 16, right: 8),
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                    children: (item.listForVoice
+                            ?.map<Widget>((e) => _getVoiceChipWithPadding(
+                                e,
+                                _bloc.getAudioList().indexOf(_bloc
+                                    .getAudioList()
+                                    .firstWhere(
+                                        (element) => element?.id == e?.id))))
+                            .toList()) ??
+                        [Container()]),
+              )
             ]));
   }
 
-  Widget _getVoiceChipWithPadding(AudioFile e, int index) => Row(children: [
+  Widget _getVoiceChipWithPadding(AudioFile? e, int index) => Row(children: [
         ChoiceChip(
           selected: _bloc.currentSelectedFileIndex == index,
           onSelected: (bool selected) {
             setState(() {
               _bloc.currentSelectedFileIndex = index;
-              _bloc.saveOptionsSelectionsToSharedPreferences(super.widget.id);
+              if (widget.id != null) {
+                _bloc.saveOptionsSelectionsToSharedPreferences(widget.id!);
+              }
             });
           },
           selectedColor: MeditoColors.walterWhite,
           label: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
             child: Text(
-              formatSessionLength(e.length),
-              style: Theme.of(context).textTheme.subtitle2.copyWith(
+              formatSessionLength(e?.length ?? ''),
+              style: Theme.of(context).textTheme.subtitle2?.copyWith(
                   color: _bloc.currentSelectedFileIndex == index
                       ? MeditoColors.intoTheNight
                       : MeditoColors.walterWhite),
@@ -270,10 +284,10 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 }
 
 class DownloadPanelWidget extends StatefulWidget {
-  const DownloadPanelWidget({Key key, this.item, this.bloc}) : super(key: key);
+  const DownloadPanelWidget({Key? key, this.item, this.bloc}) : super(key: key);
 
   final bloc;
-  final AudioFile item;
+  final AudioFile? item;
 
   @override
   _DownloadPanelWidgetState createState() => _DownloadPanelWidgetState();
@@ -297,7 +311,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(DOWNLOAD.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodyText1.copyWith(
+                    style: Theme.of(context).textTheme.bodyText1?.copyWith(
                         color: MeditoColors.meditoTextGrey,
                         fontWeight: FontWeight.w600)),
                 Container(height: 8),
@@ -316,10 +330,10 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
   }
 
   String _getDownloadLabel() {
-    if (widget.item.voice.isNotEmptyAndNotNull()) {
-      return '${widget.item.voice} — ${formatSessionLength(widget.item.length)}';
+    if (widget.item?.voice?.isNotEmptyAndNotNull() == true) {
+      return '${widget.item?.voice} — ${formatSessionLength(widget.item?.length)}';
     } else {
-      return formatSessionLength(widget.item.length);
+      return formatSessionLength(widget.item?.length);
     }
   }
 
@@ -334,12 +348,13 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
         builder: (context, snapshot) {
           return IconButton(
             icon: Icon(
-              snapshot.hasData && snapshot.data
+              snapshot.hasData && snapshot.data == true
                   ? _getDownloadedIcon()
                   : Icons.download_for_offline_rounded,
               color: MeditoColors.walterWhite,
             ),
-            onPressed: () => _download(snapshot.hasData && snapshot.data),
+            onPressed: () =>
+                _download(snapshot.hasData && snapshot.data == true),
           );
         });
   }
@@ -347,8 +362,8 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
   Widget _getLoadingSpinner() {
     return ValueListenableBuilder(
         valueListenable: widget.bloc.downloadSingleton.returnNotifier(),
-        builder: (context, value, widget) {
-          if (value >= 1) {
+        builder: (context, double? value, widget) {
+          if ((value ?? 0) >= 1) {
             return GestureDetector(
                 onTap: () => _download(true),
                 child: Icon(_getDownloadedIcon(),

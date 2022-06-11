@@ -2,7 +2,6 @@ import 'package:Medito/network/home/daily_message_response.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/loading_text_box_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:share/share.dart';
