@@ -26,7 +26,7 @@ class MeditoAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
   final _player = AudioPlayer(handleInterruptions: false);
   final _bgPlayer = AudioPlayer();
-  Duration _duration;
+  Duration? _duration;
   var _currentlyPlayingBGSound = '';
   var _updatedStats = false;
   var _bgVolume;
@@ -55,7 +55,7 @@ class MeditoAudioHandler extends BaseAudioHandler
         ProcessingState.buffering: AudioProcessingState.buffering,
         ProcessingState.ready: AudioProcessingState.ready,
         ProcessingState.completed: AudioProcessingState.completed,
-      }[_player.processingState],
+      }[_player.processingState]!,
       playing: _player.playing,
       updatePosition: _player.position,
       bufferedPosition: _player.bufferedPosition,
@@ -104,11 +104,10 @@ class MeditoAudioHandler extends BaseAudioHandler
   }
 
   @override
-  Future<Function> playMediaItem(MediaItem mediaItem) async {
-
+  Future<void> playMediaItem(MediaItem mediaItem) async {
     try {
       super.mediaItem.add(mediaItem);
-      await getDownload(mediaItem.extras[LOCATION]).then((data) async {
+      await getDownload(mediaItem.extras?[LOCATION]).then((data) async {
         if (data == null) {
           // this session has not been downloaded
           var url = '${BASE_URL}assets/${mediaItem.id}';
@@ -118,9 +117,9 @@ class MeditoAudioHandler extends BaseAudioHandler
           _duration = await _player.setFilePath(data);
         }
 
-        if (_duration == null || _duration.inMilliseconds < 1000) {
+        if (_duration == null || (_duration?.inMilliseconds ?? 0) < 1000) {
           //sometimes this library returns incorrect durations
-          _duration = Duration(milliseconds: mediaItem.extras['duration']);
+          _duration = Duration(milliseconds: mediaItem.extras?['duration']);
         }
 
         unawaited(play());
@@ -132,16 +131,14 @@ class MeditoAudioHandler extends BaseAudioHandler
     try {
       _player.positionStream.listen((position) async {
         //ticks on each position
-        var timeLeft = _duration.inSeconds - position.inSeconds;
-        if (position != null) {
-          if (_audioPositionIsInEndPeriod(position)) {
-            if (_bgPlayer.playing) {
-              unawaited(_setBgVolumeFadeAtEnd(timeLeft));
-            }
-            if (!_updatedStats) {
-              _updatedStats = true;
-              await _updateStats();
-            }
+        var timeLeft = (_duration?.inSeconds ?? 0) - (position.inSeconds);
+        if (_audioPositionIsInEndPeriod(position)) {
+          if (_bgPlayer.playing) {
+            unawaited(_setBgVolumeFadeAtEnd(timeLeft));
+          }
+          if (!_updatedStats) {
+            _updatedStats = true;
+            await _updateStats();
           }
         }
       });
@@ -149,14 +146,14 @@ class MeditoAudioHandler extends BaseAudioHandler
       print(s);
     }
 
-    return null;
+    return;
   }
 
   @override
-  Future customAction(String name, [Map<String, dynamic> extras]) async {
+  Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async {
     switch (name) {
       case SET_BG_SOUND_VOL:
-        _bgVolume = extras[SET_BG_SOUND_VOL] / 10;
+        _bgVolume = extras?[SET_BG_SOUND_VOL] / 10;
         unawaited(_bgPlayer.setVolume(_bgVolume));
         break;
       case PLAY_BG_SOUND:
@@ -166,7 +163,7 @@ class MeditoAudioHandler extends BaseAudioHandler
         customEvent.add({SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
       case SEND_BG_SOUND:
-        _currentlyPlayingBGSound = extras[SEND_BG_SOUND] ?? '';
+        _currentlyPlayingBGSound = extras?[SEND_BG_SOUND] ?? '';
         customEvent.add({SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
     }
@@ -174,26 +171,26 @@ class MeditoAudioHandler extends BaseAudioHandler
     return super.customAction(name, extras);
   }
 
-  Future<void> _playBgSound(Map<String, dynamic> extras) async {
-    var bgSound = extras[PLAY_BG_SOUND];
+  Future<void> _playBgSound(Map<String, dynamic>? extras) async {
+    var bgSound = extras?[PLAY_BG_SOUND];
     if (bgSound != null) {
-      unawaited(_bgPlayer.setFilePath(extras[PLAY_BG_SOUND]));
+      unawaited(_bgPlayer.setFilePath(extras?[PLAY_BG_SOUND]));
       unawaited(_bgPlayer.play());
     }
   }
 
   Future<void> _updateStats() async {
     var dataMap = {
-      'secsListened': _duration.inSeconds,
-      'id': '${mediaItem.value.extras[SESSION_ID]}',
+      'secsListened': (_duration?.inSeconds ?? 0),
+      'id': '${mediaItem.value?.extras?[SESSION_ID] ?? ''}',
     };
     await writeJSONToCache(encoded(dataMap), STATS);
     customEvent.add(STATS);
   }
 
   bool _audioPositionIsInEndPeriod(Duration position) {
-    return _duration.inSeconds > 0 &&
-        position.inSeconds > _duration.inSeconds - FADE_DURATION;
+    return (_duration?.inSeconds ?? 0) > 0 &&
+        position.inSeconds > (_duration?.inSeconds ?? 0) - FADE_DURATION;
   }
 
   Future<void> _setBgVolumeFadeAtEnd(int timeLeft) async {

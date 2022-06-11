@@ -16,9 +16,9 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:equatable/equatable.dart';
 
 class ApiResponse<T> extends Equatable {
-  Status status;
-  T body;
-  String message;
+  late final Status status;
+  late final T? body;
+  late final String message;
 
   ApiResponse.loading() : status = Status.LOADING;
   ApiResponse.completed(this.body) : status = Status.COMPLETED;
@@ -34,7 +34,7 @@ class ApiResponse<T> extends Equatable {
   }
 
   @override
-  List<Object> get props => [status, body, message];
+  List<Object?> get props => [status, body, message];
 }
 
 enum Status { LOADING, COMPLETED, ERROR }

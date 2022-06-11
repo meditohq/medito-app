@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class MenuResponse extends Equatable {
-  final List<MenuData> data;
+  final List<MenuData>? data;
 
   MenuResponse({this.data});
 
@@ -18,22 +18,20 @@ class MenuResponse extends Equatable {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
-    }
+    data['data'] = this.data?.map((v) => v.toJson()).toList();
     return data;
   }
 
   @override
-  List<Object> get props => [data];
+  List<Object?> get props => [data];
 }
 
 class MenuData extends Equatable {
-  final String itemLabel;
-  final String itemType;
+  final String? itemLabel;
+  final String? itemType;
   final String itemPath;
 
-  MenuData({this.itemLabel, this.itemType, this.itemPath});
+  MenuData({this.itemLabel, this.itemType, this.itemPath = ''});
 
   factory MenuData.fromJson(Map<String, dynamic> json) {
     var _itemLabel = json['item_label'];
@@ -51,5 +49,5 @@ class MenuData extends Equatable {
   }
 
   @override
-  List<Object> get props => [itemLabel, itemType, itemPath];
+  List<Object?> get props => [itemLabel, itemType, itemPath];
 }

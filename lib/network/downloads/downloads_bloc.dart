@@ -18,7 +18,7 @@ class DownloadsBloc {
     return prefs.getBool('seenDownloadsToolTip') ?? false;
   }
 
-  static Future<void> setSeenTip() async {
+  static Future<bool> setSeenTip() async {
     var prefs = await SharedPreferences.getInstance();
     return prefs.setBool('seenDownloadsToolTip', true);
   }
@@ -29,7 +29,7 @@ class DownloadsBloc {
     var list = prefs.getStringList(savedFilesKey) ?? [];
 
     var info = await PackageInfo.fromPlatform();
-    _mediaItem.extras[APP_VERSION] = info.buildNumber;
+    _mediaItem.extras?[APP_VERSION] = info.buildNumber;
     if (_mediaItem != null) {
       var json = _jsonEncodeMediaItem(_mediaItem);
       list.add(json);
@@ -76,7 +76,8 @@ class DownloadsBloc {
           extras: json['extras']);
   }
 
-  static Future<bool> isAudioFileDownloaded(AudioFile file) async {
+  static Future<bool> isAudioFileDownloaded(AudioFile? file) async {
+    if (file == null) return false;
     var list = await fetchDownloads();
     var exists = false;
 

@@ -20,52 +20,46 @@ import 'package:Medito/network/folder/folder_items_repo.dart';
 import 'package:Medito/network/folder/folder_response.dart';
 
 class FolderItemsBloc {
-  FolderItemsRepository _repo;
+  final FolderItemsRepository _repo = FolderItemsRepository();
 
-  Future<bool> selectedSessionListenedFuture;
-  Item selectedItem;
-  FolderResponse content;
+  late Future<bool> selectedSessionListenedFuture;
+  late Item selectedItem;
+  late FolderResponse? content;
 
-  StreamController<ApiResponse<List<Item>>> itemsListController;
-  StreamController<ApiResponse<String>> coverController;
-  StreamController<String> primaryColorController;
-  StreamController<String> backgroundImageController;
-  StreamController<String> titleController;
-  StreamController<String> descriptionController;
+  StreamController<ApiResponse<List<Item>>> itemsListController =
+      StreamController.broadcast();
+  StreamController<ApiResponse<String>> coverController =
+      StreamController.broadcast();
+  StreamController<String> primaryColorController =
+      StreamController.broadcast();
+  StreamController<String> backgroundImageController =
+      StreamController.broadcast();
+  StreamController<String> titleController = StreamController.broadcast();
+  StreamController<String> descriptionController = StreamController.broadcast();
 
-  String _sessionId;
+  late String _sessionId;
 
-  FolderItemsBloc() {
-    itemsListController = StreamController.broadcast();
-    primaryColorController = StreamController.broadcast();
-    coverController = StreamController.broadcast();
-    titleController = StreamController.broadcast();
-    backgroundImageController = StreamController.broadcast();
-    descriptionController = StreamController.broadcast();
-    _repo = FolderItemsRepository();
-  }
+  Future<void> fetchData({String? id, bool skipCache = false}) async {
+    _sessionId = id ?? '';
+    itemsListController.sink.add(ApiResponse.loading());
+    coverController.sink.add(ApiResponse.loading());
+    content = await _repo.fetchFolderData(_sessionId, skipCache);
 
-  Future<void> fetchData({String id, bool skipCache = false}) async {
-    _sessionId ??= id;
-    if (_sessionId != null) {
-      itemsListController.sink.add(ApiResponse.loading());
-      coverController.sink.add(ApiResponse.loading());
-      content = await _repo.fetchFolderData(_sessionId, skipCache);
-
-      if (content?.hasData == false) {
-        if (!itemsListController.isClosed) {
-          itemsListController.sink.add(ApiResponse.error('Error'));
-        }
-        if (!coverController.isClosed) {
-          coverController.sink.add(ApiResponse.error('Error'));
-        }
-        if (!titleController.isClosed) {
-          titleController.add('An error occurred, please try again later');
-        }
-      } else {
-        _postItemList(content);
-        _postTitle(content);
-        _postCoverDetails(content);
+    if (content?.hasData == false) {
+      if (!itemsListController.isClosed) {
+        itemsListController.sink.add(ApiResponse.error('Error'));
+      }
+      if (!coverController.isClosed) {
+        coverController.sink.add(ApiResponse.error('Error'));
+      }
+      if (!titleController.isClosed) {
+        titleController.add('An error occurred, please try again later');
+      }
+    } else {
+      if (content != null) {
+        _postItemList(content!);
+        _postTitle(content!);
+        _postCoverDetails(content!);
       }
     }
   }
@@ -114,11 +108,11 @@ class FolderItemsBloc {
   String getSessionID() => _sessionId;
 
   void dispose() {
-    itemsListController?.close();
-    coverController?.close();
-    titleController?.close();
-    descriptionController?.close();
-    primaryColorController?.close();
-    backgroundImageController?.close();
+    itemsListController.close();
+    coverController.close();
+    titleController.close();
+    descriptionController.close();
+    primaryColorController.close();
+    backgroundImageController.close();
   }
 }

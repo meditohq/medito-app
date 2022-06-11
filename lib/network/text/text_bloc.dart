@@ -18,28 +18,25 @@ import 'dart:async';
 import 'package:Medito/network/text/text_repo.dart';
 
 class TextBloc {
-  StreamController<String> titleController;
-  StreamController<String> bodyController;
+  StreamController<String> titleController = StreamController.broadcast()..sink.add('...');
+  StreamController<String> bodyController = StreamController.broadcast()..sink.add('...');
   final _repo = TextRepository();
 
-  TextBloc() {
-    titleController = StreamController.broadcast()..sink.add('...');
-    bodyController = StreamController.broadcast()..sink.add('...');
-  }
+  Future<void> fetchText(String? id, bool skipCache) async {
+    if (id != null) {
+      var data = await _repo.fetchData(id, skipCache);
 
-  Future<void> fetchText(String id, bool skipCache) async {
-    var data = await _repo.fetchData(id, skipCache);
-
-    if(!titleController.isClosed) {
-      titleController.sink.add(data.title);
-    }
-    if(!bodyController.isClosed) {
-      bodyController.sink.add(data.body);
+      if (!titleController.isClosed) {
+        titleController.sink.add(data.title);
+      }
+      if (!bodyController.isClosed) {
+        bodyController.sink.add(data.body);
+      }
     }
   }
 
   void dispose() {
-    titleController?.close();
-    bodyController?.close();
+    titleController.close();
+    bodyController.close();
   }
 }

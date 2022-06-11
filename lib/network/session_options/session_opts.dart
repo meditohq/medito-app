@@ -1,7 +1,7 @@
 import 'package:Medito/utils/utils.dart';
 
 class SessionOptionsResponse {
-  SessionData data;
+  SessionData? data;
 
   SessionOptionsResponse({data});
 
@@ -11,47 +11,29 @@ class SessionOptionsResponse {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (data != null) {
-      data['data'] = this.data.toJson();
-    }
+    data['data'] = this.data?.toJson();
     return data;
   }
 }
 
 class SessionData {
-  int id;
-  String title;
-  String alternativeTitle;
-  String subtitle;
-  String description;
-  bool backgroundSound;
-  String cover;
-  String get coverUrl => cover?.toAssetUrl();
-  String get backgroundImageUrl => backgroundImage?.toAssetUrl();
-  String colorPrimary;
-  String colorSecondary;
-  String get attribution => author?.body ?? '';
-  List<AudioFile> get files => audio.map((e) => e.file).toList()..removeWhere((element) => element == null);
+  int? id;
+  String? title;
+  String? alternativeTitle;
+  String? subtitle;
+  String? description;
+  bool? backgroundSound;
+  String? cover;
+  String? get coverUrl => cover?.toAssetUrl();
+  String? get backgroundImageUrl => _backgroundImage?.toAssetUrl();
+  String? colorPrimary;
+  String? colorSecondary;
+  String? get attribution => _author?.body ?? '';
+  List<AudioFile?>? get files => _audio?.map((e) => e.file).toList()?..removeWhere((element) => element == null);
 
-  @Deprecated('Use backgroundImageUrl instead')
-  String backgroundImage;
-  @Deprecated('use files instead')
-  List<Audio> audio;
-  @Deprecated('use attribution instead')
-  Author author;
-
-  SessionData(
-      {id,
-        title,
-        alternativeTitle,
-        subtitle,
-        description,
-        backgroundSound,
-        cover,
-        colorPrimary,
-        colorSecondary,
-        author,
-        audio});
+  String? _backgroundImage;
+  List<Audio>? _audio;
+  Author? _author;
 
   SessionData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -61,15 +43,15 @@ class SessionData {
     description = json['description'];
     backgroundSound = json['background_sound'];
     cover = json['cover'];
-    backgroundImage = json['background_image'];
+    _backgroundImage = json['background_image'];
     colorPrimary = json['color_primary'];
     colorSecondary = json['color_secondary'];
-    author =
+    _author =
     json['author'] != null ? Author.fromJson(json['author']) : null;
     if (json['audio'] != null) {
-      audio = <Audio>[];
+      _audio = <Audio>[];
       json['audio'].forEach((v) {
-        audio.add(Audio.fromJson(v));
+        _audio?.add(Audio.fromJson(v));
       });
     }
   }
@@ -82,24 +64,22 @@ class SessionData {
     data['subtitle'] = subtitle;
     data['description'] = description;
     data['background_sound'] = backgroundSound;
-    data['background_image'] = backgroundImage;
+    data['background_image'] = _backgroundImage;
     data['cover'] = cover;
     data['color_primary'] = colorPrimary;
     data['color_secondary'] = colorSecondary;
-    if (author != null) {
-      data['author'] = author.toJson();
+    if (_author != null) {
+      data['author'] = _author?.toJson();
     }
-    if (audio != null) {
-      data['audio'] = audio.map((v) => v.toJson()).toList();
+    if (_audio != null) {
+      data['audio'] = _audio?.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Author {
-  String body;
-
-  Author({body});
+  String? body;
 
   Author.fromJson(Map<String, dynamic> json) {
     body = json['body'];
@@ -113,7 +93,7 @@ class Author {
 }
 
 class Audio {
-  AudioFile file;
+  AudioFile? file;
 
   Audio({file});
 
@@ -124,18 +104,16 @@ class Audio {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (file != null) {
-      data['file'] = file.toJson();
+      data['file'] = file?.toJson();
     }
     return data;
   }
 }
 
 class AudioFile {
-  String id;
-  String voice;
-  String length;
-
-  AudioFile({id, voice, length});
+  String? id;
+  String? voice;
+  String? length;
 
   AudioFile.fromJson(Map<String, dynamic> json) {
     id = json['id'];

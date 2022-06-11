@@ -44,11 +44,11 @@ class PacksData {
   String subtitle;
   String id;
 
-  String get cover => coverOld?.toAssetUrl();
+  String get cover => _coverOld?.toAssetUrl();
   String colorPrimary;
   String colorSecondary;
 
-  String get backgroundImageUrl => backgroundImage?.toAssetUrl();
+  String get backgroundImageUrl => _backgroundImage?.toAssetUrl();
   String type;
 
   FileType get fileType {
@@ -60,29 +60,18 @@ class PacksData {
     return null;
   }
 
-  @Deprecated('Use backgroundImageUrl')
-  String backgroundImage;
-  @Deprecated('Use cover instead')
-  String coverOld;
-
-  PacksData(
-      {this.title,
-      this.subtitle,
-      this.type,
-      this.id,
-      this.colorPrimary,
-      this.colorSecondary,
-      this.coverOld});
+  String _backgroundImage;
+  String _coverOld;
 
   PacksData.fromJson(Map<String, dynamic> json) {
     title = json['title'];
     subtitle = json['subtitle'];
     type = json['type'];
     id = json['id'];
-    backgroundImage = json['background_image'];
+    _backgroundImage = json['background_image'];
     colorPrimary = json['color_primary'];
     colorSecondary = json['color_secondary'];
-    coverOld = json['cover'];
+    _coverOld = json['cover'];
   }
 
   Map<String, dynamic> toJson() {
@@ -91,10 +80,10 @@ class PacksData {
     data['subtitle'] = subtitle;
     data['type'] = type;
     data['id'] = id;
-    data['background_image'] = backgroundImage;
+    data['background_image'] = _backgroundImage;
     data['color_primary'] = colorPrimary;
     data['color_secondary'] = colorSecondary;
-    data['cover'] = coverOld;
+    data['cover'] = _coverOld;
     return data;
   }
 }

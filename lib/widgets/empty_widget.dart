@@ -1,13 +1,12 @@
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/text_themes.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  final String message;
-  final SvgPicture image;
-  const EmptyStateWidget({Key key, this.message, this.image}) : super(key: key);
+  final String? message;
+  final SvgPicture? image;
+  const EmptyStateWidget({Key? key, this.message, this.image}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +16,7 @@ class EmptyStateWidget extends StatelessWidget {
       children: [
         Container(
           padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
-          child: Text(message,
+          child: Text(message ?? '',
               textAlign: TextAlign.start,
               style: meditoTextTheme(context).subtitle1),
         ),

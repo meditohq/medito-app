@@ -27,25 +27,29 @@ extension DurationExtensions on Duration {
   }
 }
 
-String formatSessionLength(String item) {
-  if (item.contains(':')) {
+String formatSessionLength(String? item) {
+  if (item != null && item.contains(':')) {
     var duration = clockTimeToDuration(item);
     var time = '';
     if (duration.inMinutes < 1) {
       time = '<1';
     } else {
       var min = duration.inMinutes;
-      if(duration.inSeconds % 60 > 30){ // round up
+      if (duration.inSeconds % 60 > 30) {
+        // round up
         min++;
       }
       time = min.toString();
     }
     return '$time min';
   }
+  if (item == null) return '';
   return item + ' min';
 }
 
-Duration clockTimeToDuration(String lengthText) {
+Duration clockTimeToDuration(String? lengthText) {
+  if (lengthText == null) return Duration();
+
   //formats 00:00:00
   var tempList = lengthText.split(':');
   var tempListInts = tempList.map(int.parse).toList();

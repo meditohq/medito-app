@@ -31,8 +31,7 @@ import 'audioplayer/audio_inherited_widget.dart';
 import 'network/auth.dart';
 import 'utils/colors.dart';
 
-SharedPreferences sharedPreferences;
-
+late SharedPreferences sharedPreferences;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

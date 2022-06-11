@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/main.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/network/cache.dart';
 import 'package:pedantic/pedantic.dart';
@@ -26,15 +25,11 @@ String getUnits(UnitType type, int value) {
   switch (type) {
     case UnitType.day:
       return 'd';
-      break;
     case UnitType.min:
       return '';
-      break;
     case UnitType.sessions:
       return '';
-      break;
   }
-  return '';
 }
 
 Future<String> getCurrentStreak() async {
@@ -63,7 +58,7 @@ Future<List<String>> getStreakList() async {
   return prefs.getStringList('streakList') ?? [];
 }
 
-Future<void> setStreakList(List<String> streakList) async {
+Future<bool> setStreakList(List<String> streakList) async {
   var prefs = await SharedPreferences.getInstance();
   return prefs.setStringList('streakList', streakList);
 }
@@ -79,7 +74,7 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
   var prefs = await SharedPreferences.getInstance();
 
   var current = await _getSecondsListened();
-  var plusOne = current + (additionalSecs ?? 0);
+  var plusOne = current + (additionalSecs);
   await prefs.setInt('secsListened', plusOne);
   return true;
 }
@@ -204,8 +199,6 @@ Future<int> _getLongestStreakInt() async {
 Future<String> getNumSessions() async {
   var prefs = await SharedPreferences.getInstance();
 
-  if (prefs == null) return '...';
-
   var streak = prefs.getInt('numSessions');
   if (streak == null) {
     return '0';
@@ -255,7 +248,7 @@ Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
 }
 
-bool checkListened(String id, {String oldId}) {
+bool checkListened(String id, {String oldId = ''}) {
   var listened = sharedPreferences.getBool('listened' + id) ?? false;
 
   if (!listened && oldId.isNotEmptyAndNotNull()) {
@@ -267,7 +260,7 @@ bool checkListened(String id, {String oldId}) {
 
 void setVersionCopySeen(int id) async {
   var prefs = await SharedPreferences.getInstance();
-  await prefs?.setInt('copy', id);
+  await prefs.setInt('copy', id);
 }
 
 Future<int> getVersionCopyInt() async {
@@ -294,14 +287,14 @@ Future updateStatsFromBg() async {
   print('read ->$read');
 
   if (read.isNotEmptyAndNotNull()) {
-    var map = decoded(read);
+    var map = decoded(read!);
     var id = map['id'];
     var secsListened = map['secsListened'];
 
     if (map != null && map.isNotEmpty) {
       await updateStreak();
       await incrementNumSessions();
-      await markAsListened(id);
+      markAsListened(id);
       await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
     print('clearing bg stats');

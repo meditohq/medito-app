@@ -1,6 +1,5 @@
 import 'package:Medito/network/home/courses_response.dart';
 import 'package:Medito/widgets/home/courses_row_item_widget.dart';
-import 'package:Medito/widgets/home/daily_message_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

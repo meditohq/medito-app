@@ -149,7 +149,7 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
   return MaterialPage(key: state.pageKey, child: PlayerWidget());
 }
 
-MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
+MaterialPage<void>? getFolderMaterialPage(GoRouterState state) {
   switch(state.params.length){
     case 1:  return MaterialPage(
         key: state.pageKey, child: FolderNavWidget(id: state.params['fid']));
@@ -162,7 +162,7 @@ MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
 
 }
 
-String getPathFromString(String place, [List<String> ids]) {
+String getPathFromString(String? place, List<String> ids) {
   if (place == 'session') {
     return SessionPath.replaceAll(':sid', ids.first);
   }
@@ -175,11 +175,11 @@ String getPathFromString(String place, [List<String> ids]) {
   if (place == 'article') {
     return ArticlePath.replaceAll(':aid', ids.first);
   }
-  if (place.contains('folder3')) {
+  if (place != null && place.contains('folder3')) {
     return Folder3Path.replaceAll(':fid', ids.first).replaceAll(':f2id', ids[1])
         .replaceAll(':f3id', ids[2]);
   }
-  if (place.contains('folder2')) {
+  if (place != null && place.contains('folder2')) {
     return Folder2Path.replaceAll(':fid', ids.first)
         .replaceAll(':f2id', ids[1]);
   }
@@ -188,10 +188,9 @@ String getPathFromString(String place, [List<String> ids]) {
   }
   if (place == 'url') {
     launchUrl(ids.first);
-    return null;
   }
   if (place == 'app') {
     return CollectionPath;
   }
-  return null;
+  return '';
 }

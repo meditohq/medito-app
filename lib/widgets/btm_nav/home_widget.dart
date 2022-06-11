@@ -33,10 +33,8 @@ import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -148,7 +146,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             stream: _bloc.menuList.stream,
             initialData: ApiResponse.completed(MenuResponse(data: [])),
             builder: (context, snapshot) {
-              switch (snapshot.data.status) {
+              switch (snapshot.data?.status) {
                 case Status.LOADING:
                 case Status.ERROR:
                   return GestureDetector(
@@ -179,13 +177,16 @@ class _HomeWidgetState extends State<HomeWidget> {
         context.go(getPathFromString(result.itemType, [result.itemPath]));
       },
       itemBuilder: (BuildContext context) {
-        return snapshot.data.body.data.map((MenuData data) {
-          return PopupMenuItem<MenuData>(
-            value: data,
-            child: Text(data.itemLabel,
-                style: Theme.of(context).textTheme.headline4),
-          );
-        }).toList();
+        if (snapshot.hasData && snapshot.data?.body != null) {
+          return snapshot.data?.body.data?.map((MenuData data) {
+            return PopupMenuItem<MenuData>(
+              value: data,
+              child: Text(data.itemLabel,
+                  style: Theme.of(context).textTheme.headline4),
+            );
+          }).toList();
+        }
+        return [];
       },
     );
   }

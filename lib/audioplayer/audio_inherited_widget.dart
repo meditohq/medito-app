@@ -4,9 +4,9 @@ import 'medito_audio_handler.dart';
 
 class AudioHandlerInheritedWidget extends InheritedWidget {
   const AudioHandlerInheritedWidget({
-    Key key,
-    @required this.audioHandler,
-    @required Widget child,
+    Key? key,
+    required this.audioHandler,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final MeditoAudioHandler audioHandler;
@@ -15,7 +15,7 @@ class AudioHandlerInheritedWidget extends InheritedWidget {
     final result = context
         .dependOnInheritedWidgetOfExactType<AudioHandlerInheritedWidget>();
     assert(result != null, 'No AudioHandler found in context');
-    return result;
+    return result!;
   }
 
   @override

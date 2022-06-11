@@ -22,7 +22,7 @@ class FolderItemsRepository {
       '?fields=*,items.item:folders.id,items.item:folders.type,items.item:folders.title,items.item:folders.subtitle,items.item:sessions.id,items.item:sessions.type,items.item:sessions.title,items.item:sessions.subtitle,items.item:sessions.old_id,items.item:dailies.id,items.item:dailies.type,items.item:dailies.title,items.item:dailies.subtitle,items.item:articles.id,items.item:articles.type,items.item:articles.title,items.item:articles.subtitle&deep[items][_sort]=position';
   var ext = 'items/folders/';
 
-  Future<FolderResponse> fetchFolderData(String id, bool skipCache) async {
+  Future<FolderResponse?> fetchFolderData(String id, bool skipCache) async {
     try {
       final response = await httpGet(BASE_URL + ext + id + folderParameters,
           fileNameForCache: BASE_URL + id + '/' + ext, skipCache: skipCache);
