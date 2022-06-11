@@ -44,7 +44,7 @@ class ChooseBackgroundSoundDialog extends StatefulWidget {
 class _ChooseBackgroundSoundDialogState
     extends State<ChooseBackgroundSoundDialog> {
 
-  bool isOffline = false;
+  bool _isOffline = false;
 
   /// Tracks the bgVolume while the user drags the bgVolume bar.
   final BehaviorSubject<double> _dragBgVolumeSubject =
@@ -86,7 +86,7 @@ class _ChooseBackgroundSoundDialogState
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data == ConnectivityResult.none) {
-              isOffline = true;
+              _isOffline = true;
             }
             return StreamBuilder<dynamic>(
                 stream: widget.handler.customEvent.stream,
@@ -102,7 +102,7 @@ class _ChooseBackgroundSoundDialogState
                         bottom: false,
                         child: Material(
                             color: MeditoColors.moonlight,
-                            child: isOffline
+                            child: _isOffline
                                 ? _offlineBackgroundSounds(
                                 currentSound, scrollController)
                                 : _onlineBackgroundSounds(
@@ -242,7 +242,7 @@ class _ChooseBackgroundSoundDialogState
           downloadBGMusicFromURL(assetUrl, item.name).then((filePath) {
             if (filePath == 'Connectivity lost') {
               _downloadingItem = '';
-              isOffline = true;
+              _isOffline = true;
               setState(() {});
               createSnackBar(
                   'Connectivity lost. Displaying offline background sounds.',
@@ -327,8 +327,8 @@ class _ChooseBackgroundSoundDialogState
                           activeColor: MeditoColors.walterWhite,
                           inactiveColor:
                           MeditoColors.walterWhite.withOpacity(0.7),
-                          max: 100.0,
-                          value: volume,
+                          max: 1.0,
+                          value: volume ?? 0,
                           onChanged: (value) {
                             _dragBgVolumeSubject.add(value);
                             _handler.customAction(
@@ -350,9 +350,9 @@ class _ChooseBackgroundSoundDialogState
   }
 
   IconData _volumeIconFunction(var volume) {
-    if (volume == 0) {
+    if (volume == 0 || volume == null) {
       return Icons.volume_off;
-    } else if (volume < 50) {
+    } else if (volume < 0.5) {
       return Icons.volume_down;
     } else {
       return Icons.volume_up;

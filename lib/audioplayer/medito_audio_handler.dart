@@ -8,6 +8,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../network/auth.dart';
 import '../network/cache.dart';
+import '../utils/bgvolume_utils.dart';
 import 'media_lib.dart';
 import 'player_utils.dart';
 
@@ -142,6 +143,9 @@ class MeditoAudioHandler extends BaseAudioHandler
               _updatedStats = true;
               await _updateStats();
             }
+          } else {
+            // If the volume has started to fade, but then you select another point in the track
+            unawaited(_bgPlayer.setVolume(_bgVolume));
           }
         }
       });
@@ -156,13 +160,16 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future customAction(String name, [Map<String, dynamic> extras]) async {
     switch (name) {
       case SET_BG_SOUND_VOL:
-        _bgVolume = extras[SET_BG_SOUND_VOL] / 10;
+        _bgVolume = extras[SET_BG_SOUND_VOL];
+        print('set bg volume' + _bgVolume.toString());
         unawaited(_bgPlayer.setVolume(_bgVolume));
         break;
       case PLAY_BG_SOUND:
         await _playBgSound(extras);
         break;
       case INIT_BG_SOUND:
+        _bgVolume = extras[SET_BG_SOUND_VOL];
+        print('init' + _bgVolume.toString());
         customEvent.add({SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
       case SEND_BG_SOUND:
@@ -197,7 +204,9 @@ class MeditoAudioHandler extends BaseAudioHandler
   }
 
   Future<void> _setBgVolumeFadeAtEnd(int timeLeft) async {
-    unawaited(_bgPlayer.setVolume(_bgVolume -
-        ((FADE_DURATION - timeLeft) * (_bgVolume / FADE_DURATION))));
+    print(_bgPlayer.volume - (_bgVolume / FADE_DURATION));
+    if (_bgPlayer.volume > 0) {
+      unawaited(_bgPlayer.setVolume(_bgPlayer.volume - (_bgVolume / FADE_DURATION)));
+    }
   }
 }

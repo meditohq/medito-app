@@ -18,7 +18,6 @@ import 'dart:async';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/player/player_bloc.dart';
-import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
@@ -35,6 +34,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
+import '../../../utils/bgvolume_utils.dart';
 import '../background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {
@@ -63,6 +63,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.initState();
     _startTimeout();
     _bloc = PlayerBloc();
+
+    Future.delayed(Duration(milliseconds: 200)).then((value) async {
+      var bgSound = await getBgSoundNameFromSharedPrefs();
+      var volume = await retrieveSavedBgVolume();
+      await _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume});
+      return _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
+    });
   }
 
   void _startTimeout() {
