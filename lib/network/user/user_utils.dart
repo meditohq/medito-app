@@ -36,6 +36,11 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
     await prefs.setString(USER_ID, map[USER_ID]);
     await prefs.setString(TOKEN, map[TOKEN]);
   }
+  
+  Sentry.configureScope(
+        (scope) => scope.user = SentryUser(id: map[USER_ID]),
+  );
+
 }
 
 Future<void> _postUsage() async {
