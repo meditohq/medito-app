@@ -92,7 +92,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
 
     _handler.customEvent.stream.listen((event) {
-      if (mounted && event[AUDIO_COMPLETE] == true) {
+      if (mounted && event[AUDIO_COMPLETE] is bool && event[AUDIO_COMPLETE] == true) {
         _trackSessionEnd(_handler.mediaItem.value);
         showGeneralDialog(
             transitionDuration: Duration(milliseconds: 400),
