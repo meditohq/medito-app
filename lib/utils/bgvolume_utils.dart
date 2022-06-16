@@ -19,12 +19,21 @@ const DEFAULT_VOLUME = 0.65;
 
 Future<dynamic> retrieveSavedBgVolume() async {
   var prefs = await SharedPreferences.getInstance();
-  var vol = prefs.getDouble('bgVolume');
+  var vol;
+  try {
+    vol = prefs.getDouble(BG_VOLUME) ?? DEFAULT_VOLUME;
+  } catch (e, s) {
+    // bgVolume maybe wasn't a double
+    vol = DEFAULT_VOLUME;
+  }
+
   if (vol == null || vol > 1) vol = DEFAULT_VOLUME;
   return vol;
 }
 
 Future<void> saveBgVolume(double volume) async {
   var prefs = await SharedPreferences.getInstance();
-  await prefs.setDouble('bgVolume', volume);
+  await prefs.setDouble(BG_VOLUME, volume);
 }
+
+var BG_VOLUME = 'bgVolume';
