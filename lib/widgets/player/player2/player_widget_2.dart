@@ -31,6 +31,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
@@ -89,7 +90,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _handler = AudioHandlerInheritedWidget.of(context)?.audioHandler;
     var mediaItem = _handler.mediaItem.value;
 
-    if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
+    try {
+      if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
+    } on Exception catch (e, s) {
+      unawaited(Sentry.captureException(e,
+          stackTrace: s, hint: 'extras[HAS_BG_SOUND]: ${_handler.mediaItem.value.extras[HAS_BG_SOUND]}'));
+    }
 
     _handler.customEvent.stream.listen((event) {
       if (mounted && event[AUDIO_COMPLETE] is bool && event[AUDIO_COMPLETE] == true) {
