@@ -189,9 +189,14 @@ class SessionOptionsBloc {
   }
 
   AudioFile getCurrentlySelectedFile() {
-    return _options?.files != null
-        ? _options?.files[currentSelectedFileIndex]
-        : null;
+    try {
+      return _options?.files != null
+          ? _options?.files[currentSelectedFileIndex]
+          : null;
+    } catch (e, s) {
+      // could be out of bounds exception
+      return null;
+    }
   }
 }
 
