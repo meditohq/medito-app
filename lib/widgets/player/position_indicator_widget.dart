@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -20,7 +20,6 @@ class PositionIndicatorWidget extends StatefulWidget {
 }
 
 class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
-  double position;
 
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double> _dragPositionSubject =
@@ -28,14 +27,16 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double seekPos;
+
+    double _seekPos;
+
     return StreamBuilder(
       stream: Rx.combineLatest2<double, double, double>(
           _dragPositionSubject.stream,
           Stream.periodic(Duration(milliseconds: 200)),
           (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
-        //snapshot.data will be non null is slider was dragged
+        //snapshot.data will be non null if slider was dragged
         int position = snapshot.data?.toInt() ??
             widget.handler.playbackState.value?.position?.inMilliseconds ??
             0;
@@ -59,7 +60,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                     activeColor: widget.color,
                     inactiveColor: MeditoColors.meditoTextGrey,
                     max: duration.toDouble(),
-                    value: seekPos ??
+                    value: _seekPos ??
                         max(0.0, min(position.toDouble(), duration.toDouble())),
                     onChanged: (value) {
                       _dragPositionSubject.add(value);
@@ -67,7 +68,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                     onChangeEnd: (value) {
                       widget.handler
                           .seek(Duration(milliseconds: value.toInt()));
-                      seekPos = value;
+                      _seekPos = value;
                       _dragPositionSubject.add(null);
                     },
                   ),

@@ -18,7 +18,6 @@ import 'dart:async';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/player/player_bloc.dart';
-import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/strings.dart';
@@ -32,9 +31,11 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
+import '../../../utils/bgvolume_utils.dart';
 import '../background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {
@@ -63,6 +64,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.initState();
     _startTimeout();
     _bloc = PlayerBloc();
+
+    Future.delayed(Duration(milliseconds: 200)).then((value) async {
+      var bgSound = await getBgSoundNameFromSharedPrefs();
+      var volume = await retrieveSavedBgVolume();
+      await _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume});
+      return _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
+    });
   }
 
   void _startTimeout() {
@@ -82,10 +90,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _handler = AudioHandlerInheritedWidget.of(context)?.audioHandler;
     var mediaItem = _handler.mediaItem.value;
 
-    if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
+    try {
+      if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
+    } on Exception catch (e, s) {
+      unawaited(Sentry.captureException(e,
+          stackTrace: s, hint: 'extras[HAS_BG_SOUND]: ${_handler.mediaItem.value.extras[HAS_BG_SOUND]}'));
+    }
 
     _handler.customEvent.stream.listen((event) {
-      if (mounted && event[AUDIO_COMPLETE] == true) {
+      if (mounted && event[AUDIO_COMPLETE] is bool && event[AUDIO_COMPLETE] == true) {
         _trackSessionEnd(_handler.mediaItem.value);
         showGeneralDialog(
             transitionDuration: Duration(milliseconds: 400),

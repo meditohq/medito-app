@@ -145,7 +145,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
 
     _bloc.saveOptionsSelectionsToSharedPreferences(widget.id);
 
-    var mediaItem = _bloc.startAudioService(item);
+    var mediaItem = _bloc.getMediaItem(item);
     _audioHandler.playMediaItem(mediaItem);
     context.go(GoRouter.of(context).location + PlayerPath);
     return null;

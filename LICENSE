@@ -392,12 +392,6 @@ where to find the applicable terms.
 form of a separately written license, or stated as exceptions;
 the above requirements apply either way.
 
-As additional permission under section 7, you are allowed to distribute 
-the software through an app store, even if that store has restrictive terms and 
-conditions that are incompatible with the GPL, provided that the source is also 
-available under the GPL with or without this permission through a channel 
-without those restrictive terms and conditions. 
-
   8. Termination.
 
   You may not propagate or modify a covered work except as expressly
@@ -639,8 +633,8 @@ the "copyright" line and a pointer to where the full notice is found.
     Copyright (C) <year>  <name of author>
 
     This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
