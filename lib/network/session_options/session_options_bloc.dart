@@ -148,7 +148,7 @@ class SessionOptionsBloc {
         secondaryColor: _options?.colorSecondary,
         primaryColor: _options?.colorPrimary,
         durationAsMilliseconds:
-            clockTimeToDuration(file?.length).inMilliseconds,
+        clockTimeToDuration(file?.length).inMilliseconds,
         fileId: file?.id,
         sessionId: _options?.id,
         attributions: _options?.attribution);
@@ -169,10 +169,10 @@ class SessionOptionsBloc {
     // Add file data against each voice
     voiceSet.toList().forEach((voice) {
       var listForThisVoice =
-          items.where((element) => element?.voice == voice).toList();
+      items.where((element) => element?.voice == voice).toList();
 
       var voiceItem =
-          VoiceItem(headerValue: voice, listForVoice: listForThisVoice);
+      VoiceItem(headerValue: voice, listForVoice: listForThisVoice);
       voiceList.add(voiceItem);
     });
 
@@ -188,8 +188,16 @@ class SessionOptionsBloc {
     backgroundImageController.close();
   }
 
-  AudioFile? getCurrentlySelectedFile() =>
-      _options?.files?[currentSelectedFileIndex];
+  AudioFile getCurrentlySelectedFile() {
+    try {
+      return _options?.files != null
+          ? _options?.files[currentSelectedFileIndex]
+          : null;
+    } catch (e, s) {
+      // could be out of bounds exception
+      return null;
+    }
+  }
 }
 
 class VoiceItem {

@@ -50,6 +50,8 @@ Future httpGet(String url,
     if (response.statusCode == 200) {
       await writeJSONToCache(response.body, fileNameForCache ?? url);
     } else {
+      unawaited(Sentry.captureMessage(
+          'response code: ${response.statusCode}, url: $url, headers: ${response.headers} reason: ${response.reasonPhrase}'));
       print('----GET----');
       print('CACHE USED: ${cache != null}');
       print('FILE NAME FOR CACHE: ${fileNameForCache ?? ''}');
