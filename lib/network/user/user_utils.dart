@@ -35,6 +35,11 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
     await prefs.setString(USER_ID, map[USER_ID]);
     await prefs.setString(TOKEN, map[TOKEN]);
   }
+
+  Sentry.configureScope(
+        (scope) => scope.user = SentryUser(id: map[USER_ID]),
+  );
+
 }
 
 Future<void> _postUsage() async {
@@ -55,7 +60,7 @@ Future<void> _postUsage() async {
 
 //clears storage if this is first open, and returns true if the user has opened the app before
 bool _beginClearStorage(SharedPreferences prefs) {
-  var opened = prefs.getBool('hasOpened') ?? false;
+  var opened = prefs.getBool(HAS_OPENED) ?? false;
   if (!opened) {
     unawaited(_clearStorage(prefs));
   }
@@ -64,7 +69,7 @@ bool _beginClearStorage(SharedPreferences prefs) {
 
 Future _clearStorage(SharedPreferences prefs) async {
   await clearStorage();
-  await prefs.setBool('hasOpened', true);
+  await prefs.setBool(HAS_OPENED, true);
 }
 
 class UserRepo {
@@ -180,3 +185,4 @@ const DEVICE_OS = 'device_os';
 const DEVICE_PLATFORM = 'device_platform';
 const TOKEN = 'token_v3';
 const USER_ID = 'userId_v3';
+const HAS_OPENED = 'hasOpened';
