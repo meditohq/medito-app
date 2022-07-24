@@ -17,8 +17,8 @@ import 'package:equatable/equatable.dart';
 
 class ApiResponse<T> extends Equatable {
   late final Status status;
-  late final T? body;
-  late final String message;
+  T? body;
+  String? message = '';
 
   ApiResponse.loading() : status = Status.LOADING;
   ApiResponse.completed(this.body) : status = Status.COMPLETED;
