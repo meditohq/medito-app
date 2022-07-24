@@ -132,20 +132,18 @@ class MeditoAudioHandler extends BaseAudioHandler
     try {
       _player.positionStream.listen((position) async {
         //ticks on each position
-        var timeLeft = _duration.inSeconds - position.inSeconds;
-        if (position != null) {
-          if (_audioPositionIsInEndPeriod(position)) {
-            if (_bgPlayer.playing) {
-              unawaited(_setBgVolumeFadeAtEnd(timeLeft));
-            }
-            if (!_updatedStats) {
-              _updatedStats = true;
-              await _updateStats();
-            }
-          } else {
-            // If the volume has started to fade, but then you select another point in the track
-            unawaited(_bgPlayer.setVolume(_bgVolume));
+        var timeLeft = _duration?.inSeconds ?? 0 - position.inSeconds;
+        if (_audioPositionIsInEndPeriod(position)) {
+          if (_bgPlayer.playing) {
+            unawaited(_setBgVolumeFadeAtEnd(timeLeft));
           }
+          if (!_updatedStats) {
+            _updatedStats = true;
+            await _updateStats();
+          }
+        } else {
+          // If the volume has started to fade, but then you select another point in the track
+          unawaited(_bgPlayer.setVolume(_bgVolume));
         }
       });
     } catch (e, s) {
@@ -159,7 +157,7 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async {
     switch (name) {
       case SET_BG_SOUND_VOL:
-        _bgVolume = extras[SET_BG_SOUND_VOL];
+        _bgVolume = extras?[SET_BG_SOUND_VOL] ?? DEFAULT_VOLUME;
         print('set bg volume' + _bgVolume.toString());
         unawaited(_bgPlayer.setVolume(_bgVolume));
         break;
@@ -167,12 +165,12 @@ class MeditoAudioHandler extends BaseAudioHandler
         await _playBgSound(extras);
         break;
       case INIT_BG_SOUND:
-        _bgVolume = extras[SET_BG_SOUND_VOL];
+        _bgVolume = extras?[SET_BG_SOUND_VOL] ?? DEFAULT_VOLUME;
         print('init' + _bgVolume.toString());
         customEvent.add({SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
       case SEND_BG_SOUND:
-        _currentlyPlayingBGSound = extras?[SEND_BG_SOUND] ?? '';
+        _currentlyPlayingBGSound = extras?[SEND_BG_SOUND] ?? NONE;
         customEvent.add({SEND_BG_SOUND: _currentlyPlayingBGSound});
         break;
     }

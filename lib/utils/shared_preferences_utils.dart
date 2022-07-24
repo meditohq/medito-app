@@ -28,18 +28,23 @@ void addCurrentDateToSF(key) async {
 Future<int> daysSinceDate(key) async {
   var prefs = await SharedPreferences.getInstance();
   if (!prefs.containsKey(key)) return 365;
-  var savedDate = DateTime.fromMillisecondsSinceEpoch(prefs.get(key));
+  var savedDate = DateTime.fromMillisecondsSinceEpoch(prefs.getInt(key) ?? 0);
   var difference = DateTime.now().difference(savedDate);
   return difference.inDays;
 }
 
-Future<void> addBgSoundSelectionToSharedPrefs(String file, String name) async {
+Future<void> addBgSoundSelectionToSharedPrefs(String? file, String? name) async {
   var prefs = await SharedPreferences.getInstance();
-  await prefs.setString(BG_SOUND_PREF, file);
-  await prefs.setString(BG_SOUND_PREF_NAME, name);
+  if(file != null) {
+    await prefs.setString(BG_SOUND_PREF, file);
+  }
+  if(name != null) {
+    await prefs.setString(BG_SOUND_PREF_NAME, name);
+  }
 }
 
-Future<void> addBgSoundToOfflineSharedPrefs(String name, String file) async {
+Future<void> addBgSoundToOfflineSharedPrefs(String? name, String file) async {
+  if (name == null) return;
   var prefs = await SharedPreferences.getInstance();
   var offlineSounds = prefs.getStringList(BG_OFFLINE_PREF) ?? [];
   print('adding $name to offline bg collection');
@@ -50,7 +55,7 @@ Future<void> addBgSoundToOfflineSharedPrefs(String name, String file) async {
 
 Future<List<BackgroundSoundData>> getBgSoundFromOfflineSharedPrefs() async {
   var prefs = await SharedPreferences.getInstance();
-  var list = prefs.getStringList(BG_OFFLINE_PREF);
+  var list = prefs.getStringList(BG_OFFLINE_PREF) ?? [];
   var bgSoundDataList = List<BackgroundSoundData>.filled(
       0, BackgroundSoundData(),
       growable: true);
@@ -69,10 +74,10 @@ Future<List<BackgroundSoundData>> getBgSoundFromOfflineSharedPrefs() async {
 
 Future<String> getBgSoundFileFromSharedPrefs() async {
   var prefs = await SharedPreferences.getInstance();
-  return prefs.getString(BG_SOUND_PREF);
+  return prefs.getString(BG_SOUND_PREF) ?? '';
 }
 
 Future<String> getBgSoundNameFromSharedPrefs() async {
   var prefs = await SharedPreferences.getInstance();
-  return prefs.getString(BG_SOUND_PREF_NAME);
+  return prefs.getString(BG_SOUND_PREF_NAME) ?? '';
 }

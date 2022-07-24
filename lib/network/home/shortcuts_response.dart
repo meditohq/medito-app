@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/utils/utils.dart';
 
 class ShortcutsResponse {
-  List<ShortcutData> data;
+  List<ShortcutData>? data = [];
 
   ShortcutsResponse({this.data});
 
@@ -24,7 +24,7 @@ class ShortcutsResponse {
     if (json['data'] != null) {
       data = <ShortcutData>[];
       json['data'].forEach((v) {
-        data.add(ShortcutData.fromJson(v));
+        data?.add(ShortcutData.fromJson(v));
       });
     }
   }
@@ -32,22 +32,22 @@ class ShortcutsResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (this.data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
+      data['data'] = this.data?.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class ShortcutData {
-  String title;
-  String type;
-  String id;
-  String cover;
-  String get coverUrl => cover?.toAssetUrl();
-  String get bgImageUrl => backgroundImage?.toAssetUrl();
-  String backgroundImage;
-  String groundImage;
-  String colorPrimary;
+  String? title;
+  String? type;
+  String? id;
+  String? cover;
+  String? get coverUrl => cover?.toAssetUrl();
+  String? get bgImageUrl => backgroundImage?.toAssetUrl();
+  String? backgroundImage;
+  String? groundImage;
+  String? colorPrimary;
 
   ShortcutData(
       {this.title,

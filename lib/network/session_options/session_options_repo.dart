@@ -28,7 +28,7 @@ class SessionOptionsRepository {
 
   SessionOptionsRepository({this.screen});
 
-  Future<SessionData> fetchOptions(String id, bool skipCache) async {
+  Future<SessionData?> fetchOptions(String id, bool skipCache) async {
     var url;
 
     if (screen == Screen.daily) {

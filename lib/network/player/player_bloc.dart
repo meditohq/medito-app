@@ -24,9 +24,9 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
 
 class PlayerBloc {
-  PlayerRepository _repo;
-  PlayerCopyData version;
-  StreamController<ApiResponse<BackgroundSoundsResponse>>
+  PlayerRepository? _repo;
+  PlayerCopyData? version;
+  StreamController<ApiResponse<BackgroundSoundsResponse>>?
       bgSoundsListController;
 
   static final _random = Random();
@@ -38,18 +38,18 @@ class PlayerBloc {
   }
 
   Future<void> _fetchCopy() async {
-    var data = await _repo.fetchCopyData();
-    final randomOutOf10 = _random.nextInt(data.data.length);
-    version = data.data[randomOutOf10];
-    setVersionCopySeen(version.id);
+    var data = await _repo?.fetchCopyData();
+    final randomOutOf10 = _random.nextInt(data?.data?.length ?? 0);
+    version = data?.data?[randomOutOf10];
+    setVersionCopySeen(version?.id ?? 0);
   }
 
   Future<void> fetchBackgroundSounds() async {
     try {
-      var sounds = await _repo.fetchBackgroundSounds(true);
-      bgSoundsListController.sink.add(ApiResponse.completed(sounds));
+      var sounds = await _repo?.fetchBackgroundSounds(true);
+      bgSoundsListController?.sink.add(ApiResponse.completed(sounds));
     } catch (e) {
-      bgSoundsListController.sink.add(ApiResponse.error(e.toString()));
+      bgSoundsListController?.sink.add(ApiResponse.error(e.toString()));
     }
   }
 
@@ -57,16 +57,16 @@ class PlayerBloc {
     var title = version?.title;
     if (title?.contains('%n') ?? false) {
       var streak = await getNumSessions();
-      title = title.replaceAll('%n', streak.toString());
+      title = title?.replaceAll('%n', streak.toString());
     }
-    return title;
+    return title ?? '';
   }
 
   void postRating(int rating, MediaItem mediaItem){
-    _repo.postRating(rating, mediaItem);
+    _repo?.postRating(rating, mediaItem);
   }
 
   void dispose() {
-    bgSoundsListController.close();
+    bgSoundsListController?.close();
   }
 }

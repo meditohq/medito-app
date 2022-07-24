@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 
 class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
   const MeditoAppBarWidget(
-      {Key key,
+      {Key? key,
       this.title,
       this.titleWidget,
       this.transparent = false,
@@ -27,12 +27,12 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
       this.closePressed})
       : super(key: key);
 
-  final Function closePressed;
-  final Widget titleWidget;
+  final void Function()? closePressed;
+  final Widget? titleWidget;
   final bool hasCloseButton;
   final transparent;
   final actions;
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
     } else {
       return Row(
         children: [
-          titleWidget,
+          titleWidget ?? Container(),
         ],
       );
     }

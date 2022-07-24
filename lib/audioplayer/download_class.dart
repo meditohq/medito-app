@@ -14,7 +14,7 @@ import 'player_utils.dart';
 class _Download {
   bool isDownloading = false;
   late AudioFile _file;
-  int _received = 0, _total = 1;
+  int? _received = 0, _total = 1;
   var downloadAmountListener = ValueNotifier<double>(0);
 
   _Download(AudioFile file) {
@@ -63,13 +63,15 @@ class _Download {
 
     _response.stream.listen((value) {
       _bytes.addAll(value);
-      _received += value.length;
+      if (_received != null) {
+        _received = _received! + value.length;
+      }
 
       var progress = 0.0;
       if (_received == null) {
         progress = 0;
         print('Unexpected State of downloading');
-        _received ??= _bytes.length;
+        _received;
         if (_total == null) {
           http.Client()
               .send(http.Request('GET', Uri.parse(currentFile.id ?? '')))
@@ -78,7 +80,9 @@ class _Download {
           _received = _bytes.length;
         }
       } else {
-        progress = _received / _total;
+        if (_received != null && _total != null) {
+          progress = _received! / _total!;
+        }
       }
       downloadAmountListener.value = progress as double;
     }).onDone(() async {
@@ -103,7 +107,11 @@ class _Download {
           .then((value) => _throwResponse = value);
       _total = _throwResponse?.contentLength ?? 0;
     }
-    return _received / _total;
+    if (_received != null && _total != null) {
+      return _received! / _total!;
+    } else {
+      return 0;
+    }
   }
 }
 

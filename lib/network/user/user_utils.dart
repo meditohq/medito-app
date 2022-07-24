@@ -31,15 +31,12 @@ Future _logAccount(SharedPreferences prefs) async {
 
 Future<void> _updateUserCredentials(SharedPreferences prefs) async {
   var map = await UserRepo.createUser();
-  if (map != null) {
-    await prefs.setString(USER_ID, map[USER_ID]);
-    await prefs.setString(TOKEN, map[TOKEN]);
-  }
+  await prefs.setString(USER_ID, map?[USER_ID] ?? '');
+  await prefs.setString(TOKEN, map?[TOKEN] ?? '');
 
   Sentry.configureScope(
-        (scope) => scope.user = SentryUser(id: map[USER_ID]),
+    (scope) => scope.user = SentryUser(id: map?[USER_ID]),
   );
-
 }
 
 Future<void> _postUsage() async {
@@ -49,11 +46,13 @@ Future<void> _postUsage() async {
   var ext = 'items/usage/';
   var url = BASE_URL + ext;
   try {
-    unawaited(
-        httpPost(url, await generatedToken, body: {'app_version': version}));
+    var token = await generatedToken;
+    if (token != null) {
+      unawaited(httpPost(url, token, body: {'app_version': version}));
+    }
   } catch (e, str) {
     unawaited(Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
-    print('post usage failed: ' + e);
+    print('post usage failed: ' + e.toString());
     return;
   }
 }
@@ -73,7 +72,7 @@ Future _clearStorage(SharedPreferences prefs) async {
 }
 
 class UserRepo {
-  static Future<Map<String, String>> createUser() async {
+  static Future<Map<String, String>>? createUser() async {
     var ext = 'users/';
     var url = BASE_URL + ext;
 
@@ -110,7 +109,9 @@ class UserRepo {
     var id = '';
     try {
       final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
-      id = response != null ? UserResponse.fromJson(response).data.id : 'EMPTY';
+      id = response != null
+          ? (UserResponse.fromJson(response).data?.id ?? 'EMPTY')
+          : 'EMPTY';
     } catch (e, st) {
       unawaited(Sentry.captureException(e, stackTrace: st, hint: token));
     } finally {
@@ -129,7 +130,7 @@ class UserRepo {
   }
 }
 
-Future<String> get generatedToken async {
+Future<String?> get generatedToken async {
   var prefs = await SharedPreferences.getInstance();
   return prefs.getString(TOKEN);
 }

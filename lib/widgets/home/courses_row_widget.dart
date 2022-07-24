@@ -8,9 +8,9 @@ class CoursesRowWidget extends StatefulWidget {
   @override
   CoursesRowWidgetState createState() => CoursesRowWidgetState();
 
-  CoursesRowWidget({Key key, this.onTap}) : super(key: key);
+  CoursesRowWidget({Key? key, this.onTap}) : super(key: key);
 
-  final void Function(dynamic, dynamic) onTap;
+  final void Function(dynamic, dynamic)? onTap;
 }
 
 class CoursesRowWidgetState extends State<CoursesRowWidget> {
@@ -50,7 +50,7 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
 
   Widget _buildCoursesRowWidget(
       AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot) {
-    switch (snapshot.data.status) {
+    switch (snapshot.data?.status) {
       case Status.LOADING:
         return _horizontalCoursesRow(null, ValueKey('CoursesRowLoading'));
       case Status.COMPLETED:
@@ -63,10 +63,10 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
   }
 
   Widget _horizontalCoursesRow(
-      AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot, Key key) {
+      AsyncSnapshot<ApiResponse<CoursesResponse>>? snapshot, Key key) {
     var list = <Widget>[Container(width: 16)];
     if (snapshot != null) {
-      snapshot.data?.body?.data?.forEach((element) {
+      snapshot.data?.body?.data.forEach((element) {
         list.add(CoursesRowItemWidget(
           data: element,
           onTap: widget.onTap,

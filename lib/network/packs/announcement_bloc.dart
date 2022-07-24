@@ -20,18 +20,20 @@ import 'package:Medito/network/packs/announcement_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnnouncementBloc {
-  AnnouncementRepository _repo;
+  late AnnouncementRepository _repo;
 
-  StreamController announcementController;
+  late StreamController<AnnouncementResponse> announcementController;
 
   AnnouncementBloc() {
     announcementController = StreamController<AnnouncementResponse>();
     _repo = AnnouncementRepository();
   }
 
-  Future<void> fetchAnnouncement({bool skipCache, bool hasOpened}) async {
+  Future<void> fetchAnnouncement(
+      {bool skipCache = false, bool hasOpened = false}) async {
     try {
-      var data = await _repo.fetchAnnouncements(skipCache, hasOpened);
+      var data = await _repo.fetchAnnouncements(
+          skipCache: skipCache, hasOpened: hasOpened);
       announcementController.add(data);
     } catch (e) {
       print(e);
@@ -39,7 +41,7 @@ class AnnouncementBloc {
   }
 
   void dispose() {
-    announcementController?.close();
+    announcementController.close();
   }
 
   Future<List<String>> _getAnnouncementID() async {
@@ -47,12 +49,13 @@ class AnnouncementBloc {
     return prefs.getStringList('announcementID') ?? [];
   }
 
-  Future<bool> shouldHideAnnouncement(String id) async {
+  Future<bool> shouldHideAnnouncement(String? id) async {
     var prefs = await SharedPreferences.getInstance();
     return prefs.getStringList('announcementID')?.contains(id) ?? false;
   }
 
-  Future<void> saveAnnouncementID(String id) async {
+  Future<void> saveAnnouncementID(String? id) async {
+    if (id == null) return;
     var list = await _getAnnouncementID();
     list.add(id);
 

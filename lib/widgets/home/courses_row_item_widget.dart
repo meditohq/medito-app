@@ -5,14 +5,14 @@ import 'package:Medito/widgets/home/loading_text_box_widget.dart';
 import 'package:flutter/material.dart';
 
 class CoursesRowItemWidget extends StatelessWidget {
-  const CoursesRowItemWidget({@required this.data, Key key, this.onTap})
+  const CoursesRowItemWidget({required this.data, Key? key, this.onTap})
       : super(key: key);
 
-  final void Function(dynamic, dynamic) onTap;
+  final void Function(dynamic, dynamic)? onTap;
 
-  final Data data;
+  final Data? data;
 
-  factory CoursesRowItemWidget.waiting({Key key}) {
+  factory CoursesRowItemWidget.waiting({Key? key}) {
     return CoursesRowItemWidget(
       data: null,
       key: key,
@@ -48,7 +48,7 @@ class CoursesRowItemWidget extends StatelessWidget {
 
   Widget _createSubtitle(BuildContext context) {
     if (data != null) {
-      return Text(data.subtitle, style: Theme.of(context).textTheme.subtitle1);
+      return Text(data?.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
     } else {
       return Container(height: 0, width: 0); //LoadingTextBoxWidget(height: 21);
     }
@@ -56,7 +56,7 @@ class CoursesRowItemWidget extends StatelessWidget {
 
   Widget _createTitle(BuildContext context) {
     if (data != null) {
-      return Text(data.title, style: Theme.of(context).textTheme.headline4);
+      return Text(data?.title ?? '', style: Theme.of(context).textTheme.headline4);
     } else {
       return LoadingTextBoxWidget(height: 42);
     }
@@ -64,7 +64,7 @@ class CoursesRowItemWidget extends StatelessWidget {
 
   void Function() _createOnTap() {
     if (data != null && onTap != null) {
-      return () => onTap(data.type, data.id);
+      return () => onTap!(data?.type, data?.id);
     } else {
       return () {};
     }
@@ -91,7 +91,7 @@ class CoursesRowItemWidget extends StatelessWidget {
 
   Widget _getNetworkImageWidget() {
     if (data != null) {
-      return getNetworkImageWidget(data.coverUrl);
+      return getNetworkImageWidget(data?.coverUrl);
     } else {
       return Container(
         color: MeditoColors.moonlight,
@@ -101,16 +101,22 @@ class CoursesRowItemWidget extends StatelessWidget {
 
   Widget _buildCardBackground() {
     if (data != null) {
-      return data.backgroundImage.isEmptyOrNull()
+      return _isBgImageUnavailable()
           ? Container(
-              color: data.colorPrimary.isEmptyOrNull()
-                  ? MeditoColors.moonlight
-                  : parseColor(data.colorPrimary))
-          : getNetworkImageWidget(data.backgroundImageUrl);
+              color: _getColor())
+          : getNetworkImageWidget(data?.backgroundImageUrl);
     } else {
       return Container(
         color: MeditoColors.moonlight,
       );
     }
+  }
+
+  bool _isBgImageUnavailable() => data?.backgroundImage.isEmptyOrNull() == true;
+
+  Color _getColor() {
+    return data?.colorPrimary.isEmptyOrNull() == true
+                ? MeditoColors.moonlight
+                : parseColor(data?.colorPrimary);
   }
 }

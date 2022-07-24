@@ -20,8 +20,8 @@ import 'package:Medito/network/home/shortcuts_repo.dart';
 import 'package:Medito/network/home/shortcuts_response.dart';
 
 class ShortcutsBloc {
-  ShortcutsRepo _repo;
-  StreamController<ApiResponse<ShortcutsResponse>> shortcutList;
+  late ShortcutsRepo _repo;
+  late StreamController<ApiResponse<ShortcutsResponse>> shortcutList;
 
   ShortcutsBloc() {
     _repo = ShortcutsRepo();

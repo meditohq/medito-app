@@ -1,7 +1,7 @@
 import 'package:Medito/utils/utils.dart';
 
 class CoursesResponse {
-  List<Data> data;
+  List<Data> data = [];
 
   CoursesResponse({data});
 
@@ -16,23 +16,21 @@ class CoursesResponse {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
-    }
+    data['data'] = this.data.map((v) => v.toJson()).toList();
     return data;
   }
 }
 
 class Data {
-  String title;
-  String subtitle;
-  String type;
-  String id;
-  String cover;
-  String get coverUrl => cover?.toAssetUrl();
-  String get backgroundImageUrl => backgroundImage?.toAssetUrl();
-  String backgroundImage;
-  String colorPrimary;
+  String? title;
+  String? subtitle;
+  String? type;
+  String? id;
+  String? cover;
+  String? get coverUrl => cover?.toAssetUrl() ?? '';
+  String? get backgroundImageUrl => backgroundImage?.toAssetUrl() ?? '';
+  String? backgroundImage;
+  String? colorPrimary;
 
   Data(
       {this.title,

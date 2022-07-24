@@ -22,7 +22,7 @@ class AnnouncementRepository {
   var welcome_ext = 'items/welcome_announcement';
 
   Future<AnnouncementResponse> fetchAnnouncements(
-      bool skipCache, bool hasOpened) async {
+      {bool skipCache = false, bool hasOpened = false}) async {
     final response =
         await httpGet(BASE_URL + getExt(hasOpened), skipCache: skipCache);
     return AnnouncementResponse.fromJson(response);

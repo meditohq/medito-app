@@ -8,8 +8,8 @@ import 'package:mocktail/mocktail.dart';
 class MockHomeRepo extends Mock implements HomeRepo {}
 
 void main() {
-  HomeRepo _mockHomeRepo;
-  HomeBloc _bloc;
+  late HomeRepo _mockHomeRepo;
+  late HomeBloc _bloc;
 
   setUp(() {
     _mockHomeRepo = MockHomeRepo();

@@ -27,7 +27,7 @@ import 'package:go_router/go_router.dart';
 import '../../utils/navigation_extra.dart';
 
 class PackListWidget extends StatefulWidget {
-  PackListWidget({Key key}) : super(key: key);
+  PackListWidget({Key? key}) : super(key: key);
 
   @override
   PackListWidgetState createState() {
@@ -36,7 +36,7 @@ class PackListWidget extends StatefulWidget {
 }
 
 class PackListWidgetState extends State<PackListWidget> {
-  PacksBloc _packsBloc;
+  late PacksBloc _packsBloc;
 
   @override
   void initState() {
@@ -69,13 +69,13 @@ class PackListWidgetState extends State<PackListWidget> {
                 stream: _packsBloc.packsListController.stream,
                 initialData: ApiResponse.loading(),
                 builder: (context, snapshot) {
-                  if (snapshot.data.status == Status.LOADING) {
+                  if (snapshot.data?.status == Status.LOADING) {
                     return getLoadingWidget();
                   }
 
-                  if (connectionSnapshot.data &&
-                      snapshot.data.status == Status.COMPLETED) {
-                    return _getListWidget(snapshot.data.body);
+                  if (connectionSnapshot.data == true &&
+                      snapshot.data?.status == Status.COMPLETED) {
+                    return _getListWidget(snapshot.data?.body);
                   } else {
                     return _getErrorPacksWidget();
                   }
@@ -91,7 +91,7 @@ class PackListWidgetState extends State<PackListWidget> {
         }),
       );
 
-  Widget _getListWidget(List<PacksData> data) {
+  Widget _getListWidget(List<PacksData>? data) {
     return ListView.builder(
       padding: EdgeInsets.only(top: 8, bottom: 8),
       itemCount: data?.length ?? 0,
@@ -99,25 +99,26 @@ class PackListWidgetState extends State<PackListWidget> {
         return InkWell(
           onTap: () => _navigate(data, i, context),
           child: PackListItemWidget(PackImageListItemData(
-              title: data[i].title,
-              subtitle: data[i].subtitle,
-              cover: data[i].cover,
-              backgroundImage: data[i].backgroundImageUrl,
-              colorPrimary: parseColor(data[i].colorPrimary),
+              title: data?[i].title,
+              subtitle: data?[i].subtitle,
+              cover: data?[i].cover,
+              backgroundImage: data?[i].backgroundImageUrl,
+              colorPrimary: parseColor(data?[i].colorPrimary),
               coverSize: 72)),
         );
       },
     );
   }
 
-  Future<void> _navigate(List<PacksData> data, int i, BuildContext context) {
+  Future<void> _navigate(List<PacksData>? data, int i, BuildContext context) {
     return checkConnectivity().then((connected) {
       if (connected) {
-        var pack = data[i];
-        return context.go(getPathFromString(pack.type, [pack.id]));
-      } else {
-        createSnackBar(CHECK_CONNECTION, context);
+        var pack = data?[i];
+        if (pack != null && pack.id != null) {
+          return context.go(getPathFromString(pack.type, [pack.id!]));
+        }
       }
+      createSnackBar(CHECK_CONNECTION, context);
     });
   }
 

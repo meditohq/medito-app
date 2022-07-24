@@ -17,7 +17,7 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/utils/utils.dart';
 
 class PacksResponse {
-  List<PacksData> data;
+  List<PacksData>? data = [];
 
   PacksResponse({this.data});
 
@@ -25,31 +25,29 @@ class PacksResponse {
     if (json['data'] != null) {
       data = <PacksData>[];
       json['data'].forEach((v) {
-        data.add(PacksData.fromJson(v));
+        data?.add(PacksData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
-    }
+    data['data'] = this.data?.map((v) => v.toJson()).toList();
     return data;
   }
 }
 
 class PacksData {
-  String title;
-  String subtitle;
-  String id;
+  String? title;
+  String? subtitle;
+  String? id;
 
-  String get cover => _coverOld?.toAssetUrl();
-  String colorPrimary;
-  String colorSecondary;
+  String? get cover => _coverOld?.toAssetUrl();
+  String? colorPrimary;
+  String? colorSecondary;
 
-  String get backgroundImageUrl => _backgroundImage?.toAssetUrl();
-  String type;
+  String? get backgroundImageUrl => _backgroundImage?.toAssetUrl();
+  String? type;
 
   FileType get fileType {
     if (type == 'session') return FileType.session;
@@ -57,11 +55,11 @@ class PacksData {
     if (type == 'folder') return FileType.folder;
     if (type == 'url') return FileType.url;
     if (type == 'daily') return FileType.daily;
-    return null;
+    return FileType.session;
   }
 
-  String _backgroundImage;
-  String _coverOld;
+  String? _backgroundImage;
+  String? _coverOld;
 
   PacksData.fromJson(Map<String, dynamic> json) {
     title = json['title'];

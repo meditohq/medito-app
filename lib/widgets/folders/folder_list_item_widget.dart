@@ -21,14 +21,14 @@ import 'package:flutter/material.dart';
 
 class ListItemWidget extends StatelessWidget {
   ListItemWidget(
-      {Key key, this.title, this.subtitle, this.fileType, this.id, this.oldId})
+      {Key? key, this.title, this.subtitle, this.fileType, this.id, this.oldId})
       : super(key: key);
 
-  final title;
-  final oldId;
-  final subtitle;
-  final fileType;
-  final id;
+  final String? title;
+  final String? oldId;
+  final String? id;
+  final String? subtitle;
+  final FileType? fileType;
 
   @override
   Widget build(BuildContext context) {

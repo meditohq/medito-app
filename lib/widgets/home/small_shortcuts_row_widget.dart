@@ -10,9 +10,9 @@ class SmallShortcutsRowWidget extends StatefulWidget {
   @override
   SmallShortcutsRowWidgetState createState() => SmallShortcutsRowWidgetState();
 
-  SmallShortcutsRowWidget({Key key, this.onTap}) : super(key: key);
+  SmallShortcutsRowWidget({Key? key, this.onTap}) : super(key: key);
 
-  final void Function(dynamic, dynamic) onTap;
+  final void Function(dynamic, dynamic)? onTap;
 }
 
 class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
@@ -41,10 +41,9 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
               stream: _bloc.shortcutList.stream,
               initialData: ApiResponse.loading(),
               builder: (context, snapshot) {
-                switch (snapshot.data.status) {
+                switch (snapshot.data?.status) {
                   case Status.LOADING:
                     return _getLoadingWidget();
-                    break;
                   case Status.COMPLETED:
                     return GridView.count(
                       crossAxisCount: isLandscape ? 4 : 2,
@@ -55,20 +54,21 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: List.generate(
-                          snapshot.data.body?.data?.length ?? 0, (index) {
+                          snapshot.data?.body?.data?.length ?? 0, (index) {
                         return Card(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)),
                           clipBehavior: Clip.antiAlias,
                           color: MeditoColors.deepNight,
                           child: SmallShortcutWidget(
-                              snapshot.data.body.data[index], widget.onTap),
+                              snapshot.data?.body?.data?[index],
+                              widget.onTap),
                         );
                       }),
                     );
-                    break;
                   case Status.ERROR:
                     return Icon(Icons.error);
-                    break;
+                  case null:
                 }
                 return Container();
               }));
@@ -115,8 +115,8 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
 }
 
 class SmallShortcutWidget extends StatelessWidget {
-  final ShortcutData data;
-  final Function onTap;
+  final ShortcutData? data;
+  late Function(dynamic, dynamic)? onTap;
 
   SmallShortcutWidget(this.data, this.onTap);
 
@@ -124,7 +124,7 @@ class SmallShortcutWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: MeditoColors.softGrey,
-      onTap: () => onTap(data.type, data.id),
+      onTap: () => {if (onTap != null) onTap!(data?.type, data?.id)},
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -140,7 +140,7 @@ class SmallShortcutWidget extends StatelessWidget {
     );
   }
 
-  Widget _getTitle(BuildContext context) => AutoSizeText(data.title,
+  Widget _getTitle(BuildContext context) => AutoSizeText(data?.title ?? '',
       maxFontSize: 14,
       stepGranularity: 2,
       overflow: TextOverflow.visible,
@@ -149,7 +149,7 @@ class SmallShortcutWidget extends StatelessWidget {
       style: Theme.of(context).textTheme.subtitle2);
 
   Widget _getListItemLeadingImageWidget() => Container(
-        color: parseColor(data.colorPrimary),
+        color: parseColor(data?.colorPrimary ?? ''),
         child: Stack(
           children: [
             _getBackgroundImage(),
@@ -157,14 +157,14 @@ class SmallShortcutWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: AspectRatio(
                 aspectRatio: 1,
-                child: getNetworkImageWidget(data.coverUrl),
+                child: getNetworkImageWidget(data?.coverUrl ?? ''),
               ),
             ),
           ],
         ),
       );
 
-  Widget _getBackgroundImage() => data.backgroundImage.isNotEmptyAndNotNull()
-      ? getNetworkImageWidget(data.bgImageUrl)
+  Widget _getBackgroundImage() => data?.backgroundImage?.isNotEmptyAndNotNull() == true
+      ? getNetworkImageWidget(data?.bgImageUrl)
       : Container();
 }

@@ -20,8 +20,8 @@ import 'package:Medito/network/home/courses_repo.dart';
 import 'package:Medito/network/home/courses_response.dart';
 
 class CoursesBloc {
-  CoursesRepo _repo;
-  StreamController<ApiResponse<CoursesResponse>> coursesList;
+  late CoursesRepo _repo;
+  late StreamController<ApiResponse<CoursesResponse>> coursesList;
 
   CoursesBloc() {
     _repo = CoursesRepo();

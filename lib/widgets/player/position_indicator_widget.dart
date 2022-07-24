@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class PositionIndicatorWidget extends StatefulWidget {
-  final Color color;
-  final MeditoAudioHandler handler;
+  final Color? color;
+  final MeditoAudioHandler? handler;
 
-  PositionIndicatorWidget({Key key, this.handler, this.color})
+  PositionIndicatorWidget({Key? key, this.handler, this.color})
       : super(key: key);
 
   @override
@@ -22,27 +22,27 @@ class PositionIndicatorWidget extends StatefulWidget {
 class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   /// Tracks the position while the user drags the seek bar.
-  final BehaviorSubject<double> _dragPositionSubject =
+  final BehaviorSubject<double?> _dragPositionSubject =
       BehaviorSubject.seeded(null);
 
   @override
   Widget build(BuildContext context) {
 
-    double _seekPos;
+    double? _seekPos;
 
     return StreamBuilder(
-      stream: Rx.combineLatest2<double, double, double>(
+      stream: Rx.combineLatest2<double?, double, double?>(
           _dragPositionSubject.stream,
-          Stream.periodic(Duration(milliseconds: 200)),
+          Stream.periodic(Duration(milliseconds: 200), (count) => count.toDouble()),
           (dragPosition, _) => dragPosition),
-      builder: (context, snapshot) {
+      builder: (context, AsyncSnapshot<double?> snapshot) {
         //snapshot.data will be non null if slider was dragged
-        int position = snapshot.data?.toInt() ??
-            widget.handler.playbackState.value?.position?.inMilliseconds ??
+        var position = snapshot.data?.toInt() ??
+            widget.handler?.playbackState.value.position.inMilliseconds ??
             0;
 
         //actual duration of the audio
-        var duration = widget.handler.mediaItem.value?.extras[DURATION] ?? 0;
+        var duration = widget.handler?.mediaItem.value?.extras?[DURATION] ?? 0;
 
         return Column(
           children: [
@@ -66,10 +66,9 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                       _dragPositionSubject.add(value);
                     },
                     onChangeEnd: (value) {
-                      widget.handler
-                          .seek(Duration(milliseconds: value.toInt()));
+                      widget.handler?.seek(Duration(milliseconds: value.toInt()));
                       _seekPos = value;
-                      _dragPositionSubject.add(null);
+                      _dragPositionSubject.add(null); // todo is this ok?
                     },
                   ),
                 ),
@@ -92,14 +91,14 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
             style: Theme.of(context)
                 .textTheme
                 .subtitle2
-                .copyWith(color: MeditoColors.meditoTextGrey),
+                ?.copyWith(color: MeditoColors.meditoTextGrey),
           ),
           Text(
             Duration(milliseconds: duration).toMinutesSeconds(),
             style: Theme.of(context)
                 .textTheme
                 .subtitle2
-                .copyWith(color: MeditoColors.meditoTextGrey),
+                ?.copyWith(color: MeditoColors.meditoTextGrey),
           ),
         ],
       ),
@@ -114,13 +113,13 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
 
   @override
   Rect getPreferredRect({
-    @required RenderBox parentBox,
+    required RenderBox parentBox,
     Offset offset = Offset.zero,
-    @required SliderThemeData sliderTheme,
+    required SliderThemeData sliderTheme,
     bool isEnabled = false,
     bool isDiscrete = false,
   }) {
-    final trackHeight = sliderTheme.trackHeight;
+    final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
     var trackTop;
     if (addTopPadding) {
@@ -134,11 +133,11 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
 
   @override
   void paint(PaintingContext context, Offset offset,
-      {RenderBox parentBox,
-      SliderThemeData sliderTheme,
-      Animation<double> enableAnimation,
-      TextDirection textDirection,
-      Offset thumbCenter,
+      {required RenderBox parentBox,
+      required SliderThemeData sliderTheme,
+      required Animation<double> enableAnimation,
+      required TextDirection textDirection,
+      required Offset thumbCenter,
       bool isDiscrete = false,
       bool isEnabled = false,
       double additionalActiveTrackHeight = 2}) {

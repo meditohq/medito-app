@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class SubtitleTextWidget extends StatelessWidget {
-  final String body;
+  final String? body;
 
-  SubtitleTextWidget({Key key, this.body}) : super(key: key);
+  SubtitleTextWidget({Key? key, this.body}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class SubtitleTextWidget extends StatelessWidget {
             a: TextStyle(color: MeditoColors.meditoTextGrey)));
   }
 
-  void _linkTap(String text, String href, String title) {
+  void _linkTap(String text, String? href, String? title) {
     launchUrl(href);
   }
 }
