@@ -60,7 +60,7 @@ void main() {
   });
 
   tearDown(() {
-    _bloc?.dispose();
+    _bloc.dispose();
   });
 }
 
