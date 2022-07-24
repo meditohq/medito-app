@@ -59,7 +59,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   final GlobalKey<DailyMessageWidgetState> _dailyMessageKey = GlobalKey();
 
-  StreamSubscription<ConnectivityResult> subscription;
+  late StreamSubscription<ConnectivityResult> subscription;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +77,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           child: StreamBuilder<bool>(
               stream: _bloc.connectionStreamController.stream,
               builder: (context, connectionSnapshot) {
-                if (connectionSnapshot.hasData && !connectionSnapshot.data) {
+                if (connectionSnapshot.hasData && !(connectionSnapshot.data ?? true)) {
                   return _buildErrorPacksWidget();
                 } else {
                   return ListView(
@@ -178,13 +178,13 @@ class _HomeWidgetState extends State<HomeWidget> {
       },
       itemBuilder: (BuildContext context) {
         if (snapshot.hasData && snapshot.data?.body != null) {
-          return snapshot.data?.body.data?.map((MenuData data) {
+          return snapshot.data?.body?.data?.map((MenuData data) {
             return PopupMenuItem<MenuData>(
               value: data,
-              child: Text(data.itemLabel,
+              child: Text(data.itemLabel ?? '',
                   style: Theme.of(context).textTheme.headline4),
             );
-          }).toList();
+          }).toList() ?? [];
         }
         return [];
       },
@@ -198,7 +198,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         return GestureDetector(
           onLongPress: () => _showVersionPopUp(context),
           child:
-              Text(snapshot.data, style: Theme.of(context).textTheme.headline1),
+              Text(snapshot.data ?? '', style: Theme.of(context).textTheme.headline1),
         );
       });
 

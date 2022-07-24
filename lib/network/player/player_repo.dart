@@ -42,11 +42,13 @@ class PlayerRepository {
     var body = {
       'session_id': mediaItem.id,
       'session_title': mediaItem.title,
-      'session_length': mediaItem.extras[LENGTH],
+      'session_length': mediaItem.extras?[LENGTH],
       'session_voice': mediaItem.artist,
       'score': rating,
     };
-    unawaited(
-        httpPost(BASE_URL + _ratingExt, await generatedToken, body: body));
+    var token = await generatedToken;
+    if (token != null) {
+      unawaited(httpPost(BASE_URL + _ratingExt, token, body: body));
+    }
   }
 }

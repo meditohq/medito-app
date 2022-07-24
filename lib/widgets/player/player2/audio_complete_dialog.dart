@@ -8,11 +8,11 @@ import 'package:go_router/go_router.dart';
 import '../../../utils/colors.dart';
 
 class AudioCompleteDialog extends StatefulWidget {
-  final PlayerBloc bloc;
+  final PlayerBloc? bloc;
 
   final mediaItem;
 
-  const AudioCompleteDialog({Key key, this.bloc, this.mediaItem})
+  const AudioCompleteDialog({Key? key, this.bloc, this.mediaItem})
       : super(key: key);
 
   @override
@@ -282,21 +282,21 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
     setState(() {
       rated = true;
     });
-    widget.bloc.postRating(1, widget.mediaItem);
+    widget.bloc?.postRating(1, widget.mediaItem);
   }
 
   void _neutralFacePressed() {
     setState(() {
       rated = true;
     });
-    widget.bloc.postRating(2, widget.mediaItem);
+    widget.bloc?.postRating(2, widget.mediaItem);
   }
 
   void _happyFacePressed() {
     setState(() {
       rated = true;
     });
-    widget.bloc.postRating(3, widget.mediaItem);
+    widget.bloc?.postRating(3, widget.mediaItem);
   }
 
   void _onTwitterTap() {

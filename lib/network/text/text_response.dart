@@ -1,10 +1,10 @@
 class TextResponse {
   @Deprecated('use fields instead')
-  Data data;
-  int get id => data.id;
-  String get title => data.title;
-  String get subtitle => data.subtitle;
-  String get body => data.body;
+  Data? data;
+  int? get id => data?.id;
+  String? get title => data?.title;
+  String? get subtitle => data?.subtitle;
+  String? get body => data?.body;
 
 
   TextResponse({data});
@@ -16,17 +16,17 @@ class TextResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data?.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  int id;
-  String title;
-  String subtitle;
-  String body;
+  int? id;
+  String? title;
+  String? subtitle;
+  String? body;
 
   Data({id, title, subtitle, body});
 

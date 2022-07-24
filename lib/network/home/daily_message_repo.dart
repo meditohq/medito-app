@@ -20,7 +20,7 @@ import 'package:Medito/network/http_get.dart';
 class DailyMessageRepo {
   final _ext = 'items/daily_message';
 
-  Future<DailyMessageResponse> getMessage([bool skipCache = false]) async {
+  Future<DailyMessageResponse>? getMessage([bool skipCache = false]) async {
     final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
     return DailyMessageResponse.fromJson(response);
   }

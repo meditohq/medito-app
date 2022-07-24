@@ -5,7 +5,7 @@ class WidgetTestUtil {
   // and ScaffoldMessenger for showing the snackbar.
   // This is only needed when testing individual widget.
   // The app works without it because it is wrapped with MaterialApp at the top level.
-  static Widget wrapWidgetForTesting({@required Widget child}) {
+  static Widget wrapWidgetForTesting({required Widget? child}) {
     return MaterialApp(
       title: 'TestAppWrapper',
       home: Scaffold(

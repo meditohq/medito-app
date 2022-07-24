@@ -7,7 +7,7 @@ import '../btm_nav/home_widget.dart';
 import '../packs/packs_screen.dart';
 
 class HomeWrapperWidget extends StatefulWidget {
-  const HomeWrapperWidget({Key key}) : super(key: key);
+  const HomeWrapperWidget({Key? key}) : super(key: key);
 
   @override
   _HomeWrapperWidgetState createState() => _HomeWrapperWidgetState();
@@ -17,7 +17,7 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
-  bool _hasOpened;
+  bool _hasOpened = false;
 
   @override
   void initState() {
@@ -54,11 +54,11 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
           selectedLabelStyle: Theme.of(context)
               .textTheme
               .headline1
-              .copyWith(fontSize: 12),
+              ?.copyWith(fontSize: 12),
           unselectedLabelStyle: Theme.of(context)
               .textTheme
               .headline2
-              .copyWith(fontSize: 12),
+              ?.copyWith(fontSize: 12),
           selectedItemColor: MeditoColors.walterWhite,
           unselectedItemColor: MeditoColors.newGrey,
           currentIndex: _currentIndex,

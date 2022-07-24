@@ -25,9 +25,9 @@ import 'package:go_router/go_router.dart';
 import '../../utils/navigation_extra.dart';
 
 class AnnouncementBanner extends StatefulWidget {
-  AnnouncementBanner({Key key, this.hasOpened}) : super(key: key);
+  AnnouncementBanner({Key? key, this.hasOpened}) : super(key: key);
 
-  final bool hasOpened;
+  final bool? hasOpened;
 
   @override
   AnnouncementBannerState createState() => AnnouncementBannerState();
@@ -41,18 +41,18 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   @override
   void initState() {
     super.initState();
-    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened);
+    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened ?? false);
   }
 
   void refresh() {
-    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened);
+    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened ?? false);
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return StreamBuilder<AnnouncementResponse>(
-        stream: _bloc.announcementController.stream,
+        stream: _bloc.announcementController.stream ,
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data == null) {
             return Container();
@@ -60,10 +60,10 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
 
           return FutureBuilder<bool>(
               future: _bloc
-                  .shouldHideAnnouncement(snapshot.data?.timestamp.toString()),
+                  .shouldHideAnnouncement(snapshot.data?.timestamp?.toString()),
               initialData: false,
               builder: (context, showSnapshot) {
-                if (showSnapshot.data) {
+                if (showSnapshot.data == true) {
                   return Container();
                 }
 
@@ -72,7 +72,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                   child: AnimatedOpacity(
                     onEnd: () => {
                       _bloc.saveAnnouncementID(
-                          snapshot.data.timestamp.toString())
+                          snapshot.data?.timestamp.toString())
                     },
                     duration: Duration(milliseconds: 250),
                     opacity: _hidden ? 0 : 1,
@@ -88,7 +88,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                                 content: _buildTextAndButtonColumn(
                                     snapshot, context),
                                 leading:
-                                    snapshot.data.icon.isNotEmptyAndNotNull()
+                                    snapshot.data?.icon.isNotEmptyAndNotNull() == true
                                         ? buildCircleAvatar(snapshot)
                                         : Container(),
                                 actions: [Container()])),
@@ -103,7 +103,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
 
   List<Widget> buildActionsRow(AsyncSnapshot<AnnouncementResponse> snapshot) {
     var actions = [_buildDismissButton()];
-    if (!snapshot.data.buttonLabel.isEmptyOrNull()) {
+    if (snapshot.data?.buttonLabel?.isEmptyOrNull() == false) {
       actions.add(_buildPositiveButton(snapshot));
     }
     return actions;
@@ -114,11 +114,11 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(snapshot.data.body,
+        Text(snapshot.data?.body ?? '',
             style: Theme.of(context)
                 .textTheme
                 .subtitle1
-                .copyWith(color: MeditoColors.walterWhite)),
+                ?.copyWith(color: MeditoColors.walterWhite)),
         Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: buildActionsRow(snapshot))
@@ -130,9 +130,9 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     return Padding(
       padding: const EdgeInsets.only(bottom: 42.0),
       child: CircleAvatar(
-        backgroundColor: parseColor(snapshot.data.colorPrimary),
+        backgroundColor: parseColor(snapshot.data?.colorPrimary ?? ''),
         child: SvgPicture.asset(
-          'assets/images/${snapshot.data.icon}.svg',
+          'assets/images/${snapshot.data?.icon}.svg',
           color: MeditoColors.darkMoon,
         ),
       ),
@@ -145,9 +145,9 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
       style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.only(right: 30.0))),
       onPressed: () {
-        _openLink(snapshot.data.buttonType, snapshot.data.buttonPath);
+        _openLink(snapshot.data?.buttonType, snapshot.data?.buttonPath);
       },
-      child: Text(snapshot.data.buttonLabel.toUpperCase(),
+      child: Text(snapshot.data?.buttonLabel?.toUpperCase() ?? '',
           style:
               TextStyle(color: MeditoColors.walterWhite, letterSpacing: 0.2)),
     );
@@ -180,8 +180,8 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     );
   }
 
-  void _openLink(String buttonType, String buttonPath) {
-    context.go(getPathFromString(buttonType, [buttonPath]));
+  void _openLink(String? buttonType, String? buttonPath) {
+    context.go(getPathFromString(buttonType, [buttonPath ?? '']));
   }
 
   @override

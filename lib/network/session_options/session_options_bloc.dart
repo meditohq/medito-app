@@ -76,7 +76,7 @@ class SessionOptionsBloc {
   Future<void> fetchOptions(String id, {bool skipCache = false}) async {
     var options = await _repo.fetchOptions(id, skipCache);
 
-    var files = options.files
+    var files = options?.files
         ?.sortedBy((e) => clockTimeToDuration(e?.length).inMilliseconds)
         .toList()
         .reversed
@@ -90,16 +90,16 @@ class SessionOptionsBloc {
       var prefs = await SharedPreferences.getInstance();
       var lastSelectedVoice = prefs.getInt(LAST_SPEAKER_SELECTED + id);
       currentSelectedFileIndex =
-          lastSelectedVoice ?? options.files?.indexOf(files.first) ?? 0;
+          lastSelectedVoice ?? options?.files?.indexOf(files.first) ?? 0;
 
       // Show title, desc and image
       contentListController.sink.add(ApiResponse.completed(voiceGroups));
-      titleController.sink.add(options.title ?? '');
-      descController.sink.add(options.description ?? '');
-      imageController.sink.add(ApiResponse.completed(options.coverUrl));
-      backgroundImageController.sink.add(options.backgroundImageUrl ?? '');
-      primaryColourController.sink.add(options.colorPrimary ?? '');
-      secondaryColorController.sink.add(options.colorSecondary ?? '');
+      titleController.sink.add(options?.title ?? '');
+      descController.sink.add(options?.description ?? '');
+      imageController.sink.add(ApiResponse.completed(options?.coverUrl));
+      backgroundImageController.sink.add(options?.backgroundImageUrl ?? '');
+      primaryColourController.sink.add(options?.colorPrimary ?? '');
+      secondaryColorController.sink.add(options?.colorSecondary ?? '');
     }
     _options = options;
   }
@@ -188,10 +188,10 @@ class SessionOptionsBloc {
     backgroundImageController.close();
   }
 
-  AudioFile getCurrentlySelectedFile() {
+  AudioFile? getCurrentlySelectedFile() {
     try {
       return _options?.files != null
-          ? _options?.files[currentSelectedFileIndex]
+          ? (_options?.files?[currentSelectedFileIndex])
           : null;
     } catch (e, s) {
       // could be out of bounds exception

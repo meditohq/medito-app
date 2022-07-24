@@ -14,8 +14,8 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/main.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/network/cache.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -237,7 +237,7 @@ void markAsListened(String id) {
   unawaited(sharedPreferences.setBool('listened' + id, true));
 }
 
-void markAsNotListened(String id, String oldId) {
+void markAsNotListened(String id, String? oldId) {
   sharedPreferences.setBool('listened' + id, false);
   if (oldId != null) {
     sharedPreferences.setBool('listened' + oldId, false);
@@ -248,11 +248,13 @@ Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
 }
 
-bool checkListened(String id, {String oldId = ''}) {
+bool checkListened(String? id, {String? oldId = ''}) {
+  if (id == null) return false;
+
   var listened = sharedPreferences.getBool('listened' + id) ?? false;
 
   if (!listened && oldId.isNotEmptyAndNotNull()) {
-    return sharedPreferences.getBool('listened' + oldId) ?? false;
+    return sharedPreferences.getBool('listened' + oldId!) ?? false;
   } else {
     return listened;
   }

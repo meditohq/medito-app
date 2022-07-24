@@ -1,22 +1,22 @@
 class AnnouncementResponse {
   @Deprecated('Use fields instead')
-  Data data;
+  Data? data;
 
-  String get icon => data.icon;
+  String? get icon => data?.icon;
 
-  String get colorPrimary => data.colorPrimary;
+  String? get colorPrimary => data?.colorPrimary;
 
-  String get body => data.body;
+  String? get body => data?.body;
 
-  String get buttonLabel => data.buttonLabel;
+  String? get buttonLabel => data?.buttonLabel;
 
-  String get buttonType => data.buttonType;
+  String? get buttonType => data?.buttonType;
 
-  String get buttonPath => data.buttonPath;
+  String? get buttonPath => data?.buttonPath;
 
-  String get timestamp => data.timestamp;
+  String? get timestamp => data?.timestamp;
 
-  String get id => data.id;
+  String? get id => data?.id;
 
   AnnouncementResponse({data});
 
@@ -27,21 +27,21 @@ class AnnouncementResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data?.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String icon;
-  String colorPrimary;
-  String body;
-  String buttonLabel;
-  String buttonType;
-  String buttonPath;
-  String timestamp;
-  String id;
+  String? icon;
+  String? colorPrimary;
+  String? body;
+  String? buttonLabel;
+  String? buttonType;
+  String? buttonPath;
+  String? timestamp;
+  String? id;
 
   Data(
       {icon,

@@ -19,7 +19,7 @@ import 'package:Medito/network/http_get.dart';
 
 class PacksRepository {
 
-  Future<List<PacksData>> fetchPacks(bool skipCache) async {
+  Future<List<PacksData>?> fetchPacks(bool skipCache) async {
     final response = await httpGet(BASE_URL + 'items/packs', skipCache: skipCache);
     return PacksResponse.fromJson(response).data;
   }

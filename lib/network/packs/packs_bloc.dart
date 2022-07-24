@@ -20,9 +20,9 @@ import 'package:Medito/network/packs/packs_repo.dart';
 import 'package:Medito/network/packs/packs_response.dart';
 
 class PacksBloc {
-  PacksRepository _repo;
+  late PacksRepository _repo;
 
-  StreamController<ApiResponse<List<PacksData>>> packsListController;
+  late StreamController<ApiResponse<List<PacksData>>> packsListController;
 
   PacksBloc() {
     packsListController = StreamController.broadcast();
@@ -41,6 +41,6 @@ class PacksBloc {
   }
 
   void dispose() {
-    packsListController?.close();
+    packsListController.close();
   }
 }

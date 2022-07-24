@@ -48,13 +48,12 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-
-  MeditoAudioHandler _handler;
-  PlayerBloc _bloc;
+  MeditoAudioHandler? _handler;
+  late PlayerBloc _bloc;
 
   @override
   void dispose() {
-    _handler.stop();
+    _handler?.stop();
     _bloc.dispose();
     super.dispose();
   }
@@ -68,15 +67,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Future.delayed(Duration(milliseconds: 200)).then((value) async {
       var bgSound = await getBgSoundNameFromSharedPrefs();
       var volume = await retrieveSavedBgVolume();
-      await _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume});
-      return _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
+      await _handler
+          ?.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: volume});
+      return _handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
     });
   }
 
   void _startTimeout() {
     var timerMaxSeconds = 20;
     Timer.periodic(Duration(seconds: timerMaxSeconds), (timer) {
-      if (_handler.playbackState.value.processingState ==
+      if (_handler?.playbackState.value.processingState ==
               AudioProcessingState.loading &&
           mounted) {
         createSnackBar(TIMEOUT, context);
@@ -87,26 +87,32 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _handler = AudioHandlerInheritedWidget.of(context)?.audioHandler;
-    var mediaItem = _handler.mediaItem.value;
+    _handler = AudioHandlerInheritedWidget.of(context).audioHandler;
+    var mediaItem = _handler?.mediaItem.value;
 
     try {
-      if (_handler.mediaItem.value.extras[HAS_BG_SOUND]) getSavedBgSoundData();
+      if (_handler?.mediaItem.value?.extras?[HAS_BG_SOUND]) {
+        getSavedBgSoundData();
+      }
     } on Exception catch (e, s) {
       unawaited(Sentry.captureException(e,
-          stackTrace: s, hint: 'extras[HAS_BG_SOUND]: ${_handler.mediaItem.value.extras[HAS_BG_SOUND]}'));
+          stackTrace: s,
+          hint:
+              'extras[HAS_BG_SOUND]: ${_handler?.mediaItem.value?.extras?[HAS_BG_SOUND]}'));
     }
 
-    _handler.customEvent.stream.listen((event) {
-      if (mounted && event[AUDIO_COMPLETE] is bool && event[AUDIO_COMPLETE] == true) {
-        _trackSessionEnd(_handler.mediaItem.value);
+    _handler?.customEvent.stream.listen((event) {
+      if (mounted &&
+          event[AUDIO_COMPLETE] is bool &&
+          event[AUDIO_COMPLETE] == true) {
+        _trackSessionEnd(_handler?.mediaItem.value);
         showGeneralDialog(
             transitionDuration: Duration(milliseconds: 400),
             context: context,
             barrierColor: MeditoColors.darkMoon,
-            pageBuilder: (_,  __, ___) {
+            pageBuilder: (_, __, ___) {
               return AudioCompleteDialog(
-                  bloc: _bloc, mediaItem: _handler.mediaItem.value);
+                  bloc: _bloc, mediaItem: _handler?.mediaItem.value);
             });
       }
     });
@@ -121,10 +127,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _getAppBar(mediaItem),
+                  _getAppBar(),
                   // Show media item title
                   StreamBuilder<MediaItem>(
-                    stream: _handler.mediaItem,
+                    stream: _handler?.mediaItem.cast(),
                     builder: (context, snapshot) {
                       final mediaItem = snapshot.data;
                       return Column(
@@ -137,7 +143,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ),
                   Expanded(child: SizedBox.shrink()),
                   StreamBuilder<bool>(
-                    stream: _handler.playbackState
+                    stream: _handler?.playbackState
                         .map((state) => state.playing)
                         .distinct(),
                     builder: (context, snapshot) {
@@ -156,7 +162,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             ],
                           ),
                           _getBgMusicIconButton(
-                              mediaItem.extras[HAS_BG_SOUND] ?? true)
+                              mediaItem?.extras?[HAS_BG_SOUND] ?? true)
                         ],
                       );
                     },
@@ -165,7 +171,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   // A seek bar.
                   PositionIndicatorWidget(
                     handler: _handler,
-                    color: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
+                    color: parseColor(mediaItem?.extras?[PRIMARY_COLOUR]),
                   ),
                   Container(height: 24)
                 ])
@@ -184,15 +190,15 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget _getGradientWidget(MediaItem mediaItem, BuildContext context) {
+  Widget _getGradientWidget(MediaItem? mediaItem, BuildContext context) {
     return Align(
         alignment: Alignment.center,
         child: Container(
           decoration: BoxDecoration(
               gradient: RadialGradient(
             colors: [
-              parseColor(mediaItem.extras[PRIMARY_COLOUR]).withAlpha(100),
-              parseColor(mediaItem.extras[PRIMARY_COLOUR]).withAlpha(0),
+              parseColor(mediaItem?.extras?[PRIMARY_COLOUR]).withAlpha(100),
+              parseColor(mediaItem?.extras?[PRIMARY_COLOUR]).withAlpha(0),
             ],
             radius: 1.0,
           )),
@@ -201,7 +207,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ));
   }
 
-  MeditoAppBarWidget _getAppBar(MediaItem mediaItem) {
+  MeditoAppBarWidget _getAppBar() {
     return MeditoAppBarWidget(
       transparent: true,
       hasCloseButton: true,
@@ -209,7 +215,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget _getTitleRow(MediaItem mediaItem, bool complete) {
+  Widget _getTitleRow(MediaItem? mediaItem, bool complete) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       child: Row(
@@ -227,7 +233,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       future: _bloc.getVersionTitle(),
                       builder: (context, snapshot) {
                         return Text(
-                          snapshot.hasData ? snapshot.data : 'Loading...',
+                          snapshot.hasData ? (snapshot.data ?? '') : 'Loading...',
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -239,16 +245,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  TextStyle buildTitleTheme() {
+  TextStyle? buildTitleTheme() {
     return Theme.of(context).textTheme.headline1;
   }
 
-  Widget _getSubtitleWidget(MediaItem mediaItem, bool complete) {
+  Widget _getSubtitleWidget(MediaItem? mediaItem, bool complete) {
     var attr = '';
     if (complete) {
       attr = _bloc.version?.body ?? WELL_DONE_SUBTITLE;
     } else {
-      attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
+      attr = mediaItem?.extras != null ? (mediaItem?.extras?['attr']) : '';
     }
 
     return Padding(
@@ -287,36 +293,36 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget _playButton(MediaItem mediaItem) => Semantics(
+  Widget _playButton(MediaItem? mediaItem) => Semantics(
         label: 'Play button',
         child: PlayerButton(
           icon: Icons.play_arrow,
-          onPressed: () => _playPressed(mediaItem.extras[HAS_BG_SOUND] ?? true),
-          secondaryColor: parseColor(mediaItem.extras[SECONDARY_COLOUR]),
-          primaryColor: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
+          onPressed: () => _playPressed(mediaItem?.extras?[HAS_BG_SOUND] ?? true),
+          secondaryColor: parseColor(mediaItem?.extras?[SECONDARY_COLOUR]),
+          primaryColor: parseColor(mediaItem?.extras?[PRIMARY_COLOUR]),
         ),
       );
 
   Future<void> _playPressed(bool hasBgSound) async {
-    await _handler.play();
+    await _handler?.play();
     if (hasBgSound) await getSavedBgSoundData();
   }
 
-  Widget _pauseButton(MediaItem mediaItem) => Semantics(
+  Widget _pauseButton(MediaItem? mediaItem) => Semantics(
         label: 'Pause button',
         child: PlayerButton(
           icon: Icons.pause,
-          secondaryColor: parseColor(mediaItem.extras[SECONDARY_COLOUR]),
-          primaryColor: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
-          onPressed: _handler.pause,
+          secondaryColor: parseColor(mediaItem?.extras?[SECONDARY_COLOUR]),
+          primaryColor: parseColor(mediaItem?.extras?[PRIMARY_COLOUR]),
+          onPressed: _handler?.pause,
         ),
       );
 
   Future<void> getSavedBgSoundData() async {
     var file = await getBgSoundFileFromSharedPrefs();
     var name = await getBgSoundNameFromSharedPrefs();
-    unawaited(_handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: name}));
-    unawaited(_handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: file}));
+    unawaited(_handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: name}));
+    unawaited(_handler?.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: file}));
   }
 
   void _onBackPressed() {
@@ -330,9 +336,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return Text(
       label,
-      style: Theme.of(context).textTheme.subtitle2.copyWith(
-          color: parseColor(mediaItem.extras[SECONDARY_COLOUR]) ??
-              MeditoColors.darkMoon),
+      style: Theme.of(context).textTheme.subtitle2?.copyWith(
+          color: parseColor(mediaItem.extras?[SECONDARY_COLOUR])),
     );
   }
 
@@ -347,12 +352,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  void _trackSessionEnd(MediaItem mediaItem) {
+  void _trackSessionEnd(MediaItem? mediaItem) {
+    if (mediaItem == null) return;
     unawaited(Tracking.trackEvent({
       Tracking.TYPE: Tracking.AUDIO_COMPLETED,
-      Tracking.SESSION_ID: mediaItem.extras[SESSION_ID],
+      Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
       Tracking.SESSION_TITLE: mediaItem.title,
-      Tracking.SESSION_LENGTH: mediaItem.extras[LENGTH],
+      Tracking.SESSION_LENGTH: mediaItem.extras?[LENGTH],
       Tracking.SESSION_VOICE: mediaItem.artist
     }));
   }
@@ -362,7 +368,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       context: context,
       isScrollControlled: true,
       builder: (context) => ChooseBackgroundSoundDialog(
-          handler: _handler, stream: _bloc.bgSoundsListController.stream),
+          handler: _handler, stream: _bloc.bgSoundsListController?.stream),
     );
     // slight delay in case the cache returns before the sheet opens
     Future.delayed(Duration(milliseconds: 50))

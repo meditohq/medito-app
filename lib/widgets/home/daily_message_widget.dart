@@ -11,7 +11,7 @@ class DailyMessageWidget extends StatefulWidget {
   @override
   DailyMessageWidgetState createState() => DailyMessageWidgetState();
 
-  DailyMessageWidget({Key key}) : super(key: key);
+  DailyMessageWidget({Key? key}) : super(key: key);
 }
 
 class DailyMessageWidgetState extends State<DailyMessageWidget> {
@@ -39,21 +39,18 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
 
   Widget _buildDailyMessageItemWidget(
       AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot) {
-    if (!snapshot.hasData ||
-        snapshot.data == null ||
-        snapshot.data.body == null ||
-        snapshot.data.body.body.isEmptyOrNull()) {
+    if (snapshot.data == ApiResponse.loading()) {
       return DailyMessageItemWidget.loading(
           key: ValueKey('DailyMessageLoading'));
     } else {
-      switch (snapshot.data.status) {
+      switch (snapshot.data?.status) {
         case Status.LOADING:
           return DailyMessageItemWidget.loading(
             key: ValueKey('DailyMessageLoading'),
           );
         case Status.COMPLETED:
           return DailyMessageItemWidget(
-            data: snapshot.data.body,
+            data: snapshot.data?.body,
             key: ValueKey('DailyMessageCompleted'),
           );
         case Status.ERROR:

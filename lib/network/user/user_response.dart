@@ -1,5 +1,5 @@
 class UserResponse {
-  Data data;
+  Data? data;
 
   UserResponse({this.data});
 
@@ -10,14 +10,14 @@ class UserResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data?.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String id;
+  String? id;
 
   Data({this.id});
 

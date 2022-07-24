@@ -17,9 +17,9 @@ import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class LoadingItemWidget extends StatefulWidget {
-  LoadingItemWidget({Key key, this.index}) : super(key: key);
+  LoadingItemWidget({Key? key, this.index}) : super(key: key);
 
-  final int index;
+  final int? index;
 
   @override
   _LoadingItemWidgetState createState() => _LoadingItemWidgetState();
@@ -27,8 +27,8 @@ class LoadingItemWidget extends StatefulWidget {
 
 class _LoadingItemWidgetState extends State<LoadingItemWidget>
     with SingleTickerProviderStateMixin {
-  Animation<double> animation;
-  AnimationController controller;
+  late Animation<double> animation;
+  late AnimationController controller;
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _LoadingItemWidgetState extends State<LoadingItemWidget>
     }
   }
 
-  int getDuration() => (250 - (10 * widget.index));
+  int getDuration() => (250 - (10 * (widget.index ?? 0)));
 
   @override
   Widget build(BuildContext context) {

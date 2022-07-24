@@ -41,12 +41,12 @@ Future<dynamic> checkBgSoundExists(String name) async {
   return exists;
 }
 
-Future<dynamic> downloadBGMusicFromURL(String url, String name) async {
+Future<dynamic> downloadBGMusicFromURL(String? url, String? name) async {
   var path = (await getFilePath(name));
   var file = File(path);
   if (await file.exists()) return file.path;
   try {
-    var request = await http.get(Uri.parse(url),
+    var request = await http.get(Uri.parse(url ?? ''),
         headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
     var bytes = request.bodyBytes;
     await file.writeAsBytes(bytes);

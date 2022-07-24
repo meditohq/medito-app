@@ -54,7 +54,7 @@ class PackListItemWidget extends StatelessWidget {
   Text _getSubtitle(BuildContext context) =>
       Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
 
-  Text _getTitle(BuildContext context) => Text(data.title,
+  Text _getTitle(BuildContext context) => Text(data.title ?? '',
       style: Theme.of(context).textTheme.headline4,
       maxLines: 1,
       overflow: TextOverflow.ellipsis);
@@ -91,13 +91,13 @@ class PackListItemWidget extends StatelessWidget {
 }
 
 class PackImageListItemData {
-  String title;
-  String subtitle;
-  String cover;
-  String backgroundImage;
-  Color colorPrimary;
-  double coverSize;
-  Widget icon;
+  String? title;
+  String? subtitle;
+  String? cover;
+  String? backgroundImage;
+  Color? colorPrimary;
+  double? coverSize;
+  Widget? icon;
 
   PackImageListItemData(
       {this.title,

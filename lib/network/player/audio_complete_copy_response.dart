@@ -1,5 +1,5 @@
 class PlayerCopyResponse {
-  List<PlayerCopyData> data;
+  List<PlayerCopyData>? data;
 
   PlayerCopyResponse({data});
 
@@ -7,28 +7,26 @@ class PlayerCopyResponse {
     if (json['data'] != null) {
       data = <PlayerCopyData>[];
       json['data'].forEach((v) {
-        data.add(PlayerCopyData.fromJson(v));
+        data?.add(PlayerCopyData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
-    }
+    data['data'] = this.data?.map((v) => v.toJson()).toList();
     return data;
   }
 }
 
 class PlayerCopyData {
-  int id;
-  String body;
-  String buttonIcon;
-  String buttonLabel;
-  String buttonType;
-  String buttonPath;
-  String title;
+  int? id;
+  String? body;
+  String? buttonIcon;
+  String? buttonLabel;
+  String? buttonType;
+  String? buttonPath;
+  String? title;
 
   PlayerCopyData(
       {id,
