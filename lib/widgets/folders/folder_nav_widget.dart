@@ -148,7 +148,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           background: _getDismissibleBackgroundWidget(item),
           onDismissed: (direction) {
             setState(() {
-              toggleListenedStatus(item.id, item.oldId);
+              if (item.id != null && item.oldId != null) {
+                toggleListenedStatus(item.id!, item.oldId!);
+              }
             });
           },
           child: _getItemListWidget(item));
@@ -178,7 +180,9 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
   }
 
   Widget getSwipeableActionIcon(Item item) {
-    if (checkListened(item.id, oldId: item.oldId)) {
+    if (item.id != null &&
+        item.oldId != null &&
+        checkListened(item.id!, oldId: item.oldId!)) {
       return Icon(
         Icons.play_circle_fill,
         color: MeditoColors.walterWhite,
@@ -208,12 +212,12 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           var location = GoRouter.of(context).location;
         if (item.type == 'folder') {
           if (location.contains('folder2')) {
-            context.go(getPathFromString(Folder3Path, [location.split('/')[2], widget.id, item.id]));
+            context.go(getPathFromString(Folder3Path, [location.split('/')[2], widget.id, item.id ?? '']));
           } else {
-            context.go(getPathFromString(Folder2Path, [widget.id, item.id]));
+            context.go(getPathFromString(Folder2Path, [widget.id, item.id ?? '']));
           }
         } else {
-          context.go(location + getPathFromString(item.type, [item.id]));
+          context.go(location + getPathFromString(item.type, [item.id ?? '']));
         }
       } else {
         createSnackBar(CHECK_CONNECTION, context);

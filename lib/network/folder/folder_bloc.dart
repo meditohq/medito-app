@@ -24,7 +24,7 @@ class FolderItemsBloc {
 
   late Future<bool> selectedSessionListenedFuture;
   late Item selectedItem;
-  late FolderResponse? content;
+  FolderResponse? content;
 
   StreamController<ApiResponse<List<Item>>> itemsListController =
       StreamController.broadcast();
@@ -75,20 +75,20 @@ class FolderItemsBloc {
       }
     }
     if (!primaryColorController.isClosed) {
-      primaryColorController.sink.add(content.colour);
+      primaryColorController.sink.add(content.colour ?? '');
     }
     if (!backgroundImageController.isClosed) {
-      backgroundImageController.sink.add(content.backgroundImageUrl);
+      backgroundImageController.sink.add(content.backgroundImageUrl ?? '');
     }
   }
 
   void _postTitle(FolderResponse content) {
     try {
       if (!titleController.isClosed) {
-        titleController.sink.add(content.title);
+        titleController.sink.add(content.title ?? '');
       }
       if (!descriptionController.isClosed) {
-        descriptionController.sink.add(content.description);
+        descriptionController.sink.add(content.description ?? '');
       }
     } catch (e) {
       print('Title error');

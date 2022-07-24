@@ -7,11 +7,11 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:share/share.dart';
 
 class DailyMessageItemWidget extends StatelessWidget {
-  final DailyMessageResponse data;
+  final DailyMessageResponse? data;
 
-  DailyMessageItemWidget({Key key, @required this.data}) : super(key: key);
+  DailyMessageItemWidget({Key? key, @required this.data}) : super(key: key);
 
-  factory DailyMessageItemWidget.loading({Key key}) {
+  factory DailyMessageItemWidget.loading({Key? key}) {
     return DailyMessageItemWidget(
       data: null,
       key: key,
@@ -50,7 +50,7 @@ class DailyMessageItemWidget extends StatelessWidget {
   Widget _buildMarkdownBody(BuildContext context) {
     if (data != null) {
       return MarkdownBody(
-        data: data.body,
+        data: data?.body ?? '',
         onTapLink: _launchUrl,
         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
             .copyWith(p: Theme.of(context).textTheme.bodyText1),
@@ -62,13 +62,13 @@ class DailyMessageItemWidget extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     if (data != null) {
-      return Text(data.title.toUpperCase(), style: Theme.of(context).textTheme.subtitle2);
+      return Text(data?.title?.toUpperCase() ?? '', style: Theme.of(context).textTheme.subtitle2);
     } else {
       return LoadingTextBoxWidget(height: 23);
     }
   }
 
-  Future<void> Function() _createShareAction(DailyMessageResponse data) {
+  Future<void> Function() _createShareAction(DailyMessageResponse? data) {
     if (data != null) {
       return () => Share.share('${data.body} https://medito.app');
     } else {
@@ -76,7 +76,7 @@ class DailyMessageItemWidget extends StatelessWidget {
     }
   }
 
-  void _launchUrl(String text, String href, String title) {
+  void _launchUrl(String text, String? href, String? title) {
     launchUrl(href);
   }
 }

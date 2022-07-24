@@ -26,6 +26,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String? url,
     {double startHeight = 0.0}) {
+  if (url.isEmptyOrNull()) return Container();
   final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
   return CachedNetworkImage(
     fit: BoxFit.fill,

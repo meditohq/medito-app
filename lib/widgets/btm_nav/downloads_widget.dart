@@ -27,7 +27,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<MediaItem> _downloadList = [];
-  MeditoAudioHandler _audioHandler;
+  late MeditoAudioHandler _audioHandler;
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
     return Scaffold(
-      appBar: const MeditoAppBarWidget(
+      appBar: MeditoAppBarWidget(
         title: DOWNLOADS,
         transparent: true,
         hasCloseButton: true,
@@ -129,13 +129,13 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   PackListItemWidget _getListItemWidget(MediaItem item) {
     return PackListItemWidget(PackImageListItemData(
         title: item.title,
-        subtitle: '${item.artist} — ${_getDuration(item.extras[LENGTH])}',
+        subtitle: '${item.artist} — ${_getDuration(item.extras?[LENGTH])}',
         cover: item.artUri.toString(),
-        colorPrimary: parseColor(item.extras[PRIMARY_COLOUR]),
+        colorPrimary: parseColor(item.extras?[PRIMARY_COLOUR]),
         coverSize: 56));
   }
 
-  String _getDuration(String length) => formatSessionLength(length);
+  String _getDuration(String? length) => formatSessionLength(length);
 
   void _openPlayer(MediaItem item, BuildContext context) {
     _audioHandler.playMediaItem(item);

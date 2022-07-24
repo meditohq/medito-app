@@ -149,17 +149,20 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
   return MaterialPage(key: state.pageKey, child: PlayerWidget());
 }
 
-MaterialPage<void>? getFolderMaterialPage(GoRouterState state) {
-  switch(state.params.length){
-    case 1:  return MaterialPage(
-        key: state.pageKey, child: FolderNavWidget(id: state.params['fid']));
-    case 2:  return MaterialPage(
-        key: state.pageKey, child: FolderNavWidget(id: state.params['f2id']));
-    case 3:  return MaterialPage(
-        key: state.pageKey, child: FolderNavWidget(id: state.params['f3id']));
-    default: return null;
+MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
+  if (state.params.length == 1) {
+    return MaterialPage(
+        key: state.pageKey,
+        child: FolderNavWidget(id: state.params['fid'] ?? ''));
+  } else if (state.params.length == 2) {
+    return MaterialPage(
+        key: state.pageKey,
+        child: FolderNavWidget(id: state.params['f2id'] ?? ''));
+  } else {
+    return MaterialPage(
+        key: state.pageKey,
+        child: FolderNavWidget(id: state.params['f3id'] ?? ''));
   }
-
 }
 
 String getPathFromString(String? place, List<String> ids) {

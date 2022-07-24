@@ -2,7 +2,7 @@ import 'package:Medito/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 
 class LoadingTextBoxWidget extends StatelessWidget {
-  final double height;
+  final double? height;
 
   LoadingTextBoxWidget({this.height});
 

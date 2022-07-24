@@ -19,13 +19,13 @@ import 'package:flutter/material.dart';
 
 class StreakTileWidget extends StatefulWidget {
   StreakTileWidget(this.future, this.title,
-      {Key key, this.onClick, this.optionalText, this.editable = false})
+      {Key? key, this.onClick, this.optionalText, this.editable = false})
       : super(key: key);
 
-  final Future future;
+  final Future<String>? future;
   final String title;
-  final Function onClick;
-  final UnitType optionalText;
+  final void Function()? onClick;
+  final UnitType? optionalText;
   final bool editable;
 
   @override
@@ -39,10 +39,10 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
         future: widget.future,
         initialData: '0',
         builder: (context, snapshot) {
-          var unit;
+          String unit = '';
           if (snapshot.hasData) {
-            var value = int.parse(snapshot?.data);
-            unit = getUnits(widget.optionalText, value);
+            var value = int.parse(snapshot.data ?? '');
+            unit = getUnits(widget.optionalText ?? UnitType.day, value);
           }
           return InkWell(
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
@@ -67,10 +67,9 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   }
 
   Text _getDataTextWidget(
-      AsyncSnapshot<String> snapshot, unit, BuildContext context) {
+      AsyncSnapshot<String> snapshot, String unit, BuildContext context) {
     return Text(
-      (snapshot.hasData ? _formatSnapshotData(snapshot) : '') + unit ??
-          '',
+      (snapshot.hasData ? _formatSnapshotData(snapshot) : '') + unit,
       style: Theme.of(context).textTheme.headline5,
       overflow: TextOverflow.fade,
       maxLines: 2,
@@ -85,7 +84,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   }
 
   String _formatSnapshotData(AsyncSnapshot<String> snapshot) {
-    var value = snapshot?.data ?? '0';
+    var value = snapshot.data ?? '0';
     if (value.length > 5) {
       return '999+';
     }

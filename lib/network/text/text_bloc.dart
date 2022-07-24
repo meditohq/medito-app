@@ -27,10 +27,10 @@ class TextBloc {
       var data = await _repo.fetchData(id, skipCache);
 
       if (!titleController.isClosed) {
-        titleController.sink.add(data.title);
+        titleController.sink.add(data.title ?? '');
       }
       if (!bodyController.isClosed) {
-        bodyController.sink.add(data.body);
+        bodyController.sink.add(data.body ?? '');
       }
     }
   }

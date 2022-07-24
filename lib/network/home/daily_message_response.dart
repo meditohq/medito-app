@@ -1,10 +1,10 @@
 class DailyMessageResponse {
 
-  Data _data;
+  Data? _data;
 
-  String get title => _data?.title ?? '';
+  String? get title => _data?.title ?? '';
 
-  String get body => _data?.body ?? '';
+  String? get body => _data?.body ?? '';
 
   DailyMessageResponse(this._data);
 
@@ -15,7 +15,7 @@ class DailyMessageResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     if (_data != null) {
-      data['data'] = _data.toJson();
+      data['data'] = _data?.toJson();
     }
     return data;
   }
@@ -23,8 +23,8 @@ class DailyMessageResponse {
 }
 
 class Data {
-  String title;
-  String body;
+  String? title;
+  String? body;
 
   Data({this.title, this.body});
 

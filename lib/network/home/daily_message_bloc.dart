@@ -20,8 +20,8 @@ import 'package:Medito/network/home/daily_message_repo.dart';
 import 'package:Medito/network/home/daily_message_response.dart';
 
 class DailyMessageBloc {
-  DailyMessageRepo _repo;
-  StreamController<ApiResponse<DailyMessageResponse>> coursesList;
+  late DailyMessageRepo _repo;
+  late StreamController<ApiResponse<DailyMessageResponse>> coursesList;
 
   DailyMessageBloc() {
     _repo = DailyMessageRepo();

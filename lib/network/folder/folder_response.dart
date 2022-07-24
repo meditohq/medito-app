@@ -19,25 +19,25 @@ class FolderResponse {
 
   bool get hasData => _data != null;
 
-  String get title => _data?.title;
+  String? get title => _data?.title;
 
-  String get description => _data?.description;
+  String? get description => _data?.description;
 
-  String get colour => _data?.primaryColor;
+  String? get colour => _data?.primaryColor;
 
-  String get backgroundImageUrl => _data?.backgroundImage?.toAssetUrl();
+  String? get backgroundImageUrl => _data?.backgroundImage?.toAssetUrl();
 
-  String get cover => _data?.cover;
+  String? get cover => _data?.cover;
 
-  String get coverUrl => cover?.toAssetUrl();
+  String? get coverUrl => cover?.toAssetUrl();
 
-  String get id => _data?.id.toString();
+  String? get id => _data?.id.toString();
 
-  List<Item> get items => _data?.items
+  List<Item>? get items => _data?.items
       ?.map((e) => e.item)
-      ?.toList()
-      ?.whereType<Item>()
-      ?.toList(); //removes nulls
+      .toList()
+      .whereType<Item>()
+      .toList(); //removes nulls
 
   FolderResponse({data});
 
@@ -47,21 +47,19 @@ class FolderResponse {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (data != null) {
-      data['data'] = this._data.toJson();
-    }
+    data['data'] = _data?.toJson();
     return data;
   }
 }
 
 class Data {
-  int id;
-  String title;
-  String description;
-  String primaryColor;
-  String backgroundImage;
-  String cover;
-  List<Items> items;
+  int? id;
+  String? title;
+  String? description;
+  String? primaryColor;
+  String? backgroundImage;
+  String? cover;
+  List<Items>? items;
 
   Data({id, title, subtitle, cover, items});
 
@@ -75,7 +73,7 @@ class Data {
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items.add(Items.fromJson(v));
+        items?.add(Items.fromJson(v));
       });
     }
   }
@@ -89,7 +87,7 @@ class Data {
     data['color_primary'] = primaryColor;
     data['cover'] = cover;
     if (items != null) {
-      data['items'] = items.map((v) => v.toJson()).toList();
+      data['items'] = items?.map((v) => v.toJson()).toList();
     }
     return data;
   }

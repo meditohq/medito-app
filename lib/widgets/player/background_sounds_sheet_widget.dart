@@ -32,7 +32,7 @@ import '../../audioplayer/audio_inherited_widget.dart';
 
 class ChooseBackgroundSoundDialog extends StatefulWidget {
   final stream;
-  final MeditoAudioHandler handler;
+  final MeditoAudioHandler? handler;
 
   ChooseBackgroundSoundDialog({this.handler, this.stream});
 
@@ -48,10 +48,10 @@ class _ChooseBackgroundSoundDialogState
 
   /// Tracks the bgVolume while the user drags the bgVolume bar.
   final BehaviorSubject<double> _dragBgVolumeSubject =
-  BehaviorSubject.seeded(null);
+      BehaviorSubject.seeded(0);
 
-  MeditoAudioHandler _handler;
-  String _downloadingItem;
+  MeditoAudioHandler? _handler;
+  String? _downloadingItem;
   var _volume;
 
   @override
@@ -70,9 +70,9 @@ class _ChooseBackgroundSoundDialogState
   void initService() async {
     var bgSound = await getBgSoundNameFromSharedPrefs();
     _volume = await retrieveSavedBgVolume();
-    await Future.delayed(Duration(milliseconds: 200)).then((value) {
-      _handler.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: _volume});
-      return _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
+    await await Future.delayed(Duration(milliseconds: 200)).then((value) {
+      _handler?.customAction(SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: _volume});
+      return _handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: bgSound});
     });
   }
 
@@ -89,10 +89,11 @@ class _ChooseBackgroundSoundDialogState
               _isOffline = true;
             }
             return StreamBuilder<dynamic>(
-                stream: widget.handler.customEvent.stream,
+                stream: widget.handler?.customEvent.stream,
                 initialData: {SEND_BG_SOUND: NONE},
                 builder: (context, snapshot) {
-                  var currentSound = _getCurrentSoundFromSnapshot(snapshot.data);
+                  var currentSound =
+                      _getCurrentSoundFromSnapshot(snapshot.data);
                   return DraggableScrollableSheet(
                     expand: false,
                     builder: (BuildContext context,
@@ -123,7 +124,7 @@ class _ChooseBackgroundSoundDialogState
         stream: widget.stream,
         initialData: ApiResponse.loading(),
         builder: (context, snapshot) {
-          switch (snapshot.data.status) {
+          switch (snapshot.data?.status) {
             case Status.LOADING:
               return Center(
                   child: const CircularProgressIndicator(
@@ -132,7 +133,7 @@ class _ChooseBackgroundSoundDialogState
                           MeditoColors.walterWhite)));
               break;
             case Status.COMPLETED:
-              var list = snapshot.data.body.data;
+              var list = snapshot.data?.body?.data;
 
               var widgetList = <Widget>[
                 Divider(height: 16),
@@ -142,10 +143,12 @@ class _ChooseBackgroundSoundDialogState
                 Divider(height: 16),
                 _getNoneListItem(currentSound)
               ];
-              widgetList.addAll(list
-                  .map<Widget>((e) =>
-                  _getBackgroundSoundListTile(e, currentSound, context))
-                  .toList());
+              if (list != null) {
+                widgetList.addAll(list
+                    .map<Widget>((e) =>
+                        _getBackgroundSoundListTile(e, currentSound, context))
+                    .toList());
+              }
 
               return ListView(
                   controller: scrollController, children: widgetList);
@@ -175,10 +178,12 @@ class _ChooseBackgroundSoundDialogState
               Divider(height: 16),
               _getNoneListItem(currentSound)
             ];
-            widgetList.addAll(list
-                .map((e) =>
-                _getBackgroundSoundListTile(e, currentSound, context))
-                .toList());
+            if (list != null) {
+              widgetList.addAll(list
+                  .map((e) =>
+                      _getBackgroundSoundListTile(e, currentSound, context))
+                  .toList());
+            }
 
             return ListView(controller: scrollController, children: widgetList);
           } else {
@@ -213,8 +218,8 @@ class _ChooseBackgroundSoundDialogState
     );
   }
 
-  TextStyle _getTheme(current, String name) {
-    return Theme.of(context).textTheme.bodyText2.copyWith(
+  TextStyle? _getTheme(current, String? name) {
+    return Theme.of(context).textTheme.bodyText2?.copyWith(
         fontWeight:
             _isSelected(current, name) ? FontWeight.w600 : FontWeight.normal,
         color: _isSelected(current, name)
@@ -228,11 +233,11 @@ class _ChooseBackgroundSoundDialogState
         child: child,
       );
 
-  bool _isSelected(String current, String name) => current == name || (current == '' && name == NONE);
+  bool _isSelected(String? current, String? name) => current == name || (current == '' && name == NONE);
 
   Widget _getBackgroundSoundListTile(
       BackgroundSoundData item, String current, BuildContext context) {
-    var assetUrl = item.file.toAssetUrl();
+    var assetUrl = item.file?.toAssetUrl();
     return InkWell(
         onTap: () {
           setState(() {
@@ -251,8 +256,8 @@ class _ChooseBackgroundSoundDialogState
             }
             _downloadingItem = '';
             addBgSoundSelectionToSharedPrefs(filePath, item.name);
-            widget.handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: filePath});
-            return widget.handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: item.name});
+            widget.handler?.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: filePath});
+            return widget.handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: item.name});
           });
         },
         child: ListTile(
@@ -261,7 +266,7 @@ class _ChooseBackgroundSoundDialogState
             trailing: _isDownloading(item)
                 ? _getSmallLoadingWidget()
                 : _getVisibilityWidget(
-                    item.name,
+                    item.name ?? '',
                     current,
                     Icon(
                       Icons.check_circle_outline,
@@ -285,8 +290,8 @@ class _ChooseBackgroundSoundDialogState
 
   void _noneSelected() {
     print('selecting NONE');
-    _handler.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: ''});
-    _handler.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: ''});
+    _handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: ''});
+    _handler?.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: ''});
     addBgSoundSelectionToSharedPrefs('', '');
   }
 
@@ -307,7 +312,7 @@ class _ChooseBackgroundSoundDialogState
         child: StreamBuilder<Object>(
             stream: _dragBgVolumeSubject,
             builder: (context, snapshot) {
-              var volume = _dragBgVolumeSubject.value ?? _volume;
+              var volume = _dragBgVolumeSubject.value;
               var volumeIcon = _volumeIconFunction(volume);
               return Row(
                 mainAxisSize: MainAxisSize.min,
@@ -328,10 +333,10 @@ class _ChooseBackgroundSoundDialogState
                           inactiveColor:
                           MeditoColors.walterWhite.withOpacity(0.7),
                           max: 1.0,
-                          value: volume ?? 0,
+                          value: volume,
                           onChanged: (value) {
                             _dragBgVolumeSubject.add(value);
-                            _handler.customAction(
+                            _handler?.customAction(
                                 SET_BG_SOUND_VOL,
                                 {SET_BG_SOUND_VOL: value});
                           },

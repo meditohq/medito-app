@@ -107,7 +107,7 @@ class _StatsWidgetState extends State<StatsWidget> {
               style: Theme.of(context)
                   .textTheme
                   .subtitle2
-                  .copyWith(letterSpacing: 1.5),
+                  ?.copyWith(letterSpacing: 1.5),
               decoration: InputDecoration(
                   border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red))),
