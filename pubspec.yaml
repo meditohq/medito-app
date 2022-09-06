@@ -25,29 +25,27 @@ dependencies:
   url_launcher: ^6.0.3
   flutter_markdown: ^0.6.7
   shared_preferences: ^2.0.5
-  cached_network_image: ^3.2.1
   auto_size_text: ^3.0.0-nullsafety.0
-  just_audio: ^0.9.5
-  audio_session: ^0.1.0
-  audio_service: ^0.18.3
+  just_audio: ^0.9.28
+  audio_session: ^0.1.10
+  audio_service: ^0.18.7
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2
-  provider: ^6.0.0
   package_info: ^2.0.0
   pedantic: ^1.11.0
   connectivity: ^3.0.3
   device_info: ^2.0.0
   dart_ipify: ^1.0.2
   equatable: ^2.0.0
-  sentry_flutter: ^6.5.1
+  sentry_flutter: ^6.9.1
   back_button_interceptor: ^5.0.0
   go_router: ^3.0.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^0.3.0
+#  mocktail: ^0.3.0
 
 
 # For information on the generic Dart part of this file, see the
