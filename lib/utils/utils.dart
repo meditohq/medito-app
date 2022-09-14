@@ -18,7 +18,6 @@ import 'dart:io';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/utils/colors.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,11 +27,7 @@ Widget getNetworkImageWidget(String? url,
     {double startHeight = 0.0}) {
   if (url.isEmptyOrNull()) return Container();
   final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
-  return CachedNetworkImage(
-    fit: BoxFit.fill,
-    httpHeaders: headers,
-    imageUrl: url ?? '',
-  );
+  return Image.network(url ?? '', fit: BoxFit.fill, headers: headers);
 }
 
 Future<bool> checkConnectivity() async {

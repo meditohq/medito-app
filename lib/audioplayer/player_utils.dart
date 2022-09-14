@@ -19,6 +19,7 @@ import 'dart:io';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -28,6 +29,7 @@ var bgDownloadListener = ValueNotifier<double>(0);
 int bgTotal = 1, bgReceived = 0;
 
 Future<dynamic> checkFileExists(AudioFile currentFile) async {
+  if(kIsWeb) return null;
   var filePath = (await getFilePath(currentFile.id));
   var file = File(filePath);
   var exists = await file.exists();
@@ -35,6 +37,7 @@ Future<dynamic> checkFileExists(AudioFile currentFile) async {
 }
 
 Future<dynamic> checkBgSoundExists(String name) async {
+  if(kIsWeb) return null;
   var filePath = (await getFilePath(name));
   var file = File(filePath);
   var exists = await file.exists();
@@ -42,6 +45,8 @@ Future<dynamic> checkBgSoundExists(String name) async {
 }
 
 Future<dynamic> downloadBGMusicFromURL(String? url, String? name) async {
+  if(kIsWeb) return null;
+
   var path = (await getFilePath(name));
   var file = File(path);
   if (await file.exists()) return file.path;
@@ -59,11 +64,14 @@ Future<dynamic> downloadBGMusicFromURL(String? url, String? name) async {
 }
 
 Future<String> getFilePath(String? mediaItemId) async {
+  if(kIsWeb) return '';
+
   var dir = (await getApplicationSupportDirectory()).path;
   return '$dir/${mediaItemId?.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
 }
 
 Future<dynamic> getDownload(String filename) async {
+  if(kIsWeb) return '';
   var path = (await getFilePath(filename));
   var file = File(path);
   if (await file.exists()) {
