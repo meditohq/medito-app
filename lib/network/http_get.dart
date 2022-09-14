@@ -44,7 +44,16 @@ Future httpGet(String url,
   if (cache == null) {
     final response = await get(
       Uri.parse(url),
-      headers: {HttpHeaders.authorizationHeader: auth},
+      headers: {
+        HttpHeaders.authorizationHeader: auth,
+        HttpHeaders.accessControlAllowOriginHeader: '*',
+        HttpHeaders.accessControlAllowHeadersHeader: 'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
+        HttpHeaders.accessControlAllowCredentialsHeader: 'true',
+        HttpHeaders.accessControlAllowMethodsHeader: 'POST, OPTIONS, HEAD, GET',
+        HttpHeaders.contentTypeHeader: ContentType.json.value,
+        HttpHeaders.refererHeader: 'no-referrer-when-downgrade',
+        HttpHeaders.acceptHeader: '*/*'
+      },
     );
 
     if (response.statusCode == 200) {

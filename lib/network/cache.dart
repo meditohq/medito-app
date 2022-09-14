@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 const TILES_ID = 'tiles';
@@ -25,21 +26,24 @@ const ATTRIBUTIONS = 'attrs';
 const TEXT = 'text';
 
 Future<void> clearStorage() async {
-  final cacheDir = await getApplicationDocumentsDirectory();
+  if(!kIsWeb) {
+    final cacheDir = await getApplicationDocumentsDirectory();
 
-  await cacheDir.list(recursive: true).forEach((element) {
-    print(element.path);
-    try {
-      if (element.path.endsWith('txt') || element.path.endsWith('mp3')) {
-        element.deleteSync(recursive: true);
+    await cacheDir.list(recursive: true).forEach((element) {
+      print(element.path);
+      try {
+        if (element.path.endsWith('txt') || element.path.endsWith('mp3')) {
+          element.deleteSync(recursive: true);
+        }
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {
-      print(e);
-    }
-  });
+    });
+  }
 }
 
 Future<String> get _localPath async {
+  if(kIsWeb) return '';
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
 }
