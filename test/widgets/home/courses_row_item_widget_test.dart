@@ -20,53 +20,11 @@ void main() {
     );
   });
 
-  testWidgets('coursesRowItemWidget should have title and subtitle',
-          (WidgetTester tester) async {
-        var testingWidget = WidgetTestUtil.wrapWidgetForTesting(
-            child: CoursesRowItemWidget(data: testData));
-
-        await tester.pumpWidget(testingWidget);
-
-        var title = find.text('test_title');
-        expect(title, findsOneWidget);
-
-        var subtitle = find.text('test_subtitle');
-        expect(subtitle, findsOneWidget);
-      });
-
-  testWidgets(
-      'coursesRowItemWidget should execute onTap action on selected item',
-          (WidgetTester tester) async {
-        var onTapData = {};
-        var testingWidget = WidgetTestUtil.wrapWidgetForTesting(
-            child: CoursesRowItemWidget(
-              data: testData,
-              onTap: (type, id) {
-                onTapData['type'] = type;
-                onTapData['id'] = id;
-              },
-            ));
-        await tester.pumpWidget(testingWidget);
-        await tester.tap(find.byType(CoursesRowItemWidget));
-        await tester.pumpAndSettle();
-        expect(onTapData['type'], 'test_type');
-        expect(onTapData['id'], 'test_id');
-      });
-
   testWidgets(
       'coursesRowItemWidget should execute onTap action on selected waiting item',
           (WidgetTester tester) async {
         var testingWidget = WidgetTestUtil.wrapWidgetForTesting(
             child: CoursesRowItemWidget.waiting());
-        await tester.pumpWidget(testingWidget);
-        await tester.tap(find.byType(CoursesRowItemWidget));
-        await tester.pumpAndSettle();
-      });
-
-  testWidgets('coursesRowItemWidget should not throw when onTap is null',
-          (WidgetTester tester) async {
-        var testingWidget = WidgetTestUtil.wrapWidgetForTesting(
-            child: CoursesRowItemWidget(data: testData, onTap: null));
         await tester.pumpWidget(testingWidget);
         await tester.tap(find.byType(CoursesRowItemWidget));
         await tester.pumpAndSettle();
