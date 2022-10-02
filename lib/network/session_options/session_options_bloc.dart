@@ -130,7 +130,7 @@ class SessionOptionsBloc {
   void _trackSessionStart(MediaItem mediaItem) {
     unawaited(Tracking.trackEvent({
       Tracking.TYPE: Tracking.AUDIO_STARTED,
-      Tracking.SESSION_ID: mediaItem.id,
+      Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
       Tracking.SESSION_TITLE: mediaItem.title,
       Tracking.SESSION_LENGTH: mediaItem.extras?[LENGTH],
       Tracking.SESSION_VOICE: mediaItem.artist
