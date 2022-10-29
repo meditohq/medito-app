@@ -36,7 +36,6 @@ dependencies:
   pedantic: ^1.11.0
   connectivity: ^3.0.3
   device_info: ^2.0.0
-  dart_ipify: ^1.0.2
   equatable: ^2.0.0
   sentry_flutter: ^6.9.1
   back_button_interceptor: ^5.0.0

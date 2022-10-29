@@ -88,7 +88,6 @@ Future httpGet(String url,
 Future httpPost(String url, String token,
     {dynamic body = const <String, String>{}}) async {
   assert(token.isNotEmpty);
-  assert(token != null);
   try {
     final response = await post(
       Uri.parse(url),

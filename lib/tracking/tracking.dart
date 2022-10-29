@@ -17,7 +17,9 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class Tracking {
   static const String FOLDER_TAPPED = 'folder_tapped';
@@ -33,8 +35,8 @@ class Tracking {
   static const String SESSION = 'sessions';
 
   //for audio started
-  static const String SESSION_VOICE = 'session_voice';
-  static const String SESSION_LENGTH = 'session_length';
+  static const String SESSION_GUIDE = 'session_guide';
+  static const String SESSION_DURATION = 'session_duration';
   static const String SESSION_TITLE = 'session_title';
   static const String SESSION_ID = 'session_id';
   static const String SESSION_BACKGROUND_SOUND = 'session_background_sound';
@@ -44,24 +46,47 @@ class Tracking {
 
   static const String DESTINATION = 'destination';
   static const String TYPE = 'type';
+  static const String APP_VERSION = 'app_version';
   static const String ITEM = 'item';
-
-  static String get url => BASE_URL + 'items/analytics_sessions/';
-
-  static Future<void> trackEvent(Map<String, dynamic> map) async {
-    //only track in release mode, not debug
-    if (kReleaseMode) {
-      var token = await generatedToken;
-      if (token != null) {
-        unawaited(httpPost(url, token, body: map));
-      }
-    }
-  }
 
   static List<Map<String, String>> destinationData(String type, String item) {
     return [
       {TYPE: type, ITEM: item}
     ];
+  }
+
+  static Future<void> postUsage(String type,
+      [Map<String, String> body = const {}]) async {
+    if (kReleaseMode) {
+      var version = await PackageInfo.fromPlatform()
+        ..buildNumber;
+      var deviceInfo = await getDeviceDetails();
+
+      var ext = 'items/usage/';
+      var url = BASE_URL + ext;
+      try {
+        var token = await generatedToken;
+        if (token != null) {
+          unawaited(
+            httpPost(
+              url,
+              token,
+              body: {
+                Tracking.APP_VERSION: version,
+                Tracking.TYPE: type,
+              }
+                ..addAll(deviceInfo)
+                ..addAll(body),
+            ),
+          );
+        }
+      } catch (e, str) {
+        unawaited(
+            Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
+        print('post usage failed: ' + e.toString());
+        return;
+      }
+    }
   }
 }
 
