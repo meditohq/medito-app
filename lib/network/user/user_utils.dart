@@ -4,13 +4,14 @@ import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_response.dart';
-import 'package:dart_ipify/dart_ipify.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../tracking/tracking.dart';
 
 Future<bool> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
@@ -25,7 +26,7 @@ Future _logAccount(SharedPreferences prefs) async {
     if (user.isEmpty) {
       await _updateUserCredentials(prefs);
     }
-    unawaited(_postUsage());
+    unawaited(Tracking.postUsage(APP_OPENED));
   }
 }
 
@@ -35,26 +36,8 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
   await prefs.setString(TOKEN, map?[TOKEN] ?? '');
 
   Sentry.configureScope(
-    (scope) => scope.user = SentryUser(id: map?[USER_ID]),
+        (scope) => scope.setUser(SentryUser(id: map?[USER_ID])),
   );
-}
-
-Future<void> _postUsage() async {
-  var packageInfo = await PackageInfo.fromPlatform();
-  var version = packageInfo.buildNumber;
-
-  var ext = 'items/usage/';
-  var url = BASE_URL + ext;
-  try {
-    var token = await generatedToken;
-    if (token != null) {
-      unawaited(httpPost(url, token, body: {'app_version': version}));
-    }
-  } catch (e, str) {
-    unawaited(Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
-    print('post usage failed: ' + e.toString());
-    return;
-  }
 }
 
 //clears storage if this is first open, and returns true if the user has opened the app before
@@ -78,10 +61,6 @@ class UserRepo {
 
     var now = DateTime.now().millisecondsSinceEpoch.toString();
 
-    var deviceModel;
-    var deviceOS;
-    var devicePlatform;
-
     var deviceInfoMap = await getDeviceDetails();
 
     var version = '';
@@ -98,11 +77,7 @@ class UserRepo {
       'email': '$now@medito.user',
       'password': UniqueKey().toString(),
       'token': token,
-      'ip_address': await getIP(),
-      'device_model': deviceModel,
       'app_version': version,
-      'device_os': deviceOS,
-      'device_platform': devicePlatform,
       'device_language': io.Platform.localeName,
     }..addAll(deviceInfoMap);
 
@@ -119,15 +94,6 @@ class UserRepo {
     }
   }
 
-  static Future<String> getIP() async {
-    var ip = '';
-    try {
-      ip = await Ipify.ipv4();
-    } catch (e) {
-      print(e);
-    }
-    return ip;
-  }
 }
 
 Future<String?> get generatedToken async {
@@ -135,10 +101,11 @@ Future<String?> get generatedToken async {
   return prefs.getString(TOKEN);
 }
 
-Future<Map<String, dynamic>> getDeviceDetails() async {
+Future<Map<String, String>> getDeviceDetails() async {
   var deviceModel;
   var deviceOS;
   var devicePlatform;
+  var deviceLanguage = io.Platform.localeName;
 
   var deviceInfo = DeviceInfoPlugin();
 
@@ -166,7 +133,8 @@ Future<Map<String, dynamic>> getDeviceDetails() async {
   return {
     DEVICE_MODEL: deviceModel,
     DEVICE_OS: deviceOS,
-    DEVICE_PLATFORM: devicePlatform
+    DEVICE_PLATFORM: devicePlatform,
+    DEVICE_LANGUAGE: deviceLanguage
   };
 }
 
@@ -177,13 +145,14 @@ Future<String> getDeviceInfoString() async {
   var version = packageInfo.version;
   var buildNumber = packageInfo.buildNumber;
 
-  return 'Version: $version \n Device: ${device} \n Build Number: $buildNumber \n ReleaseMode: $kReleaseMode';
-
+  return 'Version: $version \n Device: $device \n Build Number: $buildNumber \n ReleaseMode: $kReleaseMode';
 }
 
 const DEVICE_MODEL = 'device_model';
 const DEVICE_OS = 'device_os';
 const DEVICE_PLATFORM = 'device_platform';
+const DEVICE_LANGUAGE = 'device_language';
 const TOKEN = 'token_v3';
 const USER_ID = 'userId_v3';
 const HAS_OPENED = 'hasOpened';
+const APP_OPENED = 'app_opened';

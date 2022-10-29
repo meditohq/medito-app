@@ -354,13 +354,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _trackSessionEnd(MediaItem? mediaItem) {
     if (mediaItem == null) return;
-    unawaited(Tracking.trackEvent({
-      Tracking.TYPE: Tracking.AUDIO_COMPLETED,
-      Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
-      Tracking.SESSION_TITLE: mediaItem.title,
-      Tracking.SESSION_LENGTH: mediaItem.extras?[LENGTH],
-      Tracking.SESSION_VOICE: mediaItem.artist
-    }));
+    unawaited(
+      Tracking.postUsage(
+        Tracking.AUDIO_COMPLETED,
+        {
+          Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
+          Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH],
+          Tracking.SESSION_GUIDE: mediaItem.artist ?? ''
+        },
+      ),
+    );
   }
 
   void _onBgMusicPressed() {
