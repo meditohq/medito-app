@@ -132,7 +132,7 @@ class MeditoAudioHandler extends BaseAudioHandler
     try {
       _player.positionStream.listen((position) async {
         //ticks on each position
-        var timeLeft = _duration.inSeconds - position.inSeconds;
+        var timeLeft = _duration?.inSeconds - position.inSeconds;
         if (position != null) {
           if (_audioPositionIsInEndPeriod(position)) {
             if (_bgPlayer.playing) {

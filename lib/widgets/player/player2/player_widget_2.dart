@@ -156,7 +156,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             ],
                           ),
                           _getBgMusicIconButton(
-                              mediaItem.extras[HAS_BG_SOUND] ?? true)
+                              mediaItem?.extras?[HAS_BG_SOUND] ?? true)
                         ],
                       );
                     },
@@ -165,7 +165,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   // A seek bar.
                   PositionIndicatorWidget(
                     handler: _handler,
-                    color: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
+                    color: parseColor(mediaItem?.extras?[PRIMARY_COLOUR]),
                   ),
                   Container(height: 24)
                 ])
@@ -191,8 +191,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           decoration: BoxDecoration(
               gradient: RadialGradient(
             colors: [
-              parseColor(mediaItem.extras[PRIMARY_COLOUR]).withAlpha(100),
-              parseColor(mediaItem.extras[PRIMARY_COLOUR]).withAlpha(0),
+              parseColor(mediaItem.extras?[PRIMARY_COLOUR]).withAlpha(100),
+              parseColor(mediaItem.extras?[PRIMARY_COLOUR]).withAlpha(0),
             ],
             radius: 1.0,
           )),
@@ -227,7 +227,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       future: _bloc.getVersionTitle(),
                       builder: (context, snapshot) {
                         return Text(
-                          snapshot.hasData ? snapshot.data : 'Loading...',
+                          snapshot.data ?? 'Loading...',
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -239,7 +239,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  TextStyle buildTitleTheme() {
+  TextStyle? buildTitleTheme() {
     return Theme.of(context).textTheme.headline1;
   }
 
@@ -248,7 +248,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (complete) {
       attr = _bloc.version?.body ?? WELL_DONE_SUBTITLE;
     } else {
-      attr = mediaItem?.extras != null ? mediaItem?.extras['attr'] : '';
+      attr = mediaItem.extras?['attr'];
     }
 
     return Padding(
@@ -287,13 +287,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Widget _playButton(MediaItem mediaItem) => Semantics(
+  Widget _playButton(MediaItem? mediaItem) => Semantics(
         label: 'Play button',
         child: PlayerButton(
           icon: Icons.play_arrow,
-          onPressed: () => _playPressed(mediaItem.extras[HAS_BG_SOUND] ?? true),
-          secondaryColor: parseColor(mediaItem.extras[SECONDARY_COLOUR]),
-          primaryColor: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
+          onPressed: () => _playPressed(mediaItem?.extras?[HAS_BG_SOUND] ?? true),
+          secondaryColor: parseColor(mediaItem?.extras?[SECONDARY_COLOUR]),
+          primaryColor: parseColor(mediaItem?.extras?[PRIMARY_COLOUR]),
         ),
       );
 
@@ -306,8 +306,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         label: 'Pause button',
         child: PlayerButton(
           icon: Icons.pause,
-          secondaryColor: parseColor(mediaItem.extras[SECONDARY_COLOUR]),
-          primaryColor: parseColor(mediaItem.extras[PRIMARY_COLOUR]),
+          secondaryColor: parseColor(mediaItem.extras?[SECONDARY_COLOUR]),
+          primaryColor: parseColor(mediaItem.extras?[PRIMARY_COLOUR]),
           onPressed: _handler.pause,
         ),
       );
@@ -330,8 +330,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return Text(
       label,
-      style: Theme.of(context).textTheme.subtitle2.copyWith(
-          color: parseColor(mediaItem.extras[SECONDARY_COLOUR]) ??
+      style: Theme.of(context).textTheme.subtitle2?.copyWith(
+          color: parseColor(mediaItem.extras?[SECONDARY_COLOUR]) ??
               MeditoColors.darkMoon),
     );
   }
@@ -347,14 +347,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  void _trackSessionEnd(MediaItem mediaItem) {
-    unawaited(Tracking.trackEvent({
-      Tracking.TYPE: Tracking.AUDIO_COMPLETED,
-      Tracking.SESSION_ID: mediaItem.extras[SESSION_ID],
-      Tracking.SESSION_TITLE: mediaItem.title,
-      Tracking.SESSION_LENGTH: mediaItem.extras[LENGTH],
-      Tracking.SESSION_VOICE: mediaItem.artist
-    }));
+
+  void _trackSessionEnd(MediaItem? mediaItem) {
+    if (mediaItem == null) return;
+    unawaited(
+      Tracking.postUsage(
+        Tracking.AUDIO_COMPLETED,
+        {
+          Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
+          Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH],
+          Tracking.SESSION_GUIDE: mediaItem.artist ?? ''
+        },
+      ),
+    );
   }
 
   void _onBgMusicPressed() {
