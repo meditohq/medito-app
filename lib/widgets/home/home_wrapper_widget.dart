@@ -46,21 +46,22 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-            color: MeditoColors.softGrey,
-            border: Border(
-                top: BorderSide(
-                    color: MeditoColors.softGrey, width: 2.0))),
-        child: BottomNavigationBar(
-          selectedLabelStyle: Theme.of(context)
-              .textTheme
-              .headline1
-              ?.copyWith(fontSize: 12),
-          unselectedLabelStyle: Theme.of(context)
-              .textTheme
-              .headline2
-              ?.copyWith(fontSize: 12),
-          selectedItemColor: MeditoColors.walterWhite,
-          unselectedItemColor: MeditoColors.newGrey,
+                color: MeditoColors.softGrey,
+                border: Border(
+                  top: BorderSide(color: MeditoColors.softGrey, width: 2.0),
+                ),
+              ),
+              child: BottomNavigationBar(
+                selectedLabelStyle: Theme.of(context)
+                    .textTheme
+                    .headline1
+                    ?.copyWith(fontSize: 12),
+                unselectedLabelStyle: Theme.of(context)
+                    .textTheme
+                    .headline2
+                    ?.copyWith(fontSize: 12),
+                selectedItemColor: MeditoColors.walterWhite,
+                unselectedItemColor: MeditoColors.newGrey,
           currentIndex: _currentIndex,
           onTap: _onTabTapped,
           items: [
