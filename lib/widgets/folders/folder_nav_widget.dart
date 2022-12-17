@@ -148,8 +148,8 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
           background: _getDismissibleBackgroundWidget(item),
           onDismissed: (direction) {
             setState(() {
-              if (item.id != null && item.oldId != null) {
-                toggleListenedStatus(item.id!, item.oldId!);
+              if (item.id != null) {
+                toggleListenedStatus(item.id!);
               }
             });
           },
@@ -181,8 +181,7 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
 
   Widget getSwipeableActionIcon(Item item) {
     if (item.id != null &&
-        item.oldId != null &&
-        checkListened(item.id!, oldId: item.oldId!)) {
+        checkListened(item.id)) {
       return Icon(
         Icons.play_circle_fill,
         color: MeditoColors.walterWhite,
@@ -200,7 +199,6 @@ class _FolderNavWidgetState extends State<FolderNavWidget> {
       title: item.title,
       subtitle: item.subtitle,
       id: item.id,
-      oldId: item.oldId,
       fileType: item.fileType,
     );
   }
