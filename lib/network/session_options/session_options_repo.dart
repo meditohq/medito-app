@@ -39,6 +39,8 @@ class SessionOptionsRepository {
 
     final response = await httpGet(url, skipCache: skipCache);
 
+    if (response == null) return null;
+
     return SessionOptionsResponse.fromJson(response).data;
   }
 

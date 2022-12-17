@@ -20,8 +20,9 @@ import 'package:Medito/network/http_get.dart';
 class CoursesRepo {
   final _ext = 'items/courses';
 
-  Future<CoursesResponse> fetchCourses([bool skipCache = false]) async {
+  Future<CoursesResponse?> fetchCourses([bool skipCache = false]) async {
     final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
+    if(response == null) return null;
     return CoursesResponse.fromJson(response);
   }
 }

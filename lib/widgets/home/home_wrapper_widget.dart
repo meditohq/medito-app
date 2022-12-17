@@ -21,7 +21,6 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
 
   @override
   void initState() {
-
     firstOpenOperations().then((hasOpened) {
       _hasOpened = hasOpened;
       setState(() {
@@ -62,27 +61,27 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
                     ?.copyWith(fontSize: 12),
                 selectedItemColor: MeditoColors.walterWhite,
                 unselectedItemColor: MeditoColors.newGrey,
-          currentIndex: _currentIndex,
-          onTap: _onTabTapped,
-          items: [
-            BottomNavigationBarItem(
-              tooltip: 'Home',
-              icon: Icon(
-                Icons.home_outlined,
-                size: 20,
+                currentIndex: _currentIndex,
+                onTap: _onTabTapped,
+                items: [
+                  BottomNavigationBarItem(
+                    tooltip: 'Home',
+                    icon: Icon(
+                      Icons.home_outlined,
+                      size: 20,
+                    ),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.format_list_bulleted_outlined,
+                      size: 20,
+                    ),
+                    tooltip: 'Packs',
+                    label: 'Packs',
+                  ),
+                ],
               ),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.format_list_bulleted_outlined,
-                size: 20,
-              ),
-              tooltip: 'Packs',
-              label: 'Packs',
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -81,8 +81,9 @@ class _ChooseBackgroundSoundDialogState
     _handler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
     return StreamBuilder(
-        stream: Stream.fromFuture(Connectivity()
-            .checkConnectivity()),
+        stream: Stream.fromFuture(
+          Connectivity().checkConnectivity(),
+        ),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data == ConnectivityResult.none) {

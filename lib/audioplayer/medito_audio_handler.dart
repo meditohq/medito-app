@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
@@ -68,7 +69,7 @@ class MeditoAudioHandler extends BaseAudioHandler
   @override
   Future<void> play() async {
     try {
-      if (_currentlyPlayingBGSound.isNotEmptyAndNotNull()) {
+      if (_currentlyPlayingBGSound.isNotEmptyAndNotNull() && mediaItemHasBGSound()) {
         unawaited(_bgPlayer.play());
         unawaited(_bgPlayer.setLoopMode(LoopMode.all));
       }
@@ -203,7 +204,26 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future<void> _setBgVolumeFadeAtEnd(int timeLeft) async {
     print(_bgPlayer.volume - (_bgVolume / FADE_DURATION));
     if (_bgPlayer.volume > 0) {
-      unawaited(_bgPlayer.setVolume(_bgPlayer.volume - (_bgVolume / FADE_DURATION)));
+      unawaited(
+          _bgPlayer.setVolume(_bgPlayer.volume - (_bgVolume / FADE_DURATION)));
     }
   }
+
+  void skipForward30Secs() {
+    var seekDuration = min(_duration?.inMilliseconds ?? 0,
+        _player.position.inMilliseconds + Duration(seconds: 30).inMilliseconds);
+    _player.seek(Duration(milliseconds: seekDuration));
+  }
+
+  void skipBackward10Secs() {
+    var seekDuration = max(0,
+        _player.position.inMilliseconds - Duration(seconds: 10).inMilliseconds);
+    _player.seek(Duration(milliseconds: seekDuration));
+  }
+
+  void setPlayerSpeed(double speed) => _player.setSpeed(speed);
+
+  bool mediaItemHasBGSound() => mediaItem.value?.extras?[HAS_BG_SOUND];
+
 }
+

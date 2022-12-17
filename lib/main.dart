@@ -24,12 +24,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audioplayer/audio_inherited_widget.dart';
 import 'network/auth.dart';
-import 'utils/colors.dart';
 
 late SharedPreferences sharedPreferences;
 
@@ -62,7 +62,12 @@ Future<void> main() async {
   }
 }
 
-void _runApp(MeditoAudioHandler _audioHandler) => runApp(AudioHandlerInheritedWidget(audioHandler: _audioHandler, child: ParentWidget()));
+void _runApp(MeditoAudioHandler _audioHandler) => runApp(ProviderScope(
+      child: AudioHandlerInheritedWidget(
+        audioHandler: _audioHandler,
+        child: ParentWidget(),
+      ),
+    ));
 
 /// This Widget is the main application widget.
 class ParentWidget extends StatefulWidget {
