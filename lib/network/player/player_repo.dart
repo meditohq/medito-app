@@ -19,22 +19,41 @@ import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/player/audio_complete_copy_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pedantic/pedantic.dart';
 
 import '../user/user_utils.dart';
 
+var ext = 'items/player_copy?fields=*.*';
+var bgSoundsUrl = '${BASE_URL}items/background_sounds';
+
+final backgroundSoundsProvider =
+    FutureProvider<BackgroundSoundsResponse?>((ref) async {
+  final skipCache = ref.watch(bgSoundsSkipCacheProvider);
+  final content = await httpGet(bgSoundsUrl, skipCache: skipCache);
+
+  if (content == null) return null;
+
+  return BackgroundSoundsResponse.fromJson(content);
+});
+final bgSoundsSkipCacheProvider = StateProvider<bool>((ref) => false);
+
 class PlayerRepository {
   final _ext = 'items/player_copy?fields=*.*';
   final _ratingExt = 'items/rating';
-  var bgSoundsUrl = '${BASE_URL}items/background_sounds';
 
-  Future<PlayerCopyResponse> fetchCopyData() async {
+  @Deprecated('Do not use')
+  Future<PlayerCopyResponse?> fetchCopyData() async {
     final response = await httpGet(BASE_URL + _ext);
+    if (response == null) return null;
     return PlayerCopyResponse.fromJson(response);
   }
 
-  Future<BackgroundSoundsResponse> fetchBackgroundSounds(bool skipCache) async {
+  @Deprecated('Use backgroundSoundsProvider instead')
+  Future<BackgroundSoundsResponse?> fetchBackgroundSounds(
+      bool skipCache) async {
     final response = await httpGet(bgSoundsUrl, skipCache: skipCache);
+    if (response == null) return null;
     return BackgroundSoundsResponse.fromJson(response);
   }
 

@@ -13,15 +13,16 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/auth.dart';
+import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/http_get.dart';
 
 class HomeRepo {
   final _ext = 'items/menu';
 
-  Future<MenuResponse> fetchMenu(bool skipCache) async {
+  Future<MenuResponse?> fetchMenu(bool skipCache) async {
     final response = await httpGet(BASE_URL + _ext, skipCache: skipCache);
+    if (response == null) return null;
     return MenuResponse.fromJson(response);
   }
 }

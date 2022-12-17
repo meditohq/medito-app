@@ -129,8 +129,8 @@ class SessionOptionsBloc {
       Tracking.postUsage(
         Tracking.AUDIO_STARTED,
         {
-          Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
-          Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH],
+          Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID].toString() ?? '',
+          Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH].toString() ?? '',
           Tracking.SESSION_GUIDE: mediaItem.artist ?? ''
         },
       ),

@@ -26,6 +26,7 @@ class FolderItemsRepository {
     try {
       final response = await httpGet(BASE_URL + ext + id + folderParameters,
           fileNameForCache: BASE_URL + id + '/' + ext, skipCache: skipCache);
+      if(response == null) return null;
       return FolderResponse.fromJson(response);
     } catch (e) {
       print(e);

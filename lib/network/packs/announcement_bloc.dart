@@ -34,6 +34,7 @@ class AnnouncementBloc {
     try {
       var data = await _repo.fetchAnnouncements(
           skipCache: skipCache, hasOpened: hasOpened);
+      if (data == null) return;
       announcementController.add(data);
     } catch (e) {
       print(e);

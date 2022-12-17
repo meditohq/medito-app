@@ -26,6 +26,7 @@ import 'package:audio_service/audio_service.dart';
 class PlayerBloc {
   PlayerRepository? _repo;
   PlayerCopyData? version;
+  @Deprecated('Use backgroundSoundsProvider instead')
   StreamController<ApiResponse<BackgroundSoundsResponse>>?
       bgSoundsListController;
 
@@ -44,6 +45,7 @@ class PlayerBloc {
     setVersionCopySeen(version?.id ?? 0);
   }
 
+  @Deprecated('Use backgroundSoundsProvider instead')
   Future<void> fetchBackgroundSounds() async {
     try {
       var sounds = await _repo?.fetchBackgroundSounds(true);
@@ -70,3 +72,4 @@ class PlayerBloc {
     bgSoundsListController?.close();
   }
 }
+

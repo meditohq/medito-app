@@ -13,11 +13,25 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const DEFAULT_VOLUME = 0.65;
 
+@Deprecated('Use volume provider instead')
 Future<dynamic> retrieveSavedBgVolume() async {
+  return await _getSavedVolume();
+}
+
+final volumeProvider = StateProvider((_) => Volume());
+
+class Volume {
+  Future<double> getVolume() async {
+    return await _getSavedVolume();
+  }
+}
+
+Future<double> _getSavedVolume() async {
   var prefs = await SharedPreferences.getInstance();
   var vol;
   try {

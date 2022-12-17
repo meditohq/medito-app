@@ -1,3 +1,4 @@
+import 'package:Medito/network/folder/new_folder_screen.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
 import 'package:Medito/widgets/session_options/session_options_screen.dart';
@@ -5,9 +6,8 @@ import 'package:Medito/widgets/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/folders/folder_nav_widget.dart';
 import '../widgets/home/home_wrapper_widget.dart';
-import '../widgets/player/player2/player_widget_2.dart';
+import '../widgets/player/player2/new_player_widget.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -101,7 +101,9 @@ GoRoute _getSessionRoute() {
 GoRoute _getPlayerRoute() {
   return GoRoute(
       path: 'player',
-      pageBuilder: (context, state) => getPlayerMaterialPage(state),
+      pageBuilder: (context, state) {
+        return getPlayerMaterialPage(state);
+      },
     );
 }
 
@@ -146,48 +148,50 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: PlayerWidget());
+  return MaterialPage(key: state.pageKey, child: NewPlayerWidget());
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   if (state.params.length == 1) {
     return MaterialPage(
         key: state.pageKey,
-        child: FolderNavWidget(id: state.params['fid'] ?? ''));
+        child: NewFolderScreen(id: state.params['fid']));
   } else if (state.params.length == 2) {
     return MaterialPage(
         key: state.pageKey,
-        child: FolderNavWidget(id: state.params['f2id'] ?? ''));
+        child: NewFolderScreen(id: state.params['f2id']));
   } else {
     return MaterialPage(
         key: state.pageKey,
-        child: FolderNavWidget(id: state.params['f3id'] ?? ''));
+        child: NewFolderScreen(id: state.params['f3id']));
   }
 }
 
-String getPathFromString(String? place, List<String> ids) {
+String getPathFromString(String? place, List<String?> ids) {
+  ids.removeWhere((element) => element == null);
+
   if (place == 'session') {
-    return SessionPath.replaceAll(':sid', ids.first);
+    return SessionPath.replaceAll(':sid', ids.first!);
   }
   if (place == 'daily') {
-    return DailyPath.replaceAll(':did', ids.first);
+    return DailyPath.replaceAll(':did', ids.first!);
   }
   if (place == 'donation') {
     return DonationPath;
   }
   if (place == 'article') {
-    return ArticlePath.replaceAll(':aid', ids.first);
+    return ArticlePath.replaceAll(':aid', ids.first!);
   }
   if (place != null && place.contains('folder3')) {
-    return Folder3Path.replaceAll(':fid', ids.first).replaceAll(':f2id', ids[1])
-        .replaceAll(':f3id', ids[2]);
+    return Folder3Path.replaceAll(':fid', ids.first!).replaceAll(':f2id', ids[1]!)
+        .replaceAll(':f3id', ids[2]!);
   }
   if (place != null && place.contains('folder2')) {
-    return Folder2Path.replaceAll(':fid', ids.first)
-        .replaceAll(':f2id', ids[1]);
+    return Folder2Path.replaceAll(':fid', ids.first!)
+        .replaceAll(':f2id', ids[1]!);
   }
   if (place == 'folder') {
-    return FolderPath.replaceAll(':fid', ids.first);
+    return FolderPath.replaceAll(':fid', ids.first!);
   }
   if (place == 'url') {
     launchUrl(ids.first);

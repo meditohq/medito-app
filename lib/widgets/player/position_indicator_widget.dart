@@ -2,16 +2,19 @@ import 'dart:math';
 
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
+import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/utils/colors.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class PositionIndicatorWidget extends StatefulWidget {
-  final Color? color;
-  final MeditoAudioHandler? handler;
+import 'background_sounds_sheet_widget.dart';
 
-  PositionIndicatorWidget({Key? key, this.handler, this.color})
+class PositionIndicatorWidget extends StatefulWidget {
+  final MeditoAudioHandler? handler;
+  final Stream? bgSoundsStream;
+
+  PositionIndicatorWidget({Key? key, this.handler, this.bgSoundsStream})
       : super(key: key);
 
   @override
@@ -20,6 +23,8 @@ class PositionIndicatorWidget extends StatefulWidget {
 }
 
 class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
+  final _speedList = ['X1', 'X1.25', 'X1.5', 'X2', 'X0.6'];
+  var _currentSpeed = 'X1';
 
   /// Tracks the position while the user drags the seek bar.
   final BehaviorSubject<double?> _dragPositionSubject =
@@ -27,13 +32,13 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     double? _seekPos;
 
     return StreamBuilder(
       stream: Rx.combineLatest2<double?, double, double?>(
           _dragPositionSubject.stream,
-          Stream.periodic(Duration(milliseconds: 200), (count) => count.toDouble()),
+          Stream.periodic(
+              Duration(milliseconds: 200), (count) => count.toDouble()),
           (dragPosition, _) => dragPosition),
       builder: (context, AsyncSnapshot<double?> snapshot) {
         //snapshot.data will be non null if slider was dragged
@@ -51,14 +56,14 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                 child: SliderTheme(
                   data: SliderThemeData(
-                    trackHeight: 4,
+                    trackHeight: 8,
                     trackShape: CustomTrackShape(),
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
                   ),
                   child: Slider(
                     min: 0.0,
-                    activeColor: widget.color,
-                    inactiveColor: MeditoColors.meditoTextGrey,
+                    activeColor: MeditoColors.walterWhite,
+                    inactiveColor: MeditoColors.greyIsTheNewGrey,
                     max: duration.toDouble(),
                     value: _seekPos ??
                         max(0.0, min(position.toDouble(), duration.toDouble())),
@@ -66,7 +71,8 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                       _dragPositionSubject.add(value);
                     },
                     onChangeEnd: (value) {
-                      widget.handler?.seek(Duration(milliseconds: value.toInt()));
+                      widget.handler
+                          ?.seek(Duration(milliseconds: value.toInt()));
                       _seekPos = value;
                       _dragPositionSubject.add(null); // todo is this ok?
                     },
@@ -84,24 +90,155 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            Duration(milliseconds: position).toMinutesSeconds(),
-            style: Theme.of(context)
-                .textTheme
-                .subtitle2
-                ?.copyWith(color: MeditoColors.meditoTextGrey),
-          ),
-          Text(
-            Duration(milliseconds: duration).toMinutesSeconds(),
-            style: Theme.of(context)
-                .textTheme
-                .subtitle2
-                ?.copyWith(color: MeditoColors.meditoTextGrey),
-          ),
+          _getCurrentPositionLabel(position, context),
+          Container(width: 8),
+          _getSpeedLabel(duration, context),
+          Container(width: 8),
+          if (_hasBGSound()) _getSoundLabel(),
+          if (_hasBGSound()) Container(width: 8),
+          _getFullDurationLabel(duration, context),
         ],
       ),
+    );
+  }
+
+  bool _hasBGSound() => widget.handler?.mediaItemHasBGSound() == true;
+
+  Expanded _getFullDurationLabel(int duration, BuildContext context) {
+    return Expanded(
+      flex: 25,
+      child: Container(
+        height: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: MeditoColors.greyIsTheNewGrey,
+          borderRadius: BorderRadius.all(Radius.circular(3)),
+        ),
+        child: Text(
+          Duration(milliseconds: duration).toMinutesSeconds(),
+          style: Theme.of(context)
+              .textTheme
+              .subtitle2
+              ?.copyWith(color: MeditoColors.walterWhite),
+        ),
+      ),
+    );
+  }
+
+  Expanded _getCurrentPositionLabel(int position, BuildContext context) {
+    return Expanded(
+      flex: 25,
+      child: Container(
+        alignment: Alignment.center,
+        height: 40,
+        decoration: BoxDecoration(
+          color: MeditoColors.greyIsTheNewGrey,
+          borderRadius: BorderRadius.all(Radius.circular(3)),
+        ),
+        child: Text(
+          Duration(milliseconds: position).toMinutesSeconds(),
+          style: Theme.of(context)
+              .textTheme
+              .subtitle2
+              ?.copyWith(color: MeditoColors.walterWhite),
+        ),
+      ),
+    );
+  }
+
+  Widget _getSpeedLabel(int duration, BuildContext context) {
+    return Expanded(
+      flex: 25,
+      child: GestureDetector(
+        onTap: () => {widget.handler?.setPlayerSpeed(_getNextSpeed())},
+        child: Container(
+          height: 40,
+          decoration: BoxDecoration(
+            color: MeditoColors.walterWhite,
+            borderRadius: BorderRadius.all(Radius.circular(3)),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            _currentSpeed,
+            style: Theme.of(context)
+                .textTheme
+                .subtitle2
+                ?.copyWith(color: MeditoColors.greyIsTheNewGrey),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _getSoundLabel() {
+    return Builder(builder: (context) {
+      return GestureDetector(
+        onTap: () => _onBgMusicPressed(context),
+        child: Container(
+          height: 40,
+          padding: EdgeInsets.symmetric(horizontal: 24),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: MeditoColors.walterWhite,
+            borderRadius: BorderRadius.all(Radius.circular(3)),
+          ),
+          child: Text(
+            'SOUND',
+            style: Theme.of(context)
+                .textTheme
+                .subtitle2
+                ?.copyWith(color: MeditoColors.greyIsTheNewGrey),
+          ),
+        ),
+      );
+    });
+  }
+
+  double _getNextSpeed() {
+    var nextIndex = _speedList.indexOf(_currentSpeed) + 1;
+    if (nextIndex >= _speedList.length) {
+      _currentSpeed = _speedList[0];
+    } else {
+      _currentSpeed = _speedList[nextIndex];
+    }
+
+    setState(() {
+      _currentSpeed;
+    });
+    return _getSpeedDoubleFromString(_currentSpeed);
+  }
+
+  double _getSpeedDoubleFromString(String current) {
+    if (current == 'X1') {
+      return 1;
+    } else if (current == 'X1.25') {
+      return 1.25;
+    } else if (current == 'X1.5') {
+      return 1.5;
+    } else if (current == 'X2') {
+      return 2;
+    } else if (current == 'X0.6') {
+      return 0.6;
+    } else if (current == 'X0.75') {
+      return 1;
+    } else {
+      return 0.75;
+    }
+  }
+
+  void _onBgMusicPressed(BuildContext context) {
+    var bloc = PlayerBloc();
+
+    // slight delay in case the cache returns before the sheet opens
+    Future.delayed(Duration(milliseconds: 50))
+        .then((value) => bloc.fetchBackgroundSounds());
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ChooseBackgroundSoundDialog(
+          handler: widget.handler, stream: bloc.bgSoundsListController?.stream),
     );
   }
 }
@@ -123,7 +260,7 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     final trackLeft = offset.dx;
     var trackTop;
     if (addTopPadding) {
-      trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 8;
+      trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 12;
     } else {
       trackTop = parentBox.size.height / 2 - 2;
     }

@@ -24,7 +24,7 @@ import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 //move this to network package later
-Future httpGet(String url,
+Future<Map<String, dynamic>?> httpGet(String url,
     {bool skipCache = false, String? fileNameForCache}) async {
   var cache;
 
