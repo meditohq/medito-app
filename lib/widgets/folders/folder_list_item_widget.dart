@@ -21,11 +21,10 @@ import 'package:flutter/material.dart';
 
 class ListItemWidget extends StatelessWidget {
   ListItemWidget(
-      {Key? key, this.title, this.subtitle, this.fileType, this.id, this.oldId})
+      {Key? key, this.title, this.subtitle, this.fileType, this.id})
       : super(key: key);
 
   final String? title;
-  final String? oldId;
   final String? id;
   final String? subtitle;
   final FileType? fileType;
@@ -59,7 +58,7 @@ class ListItemWidget extends StatelessWidget {
   }
 
   Widget getAudioIcon() {
-    if (checkListened(id, oldId: oldId)) {
+    if (checkListened(id)) {
       return Icon(
         Icons.check,
         color: MeditoColors.walterWhite,

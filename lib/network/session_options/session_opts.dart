@@ -19,7 +19,6 @@ class SessionOptionsResponse {
 class SessionData {
   int? id;
   String? title;
-  String? alternativeTitle;
   String? subtitle;
   String? description;
   bool? backgroundSound;
@@ -38,7 +37,6 @@ class SessionData {
   SessionData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
-    alternativeTitle = json['alternative_title'];
     subtitle = json['subtitle'];
     description = json['description'];
     backgroundSound = json['background_sound'];
@@ -60,7 +58,6 @@ class SessionData {
     final data = <String, dynamic>{};
     data['id'] = id;
     data['title'] = title;
-    data['alternative_title'] = alternativeTitle;
     data['subtitle'] = subtitle;
     data['description'] = description;
     data['background_sound'] = backgroundSound;

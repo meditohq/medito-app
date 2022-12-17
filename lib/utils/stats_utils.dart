@@ -223,10 +223,10 @@ Future<int> incrementNumSessions() async {
   return current;
 }
 
-void toggleListenedStatus(String id, String oldId) {
-  var listened = checkListened(id, oldId: oldId);
+void toggleListenedStatus(String id) {
+  var listened = checkListened(id);
   if (listened) {
-    markAsNotListened(id, oldId);
+    markAsNotListened(id);
   } else {
     markAsListened(id);
   }
@@ -237,27 +237,17 @@ void markAsListened(String id) {
   unawaited(sharedPreferences.setBool('listened' + id, true));
 }
 
-void markAsNotListened(String id, String? oldId) {
+void markAsNotListened(String id) {
   sharedPreferences.setBool('listened' + id, false);
-  if (oldId != null) {
-    sharedPreferences.setBool('listened' + oldId, false);
-  }
 }
 
 Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
 }
 
-bool checkListened(String? id, {String? oldId = ''}) {
+bool checkListened(String? id) {
   if (id == null) return false;
-
-  var listened = sharedPreferences.getBool('listened' + id) ?? false;
-
-  if (!listened && oldId.isNotEmptyAndNotNull()) {
-    return sharedPreferences.getBool('listened' + oldId!) ?? false;
-  } else {
-    return listened;
-  }
+  return sharedPreferences.getBool('listened' + id) ?? false;
 }
 
 void setVersionCopySeen(int id) async {
