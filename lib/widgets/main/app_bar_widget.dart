@@ -15,37 +15,40 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
   const MeditoAppBarWidget(
       {Key? key,
       this.title,
       this.titleWidget,
-      this.transparent = false,
+      this.isTransparent = false,
       this.hasCloseButton = false,
-        this.actions,
+      this.actions,
       this.closePressed})
       : super(key: key);
 
   final void Function()? closePressed;
   final Widget? titleWidget;
   final bool hasCloseButton;
-  final transparent;
-  final actions;
+  final bool isTransparent;
+  final List<Widget>? actions;
   final String? title;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        // leading: null,  defaults to implied leading
-        leading: hasCloseButton ? CloseButton(onPressed: closePressed ?? closePressed,) : null,
+        leading: hasCloseButton
+            ? CloseButton(onPressed: closePressed ?? closePressed)
+            : null,
         centerTitle: true,
         actions: actions,
         elevation: 0,
-        backwardsCompatibility: true,
-        brightness: Brightness.dark,
+        systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarBrightness: Brightness.dark,
+            systemStatusBarContrastEnforced: true),
         backgroundColor:
-            transparent ? Colors.transparent : MeditoColors.moonlight,
+            isTransparent ? Colors.transparent : MeditoColors.moonlight,
         title: getTitleWidget(context));
   }
 
@@ -62,6 +65,5 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
   }
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => Size.fromHeight(56.0);
 }

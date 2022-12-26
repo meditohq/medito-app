@@ -28,7 +28,6 @@ import 'package:Medito/widgets/player/position_indicator_widget.dart';
 import 'package:Medito/widgets/player/subtitle_text_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -88,16 +87,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _handler = AudioHandlerInheritedWidget.of(context).audioHandler;
     var mediaItem = _handler?.mediaItem.value;
 
-    try {
-      if (_hasBGSound() == true) {
-        getSavedBgSoundData();
-      }
-    } on Exception catch (e, s) {
-      unawaited(
-        Sentry.captureException(e,
-            stackTrace: s, hint: 'extras[HAS_BG_SOUND]: ${_hasBGSound()}'),
-      );
-    }
+    tryLoadingBgSoundsData();
 
     _handler?.customEvent.stream.listen((event) {
       if (mounted &&
@@ -117,30 +107,47 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     return Material(
       color: MeditoColors.greyIsTheNewBlack,
-      child: SafeArea(
-        top: false,
-        child: Stack(
+      child: Scaffold(
+        extendBody: false,
+        extendBodyBehindAppBar: true,
+        appBar: _getAppBar(),
+        body: Stack(
           children: [
             Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _getAppBar(),
-                  _buildImage(mediaItem?.artUri?.toString()),
-                  Container(height: 24),
-                  _buildTitleRows(),
-                  Expanded(child: SizedBox.shrink()),
-                  _buildPlayerButtonRow(mediaItem),
-                  Expanded(child: SizedBox.shrink()),
-                  // A seek bar.
-                  PositionIndicatorWidget(
-                      handler: _handler,
-                      bgSoundsStream: _bloc.bgSoundsListController?.stream),
-                  Container(height: 24)
-                ])
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildImage(mediaItem?.artUri?.toString()),
+                Container(height: 24),
+                _buildTitleRows(),
+                Expanded(child: SizedBox.shrink()),
+                _buildPlayerButtonRow(mediaItem),
+                Expanded(child: SizedBox.shrink()),
+                // A seek bar.
+                PositionIndicatorWidget(
+                    handler: _handler,
+                    bgSoundsStream: _bloc.bgSoundsListController?.stream),
+                Container(height: 24),
+              ],
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void tryLoadingBgSoundsData() {
+    try {
+      if (_hasBGSound() == true) {
+        getSavedBgSoundData();
+      }
+    } on Exception catch (e, s) {
+      unawaited(
+        Sentry.captureException(e,
+            stackTrace: s,
+            hint:
+                'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}'),
+      );
+    }
   }
 
   bool? _hasBGSound() => _handler?.mediaItemHasBGSound();
@@ -171,9 +178,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  MeditoAppBarWidget _getAppBar() {
+  PreferredSizeWidget _getAppBar() {
     return MeditoAppBarWidget(
-      transparent: true,
+      isTransparent: true,
       hasCloseButton: true,
       closePressed: _onBackPressed,
     );
@@ -292,13 +299,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Widget _buildImage(String? currentImage) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40.0),
-      child: Card(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(6))),
-        child: getNetworkImageWidget(currentImage ?? ''),
-      ),
-    );
+    return Container(
+        width: double.maxFinite,
+        child: getNetworkImageWidget(currentImage ?? ''));
   }
 }

@@ -42,7 +42,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
     return Scaffold(
       appBar: MeditoAppBarWidget(
         title: DOWNLOADS,
-        transparent: true,
+        isTransparent: true,
         hasCloseButton: true,
       ),
       key: scaffoldKey,
