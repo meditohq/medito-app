@@ -32,7 +32,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
             MeditoAppBarWidget(
                 hasCloseButton: true,
                 closePressed: _closePressed,
-                transparent: true),
+                isTransparent: true),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(

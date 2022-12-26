@@ -64,7 +64,7 @@ class HeaderWidget extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        MeditoAppBarWidget(transparent: true),
+                        MeditoAppBarWidget(isTransparent: true),
                         _getRow(),
                       ],
                     ),

@@ -66,7 +66,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
             initialData: '...',
             builder: (context, snapshot) {
               return MeditoAppBarWidget(
-                transparent: true,
+                isTransparent: true,
                 title: snapshot.data ?? '',
               );
             }), // StreamBuilder

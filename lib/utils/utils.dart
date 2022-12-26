@@ -23,11 +23,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Widget getNetworkImageWidget(String? url,
-    {double startHeight = 0.0}) {
+Widget getNetworkImageWidget(String? url) {
   if (url.isEmptyOrNull()) return Container();
   final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
-  return Image.network(url ?? '', fit: BoxFit.fill, headers: headers);
+  return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
 
 Future<bool> checkConnectivity() async {
@@ -49,23 +48,11 @@ void createSnackBar(String message, BuildContext context,
     duration: Duration(seconds: 6),
   );
 
-  // Find the Scaffold in the Widget tree and use it to show a SnackBar!
   try {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   } catch (e) {
     print(e);
   }
-}
-
-void createSnackBarWithColor(
-    String message, BuildContext context, Color color) {
-  final snackBar = SnackBar(
-      content: Text(message,
-          style: Theme.of(context).textTheme.caption?.copyWith(color: MeditoColors.almostBlack)),
-      backgroundColor: color);
-
-  // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 bool isDayBefore(DateTime day1, DateTime day2) {
