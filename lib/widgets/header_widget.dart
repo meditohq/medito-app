@@ -148,14 +148,12 @@ class HeaderWidget extends StatelessWidget {
                           AlwaysStoppedAnimation<Color>(MeditoColors.darkMoon),
                     )),
               );
-              break;
 
             case Status.COMPLETED:
               return Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: getNetworkImageWidget(snapshot.data?.body),
               );
-              break;
             case Status.ERROR:
               return Center(child: Icon(Icons.broken_image_outlined));
             default:

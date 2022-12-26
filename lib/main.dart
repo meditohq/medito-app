@@ -115,7 +115,7 @@ class _ParentWidgetState extends State<ParentWidget>
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: SlideTransitionBuilder(),
           }),
-          accentColor: MeditoColors.walterWhite,
+          colorScheme: ColorScheme.dark(secondary: MeditoColors.walterWhite),
           textTheme: meditoTextTheme(context)),
       title: ParentWidget._title,
     );

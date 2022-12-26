@@ -39,7 +39,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
         future: widget.future,
         initialData: '0',
         builder: (context, snapshot) {
-          String unit = '';
+          var unit = '';
           if (snapshot.hasData) {
             var value = int.parse(snapshot.data ?? '');
             unit = getUnits(widget.optionalText ?? UnitType.day, value);

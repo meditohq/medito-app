@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/home/home_wrapper_widget.dart';
-import '../widgets/player/player2/new_player_widget.dart';
+import '../widgets/player/player2/player_widget.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -148,7 +148,7 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: NewPlayerWidget());
+  return MaterialPage(key: state.pageKey, child: PlayerWidget());
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {

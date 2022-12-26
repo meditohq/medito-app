@@ -52,6 +52,11 @@ class ListItemWidget extends StatelessWidget {
       case FileType.folder:
         iconWidget = buildFolderIcon();
         break;
+      case FileType.url:
+      case FileType.daily:
+      case FileType.app:
+      case null:
+        break;
     }
 
     return iconWidget;

@@ -14,35 +14,21 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/player/player_repo.dart';
-import 'package:Medito/network/player/audio_complete_copy_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
 
 class PlayerBloc {
   PlayerRepository? _repo;
-  PlayerCopyData? version;
   @Deprecated('Use backgroundSoundsProvider instead')
   StreamController<ApiResponse<BackgroundSoundsResponse>>?
       bgSoundsListController;
 
-  static final _random = Random();
-
   PlayerBloc() {
     _repo = PlayerRepository();
     bgSoundsListController = StreamController.broadcast();
-    _fetchCopy();
-  }
-
-  Future<void> _fetchCopy() async {
-    var data = await _repo?.fetchCopyData();
-    final randomOutOf10 = _random.nextInt(data?.data?.length ?? 0);
-    version = data?.data?[randomOutOf10];
-    setVersionCopySeen(version?.id ?? 0);
   }
 
   @Deprecated('Use backgroundSoundsProvider instead')
@@ -53,15 +39,6 @@ class PlayerBloc {
     } catch (e) {
       bgSoundsListController?.sink.add(ApiResponse.error(e.toString()));
     }
-  }
-
-  Future<String> getVersionTitle() async {
-    var title = version?.title;
-    if (title?.contains('%n') ?? false) {
-      var streak = await getNumSessions();
-      title = title?.replaceAll('%n', streak.toString());
-    }
-    return title ?? '';
   }
 
   void postRating(int rating, MediaItem mediaItem){

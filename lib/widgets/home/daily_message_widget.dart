@@ -1,7 +1,6 @@
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/daily_message_bloc.dart';
 import 'package:Medito/network/home/daily_message_response.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/daily_message_item_widget.dart';
 import 'package:flutter/material.dart';
 

@@ -16,7 +16,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/http_get.dart';
-import 'package:Medito/network/player/audio_complete_copy_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +23,6 @@ import 'package:pedantic/pedantic.dart';
 
 import '../user/user_utils.dart';
 
-var ext = 'items/player_copy?fields=*.*';
 var bgSoundsUrl = '${BASE_URL}items/background_sounds';
 
 final backgroundSoundsProvider =
@@ -39,15 +37,7 @@ final backgroundSoundsProvider =
 final bgSoundsSkipCacheProvider = StateProvider<bool>((ref) => false);
 
 class PlayerRepository {
-  final _ext = 'items/player_copy?fields=*.*';
   final _ratingExt = 'items/rating';
-
-  @Deprecated('Do not use')
-  Future<PlayerCopyResponse?> fetchCopyData() async {
-    final response = await httpGet(BASE_URL + _ext);
-    if (response == null) return null;
-    return PlayerCopyResponse.fromJson(response);
-  }
 
   @Deprecated('Use backgroundSoundsProvider instead')
   Future<BackgroundSoundsResponse?> fetchBackgroundSounds(

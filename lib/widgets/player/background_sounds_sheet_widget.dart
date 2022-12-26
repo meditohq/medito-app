@@ -132,7 +132,6 @@ class _ChooseBackgroundSoundDialogState
                       backgroundColor: Colors.black,
                       valueColor: AlwaysStoppedAnimation<Color>(
                           MeditoColors.walterWhite)));
-              break;
             case Status.COMPLETED:
               var list = snapshot.data?.body?.data;
 
@@ -154,12 +153,11 @@ class _ChooseBackgroundSoundDialogState
               return ListView(
                   controller: scrollController, children: widgetList);
 
-              break;
             case Status.ERROR:
               return _getErrorWidget();
-              break;
+            case null:
+              return Container();
           }
-          return Container();
         });
   }
 

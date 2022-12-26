@@ -193,7 +193,7 @@ class SessionOptionsBloc {
       return _options?.files != null
           ? (_options?.files?[currentSelectedFileIndex])
           : null;
-    } catch (e, s) {
+    } catch (e) {
       // could be out of bounds exception
       return null;
     }

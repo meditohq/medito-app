@@ -49,14 +49,12 @@ class _StatsWidgetState extends State<StatsWidget> {
           editable: true,
           optionalText: UnitType.day,
         );
-        break;
       case 1:
         return StreakTileWidget(
           getMinutesListened(),
           'Minutes Listened',
           optionalText: UnitType.min,
         );
-        break;
       case 2:
         return StreakTileWidget(
           getLongestStreak(),
@@ -65,7 +63,6 @@ class _StatsWidgetState extends State<StatsWidget> {
           onClick: openResetDialog,
           optionalText: UnitType.day,
         );
-        break;
       case 3:
         return FutureBuilder<String>(
             future: getNumSessions(),
@@ -82,7 +79,6 @@ class _StatsWidgetState extends State<StatsWidget> {
                 return Container();
               }
             });
-        break;
     }
     return Container();
   }
@@ -140,8 +136,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onSaveTap,
                         style: TextButton.styleFrom(
-                          // shape: roundedRectangleBorder(),
-                            primary: MeditoColors.walterWhite),
+                            foregroundColor: MeditoColors.walterWhite),
                         child: Text('SAVE',
                             style: Theme.of(context).textTheme.headline3
                           // .copyWith(fontWeight: FontWeight.bold),
@@ -192,8 +187,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onCancelTap,
                         style: TextButton.styleFrom(
-                            // shape: roundedRectangleBorder(),
-                            primary: MeditoColors.moonlight),
+                            foregroundColor: MeditoColors.moonlight),
                         child: Text('CANCEL',
                             style: Theme.of(context).textTheme.subtitle1
                             // .copyWith(fontWeight: FontWeight.bold),
@@ -208,8 +202,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onResetTap,
                         style: TextButton.styleFrom(
-                            // shape: roundedRectangleBorder(),
-                            primary: MeditoColors.walterWhite),
+                            foregroundColor: MeditoColors.walterWhite),
                         child: Text('RESET',
                             style: Theme.of(context).textTheme.headline3
                             // .copyWith(fontWeight: FontWeight.bold),
