@@ -36,16 +36,16 @@ import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
 import '../../../utils/bgvolume_utils.dart';
 
-class NewPlayerWidget extends StatefulWidget {
+class PlayerWidget extends StatefulWidget {
   final normalPop;
 
-  NewPlayerWidget({this.normalPop});
+  PlayerWidget({this.normalPop});
 
   @override
-  _NewPlayerWidgetState createState() => _NewPlayerWidgetState();
+  _PlayerWidgetState createState() => _PlayerWidgetState();
 }
 
-class _NewPlayerWidgetState extends State<NewPlayerWidget> {
+class _PlayerWidgetState extends State<PlayerWidget> {
   MeditoAudioHandler? _handler;
   late PlayerBloc _bloc;
 
@@ -245,29 +245,6 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
 
   void _onBackPressed() {
     GoRouter.of(context).pop();
-  }
-
-  Widget buildButtonLabel(MediaItem mediaItem) {
-    var label = _bloc.version?.buttonLabel;
-
-    if (label == null) return Container();
-
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.subtitle2?.copyWith(
-          color: parseColor(mediaItem.extras?[SECONDARY_COLOUR])),
-    );
-  }
-
-  Widget buildSvgPicture(Color secondaryColor) {
-    var icon = _bloc.version?.buttonIcon;
-
-    if (icon == null) return Container();
-
-    return SvgPicture.asset(
-      'assets/images/' + icon + '.svg',
-      color: secondaryColor,
-    );
   }
 
   void _trackSessionEnd(MediaItem? mediaItem) {

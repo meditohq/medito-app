@@ -36,7 +36,7 @@ Future<double> _getSavedVolume() async {
   var vol;
   try {
     vol = prefs.getDouble(BG_VOLUME) ?? DEFAULT_VOLUME;
-  } catch (e, s) {
+  } catch (e) {
     // bgVolume maybe wasn't a double
     vol = DEFAULT_VOLUME;
   }

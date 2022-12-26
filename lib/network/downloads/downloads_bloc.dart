@@ -30,11 +30,9 @@ class DownloadsBloc {
 
     var info = await PackageInfo.fromPlatform();
     _mediaItem.extras?[APP_VERSION] = info.buildNumber;
-    if (_mediaItem != null) {
-      var json = _jsonEncodeMediaItem(_mediaItem);
-      list.add(json);
-      await prefs.setStringList(savedFilesKey, list);
-    }
+    var json = _jsonEncodeMediaItem(_mediaItem);
+    list.add(json);
+    await prefs.setStringList(savedFilesKey, list);
   }
 
   static String _jsonEncodeMediaItem(MediaItem _mediaItem) {

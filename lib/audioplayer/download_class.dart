@@ -84,6 +84,7 @@ class _Download {
           progress = _received! / _total!;
         }
       }
+      // ignore: unnecessary_cast
       downloadAmountListener.value = progress as double;
     }).onDone(() async {
       try {

@@ -116,7 +116,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
 
 class SmallShortcutWidget extends StatelessWidget {
   final ShortcutData? data;
-  late Function(dynamic, dynamic)? onTap;
+  final Function(dynamic, dynamic)? onTap;
 
   SmallShortcutWidget(this.data, this.onTap);
 

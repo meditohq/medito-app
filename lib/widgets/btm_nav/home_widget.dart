@@ -158,9 +158,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                   );
                 case Status.COMPLETED:
                   return _getMenu(context, snapshot);
-                  break;
+                case null:
+                  return Container();
               }
-              return Container();
             }),
       ],
     );
