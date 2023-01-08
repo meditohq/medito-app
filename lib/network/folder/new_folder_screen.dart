@@ -15,7 +15,7 @@ class NewFolderScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var value = ref.watch(folderProvider(id));
+    var value = ref.watch(folderDataProvider(id: id, skipCache: false));
     return value.when(
         data: (data) => buildScaffoldWithData(data, ref),
         error: (err, stack) => Text(err.toString()),
@@ -29,7 +29,7 @@ class NewFolderScreen extends ConsumerWidget {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.read(folderSkipCacheProvider.notifier).state = true;
+          return await ref.refresh(folderDataProvider(id: id, skipCache: true));
         },
         child: ListView(
           children: [

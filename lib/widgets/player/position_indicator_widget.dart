@@ -275,9 +275,10 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
       required Animation<double> enableAnimation,
       required TextDirection textDirection,
       required Offset thumbCenter,
+      Offset? secondaryOffset,
       bool isDiscrete = false,
       bool isEnabled = false,
-      double additionalActiveTrackHeight = 2}) {
+      double additionalActiveTrackHeight = 0}) {
     super.paint(context, offset,
         parentBox: parentBox,
         sliderTheme: sliderTheme,
