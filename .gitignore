@@ -82,4 +82,4 @@ gen/
 /.vscode
 android/app/meditokey.jks
 **.g.dart
-**.freezed.dart
+*.freezed.dart
