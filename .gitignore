@@ -81,3 +81,5 @@ gen/
 /android/keystore.properties
 /.vscode
 android/app/meditokey.jks
+**.g.dart
+**.freezed.dart
