@@ -22,12 +22,13 @@ import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/strings.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/header_widget.dart';
+import 'package:Medito/widgets/session_options/session_buttons.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../audioplayer/audio_inherited_widget.dart';
+import '../medito_header_widget.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String? id;
@@ -40,254 +41,69 @@ class SessionOptionsScreen extends StatefulWidget {
 }
 
 class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
-  //todo move this to the _bloc
-  bool showIndeterminateSpinner = false;
 
-  late SessionOptionsBloc _bloc;
   late AudioHandler? _audioHandler;
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc = SessionOptionsBloc(widget.id, widget.screenKey ?? Screen.daily);
-    _bloc.fetchOptions(widget.id ?? '');
-  }
 
   @override
   Widget build(BuildContext context) {
     _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
-    return StreamBuilder<String>(
-        stream: _bloc.primaryColourController.stream,
-        builder: (context, snapshot) {
-          return SafeArea(
-            top: false,
-            child: RefreshIndicator(
-                onRefresh: () =>
-                    _bloc.fetchOptions(widget.id ?? '', skipCache: true),
-                child: Scaffold(
-                  body: Stack(children: [
-                    SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          _getHeaderWidget(),
-                          _getContentListWidget(),
-                          _bloc.getCurrentlySelectedFile() != null
-                              ? DownloadPanelWidget(
-                                  item: _bloc.getCurrentlySelectedFile(),
-                                  bloc: _bloc)
-                              : Container(),
-                          Container(
-                            height: 68,
-                          )
-                        ],
-                      ),
-                    ),
-                    _getBeginButton(snapshot.data),
-                  ]),
-                )),
-          );
-        });
+    return content();
   }
 
-  Align _getBeginButton(String? primaryColor) {
-    return Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-              colors: [
-                Colors.black,
-                Colors.transparent,
-              ],
-            )),
-            child: Row(children: [
-              Expanded(
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 32, 16, 16),
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24.0),
-                          ),
-                          backgroundColor: parseColor(primaryColor),
-                          padding: const EdgeInsets.all(16.0)),
-                      onPressed: _onBeginTap,
-                      child: StreamBuilder<String>(
-                          stream: _bloc.secondaryColorController.stream,
-                          builder: (context, snapshot) {
-                            return Text(BEGIN,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle2
-                                    ?.copyWith(
-                                        color: parseColor(snapshot.data)));
-                          }),
-                    )),
-              )
-            ])));
+  RefreshIndicator content() {
+    return RefreshIndicator(
+        onRefresh: () => _refresh(),
+        child: Scaffold(
+          body: Stack(children: [
+            SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _getHeaderWidget(),
+                  _getBodyWidget(),
+                  DownloadPanelWidget(),
+                ],
+              ),
+            ),
+          ]),
+        ));
   }
 
-  HeaderWidget _getHeaderWidget() => HeaderWidget(
-      primaryColorController: _bloc.primaryColourController,
-      titleController: _bloc.titleController,
-      coverController: _bloc.imageController,
-      backgroundImageController: _bloc.backgroundImageController,
-      descriptionController: _bloc.descController,
-      whiteText: true);
+  HeaderWidget _getHeaderWidget() =>
+      HeaderWidget('Title', 'Long description!!', '');
 
   Future<void> _onBeginTap() {
-    var item = _bloc.getCurrentlySelectedFile();
-    if (_bloc.isDownloading(item) || showIndeterminateSpinner) {
-      return Future.value(null);
-    }
-
-    if (widget.id != null) {
-      _bloc.saveOptionsSelectionsToSharedPreferences(widget.id!);
-    }
-
-    var mediaItem = _bloc.getMediaItem(item);
-    _audioHandler?.playMediaItem(mediaItem);
-    context.go(GoRouter.of(context).location + PlayerPath);
+    // var item = _bloc.getCurrentlySelectedFile();
+    // if (_bloc.isDownloading(item) || showIndeterminateSpinner) {
+    //   return Future.value(null);
+    // }
+    //
+    // if (widget.id != null) {
+    //   _bloc.saveOptionsSelectionsToSharedPreferences(widget.id!);
+    // }
+    //
+    // var mediaItem = _bloc.getMediaItem(item);
+    // _audioHandler?.playMediaItem(mediaItem);
+    // context.go(GoRouter.of(context).location + PlayerPath);
     return Future.value(null);
   }
 
-  Widget _getContentListWidget() {
-    return StreamBuilder<ApiResponse<List<VoiceItem?>>>(
-        stream: _bloc.contentListController.stream,
-        initialData: ApiResponse.loading(),
-        builder: (context, itemsSnapshot) {
-          if (itemsSnapshot.data?.status == Status.LOADING) {
-            return _getLoadingWidget();
-          }
-          return _buildOptionsPanel(itemsSnapshot.data?.body);
-        });
-  }
-
-  Padding _getLoadingWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 32.0),
-      child: Center(
-          child: CircularProgressIndicator(
-              backgroundColor: Colors.black,
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite))),
+  Widget _getBodyWidget() {
+    return Column(
+      children: [
+        Text('Select a guide and a duration'),
+        SessionButtons()
+      ],
     );
   }
 
-  Widget _buildOptionsPanel(List<VoiceItem?>? items) {
-    var childList = <Widget>[];
-    // To check whether any of the VoiceItems contains a narrator
-    var containsNarrator = items?.any(
-        (voiceItem) => voiceItem?.headerValue?.isNotEmptyAndNotNull() ?? false);
-
-    items?.forEach((value) {
-      if (value != null) {
-        var section = _getListItem(context, value);
-        childList.add(section);
-      }
-    });
-
-    return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Container(
-            decoration: BoxDecoration(
-                color: MeditoColors.deepNight,
-                borderRadius: BorderRadius.all(Radius.circular(16))),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(height: 20),
-                  Padding(
-                      padding: EdgeInsets.only(left: 16),
-                      child: Text(
-                          containsNarrator == true
-                              ? PICK_NARRATOR_AND_DURATION.toUpperCase()
-                              : PICK_DURATION.toUpperCase(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1
-                              ?.copyWith(
-                                  color: MeditoColors.meditoTextGrey,
-                                  fontWeight: FontWeight.w600))),
-                  Container(height: 12),
-                  Column(children: childList),
-                ])));
-  }
-
-  Widget _getListItem(BuildContext context, VoiceItem item) {
-    return Padding(
-        padding: EdgeInsets.only(bottom: 20),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _getVoiceTextWidget(item),
-              Container(height: 8),
-              SingleChildScrollView(
-                padding: EdgeInsets.only(left: 16, right: 8),
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                    children: (item.listForVoice
-                            ?.map<Widget>((e) => _getVoiceChipWithPadding(
-                                e,
-                                _bloc.getAudioList().indexOf(_bloc
-                                    .getAudioList()
-                                    .firstWhere(
-                                        (element) => element?.id == e?.id))))
-                            .toList()) ??
-                        [Container()]),
-              )
-            ]));
-  }
-
-  Widget _getVoiceChipWithPadding(AudioFile? e, int index) => Row(children: [
-        ChoiceChip(
-          selected: _bloc.currentSelectedFileIndex == index,
-          onSelected: (bool selected) {
-            setState(() {
-              _bloc.currentSelectedFileIndex = index;
-              if (widget.id != null) {
-                _bloc.saveOptionsSelectionsToSharedPreferences(widget.id!);
-              }
-            });
-          },
-          selectedColor: MeditoColors.walterWhite,
-          label: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-            child: Text(
-              formatSessionLength(e?.length ?? ''),
-              style: Theme.of(context).textTheme.subtitle2?.copyWith(
-                  color: _bloc.currentSelectedFileIndex == index
-                      ? MeditoColors.intoTheNight
-                      : MeditoColors.walterWhite),
-            ),
-          ),
-          backgroundColor: MeditoColors.softGrey,
-        ),
-        Container(width: 8)
-      ]);
-
-  Widget _getVoiceTextWidget(VoiceItem item) => item.headerValue.isEmptyOrNull()
-      ? Container()
-      : Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Text(
-            '${item.headerValue}',
-            style: Theme.of(context).textTheme.headline4,
-          ));
+  _refresh() {}
 }
 
 class DownloadPanelWidget extends StatefulWidget {
-  const DownloadPanelWidget({Key? key, this.item, this.bloc}) : super(key: key);
-
-  final bloc;
-  final AudioFile? item;
+  const DownloadPanelWidget({Key? key}) : super(key: key);
 
   @override
   _DownloadPanelWidgetState createState() => _DownloadPanelWidgetState();
@@ -318,9 +134,9 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(_getDownloadLabel(),
-                        style: Theme.of(context).textTheme.bodyText1),
-                    _getTrailing()
+                    // Text(_getDownloadLabel(),
+                    //     style: Theme.of(context).textTheme.bodyText1),
+                    // _getTrailing()
                   ],
                 )
               ],
@@ -329,20 +145,7 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
     );
   }
 
-  String _getDownloadLabel() {
-    if (widget.item?.voice?.isNotEmptyAndNotNull() == true) {
-      return '${widget.item?.voice} — ${formatSessionLength(widget.item?.length)}';
-    } else {
-      return formatSessionLength(widget.item?.length);
-    }
-  }
-
-  Widget _getTrailing() {
-    if (widget.bloc.isDownloading(widget.item)) {
-      return IconButton(onPressed: () {}, icon: _getLoadingSpinner());
-    }
-
-    return FutureBuilder<bool>(
+/* return FutureBuilder<bool>(
         future: DownloadsBloc.isAudioFileDownloaded(widget.item),
         initialData: false,
         builder: (context, snapshot) {
@@ -356,49 +159,23 @@ class _DownloadPanelWidgetState extends State<DownloadPanelWidget> {
             onPressed: () =>
                 _download(snapshot.hasData && snapshot.data == true),
           );
-        });
-  }
+        });*/
+// }
 
-  Widget _getLoadingSpinner() {
-    return ValueListenableBuilder(
-        valueListenable: widget.bloc.downloadSingleton.returnNotifier(),
-        builder: (context, double? value, widget) {
-          if ((value ?? 0) >= 1) {
-            return GestureDetector(
-                onTap: () => _download(true),
-                child: Icon(_getDownloadedIcon(),
-                    color: MeditoColors.walterWhite));
-          } else {
-            print('Updated value: ' + value.toString());
-            return SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(
-                  backgroundColor: Colors.black,
-                  value: value,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)),
-            );
-          }
-        });
-  }
-
-  IconData _getDownloadedIcon() => Icons.highlight_off;
-
-  void _download(
-    bool downloaded,
-  ) {
-    var mediaItem = widget.bloc.getMediaItemForAudioFile(widget.item);
-
-    if (downloaded) {
-      DownloadsBloc.removeSessionFromDownloads(context, mediaItem)
-          .then((value) {
-        setState(() {});
-      });
-    } else {
-      widget.bloc.setFileForDownloadSingleton(widget.item);
-      widget.bloc.downloadSingleton.start(context, widget.item, mediaItem);
-      setState(() {});
-    }
-  }
+// void _download(
+//   bool downloaded,
+// ) {
+//   var mediaItem = widget.bloc.getMediaItemForAudioFile(widget.item);
+//
+//   if (downloaded) {
+//     DownloadsBloc.removeSessionFromDownloads(context, mediaItem)
+//         .then((value) {
+//       setState(() {});
+//     });
+//   } else {
+//     widget.bloc.setFileForDownloadSingleton(widget.item);
+//     widget.bloc.downloadSingleton.start(context, widget.item, mediaItem);
+//     setState(() {});
+//   }
+// }
 }
