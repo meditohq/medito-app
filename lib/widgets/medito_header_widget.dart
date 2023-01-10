@@ -75,11 +75,12 @@ class HeaderWidget extends StatelessWidget {
     );
   }
 
-  Image buildHeroImage(String imageUrl) {
-    return Image.asset(
-      'assets/images/dalle.png',
-      fit: BoxFit.fill,
-    );
+  Widget buildHeroImage(String imageUrl) {
+    // return Image.asset(
+    //   'assets/images/dalle.png',
+    //   fit: BoxFit.fill,
+    // );
+    return Container();
   }
 }
 

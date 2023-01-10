@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+import 'package:Medito/utils/colors.dart';
+import 'package:flutter/material.dart';
 
 class SessionButtons extends StatefulWidget {
   const SessionButtons({Key? key}) : super(key: key);
@@ -8,42 +9,59 @@ class SessionButtons extends StatefulWidget {
 }
 
 class _SessionButtonsState extends State<SessionButtons> {
-  List<Map<String, List<String>>> data = [
-    {
-      'Will': ['5 mins', '10 min']
-    },
-    {
-      'Bob': ['5 mins', '10 min', '15 min']
-    },
-    {
-      'Steve': ['5 mins', '10 min', '15 min', '40 min']
-    }
-  ];
+  Map<String, List<String>> data = {
+    'Will': ['5 mins', '10 min'],
+    'Bob': [
+      '5 mins',
+      '10 min',
+      '10 min',
+      '10 min',
+      '10 min',
+      '10 min',
+      '10 min',
+      '10 min',
+      '15 min'
+    ],
+    'Steve': ['5 mins', '10 min', '15 min', '40 min']
+  };
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> titles =
-        data.map((e) => e.keys).map((e) => Text(e.first)).toList();
-    var lengths = data.map((e) => e.values.toList());
-    var views = lengths
-        .map((e) => e.map((times) => Column(children: times.map((time) => Text(time)).toList())).toList())
-        .toList();
-    print(views);
-
     return ListView.builder(
-      shrinkWrap: true,
-      itemCount: views.length,
-      itemBuilder: (context, i) {
-        return Column(
-          children: [
-            titles[i],
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(children: views.toList()[i]),
-            ),
-          ],
-        );
-      }
-    );
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        itemCount: data.length,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, i) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(height: 20),
+              Text(data.keys.toList().elementAt(i).toString()),
+              Container(height: 8),
+              GridView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: data.values.elementAt(i).length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
+                    childAspectRatio: 3.0,
+                    crossAxisCount: 2,
+                  ),
+                  itemBuilder: (_, int index) {
+                    return _getGridItem(i, index);
+                  })
+            ],
+          );
+        });
   }
+
+  Widget _getGridItem(int i, int index) => Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          color: MeditoColors.greyIsTheNewGrey,
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      child: Text(data.values.elementAt(i).elementAt(index).toString()));
 }

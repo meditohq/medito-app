@@ -57,7 +57,7 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         child: Scaffold(
           body: Stack(children: [
             SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
+              physics: AlwaysScrollableScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -91,11 +91,17 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
   }
 
   Widget _getBodyWidget() {
-    return Column(
-      children: [
-        Text('Select a guide and a duration'),
-        SessionButtons()
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(height: 24),
+          Text('Select a guide and a duration'),
+          SessionButtons()
+        ],
+      ),
     );
   }
 
