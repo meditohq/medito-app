@@ -101,22 +101,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               'extras[HAS_BG_SOUND]: ${_handler?.mediaItem.value?.extras?[HAS_BG_SOUND]}'));
     }
 
-    _handler?.customEvent.stream.listen((event) {
-      if (mounted &&
-          event[AUDIO_COMPLETE] is bool &&
-          event[AUDIO_COMPLETE] == true) {
-        _trackSessionEnd(_handler?.mediaItem.value);
-        showGeneralDialog(
-            transitionDuration: Duration(milliseconds: 400),
-            context: context,
-            barrierColor: MeditoColors.darkMoon,
-            pageBuilder: (_, __, ___) {
-              return AudioCompleteDialog(
-                  bloc: _bloc, mediaItem: _handler?.mediaItem.value);
-            });
-      }
-    });
-
     return Material(
       child: SafeArea(
         top: false,
@@ -350,17 +334,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       'assets/images/' + icon + '.svg',
       color: secondaryColor,
     );
-  }
-
-  void _trackSessionEnd(MediaItem? mediaItem) {
-    if (mediaItem == null) return;
-    unawaited(Tracking.trackEvent({
-      Tracking.TYPE: Tracking.AUDIO_COMPLETED,
-      Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
-      Tracking.SESSION_TITLE: mediaItem.title,
-      Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH],
-      Tracking.SESSION_GUIDE: mediaItem.artist
-    }));
   }
 
   void _onBgMusicPressed() {

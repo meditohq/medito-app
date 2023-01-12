@@ -120,21 +120,7 @@ class SessionOptionsBloc {
 
   MediaItem getMediaItem(AudioFile? item) {
     var mediaItem = getMediaItemForAudioFile(item);
-    _trackSessionStart(mediaItem);
     return mediaItem;
-  }
-
-  void _trackSessionStart(MediaItem mediaItem) {
-    unawaited(
-      Tracking.postUsage(
-        Tracking.AUDIO_STARTED,
-        {
-          Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID],
-          Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH],
-          Tracking.SESSION_GUIDE: mediaItem.artist ?? ''
-        },
-      ),
-    );
   }
 
   MediaItem getMediaItemForAudioFile(AudioFile? file) {

@@ -51,22 +51,6 @@ class Tracking {
 
   static String get url => BASE_URL + 'items/analytics_sessions/';
 
-  static Future<void> trackEvent(Map<String, dynamic> map) async {
-    //only track in release mode, not debug
-    if (kReleaseMode) {
-      var token = await generatedToken;
-      if (token != null) {
-        unawaited(httpPost(url, token, body: map));
-      }
-    }
-  }
-
-  static List<Map<String, String>> destinationData(String type, String item) {
-    return [
-      {TYPE: type, ITEM: item}
-    ];
-  }
-
   static Future<void> postUsage(String type,
       [Map<String, String> body = const {}]) async {
     if (kReleaseMode) {
@@ -84,7 +68,7 @@ class Tracking {
               url,
               token,
               body: {
-                Tracking.APP_VERSION: version,
+                Tracking.APP_VERSION: version.version,
                 Tracking.TYPE: type,
               }
                 ..addAll(deviceInfo)
@@ -101,39 +85,3 @@ class Tracking {
     }
   }
 }
-
-String mapFileTypeToPlural(FileType fileType) {
-  switch (fileType) {
-    case FileType.folder:
-      return 'folders';
-    case FileType.text:
-      return 'articles';
-    case FileType.session:
-      return 'sessions';
-    case FileType.url:
-      return 'urls';
-    case FileType.daily:
-      return 'dailies';
-    case FileType.app:
-      return 'collection';
-  }
-}
-
-String mapToPlural(String fileType) {
-    if (fileType.contains('folder')) {
-      return 'folders';
-    }
-    if (fileType.contains('articles')) {
-      return 'articles';
-    }
-    if (fileType.contains('session')) {
-      return 'sessions';
-    }
-    if (fileType.contains('url')) {
-      return 'urls';
-    }
-    if (fileType.contains('daily')) {
-      return 'dailies';
-    }
-    return '';
-  }
