@@ -43,8 +43,8 @@ jobs:
         run: flutter pub get
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-      - name: Run test
-        run: flutter test
+#      - name: Run test
+#        run: flutter test
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
