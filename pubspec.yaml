@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.0.48+20048
+version: 2.0.49+20049
 environment:
   sdk: ">=2.17.0-1 <3.7.0-13.0"
   flutter: ">=3.0.0"
