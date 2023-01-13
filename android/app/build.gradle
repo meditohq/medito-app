@@ -40,13 +40,13 @@ project.ext {
     // TODO(YOU): Create release keys and a `keystore.properties` file. See
     // `example/README.md` for more info and `keystore.example.properties` for an
     // example.
-    APP_ID = keystoreProperties['appId']
-    KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : null
-    KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
-    KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
-    KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
-    VERSION_CODE = generateVersionCode(flutterVersionName)
-    VERSION_NAME = flutterVersionName
+    APP_ID = 'meditofoundation.medito'
+    KEYSTORE_STORE_FILE = 'app/meditokey.jks'
+    KEYSTORE_STORE_PASSWORD = '898889881'
+    KEYSTORE_KEY_ALIAS = 'key0'
+    KEYSTORE_KEY_PASSWORD = '89888988'
+    VERSION_CODE = 20059
+    VERSION_NAME = 'v2.0.59'
 }
 
 if (project.APP_ID == "DEFAULT_DO_NOT_USE") {
@@ -79,7 +79,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-
+    logger.error('Are we running on the CI? ' + System.getenv()["CI"])
 
     signingConfigs {
         signingConfigs {
