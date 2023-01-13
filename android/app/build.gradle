@@ -41,7 +41,7 @@ project.ext {
     // `example/README.md` for more info and `keystore.example.properties` for an
     // example.
     APP_ID = 'meditofoundation.medito'
-    KEYSTORE_STORE_FILE = 'app/meditokey.jks'
+    KEYSTORE_STORE_FILE = 'Users/mike/Projects/meditokey/meditokey.jks'
     KEYSTORE_STORE_PASSWORD = '898889881'
     KEYSTORE_KEY_ALIAS = 'key0'
     KEYSTORE_KEY_PASSWORD = '89888988'
@@ -81,27 +81,32 @@ android {
 
     logger.error('keystorePropertiesFile ' + keystorePropertiesFile)
     logger.error('Are we running on the CI? ' + System.getenv()["CI"])
+    logger.error('keystore path? ' + System.getenv()["FCI_KEYSTORE_PATH"])
     logger.error('keystore pwd? ' + System.getenv()["FCI_KEYSTORE_PASSWORD"])
     logger.error('keystore alias? ' + System.getenv()["FCI_KEY_ALIAS"])
     logger.error('key pwd? ' + System.getenv()["FCI_KEY_PASSWORD"])
 
+    logger.error(project.KEYSTORE_STORE_FILE)
+    logger.error(project.KEYSTORE_STORE_PASSWORD)
+    logger.error(project.KEYSTORE_KEY_ALIAS)
+    logger.error(project.KEYSTORE_KEY_PASSWORD)
+
     signingConfigs {
-        signingConfigs {
-            release {
-                if (System.getenv()["CI"]) { // CI=true is exported by Codemagic or GH Actions
-                    storeFile file("app/meditokey.jks")
-                    storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
-                    keyAlias System.getenv()["FCI_KEY_ALIAS"]
-                    keyPassword System.getenv()["FCI_KEY_PASSWORD"]
-                } else {
-                    storeFile project.KEYSTORE_STORE_FILE
-                    storePassword project.KEYSTORE_STORE_PASSWORD
-                    keyAlias project.KEYSTORE_KEY_ALIAS
-                    keyPassword project.KEYSTORE_KEY_PASSWORD
-                }
+        release {
+            if (System.getenv()["CI"]) { // CI=true is exported by Codemagic or GH Actions
+                storeFile file(System.getenv()["FCI_KEYSTORE_PATH"])
+                storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
+                keyAlias System.getenv()["FCI_KEY_ALIAS"]
+                keyPassword System.getenv()["FCI_KEY_PASSWORD"]
+            } else {
+                storeFile project.KEYSTORE_STORE_FILE
+                storePassword project.KEYSTORE_STORE_PASSWORD
+                keyAlias project.KEYSTORE_KEY_ALIAS
+                keyPassword project.KEYSTORE_KEY_PASSWORD
             }
         }
     }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release
