@@ -7,7 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:pedantic/pedantic.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+// import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'player_utils.dart';
 
@@ -92,8 +92,8 @@ class _Download {
         print('Saved New: ' + file.path);
         isDownloading = false;
       } catch (e, st){
-        unawaited(Sentry.captureException(e, stackTrace: st,
-            hint: 'onDone, writing file failed, ${file.path}'));
+        // unawaited(Sentry.captureException(e, stackTrace: st,
+        //     hint: 'onDone, writing file failed, ${file.path}'));
       }
       return;
     });

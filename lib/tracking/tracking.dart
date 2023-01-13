@@ -19,7 +19,7 @@ import 'package:Medito/network/user/user_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+// import 'package:sentry_flutter/sentry_flutter.dart';
 
 class Tracking {
   static const String FOLDER_TAPPED = 'folder_tapped';
@@ -77,8 +77,8 @@ class Tracking {
           );
         }
       } catch (e, str) {
-        unawaited(
-            Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
+        // unawaited(
+        //     Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
         print('post usage failed: ' + e.toString());
         return;
       }

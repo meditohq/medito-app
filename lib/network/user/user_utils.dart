@@ -8,7 +8,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+// import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../tracking/tracking.dart';
@@ -35,9 +35,9 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
   await prefs.setString(USER_ID, map?[USER_ID] ?? '');
   await prefs.setString(TOKEN, map?[TOKEN] ?? '');
 
-  Sentry.configureScope(
-    (scope) => scope.user = SentryUser(id: map?[USER_ID]),
-  );
+  // Sentry.configureScope(
+  //   (scope) => scope.user = SentryUser(id: map?[USER_ID]),
+  // );
 }
 
 Future<void> _postUsage() async {
@@ -52,7 +52,7 @@ Future<void> _postUsage() async {
       unawaited(httpPost(url, token, body: {'app_version': version}));
     }
   } catch (e, str) {
-    unawaited(Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
+    // unawaited(Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
     print('post usage failed: ' + e.toString());
     return;
   }
@@ -106,7 +106,7 @@ class UserRepo {
           ? (UserResponse.fromJson(response).data?.id ?? 'EMPTY')
           : 'EMPTY';
     } catch (e, st) {
-      unawaited(Sentry.captureException(e, stackTrace: st, hint: token));
+      // unawaited(Sentry.captureException(e, stackTrace: st, hint: token));
     } finally {
       return {USER_ID: id, TOKEN: 'Bearer $token'};
     }

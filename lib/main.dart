@@ -24,7 +24,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+// import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audioplayer/audio_inherited_widget.dart';
@@ -53,10 +53,10 @@ Future<void> main() async {
   });
 
   if (kReleaseMode) {
-    await SentryFlutter.init((options) {
-      options.dsn = SENTRY_URL;
-    },
-        appRunner: () => _runApp(_audioHandler));
+    // await SentryFlutter.init((options) {
+    //   options.dsn = SENTRY_URL;
+    // },
+    //     appRunner: () => _runApp(_audioHandler));
   } else {
     _runApp(_audioHandler);
   }

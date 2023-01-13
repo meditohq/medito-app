@@ -21,7 +21,7 @@ import 'package:Medito/network/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:http/http.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+// import 'package:sentry_flutter/sentry_flutter.dart';
 
 //move this to network package later
 Future httpGet(String url,
@@ -50,8 +50,8 @@ Future httpGet(String url,
     if (response.statusCode == 200) {
       await writeJSONToCache(response.body, fileNameForCache ?? url);
     } else {
-      unawaited(Sentry.captureMessage(
-          'response code: ${response.statusCode}, url: $url, headers: ${response.headers} reason: ${response.reasonPhrase}'));
+      // unawaited(Sentry.captureMessage(
+      //     'response code: ${response.statusCode}, url: $url, headers: ${response.headers} reason: ${response.reasonPhrase}'));
       print('----GET----');
       print('CACHE USED: ${cache != null}');
       print('FILE NAME FOR CACHE: ${fileNameForCache ?? ''}');
@@ -68,8 +68,8 @@ Future httpGet(String url,
       var decode = json.decode(response.body);
       return decode;
     } catch (e, str) {
-      unawaited(Sentry.captureException(e,
-          stackTrace: str, hint: 'decode: ${response.body}'));
+      // unawaited(Sentry.captureException(e,
+      //     stackTrace: str, hint: 'decode: ${response.body}'));
       return null;
     }
   }
