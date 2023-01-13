@@ -28,6 +28,7 @@ def configured = true
 try {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (IOException e) {
+    logger.error('keystore properties not loaded')
     configured = false
 }
 
@@ -78,11 +79,13 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+
+
     signingConfigs {
         signingConfigs {
             release {
                 if (System.getenv()["CI"]) { // CI=true is exported by Codemagic or GH Actions
-                    storeFile file(System.getenv()["FCI_KEYSTORE_PATH"])
+                    storeFile file("app/meditokey.jks")
                     storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
                     keyAlias System.getenv()["FCI_KEY_ALIAS"]
                     keyPassword System.getenv()["FCI_KEY_PASSWORD"]
