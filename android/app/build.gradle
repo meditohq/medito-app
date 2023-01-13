@@ -79,7 +79,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    logger.error('keystorePropertiesFile ' + keystorePropertiesFile)
     logger.error('Are we running on the CI? ' + System.getenv()["CI"])
+    logger.error('keystore pwd? ' + System.getenv()["FCI_KEYSTORE_PASSWORD"])
+    logger.error('keystore alias? ' + System.getenv()["FCI_KEY_ALIAS"])
+    logger.error('key pwd? ' + System.getenv()["FCI_KEY_PASSWORD"])
 
     signingConfigs {
         signingConfigs {
