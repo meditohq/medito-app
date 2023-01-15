@@ -30,6 +30,7 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
+        android:name="${applicationName}"
         android:label="Medito">
 
         <meta-data
