@@ -99,21 +99,6 @@ void _launchEmailSubmission(String href) async {
   }
 }
 
-Future<void> acceptTracking() async {
-  var prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('tracking', true);
-}
-
-Future<void> trackingAnswered() async {
-  var prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('trackingAnswered', true);
-}
-
-Future<bool> getTrackingAnswered() async {
-  var prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('trackingAnswered') ?? false;
-}
-
 extension EmptyOrNull on String? {
   bool isEmptyOrNull() {
     if (this == null) return true;
