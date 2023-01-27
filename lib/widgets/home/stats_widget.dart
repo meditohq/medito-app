@@ -1,4 +1,4 @@
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/widgets/home/streak_tile_widget.dart';
 import 'package:flutter/material.dart';

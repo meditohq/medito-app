@@ -57,5 +57,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
-
+  fonts:
+    - family: Clash Display
+      fonts:
+        - asset: assets/fonts/clash-display/ClashDisplay-Medium.otf
+        - asset: assets/fonts/clash-display/ClashDisplay-Semibold.otf
   uses-material-design: true

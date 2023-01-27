@@ -47,7 +47,8 @@ Future<Map<String, dynamic>?> httpGet(String url,
       headers: {
         HttpHeaders.authorizationHeader: auth,
         HttpHeaders.accessControlAllowOriginHeader: '*',
-        HttpHeaders.accessControlAllowHeadersHeader: 'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
+        HttpHeaders.accessControlAllowHeadersHeader:
+            'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
         HttpHeaders.accessControlAllowCredentialsHeader: 'true',
         HttpHeaders.accessControlAllowMethodsHeader: 'POST, OPTIONS, HEAD, GET',
         HttpHeaders.contentTypeHeader: ContentType.json.value,

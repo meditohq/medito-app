@@ -1,12 +1,13 @@
-import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/text_themes.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final String? message;
   final SvgPicture? image;
-  const EmptyStateWidget({Key? key, this.message, this.image}) : super(key: key);
+  const EmptyStateWidget({Key? key, this.message, this.image})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

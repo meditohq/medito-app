@@ -1,9 +1,10 @@
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
+import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/utils/strings.dart';
+import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/empty_widget.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
@@ -74,7 +75,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   Widget _getEmptyWidget() => EmptyStateWidget(
         message: EMPTY_DOWNLOADS_MESSAGE,
         image: SvgPicture.asset(
-          'assets/images/downloads.svg',
+          AssetConstants.dalle,
           height: 168,
           width: 178,
         ),

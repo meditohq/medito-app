@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../network/user/user_utils.dart';
-import '../../utils/colors.dart';
+import '../../constants/colors/color_constants.dart';
 import '../../utils/stats_utils.dart';
 import '../btm_nav/home_widget.dart';
 import '../packs/packs_screen.dart';

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../utils/colors.dart';
+import '../../../constants/colors/color_constants.dart';
 
 class AudioCompleteDialog extends StatefulWidget {
   final PlayerBloc? bloc;

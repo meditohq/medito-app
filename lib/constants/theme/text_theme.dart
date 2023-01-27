@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'colors.dart';
+import '../colors/color_constants.dart';
+
+
+
 
 TextTheme meditoTextTheme(BuildContext context) {
   return GoogleFonts.manropeTextTheme(Theme.of(context).textTheme.copyWith(

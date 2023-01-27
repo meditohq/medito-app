@@ -1,5 +1,5 @@
-import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/text_themes.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/theme/text_theme.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
