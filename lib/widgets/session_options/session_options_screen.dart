@@ -13,13 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/components/header/collapsible_header_component.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/strings/asset_constants.dart';
+import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:Medito/utils/navigation_extra.dart';
-import 'package:Medito/widgets/session_options/session_buttons.dart';
-import 'package:audio_service/audio_service.dart';
+import 'package:Medito/widgets/session_options/components/session_buttons.dart';
 import 'package:flutter/material.dart';
-
-import '../../audioplayer/audio_inherited_widget.dart';
-import '../medito_header_widget.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
   final String? id;
@@ -32,55 +32,24 @@ class SessionOptionsScreen extends StatefulWidget {
 }
 
 class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
-
-  late AudioHandler? _audioHandler;
-
   @override
   Widget build(BuildContext context) {
-    _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
-
-    return content();
-  }
-
-  RefreshIndicator content() {
     return RefreshIndicator(
-        onRefresh: () => _refresh(),
-        child: Scaffold(
-          body: Stack(children: [
-            SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _getHeaderWidget(),
-                  _getBodyWidget(),
-                ],
-              ),
-            ),
-          ]),
-        ));
+      onRefresh: () => refresh(),
+      child: Scaffold(
+        body: CollapsibleHeaderComponent(
+            bgImage: AssetConstants.dalle,
+            title: 'Gratitude for nature',
+            description:
+                'This meditation focuses on cultivating gratitude for nature and recognising our connection to it. This can foster a real sense of belonging, happiness and contentment.',
+            children: [
+              mainContent(),
+            ]),
+      ),
+    );
   }
 
-  HeaderWidget _getHeaderWidget() =>
-      HeaderWidget('Title', 'Long description!!', '');
-
-  Future<void> _onBeginTap() {
-    // var item = _bloc.getCurrentlySelectedFile();
-    // if (_bloc.isDownloading(item) || showIndeterminateSpinner) {
-    //   return Future.value(null);
-    // }
-    //
-    // if (widget.id != null) {
-    //   _bloc.saveOptionsSelectionsToSharedPreferences(widget.id!);
-    // }
-    //
-    // var mediaItem = _bloc.getMediaItem(item);
-    // _audioHandler?.playMediaItem(mediaItem);
-    // context.go(GoRouter.of(context).location + PlayerPath);
-    return Future.value(null);
-  }
-
-  Widget _getBodyWidget() {
+  Widget mainContent() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -88,13 +57,19 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(height: 24),
-          Text('Select a guide and a duration'),
+          Text(
+            'Select a guide / duration',
+            style: Theme.of(context)
+                .primaryTextTheme
+                .bodyText1
+                ?.copyWith(color: MeditoColors.newGrey, fontFamily: DmSans),
+          ),
+          height16,
           SessionButtons()
         ],
       ),
     );
   }
 
-  _refresh() {}
-
+  Future<void> refresh() async {}
 }

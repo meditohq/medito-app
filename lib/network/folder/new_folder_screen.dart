@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../utils/strings.dart';
+import '../../constants/strings/string_constants.dart';
 import '../../utils/utils.dart';
-import '../../widgets/medito_header_widget.dart';
+import '../../components/header/stack_header_component.dart';
 import 'folder_provider.dart';
 
 class NewFolderScreen extends ConsumerWidget {
@@ -34,7 +34,10 @@ class NewFolderScreen extends ConsumerWidget {
         },
         child: ListView(
           children: [
-            HeaderWidget(folder?.data?.title, folder?.data?.description, ''),
+            StackHeaderComponent(
+              title: folder?.data?.title,
+              description: folder?.data?.description,
+            ),
             ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               itemCount: folder?.data?.items?.length ?? 0,
@@ -85,11 +88,11 @@ class NewFolderScreen extends ConsumerWidget {
         var location = GoRouter.of(context).location;
         if (type == 'folder') {
           if (location.contains('folder2')) {
-            context.go(getPathFromString(Folder3Path,
-                [location.split('/')[2], this.id, id.toString()]));
+            context.go(getPathFromString(
+                Folder3Path, [location.split('/')[2], this.id, id.toString()]));
           } else {
-            context.go(
-                getPathFromString(Folder2Path, [this.id, id.toString()]));
+            context
+                .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
           }
         } else {
           context.go(location + getPathFromString(type, [id.toString()]));

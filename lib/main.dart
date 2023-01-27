@@ -16,10 +16,10 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/text_themes.dart';
+import 'package:Medito/constants/theme/text_theme.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +55,7 @@ Future<void> main() async {
   if (kReleaseMode) {
     await SentryFlutter.init((options) {
       options.dsn = SENTRY_URL;
-    },
-        appRunner: () => _runApp(_audioHandler));
+    }, appRunner: () => _runApp(_audioHandler));
   } else {
     _runApp(_audioHandler);
   }
@@ -79,7 +78,6 @@ class ParentWidget extends StatefulWidget {
 
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
-
   @override
   void initState() {
     super.initState();
@@ -129,7 +127,6 @@ class _ParentWidgetState extends State<ParentWidget>
     }
   }
 }
-
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
   @override

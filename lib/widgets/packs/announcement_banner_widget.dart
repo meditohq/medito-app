@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/packs/announcement_bloc.dart';
 import 'package:Medito/network/packs/announcement_response.dart';
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/expand_animate_widget.dart';
 import 'package:flutter/material.dart';

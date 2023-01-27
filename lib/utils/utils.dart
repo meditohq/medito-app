@@ -17,7 +17,7 @@ import 'dart:io';
 
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

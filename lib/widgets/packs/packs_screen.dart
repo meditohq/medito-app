@@ -16,8 +16,8 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/packs/packs_bloc.dart';
 import 'package:Medito/network/packs/packs_response.dart';
-import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/strings.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/packs/error_widget.dart';
 import 'package:Medito/widgets/packs/pack_list_item.dart';
@@ -74,6 +74,7 @@ class PackListWidgetState extends State<PackListWidget> {
                   }
 
                   if (connectionSnapshot.data == true &&
+                      connectionSnapshot.data != null &&
                       snapshot.data?.status == Status.COMPLETED) {
                     return _getListWidget(snapshot.data?.body);
                   } else {

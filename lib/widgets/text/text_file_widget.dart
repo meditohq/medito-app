@@ -14,8 +14,8 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/network/text/text_bloc.dart';
-import 'package:Medito/utils/colors.dart';
-import 'package:Medito/utils/text_themes.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/theme/text_theme.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
