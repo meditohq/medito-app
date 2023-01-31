@@ -1,7 +1,7 @@
 import 'package:Medito/network/home/courses_response.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/home/loading_text_box_widget.dart';
+import 'package:Medito/views/home/loading_text_box_widget.dart';
 import 'package:flutter/material.dart';
 
 class CoursesRowItemWidget extends StatelessWidget {

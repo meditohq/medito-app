@@ -1,6 +1,6 @@
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/main/app_bar_widget.dart';
+import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';

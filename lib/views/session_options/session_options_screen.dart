@@ -18,7 +18,7 @@ import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:Medito/utils/navigation_extra.dart';
-import 'package:Medito/widgets/session_options/components/session_buttons.dart';
+import 'package:Medito/views/session_options/components/session_buttons.dart';
 import 'package:flutter/material.dart';
 
 class SessionOptionsScreen extends StatefulWidget {
@@ -38,13 +38,14 @@ class _SessionOptionsScreenState extends State<SessionOptionsScreen> {
       onRefresh: () => refresh(),
       child: Scaffold(
         body: CollapsibleHeaderComponent(
-            bgImage: AssetConstants.dalle,
-            title: 'Gratitude for nature',
-            description:
-                'This meditation focuses on cultivating gratitude for nature and recognising our connection to it. This can foster a real sense of belonging, happiness and contentment.',
-            children: [
-              mainContent(),
-            ]),
+          bgImage: AssetConstants.dalle,
+          title: 'Gratitude for nature',
+          description:
+              'This meditation focuses on cultivating gratitude for nature and recognising our connection to it. This can foster a real sense of belonging, happiness and contentment.',
+          children: [
+            mainContent(),
+          ],
+        ),
       ),
     );
   }

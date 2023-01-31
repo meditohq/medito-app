@@ -49,7 +49,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.3.3
-  riverpod_generator: ^1.1.1 #USAGE: dart run build_runner watch --delete-conflicting-outputs
+  riverpod_generator: ^1.1.1 #USAGE: dart run build_runner watch --delete-conflicting-outputs separate command #dart run build_runner watch
   json_serializable: ^6.5.4
   mocktail: ^0.3.0
   dart_code_metrics: ^5.5.0 #USAGE: flutter pub run dart_code_metrics:metrics lib

@@ -1,7 +1,7 @@
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/courses_bloc.dart';
 import 'package:Medito/network/home/courses_response.dart';
-import 'package:Medito/widgets/home/courses_row_item_widget.dart';
+import 'package:Medito/views/home/courses_row_item_widget.dart';
 import 'package:flutter/material.dart';
 
 class CoursesRowWidget extends StatefulWidget {

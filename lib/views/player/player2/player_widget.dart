@@ -22,10 +22,10 @@ import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/main/app_bar_widget.dart';
-import 'package:Medito/widgets/player/player2/audio_complete_dialog.dart';
-import 'package:Medito/widgets/player/position_indicator_widget.dart';
-import 'package:Medito/widgets/player/subtitle_text_widget.dart';
+import 'package:Medito/views/main/app_bar_widget.dart';
+import 'package:Medito/views/player/player2/audio_complete_dialog.dart';
+import 'package:Medito/views/player/position_indicator_widget.dart';
+import 'package:Medito/views/player/subtitle_text_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -137,7 +137,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void tryLoadingBgSoundsData() {
     try {
-      if (_hasBGSound() == true) {
+      var x = _handler;
+      print(x);
+      if (_hasBGSound() != null && _hasBGSound() == true) {
         getSavedBgSoundData();
       }
     } on Exception catch (e, s) {
