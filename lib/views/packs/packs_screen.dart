@@ -19,8 +19,8 @@ import 'package:Medito/network/packs/packs_response.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/packs/error_widget.dart';
-import 'package:Medito/widgets/packs/pack_list_item.dart';
+import 'package:Medito/views/packs/error_widget.dart';
+import 'package:Medito/views/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

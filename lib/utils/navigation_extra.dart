@@ -1,13 +1,13 @@
 import 'package:Medito/network/folder/new_folder_screen.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
-import 'package:Medito/widgets/session_options/session_options_screen.dart';
-import 'package:Medito/widgets/text/text_file_widget.dart';
+import 'package:Medito/views/btm_nav/downloads_widget.dart';
+import 'package:Medito/views/session_options/session_options_screen.dart';
+import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/home/home_wrapper_widget.dart';
-import '../widgets/player/player2/player_widget.dart';
+import '../views/home/home_wrapper_widget.dart';
+import '../views/player/player2/player_widget.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -60,8 +60,7 @@ final router = GoRouter(
                     ],
                   ),
                 ],
-                pageBuilder: (context, state) =>
-                    getFolderMaterialPage(state),
+                pageBuilder: (context, state) => getFolderMaterialPage(state),
               ),
             ],
             pageBuilder: (context, state) => getFolderMaterialPage(state),
@@ -70,13 +69,10 @@ final router = GoRouter(
   ],
 );
 
-
 GoRoute _getDailyRoute() {
   return GoRoute(
     path: 'daily/:did',
-    routes: [
-      _getPlayerRoute()
-    ],
+    routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsDailyPage(state),
   );
 }
@@ -91,20 +87,18 @@ GoRoute _getArticleRoute() {
 GoRoute _getSessionRoute() {
   return GoRoute(
     path: 'session/:sid',
-    routes: [
-      _getPlayerRoute()
-    ],
+    routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsMaterialPage(state),
   );
 }
 
 GoRoute _getPlayerRoute() {
   return GoRoute(
-      path: 'player',
-      pageBuilder: (context, state) {
-        return getPlayerMaterialPage(state);
-      },
-    );
+    path: 'player',
+    pageBuilder: (context, state) {
+      return getPlayerMaterialPage(state);
+    },
+  );
 }
 
 enum Screen {
@@ -154,16 +148,13 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   if (state.params.length == 1) {
     return MaterialPage(
-        key: state.pageKey,
-        child: NewFolderScreen(id: state.params['fid']));
+        key: state.pageKey, child: NewFolderScreen(id: state.params['fid']));
   } else if (state.params.length == 2) {
     return MaterialPage(
-        key: state.pageKey,
-        child: NewFolderScreen(id: state.params['f2id']));
+        key: state.pageKey, child: NewFolderScreen(id: state.params['f2id']));
   } else {
     return MaterialPage(
-        key: state.pageKey,
-        child: NewFolderScreen(id: state.params['f3id']));
+        key: state.pageKey, child: NewFolderScreen(id: state.params['f3id']));
   }
 }
 
@@ -183,7 +174,8 @@ String getPathFromString(String? place, List<String?> ids) {
     return ArticlePath.replaceAll(':aid', ids.first!);
   }
   if (place != null && place.contains('folder3')) {
-    return Folder3Path.replaceAll(':fid', ids.first!).replaceAll(':f2id', ids[1]!)
+    return Folder3Path.replaceAll(':fid', ids.first!)
+        .replaceAll(':f2id', ids[1]!)
         .replaceAll(':f3id', ids[2]!);
   }
   if (place != null && place.contains('folder2')) {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-const String DmMono = 'DMMono_regular';
-const String DmSans = 'DMSans_regular';
+final String? DmMono = GoogleFonts.dmMono().fontFamily;
+final String? DmSans = GoogleFonts.dmSans().fontFamily;
 const String ClashDisplay = 'Clash Display';
 const defaultPadding = 16.0;
 const height16 = SizedBox(height: 16);

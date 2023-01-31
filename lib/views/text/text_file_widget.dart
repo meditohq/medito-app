@@ -17,7 +17,7 @@ import 'package:Medito/network/text/text_bloc.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/theme/text_theme.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/main/app_bar_widget.dart';
+import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 

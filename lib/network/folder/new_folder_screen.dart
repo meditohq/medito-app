@@ -1,12 +1,14 @@
+import 'package:Medito/components/header/collapsible_header_component.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/strings/asset_constants.dart';
+import 'package:Medito/constants/strings/string_constants.dart';
+import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:Medito/network/folder/new_folder_response.dart';
 import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../constants/strings/string_constants.dart';
-import '../../utils/utils.dart';
-import '../../components/header/stack_header_component.dart';
 import 'folder_provider.dart';
 
 class NewFolderScreen extends ConsumerWidget {
@@ -18,7 +20,7 @@ class NewFolderScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var value = ref.watch(folderDataProvider(id: id, skipCache: false));
     return value.when(
-        data: (data) => buildScaffoldWithData(data, ref),
+        data: (data) => buildScaffoldWithData(context, data, ref),
         error: (err, stack) => Text(err.toString()),
         loading: () => _buildLoadingWidget());
   }
@@ -26,41 +28,42 @@ class NewFolderScreen extends ConsumerWidget {
   Widget _buildLoadingWidget() =>
       const Center(child: CircularProgressIndicator());
 
-  Scaffold buildScaffoldWithData(NewFolderResponse? folder, WidgetRef ref) {
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          return await ref.refresh(folderDataProvider(id: id, skipCache: true));
-        },
-        child: ListView(
-          children: [
-            StackHeaderComponent(
-              title: folder?.data?.title,
-              description: folder?.data?.description,
-            ),
-            ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: folder?.data?.items?.length ?? 0,
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int i) {
-                var title = folder?.data?.items?[i].item?.title;
-                var subtitle = folder?.data?.items?[i].item?.subtitle;
-
-                return GestureDetector(
+  RefreshIndicator buildScaffoldWithData(
+      BuildContext context, NewFolderResponse? folder, WidgetRef ref) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        return await ref.refresh(folderDataProvider(id: id, skipCache: true));
+      },
+      child: Scaffold(
+        body: CollapsibleHeaderComponent(
+            bgImage: AssetConstants.dalle,
+            title: folder?.data?.title ?? '',
+            description: folder?.data?.description,
+            children: [
+              for (int i = 0; i < (folder?.data?.items?.length ?? 0); i++)
+                GestureDetector(
                   onTap: () => _onListItemTap(folder?.data?.items?[i].item?.id,
                       folder?.data?.items?[i].item?.type, ref.context),
-                  child: _buildListTile(title, subtitle, true),
-                );
-              },
-            )
-          ],
-        ),
+                  child: _buildListTile(
+                      context,
+                      folder?.data?.items?[i].item?.title,
+                      folder?.data?.items?[i].item?.subtitle,
+                      true),
+                )
+            ]),
       ),
     );
   }
 
-  Widget _buildListTile(String? title, String? subtitle, bool showIcon) {
-    return Padding(
+  Container _buildListTile(
+      BuildContext context, String? title, String? subtitle, bool showIcon) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(width: 0.5, color: MeditoColors.softGrey),
+        ),
+      ),
+      constraints: BoxConstraints(minHeight: 88),
       padding: const EdgeInsets.all(20.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,15 +71,26 @@ class NewFolderScreen extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (title != null) Text(title),
+              if (title != null)
+                Text(
+                  title,
+                  style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
+                      color: MeditoColors.walterWhite,
+                      fontFamily: DmSans,
+                      height: 2),
+                ),
               if (subtitle != null)
-                Column(children: [
-                  Container(height: 8),
-                  Text(subtitle),
-                ])
+                Text(
+                  subtitle,
+                  style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
+                        fontFamily: DmMono,
+                        height: 2,
+                        color: MeditoColors.newGrey,
+                      ),
+                )
             ],
           ),
-          showIcon ? Icon(_getIcon(), color: Colors.white) : Container()
+          if (showIcon) Icon(_getIcon(), color: Colors.white)
         ],
       ),
     );

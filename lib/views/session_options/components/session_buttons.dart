@@ -1,6 +1,8 @@
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SessionButtons extends StatelessWidget {
@@ -54,25 +56,31 @@ class SessionButtons extends StatelessWidget {
         });
   }
 
-  Container _getGridItem(BuildContext context, int i, int index) {
+  InkWell _getGridItem(BuildContext context, int i, int index) {
     var label = data.values.elementAt(i).elementAt(index).toString();
-    // print(GoogleFonts.dmSans().fontFamily);
-    return Container(
-      width: 171,
-      height: 56,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: MeditoColors.greyIsTheNewGrey,
-        borderRadius: BorderRadius.all(
-          Radius.circular(14),
+    return InkWell(
+      onTap: () {
+        context.go(GoRouter.of(context).location + PlayerPath);
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Ink(
+        width: 171,
+        height: 56,
+        decoration: BoxDecoration(
+          color: MeditoColors.greyIsTheNewGrey,
+          borderRadius: BorderRadius.all(
+            Radius.circular(14),
+          ),
         ),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context)
-            .primaryTextTheme
-            .bodyText1
-            ?.copyWith(color: MeditoColors.walterWhite, fontFamily: DmMono),
+        child: Center(
+          child: Text(
+            label,
+            style: Theme.of(context)
+                .primaryTextTheme
+                .bodyText1
+                ?.copyWith(color: MeditoColors.walterWhite, fontFamily: DmMono),
+          ),
+        ),
       ),
     );
   }

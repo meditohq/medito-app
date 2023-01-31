@@ -1,6 +1,6 @@
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/widgets/home/streak_tile_widget.dart';
+import 'package:Medito/views/home/streak_tile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';

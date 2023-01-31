@@ -22,7 +22,7 @@ import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/player/position_indicator_widget.dart';
+import 'package:Medito/views/player/position_indicator_widget.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';

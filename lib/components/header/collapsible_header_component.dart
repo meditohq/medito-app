@@ -36,7 +36,7 @@ class _CollapsibleHeaderComponentState
   bool get _isShrink {
     return _scrollController != null &&
         _scrollController!.hasClients &&
-        _scrollController!.offset > (height - kToolbarHeight);
+        _scrollController!.offset > (height - kToolbarHeight - 50);
   }
 
   @override
@@ -132,9 +132,9 @@ class _CollapsibleHeaderComponentState
       children: [
         Flexible(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: _isShrink ? 100 : 15),
+            padding: EdgeInsets.symmetric(horizontal: _isShrink ? 50 : 15),
             child: Text(
-              widget.title,
+              "${widget.title} title this is some random test",
               maxLines: _isShrink ? 1 : 3,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).primaryTextTheme.headline4?.copyWith(
