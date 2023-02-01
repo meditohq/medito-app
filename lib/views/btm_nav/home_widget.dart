@@ -21,11 +21,13 @@ import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/repositories/folder/folder_repository.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/folder/folder_viewmodel.dart';
 import 'package:Medito/views/home/courses_row_widget.dart';
 import 'package:Medito/views/home/daily_message_widget.dart';
 import 'package:Medito/views/home/small_shortcuts_row_widget.dart';
@@ -34,12 +36,13 @@ import 'package:Medito/views/packs/announcement_banner_widget.dart';
 import 'package:Medito/views/packs/error_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeWidget extends StatefulWidget {
+class HomeWidget extends ConsumerStatefulWidget {
   const HomeWidget(this.hasOpened);
 
   final bool hasOpened;
@@ -48,7 +51,7 @@ class HomeWidget extends StatefulWidget {
   _HomeWidgetState createState() => _HomeWidgetState();
 }
 
-class _HomeWidgetState extends State<HomeWidget> {
+class _HomeWidgetState extends ConsumerState<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
 
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
@@ -63,6 +66,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // ref.watch(fetchFoldersProvider(folderId: 1));
     _observeNetwork();
 
     _bloc.fetchMenu();
@@ -77,14 +81,16 @@ class _HomeWidgetState extends State<HomeWidget> {
           child: StreamBuilder<bool>(
               stream: _bloc.connectionStreamController.stream,
               builder: (context, connectionSnapshot) {
-                if (connectionSnapshot.hasData && !(connectionSnapshot.data ?? true)) {
+                if (connectionSnapshot.hasData &&
+                    !(connectionSnapshot.data ?? true)) {
                   return _buildErrorPacksWidget();
                 } else {
                   return ListView(
                     physics: AlwaysScrollableScrollPhysics(),
                     children: [
                       _getAppBar(context),
-                      AnnouncementBanner(key: _announceKey, hasOpened: widget.hasOpened),
+                      AnnouncementBanner(
+                          key: _announceKey, hasOpened: widget.hasOpened),
                       SmallShortcutsRowWidget(
                         key: _shortcutKey,
                         onTap: (type, id) => _navigate(
@@ -118,7 +124,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     return checkConnectivity().then(
       (value) {
         if (value) {
-         context.go(getPathFromString(type, [id]));
+          context.go(getPathFromString(type, [id]));
         } else {
           _bloc.checkConnection();
         }
@@ -179,12 +185,13 @@ class _HomeWidgetState extends State<HomeWidget> {
       itemBuilder: (BuildContext context) {
         if (snapshot.hasData && snapshot.data?.body != null) {
           return snapshot.data?.body?.data?.map((MenuData data) {
-            return PopupMenuItem<MenuData>(
-              value: data,
-              child: Text(data.itemLabel ?? '',
-                  style: Theme.of(context).textTheme.headline4),
-            );
-          }).toList() ?? [];
+                return PopupMenuItem<MenuData>(
+                  value: data,
+                  child: Text(data.itemLabel ?? '',
+                      style: Theme.of(context).textTheme.headline4),
+                );
+              }).toList() ??
+              [];
         }
         return [];
       },
@@ -197,13 +204,12 @@ class _HomeWidgetState extends State<HomeWidget> {
       builder: (context, snapshot) {
         return GestureDetector(
           onLongPress: () => _showVersionPopUp(context),
-          child:
-              Text(snapshot.data ?? '', style: Theme.of(context).textTheme.headline1),
+          child: Text(snapshot.data ?? '',
+              style: Theme.of(context).textTheme.headline1),
         );
       });
 
   Future<void> _showVersionPopUp(BuildContext context) async {
-
     var line1 = await getDeviceInfoString();
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';

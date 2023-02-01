@@ -20,6 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
+  dio: ^4.0.6
   google_fonts: ^3.0.1
   flutter_svg: ^1.0.3
   path_provider: ^2.0.1
@@ -49,7 +50,10 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.3.3
-  riverpod_generator: ^1.1.1 #USAGE: dart run build_runner watch --delete-conflicting-outputs separate command #dart run build_runner watch
+  #USAGE: dart run build_runner watch --delete-conflicting-outputs
+  #dart run build_runner watch
+  #flutter pub run build_runner build --delete-conflicting-outputs
+  riverpod_generator: ^1.1.1  
   json_serializable: ^6.5.4
   mocktail: ^0.3.0
   dart_code_metrics: ^5.5.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
