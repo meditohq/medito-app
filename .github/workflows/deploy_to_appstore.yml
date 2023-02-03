@@ -1,4 +1,4 @@
-name: Deploy to App Store
+name: Deploy to App Store 
 
 on:
   workflow_dispatch:
