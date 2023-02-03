@@ -1,0 +1,79 @@
+name: Deploy to Play Store
+
+on:
+  workflow_dispatch:
+    # Enable manual run
+    inputs:
+      lane:
+        description: 'Currently, only support beta lane'
+        required: true
+        default: 'beta'
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  deploy_ios:
+    name: Deploy beta build to TestFlight
+    runs-on: macos-latest
+    environment: prod
+    steps:
+      # Set up Flutter.
+      - name: Clone Flutter repository with stable channel
+        uses: subosito/flutter-action@v1.5.0
+        with:
+          channel: stable
+      - run: flutter doctor -v
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Fixme: https://github.com/meditohq/medito-app/issues/151
+      - name: Create auth.dart
+        run: sh ./.github/scripts/create_auth_dart.sh
+        env:
+          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
+          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
+          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
+
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Analyze code
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+      - name: Run test
+        run: flutter test
+
+      - name: Build ios bundle without code signing
+        run: flutter build ios --release --no-codesign
+
+      # Setup Ruby, Bundler, and Gemfile dependencies
+      - name: Setup Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Create Apple API Key JSON
+        run: |
+          echo "$APPLE_API_KEY_JSON" > fastlane/apple_api_key.json
+        env:
+          APPLE_API_KEY_JSON: ${{ secrets.APPLE_API_KEY_JSON }}
+        working-directory: ios
+
+        ## TODO: implement other lanes for appstore deployment
+      - run: bundle exec fastlane beta
+        env:
+          APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
+          DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
+          DEVELOPER_APP_IDENTIFIER: '${{ secrets.DEVELOPER_APP_IDENTIFIER }}'
+          DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
+          FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
+          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
+          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
+          PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
+          TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
+          TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
+        working-directory: ios
