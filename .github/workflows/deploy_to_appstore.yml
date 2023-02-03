@@ -39,13 +39,18 @@ jobs:
           CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
-      - name: Setup dart with later version
+      - name: Update packages # Needed to upgrade Dart SDK to compatible version
         run: flutter upgrade
+        
+      - name: Run Riverpod generator
+        run: dart pub run build_runner watch
 
       - name: Get dependencies
         run: flutter pub get
+        
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+        
       - name: Run test
         run: flutter test
 
