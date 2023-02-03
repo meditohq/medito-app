@@ -10,8 +10,9 @@ on:
         default: 'beta'
   push:
     # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    #tags:
+     # - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+     branches: ["fastlane-ios"]
 
 jobs:
   deploy_ios:
@@ -38,12 +39,21 @@ jobs:
           CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
+      - name: Update packages # Needed to upgrade Dart SDK to compatible version
+        run: flutter upgrade
+
       - name: Get dependencies
         run: flutter pub get
+        
+      - name: Run Riverpod generator
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+        
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-      - name: Run test
-        run: flutter test
+    
+    # Add this step once test folder has been re-added to project  
+    # - name: Run test
+    #   run: flutter test
 
       - name: Build ios bundle without code signing
         run: flutter build ios --release --no-codesign
