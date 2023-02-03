@@ -50,9 +50,10 @@ jobs:
         
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-        
-      - name: Run test
-        run: flutter test
+    
+    # Add this step once test folder has been re-added to project  
+    # - name: Run test
+    #   run: flutter test
 
       - name: Build ios bundle without code signing
         run: flutter build ios --release --no-codesign
