@@ -39,6 +39,11 @@ jobs:
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
       - name: Get dependencies
+        uses: actions/setup-dart@v1
+        with:
+          dart-version: '3.7.0-13.0'
+
+      - name: Get dependencies
         run: flutter pub get
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
