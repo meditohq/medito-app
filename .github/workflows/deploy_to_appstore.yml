@@ -46,7 +46,7 @@ jobs:
         run: flutter pub get
         
       - name: Run Riverpod generator
-        run: dart pub run build_runner watch
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
         
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
