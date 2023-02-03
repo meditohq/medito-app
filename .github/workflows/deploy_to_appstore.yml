@@ -41,12 +41,12 @@ jobs:
 
       - name: Update packages # Needed to upgrade Dart SDK to compatible version
         run: flutter upgrade
-        
-      - name: Run Riverpod generator
-        run: dart pub run build_runner watch
 
       - name: Get dependencies
         run: flutter pub get
+        
+      - name: Run Riverpod generator
+        run: dart pub run build_runner watch
         
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
