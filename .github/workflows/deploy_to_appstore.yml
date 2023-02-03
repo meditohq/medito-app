@@ -39,10 +39,10 @@ jobs:
           CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
-      - name: Get dependencies
-        uses: actions/setup-dart@v1
+      - name: Setup dart with later version
+      - uses: dart-lang/setup-dart@v1
         with:
-          dart-version: '3.7.0-13.0'
+          sdk: stable
 
       - name: Get dependencies
         run: flutter pub get
