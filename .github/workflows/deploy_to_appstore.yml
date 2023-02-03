@@ -40,7 +40,7 @@ jobs:
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
       - name: Setup dart with later version
-      - uses: dart-lang/setup-dart@v1
+        uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
 
