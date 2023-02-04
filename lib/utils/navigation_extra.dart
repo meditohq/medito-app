@@ -1,6 +1,7 @@
 import 'package:Medito/network/folder/new_folder_screen.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/btm_nav/downloads_widget.dart';
+import 'package:Medito/views/folder/folder_view.dart';
 import 'package:Medito/views/session_options/session_options_screen.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
@@ -148,13 +149,19 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   if (state.params.length == 1) {
     return MaterialPage(
-        key: state.pageKey, child: NewFolderScreen(id: state.params['fid']));
+        key: state.pageKey, child: FolderView(id: state.params['fid'])
+        // child: NewFolderScreen(id: state.params['fid']),
+        );
   } else if (state.params.length == 2) {
     return MaterialPage(
-        key: state.pageKey, child: NewFolderScreen(id: state.params['f2id']));
+        key: state.pageKey, child: FolderView(id: state.params['fid'])
+        // child: NewFolderScreen(id: state.params['f2id']),
+        );
   } else {
     return MaterialPage(
-        key: state.pageKey, child: NewFolderScreen(id: state.params['f3id']));
+        key: state.pageKey, child: FolderView(id: state.params['fid'])
+        // child: NewFolderScreen(id: state.params['f3id']),
+        );
   }
 }
 

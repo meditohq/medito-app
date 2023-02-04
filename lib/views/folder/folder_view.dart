@@ -1,57 +1,61 @@
+import 'package:Medito/components/components.dart';
+import 'package:Medito/components/error_component.dart';
 import 'package:Medito/components/headers/collapsible_header_component.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/constants/styles/widget_styles.dart';
-import 'package:Medito/network/folder/new_folder_response.dart';
+import 'package:Medito/models/folder/folder_model.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/folder/folder_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'folder_provider.dart';
 
-class NewFolderScreen extends ConsumerWidget {
-  const NewFolderScreen({Key? key, required this.id}) : super(key: key);
+class FolderView extends ConsumerWidget {
+  const FolderView({Key? key, required this.id}) : super(key: key);
 
   final String? id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ref.watch(fetchFoldersProvider(folderId: 1));
-    var value = ref.watch(folderDataProvider(id: id, skipCache: false));
-    return value.when(
+    var folders = ref.watch(fetchFoldersProvider(folderId: 1));
+    return Scaffold(
+      body: folders.when(
+        skipLoadingOnRefresh: false,
         data: (data) => buildScaffoldWithData(context, data, ref),
-        error: (err, stack) => Text(err.toString()),
-        loading: () => _buildLoadingWidget());
+        error: (err, stack) => ErrorComponent(
+          message: err.toString(),
+          onTap: () async =>
+              await ref.refresh(fetchFoldersProvider(folderId: 1)),
+        ),
+        loading: () => _buildLoadingWidget(),
+      ),
+    );
   }
 
-  Widget _buildLoadingWidget() =>
-      const Center(child: CircularProgressIndicator());
+  Widget _buildLoadingWidget() => const FolderShimmerComponent();
 
   RefreshIndicator buildScaffoldWithData(
-      BuildContext context, NewFolderResponse? folder, WidgetRef ref) {
+      BuildContext context, FolderModel folder, WidgetRef ref) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(folderDataProvider(id: id, skipCache: true));
+        return await ref.refresh(fetchFoldersProvider(folderId: 1));
       },
-      child: Scaffold(
-        body: CollapsibleHeaderComponent(
-            bgImage: AssetConstants.dalle,
-            title: folder?.data?.title ?? '',
-            description: folder?.data?.description,
-            children: [
-              for (int i = 0; i < (folder?.data?.items?.length ?? 0); i++)
-                GestureDetector(
-                  onTap: () => _onListItemTap(folder?.data?.items?[i].item?.id,
-                      folder?.data?.items?[i].item?.type, ref.context),
-                  child: _buildListTile(
-                      context,
-                      folder?.data?.items?[i].item?.title,
-                      folder?.data?.items?[i].item?.subtitle,
-                      true),
-                )
-            ]),
+      child: CollapsibleHeaderComponent(
+        bgImage: AssetConstants.dalle,
+        title: folder.name,
+        description: folder.description,
+        children: [
+          for (int i = 0; i < folder.items.length; i++)
+            GestureDetector(
+              onTap: () => _onListItemTap(
+                  folder.items[i].id, folder.items[i].type, ref.context),
+              child: _buildListTile(context, folder.items[i].name,
+                  folder.items[i].subtitle, true),
+            )
+        ],
       ),
     );
   }
