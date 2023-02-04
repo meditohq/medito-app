@@ -1,8 +1,8 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class HTTPConstants {
-  static const String BASE_URL = 'https://api.medito.app/';
-  static const String INIT_TOKEN =
-      'Bearer candle_wisplike_unlocking_uncross_wrongness_sludge_halves_ellipse';
-  static const CONTENT_TOKEN =
-      'Bearer graduate_aspirin_curtsy_bronco_germicide_direness_festive_eligible';
+  static String BASE_URL = dotenv.env['BASE_URL_STAGING']!;
+  static String INIT_TOKEN = dotenv.env['INIT_TOKEN']!;
+  static String CONTENT_TOKEN = dotenv.env['CONTENT_TOKEN']!;
   static const String FOLDERS = 'folders';
 }

@@ -18,11 +18,11 @@ import 'package:flutter/material.dart';
 class MeditoColors {
   static const walterWhiteLine = Color(0xff595F65);
   static const walterWhiteTrans = Color(0x30595F65);
-  static var darkBGColor = Color(0xff22282D);
-  static var almostBlack = Color(0xEE000000);
+  static const darkBGColor = Color(0xff22282D);
+  static const almostBlack = Color(0xEE000000);
 
-  static var greyIsTheNewBlack = Color(0xFF1C1C1E);
-  static var greyIsTheNewGrey = Color(0xFF2C2C2E);
+  static const greyIsTheNewBlack = Color(0xFF1C1C1E);
+  static const greyIsTheNewGrey = Color(0xFF2C2C2E);
 
   static const newGrey = Color(0xffb6b6b8);
   static const midnight = Color(0xff111213);
@@ -40,5 +40,4 @@ class MeditoColors {
   static const deepNight = Color(0xff272829);
   static const intoTheNight = Color(0xff171717);
   static const easterYellow = Color(0xfffef5c7);
-
 }

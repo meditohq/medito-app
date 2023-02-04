@@ -47,7 +47,9 @@ dependencies:
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
   json_annotation: ^4.7.0
-
+  flutter_dotenv: ^5.0.2
+  shimmer: ^2.0.0
+  
 dev_dependencies:
   build_runner: ^2.3.3
   #USAGE: dart run build_runner watch --delete-conflicting-outputs
@@ -60,6 +62,7 @@ dev_dependencies:
 
 flutter:
   assets:
+    - .env
     - assets/images/
   fonts:
     - family: Clash Display

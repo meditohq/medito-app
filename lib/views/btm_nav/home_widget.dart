@@ -14,20 +14,17 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/repositories/folder/folder_repository.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/folder/folder_viewmodel.dart';
 import 'package:Medito/views/home/courses_row_widget.dart';
 import 'package:Medito/views/home/daily_message_widget.dart';
 import 'package:Medito/views/home/small_shortcuts_row_widget.dart';
@@ -66,7 +63,6 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // ref.watch(fetchFoldersProvider(folderId: 1));
     _observeNetwork();
 
     _bloc.fetchMenu();

@@ -1,5 +1,6 @@
 // 1. import the riverpod_annotation package
 import 'dart:io';
+import 'package:Medito/constants/http/http_constants.dart';
 import 'package:Medito/services/network/dio_api_services.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,11 +16,10 @@ DioApiService dioClient(DioClientRef ref) {
   var dio = Dio();
   dio.options = BaseOptions(
       connectTimeout: 60000,
-      baseUrl: 'https://medito-content.medito-api.repl.co/v1/',
-      // baseUrl: HTTPConstants.BASE_URL,
+      // baseUrl: 'https://medito-content.medito-api.repl.co/v1/',
+      baseUrl: HTTPConstants.BASE_URL,
       headers: {
-        HttpHeaders.authorizationHeader:
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdGFnaW5nIiwibmFtZSI6Im9zYW1hIiwiaWF0IjoxNTE2MjM5MDIyfQ.IEhrPrcfzoevjYIepwZ5AsREji7Hl9mP5pf1LAKJFtg',
+        HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
         HttpHeaders.accessControlAllowOriginHeader: '*',
         HttpHeaders.accessControlAllowHeadersHeader:
             'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
