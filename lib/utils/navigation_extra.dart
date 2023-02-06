@@ -2,7 +2,7 @@ import 'package:Medito/network/folder/new_folder_screen.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/btm_nav/downloads_widget.dart';
 import 'package:Medito/views/folder/folder_view.dart';
-import 'package:Medito/views/session_options/session_options_screen.dart';
+import 'package:Medito/views/session/session_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -117,7 +117,7 @@ enum Screen {
 MaterialPage<void> getSessionOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: SessionOptionsScreen(
+    child: SessionViewScreen(
         id: state.params['sid'], screenKey: Screen.session),
   );
 }
@@ -133,7 +133,7 @@ MaterialPage<void> getSessionOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
     child:
-        SessionOptionsScreen(id: state.params['did'], screenKey: Screen.daily),
+        SessionViewScreen(id: state.params['did'], screenKey: Screen.daily),
   );
 }
 

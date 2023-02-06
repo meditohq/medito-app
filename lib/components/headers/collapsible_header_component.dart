@@ -61,9 +61,9 @@ class _CollapsibleHeaderComponentState
           leading: leadingButton(),
           leadingWidth: 80,
           expandedHeight: height,
-          floating: true,
+          floating: false,
           pinned: true,
-          snap: true,
+          snap: false,
           elevation: 50,
           backgroundColor: MeditoColors.deepNight,
           centerTitle: false,
@@ -124,26 +124,21 @@ class _CollapsibleHeaderComponentState
     );
   }
 
-  Row title(BuildContext context) {
-    return Row(
-      mainAxisAlignment:
-          _isShrink ? MainAxisAlignment.center : MainAxisAlignment.start,
-      children: [
-        Flexible(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: _isShrink ? 50 : 15),
-            child: Text(
-              "${widget.title} title this is some random test",
-              maxLines: _isShrink ? 1 : 3,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).primaryTextTheme.headline4?.copyWith(
-                  fontFamily: ClashDisplay,
-                  color: MeditoColors.walterWhite,
-                  fontSize: _isShrink ? 20 : 24),
-            ),
-          ),
-        ),
-      ],
+  Transform title(BuildContext context) {
+    return Transform(
+      // you can forcefully translate values left side using Transform
+      transform: Matrix4.translationValues(_isShrink ? 0 : -40.0, 0.0, 0.0),
+      child: Text(
+        '${widget.title}',
+        maxLines: _isShrink ? 1 : 3,
+        overflow: TextOverflow.ellipsis,
+        textScaleFactor: 1,
+        textAlign: TextAlign.left,
+        style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+            fontFamily: ClashDisplay,
+            color: MeditoColors.walterWhite,
+            fontSize: _isShrink ? 20 : 24),
+      ),
     );
   }
 
@@ -154,7 +149,7 @@ class _CollapsibleHeaderComponentState
         padding: const EdgeInsets.all(16.0),
         child: Text(
           description,
-          style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
+          style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
               color: MeditoColors.walterWhite, fontFamily: DmSans, height: 2),
         ),
       ),

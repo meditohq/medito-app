@@ -1,6 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/folder/folder_model.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/folder/folder_viewmodel.dart';
@@ -19,7 +19,7 @@ class FolderView extends ConsumerWidget {
     return Scaffold(
       body: folders.when(
         skipLoadingOnRefresh: false,
-        data: (data) => buildScaffoldWithData(context, data, ref),
+        data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
           onTap: () async =>
@@ -32,7 +32,7 @@ class FolderView extends ConsumerWidget {
 
   Widget _buildLoadingWidget() => const FolderShimmerComponent();
 
-  RefreshIndicator buildScaffoldWithData(
+  RefreshIndicator _buildScaffoldWithData(
       BuildContext context, FolderModel folder, WidgetRef ref) {
     return RefreshIndicator(
       onRefresh: () async {
@@ -40,17 +40,16 @@ class FolderView extends ConsumerWidget {
       },
       child: CollapsibleHeaderComponent(
         bgImage: AssetConstants.dalle,
-        title: folder.name,
+        title: '${folder.name}',
         description: folder.description,
-        children: [
-          for (int i = 0; i < folder.items.length; i++)
-            GestureDetector(
-              onTap: () => _onListItemTap(
-                  folder.items[i].id, folder.items[i].type, ref.context),
-              child: _buildListTile(context, folder.items[i].name,
-                  folder.items[i].subtitle, true),
+        children: folder.items
+            .map(
+              (e) => GestureDetector(
+                onTap: () => _onListItemTap(e.id, e.type, ref.context),
+                child: _buildListTile(context, e.name, e.subtitle, true),
+              ),
             )
-        ],
+            .toList(),
       ),
     );
   }
