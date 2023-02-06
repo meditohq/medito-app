@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/player/player_bloc.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';

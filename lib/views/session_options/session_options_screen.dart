@@ -14,7 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/components/headers/collapsible_header_component.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:Medito/utils/navigation_extra.dart';

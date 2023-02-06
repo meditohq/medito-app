@@ -1,4 +1,4 @@
-import 'package:Medito/constants/http/http_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/folder/folder_model.dart';
 import 'package:Medito/services/network/dio_api_services.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';

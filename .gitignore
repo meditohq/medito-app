@@ -77,6 +77,7 @@ ios/*
 /.flutter-plugins-dependencies
 /.flutter-plugins
 /lib/network/auth.dart
+/ios/Flutter/flutter_export_environment.sh
 gen/
 /pubspec.lock
 /android/keystore.properties

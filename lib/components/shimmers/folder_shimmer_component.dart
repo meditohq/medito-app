@@ -1,6 +1,5 @@
 import 'package:Medito/components/shimmers/components/box_shimmer_component.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
-import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class FolderShimmerComponent extends StatelessWidget {

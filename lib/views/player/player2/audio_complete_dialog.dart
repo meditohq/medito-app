@@ -4,8 +4,7 @@ import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 
 class AudioCompleteDialog extends StatefulWidget {
   final PlayerBloc? bloc;

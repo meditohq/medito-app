@@ -21,9 +21,8 @@ import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
-import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/home/courses_row_widget.dart';
 import 'package:Medito/views/home/daily_message_widget.dart';
@@ -251,7 +250,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     await DownloadsBloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+        createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
       }
     });
   }

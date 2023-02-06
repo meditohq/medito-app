@@ -1,6 +1,6 @@
 // 1. import the riverpod_annotation package
 import 'dart:io';
-import 'package:Medito/constants/http/http_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/services/network/dio_api_services.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
