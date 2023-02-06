@@ -1,66 +1,54 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/constants/styles/widget_styles.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/models/models.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SessionButtons extends StatelessWidget {
-  final data = <String, List<String>>{
-    'Will': ['5 mins', '10 min'],
-    'Bob': [
-      '5 mins',
-      '10 min',
-      '10 min',
-      '10 min',
-      '10 min',
-      '10 min',
-      '10 min',
-      '10 min',
-      '15 min'
-    ],
-    'Steve': ['5 mins', '10 min', '15 min', '40 min']
-  };
+  final List<SessionAudioModel> audios;
+  const SessionButtons({super.key, required this.audios});
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
-        itemCount: data.length,
+        itemCount: audios.length,
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, i) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                data.keys.toList().elementAt(i).toString(),
-                style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
+                audios[i].guideName,
+                style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                       color: MeditoColors.walterWhite,
                     ),
               ),
               height8,
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.spaceBetween,
-                children: [
-                  for (int eleIndex = 0;
-                      eleIndex < data.values.elementAt(i).length;
-                      eleIndex++)
-                    _getGridItem(context, i, eleIndex)
-                ],
-              ),
+              _gridList(context, i),
               SizedBox(height: 30),
             ],
           );
         });
   }
 
-  InkWell _getGridItem(BuildContext context, int i, int index) {
-    var label = data.values.elementAt(i).elementAt(index).toString();
+  Wrap _gridList(
+    BuildContext context,
+    int i,
+  ) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.spaceBetween,
+      children: audios[i].files.map((e) => _getGridItem(context, e)).toList(),
+    );
+  }
+
+  InkWell _getGridItem(BuildContext context, SessionFilesModel files) {
     return InkWell(
       onTap: () {
-        context.go(GoRouter.of(context).location + PlayerPath);
+        context.go(GoRouter.of(context).location + files.path.toString());
       },
       borderRadius: BorderRadius.circular(14),
       child: Ink(
@@ -74,10 +62,10 @@ class SessionButtons extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            label,
+            '${convertDurationToMinutes(milliseconds: files.duration)} mins',
             style: Theme.of(context)
                 .primaryTextTheme
-                .bodyText1
+                .bodyLarge
                 ?.copyWith(color: MeditoColors.walterWhite, fontFamily: DmMono),
           ),
         ),

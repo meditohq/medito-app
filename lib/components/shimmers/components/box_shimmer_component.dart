@@ -8,10 +8,11 @@ class BoxShimmerComponent extends StatelessWidget {
       this.width,
       this.height,
       this.delayInMiliSeconds = 1500,
-      this.child});
+      this.child,  this.borderRadius = 0});
   final double? width, height;
   final int delayInMiliSeconds;
   final Widget? child;
+  final double borderRadius;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -22,7 +23,12 @@ class BoxShimmerComponent extends StatelessWidget {
         highlightColor: MeditoColors.greyIsTheNewGrey.withOpacity(0.4),
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
-          color: MeditoColors.almostBlack,
+          decoration: BoxDecoration(
+            color: MeditoColors.almostBlack,
+            borderRadius: BorderRadius.all(
+              Radius.circular(borderRadius),
+            ),
+          ),
           width: width ?? MediaQuery.of(context).size.width,
           height: height ?? MediaQuery.of(context).size.height,
           child: child,

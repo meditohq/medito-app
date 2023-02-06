@@ -5,4 +5,5 @@ class HTTPConstants {
   static String INIT_TOKEN = dotenv.env['INIT_TOKEN']!;
   static String CONTENT_TOKEN = dotenv.env['CONTENT_TOKEN']!;
   static const String FOLDERS = 'folders';
+  static const String SESSIONS = 'sessions';
 }

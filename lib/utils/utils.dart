@@ -64,7 +64,7 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 Future<bool> launchUrl(String? href) async {
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
-  if(userId != null) {
+  if (userId != null) {
     href = href?.replaceAll('{{user_id}}', userId);
   }
 
@@ -83,8 +83,7 @@ void _launchEmailSubmission(String href) async {
 
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
-  var info =
-      '--- Please write email below this line $version, id:$userId ----';
+  var info = '--- Please write email below this line $version, id:$userId ----';
 
   final params = Uri(
       scheme: 'mailto',
@@ -97,6 +96,10 @@ void _launchEmailSubmission(String href) async {
   } else {
     print('Could not launch $url');
   }
+}
+
+int convertDurationToMinutes({required int milliseconds}) {
+  return Duration(milliseconds: milliseconds).inMinutes;
 }
 
 extension EmptyOrNull on String? {

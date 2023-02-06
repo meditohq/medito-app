@@ -1,7 +1,6 @@
-import 'package:Medito/models/folder/folder_model.dart';
-import 'package:Medito/repositories/folder/folder_repository.dart';
+import 'package:Medito/models/models.dart';
+import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 part 'folder_viewmodel.g.dart';
 
 @riverpod
