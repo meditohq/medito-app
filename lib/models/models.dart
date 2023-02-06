@@ -1,0 +1,1 @@
+export 'folder/folder_model.dart';

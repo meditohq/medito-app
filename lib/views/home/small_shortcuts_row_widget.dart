@@ -1,7 +1,7 @@
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/home/shortcuts_bloc.dart';
 import 'package:Medito/network/home/shortcuts_response.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';

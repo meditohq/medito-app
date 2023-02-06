@@ -18,9 +18,8 @@ import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:Medito/utils/bgvolume_utils.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
-import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/player/position_indicator_widget.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
@@ -197,7 +196,7 @@ class _ChooseBackgroundSoundDialogState
 
   Widget _getErrorWidget() => Padding(
         padding: const EdgeInsets.all(64.0),
-        child: Center(child: Text(PLAYER_BG_ERROR_MSG)),
+        child: Center(child: Text(StringConstants.PLAYER_BG_ERROR_MSG)),
       );
 
   InkWell _getNoneListItem(currentSounds) {
@@ -298,7 +297,7 @@ class _ChooseBackgroundSoundDialogState
     return Padding(
         padding: const EdgeInsets.only(bottom: 8.0, left: 16.0, top: 8.0),
         child: Text(
-          BACKGROUND_SOUNDS,
+          StringConstants.BACKGROUND_SOUNDS,
           style: Theme.of(context).textTheme.headline1,
         ));
   }

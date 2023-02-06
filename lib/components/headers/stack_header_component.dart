@@ -1,4 +1,4 @@
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:flutter/material.dart';
 

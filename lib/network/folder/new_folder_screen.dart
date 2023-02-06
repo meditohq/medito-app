@@ -1,8 +1,5 @@
 import 'package:Medito/components/headers/collapsible_header_component.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
-import 'package:Medito/constants/strings/asset_constants.dart';
-import 'package:Medito/constants/strings/string_constants.dart';
-import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/folder/new_folder_response.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/utils.dart';
@@ -113,7 +110,7 @@ class NewFolderScreen extends ConsumerWidget {
           context.go(location + getPathFromString(type, [id.toString()]));
         }
       } else {
-        createSnackBar(CHECK_CONNECTION, context);
+        createSnackBar(StringConstants.CHECK_CONNECTION, context);
       }
     });
   }

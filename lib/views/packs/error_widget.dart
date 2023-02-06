@@ -13,8 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/constants/colors/color_constants.dart';
-import 'package:Medito/constants/strings/string_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +38,7 @@ class ErrorPacksWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  LOADING_ERROR,
+                  StringConstants.LOADING_ERROR,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.subtitle2,
                 ),
@@ -56,12 +55,12 @@ class ErrorPacksWidget extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          createSnackBar(RETRYING, context,
+                          createSnackBar(StringConstants.RETRYING, context,
                               color: MeditoColors.darkBGColor);
                           onPressed();
                         },
                         child: Text(
-                          TRY_AGAIN,
+                          StringConstants.TRY_AGAIN,
                           style: Theme.of(context).textTheme.subtitle2,
                         )),
                     Container(width: 16),
@@ -76,7 +75,7 @@ class ErrorPacksWidget extends StatelessWidget {
                         onPressed: () => {
                           context.go(CollectionPath)},
                         child: Text(
-                          SHOW_DOWNLOADS,
+                          StringConstants.SHOW_DOWNLOADS,
                           style: Theme.of(context).textTheme.subtitle2,
                         )),
                   ],

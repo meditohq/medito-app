@@ -1,10 +1,8 @@
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
-import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
@@ -42,7 +40,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
 
     return Scaffold(
       appBar: MeditoAppBarWidget(
-        title: DOWNLOADS,
+        title: StringConstants.DOWNLOADS,
         isTransparent: true,
         hasCloseButton: true,
       ),
@@ -73,7 +71,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
-        message: EMPTY_DOWNLOADS_MESSAGE,
+        message: StringConstants.EMPTY_DOWNLOADS_MESSAGE,
         image: SvgPicture.asset(
           AssetConstants.dalle,
           height: 168,
@@ -144,7 +142,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   void showSwipeToDeleteTip() {
-    createSnackBar(SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+    createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
   }
 
   void _refreshDownloadList() {

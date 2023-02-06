@@ -1,4 +1,4 @@
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:flutter/cupertino.dart';
 
 class LoadingTextBoxWidget extends StatelessWidget {
