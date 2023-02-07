@@ -55,7 +55,7 @@ GEM
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
     fastimage (2.2.4)
-    fastlane (2.184.1)
+    fastlane (2.186.0)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.3, < 3.0.0)
       artifactory (~> 3.0)
