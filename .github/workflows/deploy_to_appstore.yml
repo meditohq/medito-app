@@ -65,6 +65,9 @@ jobs:
           ruby-version: '2.7.2'
           bundler-cache: true
           working-directory: ios
+          
+      - name: Update FastLane
+        run: bundle update fastlane
 
       - name: Create Apple API Key JSON
         run: |
