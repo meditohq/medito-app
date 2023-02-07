@@ -68,6 +68,7 @@ jobs:
           
       - name: Update FastLane
         run: bundle update fastlane
+        working-directory: ios
 
       - name: Create Apple API Key JSON
         run: |
