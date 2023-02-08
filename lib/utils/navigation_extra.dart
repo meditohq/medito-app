@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../views/home/home_wrapper_widget.dart';
-import '../views/player/player2/player_widget.dart';
+import '../views/player/player2/player_view.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';

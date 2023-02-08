@@ -23,12 +23,12 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/views/main/app_bar_widget.dart';
+import 'package:Medito/views/player/components/position_indicator_widget.dart';
+import 'package:Medito/views/player/components/subtitle_text_widget.dart';
 import 'package:Medito/views/player/player2/audio_complete_dialog.dart';
-import 'package:Medito/views/player/position_indicator_widget.dart';
-import 'package:Medito/views/player/subtitle_text_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -115,7 +115,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             image: getNetworkImage(mediaItem!.artUri.toString()),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
-                MeditoColors.almostBlack.withOpacity(0.5), BlendMode.overlay),
+                MeditoColors.almostBlack.withOpacity(0.65), BlendMode.overlay),
           ),
         ),
         child: SafeArea(
@@ -129,6 +129,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               ),
               Spacer(),
               _buildTitleRows(),
+              Spacer(),
               _buildPlayerButtonRow(mediaItem),
               // A seek bar.
               PositionIndicatorWidget(
@@ -180,42 +181,38 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       stream: _handler?.mediaItem.cast(),
       builder: (context, snapshot) {
         final mediaItem = snapshot.data;
-        return Column(
-          children: [_getTitleRow(mediaItem), _getSubtitleWidget(mediaItem)],
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
+          child: Column(
+            children: [
+              _getTitleRow(mediaItem),
+              _getSubtitleWidget(mediaItem),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _getTitleRow(MediaItem? mediaItem) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              mediaItem?.title ?? 'Loading...',
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: buildTitleTheme(),
-            ),
-          ),
-        ],
-      ),
+  Text _getTitleRow(MediaItem? mediaItem) {
+    return Text(
+      // mediaItem?.title ?? 'Loading...',
+      'This is an example of a very long title and a session with an artist',
+      textAlign: TextAlign.center,
+      style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+          fontFamily: ClashDisplay,
+          color: MeditoColors.walterWhite,
+          fontSize: 24,
+          letterSpacing: 1),
     );
   }
 
-  TextStyle? buildTitleTheme() {
-    return Theme.of(context).textTheme.displayLarge;
-  }
-
-  Widget _getSubtitleWidget(MediaItem? mediaItem) {
+  Padding _getSubtitleWidget(MediaItem? mediaItem) {
     var attr = mediaItem?.extras != null ? (mediaItem?.extras?['attr']) : '';
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SubtitleTextWidget(body: attr),
+      child: SubtitleTextWidget(
+          body: 'Giovanni Dienstmann https://www.google.com/'),
     );
   }
 
@@ -276,28 +273,30 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildRewindButton(),
-        Container(width: 38),
+        SizedBox(width: 35),
         _buildPlayPauseButtons(mediaItem),
-        Container(width: 38),
+        SizedBox(width: 35),
         _buildForwardButton()
       ],
     );
   }
 
-  Widget _buildRewindButton() {
-    return IconButton(
-        iconSize: 40,
-        color: MeditoColors.walterWhite,
-        onPressed: () => _handler?.skipBackward10Secs(),
-        icon: Icon(Icons.replay_10));
+  InkWell _buildRewindButton() {
+    return InkWell(
+      onTap: () => _handler?.skipBackward10Secs(),
+      child: SvgPicture.asset(
+        AssetConstants.icReplay10,
+      ),
+    );
   }
 
-  Widget _buildForwardButton() {
-    return IconButton(
-        iconSize: 40,
-        color: MeditoColors.walterWhite,
-        onPressed: () => _handler?.skipForward30Secs(),
-        icon: Icon(Icons.forward_30));
+  InkWell _buildForwardButton() {
+    return InkWell(
+      onTap: () => _handler?.skipForward30Secs(),
+      child: SvgPicture.asset(
+        AssetConstants.icForward30,
+      ),
+    );
   }
 
   Widget _buildImage(String? currentImage) {

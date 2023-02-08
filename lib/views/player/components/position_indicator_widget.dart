@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/player/player_bloc.dart';
@@ -7,7 +6,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-
 import 'background_sounds_sheet_widget.dart';
 
 class PositionIndicatorWidget extends StatefulWidget {
@@ -51,14 +49,20 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
         return Column(
           children: [
+            _buildDurationLabels(context, duration, position),
             if (duration != null)
               Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                padding:
+                    const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16),
                 child: SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 8,
-                    trackShape: CustomTrackShape(),
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
+                    trackShape:
+                        //  RoundedRectSliderTrackShape(),
+                        CustomTrackShape(),
+                    thumbShape: RoundSliderThumbShape(
+                      enabledThumbRadius: 5.0,
+                    ),
                   ),
                   child: Slider(
                     min: 0.0,
@@ -79,122 +83,106 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                   ),
                 ),
               ),
-            _buildLabels(context, duration, position),
+            _buildBottomLabels(context, duration, position),
           ],
         );
       },
     );
   }
 
-  Padding _buildLabels(BuildContext context, int duration, int position) {
+  Padding _buildDurationLabels(
+      BuildContext context, int duration, int position) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Transform.translate(
+        offset: Offset(0, 25),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _getDurationLabel(
+              context,
+              Duration(milliseconds: position).toMinutesSeconds(),
+            ),
+            _getDurationLabel(
+              context,
+              Duration(milliseconds: duration).toMinutesSeconds(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Text _getDurationLabel(
+    BuildContext context,
+    String label,
+  ) {
+    return Text(
+      label,
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: MeditoColors.walterWhite, fontFamily: DmMono, fontSize: 14),
+    );
+  }
+
+  Padding _buildBottomLabels(BuildContext context, int duration, int position) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _getCurrentPositionLabel(position, context),
-          Container(width: 8),
-          _getSpeedLabel(duration, context),
-          Container(width: 8),
-          if (_hasBGSound()) _getSoundLabel(),
-          if (_hasBGSound()) Container(width: 8),
-          _getFullDurationLabel(duration, context),
+          _getBottomActionLabel(
+            context,
+            // duration,
+            _currentSpeed,
+            () => {widget.handler?.setPlayerSpeed(_getNextSpeed())},
+          ),
+          width8,
+          _getBottomActionLabel(
+            context,
+            'DONWLOAD',
+            () => {widget.handler?.setPlayerSpeed(_getNextSpeed())},
+          ),
+          width8,
+          if (_hasBGSound())
+            _getBottomActionLabel(
+              context,
+              'SOUND',
+              () => _onBgMusicPressed(context),
+            ),
+          if (_hasBGSound()) width8,
         ],
       ),
     );
   }
 
-  bool _hasBGSound() => widget.handler?.mediaItemHasBGSound() == true;
-
-  Expanded _getFullDurationLabel(int duration, BuildContext context) {
+  Expanded _getBottomActionLabel(
+      BuildContext context, String label, void Function()? onTap) {
     return Expanded(
-      flex: 25,
-      child: Container(
-        height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: MeditoColors.greyIsTheNewGrey,
-          borderRadius: BorderRadius.all(Radius.circular(3)),
-        ),
-        child: Text(
-          Duration(milliseconds: duration).toMinutesSeconds(),
-          style: Theme.of(context)
-              .textTheme
-              .subtitle2
-              ?.copyWith(color: MeditoColors.walterWhite),
-        ),
-      ),
-    );
-  }
-
-  Expanded _getCurrentPositionLabel(int position, BuildContext context) {
-    return Expanded(
-      flex: 25,
-      child: Container(
-        alignment: Alignment.center,
-        height: 40,
-        decoration: BoxDecoration(
-          color: MeditoColors.greyIsTheNewGrey,
-          borderRadius: BorderRadius.all(Radius.circular(3)),
-        ),
-        child: Text(
-          Duration(milliseconds: position).toMinutesSeconds(),
-          style: Theme.of(context)
-              .textTheme
-              .subtitle2
-              ?.copyWith(color: MeditoColors.walterWhite),
-        ),
-      ),
-    );
-  }
-
-  Widget _getSpeedLabel(int duration, BuildContext context) {
-    return Expanded(
-      flex: 25,
       child: GestureDetector(
-        onTap: () => {widget.handler?.setPlayerSpeed(_getNextSpeed())},
+        onTap: onTap,
         child: Container(
           height: 40,
           decoration: BoxDecoration(
-            color: MeditoColors.walterWhite,
-            borderRadius: BorderRadius.all(Radius.circular(3)),
+            color: MeditoColors.greyIsTheNewGrey,
+            borderRadius: BorderRadius.all(
+              Radius.circular(3),
+            ),
           ),
           alignment: Alignment.center,
           child: Text(
-            _currentSpeed,
-            style: Theme.of(context)
-                .textTheme
-                .subtitle2
-                ?.copyWith(color: MeditoColors.greyIsTheNewGrey),
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: MeditoColors.walterWhite,
+                fontFamily: DmMono,
+                fontSize: 14),
           ),
         ),
       ),
     );
   }
 
-  Widget _getSoundLabel() {
-    return Builder(builder: (context) {
-      return GestureDetector(
-        onTap: () => _onBgMusicPressed(context),
-        child: Container(
-          height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 24),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: MeditoColors.walterWhite,
-            borderRadius: BorderRadius.all(Radius.circular(3)),
-          ),
-          child: Text(
-            'SOUND',
-            style: Theme.of(context)
-                .textTheme
-                .subtitle2
-                ?.copyWith(color: MeditoColors.greyIsTheNewGrey),
-          ),
-        ),
-      );
-    });
-  }
+  bool _hasBGSound() => widget.handler?.mediaItemHasBGSound() == true;
 
   double _getNextSpeed() {
     var nextIndex = _speedList.indexOf(_currentSpeed) + 1;

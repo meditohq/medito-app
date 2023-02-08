@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/audioplayer/audio_inherited_widget.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/api_response.dart';
@@ -21,13 +22,11 @@ import 'package:Medito/utils/bgvolume_utils.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/views/player/position_indicator_widget.dart';
+import 'package:Medito/views/player/components/position_indicator_widget.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-
-import '../../audioplayer/audio_inherited_widget.dart';
 
 class ChooseBackgroundSoundDialog extends StatefulWidget {
   final stream;
@@ -42,7 +41,6 @@ class ChooseBackgroundSoundDialog extends StatefulWidget {
 
 class _ChooseBackgroundSoundDialogState
     extends State<ChooseBackgroundSoundDialog> {
-
   bool _isOffline = false;
 
   /// Tracks the bgVolume while the user drags the bgVolume bar.
@@ -105,9 +103,9 @@ class _ChooseBackgroundSoundDialogState
                             color: MeditoColors.moonlight,
                             child: _isOffline
                                 ? _offlineBackgroundSounds(
-                                currentSound, scrollController)
+                                    currentSound, scrollController)
                                 : _onlineBackgroundSounds(
-                                currentSound, scrollController)),
+                                    currentSound, scrollController)),
                       );
                     },
                   );
@@ -118,8 +116,8 @@ class _ChooseBackgroundSoundDialogState
         });
   }
 
-  Widget _onlineBackgroundSounds(String currentSound,
-      ScrollController scrollController) {
+  Widget _onlineBackgroundSounds(
+      String currentSound, ScrollController scrollController) {
     return StreamBuilder<ApiResponse<BackgroundSoundsResponse>>(
         stream: widget.stream,
         initialData: ApiResponse.loading(),
@@ -160,8 +158,8 @@ class _ChooseBackgroundSoundDialogState
         });
   }
 
-  Widget _offlineBackgroundSounds(String currentSound,
-      ScrollController scrollController) {
+  Widget _offlineBackgroundSounds(
+      String currentSound, ScrollController scrollController) {
     return FutureBuilder<List<BackgroundSoundData>>(
         future: getBgSoundFromOfflineSharedPrefs(),
         initialData: [],
@@ -231,7 +229,8 @@ class _ChooseBackgroundSoundDialogState
         child: child,
       );
 
-  bool _isSelected(String? current, String? name) => current == name || (current == '' && name == NONE);
+  bool _isSelected(String? current, String? name) =>
+      current == name || (current == '' && name == NONE);
 
   Widget _getBackgroundSoundListTile(
       BackgroundSoundData item, String current, BuildContext context) {
@@ -254,8 +253,10 @@ class _ChooseBackgroundSoundDialogState
             }
             _downloadingItem = '';
             addBgSoundSelectionToSharedPrefs(filePath, item.name);
-            widget.handler?.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: filePath});
-            return widget.handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: item.name});
+            widget.handler
+                ?.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: filePath});
+            return widget.handler
+                ?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: item.name});
           });
         },
         child: ListTile(
@@ -329,14 +330,13 @@ class _ChooseBackgroundSoundDialogState
                           min: 0.0,
                           activeColor: MeditoColors.walterWhite,
                           inactiveColor:
-                          MeditoColors.walterWhite.withOpacity(0.7),
+                              MeditoColors.walterWhite.withOpacity(0.7),
                           max: 1.0,
                           value: volume,
                           onChanged: (value) {
                             _dragBgVolumeSubject.add(value);
                             _handler?.customAction(
-                                SET_BG_SOUND_VOL,
-                                {SET_BG_SOUND_VOL: value});
+                                SET_BG_SOUND_VOL, {SET_BG_SOUND_VOL: value});
                           },
                           onChangeEnd: (value) {
                             saveBgVolume(value);
@@ -369,7 +369,7 @@ class _ChooseBackgroundSoundDialogState
     super.dispose();
   }
 
-  String _getCurrentSoundFromSnapshot(Map<String, dynamic>  snapshot) {
+  String _getCurrentSoundFromSnapshot(Map<String, dynamic> snapshot) {
     return snapshot[SEND_BG_SOUND];
   }
 }
