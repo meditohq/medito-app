@@ -91,4 +91,5 @@ jobs:
           TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
           MEDITO_APPSTORE_CERTIFICATES_REPO: '${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}'
+          FASTLANE_PASSWORD: '${{ secrets.APPLE_ID_PASSWORD }}'
         working-directory: ios
