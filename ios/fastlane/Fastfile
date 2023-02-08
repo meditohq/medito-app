@@ -47,7 +47,7 @@ platform :ios do
     keychain_password = TEMP_KEYCHAIN_PASSWORD
     ensure_temp_keychain(keychain_name, keychain_password)
     
-    xcodes(version: "13.1")
+    xcversion(version: "13.1")
 
     # Fetch the signing certificate
     match(
