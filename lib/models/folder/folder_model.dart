@@ -14,6 +14,9 @@ abstract class FolderModel with _$FolderModel {
 
   factory FolderModel.fromJson(Map<String, Object?> json) =>
       _$FolderModelFromJson(json);
+
+  
+
 }
 
 @freezed

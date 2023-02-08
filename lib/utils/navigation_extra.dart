@@ -1,4 +1,4 @@
-import 'package:Medito/network/folder/new_folder_screen.dart';
+import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/btm_nav/downloads_widget.dart';
 import 'package:Medito/views/folder/folder_view.dart';
@@ -23,6 +23,7 @@ const String Folder3Path = '/folder/:fid/folder2/:f2id/folder3/:f3id';
 const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
 const String UrlPath = '/url';
 const String CollectionPath = '/app';
+const String webviewPath = '/webview';
 const String HomePath = '/';
 
 final router = GoRouter(
@@ -36,6 +37,7 @@ final router = GoRouter(
           _getSessionRoute(),
           _getArticleRoute(),
           _getDailyRoute(),
+          _getWebviewRoute(),
           GoRoute(
             path: 'app',
             routes: [_getPlayerRoute()],
@@ -46,6 +48,7 @@ final router = GoRouter(
             routes: [
               _getSessionRoute(),
               _getArticleRoute(),
+              _getWebviewRoute(),
               GoRoute(
                 path: 'folder2/:f2id',
                 routes: [
@@ -102,6 +105,19 @@ GoRoute _getPlayerRoute() {
   );
 }
 
+GoRoute _getWebviewRoute() {
+  return GoRoute(
+    path: 'webview',
+    pageBuilder: (context, state) {
+      final url = state.extra! as Map;
+      return MaterialPage(
+        key: state.pageKey,
+        child: WebViewComponent(url: url['url']!),
+      );
+    },
+  );
+}
+
 enum Screen {
   folder,
   player,
@@ -117,8 +133,8 @@ enum Screen {
 MaterialPage<void> getSessionOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: SessionViewScreen(
-        id: state.params['sid'], screenKey: Screen.session),
+    child:
+        SessionViewScreen(id: state.params['sid'], screenKey: Screen.session),
   );
 }
 
@@ -132,8 +148,7 @@ MaterialPage<void> getArticleMaterialPAge(GoRouterState state) {
 MaterialPage<void> getSessionOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child:
-        SessionViewScreen(id: state.params['did'], screenKey: Screen.daily),
+    child: SessionViewScreen(id: state.params['did'], screenKey: Screen.daily),
   );
 }
 

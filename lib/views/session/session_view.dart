@@ -30,7 +30,7 @@ class SessionViewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(fetchSessionsProvider(sessionId: 1));
+    var sessions = ref.watch(fetchSessionsProvider(sessionId: int.parse(id!)));
     return Scaffold(
       body: sessions.when(
         skipLoadingOnRefresh: false,
@@ -86,7 +86,7 @@ class SessionViewScreen extends ConsumerWidget {
           ),
           height16,
           SessionButtons(
-            audios: sessionModel.audio,
+            sessionModel: sessionModel,
           )
         ],
       ),

@@ -11,7 +11,7 @@ abstract class SessionModel with _$SessionModel {
       required String coverUrl,
       required bool isPublished,
       required bool hasBackgroundSound,
-      required SessionArtistModel artist,
+      @Default(null) SessionArtistModel? artist,
       @Default([]) List<SessionAudioModel> audio}) = _SessionModel;
 
   factory SessionModel.fromJson(Map<String, Object?> json) =>

@@ -1,26 +1,30 @@
+import 'package:Medito/audioplayer/audio_inherited_widget.dart';
+import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionButtons extends StatelessWidget {
-  final List<SessionAudioModel> audios;
-  const SessionButtons({super.key, required this.audios});
+  final SessionModel sessionModel;
+  const SessionButtons({super.key, required this.sessionModel});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
-        itemCount: audios.length,
+        itemCount: sessionModel.audio.length,
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, i) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                audios[i].guideName,
+                sessionModel.audio[i].guideName,
                 style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                       color: MeditoColors.walterWhite,
                     ),
@@ -41,14 +45,37 @@ class SessionButtons extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       alignment: WrapAlignment.spaceBetween,
-      children: audios[i].files.map((e) => _getGridItem(context, e)).toList(),
+      children: sessionModel.audio[i].files
+          .map((e) => _getGridItem(
+              context,
+              sessionModel.audio[i].guideName,
+              'https://cdn.esawebb.org/archives/images/screen/weic2216b.jpg',
+              e))
+          .toList(),
     );
   }
 
-  InkWell _getGridItem(BuildContext context, SessionFilesModel files) {
+  InkWell _getGridItem(
+    BuildContext context,
+    String title,
+    String coverUrl,
+    SessionFilesModel file,
+  ) {
     return InkWell(
       onTap: () {
-        context.go(GoRouter.of(context).location + files.path.toString());
+        AudioHandler? _audioHandler =
+            AudioHandlerInheritedWidget.of(context).audioHandler;
+        var mediaItem = MediaItem(
+            id: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+            // id: file.path.toString(),
+            title: title,
+            duration: Duration(milliseconds: file.duration),
+            artUri: Uri.parse(coverUrl),
+            extras: {
+              HAS_BG_SOUND: true,
+            });
+        _audioHandler.playMediaItem(mediaItem);
+        context.go(GoRouter.of(context).location + PlayerPath);
       },
       borderRadius: BorderRadius.circular(14),
       child: Ink(
@@ -62,7 +89,7 @@ class SessionButtons extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            '${convertDurationToMinutes(milliseconds: files.duration)} mins',
+            '${convertDurationToMinutes(milliseconds: file.duration)} mins',
             style: Theme.of(context)
                 .primaryTextTheme
                 .bodyLarge

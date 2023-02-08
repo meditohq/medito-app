@@ -49,6 +49,7 @@ dependencies:
   json_annotation: ^4.7.0
   flutter_dotenv: ^5.0.2
   shimmer: ^2.0.0
+  webview_flutter: ^2.8.0
   
 dev_dependencies:
   build_runner: ^2.3.3

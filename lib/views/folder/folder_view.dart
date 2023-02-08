@@ -6,6 +6,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/folder/folder_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 class FolderView extends ConsumerWidget {
@@ -45,8 +46,13 @@ class FolderView extends ConsumerWidget {
         children: folder.items
             .map(
               (e) => GestureDetector(
-                onTap: () => _onListItemTap(e.id, e.type, ref.context),
-                child: _buildListTile(context, e.name, e.subtitle, true),
+                onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
+                child: _buildListTile(
+                  context,
+                  e.name,
+                  e.subtitle,
+                  e.type,
+                ),
               ),
             )
             .toList(),
@@ -55,7 +61,7 @@ class FolderView extends ConsumerWidget {
   }
 
   Container _buildListTile(
-      BuildContext context, String? title, String? subtitle, bool showIcon) {
+      BuildContext context, String? title, String? subtitle, String type) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -73,7 +79,7 @@ class FolderView extends ConsumerWidget {
               if (title != null)
                 Text(
                   title,
-                  style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
+                  style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                       color: MeditoColors.walterWhite,
                       fontFamily: DmSans,
                       height: 2),
@@ -81,7 +87,7 @@ class FolderView extends ConsumerWidget {
               if (subtitle != null)
                 Text(
                   subtitle,
-                  style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
+                  style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                         fontFamily: DmMono,
                         height: 2,
                         color: MeditoColors.newGrey,
@@ -89,17 +95,18 @@ class FolderView extends ConsumerWidget {
                 )
             ],
           ),
-          if (showIcon) Icon(_getIcon(), color: Colors.white)
+          if (type != TypeConstants.SESSION) _getIcon(type)
         ],
       ),
     );
   }
 
-  void _onListItemTap(int? id, String? type, BuildContext context) {
+  void _onListItemTap(
+      int? id, String? type, String? path, BuildContext context) {
     checkConnectivity().then((value) {
       if (value) {
         var location = GoRouter.of(context).location;
-        if (type == 'folder') {
+        if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
             context.go(getPathFromString(
                 Folder3Path, [location.split('/')[2], this.id, id.toString()]));
@@ -107,6 +114,9 @@ class FolderView extends ConsumerWidget {
             context
                 .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
           }
+        } else if (type == TypeConstants.LINK) {
+          context.go(location + webviewPath, extra: {'url': path!});
+          // context.go(getPathFromString('url', [path.toString()]));
         } else {
           context.go(location + getPathFromString(type, [id.toString()]));
         }
@@ -116,9 +126,12 @@ class FolderView extends ConsumerWidget {
     });
   }
 
-  IconData _getIcon() {
-    return Icons.check_circle_outline_sharp;
-    // return Icons.article_outlined;
-    // return Icons.arrow_forward_ios_sharp;
+  Widget _getIcon(String type) {
+    if (type == TypeConstants.FOLDER) {
+      return SvgPicture.asset(AssetConstants.icForward);
+    } else if (type == TypeConstants.LINK) {
+      return SvgPicture.asset(AssetConstants.icLink);
+    }
+    return SizedBox();
   }
 }

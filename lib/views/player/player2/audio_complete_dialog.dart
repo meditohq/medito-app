@@ -63,7 +63,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset('assets/images/colourful_hearts.svg'),
+            SvgPicture.asset(AssetConstants.icColourfulHearts),
             Container(height: 16),
             Text(
                 'Medito is keeping access to meditation free, forever. Say thanks by donating.',
@@ -135,7 +135,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
               color: MeditoColors.darkMoon,
               onPressed: _sadPressed,
               child: SvgPicture.asset(
-                'assets/images/ic_sad_face.svg',
+                AssetConstants.icSadFace,
               ),
             ),
             Container(width: 12),
@@ -149,7 +149,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
               color: MeditoColors.darkMoon,
               onPressed: _neutralFacePressed,
               child: SvgPicture.asset(
-                'assets/images/ic_neutral_face.svg',
+                AssetConstants.icNeutralFace,
               ),
             ),
             Container(width: 12),
@@ -163,7 +163,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
               color: MeditoColors.darkMoon,
               onPressed: _happyFacePressed,
               child: SvgPicture.asset(
-                'assets/images/ic_happy_face.svg',
+                AssetConstants.icHappyFace,
               ),
             ),
           ],
@@ -198,7 +198,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onTwitterTap,
                     icon: SvgPicture.asset(
-                      'assets/images/ic_twitter.svg',
+                     AssetConstants.icTwitter,
                     ),
                     label:
                         Text('Twitter', style: TextStyle(color: Colors.white))),
@@ -212,7 +212,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onYoutubeTap,
                     icon: SvgPicture.asset(
-                      'assets/images/ic_youtube.svg',
+                      AssetConstants.icYoutube,
                     ),
                     label:
                         Text('Youtube', style: TextStyle(color: Colors.white))),
@@ -231,7 +231,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onInstaTap,
                     icon: SvgPicture.asset(
-                      'assets/images/ic_insta.svg',
+                    AssetConstants.icInsta,
                     ),
                     label: Text('Instagram',
                         style: TextStyle(color: Colors.white))),
@@ -245,7 +245,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onRedditTap,
                     icon: SvgPicture.asset(
-                      'assets/images/ic_reddit.svg',
+                      AssetConstants.icReddit,
                     ),
                     label:
                         Text('Reddit', style: TextStyle(color: Colors.white))),
