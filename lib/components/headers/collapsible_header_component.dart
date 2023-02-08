@@ -1,3 +1,4 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class _CollapsibleHeaderComponentState
       physics: AlwaysScrollableScrollPhysics(),
       slivers: <Widget>[
         SliverAppBar(
-          leading: leadingButton(),
+          leading: _leadingButton(),
           leadingWidth: 80,
           expandedHeight: height,
           floating: false,
@@ -68,13 +69,13 @@ class _CollapsibleHeaderComponentState
           backgroundColor: MeditoColors.deepNight,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
-            title: title(context),
-            background: bgImage(context),
+            title: _title(context),
+            background: _bgImage(context),
           ),
         ),
         SliverList(
           delegate: SliverChildListDelegate([
-            if (widget.description != null) description(widget.description!),
+            if (widget.description != null) _description(widget.description!),
             ...widget.children
           ]),
         ),
@@ -82,23 +83,16 @@ class _CollapsibleHeaderComponentState
     );
   }
 
-  MaterialButton leadingButton() {
-    return MaterialButton(
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  CloseButtonComponent _leadingButton() {
+    return CloseButtonComponent(
       onPressed: () {
         router.pop();
       },
-      color: _isShrink ? null : Colors.black38,
-      padding: EdgeInsets.all(16),
-      shape: _isShrink ? null : CircleBorder(),
-      child: Icon(
-        Icons.close,
-        color: Colors.white,
-      ),
+      isShowCircle: !_isShrink,
     );
   }
 
-  Stack bgImage(BuildContext context) {
+  Stack _bgImage(BuildContext context) {
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -124,7 +118,7 @@ class _CollapsibleHeaderComponentState
     );
   }
 
-  Transform title(BuildContext context) {
+  Transform _title(BuildContext context) {
     return Transform(
       // you can forcefully translate values left side using Transform
       transform: Matrix4.translationValues(_isShrink ? 0 : -40.0, 0.0, 0.0),
@@ -142,7 +136,7 @@ class _CollapsibleHeaderComponentState
     );
   }
 
-  Container description(String description) {
+  Container _description(String description) {
     return Container(
       color: Colors.grey.shade900,
       child: Padding(

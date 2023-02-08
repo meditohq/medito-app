@@ -17,8 +17,10 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
+import 'package:Medito/components/components.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
@@ -104,31 +106,37 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       }
     });
 
-    return Material(
-      color: MeditoColors.greyIsTheNewBlack,
-      child: Scaffold(
-        extendBody: false,
-        extendBodyBehindAppBar: true,
-        appBar: _getAppBar(),
-        body: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildImage(mediaItem?.artUri?.toString()),
-                Container(height: 24),
-                _buildTitleRows(),
-                Expanded(child: SizedBox.shrink()),
-                _buildPlayerButtonRow(mediaItem),
-                Expanded(child: SizedBox.shrink()),
-                // A seek bar.
-                PositionIndicatorWidget(
-                    handler: _handler,
-                    bgSoundsStream: _bloc.bgSoundsListController?.stream),
-                Container(height: 24),
-              ],
-            ),
-          ],
+    return Scaffold(
+      extendBody: false,
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: getNetworkImage(mediaItem!.artUri.toString()),
+            fit: BoxFit.fill,
+            colorFilter: ColorFilter.mode(
+                MeditoColors.almostBlack.withOpacity(0.5), BlendMode.overlay),
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CloseButtonComponent(
+                onPressed: () => router.pop(),
+                bgColor: MeditoColors.walterWhite,
+                icColor: MeditoColors.almostBlack,
+              ),
+              Spacer(),
+              _buildTitleRows(),
+              _buildPlayerButtonRow(mediaItem),
+              // A seek bar.
+              PositionIndicatorWidget(
+                  handler: _handler,
+                  bgSoundsStream: _bloc.bgSoundsListController?.stream),
+              Container(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -179,34 +187,27 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  PreferredSizeWidget _getAppBar() {
-    return MeditoAppBarWidget(
-      isTransparent: true,
-      hasCloseButton: true,
-      closePressed: _onBackPressed,
-    );
-  }
-
   Widget _getTitleRow(MediaItem? mediaItem) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       child: Row(
         children: [
           Expanded(
-              child: Text(
-            mediaItem?.title ?? 'Loading...',
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: buildTitleTheme(),
-          )),
+            child: Text(
+              mediaItem?.title ?? 'Loading...',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: buildTitleTheme(),
+            ),
+          ),
         ],
       ),
     );
   }
 
   TextStyle? buildTitleTheme() {
-    return Theme.of(context).textTheme.headline1;
+    return Theme.of(context).textTheme.displayLarge;
   }
 
   Widget _getSubtitleWidget(MediaItem? mediaItem) {

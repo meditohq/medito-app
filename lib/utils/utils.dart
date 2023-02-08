@@ -29,6 +29,11 @@ Widget getNetworkImageWidget(String? url) {
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
 
+NetworkImage getNetworkImage(String url) {
+  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  return NetworkImage(url, headers: headers);
+}
+
 Future<bool> checkConnectivity() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
   return connectivityResult != ConnectivityResult.none;
@@ -113,6 +118,22 @@ extension EmptyOrNull on String? {
     if (this != null && this?.isNotEmpty == true) return true;
     return false;
   }
+}
+
+Future<void> showBottomModal(BuildContext context, Widget child) async {
+  await showModalBottomSheet(
+    context: context,
+    barrierColor: MeditoColors.almostBlack,
+    backgroundColor: MeditoColors.greyIsTheNewGrey,
+    isScrollControlled: false,
+    elevation: 10,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+    builder: (BuildContext context) {
+      return FractionallySizedBox(heightFactor: 0.9, child: child);
+    },
+  );
 }
 
 extension AssetUrl on String {
