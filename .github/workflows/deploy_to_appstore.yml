@@ -21,10 +21,6 @@ jobs:
     environment: prod
     steps:
       # Set up Flutter.
-      - name: Use Xcode 13 (Xcode 14 deprecates iTMS Transporter) # switch to newer version of Fastlane?
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: 13
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
@@ -71,7 +67,7 @@ jobs:
           working-directory: ios
           
       - name: Update FastLane
-        run: bundle update fastlane
+        run: gem update fastlane
         working-directory: ios
 
       - name: Create Apple API Key JSON
