@@ -12,12 +12,12 @@ on:
     # Sequence of patterns matched against refs/tags
     #tags:
      # - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-     branches: ["fastlane-ios"]
+     branches: ["fix/icons"]
 
 jobs:
   deploy_ios:
     name: Deploy beta build to TestFlight
-    runs-on: macos-11
+    runs-on: macos-latest
     environment: prod
     steps:
       # Set up Flutter.
@@ -65,10 +65,6 @@ jobs:
           ruby-version: '2.7.2'
           bundler-cache: true
           working-directory: ios
-          
-      - name: Update FastLane to latest
-        run: gem update fastlane
-        working-directory: ios
 
       - name: Create Apple API Key JSON
         run: |
