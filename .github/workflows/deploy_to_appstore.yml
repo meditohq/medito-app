@@ -17,7 +17,7 @@ on:
 jobs:
   deploy_ios:
     name: Deploy beta build to TestFlight
-    runs-on: macos-11
+    runs-on: macos-latest
     environment: prod
     steps:
       # Set up Flutter.
