@@ -18,7 +18,7 @@ class _StatsWidgetState extends State<StatsWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 12.0, right: 12.0),
       child: Card(
-        color: MeditoColors.deepNight,
+        color: ColorConstants.deepNight,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16.0))),
         child: Padding(
@@ -90,12 +90,12 @@ class _StatsWidgetState extends State<StatsWidget> {
       builder: (BuildContext context) {
         return Theme(
           data: ThemeData(
-            primaryColor: MeditoColors.walterWhite,
+            primaryColor: ColorConstants.walterWhite,
           ),
           child: AlertDialog(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            backgroundColor: MeditoColors.moonlight,
+            backgroundColor: ColorConstants.moonlight,
             title: Text('How many days is your streak?',
                 style: Theme.of(context).textTheme.headline4),
             content: TextField(
@@ -136,7 +136,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onSaveTap,
                         style: TextButton.styleFrom(
-                            foregroundColor: MeditoColors.walterWhite),
+                            foregroundColor: ColorConstants.walterWhite),
                         child: Text('SAVE',
                             style: Theme.of(context).textTheme.headline3
                           // .copyWith(fontWeight: FontWeight.bold),
@@ -166,11 +166,11 @@ class _StatsWidgetState extends State<StatsWidget> {
       builder: (BuildContext context) {
         return Theme(
           data: ThemeData(
-              primaryColor: MeditoColors.walterWhite,
+              primaryColor: ColorConstants.walterWhite,
               accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
-            backgroundColor: MeditoColors.moonlight,
+            backgroundColor: ColorConstants.moonlight,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text('Reset longest streak to your current streak?',
@@ -187,7 +187,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onCancelTap,
                         style: TextButton.styleFrom(
-                            foregroundColor: MeditoColors.moonlight),
+                            foregroundColor: ColorConstants.moonlight),
                         child: Text('CANCEL',
                             style: Theme.of(context).textTheme.subtitle1
                             // .copyWith(fontWeight: FontWeight.bold),
@@ -202,7 +202,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                       child: TextButton(
                         onPressed: _onResetTap,
                         style: TextButton.styleFrom(
-                            foregroundColor: MeditoColors.walterWhite),
+                            foregroundColor: ColorConstants.walterWhite),
                         child: Text('RESET',
                             style: Theme.of(context).textTheme.headline3
                             // .copyWith(fontWeight: FontWeight.bold),

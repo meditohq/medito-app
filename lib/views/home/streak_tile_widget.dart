@@ -46,7 +46,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
           }
           return InkWell(
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            splashColor: MeditoColors.softGrey,
+            splashColor: ColorConstants.softGrey,
             onTap: widget.onClick,
             child: Ink(
               child: Padding(

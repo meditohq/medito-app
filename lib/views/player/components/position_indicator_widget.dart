@@ -66,8 +66,8 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                   ),
                   child: Slider(
                     min: 0.0,
-                    activeColor: MeditoColors.walterWhite,
-                    inactiveColor: MeditoColors.greyIsTheNewGrey,
+                    activeColor: ColorConstants.walterWhite,
+                    inactiveColor: ColorConstants.greyIsTheNewGrey,
                     max: duration.toDouble(),
                     value: _seekPos ??
                         max(0.0, min(position.toDouble(), duration.toDouble())),
@@ -120,7 +120,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
     return Text(
       label,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: MeditoColors.walterWhite, fontFamily: DmMono, fontSize: 14),
+          color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
     );
   }
 
@@ -164,7 +164,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
         child: Container(
           height: 40,
           decoration: BoxDecoration(
-            color: MeditoColors.greyIsTheNewGrey,
+            color: ColorConstants.greyIsTheNewGrey,
             borderRadius: BorderRadius.all(
               Radius.circular(3),
             ),
@@ -173,7 +173,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: MeditoColors.walterWhite,
+                color: ColorConstants.walterWhite,
                 fontFamily: DmMono,
                 fontSize: 14),
           ),

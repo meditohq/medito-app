@@ -19,12 +19,12 @@ class SubtitleTextWidget extends StatelessWidget {
         p: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontFamily: DmMono,
               letterSpacing: 1,
-              color: MeditoColors.walterWhite.withOpacity(0.9),
+              color: ColorConstants.walterWhite.withOpacity(0.9),
             ),
         textAlign: WrapAlignment.center,
         a: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontFamily: DmMono,
-            color: MeditoColors.walterWhite.withOpacity(0.9),
+            color: ColorConstants.walterWhite.withOpacity(0.9),
             fontSize: 13,
             fontWeight: FontWeight.w600),
       ),

@@ -66,7 +66,7 @@ class _CollapsibleHeaderComponentState
           pinned: true,
           snap: false,
           elevation: 50,
-          backgroundColor: MeditoColors.deepNight,
+          backgroundColor: ColorConstants.deepNight,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
             title: _title(context),
@@ -107,7 +107,7 @@ class _CollapsibleHeaderComponentState
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(boxShadow: [
               BoxShadow(
-                  color: MeditoColors.almostBlack.withOpacity(0.6),
+                  color: ColorConstants.almostBlack.withOpacity(0.6),
                   offset: Offset(0, 10),
                   blurRadius: 50,
                   spreadRadius: 50)
@@ -130,7 +130,7 @@ class _CollapsibleHeaderComponentState
         textAlign: TextAlign.left,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
             fontFamily: ClashDisplay,
-            color: MeditoColors.walterWhite,
+            color: ColorConstants.walterWhite,
             fontSize: _isShrink ? 20 : 24),
       ),
     );
@@ -144,7 +144,7 @@ class _CollapsibleHeaderComponentState
         child: Text(
           description,
           style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-              color: MeditoColors.walterWhite, fontFamily: DmSans, height: 2),
+              color: ColorConstants.walterWhite, fontFamily: DmSans, height: 2),
         ),
       ),
     );

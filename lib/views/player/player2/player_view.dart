@@ -98,7 +98,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         showGeneralDialog(
             transitionDuration: Duration(milliseconds: 400),
             context: context,
-            barrierColor: MeditoColors.darkMoon,
+            barrierColor: ColorConstants.darkMoon,
             pageBuilder: (_, __, ___) {
               return AudioCompleteDialog(
                   bloc: _bloc, mediaItem: _handler?.mediaItem.value);
@@ -115,7 +115,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             image: getNetworkImage(mediaItem!.artUri.toString()),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
-                MeditoColors.almostBlack.withOpacity(0.65), BlendMode.overlay),
+                ColorConstants.almostBlack.withOpacity(0.65),
+                BlendMode.overlay),
           ),
         ),
         child: SafeArea(
@@ -124,8 +125,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             children: [
               CloseButtonComponent(
                 onPressed: () => router.pop(),
-                bgColor: MeditoColors.walterWhite,
-                icColor: MeditoColors.almostBlack,
+                bgColor: ColorConstants.walterWhite,
+                icColor: ColorConstants.almostBlack,
               ),
               Spacer(),
               _buildTitleRows(),
@@ -201,7 +202,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       textAlign: TextAlign.center,
       style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
           fontFamily: ClashDisplay,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
           fontSize: 24,
           letterSpacing: 1),
     );
@@ -219,7 +220,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Widget _playButton(MediaItem? mediaItem) => Semantics(
         label: 'Play button',
         child: IconButton(
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
           icon: Icon(Icons.play_circle_fill),
           iconSize: 80,
           onPressed: () =>
@@ -237,7 +238,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         child: IconButton(
           icon: Icon(Icons.pause_circle_filled),
           iconSize: 80,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
           onPressed: _handler?.pause,
         ),
       );
@@ -247,10 +248,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var name = await getBgSoundNameFromSharedPrefs();
     unawaited(_handler?.customAction(SEND_BG_SOUND, {SEND_BG_SOUND: name}));
     unawaited(_handler?.customAction(PLAY_BG_SOUND, {PLAY_BG_SOUND: file}));
-  }
-
-  void _onBackPressed() {
-    GoRouter.of(context).pop();
   }
 
   void _trackSessionEnd(MediaItem? mediaItem) {
@@ -297,11 +294,5 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         AssetConstants.icForward30,
       ),
     );
-  }
-
-  Widget _buildImage(String? currentImage) {
-    return Container(
-        width: double.maxFinite,
-        child: getNetworkImageWidget(currentImage ?? ''));
   }
 }

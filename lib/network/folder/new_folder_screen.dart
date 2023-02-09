@@ -58,7 +58,7 @@ class NewFolderScreen extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(width: 0.5, color: MeditoColors.softGrey),
+          bottom: BorderSide(width: 0.5, color: ColorConstants.softGrey),
         ),
       ),
       constraints: BoxConstraints(minHeight: 88),
@@ -73,7 +73,7 @@ class NewFolderScreen extends ConsumerWidget {
                 Text(
                   title,
                   style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
-                      color: MeditoColors.walterWhite,
+                      color: ColorConstants.walterWhite,
                       fontFamily: DmSans,
                       height: 2),
                 ),
@@ -83,7 +83,7 @@ class NewFolderScreen extends ConsumerWidget {
                   style: Theme.of(context).primaryTextTheme.bodyText1?.copyWith(
                         fontFamily: DmMono,
                         height: 2,
-                        color: MeditoColors.newGrey,
+                        color: ColorConstants.newGrey,
                       ),
                 )
             ],

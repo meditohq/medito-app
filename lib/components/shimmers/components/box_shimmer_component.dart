@@ -19,12 +19,12 @@ class BoxShimmerComponent extends StatelessWidget {
       width: width ?? MediaQuery.of(context).size.width,
       height: height ?? MediaQuery.of(context).size.height,
       child: Shimmer.fromColors(
-        baseColor: MeditoColors.greyIsTheNewGrey,
-        highlightColor: MeditoColors.greyIsTheNewGrey.withOpacity(0.4),
+        baseColor: ColorConstants.greyIsTheNewGrey,
+        highlightColor: ColorConstants.greyIsTheNewGrey.withOpacity(0.4),
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(
-            color: MeditoColors.almostBlack,
+            color: ColorConstants.almostBlack,
             borderRadius: BorderRadius.all(
               Radius.circular(borderRadius),
             ),

@@ -59,7 +59,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6)),
                           clipBehavior: Clip.antiAlias,
-                          color: MeditoColors.deepNight,
+                          color: ColorConstants.deepNight,
                           child: SmallShortcutWidget(
                               snapshot.data?.body?.data?[index],
                               widget.onTap),
@@ -89,7 +89,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
           } else {
             return Card(
               clipBehavior: Clip.antiAlias,
-              color: MeditoColors.deepNight,
+              color: ColorConstants.deepNight,
               child: Container(),
             );
           }
@@ -99,7 +99,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
   Card _getLocalDownloadsWidget() {
     return Card(
         clipBehavior: Clip.antiAlias,
-        color: MeditoColors.almostBlack,
+        color: ColorConstants.almostBlack,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: SmallShortcutWidget(
             ShortcutData(
@@ -123,7 +123,7 @@ class SmallShortcutWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: MeditoColors.softGrey,
+      splashColor: ColorConstants.softGrey,
       onTap: () => {if (onTap != null) onTap!(data?.type, data?.id)},
       child: Row(
         mainAxisSize: MainAxisSize.min,

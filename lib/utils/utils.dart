@@ -40,7 +40,7 @@ Future<bool> checkConnectivity() async {
 }
 
 Color parseColor(String? color) {
-  if (color == null || color.isEmpty) return MeditoColors.midnight;
+  if (color == null || color.isEmpty) return ColorConstants.midnight;
 
   return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }
@@ -123,8 +123,8 @@ extension EmptyOrNull on String? {
 Future<void> showBottomModal(BuildContext context, Widget child) async {
   await showModalBottomSheet(
     context: context,
-    barrierColor: MeditoColors.almostBlack,
-    backgroundColor: MeditoColors.greyIsTheNewGrey,
+    barrierColor: ColorConstants.almostBlack,
+    backgroundColor: ColorConstants.greyIsTheNewGrey,
     isScrollControlled: false,
     elevation: 10,
     shape: RoundedRectangleBorder(

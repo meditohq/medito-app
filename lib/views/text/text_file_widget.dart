@@ -122,14 +122,14 @@ class _TextFileWidgetState extends State<TextFileWidget>
                             border: Border(
                               top: BorderSide(
                                 width: 1.0,
-                                color: MeditoColors.meditoTextGrey,
+                                color: ColorConstants.meditoTextGrey,
                               ),
                             ),
                           ),
                           h2: TextStyle(
-                              color: MeditoColors.walterWhite, height: 1.5),
+                              color: ColorConstants.walterWhite, height: 1.5),
                           p: TextStyle(
-                              color: MeditoColors.walterWhite, height: 1.5)));
+                              color: ColorConstants.walterWhite, height: 1.5)));
                 }),
           ),
         ],

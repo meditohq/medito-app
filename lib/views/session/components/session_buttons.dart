@@ -26,7 +26,7 @@ class SessionButtons extends StatelessWidget {
               Text(
                 sessionModel.audio[i].guideName,
                 style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                      color: MeditoColors.walterWhite,
+                      color: ColorConstants.walterWhite,
                     ),
               ),
               height8,
@@ -62,19 +62,27 @@ class SessionButtons extends StatelessWidget {
     SessionFilesModel file,
   ) {
     return InkWell(
-      onTap: () {
-        AudioHandler? _audioHandler =
-            AudioHandlerInheritedWidget.of(context).audioHandler;
-        var mediaItem = MediaItem(
-            id: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
-            // id: file.path.toString(),
-            title: title,
-            duration: Duration(milliseconds: file.duration),
-            artUri: Uri.parse(coverUrl),
-            extras: {
-              HAS_BG_SOUND: true,
-            });
-        _audioHandler.playMediaItem(mediaItem);
+      onTap: () async {
+        try {
+          AudioHandler? _audioHandler =
+              AudioHandlerInheritedWidget.of(context).audioHandler;
+          var mediaItem = MediaItem(
+            //TODO
+              id: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+
+              // id: file.path.toString(),
+              title: title,
+              duration: Duration(milliseconds: file.duration),
+              artUri: Uri.parse(coverUrl),
+              extras: {
+                HAS_BG_SOUND: true,
+                LOCATION: null,
+                DURATION: file.duration
+              });
+          await _audioHandler.playMediaItem(mediaItem);
+        } catch (e) {
+          print(e);
+        }
         context.go(GoRouter.of(context).location + PlayerPath);
       },
       borderRadius: BorderRadius.circular(14),
@@ -82,7 +90,7 @@ class SessionButtons extends StatelessWidget {
         width: 171,
         height: 56,
         decoration: BoxDecoration(
-          color: MeditoColors.greyIsTheNewGrey,
+          color: ColorConstants.greyIsTheNewGrey,
           borderRadius: BorderRadius.all(
             Radius.circular(14),
           ),
@@ -90,10 +98,8 @@ class SessionButtons extends StatelessWidget {
         child: Center(
           child: Text(
             '${convertDurationToMinutes(milliseconds: file.duration)} mins',
-            style: Theme.of(context)
-                .primaryTextTheme
-                .bodyLarge
-                ?.copyWith(color: MeditoColors.walterWhite, fontFamily: DmMono),
+            style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
+                color: ColorConstants.walterWhite, fontFamily: DmMono),
           ),
         ),
       ),
