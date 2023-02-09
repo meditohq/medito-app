@@ -82,7 +82,7 @@ class SessionViewScreen extends ConsumerWidget {
             style: Theme.of(context)
                 .primaryTextTheme
                 .bodyLarge
-                ?.copyWith(color: MeditoColors.newGrey, fontFamily: DmSans),
+                ?.copyWith(color: ColorConstants.newGrey, fontFamily: DmSans),
           ),
           height16,
           SessionButtons(

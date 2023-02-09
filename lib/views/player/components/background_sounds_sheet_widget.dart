@@ -100,7 +100,7 @@ class _ChooseBackgroundSoundDialogState
                         top: true,
                         bottom: false,
                         child: Material(
-                            color: MeditoColors.moonlight,
+                            color: ColorConstants.moonlight,
                             child: _isOffline
                                 ? _offlineBackgroundSounds(
                                     currentSound, scrollController)
@@ -128,7 +128,7 @@ class _ChooseBackgroundSoundDialogState
                   child: const CircularProgressIndicator(
                       backgroundColor: Colors.black,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                          MeditoColors.walterWhite)));
+                          ColorConstants.walterWhite)));
             case Status.COMPLETED:
               var list = snapshot.data?.body?.data;
 
@@ -187,7 +187,7 @@ class _ChooseBackgroundSoundDialogState
                 child: const CircularProgressIndicator(
                     backgroundColor: Colors.black,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                        MeditoColors.walterWhite)));
+                        ColorConstants.walterWhite)));
           }
         });
   }
@@ -207,7 +207,7 @@ class _ChooseBackgroundSoundDialogState
           currentSounds,
           Icon(
             Icons.check_circle_outline,
-            color: MeditoColors.walterWhite,
+            color: ColorConstants.walterWhite,
           ),
         ),
       ),
@@ -219,8 +219,8 @@ class _ChooseBackgroundSoundDialogState
         fontWeight:
             _isSelected(current, name) ? FontWeight.w600 : FontWeight.normal,
         color: _isSelected(current, name)
-            ? MeditoColors.walterWhite
-            : MeditoColors.meditoTextGrey);
+            ? ColorConstants.walterWhite
+            : ColorConstants.meditoTextGrey);
   }
 
   Widget _getVisibilityWidget(String name, String current, Widget child) =>
@@ -269,7 +269,7 @@ class _ChooseBackgroundSoundDialogState
                     current,
                     Icon(
                       Icons.check_circle_outline,
-                      color: MeditoColors.walterWhite,
+                      color: ColorConstants.walterWhite,
                     ))));
   }
 
@@ -284,7 +284,7 @@ class _ChooseBackgroundSoundDialogState
             child: const CircularProgressIndicator(
                 backgroundColor: Colors.black,
                 valueColor:
-                    AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite))),
+                    AlwaysStoppedAnimation<Color>(ColorConstants.walterWhite))),
       );
 
   void _noneSelected() {
@@ -305,7 +305,7 @@ class _ChooseBackgroundSoundDialogState
 
   Widget _getVolumeWidget() {
     return Container(
-      color: MeditoColors.softGrey,
+      color: ColorConstants.softGrey,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: StreamBuilder<Object>(
@@ -316,7 +316,7 @@ class _ChooseBackgroundSoundDialogState
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(volumeIcon, size: 24, color: MeditoColors.walterWhite),
+                  Icon(volumeIcon, size: 24, color: ColorConstants.walterWhite),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 24.0, right: 4),
@@ -328,9 +328,9 @@ class _ChooseBackgroundSoundDialogState
                         ),
                         child: Slider(
                           min: 0.0,
-                          activeColor: MeditoColors.walterWhite,
+                          activeColor: ColorConstants.walterWhite,
                           inactiveColor:
-                              MeditoColors.walterWhite.withOpacity(0.7),
+                              ColorConstants.walterWhite.withOpacity(0.7),
                           max: 1.0,
                           value: volume,
                           onChanged: (value) {

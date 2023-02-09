@@ -25,7 +25,7 @@ class DailyMessageItemWidget extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        color: MeditoColors.deepNight,
+        color: ColorConstants.deepNight,
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: GestureDetector(

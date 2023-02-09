@@ -100,7 +100,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
             createSnackBar(
               '"${item.title}" removed',
               context,
-              color: MeditoColors.moonlight,
+              color: ColorConstants.moonlight,
             );
           },
           child: _getListItemWidget(item)),
@@ -108,7 +108,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-        color: MeditoColors.moonlight,
+        color: ColorConstants.moonlight,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(
@@ -142,7 +142,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   void showSwipeToDeleteTip() {
-    createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+    createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: ColorConstants.darkMoon);
   }
 
   void _refreshDownloadList() {

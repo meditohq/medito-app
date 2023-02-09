@@ -1,5 +1,5 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/navigation_extra.dart';
 import 'package:flutter/material.dart';
 
 class StackHeaderComponent extends StatelessWidget {
@@ -28,7 +28,7 @@ class StackHeaderComponent extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(boxShadow: [
                     BoxShadow(
-                        color: MeditoColors.almostBlack.withOpacity(0.4),
+                        color: ColorConstants.almostBlack.withOpacity(0.4),
                         offset: Offset(0, 10),
                         blurRadius: 10,
                         spreadRadius: 20)
@@ -57,7 +57,7 @@ class StackHeaderComponent extends StatelessWidget {
                 description,
                 style: Theme.of(context)
                     .textTheme
-                    .bodyText1
+                    .bodyLarge
                     ?.copyWith(color: Colors.white),
               ),
             ),
@@ -71,7 +71,7 @@ class StackHeaderComponent extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(top: 20.0),
-        child: MeditoRoundCloseButton(),
+        child: CloseButtonComponent(),
       ),
     );
   }
@@ -90,7 +90,7 @@ class StackHeaderComponent extends StatelessWidget {
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).primaryTextTheme.headline4?.copyWith(
-              fontFamily: 'Clash Display', color: MeditoColors.walterWhite),
+              fontFamily: 'Clash Display', color: ColorConstants.walterWhite),
         ),
       ),
     );
@@ -100,27 +100,6 @@ class StackHeaderComponent extends StatelessWidget {
     return Image.asset(
       imageUrl,
       fit: BoxFit.fill,
-    );
-  }
-}
-
-class MeditoRoundCloseButton extends StatelessWidget {
-  const MeditoRoundCloseButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      onPressed: () {
-        router.pop();
-      },
-      color: Colors.black38,
-      padding: EdgeInsets.all(16),
-      shape: CircleBorder(),
-      child: Icon(
-        Icons.close,
-        color: Colors.white,
-      ),
     );
   }
 }

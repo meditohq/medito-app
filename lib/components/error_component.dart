@@ -37,7 +37,7 @@ class ErrorComponent extends StatelessWidget {
         text: title,
         style: Theme.of(context).textTheme.headline5?.copyWith(
             fontSize: 18,
-            color: MeditoColors.newGrey,
+            color: ColorConstants.newGrey,
             letterSpacing: -0.3,
             fontWeight: FontWeight.w400),
         children: <TextSpan>[
@@ -45,7 +45,7 @@ class ErrorComponent extends StatelessWidget {
               text: text,
               style: Theme.of(context).textTheme.headline5?.copyWith(
                   fontSize: 18,
-                  color: MeditoColors.link,
+                  color: ColorConstants.link,
                   letterSpacing: -0.3,
                   fontWeight: FontWeight.w400),
               recognizer: TapGestureRecognizer()..onTap = onTap)

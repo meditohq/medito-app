@@ -45,9 +45,9 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-                color: MeditoColors.softGrey,
+                color: ColorConstants.softGrey,
                 border: Border(
-                  top: BorderSide(color: MeditoColors.softGrey, width: 2.0),
+                  top: BorderSide(color: ColorConstants.softGrey, width: 2.0),
                 ),
               ),
               child: BottomNavigationBar(
@@ -59,8 +59,8 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
                     .textTheme
                     .headline2
                     ?.copyWith(fontSize: 12),
-                selectedItemColor: MeditoColors.walterWhite,
-                unselectedItemColor: MeditoColors.newGrey,
+                selectedItemColor: ColorConstants.walterWhite,
+                unselectedItemColor: ColorConstants.newGrey,
                 currentIndex: _currentIndex,
                 onTap: _onTabTapped,
                 items: [
@@ -91,7 +91,7 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
     return Center(
         child: CircularProgressIndicator(
             backgroundColor: Colors.black,
-            valueColor: AlwaysStoppedAnimation<Color>(MeditoColors.walterWhite)));
+            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.walterWhite)));
   }
 
   void _onTabTapped(int value) {

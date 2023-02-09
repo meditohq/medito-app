@@ -84,9 +84,9 @@ class _ParentWidgetState extends State<ParentWidget>
       SystemUiOverlayStyle(
           statusBarBrightness: Brightness.dark,
           statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor: MeditoColors.transparent,
+          systemNavigationBarColor: ColorConstants.transparent,
           systemNavigationBarIconBrightness: Brightness.light,
-          statusBarColor: MeditoColors.transparent),
+          statusBarColor: ColorConstants.transparent),
     );
 
     // listened for app background/foreground events
@@ -105,13 +105,13 @@ class _ParentWidgetState extends State<ParentWidget>
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
       theme: ThemeData(
-          splashColor: MeditoColors.moonlight,
-          canvasColor: MeditoColors.darkMoon,
+          splashColor: ColorConstants.moonlight,
+          canvasColor: ColorConstants.darkMoon,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: SlideTransitionBuilder(),
           }),
-          colorScheme: ColorScheme.dark(secondary: MeditoColors.walterWhite),
+          colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
           textTheme: meditoTextTheme(context)),
       title: ParentWidget._title,
     );

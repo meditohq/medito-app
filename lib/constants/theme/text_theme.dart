@@ -15,7 +15,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.5,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
         ),
         headline2: TextStyle(
           // btm bar text unselected
@@ -23,7 +23,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.5,
-          color: MeditoColors.meditoTextGrey,
+          color: ColorConstants.meditoTextGrey,
         ),
         headline3: TextStyle(
           // header of rows on homepage
@@ -31,7 +31,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.3,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
         ),
         headline4: TextStyle(
           // packs title on home and packs screen
@@ -42,7 +42,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w600,
           height: 1.3,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
         ),
         headline5: TextStyle(
           // stats widget
@@ -50,7 +50,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.2,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
         ),
         subtitle1: TextStyle(
           // packs subtitle on home
@@ -59,7 +59,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.4,
           fontWeight: FontWeight.w500,
           height: 1.5,
-          color: MeditoColors.meditoTextGrey,
+          color: ColorConstants.meditoTextGrey,
         ),
         subtitle2: TextStyle(
           // shortcut title
@@ -67,7 +67,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.2,
           fontWeight: FontWeight.w700,
           height: 1.5,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
         ),
         caption: TextStyle(
           // shortcut title
@@ -75,7 +75,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
           height: 1.5,
-          color: MeditoColors.meditoTextGrey,
+          color: ColorConstants.meditoTextGrey,
         ),
         bodyText2: TextStyle(
           // error widget
@@ -83,7 +83,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.normal,
           height: 1.3,
-          color: MeditoColors.meditoTextGrey,
+          color: ColorConstants.meditoTextGrey,
         ),
         bodyText1: TextStyle(
           // daily text and quote
@@ -91,7 +91,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
         ),
       ));
 }

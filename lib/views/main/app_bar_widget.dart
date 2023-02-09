@@ -48,7 +48,7 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
             statusBarBrightness: Brightness.dark,
             systemStatusBarContrastEnforced: true),
         backgroundColor:
-            isTransparent ? Colors.transparent : MeditoColors.moonlight,
+            isTransparent ? Colors.transparent : ColorConstants.moonlight,
         title: getTitleWidget(context));
   }
 

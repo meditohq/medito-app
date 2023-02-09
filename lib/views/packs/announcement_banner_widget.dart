@@ -84,7 +84,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                             padding:
                                 const EdgeInsets.only(top: 20.0, bottom: 10.0),
                             child: MaterialBanner(
-                                backgroundColor: MeditoColors.darkMoon,
+                                backgroundColor: ColorConstants.darkMoon,
                                 content: _buildTextAndButtonColumn(
                                     snapshot, context),
                                 leading:
@@ -118,7 +118,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
             style: Theme.of(context)
                 .textTheme
                 .subtitle1
-                ?.copyWith(color: MeditoColors.walterWhite)),
+                ?.copyWith(color: ColorConstants.walterWhite)),
         Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: buildActionsRow(snapshot))
@@ -133,7 +133,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
         backgroundColor: parseColor(snapshot.data?.colorPrimary ?? ''),
         child: SvgPicture.asset(
           'assets/images/${snapshot.data?.icon}.svg',
-          color: MeditoColors.darkMoon,
+          color: ColorConstants.darkMoon,
         ),
       ),
     );
@@ -149,7 +149,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
       },
       child: Text(snapshot.data?.buttonLabel?.toUpperCase() ?? '',
           style:
-              TextStyle(color: MeditoColors.walterWhite, letterSpacing: 0.2)),
+              TextStyle(color: ColorConstants.walterWhite, letterSpacing: 0.2)),
     );
   }
 
@@ -166,7 +166,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
       child: const Text(
         'DISMISS',
         style: TextStyle(
-          color: MeditoColors.walterWhite,
+          color: ColorConstants.walterWhite,
           letterSpacing: 0.2,
         ),
       ),
@@ -175,7 +175,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
 
   Widget buildSpacer() {
     return Divider(
-      color: MeditoColors.moonlight,
+      color: ColorConstants.moonlight,
       height: 1,
     );
   }

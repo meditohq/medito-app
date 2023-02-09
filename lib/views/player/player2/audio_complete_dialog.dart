@@ -25,7 +25,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        color: MeditoColors.darkMoon,
+        color: ColorConstants.darkMoon,
         child: Column(
           children: [
             MeditoAppBarWidget(
@@ -57,7 +57,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
       ),
-      color: MeditoColors.deepNight,
+      color: ColorConstants.deepNight,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -75,10 +75,10 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14.0),
                     ),
-                    backgroundColor: MeditoColors.darkMoon,
+                    backgroundColor: ColorConstants.darkMoon,
                     padding: const EdgeInsets.all(16.0)),
                 onPressed: _onDonateTap,
-                icon: Icon(Icons.favorite, color: MeditoColors.walterWhite),
+                icon: Icon(Icons.favorite, color: ColorConstants.walterWhite),
                 label:
                     Text('Donate now', style: TextStyle(color: Colors.white)))
           ],
@@ -92,7 +92,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
-      color: MeditoColors.easterYellow,
+      color: ColorConstants.easterYellow,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: AnimatedCrossFade(
@@ -132,7 +132,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                 borderRadius: BorderRadius.circular(12),
               ),
               minWidth: 68,
-              color: MeditoColors.darkMoon,
+              color: ColorConstants.darkMoon,
               onPressed: _sadPressed,
               child: SvgPicture.asset(
                 AssetConstants.icSadFace,
@@ -146,7 +146,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                 borderRadius: BorderRadius.circular(12),
               ),
               minWidth: 68,
-              color: MeditoColors.darkMoon,
+              color: ColorConstants.darkMoon,
               onPressed: _neutralFacePressed,
               child: SvgPicture.asset(
                 AssetConstants.icNeutralFace,
@@ -160,7 +160,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              color: MeditoColors.darkMoon,
+              color: ColorConstants.darkMoon,
               onPressed: _happyFacePressed,
               child: SvgPicture.asset(
                 AssetConstants.icHappyFace,
@@ -177,7 +177,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
       ),
-      color: MeditoColors.deepNight,
+      color: ColorConstants.deepNight,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -194,7 +194,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
                         ),
-                        backgroundColor: MeditoColors.darkMoon,
+                        backgroundColor: ColorConstants.darkMoon,
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onTwitterTap,
                     icon: SvgPicture.asset(
@@ -208,7 +208,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
                         ),
-                        backgroundColor: MeditoColors.darkMoon,
+                        backgroundColor: ColorConstants.darkMoon,
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onYoutubeTap,
                     icon: SvgPicture.asset(
@@ -227,7 +227,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
                         ),
-                        backgroundColor: MeditoColors.darkMoon,
+                        backgroundColor: ColorConstants.darkMoon,
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onInstaTap,
                     icon: SvgPicture.asset(
@@ -241,7 +241,7 @@ class _AudioCompleteDialogState extends State<AudioCompleteDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
                         ),
-                        backgroundColor: MeditoColors.darkMoon,
+                        backgroundColor: ColorConstants.darkMoon,
                         padding: const EdgeInsets.all(16.0)),
                     onPressed: _onRedditTap,
                     icon: SvgPicture.asset(

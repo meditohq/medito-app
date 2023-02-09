@@ -55,7 +55,7 @@ class SessionShimmerComponent extends StatelessWidget {
         width: 171,
         height: 56,
         decoration: BoxDecoration(
-          color: MeditoColors.greyIsTheNewBlack,
+          color: ColorConstants.greyIsTheNewBlack,
           borderRadius: BorderRadius.all(
             Radius.circular(14),
           ),

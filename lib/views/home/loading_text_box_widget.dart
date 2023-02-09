@@ -12,7 +12,7 @@ class LoadingTextBoxWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10.0),
         child: Container(
             child: Container(
-          color: MeditoColors.moonlight,
+          color: ColorConstants.moonlight,
           height: height,
         )));
   }

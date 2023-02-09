@@ -24,7 +24,7 @@ class _WebViewComponentState extends State<WebViewComponent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MeditoColors.greyIsTheNewGrey,
+      backgroundColor: ColorConstants.greyIsTheNewGrey,
       appBar: MeditoAppBarWidget(
         hasCloseButton: true,
       ),

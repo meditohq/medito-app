@@ -94,7 +94,7 @@ class CoursesRowItemWidget extends StatelessWidget {
       return getNetworkImageWidget(data?.coverUrl);
     } else {
       return Container(
-        color: MeditoColors.moonlight,
+        color: ColorConstants.moonlight,
       );
     }
   }
@@ -107,7 +107,7 @@ class CoursesRowItemWidget extends StatelessWidget {
           : getNetworkImageWidget(data?.backgroundImageUrl);
     } else {
       return Container(
-        color: MeditoColors.moonlight,
+        color: ColorConstants.moonlight,
       );
     }
   }
@@ -116,7 +116,7 @@ class CoursesRowItemWidget extends StatelessWidget {
 
   Color _getColor() {
     return data?.colorPrimary.isEmptyOrNull() == true
-                ? MeditoColors.moonlight
+                ? ColorConstants.moonlight
                 : parseColor(data?.colorPrimary);
   }
 }

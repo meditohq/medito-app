@@ -15,7 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:flutter/material.dart';
 
-class MeditoColors {
+class ColorConstants {
   static const walterWhiteLine = Color(0xff595F65);
   static const walterWhiteTrans = Color(0x30595F65);
   static const darkBGColor = Color(0xff22282D);

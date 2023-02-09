@@ -31,7 +31,7 @@ class ErrorPacksWidget extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(6.0),
           child: Container(
-            color: MeditoColors.deepNight,
+            color: ColorConstants.deepNight,
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -50,13 +50,13 @@ class ErrorPacksWidget extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
                             width: 1.0,
-                            color: MeditoColors.walterWhite,
+                            color: ColorConstants.walterWhite,
                             style: BorderStyle.solid,
                           ),
                         ),
                         onPressed: () {
                           createSnackBar(StringConstants.RETRYING, context,
-                              color: MeditoColors.darkBGColor);
+                              color: ColorConstants.darkBGColor);
                           onPressed();
                         },
                         child: Text(
@@ -68,7 +68,7 @@ class ErrorPacksWidget extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
                             width: 1.0,
-                            color: MeditoColors.walterWhite,
+                            color: ColorConstants.walterWhite,
                             style: BorderStyle.solid,
                           ),
                         ),

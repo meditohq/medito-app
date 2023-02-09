@@ -138,9 +138,9 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   AppBar _getAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: MeditoColors.darkMoon,
+      backgroundColor: ColorConstants.darkMoon,
       elevation: 0,
-      actionsIconTheme: IconThemeData(color: MeditoColors.walterWhite),
+      actionsIconTheme: IconThemeData(color: ColorConstants.walterWhite),
       title: _getTitleWidget(context),
       actions: <Widget>[
         StreamBuilder<ApiResponse<MenuResponse>>(
@@ -154,7 +154,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
                     onTap: () => _bloc.fetchMenu(skipCache: true),
                     child: Icon(
                       Icons.more_vert,
-                      color: MeditoColors.walterWhite,
+                      color: ColorConstants.walterWhite,
                     ),
                   );
                 case Status.COMPLETED:
@@ -173,7 +173,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
       ),
-      color: MeditoColors.deepNight,
+      color: ColorConstants.deepNight,
       onSelected: (MenuData result) {
         context.go(getPathFromString(result.itemType, [result.itemPath]));
       },
@@ -219,13 +219,13 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Tap here to copy',
-                  style: TextStyle(color: MeditoColors.walterWhite)),
-              Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
-              Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
+                  style: TextStyle(color: ColorConstants.walterWhite)),
+              Text(line1, style: TextStyle(color: ColorConstants.meditoTextGrey)),
+              Text(userID, style: TextStyle(color: ColorConstants.meditoTextGrey))
             ],
           ),
         ),
-        backgroundColor: MeditoColors.midnight);
+        backgroundColor: ColorConstants.midnight);
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -250,7 +250,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     await DownloadsBloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: MeditoColors.darkMoon);
+        createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: ColorConstants.darkMoon);
       }
     });
   }
