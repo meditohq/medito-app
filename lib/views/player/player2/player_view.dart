@@ -24,14 +24,11 @@ import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/player/components/position_indicator_widget.dart';
-import 'package:Medito/views/player/components/subtitle_text_widget.dart';
 import 'package:Medito/views/player/player2/audio_complete_dialog.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-
 import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
 import '../../../utils/bgvolume_utils.dart';
@@ -212,7 +209,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     var attr = mediaItem?.extras != null ? (mediaItem?.extras?['attr']) : '';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SubtitleTextWidget(
+      child: MarkdownComponent(
           body: 'Giovanni Dienstmann https://www.google.com/'),
     );
   }
