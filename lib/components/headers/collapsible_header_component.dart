@@ -141,10 +141,18 @@ class _CollapsibleHeaderComponentState
       color: Colors.grey.shade900,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Text(
-          description,
-          style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-              color: ColorConstants.walterWhite, fontFamily: DmSans, height: 2),
+        child: MarkdownComponent(
+          body: description,
+          textAlign: WrapAlignment.start,
+          p: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              height: 1.5),
+          a: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              decoration: TextDecoration.underline,
+              height: 1.5),
         ),
       ),
     );

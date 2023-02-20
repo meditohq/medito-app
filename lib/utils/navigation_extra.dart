@@ -54,6 +54,7 @@ final router = GoRouter(
                 routes: [
                   _getSessionRoute(),
                   _getArticleRoute(),
+                  _getWebviewRoute(),
                   GoRoute(
                     path: 'folder3/:f3id',
                     pageBuilder: (context, state) =>
@@ -61,6 +62,7 @@ final router = GoRouter(
                     routes: [
                       _getSessionRoute(),
                       _getArticleRoute(),
+                      _getWebviewRoute(),
                     ],
                   ),
                 ],
@@ -98,11 +100,11 @@ GoRoute _getSessionRoute() {
 
 GoRoute _getPlayerRoute() {
   return GoRoute(
-    path: 'player',
-    pageBuilder: (context, state) {
-      return getPlayerMaterialPage(state);
-    },
-  );
+      path: 'player',
+      pageBuilder: (context, state) {
+        return getPlayerMaterialPage(state);
+      },
+      routes: [_getWebviewRoute()]);
 }
 
 GoRoute _getWebviewRoute() {

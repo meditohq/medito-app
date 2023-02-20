@@ -1,8 +1,6 @@
-import 'package:Medito/components/buttons/close_button_component.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewComponent extends StatefulWidget {
