@@ -1,5 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/btm_nav/downloads_widget.dart';
 import 'package:Medito/views/folder/folder_view.dart';
 import 'package:Medito/views/session/session_view.dart';
@@ -24,6 +25,7 @@ const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
 const String UrlPath = '/url';
 const String CollectionPath = '/app';
 const String webviewPath = '/webview';
+const String backgroundSounds = '/backgroundsounds';
 const String HomePath = '/';
 
 final router = GoRouter(
@@ -104,7 +106,19 @@ GoRoute _getPlayerRoute() {
       pageBuilder: (context, state) {
         return getPlayerMaterialPage(state);
       },
-      routes: [_getWebviewRoute()]);
+      routes: [_getWebviewRoute(), _getBackgroundSoundRoute()]);
+}
+
+GoRoute _getBackgroundSoundRoute() {
+  return GoRoute(
+    path: 'backgroundSounds',
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: BackgroundSoundView(),
+      );
+    },
+  );
 }
 
 GoRoute _getWebviewRoute() {

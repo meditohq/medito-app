@@ -34,28 +34,25 @@ class SessionViewScreen extends ConsumerWidget {
     return Scaffold(
       body: sessions.when(
         skipLoadingOnRefresh: false,
-        data: (data) =>
-            // SessionShimmerComponent(),
-
-            _buildScaffoldWithData(context, data, ref),
+        data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async =>
-              await ref.refresh(sessionsProvider(sessionId: 1)),
+          onTap: () async => await ref.refresh(sessionsProvider(sessionId: 1)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
     );
   }
 
-  SessionShimmerComponent _buildLoadingWidget() =>
-      const SessionShimmerComponent();
+  Padding _buildLoadingWidget() => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: const SessionShimmerComponent(),
+      );
 
   RefreshIndicator _buildScaffoldWithData(
       BuildContext context, SessionModel sessionModel, WidgetRef ref) {
     return RefreshIndicator(
-      onRefresh: () async =>
-          await ref.refresh(sessionsProvider(sessionId: 1)),
+      onRefresh: () async => await ref.refresh(sessionsProvider(sessionId: 1)),
       child: Scaffold(
         body: CollapsibleHeaderComponent(
           bgImage: AssetConstants.dalle,

@@ -7,13 +7,19 @@ class CollapsibleHeaderComponent extends StatefulWidget {
   const CollapsibleHeaderComponent(
       {super.key,
       required this.children,
-      required this.bgImage,
+      this.bgImage,
       required this.title,
-      this.description});
+      this.description,
+      this.headerHeight = 300,
+      this.leadingIconColor = Colors.white,
+      this.leadingIconBgColor = Colors.black38});
   final List<Widget> children;
-  final String bgImage;
+  final String? bgImage;
   final String title;
   final String? description;
+  final double headerHeight;
+  final Color leadingIconColor;
+  final Color leadingIconBgColor;
   @override
   State<CollapsibleHeaderComponent> createState() =>
       _CollapsibleHeaderComponentState();
@@ -23,7 +29,6 @@ class _CollapsibleHeaderComponentState
     extends State<CollapsibleHeaderComponent> {
   ScrollController? _scrollController;
   bool lastStatus = true;
-  double height = 300;
 
   void _scrollListener() {
     if (_isShrink != lastStatus) {
@@ -36,7 +41,7 @@ class _CollapsibleHeaderComponentState
   bool get _isShrink {
     return _scrollController != null &&
         _scrollController!.hasClients &&
-        _scrollController!.offset > (height - kToolbarHeight - 50);
+        _scrollController!.offset > (widget.headerHeight - kToolbarHeight - 50);
   }
 
   @override
@@ -59,9 +64,12 @@ class _CollapsibleHeaderComponentState
       physics: AlwaysScrollableScrollPhysics(),
       slivers: <Widget>[
         SliverAppBar(
-          leading: _leadingButton(),
+          leading: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: _leadingButton(),
+          ),
           leadingWidth: 80,
-          expandedHeight: height,
+          expandedHeight: widget.headerHeight,
           floating: false,
           pinned: true,
           snap: false,
@@ -69,8 +77,14 @@ class _CollapsibleHeaderComponentState
           backgroundColor: ColorConstants.deepNight,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
+            expandedTitleScale: 1.2,
             title: _title(context),
-            background: _bgImage(context),
+            background: widget.bgImage != null
+                ? _bgImage(context, widget.bgImage!)
+                : Container(
+                    height: 20,
+                    color: ColorConstants.darkMoon,
+                  ),
           ),
         ),
         SliverList(
@@ -85,6 +99,8 @@ class _CollapsibleHeaderComponentState
 
   CloseButtonComponent _leadingButton() {
     return CloseButtonComponent(
+      bgColor: widget.leadingIconBgColor,
+      icColor: widget.leadingIconColor,
       onPressed: () {
         router.pop();
       },
@@ -92,12 +108,12 @@ class _CollapsibleHeaderComponentState
     );
   }
 
-  Stack _bgImage(BuildContext context) {
+  Stack _bgImage(BuildContext context, String image) {
     return Stack(
       fit: StackFit.expand,
       children: [
         Image.asset(
-          widget.bgImage,
+          image,
           fit: BoxFit.fill,
         ),
         Align(
@@ -138,9 +154,9 @@ class _CollapsibleHeaderComponentState
 
   Container _description(String description) {
     return Container(
-      color: Colors.grey.shade900,
+      color: ColorConstants.greyIsTheNewGrey,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: MarkdownComponent(
           body: description,
           textAlign: WrapAlignment.start,
