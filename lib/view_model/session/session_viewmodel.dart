@@ -4,8 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'session_viewmodel.g.dart';
 
 @riverpod
-Future<SessionModel> fetchSessions(
-  FetchSessionsRef ref, {
+Future<SessionModel> sessions(
+  SessionsRef ref, {
   required int sessionId,
 }) {
   return ref.watch(sessionRepositoryProvider).fetchSession(sessionId);

@@ -30,7 +30,7 @@ class SessionViewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(fetchSessionsProvider(sessionId: int.parse(id!)));
+    var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
     return Scaffold(
       body: sessions.when(
         skipLoadingOnRefresh: false,
@@ -41,7 +41,7 @@ class SessionViewScreen extends ConsumerWidget {
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
           onTap: () async =>
-              await ref.refresh(fetchSessionsProvider(sessionId: 1)),
+              await ref.refresh(sessionsProvider(sessionId: 1)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -55,7 +55,7 @@ class SessionViewScreen extends ConsumerWidget {
       BuildContext context, SessionModel sessionModel, WidgetRef ref) {
     return RefreshIndicator(
       onRefresh: () async =>
-          await ref.refresh(fetchSessionsProvider(sessionId: 1)),
+          await ref.refresh(sessionsProvider(sessionId: 1)),
       child: Scaffold(
         body: CollapsibleHeaderComponent(
           bgImage: AssetConstants.dalle,
