@@ -27,7 +27,7 @@ class FolderShimmerComponent extends StatelessWidget {
       child: Container(
         height: 100,
         width: size.width,
-        color: ColorConstants.greyIsTheNewBlack,
+        color: ColorConstants.greyIsTheNewGrey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,

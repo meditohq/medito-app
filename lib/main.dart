@@ -106,7 +106,7 @@ class _ParentWidgetState extends State<ParentWidget>
       routerDelegate: router.routerDelegate,
       theme: ThemeData(
           splashColor: ColorConstants.moonlight,
-          canvasColor: ColorConstants.darkMoon,
+          canvasColor: ColorConstants.greyIsTheNewBlack,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: SlideTransitionBuilder(),

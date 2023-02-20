@@ -4,7 +4,9 @@ import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/navigation_extra.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rxdart/rxdart.dart';
 import 'background_sounds_sheet_widget.dart';
 
@@ -217,17 +219,19 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
   }
 
   void _onBgMusicPressed(BuildContext context) {
-    var bloc = PlayerBloc();
+    var location = GoRouter.of(context).location;
+    context.go(location + backgroundSounds);
+    // var bloc = PlayerBloc();
 
-    // slight delay in case the cache returns before the sheet opens
-    Future.delayed(Duration(milliseconds: 50))
-        .then((value) => bloc.fetchBackgroundSounds());
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => ChooseBackgroundSoundDialog(
-          handler: widget.handler, stream: bloc.bgSoundsListController?.stream),
-    );
+    // // slight delay in case the cache returns before the sheet opens
+    // Future.delayed(Duration(milliseconds: 50))
+    //     .then((value) => bloc.fetchBackgroundSounds());
+    // showModalBottomSheet(
+    //   context: context,
+    //   isScrollControlled: true,
+    //   builder: (context) => ChooseBackgroundSoundDialog(
+    //       handler: widget.handler, stream: bloc.bgSoundsListController?.stream),
+    // );
   }
 }
 
