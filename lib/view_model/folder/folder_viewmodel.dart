@@ -4,9 +4,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'folder_viewmodel.g.dart';
 
 @riverpod
-Future<FolderModel> fetchFolders(
-  FetchFoldersRef ref, {
+Future<FolderModel> folders(
+  FoldersRef ref, {
   required int folderId,
 }) {
-  return ref.watch(folderRepositoryProvider).fetchFolders(folderId);
+  final folderRepository = ref.watch(folderRepositoryProvider);
+  return folderRepository.fetchFolders(folderId);
 }

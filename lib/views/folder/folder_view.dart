@@ -16,15 +16,14 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var folders = ref.watch(fetchFoldersProvider(folderId: 1));
+    var folders = ref.watch(FoldersProvider(folderId: 28));
     return Scaffold(
       body: folders.when(
         skipLoadingOnRefresh: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async =>
-              await ref.refresh(fetchFoldersProvider(folderId: 1)),
+          onTap: () async => await ref.refresh(FoldersProvider(folderId: 28)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -37,7 +36,7 @@ class FolderView extends ConsumerWidget {
       BuildContext context, FolderModel folder, WidgetRef ref) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(fetchFoldersProvider(folderId: 1));
+        return await ref.refresh(FoldersProvider(folderId: 28));
       },
       child: CollapsibleHeaderComponent(
         bgImage: AssetConstants.dalle,

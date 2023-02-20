@@ -92,9 +92,9 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
                             type, id, context, Tracking.SHORTCUT_TAPPED),
                       ),
                       CoursesRowWidget(
-                          key: _coursesKey,
-                          onTap: (type, id) => _navigate(
-                              type, id, context, Tracking.COURSE_TAPPED)),
+                        key: _coursesKey,
+                        onTap: (type, id) => _navigate(
+                            type, id, context, Tracking.COURSE_TAPPED)),
                       StatsWidget(),
                       SizedBox(height: 16),
                       DailyMessageWidget(key: _dailyMessageKey),
@@ -220,8 +220,10 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
             children: [
               Text('Tap here to copy',
                   style: TextStyle(color: ColorConstants.walterWhite)),
-              Text(line1, style: TextStyle(color: ColorConstants.meditoTextGrey)),
-              Text(userID, style: TextStyle(color: ColorConstants.meditoTextGrey))
+              Text(line1,
+                  style: TextStyle(color: ColorConstants.meditoTextGrey)),
+              Text(userID,
+                  style: TextStyle(color: ColorConstants.meditoTextGrey))
             ],
           ),
         ),
@@ -250,7 +252,8 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     await DownloadsBloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: ColorConstants.darkMoon);
+        createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
+            color: ColorConstants.darkMoon);
       }
     });
   }

@@ -119,7 +119,7 @@ class MeditoAudioHandler extends BaseAudioHandler
         // this session has not been downloaded
         // TODO
         // var url = '${HTTPConstants.TEST_BASE_URL}assets/${mediaItem.id}';
-        var url = '$mediaItem.id}';
+        var url = '${mediaItem.id}';
         _duration = await _player.setUrl(url,
             headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
       } else {
