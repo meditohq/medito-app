@@ -7,4 +7,5 @@ class HTTPConstants {
   static String CONTENT_TOKEN = dotenv.env['CONTENT_TOKEN']!;
   static const String FOLDERS = 'folders';
   static const String SESSIONS = 'sessions';
+  static const String BACKGROUND_SOUNDS = 'backgroundSounds';
 }
