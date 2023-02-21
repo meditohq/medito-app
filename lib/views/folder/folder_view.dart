@@ -64,7 +64,7 @@ class FolderView extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(width: 0.5, color: ColorConstants.softGrey),
+          bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
         ),
       ),
       constraints: BoxConstraints(minHeight: 88),
