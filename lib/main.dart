@@ -14,12 +14,10 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/navigation_extra.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/text_themes.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'audioplayer/audio_inherited_widget.dart';
 import 'network/auth.dart';
 
@@ -35,7 +33,7 @@ late SharedPreferences sharedPreferences;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await dotenv.load(fileName: '.env');
   sharedPreferences = await SharedPreferences.getInstance();
 
   var _audioHandler = await AudioService.init(
@@ -55,8 +53,7 @@ Future<void> main() async {
   if (kReleaseMode) {
     await SentryFlutter.init((options) {
       options.dsn = SENTRY_URL;
-    },
-        appRunner: () => _runApp(_audioHandler));
+    }, appRunner: () => _runApp(_audioHandler));
   } else {
     _runApp(_audioHandler);
   }
@@ -79,7 +76,6 @@ class ParentWidget extends StatefulWidget {
 
 class _ParentWidgetState extends State<ParentWidget>
     with WidgetsBindingObserver {
-
   @override
   void initState() {
     super.initState();
@@ -88,9 +84,9 @@ class _ParentWidgetState extends State<ParentWidget>
       SystemUiOverlayStyle(
           statusBarBrightness: Brightness.dark,
           statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor: MeditoColors.transparent,
+          systemNavigationBarColor: ColorConstants.transparent,
           systemNavigationBarIconBrightness: Brightness.light,
-          statusBarColor: MeditoColors.transparent),
+          statusBarColor: ColorConstants.transparent),
     );
 
     // listened for app background/foreground events
@@ -109,13 +105,13 @@ class _ParentWidgetState extends State<ParentWidget>
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
       theme: ThemeData(
-          splashColor: MeditoColors.moonlight,
-          canvasColor: MeditoColors.darkMoon,
+          splashColor: ColorConstants.moonlight,
+          canvasColor: ColorConstants.greyIsTheNewBlack,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
             TargetPlatform.android: SlideTransitionBuilder(),
           }),
-          colorScheme: ColorScheme.dark(secondary: MeditoColors.walterWhite),
+          colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
           textTheme: meditoTextTheme(context)),
       title: ParentWidget._title,
     );
@@ -129,7 +125,6 @@ class _ParentWidgetState extends State<ParentWidget>
     }
   }
 }
-
 
 class SlideTransitionBuilder extends PageTransitionsBuilder {
   @override

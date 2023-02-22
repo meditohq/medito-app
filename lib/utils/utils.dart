@@ -17,7 +17,7 @@ import 'dart:io';
 
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/utils/colors.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,13 +29,18 @@ Widget getNetworkImageWidget(String? url) {
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
 
+NetworkImage getNetworkImage(String url) {
+  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  return NetworkImage(url, headers: headers);
+}
+
 Future<bool> checkConnectivity() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
   return connectivityResult != ConnectivityResult.none;
 }
 
 Color parseColor(String? color) {
-  if (color == null || color.isEmpty) return MeditoColors.midnight;
+  if (color == null || color.isEmpty) return ColorConstants.midnight;
 
   return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }
@@ -64,7 +69,7 @@ bool isDayBefore(DateTime day1, DateTime day2) {
 Future<bool> launchUrl(String? href) async {
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
-  if(userId != null) {
+  if (userId != null) {
     href = href?.replaceAll('{{user_id}}', userId);
   }
 
@@ -83,8 +88,7 @@ void _launchEmailSubmission(String href) async {
 
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
-  var info =
-      '--- Please write email below this line $version, id:$userId ----';
+  var info = '--- Please write email below this line $version, id:$userId ----';
 
   final params = Uri(
       scheme: 'mailto',
@@ -99,6 +103,10 @@ void _launchEmailSubmission(String href) async {
   }
 }
 
+int convertDurationToMinutes({required int milliseconds}) {
+  return Duration(milliseconds: milliseconds).inMinutes;
+}
+
 extension EmptyOrNull on String? {
   bool isEmptyOrNull() {
     if (this == null) return true;
@@ -110,6 +118,22 @@ extension EmptyOrNull on String? {
     if (this != null && this?.isNotEmpty == true) return true;
     return false;
   }
+}
+
+Future<void> showBottomModal(BuildContext context, Widget child) async {
+  await showModalBottomSheet(
+    context: context,
+    barrierColor: ColorConstants.almostBlack,
+    backgroundColor: ColorConstants.greyIsTheNewGrey,
+    isScrollControlled: false,
+    elevation: 10,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+    builder: (BuildContext context) {
+      return FractionallySizedBox(heightFactor: 0.9, child: child);
+    },
+  );
 }
 
 extension AssetUrl on String {
