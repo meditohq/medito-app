@@ -35,7 +35,7 @@ jobs:
         # This is a quick workaround to make the Github workflow happy.
         # There should be a better way to handle the keys to improve DX.
       - name: "Create a dummy auth.dart"
-        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > ./lib/.env
+        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
 
       - run: flutter pub get
 
