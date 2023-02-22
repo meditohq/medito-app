@@ -1,13 +1,15 @@
-import 'package:Medito/network/folder/new_folder_screen.dart';
+import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/btm_nav/downloads_widget.dart';
-import 'package:Medito/widgets/session_options/session_options_screen.dart';
-import 'package:Medito/widgets/text/text_file_widget.dart';
+import 'package:Medito/views/background_sound/background_sound_view.dart';
+import 'package:Medito/views/btm_nav/downloads_widget.dart';
+import 'package:Medito/views/folder/folder_view.dart';
+import 'package:Medito/views/session/session_view.dart';
+import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/home/home_wrapper_widget.dart';
-import '../widgets/player/player2/player_widget.dart';
+import '../views/home/home_wrapper_widget.dart';
+import '../views/player/player2/player_view.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -22,6 +24,8 @@ const String Folder3Path = '/folder/:fid/folder2/:f2id/folder3/:f3id';
 const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
 const String UrlPath = '/url';
 const String CollectionPath = '/app';
+const String webviewPath = '/webview';
+const String backgroundSounds = '/backgroundsounds';
 const String HomePath = '/';
 
 final router = GoRouter(
@@ -35,6 +39,7 @@ final router = GoRouter(
           _getSessionRoute(),
           _getArticleRoute(),
           _getDailyRoute(),
+          _getWebviewRoute(),
           GoRoute(
             path: 'app',
             routes: [_getPlayerRoute()],
@@ -45,11 +50,13 @@ final router = GoRouter(
             routes: [
               _getSessionRoute(),
               _getArticleRoute(),
+              _getWebviewRoute(),
               GoRoute(
                 path: 'folder2/:f2id',
                 routes: [
                   _getSessionRoute(),
                   _getArticleRoute(),
+                  _getWebviewRoute(),
                   GoRoute(
                     path: 'folder3/:f3id',
                     pageBuilder: (context, state) =>
@@ -57,11 +64,11 @@ final router = GoRouter(
                     routes: [
                       _getSessionRoute(),
                       _getArticleRoute(),
+                      _getWebviewRoute(),
                     ],
                   ),
                 ],
-                pageBuilder: (context, state) =>
-                    getFolderMaterialPage(state),
+                pageBuilder: (context, state) => getFolderMaterialPage(state),
               ),
             ],
             pageBuilder: (context, state) => getFolderMaterialPage(state),
@@ -70,13 +77,10 @@ final router = GoRouter(
   ],
 );
 
-
 GoRoute _getDailyRoute() {
   return GoRoute(
     path: 'daily/:did',
-    routes: [
-      _getPlayerRoute()
-    ],
+    routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsDailyPage(state),
   );
 }
@@ -91,9 +95,7 @@ GoRoute _getArticleRoute() {
 GoRoute _getSessionRoute() {
   return GoRoute(
     path: 'session/:sid',
-    routes: [
-      _getPlayerRoute()
-    ],
+    routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsMaterialPage(state),
   );
 }
@@ -104,7 +106,32 @@ GoRoute _getPlayerRoute() {
       pageBuilder: (context, state) {
         return getPlayerMaterialPage(state);
       },
-    );
+      routes: [_getWebviewRoute(), _getBackgroundSoundRoute()]);
+}
+
+GoRoute _getBackgroundSoundRoute() {
+  return GoRoute(
+    path: 'backgroundSounds',
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: BackgroundSoundView(),
+      );
+    },
+  );
+}
+
+GoRoute _getWebviewRoute() {
+  return GoRoute(
+    path: 'webview',
+    pageBuilder: (context, state) {
+      final url = state.extra! as Map;
+      return MaterialPage(
+        key: state.pageKey,
+        child: WebViewComponent(url: url['url']!),
+      );
+    },
+  );
 }
 
 enum Screen {
@@ -122,8 +149,8 @@ enum Screen {
 MaterialPage<void> getSessionOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: SessionOptionsScreen(
-        id: state.params['sid'], screenKey: Screen.session),
+    child:
+        SessionViewScreen(id: state.params['sid'], screenKey: Screen.session),
   );
 }
 
@@ -137,8 +164,7 @@ MaterialPage<void> getArticleMaterialPAge(GoRouterState state) {
 MaterialPage<void> getSessionOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child:
-        SessionOptionsScreen(id: state.params['did'], screenKey: Screen.daily),
+    child: SessionViewScreen(id: state.params['did'], screenKey: Screen.daily),
   );
 }
 
@@ -154,16 +180,19 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   if (state.params.length == 1) {
     return MaterialPage(
-        key: state.pageKey,
-        child: NewFolderScreen(id: state.params['fid']));
+        key: state.pageKey, child: FolderView(id: state.params['fid'])
+        // child: NewFolderScreen(id: state.params['fid']),
+        );
   } else if (state.params.length == 2) {
     return MaterialPage(
-        key: state.pageKey,
-        child: NewFolderScreen(id: state.params['f2id']));
+        key: state.pageKey, child: FolderView(id: state.params['fid'])
+        // child: NewFolderScreen(id: state.params['f2id']),
+        );
   } else {
     return MaterialPage(
-        key: state.pageKey,
-        child: NewFolderScreen(id: state.params['f3id']));
+        key: state.pageKey, child: FolderView(id: state.params['fid'])
+        // child: NewFolderScreen(id: state.params['f3id']),
+        );
   }
 }
 
@@ -183,7 +212,8 @@ String getPathFromString(String? place, List<String?> ids) {
     return ArticlePath.replaceAll(':aid', ids.first!);
   }
   if (place != null && place.contains('folder3')) {
-    return Folder3Path.replaceAll(':fid', ids.first!).replaceAll(':f2id', ids[1]!)
+    return Folder3Path.replaceAll(':fid', ids.first!)
+        .replaceAll(':f2id', ids[1]!)
         .replaceAll(':f3id', ids[2]!);
   }
   if (place != null && place.contains('folder2')) {

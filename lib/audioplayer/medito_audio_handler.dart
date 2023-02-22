@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -69,7 +70,8 @@ class MeditoAudioHandler extends BaseAudioHandler
   @override
   Future<void> play() async {
     try {
-      if (_currentlyPlayingBGSound.isNotEmptyAndNotNull() && mediaItemHasBGSound()) {
+      if (_currentlyPlayingBGSound.isNotEmptyAndNotNull() &&
+          mediaItemHasBGSound()) {
         unawaited(_bgPlayer.play());
         unawaited(_bgPlayer.setLoopMode(LoopMode.all));
       }
@@ -80,6 +82,8 @@ class MeditoAudioHandler extends BaseAudioHandler
       if (_player.processingState == ProcessingState.completed) {
         customEvent.add({AUDIO_COMPLETE: true});
       }
+    }).catchError((err) {
+      print(err);
     }));
   }
 
@@ -109,23 +113,25 @@ class MeditoAudioHandler extends BaseAudioHandler
   Future<void> playMediaItem(MediaItem mediaItem) async {
     try {
       super.mediaItem.add(mediaItem);
-      await getDownload(mediaItem.extras?[LOCATION]).then((data) async {
-        if (data == null) {
-          // this session has not been downloaded
-          var url = '${BASE_URL}assets/${mediaItem.id}';
-          _duration = await _player.setUrl(url,
-              headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
-        } else {
-          _duration = await _player.setFilePath(data);
-        }
+      String? getLocation = mediaItem.extras?[LOCATION];
+      var data = getLocation != null ? await getDownload(getLocation) : null;
+      if (data == null) {
+        // this session has not been downloaded
+        // TODO
+        // var url = '${HTTPConstants.TEST_BASE_URL}assets/${mediaItem.id}';
+        var url = '${mediaItem.id}';
+        _duration = await _player.setUrl(url,
+            headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+      } else {
+        _duration = await _player.setFilePath(data);
+      }
 
-        if (_duration == null || (_duration?.inMilliseconds ?? 0) < 1000) {
-          //sometimes this library returns incorrect durations
-          _duration = Duration(milliseconds: mediaItem.extras?['duration']);
-        }
+      if (_duration == null || (_duration?.inMilliseconds ?? 0) < 1000) {
+        //sometimes this library returns incorrect durations
+        _duration = Duration(milliseconds: mediaItem.extras?['duration']);
+      }
 
-        unawaited(play());
-      });
+      unawaited(play());
     } catch (e, s) {
       print(s);
     }
@@ -155,7 +161,8 @@ class MeditoAudioHandler extends BaseAudioHandler
   }
 
   @override
-  Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async {
+  Future<dynamic> customAction(String name,
+      [Map<String, dynamic>? extras]) async {
     switch (name) {
       case SET_BG_SOUND_VOL:
         _bgVolume = extras?[SET_BG_SOUND_VOL] ?? DEFAULT_VOLUME;
@@ -224,6 +231,4 @@ class MeditoAudioHandler extends BaseAudioHandler
   void setPlayerSpeed(double speed) => _player.setSpeed(speed);
 
   bool mediaItemHasBGSound() => mediaItem.value?.extras?[HAS_BG_SOUND];
-
 }
-
