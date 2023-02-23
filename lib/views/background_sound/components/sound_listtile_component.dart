@@ -28,7 +28,7 @@ class SoundListTileComponent extends ConsumerWidget {
             _radioButton(isSelected),
             width16,
             Text(
-              sound.name,
+              sound.title,
               style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                     color: ColorConstants.walterWhite,
                     fontFamily: DmSans,
