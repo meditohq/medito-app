@@ -21,7 +21,7 @@ abstract class SessionModel with _$SessionModel {
 @freezed
 abstract class SessionArtistModel with _$SessionArtistModel {
   const factory SessionArtistModel(
-      {required String title, required String path}) = _SessionArtistModel;
+      {required String name, required String path}) = _SessionArtistModel;
 
   factory SessionArtistModel.fromJson(Map<String, Object?> json) =>
       _$SessionArtistModelFromJson(json);

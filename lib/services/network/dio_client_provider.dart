@@ -1,16 +1,11 @@
-// 1. import the riverpod_annotation package
 import 'dart:io';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/services/network/dio_api_services.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-// 2. add a part file
 part 'dio_client_provider.g.dart';
 
-// 3. use the @riverpod annotation
 
-// 4. update the declaration
 @riverpod
 DioApiService dioClient(DioClientRef ref) {
   var dio = Dio();
