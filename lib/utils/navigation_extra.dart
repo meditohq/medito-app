@@ -34,7 +34,8 @@ final router = GoRouter(
   routes: [
     GoRoute(
         path: HomePath,
-        builder: (context, state) => HomeWrapperWidget(),
+        builder: (context, state) => BackgroundSoundView(),
+        // builder: (context, state) => HomeWrapperWidget(),
         routes: [
           _getSessionRoute(),
           _getArticleRoute(),
