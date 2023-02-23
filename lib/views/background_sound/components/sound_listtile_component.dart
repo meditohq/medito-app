@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,10 +11,16 @@ class SoundListTileComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
+    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
     var isSelected = bgSoundNotifierProvider.selectedBgSound?.id == sound.id;
     return InkWell(
       onTap: () {
         bgSoundNotifierProvider.handleOnChangeSound(sound);
+        // var x = sound.copyWith(
+        //     path:
+        //         'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3');
+        audioPlayerNotifier.setBackgroundAudio(sound);
+        audioPlayerNotifier.playBackgroundSound();
       },
       child: Container(
         decoration: BoxDecoration(

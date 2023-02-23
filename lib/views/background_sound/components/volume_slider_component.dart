@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
+import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'custom_track_shape_component.dart';
@@ -10,6 +11,7 @@ class VolumeSliderComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
+    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
     var currentVolume = bgSoundNotifierProvider.volume;
     return SliderTheme(
       data: SliderThemeData(
@@ -28,6 +30,7 @@ class VolumeSliderComponent extends ConsumerWidget {
         inactiveColor: ColorConstants.greyIsTheNewGrey,
         onChanged: (double newValue) {
           bgSoundNotifierProvider.handleOnChangeVolume(newValue);
+          audioPlayerNotifier.setBackgroundSoundVolume(newValue);
         },
         semanticFormatterCallback: (double newValue) {
           return '${newValue.round()} ';
