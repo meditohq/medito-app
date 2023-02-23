@@ -56,7 +56,7 @@ class SessionViewScreen extends ConsumerWidget {
       child: Scaffold(
         body: CollapsibleHeaderComponent(
           bgImage: AssetConstants.dalle,
-          title: sessionModel.name,
+          title: sessionModel.title,
           description: sessionModel.description,
           children: [
             _mainContent(context, sessionModel),

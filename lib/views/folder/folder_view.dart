@@ -40,7 +40,7 @@ class FolderView extends ConsumerWidget {
       },
       child: CollapsibleHeaderComponent(
         bgImage: AssetConstants.dalle,
-        title: '${folder.name}',
+        title: '${folder.title}',
         description: folder.description,
         children: folder.items
             .map(
@@ -48,7 +48,7 @@ class FolderView extends ConsumerWidget {
                 onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
                 child: _buildListTile(
                   context,
-                  e.name,
+                  e.title,
                   e.subtitle,
                   e.type,
                 ),
