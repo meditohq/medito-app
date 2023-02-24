@@ -15,12 +15,13 @@ class SoundListTileComponent extends ConsumerWidget {
     var isSelected = bgSoundNotifierProvider.selectedBgSound?.id == sound.id;
     return InkWell(
       onTap: () {
-        bgSoundNotifierProvider.handleOnChangeSound(sound);
-        // var x = sound.copyWith(
-        //     path:
-        //         'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3');
-        audioPlayerNotifier.setBackgroundAudio(sound);
-        audioPlayerNotifier.playBackgroundSound();
+        bgSoundNotifierProvider.handleOnChangeSound(!isSelected ? sound : null);
+        if (!isSelected) {
+          audioPlayerNotifier.setBackgroundAudio(sound);
+          audioPlayerNotifier.playBackgroundSound();
+        } else {
+          audioPlayerNotifier.stopBackgroundSound();
+        }
       },
       child: Container(
         decoration: BoxDecoration(

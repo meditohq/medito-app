@@ -1,17 +1,40 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/sound_listtile_component.dart';
 import 'components/volume_slider_component.dart';
 
-class BackgroundSoundView extends ConsumerWidget {
-  const BackgroundSoundView({super.key});
+class BackgroundSoundView extends ConsumerStatefulWidget {
+  const BackgroundSoundView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  BackgroundSoundViewState createState() => BackgroundSoundViewState();
+}
+
+class BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
+  @override
+  void initState() {
+    super.initState();
+    final _provider = ref.read(backgroundSoundsNotifierProvider);
+    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+
+    _provider.getBackgroundSoundFromPref().then((_) {
+      if (_provider.selectedBgSound != null) {
+        _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+        _audioPlayerNotifier.playBackgroundSound();
+      }
+    });
+    _provider.getVolumeFromPref().then((_) {
+      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
     return Scaffold(
       body: backgroundSounds.when(
