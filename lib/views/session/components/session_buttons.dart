@@ -3,7 +3,7 @@ import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/download/download_viewmodel.dart';
 import 'package:audio_service/audio_service.dart';
@@ -68,29 +68,29 @@ class SessionButtons extends StatelessWidget {
       builder: (context, ref, child) => InkWell(
         onTap: () async {
           try {
-            var fileUrl =
-                'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3';
-            AudioHandler? _audioHandler =
-                AudioHandlerInheritedWidget.of(context).audioHandler;
-            var mediaItem = MediaItem(
-                //TODO
-                id: fileUrl,
+            // var fileUrl =
+            //     'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3';
+            // AudioHandler? _audioHandler =
+            //     AudioHandlerInheritedWidget.of(context).audioHandler;
+            // var mediaItem = MediaItem(
+            //     //TODO
+            //     id: fileUrl,
 
-                // id: file.path.toString(),
-                title: title,
-                duration: Duration(milliseconds: file.duration),
-                artUri: Uri.parse(coverUrl),
-                extras: {
-                  HAS_BG_SOUND: true,
-                  LOCATION: null,
-                  DURATION: file.duration
-                });
+            //     // id: file.path.toString(),
+            //     title: title,
+            //     duration: Duration(milliseconds: file.duration),
+            //     artUri: Uri.parse(coverUrl),
+            //     extras: {
+            //       HAS_BG_SOUND: true,
+            //       LOCATION: null,
+            //       DURATION: file.duration
+            //     });
 
             // await ref.watch(downloaderProvider).downloadFile(
             //     ref.watch(dioClientProvider),
             //     'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3');
 
-            await _audioHandler.playMediaItem(mediaItem);
+            // await _audioHandler.playMediaItem(mediaItem);
           } catch (e) {
             createSnackBar(
               e.toString(),
@@ -98,7 +98,8 @@ class SessionButtons extends StatelessWidget {
             );
             print(e);
           }
-          context.go(GoRouter.of(context).location + PlayerPath);
+          context.go(GoRouter.of(context).location + PlayerPath,
+              extra: sessionModel);
         },
         borderRadius: BorderRadius.circular(14),
         child: Ink(

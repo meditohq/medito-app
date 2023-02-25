@@ -13,7 +13,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../audioplayer/audio_inherited_widget.dart';
-import '../../utils/navigation_extra.dart';
+import '../../routes/routes.dart';
 
 class DownloadsListWidget extends StatefulWidget {
   @override
