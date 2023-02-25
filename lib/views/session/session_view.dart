@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:Medito/views/session/components/session_buttons.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,7 @@ class SessionViewScreen extends ConsumerWidget {
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(sessionsProvider(sessionId: 1)),
+          onTap: () async => await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -52,10 +52,10 @@ class SessionViewScreen extends ConsumerWidget {
   RefreshIndicator _buildScaffoldWithData(
       BuildContext context, SessionModel sessionModel, WidgetRef ref) {
     return RefreshIndicator(
-      onRefresh: () async => await ref.refresh(sessionsProvider(sessionId: 1)),
+      onRefresh: () async => await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
       child: Scaffold(
         body: CollapsibleHeaderComponent(
-          bgImage: AssetConstants.dalle,
+          bgImage: sessionModel.coverUrl,
           title: sessionModel.title,
           description: sessionModel.description,
           children: [

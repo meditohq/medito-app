@@ -1,6 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 
 class CollapsibleHeaderComponent extends StatefulWidget {
@@ -112,9 +112,12 @@ class _CollapsibleHeaderComponentState
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.asset(
-          image,
-          fit: BoxFit.fill,
+        // Image.asset(
+        //   image,
+        //   fit: BoxFit.fill,
+        // ),
+        NetworkImageComponent(
+          url: image,
         ),
         Align(
           alignment: Alignment.bottomCenter,

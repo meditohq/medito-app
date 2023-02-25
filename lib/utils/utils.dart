@@ -30,12 +30,12 @@ Widget getNetworkImageWidget(String? url) {
 }
 
 NetworkImage getNetworkImage(String url) {
-  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  final headers = {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN};
   return NetworkImage(url, headers: headers);
 }
 
 Future<bool> checkConnectivity() async {
-  var connectivityResult = await (Connectivity().checkConnectivity());
+  var connectivityResult = await Connectivity().checkConnectivity();
   return connectivityResult != ConnectivityResult.none;
 }
 
