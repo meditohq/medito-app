@@ -5,7 +5,6 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/download/download_viewmodel.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
