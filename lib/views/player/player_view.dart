@@ -5,7 +5,7 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'components/artist_title_component.dart';
-import 'components/bottom_action_component.dart';
+import 'components/bottom_actions/bottom_action_component.dart';
 import 'components/duration_indicatior_component.dart';
 import 'components/player_buttons_component.dart';
 
@@ -22,56 +22,45 @@ class _PlayerViewState extends State<PlayerView> {
     return Scaffold(
       extendBody: false,
       extendBodyBehindAppBar: true,
-      body: Container(
-        // decoration: BoxDecoration(
-        //   image: DecorationImage(
-        //     image: getNetworkImage(widget.sessionModel.coverUrl),
-        //     // image: getNetworkImage(widget.sessionModel.coverUrl),
-        //     fit: BoxFit.fill,
-        //     colorFilter: ColorFilter.mode(
-        //         ColorConstants.almostBlack.withOpacity(0.65),
-        //         BlendMode.overlay),
-        //   ),
-        // ),
-        child: Stack(
-          children: [
-            _bgImage(context),
-            SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CloseButtonComponent(
-                    onPressed: () => router.pop(),
-                    bgColor: ColorConstants.walterWhite,
-                    icColor: ColorConstants.almostBlack,
-                  ),
-                  Spacer(),
-                  ArtistTitleComponent(sessionModel: widget.sessionModel),
-                  Spacer(),
-                  PlayerButtonsComponent(),
-                  height16,
-                  DurationIndicatorComponent(),
-                  height16,
-                  BottomActionComponent(),
-                  height16,
-                ],
-              ),
+      body: Stack(
+        children: [
+          _bgImage(context),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CloseButtonComponent(
+                  onPressed: () => router.pop(),
+                  bgColor: ColorConstants.walterWhite,
+                  icColor: ColorConstants.almostBlack,
+                ),
+                Spacer(),
+                ArtistTitleComponent(sessionModel: widget.sessionModel),
+                Spacer(),
+                PlayerButtonsComponent(),
+                height16,
+                DurationIndicatorComponent(),
+                height16,
+                BottomActionComponent(
+                  sessionModel: widget.sessionModel,
+                ),
+                height16,
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   SizedBox _bgImage(BuildContext context) {
     return SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: ImageFiltered(
-              imageFilter: ColorFilter.mode(
-                  ColorConstants.almostBlack.withOpacity(0.4),
-                  BlendMode.colorBurn),
-              child: NetworkImageComponent(url: widget.sessionModel.coverUrl),
-            ),
-          );
+      height: MediaQuery.of(context).size.height,
+      child: ImageFiltered(
+        imageFilter: ColorFilter.mode(
+            ColorConstants.almostBlack.withOpacity(0.4), BlendMode.colorBurn),
+        child: NetworkImageComponent(url: widget.sessionModel.coverUrl),
+      ),
+    );
   }
 }

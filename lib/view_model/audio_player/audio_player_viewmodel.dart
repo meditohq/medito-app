@@ -14,9 +14,17 @@ final audioPlayerNotifierProvider =
 
 class AudioPlayerNotifier extends ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
+  final sessionAudioPlayer = AudioPlayer();
+
 
   void setBackgroundAudio(BackgroundSoundsModel sound) async {
     unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
+      HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
+    }));
+  }
+
+  void setSessionAudio(BackgroundSoundsModel sound) async {
+    unawaited(sessionAudioPlayer.setUrl(sound.path, headers: {
       HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
     }));
   }
@@ -25,12 +33,28 @@ class AudioPlayerNotifier extends ChangeNotifier {
     unawaited(backgroundSoundAudioPlayer.play());
   }
 
+  void playSessionAudio() async {
+    unawaited(sessionAudioPlayer.play());
+  }
+
   void pauseBackgroundSound() async {
     await backgroundSoundAudioPlayer.pause();
   }
 
+  void pauseSessionAudio() async {
+    await sessionAudioPlayer.pause();
+  }
+
   void stopBackgroundSound() async {
     await backgroundSoundAudioPlayer.stop();
+  }
+
+  void stopSessionAudio() async {
+    await sessionAudioPlayer.stop();
+  }
+
+  void setSessionAudioSpeed(double speed) async {
+    await sessionAudioPlayer.setSpeed(speed);
   }
 
   void setBackgroundSoundVolume(double volume) async {

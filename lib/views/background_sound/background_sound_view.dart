@@ -12,13 +12,18 @@ class BackgroundSoundView extends ConsumerStatefulWidget {
   const BackgroundSoundView({Key? key}) : super(key: key);
 
   @override
-  BackgroundSoundViewState createState() => BackgroundSoundViewState();
+  ConsumerState<BackgroundSoundView> createState() =>
+      _BackgroundSoundViewState();
 }
 
-class BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
+class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void initState() {
     super.initState();
+    setInitStateValues();
+  }
+
+  void setInitStateValues() {
     final _provider = ref.read(backgroundSoundsNotifierProvider);
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
 
