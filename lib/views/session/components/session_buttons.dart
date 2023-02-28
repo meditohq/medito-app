@@ -48,19 +48,14 @@ class SessionButtons extends StatelessWidget {
       runSpacing: 8,
       alignment: WrapAlignment.spaceBetween,
       children: sessionModel.audio[i].files
-          .map((e) => _getGridItem(
-              context,
-              sessionModel.audio[i].guideName,
-              'https://cdn.esawebb.org/archives/images/screen/weic2216b.jpg',
-              e))
+          .map((e) => _getGridItem(context, i, e))
           .toList(),
     );
   }
 
   Consumer _getGridItem(
     BuildContext context,
-    String title,
-    String coverUrl,
+    int audioIndex,
     SessionFilesModel file,
   ) {
     return Consumer(
@@ -97,8 +92,9 @@ class SessionButtons extends StatelessWidget {
             );
             print(e);
           }
+
           context.go(GoRouter.of(context).location + PlayerPath,
-              extra: sessionModel);
+              extra: {'sessionModel': sessionModel, 'file': file});
         },
         borderRadius: BorderRadius.circular(14),
         child: Ink(
