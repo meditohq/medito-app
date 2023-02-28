@@ -59,9 +59,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
                 child: SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 8,
-                    trackShape:
-                        //  RoundedRectSliderTrackShape(),
-                        CustomTrackShape(),
+                    trackShape: CustomTrackShape(),
                     thumbShape: RoundSliderThumbShape(
                       enabledThumbRadius: 5.0,
                     ),

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
@@ -24,17 +23,17 @@ class AudioSpeedViewModel extends ChangeNotifier {
     } else {
       label = _speedList[nextIndex];
     }
-    if (audioSpeedModel.label == 'X1') {
+    if (label == 'X1') {
       speed = 1;
-    } else if (audioSpeedModel.label == 'X1.25') {
+    } else if (label == 'X1.25') {
       speed = 1.25;
-    } else if (audioSpeedModel.label == 'X1.5') {
+    } else if (label == 'X1.5') {
       speed = 1.5;
-    } else if (audioSpeedModel.label == 'X2') {
+    } else if (label == 'X2') {
       speed = 2;
-    } else if (audioSpeedModel.label == 'X0.6') {
+    } else if (label == 'X0.6') {
       speed = 0.6;
-    } else if (audioSpeedModel.label == 'X0.75') {
+    } else if (label == 'X0.75') {
       speed = 1;
     } else {
       speed = 0.75;

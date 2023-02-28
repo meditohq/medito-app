@@ -3,20 +3,29 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
 import 'components/bottom_actions/bottom_action_component.dart';
 import 'components/duration_indicatior_component.dart';
 import 'components/player_buttons_component.dart';
 
-class PlayerView extends StatefulWidget {
-  const PlayerView({super.key, required this.sessionModel});
+class PlayerView extends ConsumerStatefulWidget {
+  const PlayerView({super.key, required this.sessionModel, required this.file});
   final SessionModel sessionModel;
+  final SessionFilesModel file;
   @override
-  State<PlayerView> createState() => _PlayerViewState();
+  ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
 
-class _PlayerViewState extends State<PlayerView> {
+class _PlayerViewState extends ConsumerState<PlayerView> {
+  @override
+  void initState() {
+    ref.read(audioPlayerNotifierProvider).setSessionAudio(widget.file.path);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +46,7 @@ class _PlayerViewState extends State<PlayerView> {
                 Spacer(),
                 ArtistTitleComponent(sessionModel: widget.sessionModel),
                 Spacer(),
-                PlayerButtonsComponent(),
+                PlayerButtonsComponent(file: widget.file),
                 height16,
                 DurationIndicatorComponent(),
                 height16,

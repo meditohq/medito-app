@@ -178,13 +178,15 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  var session = state.extra as SessionModel;
-  return MaterialPage(key: state.pageKey,
-  //  child: PlayerWidget()
-      child: PlayerView(
-        sessionModel: session,
-      ),
-      );
+  var session = state.extra as Map;
+  return MaterialPage(
+    key: state.pageKey,
+    //  child: PlayerWidget()
+    child: PlayerView(
+      sessionModel: session['sessionModel'],
+      file: session['file'],
+    ),
+  );
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {

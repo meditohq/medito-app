@@ -42,7 +42,8 @@ abstract class SessionFilesModel with _$SessionFilesModel {
   const factory SessionFilesModel(
       {required int id,
       required String path,
-      required int duration}) = _SessionFilesModel;
+      required int duration,
+      }) = _SessionFilesModel;
 
   factory SessionFilesModel.fromJson(Map<String, Object?> json) =>
       _$SessionFilesModelFromJson(json);

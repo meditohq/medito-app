@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -16,15 +17,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
   final sessionAudioPlayer = AudioPlayer();
 
-
   void setBackgroundAudio(BackgroundSoundsModel sound) async {
     unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
       HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
     }));
   }
 
-  void setSessionAudio(BackgroundSoundsModel sound) async {
-    unawaited(sessionAudioPlayer.setUrl(sound.path, headers: {
+  void setSessionAudio(String path) async {
+    unawaited(sessionAudioPlayer.setUrl(path, headers: {
       HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
     }));
   }
@@ -35,6 +35,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void playSessionAudio() async {
     unawaited(sessionAudioPlayer.play());
+    notifyListeners();
   }
 
   void pauseBackgroundSound() async {
@@ -43,6 +44,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void pauseSessionAudio() async {
     await sessionAudioPlayer.pause();
+    notifyListeners();
   }
 
   void stopBackgroundSound() async {
@@ -55,6 +57,20 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void setSessionAudioSpeed(double speed) async {
     await sessionAudioPlayer.setSpeed(speed);
+  }
+
+  void skipForward30Secs() {
+    var seekDuration = sessionAudioPlayer.position.inMilliseconds +
+        Duration(seconds: 30).inMilliseconds;
+    sessionAudioPlayer.seek(Duration(milliseconds: seekDuration));
+  }
+
+  void skipBackward10Secs() {
+    var seekDuration = max(
+        0,
+        sessionAudioPlayer.position.inMilliseconds -
+            Duration(seconds: 10).inMilliseconds);
+    sessionAudioPlayer.seek(Duration(milliseconds: seekDuration));
   }
 
   void setBackgroundSoundVolume(double volume) async {
