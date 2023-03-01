@@ -27,6 +27,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   @override
+  void dispose() {
+    // ref.read(audioPlayerNotifierProvider).disposeSessionAudio();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: false,
@@ -48,7 +54,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 Spacer(),
                 PlayerButtonsComponent(file: widget.file),
                 height16,
-                DurationIndicatorComponent(),
+                DurationIndicatorComponent(file: widget.file),
                 height16,
                 BottomActionComponent(
                   sessionModel: widget.sessionModel,

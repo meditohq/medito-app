@@ -59,6 +59,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await sessionAudioPlayer.setSpeed(speed);
   }
 
+  void seekValueFromSlider(int duration) {
+    sessionAudioPlayer.seek(Duration(milliseconds: duration));
+  }
+
   void skipForward30Secs() {
     var seekDuration = sessionAudioPlayer.position.inMilliseconds +
         Duration(seconds: 30).inMilliseconds;
@@ -75,5 +79,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void setBackgroundSoundVolume(double volume) async {
     await backgroundSoundAudioPlayer.setVolume(volume / 100);
+  }
+
+  void disposeSessionAudio() async {
+    await sessionAudioPlayer.dispose();
   }
 }
