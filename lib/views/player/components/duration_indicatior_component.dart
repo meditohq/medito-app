@@ -1,27 +1,27 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DurationIndicatorComponent extends ConsumerWidget {
-  const DurationIndicatorComponent({super.key});
-
+  const DurationIndicatorComponent({super.key, required this.file});
+  final SessionFilesModel file;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(audioPlayerNotifierProvider);
+    final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: StreamBuilder<Duration?>(
-          stream: provider.sessionAudioPlayer.positionStream,
+      child: StreamBuilder<int?>(
+          stream: audioPlayerPositionProvider,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
+              var currentDuration = snapshot.data ?? 0;
               return Column(
                 children: [
-                  _durationLabels(
-                      context,
-                      provider.sessionAudioPlayer.duration?.inMilliseconds ?? 0,
-                      snapshot.data?.inMilliseconds ?? 0),
+                  _durationLabels(context, file.duration, currentDuration),
                   SliderTheme(
                     data: SliderThemeData(
                       trackHeight: 8,
@@ -34,12 +34,16 @@ class DurationIndicatorComponent extends ConsumerWidget {
                       min: 0.0,
                       activeColor: ColorConstants.walterWhite,
                       inactiveColor: ColorConstants.greyIsTheNewGrey,
-                      max: provider.sessionAudioPlayer.duration?.inMilliseconds
-                              .toDouble() ??
-                          0,
-                      value: snapshot.data?.inMilliseconds.toDouble() ?? 0,
-                      onChanged: (value) {},
-                      onChangeEnd: (value) {},
+                      max: file.duration.toDouble(),
+                      value: currentDuration.toDouble(),
+                      onChanged: (value) {
+                        ref.read(slideAudioPositionProvider(
+                            duration: value.toInt()));
+                      },
+                      onChangeEnd: (value) {
+                        ref.read(slideAudioPositionProvider(
+                            duration: value.toInt()));
+                      },
                     ),
                   ),
                 ],
@@ -78,10 +82,6 @@ class DurationIndicatorComponent extends ConsumerWidget {
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
           color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
     );
-  }
-
-  String _calculateDuration(int duration) {
-    return Duration(milliseconds: duration).toMinutesSeconds();
   }
 }
 
