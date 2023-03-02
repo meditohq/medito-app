@@ -33,19 +33,13 @@ class AudioPlayerNotifier extends ChangeNotifier {
     unawaited(backgroundSoundAudioPlayer.play());
   }
 
-  void playSessionAudio() async {
-    unawaited(sessionAudioPlayer.play());
-    notifyListeners();
-  }
+  Future<void> playSessionAudio() async => await sessionAudioPlayer.play();
 
   void pauseBackgroundSound() async {
-    await backgroundSoundAudioPlayer.pause();
+    unawaited(backgroundSoundAudioPlayer.pause());
   }
 
-  void pauseSessionAudio() async {
-    await sessionAudioPlayer.pause();
-    notifyListeners();
-  }
+  Future<void> pauseSessionAudio() async => await sessionAudioPlayer.pause();
 
   void stopBackgroundSound() async {
     await backgroundSoundAudioPlayer.stop();

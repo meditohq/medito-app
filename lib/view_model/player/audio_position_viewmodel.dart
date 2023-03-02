@@ -12,8 +12,26 @@ void slideAudioPosition(
   audioPlayer.seekValueFromSlider(duration);
 }
 
+@riverpod
+void skipAudio(
+  SkipAudioRef ref, {
+  required SKIP_AUDIO skip,
+}) {
+  final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+  switch (skip) {
+    case SKIP_AUDIO.SKIP_FORWARD_30:
+      audioPlayer.skipForward30Secs();
+      break;
+    case SKIP_AUDIO.SKIP_BACWARD_10:
+      audioPlayer.skipBackward10Secs();
+      break;
+  }
+}
+
 final audioPositionProvider = StreamProvider.autoDispose<int>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
   return audioPlayer.sessionAudioPlayer.positionStream
       .map((position) => position.inMilliseconds);
 });
+
+enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACWARD_10 }
