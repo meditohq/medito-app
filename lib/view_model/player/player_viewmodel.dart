@@ -1,10 +1,25 @@
+import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+part 'player_viewmodel.g.dart';
 
-
-
-
-
+@riverpod
+bool playPauseAudio(
+  PlayPauseAudioRef ref, {
+  required PLAY_PAUSE_AUDIO action,
+}) {
+  final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+  switch (action) {
+    case PLAY_PAUSE_AUDIO.PLAY:
+      audioPlayer.playSessionAudio();
+      break;
+    case PLAY_PAUSE_AUDIO.PAUSE:
+      audioPlayer.pauseSessionAudio();
+      break;
+  }
+  return audioPlayer.sessionAudioPlayer.playerState.playing;
+}
 
 final playerProvider = ChangeNotifierProvider<PlayerViewModel>((ref) {
   return PlayerViewModel(ref);
@@ -15,8 +30,7 @@ class PlayerViewModel extends ChangeNotifier {
   PlayerViewModel(this.ref);
 }
 
-
-
+enum PLAY_PAUSE_AUDIO { PLAY, PAUSE }
 
 
 
