@@ -58,6 +58,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 height16,
                 BottomActionComponent(
                   sessionModel: widget.sessionModel,
+                  file: widget.file,
                 ),
                 height16,
               ],

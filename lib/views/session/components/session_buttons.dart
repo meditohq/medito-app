@@ -93,8 +93,10 @@ class SessionButtons extends StatelessWidget {
             print(e);
           }
 
-          context.go(GoRouter.of(context).location + PlayerPath,
-              extra: {'sessionModel': sessionModel, 'file': file});
+          context.go(
+            GoRouter.of(context).location + PlayerPath,
+            extra: {'sessionModel': sessionModel, 'file': file},
+          );
         },
         borderRadius: BorderRadius.circular(14),
         child: Ink(
