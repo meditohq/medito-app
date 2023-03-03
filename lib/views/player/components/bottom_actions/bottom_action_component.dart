@@ -1,12 +1,16 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/views/player/components/bottom_actions/components/audio_speed_component.dart';
 import 'package:Medito/views/player/components/bottom_actions/components/labels_component.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BottomActionComponent extends StatelessWidget {
-  const BottomActionComponent({super.key, required this.sessionModel});
+  const BottomActionComponent(
+      {super.key, required this.sessionModel, required this.file});
   final SessionModel sessionModel;
+  final SessionFilesModel file;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -18,14 +22,19 @@ class BottomActionComponent extends StatelessWidget {
           AudioSpeedComponent(),
           width8,
           LabelsComponent(
-            label: 'DONWLOAD',
+            label:  StringConstants.DOWNLOAD.toUpperCase(),
             onTap: () => {},
           ),
           width8,
           if (sessionModel.hasBackgroundSound)
             LabelsComponent(
-              label: 'SOUND',
-              onTap: () => {},
+              label: StringConstants.SOUND.toUpperCase(),
+              onTap: () {
+                var location = GoRouter.of(context).location;
+                print(location + backgroundSounds);
+                context.go(location + backgroundSounds,
+                    extra: {'sessionModel': sessionModel, 'file': file});
+              },
             ),
           if (sessionModel.hasBackgroundSound) width8,
         ],

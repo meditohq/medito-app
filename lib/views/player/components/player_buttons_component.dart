@@ -1,7 +1,7 @@
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
-import 'package:Medito/view_model/player/player_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,15 +12,14 @@ class PlayerButtonsComponent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var isPlaying =
-        ref.watch(playPauseAudioProvider(action: PLAY_PAUSE_AUDIO.PLAY));
+    ref.watch(audioPlayPauseProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _rewindButton(ref),
         SizedBox(width: 35),
-        _playPauseButton(ref, isPlaying),
+        _playPauseButton(ref),
         SizedBox(width: 35),
         _forwardButton(ref)
       ],
@@ -47,14 +46,15 @@ class PlayerButtonsComponent extends ConsumerWidget {
     );
   }
 
-  InkWell _playPauseButton(WidgetRef ref, bool isPlaying) {
+  InkWell _playPauseButton(WidgetRef ref) {
     return InkWell(
       onTap: () {
-        ref.read(
-          playPauseAudioProvider(
-              action:
-                  isPlaying ? PLAY_PAUSE_AUDIO.PAUSE : PLAY_PAUSE_AUDIO.PLAY),
-        );
+        var _state = ref.watch(audioPlayPauseStateProvider.notifier).state;
+
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            _state == PLAY_PAUSE_AUDIO.PAUSE
+                ? PLAY_PAUSE_AUDIO.PLAY
+                : PLAY_PAUSE_AUDIO.PAUSE;
       },
       child: AnimatedCrossFade(
         firstChild: Icon(
@@ -66,7 +66,9 @@ class PlayerButtonsComponent extends ConsumerWidget {
           size: 80,
         ),
         crossFadeState:
-            isPlaying ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            ref.watch(audioPlayPauseStateProvider) == PLAY_PAUSE_AUDIO.PLAY
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
         duration: Duration(milliseconds: 500),
       ),
     );
