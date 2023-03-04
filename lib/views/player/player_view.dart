@@ -5,6 +5,8 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_completion_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
@@ -30,6 +32,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void setInitStateValues() {
     ref.read(audioPlayerNotifierProvider).setSessionAudio(widget.file.path);
+    ref.read(audioPlayerNotifierProvider).playSessionAudio();
+    Future.delayed(Duration(milliseconds: 500), () {
+      ref.read(audioPlayPauseStateProvider.notifier).state =
+          PLAY_PAUSE_AUDIO.PLAY;
+    });
     loadBackgroundAudio();
   }
 
@@ -51,6 +58,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(audioCompletionProvider(widget.file.duration));
     return Scaffold(
       extendBody: false,
       extendBodyBehindAppBar: true,

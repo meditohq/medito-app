@@ -50,6 +50,7 @@ dependencies:
   flutter_dotenv: ^5.0.2
   shimmer: ^2.0.0
   webview_flutter: ^2.8.0
+  flutter_downloader: ^1.10.2
   
 dev_dependencies:
   flutter_test:
