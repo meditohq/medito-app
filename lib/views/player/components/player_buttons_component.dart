@@ -7,12 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PlayerButtonsComponent extends ConsumerWidget {
-  const PlayerButtonsComponent({super.key, required this.file});
+  const PlayerButtonsComponent(
+      {super.key, required this.sessionModel, required this.file});
   final SessionFilesModel file;
+  final SessionModel sessionModel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(audioPlayPauseProvider);
+    ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
