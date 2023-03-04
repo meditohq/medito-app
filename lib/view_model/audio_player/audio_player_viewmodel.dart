@@ -31,6 +31,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void playBackgroundSound() async {
     unawaited(backgroundSoundAudioPlayer.play());
+    unawaited(backgroundSoundAudioPlayer.setLoopMode(LoopMode.all));
   }
 
   Future<void> playSessionAudio() async => await sessionAudioPlayer.play();
