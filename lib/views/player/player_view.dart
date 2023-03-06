@@ -2,7 +2,6 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_completion_viewmodel.dart';
@@ -26,33 +25,31 @@ class PlayerView extends ConsumerStatefulWidget {
 class _PlayerViewState extends ConsumerState<PlayerView> {
   @override
   void initState() {
-    setInitStateValues();
-    super.initState();
-  }
-
-  void setInitStateValues() {
-    ref.read(audioPlayerNotifierProvider).setSessionAudio(widget.file.path);
-    ref.read(audioPlayerNotifierProvider).playSessionAudio();
-    Future.delayed(Duration(milliseconds: 500), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadSessionAndBackgroundSound();
       ref.read(audioPlayPauseStateProvider.notifier).state =
           PLAY_PAUSE_AUDIO.PLAY;
     });
-    loadBackgroundAudio();
+    super.initState();
   }
 
-  void loadBackgroundAudio() {
-    if (widget.sessionModel.hasBackgroundSound) {
-      final _provider = ref.read(backgroundSoundsNotifierProvider);
-      final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-      _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          _audioPlayerNotifier.playBackgroundSound();
-        }
-      });
-      _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-      });
+  void loadSessionAndBackgroundSound() {
+    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+    if (!_audioPlayerNotifier.sessionAudioPlayer.playerState.playing ||
+        _audioPlayerNotifier.currentlyPlayingSession?.id != widget.file.id) {
+      _audioPlayerNotifier.setSessionAudio(widget.file.path);
+      _audioPlayerNotifier.currentlyPlayingSession = widget.file;
+      if (widget.sessionModel.hasBackgroundSound) {
+        final _provider = ref.read(backgroundSoundsNotifierProvider);
+        _provider.getBackgroundSoundFromPref().then((_) {
+          if (_provider.selectedBgSound != null) {
+            _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+          }
+        });
+        _provider.getVolumeFromPref().then((_) {
+          _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+        });
+      }
     }
   }
 
@@ -87,6 +84,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 BottomActionComponent(
                   sessionModel: widget.sessionModel,
                   file: widget.file,
+                  isDownloaded: false,
                 ),
                 height16,
               ],
