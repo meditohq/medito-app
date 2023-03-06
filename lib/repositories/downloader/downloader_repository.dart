@@ -12,6 +12,7 @@ abstract class DownloaderRepository {
   Future<dynamic> downloadFile(String url,
       {String? name, void Function(int, int)? onReceiveProgress});
   Future<dynamic> getDownloadedFile(String name);
+  Future<dynamic> deleteDownloadedFile(String name);
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
@@ -36,6 +37,23 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
             onReceiveProgress: onReceiveProgress);
       } else {
         throw ('File already exists');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteDownloadedFile(
+    String fileName,
+  ) async {
+    try {
+      var file = await getApplicationDocumentsDirectory();
+      var savePath = file.path + '/' + fileName;
+      var filePath = File(savePath);
+      var checkIsExists = await filePath.exists();
+      if (checkIsExists) {
+        await filePath.delete();
       }
     } catch (e) {
       rethrow;

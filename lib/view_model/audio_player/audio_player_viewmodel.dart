@@ -16,6 +16,7 @@ final audioPlayerNotifierProvider =
 class AudioPlayerNotifier extends ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
   final sessionAudioPlayer = AudioPlayer();
+  SessionFilesModel? currentlyPlayingSession;
 
   void setBackgroundAudio(BackgroundSoundsModel sound) async {
     unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {

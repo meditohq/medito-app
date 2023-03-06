@@ -6,11 +6,18 @@ import 'package:Medito/views/player/components/bottom_actions/components/labels_
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'components/audio_download_component.dart';
+
 class BottomActionComponent extends StatelessWidget {
   const BottomActionComponent(
-      {super.key, required this.sessionModel, required this.file});
+      {super.key,
+      required this.sessionModel,
+      required this.file,
+      required this.isDownloaded});
   final SessionModel sessionModel;
   final SessionFilesModel file;
+  final bool isDownloaded;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -21,9 +28,10 @@ class BottomActionComponent extends StatelessWidget {
         children: [
           AudioSpeedComponent(),
           width8,
-          LabelsComponent(
-            label:  StringConstants.DOWNLOAD.toUpperCase(),
-            onTap: () => {},
+          AudioDownloadComponent(
+            sessionModel: sessionModel,
+            file: file,
+            isDownloaded: isDownloaded,
           ),
           width8,
           if (sessionModel.hasBackgroundSound)

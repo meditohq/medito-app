@@ -30,7 +30,9 @@ Widget getNetworkImageWidget(String? url) {
 }
 
 NetworkImage getNetworkImage(String url) {
-  final headers = {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN};
+  final headers = {
+    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN
+  };
   return NetworkImage(url, headers: headers);
 }
 

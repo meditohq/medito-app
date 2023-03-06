@@ -1,6 +1,7 @@
 class StringConstants {
   static const String DOWNLOADS = 'Downloads';
   static const String DOWNLOAD = 'Download';
+  static const String DOWNLOADED = 'Downloaded';
   static const String SOUNDS = 'Sounds';
   static const String SOUND = 'Sound';
   static const String VOLUME = 'Volume';
