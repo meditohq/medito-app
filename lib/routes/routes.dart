@@ -1,5 +1,4 @@
 import 'package:Medito/components/components.dart';
-import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/btm_nav/downloads_widget.dart';
@@ -11,7 +10,6 @@ import 'package:go_router/go_router.dart';
 
 import '../views/home/home_wrapper_widget.dart';
 import '../views/player_old/player2/player_view.dart';
-// import '../views/player/player_view.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -36,7 +34,6 @@ final router = GoRouter(
   routes: [
     GoRoute(
         path: HomePath,
-        // builder: (context, state) => BackgroundSoundView(),
         builder: (context, state) => HomeWrapperWidget(),
         routes: [
           _getSessionRoute(),
@@ -177,12 +174,7 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  var session = state.extra as SessionModel;
-  return MaterialPage(key: state.pageKey, child: PlayerWidget()
-      // child: PlayerView(
-      //   sessionModel: session,
-      // ),
-      );
+  return MaterialPage(key: state.pageKey, child: PlayerWidget());
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {

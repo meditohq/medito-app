@@ -68,29 +68,23 @@ class SessionButtons extends StatelessWidget {
       builder: (context, ref, child) => InkWell(
         onTap: () async {
           try {
-            // var fileUrl =
-            //     'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3';
-            // AudioHandler? _audioHandler =
-            //     AudioHandlerInheritedWidget.of(context).audioHandler;
-            // var mediaItem = MediaItem(
-            //     //TODO
-            //     id: fileUrl,
-
-            //     // id: file.path.toString(),
-            //     title: title,
-            //     duration: Duration(milliseconds: file.duration),
-            //     artUri: Uri.parse(coverUrl),
-            //     extras: {
-            //       HAS_BG_SOUND: true,
-            //       LOCATION: null,
-            //       DURATION: file.duration
-            //     });
-
-            // await ref.watch(downloaderProvider).downloadFile(
-            //     ref.watch(dioClientProvider),
-            //     'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3');
-
-            // await _audioHandler.playMediaItem(mediaItem);
+            var fileUrl =
+                'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3';
+            AudioHandler? _audioHandler =
+                AudioHandlerInheritedWidget.of(context).audioHandler;
+            var mediaItem = MediaItem(
+                //TODO
+                id: fileUrl,
+                // id: file.path.toString(),
+                title: title,
+                duration: Duration(milliseconds: file.duration),
+                artUri: Uri.parse(coverUrl),
+                extras: {
+                  HAS_BG_SOUND: true,
+                  LOCATION: null,
+                  DURATION: file.duration
+                });
+            await _audioHandler.playMediaItem(mediaItem);
           } catch (e) {
             createSnackBar(
               e.toString(),

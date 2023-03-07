@@ -23,16 +23,6 @@ class _PlayerViewState extends State<PlayerView> {
       extendBody: false,
       extendBodyBehindAppBar: true,
       body: Container(
-        // decoration: BoxDecoration(
-        //   image: DecorationImage(
-        //     image: getNetworkImage(widget.sessionModel.coverUrl),
-        //     // image: getNetworkImage(widget.sessionModel.coverUrl),
-        //     fit: BoxFit.fill,
-        //     colorFilter: ColorFilter.mode(
-        //         ColorConstants.almostBlack.withOpacity(0.65),
-        //         BlendMode.overlay),
-        //   ),
-        // ),
         child: Stack(
           children: [
             _bgImage(context),
@@ -65,13 +55,12 @@ class _PlayerViewState extends State<PlayerView> {
 
   SizedBox _bgImage(BuildContext context) {
     return SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: ImageFiltered(
-              imageFilter: ColorFilter.mode(
-                  ColorConstants.almostBlack.withOpacity(0.4),
-                  BlendMode.colorBurn),
-              child: NetworkImageComponent(url: widget.sessionModel.coverUrl),
-            ),
-          );
+      height: MediaQuery.of(context).size.height,
+      child: ImageFiltered(
+        imageFilter: ColorFilter.mode(
+            ColorConstants.almostBlack.withOpacity(0.4), BlendMode.colorBurn),
+        child: NetworkImageComponent(url: widget.sessionModel.coverUrl),
+      ),
+    );
   }
 }
