@@ -112,10 +112,6 @@ class _CollapsibleHeaderComponentState
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Image.asset(
-        //   image,
-        //   fit: BoxFit.fill,
-        // ),
         NetworkImageComponent(
           url: image,
         ),

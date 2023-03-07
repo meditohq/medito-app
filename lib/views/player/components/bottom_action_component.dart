@@ -6,7 +6,6 @@ class BottomActionComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _speedList = ['X1', 'X1.25', 'X1.5', 'X2', 'X0.6'];
     var _currentSpeed = 'X1';
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -26,13 +25,11 @@ class BottomActionComponent extends StatelessWidget {
             () => {},
           ),
           width8,
-          // if (_hasBGSound())
           _bottomActionLabel(
             context,
             'SOUND',
             () => {},
           ),
-          // if (_hasBGSound()) width8,
         ],
       ),
     );
