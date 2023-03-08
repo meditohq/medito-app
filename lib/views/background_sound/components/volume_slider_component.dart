@@ -3,7 +3,7 @@ import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'custom_track_shape_component.dart';
+import './background_sound_volume_track_shape_component.dart';
 
 class VolumeSliderComponent extends ConsumerWidget {
   const VolumeSliderComponent({super.key});
@@ -15,7 +15,7 @@ class VolumeSliderComponent extends ConsumerWidget {
     var currentVolume = bgSoundNotifierProvider.volume;
     return SliderTheme(
       data: SliderThemeData(
-          trackShape: CustomTrackShapeComponent(
+          trackShape: BackgroundSoundVolumeTrackShapeComponent(
               leadingTitle: StringConstants.VOLUME,
               tralingText: currentVolume.toString().split('.').first + '%'),
           overlayShape: RoundSliderOverlayShape(overlayRadius: 0.0),

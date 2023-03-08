@@ -2,8 +2,8 @@ import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CustomTrackShapeComponent extends RectangularSliderTrackShape {
-  CustomTrackShapeComponent({required this.leadingTitle, required this.tralingText});
+class BackgroundSoundVolumeTrackShapeComponent extends RectangularSliderTrackShape {
+  BackgroundSoundVolumeTrackShapeComponent({required this.leadingTitle, required this.tralingText});
   final String tralingText;
   final String leadingTitle;
 
