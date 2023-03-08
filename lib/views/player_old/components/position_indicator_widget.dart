@@ -141,7 +141,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
           _getBottomActionLabel(
             context,
             'DONWLOAD',
-            () => {widget.handler?.setPlayerSpeed(_getNextSpeed())},
+            () => {},
           ),
           width8,
           if (_hasBGSound())
