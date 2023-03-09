@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/models/session/session_model.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
@@ -14,28 +15,68 @@ final audioDownloaderProvider =
 class AudioDownloaderViewModel extends ChangeNotifier {
   ChangeNotifierProviderRef<AudioDownloaderViewModel> ref;
   AudioDownloaderViewModel(this.ref);
-  double downloadingProgress = 0.0;
+  Map<String, double> downloadingProgress = {};
+  List<SessionModel> downloadedSessions = [];
 
   Future<void> downloadSessionAudio(
       SessionModel sessionModel, SessionFilesModel file) async {
-    final downloadAudio = ref.read(downloaderRepositoryProvider);
-    var fileName = '${sessionModel.id}-${file.id}';
-    await downloadAudio.downloadFile(
-      file.path,
-      name: fileName,
-      onReceiveProgress: (received, total) {
-        if (total != -1) {
-          downloadingProgress = (received / total * 100);
-          print(downloadingProgress);
-          notifyListeners();
-        }
-      },
-    );
+    try {
+      final downloadAudio = ref.read(downloaderRepositoryProvider);
+      var fileName = '${sessionModel.id}-${file.id}';
+      await downloadAudio.downloadFile(
+        file.path,
+        name: fileName,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            downloadingProgress[fileName] = (received / total * 100);
+            print(downloadingProgress);
+            notifyListeners();
+          }
+        },
+      );
+      await _updateDownloadsInPref(sessionModel, file);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _updateDownloadsInPref(
+      SessionModel sessionModel, SessionFilesModel file) async {
+    for (var i = 0; i < sessionModel.audio.length; i++) {
+      var element = sessionModel.audio[i];
+      var fileIndex = element.files.indexWhere((e) => e.id == file.id);
+      if (fileIndex != -1) {
+        sessionModel.audio.removeWhere((e) => e.guideName != element.guideName);
+        sessionModel.audio[i].files
+            .removeWhere((e) => e.id != element.files[fileIndex].id);
+        break;
+      }
+    }
+    print(sessionModel);
+    var _downloadedSessionList = <SessionModel>[];
+    var _downloadedSessionFromPref =
+        await SharedPreferencesService.getStringFromSF(
+            SharedPreferenceConstants.downloads);
+    if (_downloadedSessionFromPref != null) {
+      var tempList = [];
+      tempList = json.decode(_downloadedSessionFromPref);
+      tempList.forEach((element) {
+        _downloadedSessionList.add(SessionModel.fromJson(element));
+      });
+    }
+    _downloadedSessionList.add(sessionModel);
+
     await SharedPreferencesService.addStringInSF(
-        fileName, json.encode(sessionModel.toJson()));
+        SharedPreferenceConstants.downloads,
+        json.encode(_downloadedSessionList));
   }
 
   Future<void> deleteSessionAudio(String fileName) async {
+    final downloadAudio = ref.read(downloaderRepositoryProvider);
+    await downloadAudio.deleteDownloadedFile(fileName);
+  }
+
+  Future<String?> getDownloadedSessionAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
   }
