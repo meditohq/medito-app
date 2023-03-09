@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Medito/view_model/player/audio_downloader_viewmodel.dart';
@@ -37,14 +39,18 @@ class AudioDownloadComponent extends ConsumerWidget {
       } else {
         return LabelsComponent(
           label: StringConstants.DOWNLOAD.toUpperCase(),
-          // onTap: () async => await downloadAudioProvider.deleteSessionAudio(
-          //     '${sessionModel.id}-${file.id}'),
-
           onTap: () async {
-            // await downloadAudioProvider.downloadSessionAudio(
-            //     sessionModel, file);
-
-          
+            try {
+              await downloadAudioProvider
+                  .deleteSessionAudio('${sessionModel.id}-${file.id}');
+              await downloadAudioProvider.downloadSessionAudio(
+                  sessionModel, file);
+              await ref.read(addSessionInPreferenceProvider(
+                      sessionModel: sessionModel, file: file)
+                  .future);
+            } catch (e) {
+              createSnackBar(e.toString(), context);
+            }
           },
         );
       }

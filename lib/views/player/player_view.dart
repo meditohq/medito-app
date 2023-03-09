@@ -5,7 +5,9 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_completion_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
+import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
@@ -23,33 +25,59 @@ class PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
+  SessionModel? downloadedSession;
+  late int sessionId, fileId;
   @override
   void initState() {
+    sessionId = widget.sessionModel.id;
+    fileId = widget.file.id;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadSessionAndBackgroundSound();
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PLAY;
+      ref
+          .read(
+              getSpecificSessionsProvider(sessionId: sessionId, fileId: fileId)
+                  .future)
+          .then((value) {
+        downloadedSession = value;
+        loadSessionAndBackgroundSound();
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PLAY;
+      });
     });
     super.initState();
   }
 
   void loadSessionAndBackgroundSound() {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.sessionAudioPlayer.playerState.playing ||
-        _audioPlayerNotifier.currentlyPlayingSession?.id != widget.file.id) {
-      _audioPlayerNotifier.setSessionAudio(widget.file);
+    var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
+    var _currentPlayingFileId =
+        _audioPlayerNotifier.currentlyPlayingSession?.id;
+
+    if (!isPlaying || _currentPlayingFileId != fileId) {
+      setSessionAudio(_audioPlayerNotifier);
+      setBackgroundSound(_audioPlayerNotifier);
+    }
+  }
+
+  void setSessionAudio(AudioPlayerNotifier _audioPlayerNotifier) {
+    var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
+        '$sessionId-$fileId.${widget.file.path.substring(widget.file.path.lastIndexOf('.') + 1)}');
+    checkDownloadedFile.then((value) {
+      _audioPlayerNotifier.setSessionAudio(widget.file, filePath: value);
       _audioPlayerNotifier.currentlyPlayingSession = widget.file;
-      if (widget.sessionModel.hasBackgroundSound) {
-        final _provider = ref.read(backgroundSoundsNotifierProvider);
-        _provider.getBackgroundSoundFromPref().then((_) {
-          if (_provider.selectedBgSound != null) {
-            _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          }
-        });
-        _provider.getVolumeFromPref().then((_) {
-          _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-        });
-      }
+    });
+  }
+
+  void setBackgroundSound(AudioPlayerNotifier _audioPlayerNotifier) {
+    if (widget.sessionModel.hasBackgroundSound) {
+      final _provider = ref.read(backgroundSoundsNotifierProvider);
+      _provider.getBackgroundSoundFromPref().then((_) {
+        if (_provider.selectedBgSound != null) {
+          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+        }
+      });
+      _provider.getVolumeFromPref().then((_) {
+        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+      });
     }
   }
 

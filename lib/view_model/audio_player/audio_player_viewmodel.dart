@@ -24,11 +24,15 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }));
   }
 
-  void setSessionAudio(SessionFilesModel file) async {
-    
-    unawaited(sessionAudioPlayer.setUrl(file.path, headers: {
-      HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
-    }));
+  void setSessionAudio(SessionFilesModel file, {String? filePath}) async {
+    if (filePath != null) {
+      unawaited(sessionAudioPlayer
+          .setAudioSource(AudioSource.uri(Uri.file(file.path))));
+    } else {
+      unawaited(sessionAudioPlayer.setUrl(file.path, headers: {
+        HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
+      }));
+    }
   }
 
   void playBackgroundSound() async {
