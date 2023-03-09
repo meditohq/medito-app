@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'session_model.freezed.dart';
 part 'session_model.g.dart';
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 abstract class SessionModel with _$SessionModel {
   const factory SessionModel(
       {required int id,
@@ -27,7 +27,7 @@ abstract class SessionArtistModel with _$SessionArtistModel {
       _$SessionArtistModelFromJson(json);
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 abstract class SessionAudioModel with _$SessionAudioModel {
   const factory SessionAudioModel(
       {required String guideName,
@@ -37,13 +37,13 @@ abstract class SessionAudioModel with _$SessionAudioModel {
       _$SessionAudioModelFromJson(json);
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 abstract class SessionFilesModel with _$SessionFilesModel {
-  const factory SessionFilesModel(
-      {required int id,
-      required String path,
-      required int duration,
-      }) = _SessionFilesModel;
+  const factory SessionFilesModel({
+    required int id,
+    required String path,
+    required int duration,
+  }) = _SessionFilesModel;
 
   factory SessionFilesModel.fromJson(Map<String, Object?> json) =>
       _$SessionFilesModelFromJson(json);

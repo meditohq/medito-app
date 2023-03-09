@@ -37,7 +37,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
     if (!_audioPlayerNotifier.sessionAudioPlayer.playerState.playing ||
         _audioPlayerNotifier.currentlyPlayingSession?.id != widget.file.id) {
-      _audioPlayerNotifier.setSessionAudio(widget.file.path);
+      _audioPlayerNotifier.setSessionAudio(widget.file);
       _audioPlayerNotifier.currentlyPlayingSession = widget.file;
       if (widget.sessionModel.hasBackgroundSound) {
         final _provider = ref.read(backgroundSoundsNotifierProvider);

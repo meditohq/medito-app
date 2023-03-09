@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Medito/view_model/player/audio_downloader_viewmodel.dart';
@@ -15,9 +18,11 @@ class AudioDownloadComponent extends ConsumerWidget {
   final bool isDownloaded;
   final SessionModel sessionModel;
   final SessionFilesModel file;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
+    var downloadFileKey = '${sessionModel.id}-${file.id}';
     if (isDownloaded) {
       return LabelsComponent(
         bgColor: ColorConstants.walterWhite,
@@ -26,16 +31,22 @@ class AudioDownloadComponent extends ConsumerWidget {
         onTap: () => {},
       );
     } else {
-      if (downloadAudioProvider.downloadingProgress == 0.0) {
+      if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
+        return showDownloadProgress(
+            getDownloadProgress(downloadAudioProvider, downloadFileKey));
+      } else {
         return LabelsComponent(
           label: StringConstants.DOWNLOAD.toUpperCase(),
           // onTap: () async => await downloadAudioProvider.deleteSessionAudio(
           //     '${sessionModel.id}-${file.id}'),
-          onTap: () async => await downloadAudioProvider.downloadSessionAudio(
-              sessionModel, file),
+
+          onTap: () async {
+            // await downloadAudioProvider.downloadSessionAudio(
+            //     sessionModel, file);
+
+          
+          },
         );
-      } else {
-        return showDownloadProgress(downloadAudioProvider.downloadingProgress/100);
       }
     }
   }
@@ -57,5 +68,10 @@ class AudioDownloadComponent extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  double getDownloadProgress(
+      AudioDownloaderViewModel downloadAudioProvider, String downloadFileKey) {
+    return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
   }
 }

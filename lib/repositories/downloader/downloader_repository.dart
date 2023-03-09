@@ -61,9 +61,18 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   }
 
   @override
-  Future getDownloadedFile(String name) {
-    // TODO: implement getSessionAudio
-    throw UnimplementedError();
+  Future<String?> getDownloadedFile(String name) async {
+    try {
+      var file = await getApplicationDocumentsDirectory();
+      var savePath = file.path + '/' + name;
+      var filePath = File(savePath);
+      var checkIsExists = await filePath.exists();
+      if (checkIsExists) {
+        await filePath.delete();
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }
 

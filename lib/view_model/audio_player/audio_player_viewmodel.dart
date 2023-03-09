@@ -24,8 +24,9 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }));
   }
 
-  void setSessionAudio(String path) async {
-    unawaited(sessionAudioPlayer.setUrl(path, headers: {
+  void setSessionAudio(SessionFilesModel file) async {
+    
+    unawaited(sessionAudioPlayer.setUrl(file.path, headers: {
       HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
     }));
   }
