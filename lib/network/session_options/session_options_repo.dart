@@ -17,7 +17,7 @@ import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 
-import '../../utils/navigation_extra.dart';
+import '../../routes/routes.dart';
 
 class SessionOptionsRepository {
   var ext = 'items/sessions/';

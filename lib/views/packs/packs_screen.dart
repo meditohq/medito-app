@@ -23,7 +23,7 @@ import 'package:Medito/views/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../utils/navigation_extra.dart';
+import '../../routes/routes.dart';
 
 class PackListWidget extends StatefulWidget {
   PackListWidget({Key? key}) : super(key: key);

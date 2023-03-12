@@ -4,7 +4,7 @@ import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rxdart/rxdart.dart';
@@ -143,7 +143,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
           _getBottomActionLabel(
             context,
             'DONWLOAD',
-            () => {widget.handler?.setPlayerSpeed(_getNextSpeed())},
+            () => {},
           ),
           width8,
           if (_hasBGSound())

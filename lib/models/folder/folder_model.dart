@@ -6,7 +6,7 @@ part 'folder_model.g.dart';
 abstract class FolderModel with _$FolderModel {
   const factory FolderModel(
       {required int id,
-      required String name,
+      required String title,
       required String description,
       required String coverUrl,
       required bool isPublished,
@@ -24,7 +24,7 @@ abstract class FolderItemsModel with _$FolderItemsModel {
   const factory FolderItemsModel(
       {required String type,
       required int id,
-      required String name,
+      required String title,
       required String subtitle,
       required String path}) = _FolderItemsModel;
 

@@ -1,7 +1,7 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/folder/folder_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +39,8 @@ class FolderView extends ConsumerWidget {
         return await ref.refresh(FoldersProvider(folderId: 28));
       },
       child: CollapsibleHeaderComponent(
-        bgImage: AssetConstants.dalle,
-        title: '${folder.name}',
+        bgImage: folder.coverUrl,
+        title: '${folder.title}',
         description: folder.description,
         children: folder.items
             .map(
@@ -48,7 +48,7 @@ class FolderView extends ConsumerWidget {
                 onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
                 child: _buildListTile(
                   context,
-                  e.name,
+                  e.title,
                   e.subtitle,
                   e.type,
                 ),
