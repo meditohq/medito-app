@@ -6,7 +6,7 @@ part 'session_model.g.dart';
 abstract class SessionModel with _$SessionModel {
   const factory SessionModel(
       {required int id,
-      required String name,
+      required String title,
       required String description,
       required String coverUrl,
       required bool isPublished,
