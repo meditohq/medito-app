@@ -9,14 +9,13 @@ import 'package:go_router/go_router.dart';
 import 'components/audio_download_component.dart';
 
 class BottomActionComponent extends StatelessWidget {
-  const BottomActionComponent(
-      {super.key,
-      required this.sessionModel,
-      required this.file,
-      required this.isDownloaded});
+  const BottomActionComponent({
+    super.key,
+    required this.sessionModel,
+    required this.file,
+  });
   final SessionModel sessionModel;
   final SessionFilesModel file;
-  final bool isDownloaded;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,6 @@ class BottomActionComponent extends StatelessWidget {
           AudioDownloadComponent(
             sessionModel: sessionModel,
             file: file,
-            isDownloaded: isDownloaded,
           ),
           width8,
           if (sessionModel.hasBackgroundSound)

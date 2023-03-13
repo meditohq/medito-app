@@ -1,23 +1,16 @@
-import 'dart:convert';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Medito/view_model/player/audio_downloader_viewmodel.dart';
+import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 
 import 'labels_component.dart';
 
 class AudioDownloadComponent extends ConsumerWidget {
   const AudioDownloadComponent(
-      {required this.sessionModel,
-      required this.file,
-      required this.isDownloaded,
-      super.key});
-  final bool isDownloaded;
+      {required this.sessionModel, required this.file, super.key});
   final SessionModel sessionModel;
   final SessionFilesModel file;
 
@@ -25,39 +18,29 @@ class AudioDownloadComponent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
     var downloadFileKey = '${sessionModel.id}-${file.id}';
-    if (isDownloaded) {
+
+    if (downloadAudioProvider.audioDownloadState ==
+        AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
       return LabelsComponent(
         bgColor: ColorConstants.walterWhite,
         textColor: ColorConstants.greyIsTheNewGrey,
         label: StringConstants.DOWNLOADED.toUpperCase(),
-        onTap: () => {},
+        onTap: () async =>
+            await _handleRemoveDownload(downloadAudioProvider, ref, context),
       );
+    } else if (downloadAudioProvider.audioDownloadState ==
+        AUDIO_DOWNLOAD_STATE.DOWNLOADIING) {
+      return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
-      if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
-        return showDownloadProgress(
-            getDownloadProgress(downloadAudioProvider, downloadFileKey));
-      } else {
-        return LabelsComponent(
+      return LabelsComponent(
           label: StringConstants.DOWNLOAD.toUpperCase(),
-          onTap: () async {
-            try {
-              await downloadAudioProvider
-                  .deleteSessionAudio('${sessionModel.id}-${file.id}');
-              await downloadAudioProvider.downloadSessionAudio(
-                  sessionModel, file);
-              await ref.read(addSessionInPreferenceProvider(
-                      sessionModel: sessionModel, file: file)
-                  .future);
-            } catch (e) {
-              createSnackBar(e.toString(), context);
-            }
-          },
-        );
-      }
+          onTap: () async =>
+              await _handleDownload(downloadAudioProvider, ref, context));
     }
   }
 
-  Expanded showDownloadProgress(double downloadingProgress) {
+  Expanded showDownloadProgress(
+      AudioDownloaderViewModel downloadAudioProvider, String downloadFileKey) {
     return Expanded(
       child: Container(
         height: 40,
@@ -70,14 +53,40 @@ class AudioDownloadComponent extends ConsumerWidget {
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 5),
         child: LinearProgressIndicator(
-          value: downloadingProgress,
+          value: _getDownloadProgress(downloadAudioProvider, downloadFileKey),
         ),
       ),
     );
   }
 
-  double getDownloadProgress(
+  double _getDownloadProgress(
       AudioDownloaderViewModel downloadAudioProvider, String downloadFileKey) {
     return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
+  }
+
+  Future<void> _handleDownload(AudioDownloaderViewModel downloadAudioProvider,
+      WidgetRef ref, BuildContext context) async {
+    try {
+      await downloadAudioProvider.downloadSessionAudio(sessionModel, file);
+      await ref.read(
+          addSessionInPreferenceProvider(sessionModel: sessionModel, file: file)
+              .future);
+    } catch (e) {
+      createSnackBar(e.toString(), context);
+    }
+  }
+
+  Future<void> _handleRemoveDownload(
+      AudioDownloaderViewModel downloadAudioProvider,
+      WidgetRef ref,
+      BuildContext context) async {
+    try {
+      await downloadAudioProvider.deleteSessionAudio(
+          '${sessionModel.id}-${file.id}${getFileExtension(file.path)}');
+      ref.read(deleteSessionFromPreferenceProvider(
+          sessionModel: sessionModel, file: file));
+    } catch (e) {
+      createSnackBar(e.toString(), context);
+    }
   }
 }
