@@ -138,6 +138,10 @@ Future<void> showBottomModal(BuildContext context, Widget child) async {
   );
 }
 
+String getFileExtension(String path) {
+  return '.${path.substring(path.lastIndexOf('.') + 1)}';
+}
+
 extension AssetUrl on String {
   String toAssetUrl() {
     return '${BASE_URL}assets/$this?download';

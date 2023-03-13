@@ -17,35 +17,39 @@ Future<List<SessionModel>> downloadedSessions(DownloadedSessionsRef ref) {
 }
 
 @riverpod
-Future<SessionModel?> getSpecificSessions(GetSpecificSessionsRef ref,
-    {required int sessionId, required int fileId}) async {
-  var sessions = await ref.watch(downloadedSessionsProvider.future);
-  SessionModel? foundSession;
-  for (var i = 0; i < sessions.length; i++) {
-    var element = sessions[i];
-    if (element.id == sessionId) {
-      var fileIndex = element.audio.first.files
-          .indexWhere((element) => element.id == fileId);
-      if (fileIndex != -1) {
-        foundSession = element;
-        break;
-      }
+Future<void> addSessionInPreference(AddSessionInPreferenceRef ref,
+    {required SessionModel sessionModel,
+    required SessionFilesModel file}) async {
+  var _session = sessionModel.copyWith();
+  for (var i = 0; i < _session.audio.length; i++) {
+    var element = _session.audio[i];
+    var fileIndex = element.files.indexWhere((e) => e.id == file.id);
+    if (fileIndex != -1) {
+      _session.audio.removeWhere((e) => e.guideName != element.guideName);
+      _session.audio[i].files
+          .removeWhere((e) => e.id != element.files[fileIndex].id);
+      break;
     }
   }
-  return foundSession;
+  var _downloadedSessionList =
+      await ref.read(downloadedSessionsProvider.future);
+  _downloadedSessionList.add(_session);
+  await ref
+      .read(sessionRepositoryProvider)
+      .addSessionInPreference(_downloadedSessionList);
 }
 
 @riverpod
-Future<void> addSessionInPreference(AddSessionInPreferenceRef ref,
+Future<void> deleteSessionFromPreference(DeleteSessionFromPreferenceRef ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
   for (var i = 0; i < sessionModel.audio.length; i++) {
     var element = sessionModel.audio[i];
     var fileIndex = element.files.indexWhere((e) => e.id == file.id);
     if (fileIndex != -1) {
-      sessionModel.audio.removeWhere((e) => e.guideName != element.guideName);
+      sessionModel.audio.removeWhere((e) => e.guideName == element.guideName);
       sessionModel.audio[i].files
-          .removeWhere((e) => e.id != element.files[fileIndex].id);
+          .removeWhere((e) => e.id == element.files[fileIndex].id);
       break;
     }
   }
