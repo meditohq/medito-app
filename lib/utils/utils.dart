@@ -22,9 +22,10 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 Widget getNetworkImageWidget(String? url) {
-  if (url.isEmptyOrNull()) return Container();
+  if (url.isNullOrEmpty()) return Container();
   final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
@@ -108,15 +109,14 @@ int convertDurationToMinutes({required int milliseconds}) {
 }
 
 extension EmptyOrNull on String? {
-  bool isEmptyOrNull() {
+  bool isNullOrEmpty() {
     if (this == null) return true;
     if (this?.isEmpty == true) return true;
     return false;
   }
 
-  bool isNotEmptyAndNotNull() {
-    if (this != null && this?.isNotEmpty == true) return true;
-    return false;
+  bool isNotNullAndNotEmpty() {
+    return this != null && this?.isNotEmpty == true;
   }
 }
 

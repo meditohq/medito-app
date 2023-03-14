@@ -164,7 +164,7 @@ class SmallShortcutWidget extends StatelessWidget {
         ),
       );
 
-  Widget _getBackgroundImage() => data?.backgroundImage?.isNotEmptyAndNotNull() == true
+  Widget _getBackgroundImage() => data?.backgroundImage?.isNotNullAndNotEmpty() == true
       ? getNetworkImageWidget(data?.bgImageUrl)
       : Container();
 }
