@@ -18,15 +18,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
-  const MeditoAppBarWidget(
-      {Key? key,
-      this.title,
-      this.titleWidget,
-      this.isTransparent = false,
-      this.hasCloseButton = false,
-      this.actions,
-      this.closePressed})
-      : super(key: key);
+  const MeditoAppBarWidget({
+    Key? key,
+    this.title,
+    this.titleWidget,
+    this.isTransparent = false,
+    this.hasCloseButton = false,
+    this.actions,
+    this.closePressed,
+  }) : super(key: key);
 
   final void Function()? closePressed;
   final Widget? titleWidget;
@@ -45,8 +45,9 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
         actions: actions,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.dark,
-            systemStatusBarContrastEnforced: true),
+          statusBarBrightness: Brightness.dark,
+          systemStatusBarContrastEnforced: true,
+        ),
         backgroundColor:
             isTransparent ? Colors.transparent : ColorConstants.moonlight,
         title: getTitleWidget(context));
