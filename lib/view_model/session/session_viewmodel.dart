@@ -20,13 +20,15 @@ Future<List<SessionModel>> downloadedSessions(DownloadedSessionsRef ref) {
 Future<void> addSessionInPreference(AddSessionInPreferenceRef ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
-  var _session = sessionModel.copyWith();
+  var _session = sessionModel.customCopyWith();
+  print(sessionModel == _session);
+  print(sessionModel.audio == _session.audio);
   for (var i = 0; i < _session.audio.length; i++) {
     var element = _session.audio[i];
     var fileIndex = element.files.indexWhere((e) => e.id == file.id);
     if (fileIndex != -1) {
       _session.audio.removeWhere((e) => e.guideName != element.guideName);
-      _session.audio[i].files
+      _session.audio.first.files
           .removeWhere((e) => e.id != element.files[fileIndex].id);
       break;
     }
@@ -43,19 +45,10 @@ Future<void> addSessionInPreference(AddSessionInPreferenceRef ref,
 Future<void> deleteSessionFromPreference(DeleteSessionFromPreferenceRef ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
-  for (var i = 0; i < sessionModel.audio.length; i++) {
-    var element = sessionModel.audio[i];
-    var fileIndex = element.files.indexWhere((e) => e.id == file.id);
-    if (fileIndex != -1) {
-      sessionModel.audio.removeWhere((e) => e.guideName == element.guideName);
-      sessionModel.audio[i].files
-          .removeWhere((e) => e.id == element.files[fileIndex].id);
-      break;
-    }
-  }
   var _downloadedSessionList =
       await ref.read(downloadedSessionsProvider.future);
-  _downloadedSessionList.add(sessionModel);
+  _downloadedSessionList.removeWhere((element) =>
+      element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
   await ref
       .read(sessionRepositoryProvider)
       .addSessionInPreference(_downloadedSessionList);
