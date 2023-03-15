@@ -167,7 +167,6 @@ class _StatsWidgetState extends State<StatsWidget> {
         return Theme(
           data: ThemeData(
               primaryColor: ColorConstants.walterWhite,
-              accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
             backgroundColor: ColorConstants.moonlight,
