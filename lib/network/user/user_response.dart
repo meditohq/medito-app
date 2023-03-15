@@ -1,3 +1,5 @@
+// ignore_for_file: avoid-dynamic
+
 class UserResponse {
   Data? data;
 

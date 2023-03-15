@@ -19,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 const DEFAULT_VOLUME = 0.65;
 
 @Deprecated('Use volume provider instead')
-Future<dynamic> retrieveSavedBgVolume() async {
+Future<double> retrieveSavedBgVolume() async {
   return await _getSavedVolume();
 }
 

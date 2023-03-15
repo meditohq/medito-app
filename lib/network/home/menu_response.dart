@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+// ignore_for_file: avoid-dynamic
 
 class MenuResponse extends Equatable {
   final List<MenuData>? data;
