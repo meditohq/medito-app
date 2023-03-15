@@ -112,10 +112,10 @@ class CoursesRowItemWidget extends StatelessWidget {
     }
   }
 
-  bool _isBgImageUnavailable() => data?.backgroundImage.isEmptyOrNull() == true;
+  bool _isBgImageUnavailable() => data?.backgroundImage.isNullOrEmpty() == true;
 
   Color _getColor() {
-    return data?.colorPrimary.isEmptyOrNull() == true
+    return data?.colorPrimary.isNullOrEmpty() == true
                 ? ColorConstants.moonlight
                 : parseColor(data?.colorPrimary);
   }

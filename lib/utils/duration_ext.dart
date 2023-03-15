@@ -15,7 +15,7 @@ extension DurationExtensions on Duration {
         inMinutes.remainder(100)); //NB: if it's over 100 min it'll show 0:00!!
     var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
 
-    if (twoDigitSeconds.isNotEmptyAndNotNull() && twoDigitMinutes != '00') {
+    if (twoDigitSeconds.isNotNullAndNotEmpty() && twoDigitMinutes != '00') {
       return '$twoDigitMinutes min $twoDigitSeconds sec';
     }
     return '$twoDigitSeconds sec';
