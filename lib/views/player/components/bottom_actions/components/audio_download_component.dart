@@ -68,9 +68,7 @@ class AudioDownloadComponent extends ConsumerWidget {
       WidgetRef ref, BuildContext context) async {
     try {
       await downloadAudioProvider.downloadSessionAudio(sessionModel, file);
-      await ref.read(
-          addSessionInPreferenceProvider(sessionModel: sessionModel, file: file)
-              .future);
+      await ref.read(addSessionInPreferenceProvider(sessionModel: sessionModel, file: file).future);
     } catch (e) {
       createSnackBar(e.toString(), context);
     }

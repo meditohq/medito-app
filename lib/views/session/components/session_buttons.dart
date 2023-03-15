@@ -56,7 +56,7 @@ class SessionButtons extends StatelessWidget {
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
-        onTap: () async {
+        onTap: () {
           context.go(
             GoRouter.of(context).location + PlayerPath,
             extra: {'sessionModel': sessionModel, 'file': file},
