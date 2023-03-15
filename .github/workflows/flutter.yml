@@ -31,6 +31,12 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 2
+          command: flutter channel stable
+
+      - uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
           command: flutter upgrade
 
       - uses: nick-invision/retry@v2
@@ -38,12 +44,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 2
           command: flutter pub get
-
-      - name: dcm
-        uses: dart-code-checker/dart-code-metrics-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_comment: true
 
         # This is a quick workaround to make the Github workflow happy.
         # There should be a better way to handle the keys to improve DX.
@@ -60,3 +60,9 @@ jobs:
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos .
 
       - run: flutter test
+
+      - name: dcm
+        uses: dart-code-checker/dart-code-metrics-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pull_request_comment: true
