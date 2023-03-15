@@ -49,7 +49,7 @@ jobs:
       - run: flutter test
 
       - name: dcm
-          uses: dart-code-checker/dart-code-metrics-action@v2
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            pull_request_comment: true
+        uses: dart-code-checker/dart-code-metrics-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pull_request_comment: true
