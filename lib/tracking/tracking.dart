@@ -58,8 +58,8 @@ class Tracking {
   static Future<void> postUsage(String type,
       [Map<String, String> body = const {}]) async {
     if (kReleaseMode) {
-      var version = await PackageInfo.fromPlatform()
-        ..buildNumber;
+      var packageInfo = await PackageInfo.fromPlatform();
+      var version = packageInfo.buildNumber;
       var deviceInfo = await getDeviceDetails();
 
       var ext = 'items/usage/';
