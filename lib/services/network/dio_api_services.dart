@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 
+// ignore: avoid_dynamic_calls
 class DioApiService {
   Dio dio;
 
   DioApiService({required this.dio});
 
+  // ignore: avoid-dynamic
   Future<dynamic> getRequest(
     String uri, {
     Map<String, dynamic>? queryParameters,
@@ -26,6 +28,7 @@ class DioApiService {
     }
   }
 
+  // ignore: avoid-dynamic
   Future<dynamic> postRequest(
     String uri, {
     data,
@@ -51,7 +54,7 @@ class DioApiService {
     }
   }
 
-  dynamic _returnDioErrorResponse(DioError error) {
+  CustomException _returnDioErrorResponse(DioError error) {
     if (error.type == DioErrorType.connectTimeout) {
       throw FetchDataException('Error connection timeout');
     }
@@ -71,14 +74,14 @@ class DioApiService {
       case 500:
       default:
         throw FetchDataException(
-            'Error occured while Communication with Server ');
+            'Error occurred while Communication with Server ');
     }
   }
 }
 
 class CustomException implements Exception {
-  final dynamic message;
-  final dynamic prefix;
+  final String? message;
+  final String? prefix;
 
   CustomException([this.message, this.prefix]);
 
