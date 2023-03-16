@@ -1,12 +1,10 @@
+import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'background_sounds_viewmodel.g.dart';
