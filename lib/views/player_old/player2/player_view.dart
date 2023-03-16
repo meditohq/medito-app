@@ -149,12 +149,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         getSavedBgSoundData();
       }
     } on Exception catch (e, s) {
-      unawaited(
-        Sentry.captureException(e,
-            stackTrace: s,
-            hint:
-                'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}'),
-      );
+      unawaited(Sentry.captureException(e,
+          stackTrace: s,
+          hint: Hint.withMap({
+            'message':
+                'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}'
+          })));
     }
   }
 

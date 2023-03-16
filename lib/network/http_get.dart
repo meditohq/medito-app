@@ -78,8 +78,15 @@ Future<Map<String, dynamic>?> httpGet(String url,
       var decode = json.decode(response.body);
       return decode;
     } catch (e, str) {
-      unawaited(Sentry.captureException(e,
-          stackTrace: str, hint: 'decode: ${response.body}'));
+      unawaited(
+        Sentry.captureException(
+          e,
+          stackTrace: str,
+          hint: Hint.withMap(
+            {'message': 'decode: ${response.body}'},
+          ),
+        ),
+      );
       return null;
     }
   }

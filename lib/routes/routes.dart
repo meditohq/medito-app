@@ -29,8 +29,8 @@ const String backgroundSounds = '/backgroundsounds';
 const String HomePath = '/';
 
 final router = GoRouter(
-  urlPathStrategy: UrlPathStrategy.path,
   debugLogDiagnostics: true,
+
   routes: [
     GoRoute(
         path: HomePath,

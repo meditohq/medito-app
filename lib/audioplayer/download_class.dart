@@ -92,9 +92,16 @@ class _Download {
         await DownloadsBloc.saveFileToDownloadedFilesList(mediaItem);
         print('Saved New: ' + file.path);
         isDownloading = false;
-      } catch (e, st){
-        unawaited(Sentry.captureException(e, stackTrace: st,
-            hint: 'onDone, writing file failed, ${file.path}'));
+      } catch (e, st) {
+        unawaited(
+          Sentry.captureException(
+            e,
+            stackTrace: st,
+            hint: Hint.withMap(
+              {'message': 'onDone, writing file failed, ${file.path}'},
+            ),
+          ),
+        );
       }
       return;
     });
