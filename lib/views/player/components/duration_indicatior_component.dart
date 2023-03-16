@@ -1,37 +1,61 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DurationIndicatorComponent extends StatelessWidget {
-  const DurationIndicatorComponent({super.key});
-
+class DurationIndicatorComponent extends ConsumerWidget {
+  const DurationIndicatorComponent({super.key, required this.file});
+  final SessionFilesModel file;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
+    final audioPlayer = ref
+        .watch(audioPlayerNotifierProvider.notifier)
+        .sessionAudioPlayer
+        .duration;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          _durationLabels(context, 5000, 20),
-          SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 8,
-              trackShape: CustomTrackShape(),
-              thumbShape: RoundSliderThumbShape(
-                enabledThumbRadius: 5.0,
-              ),
-            ),
-            child: Slider(
-              min: 0.0,
-              activeColor: ColorConstants.walterWhite,
-              inactiveColor: ColorConstants.greyIsTheNewGrey,
-              max: 100,
-              value: 10,
-              onChanged: (value) {},
-              onChangeEnd: (value) {},
-            ),
-          ),
-        ],
-      ),
+      child: StreamBuilder<int?>(
+          stream: audioPlayerPositionProvider,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              var currentDuration = snapshot.data ?? 0;
+
+              return Column(
+                children: [
+                  _durationLabels(context, file.duration, currentDuration),
+                  SliderTheme(
+                    data: SliderThemeData(
+                      trackHeight: 8,
+                      trackShape: CustomTrackShape(),
+                      thumbShape: RoundSliderThumbShape(
+                        enabledThumbRadius: 5.0,
+                      ),
+                    ),
+                    child: Slider(
+                      min: 0.0,
+                      activeColor: ColorConstants.walterWhite,
+                      inactiveColor: ColorConstants.greyIsTheNewGrey,
+                      max: file.duration.toDouble() + 300,
+                      value: currentDuration.toDouble(),
+                      onChanged: (value) {
+                        ref.read(slideAudioPositionProvider(
+                            duration: value.toInt()));
+                      },
+                      onChangeEnd: (value) {
+                        ref.read(slideAudioPositionProvider(
+                            duration: value.toInt()));
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
+            return SizedBox();
+          }),
     );
   }
 

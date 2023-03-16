@@ -12,25 +12,31 @@ class BackgroundSoundView extends ConsumerStatefulWidget {
   const BackgroundSoundView({Key? key}) : super(key: key);
 
   @override
-  BackgroundSoundViewState createState() => BackgroundSoundViewState();
+  ConsumerState<BackgroundSoundView> createState() =>
+      _BackgroundSoundViewState();
 }
 
-class BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
+class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void initState() {
     super.initState();
+    setInitStateValues();
+  }
+
+  void setInitStateValues() {
     final _provider = ref.read(backgroundSoundsNotifierProvider);
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-
-    _provider.getBackgroundSoundFromPref().then((_) {
-      if (_provider.selectedBgSound != null) {
-        _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-        _audioPlayerNotifier.playBackgroundSound();
-      }
-    });
-    _provider.getVolumeFromPref().then((_) {
-      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-    });
+    if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
+      _provider.getBackgroundSoundFromPref().then((_) {
+        if (_provider.selectedBgSound != null) {
+          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+          _audioPlayerNotifier.playBackgroundSound();
+        }
+      });
+      _provider.getVolumeFromPref().then((_) {
+        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+      });
+    }
   }
 
   @override
