@@ -6,6 +6,7 @@ import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
@@ -45,28 +46,26 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
     return Scaffold(
-        appBar: MeditoAppBarWidget(
-          title: StringConstants.DOWNLOADS,
-          isTransparent: true,
-          hasCloseButton: true,
-        ),
-        key: scaffoldKey,
-        body: downloadedSessions.when(
-            skipLoadingOnRefresh: false,
-            data: (data) {
-              if (data.isEmpty) {
-                return _getEmptyWidget();
-              }
-              return _getDownloadList(data);
-            },
-            error: (err, stack) => ErrorComponent(
-                message: err.toString(),
-                onTap: () async =>
-                    await ref.refresh(downloadedSessionsProvider)),
-            loading: () => SessionShimmerComponent())
-
-        // _downloadList.isEmpty ? _getEmptyWidget() : _getDownloadList(),
-        );
+      appBar: MeditoAppBarWidget(
+        title: StringConstants.DOWNLOADS,
+        isTransparent: true,
+        hasCloseButton: true,
+      ),
+      key: scaffoldKey,
+      body: downloadedSessions.when(
+        skipLoadingOnRefresh: false,
+        data: (data) {
+          if (data.isEmpty) {
+            return _getEmptyWidget();
+          }
+          return _getDownloadList(data);
+        },
+        error: (err, stack) => ErrorComponent(
+            message: err.toString(),
+            onTap: () async => await ref.refresh(downloadedSessionsProvider)),
+        loading: () => SessionShimmerComponent(),
+      ),
+    );
   }
 
   Widget _getDownloadList(List<SessionModel> sessions) {
@@ -82,8 +81,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           var reorderedItem = sessions.removeAt(oldIndex);
           sessions.insert(newIndex, reorderedItem);
           // To ensure, that the new list order is saved
-          //TODO
-          DownloadsBloc.saveDownloads(_downloadList);
+          ref.read(addSessionListInPreferenceProvider(sessions: sessions));
         });
       },
       children: sessions.map((item) => _getSlidingItem(item, context)).toList(),
@@ -110,12 +108,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           key: UniqueKey(),
           direction: DismissDirection.endToStart,
           background: _getDismissibleBackgroundWidget(),
-          onDismissed: (direction) {
+          onDismissed: (direction) async {
             if (mounted) {
-              //TODO
-              // _downloadList.removeWhere((element) => element == item);
-              // DownloadsBloc.removeSessionFromDownloads(context, item);
-              setState(() {});
+              await ref.watch(audioDownloaderProvider).deleteSessionAudio(
+                  '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}');
+              await ref.read(deleteSessionFromPreferenceProvider(
+                      sessionModel: item, file: item.audio.first.files.first)
+                  .future);
+              // setState(() {});
             }
 
             createSnackBar(
