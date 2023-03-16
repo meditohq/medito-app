@@ -23,12 +23,22 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     setInitStateValues();
   }
 
+  @override
+  void deactivate() {
+    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+    if (!_audioPlayerNotifier.sessionAudioPlayer.playerState.playing) {
+      _audioPlayerNotifier.stopBackgroundSound();
+    }
+    super.deactivate();
+  }
+
   void setInitStateValues() {
     final _provider = ref.read(backgroundSoundsNotifierProvider);
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
     if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
       _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null && _provider.selectedBgSound?.title != StringConstants.NONE) {
+        if (_provider.selectedBgSound != null &&
+            _provider.selectedBgSound?.title != StringConstants.NONE) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
           _audioPlayerNotifier.playBackgroundSound();
         }
