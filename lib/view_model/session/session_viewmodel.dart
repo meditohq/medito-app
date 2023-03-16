@@ -17,7 +17,15 @@ Future<List<SessionModel>> downloadedSessions(DownloadedSessionsRef ref) {
 }
 
 @riverpod
-Future<void> addSessionInPreference(AddSessionInPreferenceRef ref,
+Future<void> addSessionListInPreference(AddSessionListInPreferenceRef ref,
+    {required List<SessionModel> sessions}) async {
+  return await ref
+      .read(sessionRepositoryProvider)
+      .addSessionInPreference(sessions);
+}
+
+@riverpod
+Future<void> addSingleSessionInPreference(AddSingleSessionInPreferenceRef ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
   var _session = sessionModel.customCopyWith();
@@ -36,9 +44,9 @@ Future<void> addSessionInPreference(AddSessionInPreferenceRef ref,
   var _downloadedSessionList =
       await ref.read(downloadedSessionsProvider.future);
   _downloadedSessionList.add(_session);
-  await ref
-      .read(sessionRepositoryProvider)
-      .addSessionInPreference(_downloadedSessionList);
+  await ref.read(
+      addSessionListInPreferenceProvider(sessions: _downloadedSessionList)
+          .future);
 }
 
 @riverpod
@@ -49,7 +57,7 @@ Future<void> deleteSessionFromPreference(DeleteSessionFromPreferenceRef ref,
       await ref.read(downloadedSessionsProvider.future);
   _downloadedSessionList.removeWhere((element) =>
       element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
-  await ref
-      .read(sessionRepositoryProvider)
-      .addSessionInPreference(_downloadedSessionList);
+  await ref.read(
+      addSessionListInPreferenceProvider(sessions: _downloadedSessionList)
+          .future);
 }
