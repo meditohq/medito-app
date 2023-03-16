@@ -1,12 +1,7 @@
-import 'package:Medito/audioplayer/audio_inherited_widget.dart';
-import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/download/download_viewmodel.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,51 +44,23 @@ class SessionButtons extends StatelessWidget {
       runSpacing: 8,
       alignment: WrapAlignment.spaceBetween,
       children: sessionModel.audio[i].files
-          .map((e) => _getGridItem(
-              context,
-              sessionModel.audio[i].guideName,
-              'https://cdn.esawebb.org/archives/images/screen/weic2216b.jpg',
-              e))
+          .map((e) => _getGridItem(context, i, e))
           .toList(),
     );
   }
 
   Consumer _getGridItem(
     BuildContext context,
-    String title,
-    String coverUrl,
+    int audioIndex,
     SessionFilesModel file,
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
         onTap: () async {
-          try {
-            var fileUrl =
-                'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3';
-            AudioHandler? _audioHandler =
-                AudioHandlerInheritedWidget.of(context).audioHandler;
-            var mediaItem = MediaItem(
-                //TODO
-                id: fileUrl,
-                // id: file.path.toString(),
-                title: title,
-                duration: Duration(milliseconds: file.duration),
-                artUri: Uri.parse(coverUrl),
-                extras: {
-                  HAS_BG_SOUND: true,
-                  LOCATION: null,
-                  DURATION: file.duration
-                });
-            await _audioHandler.playMediaItem(mediaItem);
-          } catch (e) {
-            createSnackBar(
-              e.toString(),
-              context,
-            );
-            print(e);
-          }
-          context.go(GoRouter.of(context).location + PlayerPath,
-              extra: sessionModel);
+          context.go(
+            GoRouter.of(context).location + PlayerPath,
+            extra: {'sessionModel': sessionModel, 'file': file},
+          );
         },
         borderRadius: BorderRadius.circular(14),
         child: Ink(
