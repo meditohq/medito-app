@@ -61,7 +61,7 @@ jobs:
 
       - run: flutter test
 
-      - name: dcm
+      - name: dart-code-metrics
         uses: dart-code-checker/dart-code-metrics-action@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
