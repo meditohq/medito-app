@@ -30,7 +30,7 @@ class SessionViewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
+    var sessions = ref.watch(sessionsProvider(sessionId: 9));
     return Scaffold(
       body: sessions.when(
         skipLoadingOnRefresh: false,

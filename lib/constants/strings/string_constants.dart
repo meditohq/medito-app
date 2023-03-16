@@ -2,6 +2,7 @@ class StringConstants {
   static const String DOWNLOADS = 'Downloads';
   static const String DOWNLOAD = 'Download';
   static const String SOUNDS = 'Sounds';
+  static const String SOUND = 'Sound';
   static const String VOLUME = 'Volume';
   static const String BEGIN = 'Begin';
   static const String PICK_NARRATOR_AND_DURATION = 'Pick a narrator & duration';

@@ -7,9 +7,8 @@ import 'package:Medito/views/session/session_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../views/home/home_wrapper_widget.dart';
-import '../views/player_old/player2/player_view.dart';
+import '../views/player/player_view.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -174,7 +173,14 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: PlayerWidget());
+  var session = state.extra as Map;
+  return MaterialPage(
+    key: state.pageKey,
+    child: PlayerView(
+      sessionModel: session['sessionModel'],
+      file: session['file'],
+    ),
+  );
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
