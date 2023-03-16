@@ -7,7 +7,6 @@ import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
@@ -67,7 +66,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     if (widget.sessionModel.hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
       _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null) {
+        if (_provider.selectedBgSound != null &&
+            _provider.selectedBgSound?.title != StringConstants.NONE) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
         }
       });
