@@ -32,7 +32,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 2
-          command: flutter channel master
+          command: flutter channel stable
 
       - uses: nick-invision/retry@v2
         with:
