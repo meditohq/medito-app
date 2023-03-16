@@ -22,7 +22,7 @@ void skipAudio(
     case SKIP_AUDIO.SKIP_FORWARD_30:
       audioPlayer.skipForward30Secs();
       break;
-    case SKIP_AUDIO.SKIP_BACWARD_10:
+    case SKIP_AUDIO.SKIP_BACKWARD_10:
       audioPlayer.skipBackward10Secs();
       break;
   }
@@ -34,4 +34,4 @@ final audioPositionProvider = StreamProvider.autoDispose<int>((ref) {
       .map((position) => position.inMilliseconds);
 });
 
-enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACWARD_10 }
+enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }

@@ -31,7 +31,7 @@ class PlayerButtonsComponent extends ConsumerWidget {
   InkWell _rewindButton(WidgetRef ref) {
     return InkWell(
       onTap: () =>
-          ref.read(skipAudioProvider(skip: SKIP_AUDIO.SKIP_BACWARD_10)),
+          ref.read(skipAudioProvider(skip: SKIP_AUDIO.SKIP_BACKWARD_10)),
       child: SvgPicture.asset(
         AssetConstants.icReplay10,
       ),
