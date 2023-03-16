@@ -22,23 +22,26 @@ class BottomActionComponent extends StatelessWidget {
           AudioSpeedComponent(),
           width8,
           LabelsComponent(
-            label:  StringConstants.DOWNLOAD.toUpperCase(),
+            label: StringConstants.DOWNLOAD.toUpperCase(),
             onTap: () => {},
           ),
           width8,
           if (sessionModel.hasBackgroundSound)
             LabelsComponent(
               label: StringConstants.SOUND.toUpperCase(),
-              onTap: () {
-                var location = GoRouter.of(context).location;
-                print(location + backgroundSounds);
-                context.go(location + backgroundSounds,
-                    extra: {'sessionModel': sessionModel, 'file': file});
-              },
+              onTap: () => _handleOnTapSound(context),
             ),
           if (sessionModel.hasBackgroundSound) width8,
         ],
       ),
+    );
+  }
+
+  void _handleOnTapSound(BuildContext context) {
+    var location = GoRouter.of(context).location;
+    context.go(
+      location + backgroundSounds,
+      extra: {'sessionModel': sessionModel, 'file': file},
     );
   }
 }

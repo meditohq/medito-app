@@ -20,8 +20,6 @@ class PlayerViewModel extends ChangeNotifier {
         onReceiveProgress: (received, total) {
           if (total != -1) {
             downloadingProgress = (received / total * 100);
-            // (received / total * 100).toStringAsFixed(0) + '%';
-            print(downloadingProgress);
             notifyListeners();
           }
         },
