@@ -82,7 +82,14 @@ class Tracking {
         }
       } catch (e, str) {
         unawaited(
-            Sentry.captureException(e, stackTrace: str, hint: '_postUsage'));
+          Sentry.captureException(
+            e,
+            stackTrace: str,
+            hint: Hint.withMap(
+              {'message': 'post usage'},
+            ),
+          ),
+        );
         print('post usage failed: ' + e.toString());
         return;
       }
@@ -108,20 +115,20 @@ String mapFileTypeToPlural(FileType fileType) {
 }
 
 String mapToPlural(String fileType) {
-    if (fileType.contains('folder')) {
-      return 'folders';
-    }
-    if (fileType.contains('articles')) {
-      return 'articles';
-    }
-    if (fileType.contains('session')) {
-      return 'sessions';
-    }
-    if (fileType.contains('url')) {
-      return 'urls';
-    }
-    if (fileType.contains('daily')) {
-      return 'dailies';
-    }
-    return '';
+  if (fileType.contains('folder')) {
+    return 'folders';
   }
+  if (fileType.contains('articles')) {
+    return 'articles';
+  }
+  if (fileType.contains('session')) {
+    return 'sessions';
+  }
+  if (fileType.contains('url')) {
+    return 'urls';
+  }
+  if (fileType.contains('daily')) {
+    return 'dailies';
+  }
+  return '';
+}
