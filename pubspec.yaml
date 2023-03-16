@@ -54,14 +54,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^0.3.0
+  mocktail: ^0.1.3
   build_runner: ^2.3.3
   #USAGE: dart run build_runner watch --delete-conflicting-outputs
   #dart run build_runner watch
   #flutter pub run build_runner build --delete-conflicting-outputs
   riverpod_generator: ^1.1.1  
   json_serializable: ^6.5.4
-  dart_code_metrics: ^5.2.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
+  dart_code_metrics: ^5.6.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
 
 flutter:
   assets:
