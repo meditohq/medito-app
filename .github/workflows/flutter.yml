@@ -64,6 +64,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          pwd
+          ls a .
+          cd dart-code-metrics
+          pwd
           ./dart_code_metrics analyze --reporter=github \
             --github-workflow=${{ github.workflow }} \
             --github-run-id=${{ github.run_id }} \
