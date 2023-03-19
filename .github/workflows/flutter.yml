@@ -65,13 +65,13 @@ jobs:
           ${{ env.DART_PATH }}/dart compile exe bin/metrics.dart -o dart_code_metrics
 
       - name: Run dart_code_metrics
-        run: |
+      - run: |
           cd dart-code-metrics
           ./dart_code_metrics analyze --reporter=github > ../metrics_report.txt
           cd ..
 
       - name: Create or update PR comment
-        uses: peter-evans/create-or-update-comment@v1
+      - uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
@@ -80,7 +80,7 @@ jobs:
           edit-mode: replace
 
       - name: Create a dummy auth.dart
-        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
+      - run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
 
       - name: Flutter clean and pub get
       - run: flutter clean && flutter pub get
