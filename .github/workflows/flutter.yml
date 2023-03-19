@@ -28,6 +28,8 @@ jobs:
         uses: subosito/flutter-action@v2.3.0
         with:
           channel: 'stable'
+          
+      - name: Check Flutter version
         run: flutter --version
 
       - name: Flutter Stable
