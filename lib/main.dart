@@ -27,6 +27,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'audioplayer/audio_inherited_widget.dart';
+import 'root_page_view.dart';
 import 'network/auth.dart';
 
 late SharedPreferences sharedPreferences;
@@ -101,19 +102,25 @@ class _ParentWidgetState extends State<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routeInformationParser: router.routeInformationParser,
-      routerDelegate: router.routerDelegate,
-      theme: ThemeData(
-          splashColor: ColorConstants.moonlight,
-          canvasColor: ColorConstants.greyIsTheNewBlack,
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: SlideTransitionBuilder(),
-          }),
-          colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
-          textTheme: meditoTextTheme(context)),
-      title: ParentWidget._title,
+    return MaterialApp(
+      home: RootPageView(
+        firstChild: MaterialApp.router(
+          routeInformationParser: router.routeInformationParser,
+          routerDelegate: router.routerDelegate,
+          theme: ThemeData(
+            splashColor: ColorConstants.moonlight,
+            canvasColor: ColorConstants.greyIsTheNewBlack,
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.android: SlideTransitionBuilder(),
+            }),
+            colorScheme:
+                ColorScheme.dark(secondary: ColorConstants.walterWhite),
+            textTheme: meditoTextTheme(context),
+          ),
+          title: ParentWidget._title,
+        ),
+      ),
     );
   }
 
