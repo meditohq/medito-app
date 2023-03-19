@@ -62,7 +62,7 @@ jobs:
       - name: Run dart_code_metrics
         run: |
           flutter pub get
-          flutter pub run dart_code_metrics:metrics analyze --reporter=github > metrics_report.txt
+          flutter pub run dart_code_metrics:metrics analyze --reporter=github --verbose > metrics_report.txt
 
       - name: Create or update PR comment
         uses: peter-evans/create-or-update-comment@v1
