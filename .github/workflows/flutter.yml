@@ -53,17 +53,17 @@ jobs:
           DART_PATH=$(dirname $(which dart))
           echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
 
-        - name: Clone and build dart-code-metrics
-          run: |
-            git clone https://github.com/dart-code-checker/dart-code-metrics.git
-            cd dart-code-metrics
-            flutter pub get
-            ${{ env.DART_PATH }}/dart compile exe bin/metrics.dart -o dart_code_metrics
+      - name: Clone and build dart-code-metrics
+        run: |
+          git clone https://github.com/dart-code-checker/dart-code-metrics.git
+          cd dart-code-metrics
+          flutter pub get
+          ${{ env.DART_PATH }}/dart compile exe bin/metrics.dart -o dart_code_metrics
 
-        - name: Run dart-code-metrics
-          env:
-            DART_CODE_METRICS_PATH: ${{ github.workspace }}/dart-code-metrics/dart_code_metrics
-          uses: dart-code-checker/dart-code-metrics-action@v2
+      - name: Run dart-code-metrics
+        env:
+          DART_CODE_METRICS_PATH: ${{ github.workspace }}/dart-code-metrics/dart_code_metrics
+        uses: dart-code-checker/dart-code-metrics-action@v2
         with:
           dart-code-metrics-path: ${{ env.DART_CODE_METRICS_PATH }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
