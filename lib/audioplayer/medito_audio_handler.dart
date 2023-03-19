@@ -230,5 +230,5 @@ class MeditoAudioHandler extends BaseAudioHandler
 
   void setPlayerSpeed(double speed) => _player.setSpeed(speed);
 
-  bool mediaItemHasBGSound() => mediaItem.value?.extras?[HAS_BG_SOUND];
+  bool mediaItemHasBGSound() => mediaItem.value?.extras?[HAS_BG_SOUND] ?? false;
 }

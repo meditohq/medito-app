@@ -109,7 +109,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: getNetworkImage(mediaItem!.artUri.toString()),
+            image: getNetworkImage(mediaItem?.artUri?.toString() ?? ''),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
                 ColorConstants.almostBlack.withOpacity(0.65),
