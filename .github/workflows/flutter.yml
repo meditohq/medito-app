@@ -67,8 +67,8 @@ jobs:
         run: |
           git clone https://github.com/dart-code-checker/dart-code-metrics.git
           cd dart-code-metrics
-          ${{ env.DART_PATH }}/pub get
-          ${{ env.DART_PATH }}/dart compile exe bin/dart_code_metrics.dart -o dart_code_metrics
+          ${{ env.DART_PATH }}/pub.bat get
+          ${{ env.DART_PATH }}/dart.bat compile exe bin/dart_code_metrics.dart -o dart_code_metrics
 
       - name: Run dart-code-metrics
         env:
