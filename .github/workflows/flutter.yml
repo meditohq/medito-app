@@ -50,7 +50,7 @@ jobs:
       - name: Check Flutter and Dart versions
         run: |
           flutter --version
-          DART_PATH=$(echo $(flutter --suppress-analytics --verbose version 2>&1 | grep -o "Dart location:.*" | sed 's/Dart location: //')/bin)
+          DART_PATH=$(dirname $(which dart))
           echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
 
       - name: Clone and build dart-code-metrics
