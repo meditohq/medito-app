@@ -64,16 +64,18 @@ jobs:
           flutter pub get
           ${{ env.DART_PATH }}/dart compile exe bin/metrics.dart -o dart_code_metrics
 
-      - name: Run dart-code-metrics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run dart_code_metrics
         run: |
-          cd dart-code-metrics
-          ./dart_code_metrics analyze --reporter=github \
-            --github-run-id=${{ github.run_id }} \
-            --github-repository=${{ github.repository }} \
-            --github-pull-request=${{ github.event.pull_request.number }} \
-            --github-token=$GITHUB_TOKEN
+          ./dart_code_metrics analyze --reporter=github > metrics_report.txt
+
+      - name: Create or update PR comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: metrics_report.txt
+          edit-mode: replace
 
 
       - name: Create a dummy auth.dart
