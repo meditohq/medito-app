@@ -3,4 +3,5 @@ class SharedPreferenceConstants {
   static const bgSound  = 'bgSound';
   static const sessionAudioSpeed  = 'sessionAudioSpeed';
   static const downloads  = 'downloads';
+  static const currentPlayingSession  = 'currentPlayingSession';
 }
