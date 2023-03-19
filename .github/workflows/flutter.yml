@@ -44,7 +44,7 @@ jobs:
           max_attempts: 2
           command: flutter upgrade
 
-      - Flutter Pub Get
+      - name: Flutter Pub Get
       - uses: nick-invision/retry@v2
         with:
           timeout_minutes: 5
@@ -82,14 +82,14 @@ jobs:
       - name: Create a dummy auth.dart
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
 
-      - name Flutter clean and pub get
+      - name: Flutter clean and pub get
       - run: flutter clean && flutter pub get
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
-      - name Analyze
+      - name: Analyze
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos .
 
-      - name Run tests
+      - name: Run tests
       - run: flutter test
