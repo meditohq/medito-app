@@ -62,7 +62,12 @@ jobs:
 
       - run: flutter test
 
-      - run: flutter --version
+
+      - name: Check Flutter and Dart versions
+        run: |
+          flutter --version
+          echo "DART_PATH=$(echo $(flutter --suppress-analytics --verbose version 2>&1 | grep -o "Dart location:.*" | sed 's/Dart location: //')/bin)" >> $GITHUB_ENV
+
       - name: dart-code-metrics
         uses: dart-code-checker/dart-code-metrics-action@v2
         with:
