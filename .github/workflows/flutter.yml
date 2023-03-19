@@ -53,24 +53,28 @@ jobs:
           max_attempts: 2
           command: flutter pub get
 
-      - name: Check Flutter and Dart versions
-        run: |
-          flutter --version
-          DART_PATH=$(dirname $(which dart))
-          echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
+#      - name: Check Flutter and Dart versions
+#        run: |
+#          flutter --version
+#          DART_PATH=$(dirname $(which dart))
+#          echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
+#
+#      - name: Run dart_code_metrics
+#        run: |
+#          flutter pub run dart_code_metrics:metrics analyze --reporter=github --verbose > metrics_report.txt
+#
+#      - name: Create or update PR comment
+#        uses: peter-evans/create-or-update-comment@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          repository: ${{ github.repository }}
+#          issue-number: ${{ github.event.pull_request.number }}
+#          body-file: metrics_report.txt
+#          edit-mode: replace
 
-      - name: Run dart_code_metrics
-        run: |
-          flutter pub run dart_code_metrics:metrics analyze --reporter=github --verbose > metrics_report.txt
-
-      - name: Create or update PR comment
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body-file: metrics_report.txt
-          edit-mode: replace
+        - name: Run dart_code_metrics
+          run: |
+            flutter pub run dart_code_metrics:metrics lib
 
       - name: Create a dummy auth.dart
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
