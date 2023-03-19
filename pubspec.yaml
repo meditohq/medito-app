@@ -62,7 +62,7 @@ dev_dependencies:
   #flutter pub run build_runner build --delete-conflicting-outputs
   riverpod_generator: ^2.1.0  
   json_serializable: ^6.5.4
-  dart_code_metrics: ^5.5.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
+  dart_code_metrics: ^5.6.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
 
 flutter:
   assets:
