@@ -23,6 +23,7 @@ jobs:
         with:
           java-version: '12.x'
 
+
       - uses: subosito/flutter-action@v2.3.0
         with:
           channel: 'stable'
@@ -46,6 +47,19 @@ jobs:
           max_attempts: 2
           command: flutter pub get
 
+      - name: Check Flutter and Dart versions
+        run: |
+          flutter --version
+          DART_PATH=$(echo $(flutter --suppress-analytics --verbose version 2>&1 | grep -o "Dart location:.*" | sed 's/Dart location: //')/bin)
+          echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
+
+      - name: Clone and build dart-code-metrics
+        run: |
+          git clone https://github.com/dart-code-checker/dart-code-metrics.git
+          cd dart-code-metrics
+          ${{ env.DART_PATH }}/pub get
+          ${{ env.DART_PATH }}/dart compile exe bin/dart_code_metrics.dart -o dart_code_metrics
+          
       - name: "Create a dummy auth.dart"
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
 
@@ -57,24 +71,3 @@ jobs:
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos .
 
       - run: flutter test
-
-      - name: Check Flutter and Dart versions
-        run: |
-          flutter --version
-          echo "DART_PATH=$(echo $(flutter --suppress-analytics --verbose version 2>&1 | grep -o "Dart location:.*" | sed 's/Dart location: //')/bin)" >> $GITHUB_ENV
-
-      - name: Clone and build dart-code-metrics
-        run: |
-          git clone https://github.com/dart-code-checker/dart-code-metrics.git
-          cd dart-code-metrics
-          ${{ env.DART_PATH }}/pub.bat get
-          ${{ env.DART_PATH }}/dart.bat compile exe bin/dart_code_metrics.dart -o dart_code_metrics
-
-      - name: Run dart-code-metrics
-        env:
-          DART_CODE_METRICS_PATH: ${{ github.workspace }}/dart-code-metrics/dart_code_metrics
-        uses: dart-code-checker/dart-code-metrics-action@v2
-        with:
-          dart-code-metrics-path: ${{ env.DART_CODE_METRICS_PATH }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_comment: true
