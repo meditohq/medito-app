@@ -58,8 +58,8 @@ jobs:
           git clone https://github.com/dart-code-checker/dart-code-metrics.git
           cd dart-code-metrics
           flutter pub get
-          ${{ env.DART_PATH }}/dart compile exe bin/dart_code_metrics.dart -o dart_code_metrics
-          
+          ${{ env.DART_PATH }}/dart compile exe bin/metrics.dart -o dart_code_metrics
+
       - name: "Create a dummy auth.dart"
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
 
