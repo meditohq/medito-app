@@ -66,7 +66,9 @@ jobs:
 
       - name: Run dart_code_metrics
         run: |
-          ./dart_code_metrics analyze --reporter=github > metrics_report.txt
+          cd dart-code-metrics
+          ./dart_code_metrics analyze --reporter=github > ../metrics_report.txt
+          cd ..
 
       - name: Create or update PR comment
         uses: peter-evans/create-or-update-comment@v1
@@ -76,7 +78,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body-file: metrics_report.txt
           edit-mode: replace
-
 
       - name: Create a dummy auth.dart
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
