@@ -62,14 +62,23 @@ jobs:
 
       - run: flutter test
 
-
       - name: Check Flutter and Dart versions
-        run: |
-          flutter --version
-          echo "DART_PATH=$(echo $(flutter --suppress-analytics --verbose version 2>&1 | grep -o "Dart location:.*" | sed 's/Dart location: //')/bin)" >> $GITHUB_ENV
+      run: |
+        flutter --version
+        echo "DART_PATH=$(echo $(flutter --suppress-analytics --verbose version 2>&1 | grep -o "Dart location:.*" | sed 's/Dart location: //')/bin)" >> $GITHUB_ENV
 
-      - name: dart-code-metrics
+      - name: Clone and build dart-code-metrics
+        run: |
+          git clone https://github.com/dart-code-checker/dart-code-metrics.git
+          cd dart-code-metrics
+          ${{ env.DART_PATH }}/pub get
+          ${{ env.DART_PATH }}/dart compile exe bin/dart_code_metrics.dart -o dart_code_metrics
+
+      - name: Run dart-code-metrics
+        env:
+          DART_CODE_METRICS_PATH: ${{ github.workspace }}/dart-code-metrics/dart_code_metrics
         uses: dart-code-checker/dart-code-metrics-action@v2
         with:
+          dart-code-metrics-path: ${{ env.DART_CODE_METRICS_PATH }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pull_request_comment: true
