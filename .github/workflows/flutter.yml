@@ -74,7 +74,7 @@ jobs:
 
       - name: Run dart_code_metrics
         run: |
-          flutter pub run dart_code_metrics:metrics --reporter=github lib
+          flutter pub run dart_code_metrics:metrics --reporter=github lib  
 
       - name: Create a dummy auth.dart
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
@@ -86,7 +86,7 @@ jobs:
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Analyze
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos --set-exit-on-violation-level=alarm .
 
       - name: Run tests
         run: flutter test
