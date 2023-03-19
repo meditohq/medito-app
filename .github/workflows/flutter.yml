@@ -59,18 +59,10 @@ jobs:
           DART_PATH=$(dirname $(which dart))
           echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
 
-      - name: Clone and build dart-code-metrics
-        run: |
-          git clone https://github.com/dart-code-checker/dart-code-metrics.git
-          cd dart-code-metrics
-          flutter pub get
-          ${{ env.DART_PATH }}/dart compile exe bin/metrics.dart -o dart_code_metrics
-
       - name: Run dart_code_metrics
         run: |
-          cd dart-code-metrics
-          ./dart_code_metrics analyze --reporter=github > ../metrics_report.txt
-          cd ..
+          flutter pub get
+          flutter pub run dart_code_metrics:metrics analyze --reporter=github > metrics_report.txt
 
       - name: Create or update PR comment
         uses: peter-evans/create-or-update-comment@v1
