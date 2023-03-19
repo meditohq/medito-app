@@ -62,12 +62,14 @@ jobs:
 
       - name: Run dart-code-metrics
         env:
-          DART_CODE_METRICS_PATH: ${{ github.workspace }}/dart-code-metrics/dart_code_metrics
-        uses: dart-code-checker/dart-code-metrics-action@v2
-        with:
-          dart-code-metrics-path: ${{ env.DART_CODE_METRICS_PATH }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_comment: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./dart_code_metrics analyze --reporter=github \
+            --github-workflow=${{ github.workflow }} \
+            --github-run-id=${{ github.run_id }} \
+            --github-repository=${{ github.repository }} \
+            --github-pull-request=${{ github.event.pull_request.number }} \
+            --github-token=$GITHUB_TOKEN
 
       - name: "Create a dummy auth.dart"
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
