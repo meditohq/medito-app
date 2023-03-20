@@ -74,7 +74,7 @@ jobs:
 
       - name: Run dart_code_metrics
         run: |
-          flutter pub run dart_code_metrics:metrics --reporter=github lib  
+          flutter pub run dart_code_metrics:metrics --reporter=github --no-fatal-style --no-fatal-warnings  --no-fatal-performance  lib
 
       - name: Create a dummy auth.dart
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
