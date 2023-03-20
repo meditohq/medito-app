@@ -86,7 +86,7 @@ jobs:
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Analyze
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos --set-exit-on-violation-level=alarm .
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
 
       - name: Run tests
         run: flutter test
