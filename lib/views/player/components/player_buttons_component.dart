@@ -61,11 +61,11 @@ class PlayerButtonsComponent extends ConsumerWidget {
       child: AnimatedCrossFade(
         firstChild: Icon(
           Icons.play_circle_fill,
-          size: 80,
+          size: 72,
         ),
         secondChild: Icon(
           Icons.pause_circle_filled,
-          size: 80,
+          size: 72,
         ),
         crossFadeState:
             ref.watch(audioPlayPauseStateProvider) == PLAY_PAUSE_AUDIO.PLAY

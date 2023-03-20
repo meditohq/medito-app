@@ -13,6 +13,7 @@ import 'components/artist_title_component.dart';
 import 'components/background_image_component.dart';
 import 'components/bottom_actions/bottom_action_component.dart';
 import 'components/duration_indicatior_component.dart';
+import 'components/overlay_cover_image_component.dart';
 import 'components/player_buttons_component.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
@@ -87,23 +88,26 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           BackgroundImageComponent(imageUrl: widget.sessionModel.coverUrl),
           SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CloseButtonComponent(
-                  onPressed: () => router.pop(),
-                  bgColor: ColorConstants.walterWhite,
-                  icColor: ColorConstants.almostBlack,
+                Container(
+                  height: 4,
+                  width: 44,
+                  decoration: BoxDecoration(
+                    color: ColorConstants.walterWhite,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 Spacer(),
                 ArtistTitleComponent(sessionModel: widget.sessionModel),
+                OverlayCoverImageComponent(
+                    imageUrl: widget.sessionModel.coverUrl),
+                DurationIndicatorComponent(file: widget.file),
                 Spacer(),
                 PlayerButtonsComponent(
                   file: widget.file,
                   sessionModel: widget.sessionModel,
                 ),
-                height16,
-                DurationIndicatorComponent(file: widget.file),
-                height16,
+                Spacer(),
                 BottomActionComponent(
                   sessionModel: widget.sessionModel,
                   file: widget.file,
