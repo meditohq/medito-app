@@ -2,6 +2,7 @@ import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
+import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -51,12 +52,7 @@ class PlayerButtonsComponent extends ConsumerWidget {
   InkWell _playPauseButton(WidgetRef ref) {
     return InkWell(
       onTap: () {
-        var _state = ref.watch(audioPlayPauseStateProvider.notifier).state;
-
-        ref.read(audioPlayPauseStateProvider.notifier).state =
-            _state == PLAY_PAUSE_AUDIO.PAUSE
-                ? PLAY_PAUSE_AUDIO.PLAY
-                : PLAY_PAUSE_AUDIO.PAUSE;
+        _handleTap(ref);
       },
       child: AnimatedCrossFade(
         firstChild: Icon(
@@ -74,5 +70,15 @@ class PlayerButtonsComponent extends ConsumerWidget {
         duration: Duration(milliseconds: 500),
       ),
     );
+  }
+
+  void _handleTap(WidgetRef ref) {
+    var _state = ref.watch(audioPlayPauseStateProvider.notifier).state;
+    ref.read(addCurrentlyPlayingSessionInPreferenceProvider(
+        sessionModel: sessionModel, file: file));
+    ref.read(audioPlayPauseStateProvider.notifier).state =
+        _state == PLAY_PAUSE_AUDIO.PAUSE
+            ? PLAY_PAUSE_AUDIO.PLAY
+            : PLAY_PAUSE_AUDIO.PAUSE;
   }
 }

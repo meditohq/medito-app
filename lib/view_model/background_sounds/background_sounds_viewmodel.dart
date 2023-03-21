@@ -17,9 +17,11 @@ Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
 }
 
 final backgroundSoundsNotifierProvider =
-    ChangeNotifierProvider<BackgroundSoundsNotifier>((ref) {
-  return BackgroundSoundsNotifier();
-});
+    ChangeNotifierProvider<BackgroundSoundsNotifier>(
+  (ref) {
+    return BackgroundSoundsNotifier();
+  },
+);
 
 class BackgroundSoundsNotifier extends ChangeNotifier {
   double volume = 0;
@@ -27,16 +29,24 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   void handleOnChangeVolume(double _volume) async {
     volume = _volume;
-    unawaited(SharedPreferencesService.addDoubleInSF(
-        SharedPreferenceConstants.bgSoundVolume, _volume));
+    unawaited(
+      SharedPreferencesService.addDoubleInSF(
+          SharedPreferenceConstants.bgSoundVolume, _volume),
+    );
     notifyListeners();
   }
 
   void handleOnChangeSound(BackgroundSoundsModel? _sound) async {
     selectedBgSound = _sound;
     if (_sound != null) {
-      unawaited(SharedPreferencesService.addStringInSF(
-          SharedPreferenceConstants.bgSound, json.encode(_sound.toJson())));
+      unawaited(
+        SharedPreferencesService.addStringInSF(
+          SharedPreferenceConstants.bgSound,
+          json.encode(
+            _sound.toJson(),
+          ),
+        ),
+      );
     } else {
       unawaited(SharedPreferencesService.removeValueFromSF(
           SharedPreferenceConstants.bgSound));
@@ -47,24 +57,28 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   Future<void> getBackgroundSoundFromPref() async {
     await SharedPreferencesService.getStringFromSF(
             SharedPreferenceConstants.bgSound)
-        .then((value) {
-      if (value != null) {
-        selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
-        notifyListeners();
-      }
-    });
+        .then(
+      (value) {
+        if (value != null) {
+          selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
+          notifyListeners();
+        }
+      },
+    );
   }
 
   Future<void> getVolumeFromPref() async {
     await SharedPreferencesService.getDoubleFromSF(
             SharedPreferenceConstants.bgSoundVolume)
-        .then((value) {
-      if (value != null) {
-        volume = value;
-        notifyListeners();
-      } else {
-        handleOnChangeVolume(50.0);
-      }
-    });
+        .then(
+      (value) {
+        if (value != null) {
+          volume = value;
+          notifyListeners();
+        } else {
+          handleOnChangeVolume(50.0);
+        }
+      },
+    );
   }
 }
