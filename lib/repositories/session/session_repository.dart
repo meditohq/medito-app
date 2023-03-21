@@ -52,6 +52,13 @@ class SessionRepositoryImpl extends SessionRepository {
       json.encode(sessionList),
     );
   }
+  @override
+  Future<void> addCurrentlyPlayingSessionInPreference(SessionModel sessionList) async {
+    await SharedPreferencesService.addStringInSF(
+      SharedPreferenceConstants.downloads,
+      json.encode(sessionList),
+    );
+  }
 }
 
 @riverpod

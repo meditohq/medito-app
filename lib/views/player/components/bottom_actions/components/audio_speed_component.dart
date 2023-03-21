@@ -1,3 +1,4 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_speed_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,9 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedComponent> {
     super.initState();
     final _provider = ref.read(audioSpeedProvider);
     _provider.getAudioTrackSpeedFromPref().then((_) {
-      ref.read(audioPlayerNotifierProvider).setSessionAudioSpeed(_provider.audioSpeedModel.speed);
+      ref
+          .read(audioPlayerNotifierProvider)
+          .setSessionAudioSpeed(_provider.audioSpeedModel.speed);
     });
   }
 
@@ -29,6 +32,12 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedComponent> {
     var audioSpeedModel = _provider.audioSpeedModel;
     return LabelsComponent(
       label: audioSpeedModel.label,
+      bgColor: audioSpeedModel.label != 'X1'
+          ? ColorConstants.walterWhite
+          : ColorConstants.greyIsTheNewGrey,
+      textColor: audioSpeedModel.label != 'X1'
+          ? ColorConstants.greyIsTheNewGrey
+          : ColorConstants.walterWhite,
       onTap: () {
         _provider.setAudioTrackSpeed();
         ref
