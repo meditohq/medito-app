@@ -50,6 +50,27 @@ Future<void> addSingleSessionInPreference(AddSingleSessionInPreferenceRef ref,
 }
 
 @riverpod
+Future<void> addCurrentlyPlayingSessionInPreference(
+    AddCurrentlyPlayingSessionInPreferenceRef ref,
+    {required SessionModel sessionModel,
+    required SessionFilesModel file}) async {
+  var _session = sessionModel.customCopyWith();
+  print(sessionModel == _session);
+  print(sessionModel.audio == _session.audio);
+  for (var i = 0; i < _session.audio.length; i++) {
+    var element = _session.audio[i];
+    var fileIndex = element.files.indexWhere((e) => e.id == file.id);
+    if (fileIndex != -1) {
+      _session.audio.removeWhere((e) => e.guideName != element.guideName);
+      _session.audio.first.files
+          .removeWhere((e) => e.id != element.files[fileIndex].id);
+      break;
+    }
+  }
+  print(_session);
+}
+
+@riverpod
 Future<void> deleteSessionFromPreference(DeleteSessionFromPreferenceRef ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {

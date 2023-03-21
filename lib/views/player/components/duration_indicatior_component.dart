@@ -23,7 +23,6 @@ class DurationIndicatorComponent extends ConsumerWidget {
               _handleAudioCompletion(currentDuration, ref);
               return Column(
                 children: [
-                  _durationLabels(context, file.duration, currentDuration),
                   SliderTheme(
                     data: SliderThemeData(
                       trackHeight: 8,
@@ -48,6 +47,7 @@ class DurationIndicatorComponent extends ConsumerWidget {
                       },
                     ),
                   ),
+                  _durationLabels(context, file.duration, currentDuration),
                 ],
               );
             }
@@ -69,22 +69,19 @@ class DurationIndicatorComponent extends ConsumerWidget {
     }
   }
 
-  Transform _durationLabels(BuildContext context, int duration, int position) {
-    return Transform.translate(
-      offset: Offset(0, 25),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _durationLabel(
-            context,
-            Duration(milliseconds: position).toMinutesSeconds(),
-          ),
-          _durationLabel(
-            context,
-            Duration(milliseconds: duration).toMinutesSeconds(),
-          ),
-        ],
-      ),
+  Row _durationLabels(BuildContext context, int duration, int position) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _durationLabel(
+          context,
+          Duration(milliseconds: position).toMinutesSeconds(),
+        ),
+        _durationLabel(
+          context,
+          Duration(milliseconds: duration).toMinutesSeconds(),
+        ),
+      ],
     );
   }
 
