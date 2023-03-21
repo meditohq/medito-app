@@ -1,5 +1,3 @@
-import 'package:Medito/audioplayer/media_lib.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
@@ -7,7 +5,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/view_model/session/download_session_viewmodel.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
@@ -16,8 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../audioplayer/audio_inherited_widget.dart';
 import '../../routes/routes.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
@@ -29,10 +25,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
-
   List<MediaItem> _downloadList = [];
-  late MeditoAudioHandler _audioHandler;
-  List<SessionModel> _downloadedSessions = [];
   @override
   void initState() {
     super.initState();
@@ -43,7 +36,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   @override
   Widget build(BuildContext context) {
     final downloadedSessions = ref.watch(downloadedSessionsProvider);
-    _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
     return Scaffold(
       appBar: MeditoAppBarWidget(

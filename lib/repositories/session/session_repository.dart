@@ -12,6 +12,9 @@ abstract class SessionRepository {
   Future<SessionModel> fetchSession(int sessionId);
   Future<List<SessionModel>> fetchSessionFromPreference();
   Future<void> addSessionInPreference(List<SessionModel> sessionList);
+  Future<void> addCurrentlyPlayingSessionInPreference(
+      SessionModel sessionModel);
+  Future<SessionModel?> fetchCurrentlyPlayingSessionFromPreference();
 }
 
 class SessionRepositoryImpl extends SessionRepository {
@@ -52,12 +55,24 @@ class SessionRepositoryImpl extends SessionRepository {
       json.encode(sessionList),
     );
   }
+
   @override
-  Future<void> addCurrentlyPlayingSessionInPreference(SessionModel sessionList) async {
+  Future<void> addCurrentlyPlayingSessionInPreference(
+      SessionModel sessionModel) async {
     await SharedPreferencesService.addStringInSF(
-      SharedPreferenceConstants.downloads,
-      json.encode(sessionList),
+      SharedPreferenceConstants.currentPlayingSession,
+      json.encode(sessionModel),
     );
+  }
+
+  @override
+  Future<SessionModel?> fetchCurrentlyPlayingSessionFromPreference() async {
+    var _session = await SharedPreferencesService.getStringFromSF(
+        SharedPreferenceConstants.currentPlayingSession);
+    if (_session != null) {
+      return SessionModel.fromJson(json.decode(_session));
+    }
+    return null;
   }
 }
 
