@@ -1,7 +1,9 @@
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
+import 'package:Medito/view_model/player/player_viewmodel.dart';
+import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'views/player/components/mini_player_widget.dart';
 
 class RootPageView extends ConsumerStatefulWidget {
@@ -15,13 +17,15 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewtState extends ConsumerState<RootPageView> {
   @override
   void initState() {
-    ref.read(pageviewNotifierProvider).getCurrentPagePositionListener();
+    ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentlyPlayingSession = ref.watch(playerProvider);
     return Scaffold(
+      backgroundColor: ColorConstants.greyIsTheNewGrey,
       body: PageView(
         controller: ref.read(pageviewNotifierProvider).pageController,
         scrollDirection: Axis.vertical,
@@ -30,27 +34,16 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
           Column(
             children: [
               Expanded(child: widget.firstChild),
-              MiniPlayerWidget(),
+              if (currentlyPlayingSession != null)
+                MiniPlayerWidget(
+                  sessionModel: currentlyPlayingSession,
+                )
             ],
           ),
-          Consumer(builder: (context, ref, child) {
-            final provider = ref.watch(pageviewNotifierProvider);
-            return FractionallySizedBox(
-              heightFactor: provider.secondScreenHeightFactor,
-              child: AnimatedCrossFade(
-                duration: Duration(milliseconds: 500),
-                crossFadeState: (provider.pageController.page ?? 0) >= 0.9
-                    ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond,
-                firstChild: Container(
-                  color: Colors.green,
-                ),
-                secondChild: Container(
-                  color: Colors.red,
-                ),
-              ),
-            );
-          }),
+          if (currentlyPlayingSession != null)
+            PlayerView(
+                sessionModel: currentlyPlayingSession,
+                file: currentlyPlayingSession.audio.first.files.first)
         ],
       ),
     );
