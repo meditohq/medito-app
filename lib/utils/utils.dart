@@ -15,23 +15,26 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/constants/constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
   final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
 
 NetworkImage getNetworkImage(String url) {
-  final headers = {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN};
+  final headers = {
+
+    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN
+  };
   return NetworkImage(url, headers: headers);
 }
 

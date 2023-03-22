@@ -15,11 +15,11 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/media_library.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/components/components.dart';
-import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
@@ -29,6 +29,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+
 import '../../../audioplayer/audio_inherited_widget.dart';
 import '../../../tracking/tracking.dart';
 import '../../../utils/bgvolume_utils.dart';
@@ -93,13 +94,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           event[AUDIO_COMPLETE] == true) {
         _trackSessionEnd(_handler?.mediaItem.value);
         showGeneralDialog(
-            transitionDuration: Duration(milliseconds: 400),
-            context: context,
-            barrierColor: ColorConstants.darkMoon,
-            pageBuilder: (_, __, ___) {
-              return AudioCompleteDialog(
-                  bloc: _bloc, mediaItem: _handler?.mediaItem.value);
-            });
+          transitionDuration: Duration(milliseconds: 400),
+          context: context,
+          barrierColor: ColorConstants.darkMoon,
+          pageBuilder: (_, __, ___) {
+            return AudioCompleteDialog(
+              bloc: _bloc,
+              mediaItem: _handler?.mediaItem.value,
+            );
+          },
+        );
       }
     });
 
@@ -112,8 +116,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             image: getNetworkImage(mediaItem?.artUri?.toString() ?? ''),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
-                ColorConstants.almostBlack.withOpacity(0.65),
-                BlendMode.overlay),
+              ColorConstants.almostBlack.withOpacity(0.65),
+              BlendMode.overlay,
+            ),
           ),
         ),
         child: SafeArea(
@@ -131,8 +136,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               _buildPlayerButtonRow(mediaItem),
               // A seek bar.
               PositionIndicatorWidget(
-                  handler: _handler,
-                  bgSoundsStream: _bloc.bgSoundsListController?.stream),
+                handler: _handler,
+                bgSoundsStream: _bloc.bgSoundsListController?.stream,
+              ),
               Container(height: 24),
             ],
           ),
@@ -149,12 +155,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         getSavedBgSoundData();
       }
     } on Exception catch (e, s) {
-      unawaited(Sentry.captureException(e,
-          stackTrace: s,
-          hint: Hint.withMap({
-            'message':
-                'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}'
-          })));
+      unawaited(Sentry.captureException(
+        e,
+        stackTrace: s,
+        hint: Hint.withMap({
+          'message':
+              'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}',
+        }),
+      ));
     }
   }
 
@@ -207,10 +215,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Padding _getSubtitleWidget(MediaItem? mediaItem) {
     var attr = mediaItem?.extras != null ? (mediaItem?.extras?['attr']) : '';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: MarkdownComponent(
-          body: 'Giovanni Dienstmann https://www.google.com/'),
+        body: 'Giovanni Dienstmann https://www.google.com/',
+      ),
     );
   }
 
@@ -255,7 +265,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         {
           Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID].toString() ?? '',
           Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH].toString() ?? '',
-          Tracking.SESSION_GUIDE: mediaItem.artist ?? ''
+          Tracking.SESSION_GUIDE: mediaItem.artist ?? '',
         },
       ),
     );
