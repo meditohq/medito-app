@@ -1,19 +1,20 @@
 import 'package:audio_service/audio_service.dart';
 
 class MediaLibrary {
-  static MediaItem getMediaLibrary(
-      {String? description,
-      String? title,
-      String? illustrationUrl,
-      String? secondaryColor,
-      String? primaryColor,
-      int? durationAsMilliseconds,
-      String? fileId,
-      String? attributions,
-      String? voice,
-      String? length,
-      bool? hasBgSound,
-      int? sessionId}) {
+  static MediaItem getMediaLibrary({
+    String? description,
+    String? title,
+    String? illustrationUrl,
+    String? secondaryColor,
+    String? primaryColor,
+    int? durationAsMilliseconds,
+    String? fileId,
+    String? attributions,
+    String? voice,
+    String? length,
+    bool? hasBgSound,
+    int? sessionId,
+  }) {
     return MediaItem(
       id: fileId ?? '',
       extras: {
@@ -25,10 +26,12 @@ class MediaLibrary {
         ATTR: attributions,
         LENGTH: length,
         DURATION: durationAsMilliseconds,
-        HAS_BG_SOUND : hasBgSound,
+        HAS_BG_SOUND: hasBgSound,
       },
       artist: voice,
-      album: '', //empty to remove it from the notification
+      displayDescription: description,
+      album: '',
+      //empty to remove it from the notification
       title: title ?? '',
       artUri: Uri.parse(illustrationUrl ?? ''),
     );

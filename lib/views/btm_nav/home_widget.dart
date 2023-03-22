@@ -14,15 +14,16 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/home/courses_row_widget.dart';
 import 'package:Medito/views/home/daily_message_widget.dart';
@@ -92,9 +93,9 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
                             type, id, context, Tracking.SHORTCUT_TAPPED),
                       ),
                       CoursesRowWidget(
-                        key: _coursesKey,
-                        onTap: (type, id) => _navigate(
-                            type, id, context, Tracking.COURSE_TAPPED)),
+                          key: _coursesKey,
+                          onTap: (type, id) => _navigate(
+                              type, id, context, Tracking.COURSE_TAPPED)),
                       StatsWidget(),
                       SizedBox(height: 16),
                       DailyMessageWidget(key: _dailyMessageKey),
@@ -194,40 +195,50 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
   }
 
   Widget _getTitleWidget(BuildContext context) => FutureBuilder<String>(
-      future: _bloc.getTitleText(DateTime.now()),
-      initialData: 'Medito',
-      builder: (context, snapshot) {
-        return GestureDetector(
-          onLongPress: () => _showVersionPopUp(context),
-          child: Text(snapshot.data ?? '',
-              style: Theme.of(context).textTheme.headline1),
-        );
-      });
+        future: _bloc.getTitleText(DateTime.now()),
+        initialData: 'Medito',
+        builder: (context, snapshot) {
+          return GestureDetector(
+            onLongPress: () => _showVersionPopUp(context),
+            child: Text(
+              snapshot.data ?? '',
+              style: Theme.of(context).textTheme.headline1,
+            ),
+          );
+        },
+      );
 
   Future<void> _showVersionPopUp(BuildContext context) async {
     var line1 = await getDeviceInfoString();
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';
     final snackBar = SnackBar(
-        content: GestureDetector(
-          onTap: () {
-            Share.share('$line1 $userID');
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Tap here to copy',
-                  style: TextStyle(color: ColorConstants.walterWhite)),
-              Text(line1,
-                  style: TextStyle(color: ColorConstants.meditoTextGrey)),
-              Text(userID,
-                  style: TextStyle(color: ColorConstants.meditoTextGrey))
-            ],
-          ),
+      content: GestureDetector(
+        onTap: () {
+          Share.share('$line1 $userID');
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Tap here to copy',
+              style: TextStyle(color: ColorConstants.walterWhite),
+            ),
+            Text(
+              line1,
+              style: TextStyle(color: ColorConstants.meditoTextGrey),
+            ),
+            Text(
+              userID,
+              style: TextStyle(color: ColorConstants.meditoTextGrey),
+            ),
+          ],
         ),
-        backgroundColor: ColorConstants.midnight);
+      ),
+      backgroundColor: ColorConstants.midnight,
+    );
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -252,8 +263,11 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     await DownloadsBloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
-            color: ColorConstants.darkMoon);
+        createSnackBar(
+          StringConstants.SWIPE_TO_DELETE,
+          context,
+          color: ColorConstants.darkMoon,
+        );
       }
     });
   }

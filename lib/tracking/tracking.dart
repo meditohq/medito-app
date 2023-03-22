@@ -51,12 +51,14 @@ class Tracking {
 
   static List<Map<String, String>> destinationData(String type, String item) {
     return [
-      {TYPE: type, ITEM: item}
+      {TYPE: type, ITEM: item},
     ];
   }
 
-  static Future<void> postUsage(String type,
-      [Map<String, String> body = const {}]) async {
+  static Future<void> postUsage(
+    String type, [
+    Map<String, String> body = const {},
+  ]) async {
     if (kReleaseMode) {
       var packageInfo = await PackageInfo.fromPlatform();
       var version = packageInfo.buildNumber;
@@ -91,6 +93,7 @@ class Tracking {
           ),
         );
         print('post usage failed: ' + e.toString());
+
         return;
       }
     }
@@ -130,5 +133,6 @@ String mapToPlural(String fileType) {
   if (fileType.contains('daily')) {
     return 'dailies';
   }
+
   return '';
 }

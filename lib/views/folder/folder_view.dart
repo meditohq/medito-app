@@ -33,7 +33,10 @@ class FolderView extends ConsumerWidget {
   Widget _buildLoadingWidget() => const FolderShimmerComponent();
 
   RefreshIndicator _buildScaffoldWithData(
-      BuildContext context, FolderModel folder, WidgetRef ref) {
+    BuildContext context,
+    FolderModel folder,
+    WidgetRef ref,
+  ) {
     return RefreshIndicator(
       onRefresh: () async {
         return await ref.refresh(FoldersProvider(folderId: 28));
@@ -60,7 +63,11 @@ class FolderView extends ConsumerWidget {
   }
 
   Container _buildListTile(
-      BuildContext context, String? title, String? subtitle, String type) {
+    BuildContext context,
+    String? title,
+    String? subtitle,
+    String type,
+  ) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
