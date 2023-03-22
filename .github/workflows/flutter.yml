@@ -19,37 +19,74 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-java@v1
+      - name: Java version
+        uses: actions/setup-java@v1
         with:
           java-version: '12.x'
 
-      - uses: subosito/flutter-action@v2.3.0
+      - name: Flutter version
+        uses: subosito/flutter-action@v2.3.0
+        with:
+          channel: 'stable'
 
-        # Uses v2.4.0
-      - uses: nick-invision/retry@v2
+      - name: Check Flutter version
+        run: flutter --version
+
+      - name: Flutter Stable
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: flutter channel stable
+
+      - name: Flutter Upgrade
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: flutter upgrade
+
+      - name: Flutter Pub Get
+        uses: nick-invision/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 2
           command: flutter pub get
 
-        # This is a quick workaround to make the Github workflow happy.
-        # There should be a better way to handle the keys to improve DX.
-      - name: "Create a dummy auth.dart"
+#      - name: Check Flutter and Dart versions
+#        run: |
+#          flutter --version
+#          DART_PATH=$(dirname $(which dart))
+#          echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
+#
+#      - name: Run dart_code_metrics
+#        run: |
+#          flutter pub run dart_code_metrics:metrics analyze --reporter=github --verbose > metrics_report.txt
+#
+#      - name: Create or update PR comment
+#        uses: peter-evans/create-or-update-comment@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          repository: ${{ github.repository }}
+#          issue-number: ${{ github.event.pull_request.number }}
+#          body-file: metrics_report.txt
+#          edit-mode: replace
+
+      - name: Run dart_code_metrics
+        run: |
+          flutter pub run dart_code_metrics:metrics --reporter=github --no-fatal-style --no-fatal-warnings  --no-fatal-performance  lib
+
+      - name: Create a dummy auth.dart
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
 
-      - run: flutter pub get
-
-        # - run: flutter format --set-exit-if-changed .
+      - name: Flutter clean and pub get
+        run: flutter clean && flutter pub get
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
-      - run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+      - name: Analyze
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
 
-      - run: flutter test
-
-      - name: dcm
-        uses: dart-code-checker/dart-code-metrics-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_comment: true
+      - name: Run tests
+        run: flutter test

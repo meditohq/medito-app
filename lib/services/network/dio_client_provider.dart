@@ -10,7 +10,7 @@ part 'dio_client_provider.g.dart';
 DioApiService dioClient(DioClientRef ref) {
   var dio = Dio();
   dio.options = BaseOptions(
-      connectTimeout: 60000,
+      connectTimeout: Duration(milliseconds: 60000),
       // baseUrl: 'https://medito-content.medito-api.repl.co/v1/',
       baseUrl: HTTPConstants.BASE_URL,
       headers: {

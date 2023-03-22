@@ -48,12 +48,12 @@ class PlayerRepository {
   }
 
   Future<void> postRating(int rating, MediaItem mediaItem) async {
-    var body = {
+    var body = <String, String>{
       'session_id': mediaItem.id,
       'session_title': mediaItem.title,
-      'session_length': mediaItem.extras?[LENGTH],
-      'session_voice': mediaItem.artist,
-      'score': rating,
+      'session_length': mediaItem.extras?[LENGTH] ?? '',
+      'session_voice': mediaItem.artist ?? '',
+      'score': rating.toString(),
     };
     var token = await generatedToken;
     if (token != null) {
