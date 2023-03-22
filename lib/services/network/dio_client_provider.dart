@@ -10,7 +10,7 @@ part 'dio_client_provider.g.dart';
 DioApiService dioClient(DioClientRef ref) {
   var dio = Dio();
   dio.options = BaseOptions(
-      connectTimeout: 60000,
+      connectTimeout: Duration(milliseconds: 60000),
       // baseUrl: '',
       baseUrl: HTTPConstants.BASE_URL,
       headers: {

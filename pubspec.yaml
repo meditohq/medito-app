@@ -13,16 +13,16 @@ description: A meditation learning tool
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 2.0.50+20050
 environment:
-  sdk: ">=2.17.0-1 <3.7.0-13.0"
+  sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
-  dio: ^4.0.6
-  google_fonts: ^3.0.1
-  flutter_svg: ^1.0.3
+  dio: ^5.0.2
+  google_fonts: ^4.0.3
+  flutter_svg: ^1.1.6
   path_provider: ^2.0.1
   url_launcher: ^6.0.3
   flutter_markdown: ^0.6.7
@@ -39,19 +39,19 @@ dependencies:
   connectivity: ^3.0.3
   device_info: ^2.0.0
   equatable: ^2.0.0
-  sentry_flutter: ^6.9.1
+  sentry_flutter: ^7.0.0
   back_button_interceptor: ^6.0.2
-  go_router: ^3.0.4
+  go_router: ^6.2.0
   flutter_riverpod: ^2.1.3
-  riverpod_annotation: ^1.0.6
+  riverpod_annotation: ^2.0.2
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
   json_annotation: ^4.7.0
   flutter_dotenv: ^5.0.2
   shimmer: ^2.0.0
-  webview_flutter: ^2.8.0
+  webview_flutter: ^4.0.6
   flutter_downloader: ^1.10.2
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -60,9 +60,9 @@ dev_dependencies:
   #USAGE: dart run build_runner watch --delete-conflicting-outputs
   #dart run build_runner watch
   #flutter pub run build_runner build --delete-conflicting-outputs
-  riverpod_generator: ^1.1.1  
+  riverpod_generator: ^2.1.0  
   json_serializable: ^6.5.4
-  dart_code_metrics: ^5.5.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
+  dart_code_metrics: ^5.6.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
 
 flutter:
   assets:
