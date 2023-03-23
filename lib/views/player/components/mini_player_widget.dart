@@ -10,6 +10,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   final SessionModel sessionModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
     return Container(
       height: 64,
       color: ColorConstants.greyIsTheNewGrey,

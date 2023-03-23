@@ -13,7 +13,8 @@ class HomeWrapperWidget extends StatefulWidget {
   _HomeWrapperWidgetState createState() => _HomeWrapperWidgetState();
 }
 
-class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
+class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
+    with AutomaticKeepAliveClientMixin<HomeWrapperWidget> {
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
@@ -38,13 +39,13 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
     return _deletingCache
         ? _getLoadingWidget()
         : Scaffold(
-      key: _messengerKey,
-      body: IndexedStack(
-        index: _currentIndex,
-        children:  [HomeWidget(_hasOpened), PackListWidget()],
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+            key: _messengerKey,
+            body: IndexedStack(
+              index: _currentIndex,
+              children: [HomeWidget(_hasOpened), PackListWidget()],
+            ),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
                 color: ColorConstants.softGrey,
                 border: Border(
                   top: BorderSide(color: ColorConstants.softGrey, width: 2.0),
@@ -82,16 +83,16 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
                   ),
                 ],
               ),
-      ),
-    );
+            ),
+          );
   }
-
 
   Widget _getLoadingWidget() {
     return Center(
         child: CircularProgressIndicator(
             backgroundColor: Colors.black,
-            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.walterWhite)));
+            valueColor:
+                AlwaysStoppedAnimation<Color>(ColorConstants.walterWhite)));
   }
 
   void _onTabTapped(int value) {
@@ -100,4 +101,7 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
     });
   }
 
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

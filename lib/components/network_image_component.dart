@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
@@ -8,8 +9,13 @@ import 'package:shimmer/shimmer.dart';
 class NetworkImageComponent extends StatelessWidget {
   final String url;
   final double? height, width;
+  final bool isCache;
   const NetworkImageComponent(
-      {Key? key, required this.url, this.height, this.width})
+      {Key? key,
+      required this.url,
+      this.height,
+      this.width,
+      this.isCache = false})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -21,6 +27,36 @@ class NetworkImageComponent extends StatelessWidget {
         width: width,
       );
     } else {
+      if (isCache) {
+        return CachedNetworkImage(
+          imageUrl: url,
+          httpHeaders: {
+            "authorization": HTTPConstants.CONTENT_TOKEN,
+          },
+          imageBuilder: (context, imageProvider) => Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          placeholder: (context, url) => Shimmer.fromColors(
+            period: Duration(seconds: 1),
+            baseColor: ColorConstants.almostBlack,
+            highlightColor: ColorConstants.greyIsTheNewBlack,
+            child: Container(
+              color: ColorConstants.almostBlack,
+              height: height,
+              width: width,
+            ),
+          ),
+          errorWidget: (context, url, error) {
+            print(error);
+            return const Icon(Icons.error);
+          },
+        );
+      }
       return Image.network(
         url,
         fit: BoxFit.cover,

@@ -47,7 +47,8 @@ class HomeWidget extends ConsumerStatefulWidget {
   _HomeWidgetState createState() => _HomeWidgetState();
 }
 
-class _HomeWidgetState extends ConsumerState<HomeWidget> {
+class _HomeWidgetState extends ConsumerState<HomeWidget>
+    with AutomaticKeepAliveClientMixin<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
 
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
@@ -62,6 +63,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     _observeNetwork();
 
     _bloc.fetchMenu();
@@ -92,9 +94,9 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
                             type, id, context, Tracking.SHORTCUT_TAPPED),
                       ),
                       CoursesRowWidget(
-                        key: _coursesKey,
-                        onTap: (type, id) => _navigate(
-                            type, id, context, Tracking.COURSE_TAPPED)),
+                          key: _coursesKey,
+                          onTap: (type, id) => _navigate(
+                              type, id, context, Tracking.COURSE_TAPPED)),
                       StatsWidget(),
                       SizedBox(height: 16),
                       DailyMessageWidget(key: _dailyMessageKey),
@@ -257,4 +259,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
       }
     });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

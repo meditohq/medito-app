@@ -1,3 +1,4 @@
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
@@ -56,10 +57,12 @@ class PlayerButtonsComponent extends ConsumerWidget {
         firstChild: Icon(
           Icons.play_circle_fill,
           size: 72,
+          color: ColorConstants.walterWhite,
         ),
         secondChild: Icon(
           Icons.pause_circle_filled,
           size: 72,
+          color: ColorConstants.walterWhite,
         ),
         crossFadeState:
             ref.watch(audioPlayPauseStateProvider) == PLAY_PAUSE_AUDIO.PLAY

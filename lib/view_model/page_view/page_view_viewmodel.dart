@@ -7,7 +7,7 @@ final pageviewNotifierProvider =
 });
 
 class PageviewViewModel extends ChangeNotifier {
-  final pageController = PageController();
+  final pageController = PageController(keepPage: true);
   double secondScreenHeightFactor = 1;
 
   void gotoNextPage() {
