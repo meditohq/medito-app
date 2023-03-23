@@ -12,7 +12,10 @@ class BackgroundImageComponent extends StatelessWidget {
       child: ImageFiltered(
         imageFilter: ColorFilter.mode(
             ColorConstants.almostBlack.withOpacity(0.85), BlendMode.colorBurn),
-        child: NetworkImageComponent(url: imageUrl),
+        child: NetworkImageComponent(
+          url: imageUrl,
+          isCache: false,
+        ),
       ),
     );
   }

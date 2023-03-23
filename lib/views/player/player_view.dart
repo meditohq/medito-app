@@ -24,60 +24,8 @@ class PlayerView extends ConsumerStatefulWidget {
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
 
-class _PlayerViewState extends ConsumerState<PlayerView> {
-  late int sessionId, fileId;
-  @override
-  void initState() {
-    sessionId = widget.sessionModel.id;
-    fileId = widget.file.id;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      checkAudioLocally();
-    });
-    super.initState();
-  }
-
-  void checkAudioLocally() {
-    loadSessionAndBackgroundSound();
-    ref.read(audioPlayPauseStateProvider.notifier).state =
-        PLAY_PAUSE_AUDIO.PLAY;
-  }
-
-  void loadSessionAndBackgroundSound() {
-    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
-    var _currentPlayingFileId =
-        _audioPlayerNotifier.currentlyPlayingSession?.id;
-
-    if (!isPlaying || _currentPlayingFileId != fileId) {
-      setSessionAudio(_audioPlayerNotifier);
-      setBackgroundSound(_audioPlayerNotifier);
-    }
-  }
-
-  void setSessionAudio(AudioPlayerNotifier _audioPlayerNotifier) {
-    var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
-        '$sessionId-$fileId${getFileExtension(widget.file.path)}');
-    checkDownloadedFile.then((value) {
-      _audioPlayerNotifier.setSessionAudio(widget.file, filePath: value);
-      _audioPlayerNotifier.currentlyPlayingSession = widget.file;
-    });
-  }
-
-  void setBackgroundSound(AudioPlayerNotifier _audioPlayerNotifier) {
-    if (widget.sessionModel.hasBackgroundSound) {
-      final _provider = ref.read(backgroundSoundsNotifierProvider);
-      _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.NONE) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-        }
-      });
-      _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-      });
-    }
-  }
-
+class _PlayerViewState extends ConsumerState<PlayerView>
+    with AutomaticKeepAliveClientMixin<PlayerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,4 +68,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
