@@ -79,9 +79,5 @@ class PlayerButtonsComponent extends ConsumerWidget {
         _state == PLAY_PAUSE_AUDIO.PAUSE
             ? PLAY_PAUSE_AUDIO.PLAY
             : PLAY_PAUSE_AUDIO.PAUSE;
-    await ref
-        .read(playerProvider.notifier)
-        .addCurrentlyPlayingSessionInPreference(
-            sessionModel: sessionModel, file: file);
   }
 }

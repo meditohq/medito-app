@@ -24,6 +24,7 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
   @override
   void initState() {
     ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
+    ref.read(pageviewNotifierProvider).addListenerToPage();
     super.initState();
   }
 
@@ -47,9 +48,19 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
             children: [
               Expanded(child: widget.firstChild),
               if (currentlyPlayingSession != null)
-                MiniPlayerWidget(
-                  sessionModel: currentlyPlayingSession,
-                )
+                Consumer(builder: (context, ref, child) {
+                  return AnimatedCrossFade(
+                    duration: Duration(milliseconds: 700),
+                    crossFadeState:
+                        ref.watch(pageviewNotifierProvider).currentPage == 0
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                    firstChild: MiniPlayerWidget(
+                      sessionModel: currentlyPlayingSession,
+                    ),
+                    secondChild: SizedBox(),
+                  );
+                }),
             ],
           ),
           if (currentlyPlayingSession != null)

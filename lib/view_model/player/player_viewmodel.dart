@@ -24,6 +24,7 @@ class PlayerViewModel extends StateNotifier<SessionModel?> {
         break;
       }
     }
+    
     state = _session;
     await ref
         .read(sessionRepositoryProvider)

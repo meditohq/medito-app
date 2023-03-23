@@ -7,6 +7,7 @@ import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
+import 'package:Medito/view_model/player/player_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
@@ -28,6 +29,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     with AutomaticKeepAliveClientMixin<PlayerView> {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       extendBody: false,
       extendBodyBehindAppBar: true,

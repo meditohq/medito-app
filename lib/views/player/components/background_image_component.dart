@@ -1,5 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class BackgroundImageComponent extends StatelessWidget {
@@ -7,16 +8,20 @@ class BackgroundImageComponent extends StatelessWidget {
   final String imageUrl;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
-      child: ImageFiltered(
-        imageFilter: ColorFilter.mode(
-            ColorConstants.almostBlack.withOpacity(0.85), BlendMode.colorBurn),
-        child: NetworkImageComponent(
-          url: imageUrl,
-          isCache: false,
+    return Stack(
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: NetworkImageComponent(
+            url: imageUrl,
+            isCache: false,
+          ),
         ),
-      ),
+        Container(
+          height: MediaQuery.of(context).size.height,
+          color: ColorConstants.almostBlack.withOpacity(0.85),
+        ),
+      ],
     );
   }
 }
