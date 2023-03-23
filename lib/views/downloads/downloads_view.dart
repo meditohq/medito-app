@@ -4,7 +4,9 @@ import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
+import 'package:Medito/view_model/player/player_viewmodel.dart';
 import 'package:Medito/view_model/session/download_session_viewmodel.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
@@ -94,7 +96,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
       onTap: () {
-        _openPlayer(item, context);
+        _openPlayer(ref, item);
       },
       child: Dismissible(
           key: UniqueKey(),
@@ -156,14 +158,21 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   String _getDuration(String? length) => formatSessionLength(length);
 
-  void _openPlayer(SessionModel sessionModel, BuildContext context) {
-    context.go(
-      GoRouter.of(context).location + PlayerPath,
-      extra: {
-        'sessionModel': sessionModel,
-        'file': sessionModel.audio.first.files.first
-      },
-    );
+  void _openPlayer(
+    WidgetRef ref,
+    SessionModel sessionModel,
+  ) {
+    ref.read(playerProvider.notifier).addCurrentlyPlayingSessionInPreference(
+        sessionModel: sessionModel, file: sessionModel.audio.first.files.first);
+    ref.read(pageviewNotifierProvider).gotoNextPage();
+
+    // context.go(
+    //   GoRouter.of(context).location + PlayerPath,
+    //   extra: {
+    //     'sessionModel': sessionModel,
+    //     'file': sessionModel.audio.first.files.first
+    //   },
+    // );
   }
 
   void showSwipeToDeleteTip() {

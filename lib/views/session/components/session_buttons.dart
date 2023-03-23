@@ -2,6 +2,8 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
+import 'package:Medito/view_model/player/player_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -57,10 +59,15 @@ class SessionButtons extends StatelessWidget {
     return Consumer(
       builder: (context, ref, child) => InkWell(
         onTap: () {
-          context.go(
-            GoRouter.of(context).location + PlayerPath,
-            extra: {'sessionModel': sessionModel, 'file': file},
-          );
+          ref
+              .read(playerProvider.notifier)
+              .addCurrentlyPlayingSessionInPreference(
+                  sessionModel: sessionModel, file: file);
+          ref.read(pageviewNotifierProvider).gotoNextPage();
+          // context.go(
+          //   GoRouter.of(context).location + PlayerPath,
+          //   extra: {'sessionModel': sessionModel, 'file': file},
+          // );
         },
         borderRadius: BorderRadius.circular(14),
         child: Ink(

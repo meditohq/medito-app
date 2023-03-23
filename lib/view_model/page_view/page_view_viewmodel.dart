@@ -8,7 +8,24 @@ final pageviewNotifierProvider =
 
 class PageviewViewModel extends ChangeNotifier {
   final pageController = PageController(keepPage: true);
-  double secondScreenHeightFactor = 1;
+  int currentPage = 0;
+
+  void addListenerToPage() {
+    pageController.addListener(
+      () {
+        var currentPagePosition = pageController.page != null
+            ? double.parse(pageController.page!.toStringAsFixed(1))
+            : 0.0;
+        if (currentPagePosition == 0.0) {
+          currentPage = 0;
+          notifyListeners();
+        } else if (currentPagePosition == 1.0) {
+          currentPage = 1;
+          notifyListeners();
+        }
+      },
+    );
+  }
 
   void gotoNextPage() {
     pageController.nextPage(
