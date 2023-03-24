@@ -151,7 +151,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           subtitle:
               '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
           cover: item.coverUrl,
-          // colorPrimary: parseColor(item.extras?[PRIMARY_COLOUR]),
           coverSize: 70),
     );
   }
@@ -165,14 +164,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     ref.read(playerProvider.notifier).addCurrentlyPlayingSessionInPreference(
         sessionModel: sessionModel, file: sessionModel.audio.first.files.first);
     ref.read(pageviewNotifierProvider).gotoNextPage();
-
-    // context.go(
-    //   GoRouter.of(context).location + PlayerPath,
-    //   extra: {
-    //     'sessionModel': sessionModel,
-    //     'file': sessionModel.audio.first.files.first
-    //   },
-    // );
   }
 
   void showSwipeToDeleteTip() {
