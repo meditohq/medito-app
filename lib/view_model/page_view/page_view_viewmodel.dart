@@ -31,4 +31,8 @@ class PageviewViewModel extends ChangeNotifier {
     pageController.nextPage(
         duration: Duration(milliseconds: 500), curve: Curves.easeIn);
   }
+  void gotoPreviousPage() {
+    pageController.previousPage(
+        duration: Duration(milliseconds: 500), curve: Curves.easeIn);
+  }
 }
