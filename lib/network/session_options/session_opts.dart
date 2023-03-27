@@ -1,5 +1,6 @@
 import 'package:Medito/utils/utils.dart';
 
+// ignore_for_file: avoid-dynamic
 class SessionOptionsResponse {
   SessionData? data;
 

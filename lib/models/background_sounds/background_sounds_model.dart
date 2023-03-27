@@ -6,7 +6,7 @@ part 'background_sounds_model.g.dart';
 abstract class BackgroundSoundsModel with _$BackgroundSoundsModel {
   const factory BackgroundSoundsModel({
     required int id,
-    required String name,
+    required String title,
     required String path,
     required int duration,
   }) = _BackgroundSoundsModel;

@@ -1,3 +1,4 @@
+// ignore_for_file: avoid-dynamic
 class DailyMessageResponse {
 
   Data? _data;

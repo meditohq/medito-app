@@ -70,7 +70,7 @@ class MeditoAudioHandler extends BaseAudioHandler
   @override
   Future<void> play() async {
     try {
-      if (_currentlyPlayingBGSound.isNotEmptyAndNotNull() &&
+      if (_currentlyPlayingBGSound.isNotNullAndNotEmpty() &&
           mediaItemHasBGSound()) {
         unawaited(_bgPlayer.play());
         unawaited(_bgPlayer.setLoopMode(LoopMode.all));
@@ -230,5 +230,5 @@ class MeditoAudioHandler extends BaseAudioHandler
 
   void setPlayerSpeed(double speed) => _player.setSpeed(speed);
 
-  bool mediaItemHasBGSound() => mediaItem.value?.extras?[HAS_BG_SOUND];
+  bool mediaItemHasBGSound() => mediaItem.value?.extras?[HAS_BG_SOUND] ?? false;
 }

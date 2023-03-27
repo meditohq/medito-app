@@ -20,11 +20,11 @@ import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/components/components.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/views/player/components/position_indicator_widget.dart';
-import 'package:Medito/views/player/player2/audio_complete_dialog.dart';
+import 'package:Medito/views/player_old/components/position_indicator_widget.dart';
+import 'package:Medito/views/player_old/player2/audio_complete_dialog.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -109,7 +109,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: getNetworkImage(mediaItem!.artUri.toString()),
+            image: getNetworkImage(mediaItem?.artUri?.toString() ?? ''),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
                 ColorConstants.almostBlack.withOpacity(0.65),
@@ -149,12 +149,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         getSavedBgSoundData();
       }
     } on Exception catch (e, s) {
-      unawaited(
-        Sentry.captureException(e,
-            stackTrace: s,
-            hint:
-                'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}'),
-      );
+      unawaited(Sentry.captureException(e,
+          stackTrace: s,
+          hint: Hint.withMap({
+            'message':
+                'Failed trying to get save background  sounds data: extras[HAS_BG_SOUND]: ${_hasBGSound()}'
+          })));
     }
   }
 

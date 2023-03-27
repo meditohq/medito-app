@@ -21,6 +21,20 @@ class _WebViewComponentState extends State<WebViewComponent> {
 
   @override
   Widget build(BuildContext context) {
+
+    var controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: _handleLoad,
+          onNavigationRequest: (NavigationRequest request) {
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(widget.url));
+
     return Scaffold(
       backgroundColor: ColorConstants.greyIsTheNewGrey,
       appBar: MeditoAppBarWidget(
@@ -29,12 +43,8 @@ class _WebViewComponentState extends State<WebViewComponent> {
       body: IndexedStack(
         index: _stackToView,
         children: [
-          WebView(
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController webViewController) {
-              webViewController.loadUrl(widget.url);
-            },
-            onPageFinished: _handleLoad,
+          WebViewWidget(
+            controller: controller
           ),
           const Center(
             child: CircularProgressIndicator(),

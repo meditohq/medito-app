@@ -278,7 +278,7 @@ Future updateStatsFromBg() async {
   var read = await readJSONFromCache('stats');
   print('read ->$read');
 
-  if (read.isNotEmptyAndNotNull()) {
+  if (read.isNotNullAndNotEmpty()) {
     var map = decoded(read!);
     var id = map['id'];
     var secsListened = map['secsListened'];

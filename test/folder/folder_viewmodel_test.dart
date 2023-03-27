@@ -29,7 +29,7 @@ void main() {
         //ARRANGE
         final folderResponseData = FolderModel(
           id: 28,
-          name: 'UCLA',
+          title: 'UCLA',
           description:
               'Guided meditations provided by [UCLA Mindful Awareness Research Center]',
           coverUrl: 'Some test cover url',
@@ -38,7 +38,7 @@ void main() {
             FolderItemsModel(
                 type: 'session',
                 id: 120,
-                name: 'Complete meditation',
+                title: 'Complete meditation',
                 subtitle: '19 min',
                 path: 'sessions/120')
           ],
@@ -60,7 +60,7 @@ void main() {
           container.read(foldersProvider(folderId: 28)).value,
           isA<FolderModel>()
               .having((s) => s.id, 'id', 28)
-              .having((s) => s.name, 'name', 'UCLA')
+              .having((s) => s.title, 'title', 'UCLA')
               .having((s) => s.description, 'description',
                   'Guided meditations provided by [UCLA Mindful Awareness Research Center]'),
         );

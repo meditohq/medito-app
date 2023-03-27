@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../utils/navigation_extra.dart';
+import '../../routes/routes.dart';
 
 class AnnouncementBanner extends StatefulWidget {
   AnnouncementBanner({Key? key, this.hasOpened}) : super(key: key);
@@ -88,7 +88,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
                                 content: _buildTextAndButtonColumn(
                                     snapshot, context),
                                 leading:
-                                    snapshot.data?.icon.isNotEmptyAndNotNull() == true
+                                    snapshot.data?.icon.isNotNullAndNotEmpty() == true
                                         ? buildCircleAvatar(snapshot)
                                         : Container(),
                                 actions: [Container()])),
@@ -103,7 +103,7 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
 
   List<Widget> buildActionsRow(AsyncSnapshot<AnnouncementResponse> snapshot) {
     var actions = [_buildDismissButton()];
-    if (snapshot.data?.buttonLabel?.isEmptyOrNull() == false) {
+    if (snapshot.data?.buttonLabel?.isNullOrEmpty() == false) {
       actions.add(_buildPositiveButton(snapshot));
     }
     return actions;
