@@ -29,7 +29,7 @@ void main() {
         //ARRANGE
         final sessionResponseData = SessionModel(
           id: 1,
-          name: 'Welcome',
+          title: 'Welcome',
           description: '',
           coverUrl: '',
           isPublished: true,
@@ -58,7 +58,7 @@ void main() {
             container.read(sessionsProvider(sessionId: 1)).value,
             isA<SessionModel>()
                 .having((s) => s.id, 'id', 1)
-                .having((s) => s.name, 'name', 'Welcome')
+                .having((s) => s.title, 'title', 'Welcome')
                 .having((s) => s.description, 'description', ''));
         verify(
           () => mockSessionRepository.fetchSession(1),

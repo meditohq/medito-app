@@ -26,7 +26,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../utils/navigation_extra.dart';
+import '../../routes/routes.dart';
 
 class SessionOptionsBloc {
   late SessionOptionsRepository _repo;

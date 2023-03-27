@@ -27,7 +27,7 @@ var downloadListener = ValueNotifier<double>(0);
 var bgDownloadListener = ValueNotifier<double>(0);
 int bgTotal = 1, bgReceived = 0;
 
-Future<dynamic> checkFileExists(AudioFile currentFile) async {
+Future<bool?> checkFileExists(AudioFile currentFile) async {
   if(kIsWeb) return null;
   var filePath = (await getFilePath(currentFile.id));
   var file = File(filePath);
@@ -35,7 +35,7 @@ Future<dynamic> checkFileExists(AudioFile currentFile) async {
   return exists;
 }
 
-Future<dynamic> checkBgSoundExists(String name) async {
+Future<bool?> checkBgSoundExists(String name) async {
   if(kIsWeb) return null;
   var filePath = (await getFilePath(name));
   var file = File(filePath);
@@ -43,7 +43,7 @@ Future<dynamic> checkBgSoundExists(String name) async {
   return exists;
 }
 
-Future<dynamic> downloadBGMusicFromURL(String? url, String? name) async {
+Future<String?> downloadBGMusicFromURL(String? url, String? name) async {
   if(kIsWeb) return null;
 
   var path = (await getFilePath(name));
@@ -69,7 +69,7 @@ Future<String> getFilePath(String? mediaItemId) async {
   return '$dir/${mediaItemId?.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
 }
 
-Future<dynamic> getDownload(String filename) async {
+Future<String?> getDownload(String filename) async {
   if(kIsWeb) return '';
   var path = (await getFilePath(filename));
   var file = File(path);

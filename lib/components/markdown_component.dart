@@ -1,5 +1,5 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/navigation_extra.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
