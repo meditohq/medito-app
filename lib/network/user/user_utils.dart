@@ -36,7 +36,7 @@ Future<void> _updateUserCredentials(SharedPreferences prefs) async {
   await prefs.setString(TOKEN, map?[TOKEN] ?? '');
 
   Sentry.configureScope(
-        (scope) => scope.setUser(SentryUser(id: map?[USER_ID])),
+    (scope) => scope.setUser(SentryUser(id: map?[USER_ID])),
   );
 }
 
@@ -88,12 +88,19 @@ class UserRepo {
           ? (UserResponse.fromJson(response).data?.id ?? 'EMPTY')
           : 'EMPTY';
     } catch (e, st) {
-      unawaited(Sentry.captureException(e, stackTrace: st, hint: token));
+      unawaited(
+        Sentry.captureException(
+          e,
+          stackTrace: st,
+          hint: Hint.withMap(
+            {'message': token},
+          ),
+        ),
+      );
     } finally {
       return {USER_ID: id, TOKEN: 'Bearer $token'};
     }
   }
-
 }
 
 Future<String?> get generatedToken async {

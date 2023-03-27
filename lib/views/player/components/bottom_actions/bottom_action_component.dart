@@ -42,4 +42,12 @@ class BottomActionComponent extends StatelessWidget {
       ),
     );
   }
+
+  void _handleOnTapSound(BuildContext context) {
+    var location = GoRouter.of(context).location;
+    context.go(
+      location + backgroundSounds,
+      extra: {'sessionModel': sessionModel, 'file': file},
+    );
+  }
 }
