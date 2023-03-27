@@ -1,8 +1,8 @@
-import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/media_library.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
-import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/network/downloads/downloads_bloc.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
@@ -93,7 +93,7 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
           onDismissed: (direction) {
             if (mounted) {
               _downloadList.removeWhere((element) => element == item);
-              DownloadsBloc.removeSessionFromDownloads(context, item);
+              DownloadsBloc.removeSessionFromDownloads(item);
               setState(() {});
             }
 
@@ -142,7 +142,8 @@ class _DownloadsListWidgetState extends State<DownloadsListWidget>
   }
 
   void showSwipeToDeleteTip() {
-    createSnackBar(StringConstants.SWIPE_TO_DELETE, context, color: ColorConstants.darkMoon);
+    createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
+        color: ColorConstants.darkMoon);
   }
 
   void _refreshDownloadList() {

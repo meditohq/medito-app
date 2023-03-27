@@ -22,6 +22,7 @@ class DioApiService {
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
+
       return response.data;
     } on DioError catch (err) {
       _returnDioErrorResponse(err);
@@ -48,6 +49,7 @@ class DioApiService {
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+
       return response.data;
     } on DioError catch (err) {
       _returnDioErrorResponse(err);
@@ -61,20 +63,25 @@ class DioApiService {
     switch (error.response?.statusCode) {
       case 400:
         throw BadRequestException(
-            error.response!.statusMessage ?? 'Bad request');
+          error.response!.statusMessage ?? 'Bad request',
+        );
       case 401:
         throw UnauthorisedException(
-            'Unauthorised request: ${error.response!.statusCode}');
+          'Unauthorised request: ${error.response!.statusCode}',
+        );
       case 403:
         throw UnauthorisedException(
-            'Access forbidden: ${error.response!.statusCode}');
+          'Access forbidden: ${error.response!.statusCode}',
+        );
       case 404:
         throw FetchDataException(
-            'Api not found: ${error.response!.statusCode}');
+          'Api not found: ${error.response!.statusCode}',
+        );
       case 500:
       default:
         throw FetchDataException(
-            'Error occurred while Communication with Server ');
+          'Error occurred while Communication with Server ',
+        );
     }
   }
 }
