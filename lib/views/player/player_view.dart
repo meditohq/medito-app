@@ -53,26 +53,26 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
   }
 
-  void setSessionAudio(AudioPlayerNotifier _audioPlayerNotifier) {
+  void setSessionAudio(AudioPlayerNotifier audioPlayerNotifier) {
     var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
         '$sessionId-$fileId${getFileExtension(widget.file.path)}');
     checkDownloadedFile.then((value) {
-      _audioPlayerNotifier.setSessionAudio(widget.file, filePath: value);
-      _audioPlayerNotifier.currentlyPlayingSession = widget.file;
+      audioPlayerNotifier.setSessionAudio(widget.file, filePath: value);
+      audioPlayerNotifier.currentlyPlayingSession = widget.file;
     });
   }
 
-  void setBackgroundSound(AudioPlayerNotifier _audioPlayerNotifier) {
+  void setBackgroundSound(AudioPlayerNotifier audioPlayerNotifier) {
     if (widget.sessionModel.hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
       _provider.getBackgroundSoundFromPref().then((_) {
         if (_provider.selectedBgSound != null &&
             _provider.selectedBgSound?.title != StringConstants.NONE) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+          audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
         }
       });
       _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+        audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
       });
     }
   }

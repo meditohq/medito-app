@@ -53,10 +53,10 @@ class PackListItemWidget extends StatelessWidget {
   }
 
   Text _getSubtitle(BuildContext context) =>
-      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
+      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.titleMedium);
 
   Text _getTitle(BuildContext context) => Text(data.title ?? '',
-      style: Theme.of(context).textTheme.headline4,
+      style: Theme.of(context).textTheme.headlineMedium,
       maxLines: 1,
       overflow: TextOverflow.ellipsis);
 
