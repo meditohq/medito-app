@@ -61,14 +61,19 @@ class AudioDownloadComponent extends ConsumerWidget {
 
   double _getDownloadProgress(
       AudioDownloaderViewModel downloadAudioProvider, String downloadFileKey) {
-    return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
+    if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
+      return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
+    }
+    return 0;
   }
 
   Future<void> _handleDownload(AudioDownloaderViewModel downloadAudioProvider,
       WidgetRef ref, BuildContext context) async {
     try {
       await downloadAudioProvider.downloadSessionAudio(sessionModel, file);
-      await ref.read(addSingleSessionInPreferenceProvider(sessionModel: sessionModel, file: file).future);
+      await ref.read(addSingleSessionInPreferenceProvider(
+              sessionModel: sessionModel, file: file)
+          .future);
     } catch (e) {
       createSnackBar(e.toString(), context);
     }
