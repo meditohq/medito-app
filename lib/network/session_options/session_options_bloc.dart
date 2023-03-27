@@ -16,12 +16,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/audioplayer/download_class.dart';
-import 'package:Medito/audioplayer/media_lib.dart';
+import 'package:Medito/audioplayer/media_library.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/session_options/session_options_repo.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -131,7 +131,7 @@ class SessionOptionsBloc {
         {
           Tracking.SESSION_ID: mediaItem.extras?[SESSION_ID].toString() ?? '',
           Tracking.SESSION_DURATION: mediaItem.extras?[LENGTH].toString() ?? '',
-          Tracking.SESSION_GUIDE: mediaItem.artist ?? ''
+          Tracking.SESSION_GUIDE: mediaItem.artist ?? '',
         },
       ),
     );
@@ -148,7 +148,7 @@ class SessionOptionsBloc {
         secondaryColor: _options?.colorSecondary,
         primaryColor: _options?.colorPrimary,
         durationAsMilliseconds:
-        clockTimeToDuration(file?.length).inMilliseconds,
+            clockTimeToDuration(file?.length).inMilliseconds,
         fileId: file?.id,
         sessionId: _options?.id,
         attributions: _options?.attribution);
@@ -169,10 +169,10 @@ class SessionOptionsBloc {
     // Add file data against each voice
     voiceSet.toList().forEach((voice) {
       var listForThisVoice =
-      items.where((element) => element?.voice == voice).toList();
+          items.where((element) => element?.voice == voice).toList();
 
       var voiceItem =
-      VoiceItem(headerValue: voice, listForVoice: listForThisVoice);
+          VoiceItem(headerValue: voice, listForVoice: listForThisVoice);
       voiceList.add(voiceItem);
     });
 

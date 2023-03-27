@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -11,7 +10,7 @@ import 'package:just_audio/just_audio.dart';
 import '../network/auth.dart';
 import '../network/cache.dart';
 import '../utils/bgvolume_utils.dart';
-import 'media_lib.dart';
+import 'media_library.dart';
 import 'player_utils.dart';
 
 //This is the duration of bgSound fade towards the end.
@@ -170,7 +169,7 @@ class MeditoAudioHandler extends BaseAudioHandler
         unawaited(_bgPlayer.setVolume(_bgVolume));
         break;
       case PLAY_BG_SOUND:
-        await _playBgSound(extras);
+        _playBgSound(extras);
         break;
       case INIT_BG_SOUND:
         _bgVolume = extras?[SET_BG_SOUND_VOL] ?? DEFAULT_VOLUME;
@@ -186,7 +185,7 @@ class MeditoAudioHandler extends BaseAudioHandler
     return super.customAction(name, extras);
   }
 
-  Future<void> _playBgSound(Map<String, dynamic>? extras) async {
+  void _playBgSound(Map<String, dynamic>? extras) {
     var bgSound = extras?[PLAY_BG_SOUND];
     if (bgSound != null) {
       unawaited(_bgPlayer.setFilePath(extras?[PLAY_BG_SOUND]));
@@ -212,13 +211,16 @@ class MeditoAudioHandler extends BaseAudioHandler
     print(_bgPlayer.volume - (_bgVolume / FADE_DURATION));
     if (_bgPlayer.volume > 0) {
       unawaited(
-          _bgPlayer.setVolume(_bgPlayer.volume - (_bgVolume / FADE_DURATION)));
+        _bgPlayer.setVolume(_bgPlayer.volume - (_bgVolume / FADE_DURATION)),
+      );
     }
   }
 
   void skipForward30Secs() {
-    var seekDuration = min(_duration?.inMilliseconds ?? 0,
-        _player.position.inMilliseconds + Duration(seconds: 30).inMilliseconds);
+    var seekDuration = min(
+      _duration?.inMilliseconds ?? 0,
+      _player.position.inMilliseconds + Duration(seconds: 30).inMilliseconds,
+    );
     _player.seek(Duration(milliseconds: seekDuration));
   }
 

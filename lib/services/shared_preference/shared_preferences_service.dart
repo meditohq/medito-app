@@ -9,6 +9,7 @@ class SharedPreferencesService {
   static Future<String?> getStringFromSF(String key) async {
     var pref = await SharedPreferences.getInstance();
     var stringValue = pref.getString(key);
+
     return stringValue;
   }
 
@@ -20,6 +21,7 @@ class SharedPreferencesService {
   static Future<int?> getIntFromSF(String key) async {
     var pref = await SharedPreferences.getInstance();
     var intValue = pref.getInt(key);
+
     return intValue;
   }
 
@@ -31,6 +33,7 @@ class SharedPreferencesService {
   static Future<double?> getDoubleFromSF(String key) async {
     var pref = await SharedPreferences.getInstance();
     var doubleValue = pref.getDouble(key);
+
     return doubleValue;
   }
 
@@ -41,18 +44,21 @@ class SharedPreferencesService {
 
   static Future<bool?> getBoolFromPref(String key) async {
     var pref = await SharedPreferences.getInstance();
+
     return pref.getBool(key);
   }
 
   static Future<bool> removeValueFromSF(String key) async {
     var pref = await SharedPreferences.getInstance();
     var isRemoved = await pref.remove(key);
+
     return isRemoved;
   }
 
   static Future<bool> checkValueInSF(String key) async {
     var pref = await SharedPreferences.getInstance();
     var isRemoved = pref.containsKey(key);
+
     return isRemoved;
   }
 }
