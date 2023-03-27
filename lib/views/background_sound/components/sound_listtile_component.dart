@@ -14,15 +14,8 @@ class SoundListTileComponent extends ConsumerWidget {
     final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
     var isSelected = bgSoundNotifierProvider.selectedBgSound?.id == sound.id;
     return InkWell(
-      onTap: () {
-        bgSoundNotifierProvider.handleOnChangeSound(!isSelected ? sound : null);
-        if (!isSelected) {
-          audioPlayerNotifier.setBackgroundAudio(sound);
-          audioPlayerNotifier.playBackgroundSound();
-        } else {
-          audioPlayerNotifier.stopBackgroundSound();
-        }
-      },
+      onTap: () => _handleItemTap(
+          bgSoundNotifierProvider, audioPlayerNotifier, isSelected),
       child: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -62,5 +55,26 @@ class SoundListTileComponent extends ConsumerWidget {
             : ColorConstants.transparent,
       ),
     );
+  }
+
+  void _handleItemTap(BackgroundSoundsNotifier bgSoundNotifierProvider,
+      AudioPlayerNotifier audioPlayerNotifier, bool isSelected) {
+    if (sound.title == StringConstants.NONE) {
+      bgSoundNotifierProvider.handleOnChangeSound(sound);
+      audioPlayerNotifier.stopBackgroundSound();
+    } else {
+      bgSoundNotifierProvider.handleOnChangeSound(
+        !isSelected
+            ? sound
+            : BackgroundSoundsModel(
+                id: 0, title: StringConstants.NONE, duration: 0, path: ''),
+      );
+      if (!isSelected) {
+        audioPlayerNotifier.setBackgroundAudio(sound);
+        audioPlayerNotifier.playBackgroundSound();
+      } else {
+        audioPlayerNotifier.stopBackgroundSound();
+      }
+    }
   }
 }

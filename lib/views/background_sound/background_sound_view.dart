@@ -23,12 +23,22 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     setInitStateValues();
   }
 
+  @override
+  void deactivate() {
+    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+    if (!_audioPlayerNotifier.sessionAudioPlayer.playerState.playing) {
+      _audioPlayerNotifier.stopBackgroundSound();
+    }
+    super.deactivate();
+  }
+
   void setInitStateValues() {
     final _provider = ref.read(backgroundSoundsNotifierProvider);
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
     if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
       _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null) {
+        if (_provider.selectedBgSound != null &&
+            _provider.selectedBgSound?.title != StringConstants.NONE) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
           _audioPlayerNotifier.playBackgroundSound();
         }
@@ -64,6 +74,10 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       headerHeight: 130,
       children: [
         VolumeSliderComponent(),
+        SoundListTileComponent(
+          sound: BackgroundSoundsModel(
+              id: 0, title: StringConstants.NONE, duration: 0, path: ''),
+        ),
         for (int i = 0; i < data.length; i++)
           SoundListTileComponent(sound: data[i])
       ],

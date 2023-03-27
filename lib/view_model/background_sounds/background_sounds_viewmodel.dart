@@ -34,8 +34,13 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   void handleOnChangeSound(BackgroundSoundsModel? _sound) async {
     selectedBgSound = _sound;
-    unawaited(SharedPreferencesService.addStringInSF(
-        SharedPreferenceConstants.bgSound, json.encode(_sound?.toJson())));
+    if (_sound != null) {
+      unawaited(SharedPreferencesService.addStringInSF(
+          SharedPreferenceConstants.bgSound, json.encode(_sound.toJson())));
+    } else {
+      unawaited(SharedPreferencesService.removeValueFromSF(
+          SharedPreferenceConstants.bgSound));
+    }
     notifyListeners();
   }
 
