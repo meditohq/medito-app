@@ -124,8 +124,8 @@ class _StatsWidgetState extends State<StatsWidget> {
                         onPressed: _onCancelTap,
                         child: Text('CANCEL',
                             style: Theme.of(context).textTheme.subtitle1
-                          // .copyWith(fontWeight: FontWeight.bold),
-                        ),
+                            // .copyWith(fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                     Container(
@@ -139,8 +139,8 @@ class _StatsWidgetState extends State<StatsWidget> {
                             foregroundColor: ColorConstants.walterWhite),
                         child: Text('SAVE',
                             style: Theme.of(context).textTheme.headline3
-                          // .copyWith(fontWeight: FontWeight.bold),
-                        ),
+                            // .copyWith(fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                   ],
@@ -167,7 +167,6 @@ class _StatsWidgetState extends State<StatsWidget> {
         return Theme(
           data: ThemeData(
               primaryColor: ColorConstants.walterWhite,
-              accentColor: Colors.orange,
               hintColor: Colors.green),
           child: AlertDialog(
             backgroundColor: ColorConstants.moonlight,
@@ -235,8 +234,15 @@ class _StatsWidgetState extends State<StatsWidget> {
       Navigator.pop(context);
       _controller.text = '';
     } catch (e, st) {
-      unawaited(Sentry.captureException(e,
-          stackTrace: st, hint: 'cancel stats widget ${_controller.text}'));
+      unawaited(
+        Sentry.captureException(
+          e,
+          stackTrace: st,
+          hint: Hint.withMap(
+            {'message': 'cancel stats widget ${_controller.text}'},
+          ),
+        ),
+      );
     }
   }
 }

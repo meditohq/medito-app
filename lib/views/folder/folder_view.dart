@@ -75,17 +75,17 @@ class FolderView extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (title != null)
+              if (title.isNotNullAndNotEmpty())
                 Text(
-                  title,
+                  title!,
                   style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                       color: ColorConstants.walterWhite,
                       fontFamily: DmSans,
                       height: 2),
                 ),
-              if (subtitle != null)
+              if (subtitle.isNotNullAndNotEmpty())
                 Text(
-                  subtitle,
+                  subtitle!,
                   style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                         fontFamily: DmMono,
                         height: 2,

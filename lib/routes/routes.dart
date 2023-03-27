@@ -3,12 +3,12 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
+import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/session/session_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../views/home/home_wrapper_widget.dart';
-import '../views/player/player_view.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -28,7 +28,6 @@ const String backgroundSounds = '/backgroundsounds';
 const String HomePath = '/';
 
 final router = GoRouter(
-  urlPathStrategy: UrlPathStrategy.path,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(

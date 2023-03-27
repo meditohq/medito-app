@@ -1,3 +1,4 @@
+// ignore_for_file: avoid-dynamic
 class TextResponse {
   @Deprecated('use fields instead')
   Data? data;

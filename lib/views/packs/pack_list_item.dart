@@ -38,10 +38,10 @@ class PackListItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _getTitle(context),
-                data.subtitle.isNotEmptyAndNotNull()
+                data.subtitle.isNotNullAndNotEmpty()
                     ? Container(height: 4)
                     : Container(),
-                data.subtitle.isNotEmptyAndNotNull()
+                data.subtitle.isNotNullAndNotEmpty()
                     ? _getSubtitle(context)
                     : Container()
               ],
@@ -85,7 +85,7 @@ class PackListItemWidget extends StatelessWidget {
   }
 
   Widget _backgroundImageWidget() {
-    return data.backgroundImage.isNotEmptyAndNotNull()
+    return data.backgroundImage.isNotNullAndNotEmpty()
         ? getNetworkImageWidget(data.backgroundImage)
         : Container();
   }

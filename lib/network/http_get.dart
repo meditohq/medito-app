@@ -78,8 +78,15 @@ Future<Map<String, dynamic>?> httpGet(String url,
       var decode = json.decode(response.body);
       return decode;
     } catch (e, str) {
-      unawaited(Sentry.captureException(e,
-          stackTrace: str, hint: 'decode: ${response.body}'));
+      unawaited(
+        Sentry.captureException(
+          e,
+          stackTrace: str,
+          hint: Hint.withMap(
+            {'message': 'decode: ${response.body}'},
+          ),
+        ),
+      );
       return null;
     }
   }
@@ -87,7 +94,7 @@ Future<Map<String, dynamic>?> httpGet(String url,
 }
 
 Future httpPost(String url, String token,
-    {dynamic body = const <String, String>{}}) async {
+    {Map<String, String> body = const <String, String>{}}) async {
   assert(token.isNotEmpty);
   try {
     final response = await post(
