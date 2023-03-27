@@ -2,6 +2,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,10 +13,6 @@ class DurationIndicatorComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
-    final audioPlayer = ref
-        .watch(audioPlayerNotifierProvider.notifier)
-        .sessionAudioPlayer
-        .duration;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: StreamBuilder<int?>(
@@ -23,7 +20,7 @@ class DurationIndicatorComponent extends ConsumerWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               var currentDuration = snapshot.data ?? 0;
-
+              _handleAudioCompletion(currentDuration, ref);
               return Column(
                 children: [
                   _durationLabels(context, file.duration, currentDuration),
@@ -57,6 +54,19 @@ class DurationIndicatorComponent extends ConsumerWidget {
             return SizedBox();
           }),
     );
+  }
+
+  void _handleAudioCompletion(int currentDuration, WidgetRef ref) {
+    if (file.duration <= currentDuration) {
+      final audioProvider = ref.watch(audioPlayerNotifierProvider);
+      audioProvider.seekValueFromSlider(0);
+      audioProvider.pauseSessionAudio();
+      audioProvider.pauseBackgroundSound();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+    }
   }
 
   Transform _durationLabels(BuildContext context, int duration, int position) {

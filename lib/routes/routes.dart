@@ -1,7 +1,7 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
-import 'package:Medito/views/btm_nav/downloads_widget.dart';
+import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
 import 'package:Medito/views/session/session_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
@@ -169,7 +169,7 @@ MaterialPage<void> getSessionOptionsDailyPage(GoRouterState state) {
 
 //Can be altered to open other pages in the app other than Downloads (eg Faves)
 MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: DownloadsListWidget());
+  return MaterialPage(key: state.pageKey, child: DownloadsView());
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {

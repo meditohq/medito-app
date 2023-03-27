@@ -16,6 +16,7 @@ final audioPlayerNotifierProvider =
 class AudioPlayerNotifier extends ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
   final sessionAudioPlayer = AudioPlayer();
+  SessionFilesModel? currentlyPlayingSession;
 
   void setBackgroundAudio(BackgroundSoundsModel sound) async {
     unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
@@ -23,10 +24,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }));
   }
 
-  void setSessionAudio(String path) async {
-    unawaited(sessionAudioPlayer.setUrl(path, headers: {
-      HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
-    }));
+  void setSessionAudio(SessionFilesModel file, {String? filePath}) async {
+    if (filePath != null) {
+      unawaited(sessionAudioPlayer.setFilePath(filePath));
+    } else {
+      unawaited(sessionAudioPlayer.setUrl(file.path, headers: {
+        HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
+      }));
+    }
   }
 
   void playBackgroundSound() async {

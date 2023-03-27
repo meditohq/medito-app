@@ -6,9 +6,13 @@ class LabelsComponent extends StatelessWidget {
     super.key,
     required this.label,
     this.onTap,
+    this.bgColor = ColorConstants.greyIsTheNewGrey,
+    this.textColor = ColorConstants.walterWhite,
   });
   final String label;
   final void Function()? onTap;
+  final Color? bgColor;
+  final Color? textColor;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -17,7 +21,7 @@ class LabelsComponent extends StatelessWidget {
         child: Container(
           height: 40,
           decoration: BoxDecoration(
-            color: ColorConstants.greyIsTheNewGrey,
+            color: bgColor,
             borderRadius: BorderRadius.all(
               Radius.circular(3),
             ),
@@ -25,10 +29,10 @@ class LabelsComponent extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: ColorConstants.walterWhite,
-                fontFamily: DmMono,
-                fontSize: 14),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: textColor, fontFamily: DmMono, fontSize: 14),
           ),
         ),
       ),
