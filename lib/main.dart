@@ -107,19 +107,17 @@ class _ParentWidgetState extends State<ParentWidget>
     return MaterialApp(
       home: RootPageView(
         firstChild: MaterialApp.router(
-          routeInformationParser: router.routeInformationParser,
-          routerDelegate: router.routerDelegate,
+          routerConfig: router,
           theme: ThemeData(
-            splashColor: ColorConstants.moonlight,
-            canvasColor: ColorConstants.greyIsTheNewBlack,
-            pageTransitionsTheme: PageTransitionsTheme(builders: {
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.android: SlideTransitionBuilder(),
-            }),
-            colorScheme:
-                ColorScheme.dark(secondary: ColorConstants.walterWhite),
-            textTheme: meditoTextTheme(context),
-          ),
+              splashColor: ColorConstants.moonlight,
+              canvasColor: ColorConstants.greyIsTheNewBlack,
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.android: SlideTransitionBuilder(),
+              }),
+              colorScheme:
+                  ColorScheme.dark(secondary: ColorConstants.walterWhite),
+              textTheme: meditoTextTheme(context)),
           title: ParentWidget._title,
         ),
       ),
