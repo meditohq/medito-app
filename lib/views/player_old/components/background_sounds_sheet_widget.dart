@@ -28,6 +28,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+// ignore_for_file: avoid-dynamic
 class ChooseBackgroundSoundDialog extends StatefulWidget {
   final stream;
   final MeditoAudioHandler? handler;

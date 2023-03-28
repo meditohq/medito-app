@@ -1,1 +1,14 @@
 include: package:pedantic/analysis_options.yaml
+
+analyzer:
+  plugins:
+    - dart_code_metrics
+
+dart_code_metrics:
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+  metrics-exclude:
+    - test/**
+  rules:
+    - avoid-dynamic

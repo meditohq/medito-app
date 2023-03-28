@@ -38,10 +38,10 @@ class PackListItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _getTitle(context),
-                data.subtitle.isNotEmptyAndNotNull()
+                data.subtitle.isNotNullAndNotEmpty()
                     ? Container(height: 4)
                     : Container(),
-                data.subtitle.isNotEmptyAndNotNull()
+                data.subtitle.isNotNullAndNotEmpty()
                     ? _getSubtitle(context)
                     : Container()
               ],
@@ -53,10 +53,10 @@ class PackListItemWidget extends StatelessWidget {
   }
 
   Text _getSubtitle(BuildContext context) =>
-      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
+      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.titleMedium);
 
   Text _getTitle(BuildContext context) => Text(data.title ?? '',
-      style: Theme.of(context).textTheme.headline4,
+      style: Theme.of(context).textTheme.headlineMedium,
       maxLines: 1,
       overflow: TextOverflow.ellipsis);
 
@@ -85,7 +85,7 @@ class PackListItemWidget extends StatelessWidget {
   }
 
   Widget _backgroundImageWidget() {
-    return data.backgroundImage.isNotEmptyAndNotNull()
+    return data.backgroundImage.isNotNullAndNotEmpty()
         ? getNetworkImageWidget(data.backgroundImage)
         : Container();
   }

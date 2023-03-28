@@ -36,7 +36,7 @@ class SessionRepositoryImpl extends SessionRepository {
   Future<List<SessionModel>> fetchSessionFromPreference() async {
     var _downloadedSessionList = <SessionModel>[];
     var _downloadedSessionFromPref =
-        await SharedPreferencesService.getStringFromSF(
+        await SharedPreferencesService.getStringFromSharedPref(
             SharedPreferenceConstants.downloads);
     if (_downloadedSessionFromPref != null) {
       var tempList = [];
@@ -50,24 +50,23 @@ class SessionRepositoryImpl extends SessionRepository {
 
   @override
   Future<void> addSessionInPreference(List<SessionModel> sessionList) async {
-    await SharedPreferencesService.addStringInSF(
+    await SharedPreferencesService.addStringInSharedPref(
+      SharedPreferenceConstants.downloads,
+      json.encode(sessionList),
+    );
+  }
+  
+  @override
+  Future<void> addCurrentlyPlayingSessionInPreference(SessionModel sessionList) async {
+    await SharedPreferencesService.addStringInSharedPref(
       SharedPreferenceConstants.downloads,
       json.encode(sessionList),
     );
   }
 
   @override
-  Future<void> addCurrentlyPlayingSessionInPreference(
-      SessionModel sessionModel) async {
-    await SharedPreferencesService.addStringInSF(
-      SharedPreferenceConstants.currentPlayingSession,
-      json.encode(sessionModel),
-    );
-  }
-
-  @override
   Future<SessionModel?> fetchCurrentlyPlayingSessionFromPreference() async {
-    var _session = await SharedPreferencesService.getStringFromSF(
+    var _session = await SharedPreferencesService.getStringFromSharedPref(
         SharedPreferenceConstants.currentPlayingSession);
     if (_session != null) {
       return SessionModel.fromJson(json.decode(_session));
