@@ -16,15 +16,22 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:equatable/equatable.dart';
 
 class ApiResponse<T> extends Equatable {
-  late final Status status;
-  T? body;
-  String? message = '';
+  final Status status;
+  final T? body;
+  final String? message;
 
-  ApiResponse.loading() : status = Status.LOADING;
-  ApiResponse.completed(this.body) : status = Status.COMPLETED;
-  ApiResponse.error(this.message) : status = Status.ERROR;
+  ApiResponse.loading()
+      : status = Status.LOADING,
+        body = null,
+        message = '';
+  ApiResponse.completed(this.body)
+      : status = Status.COMPLETED,
+        message = '';
+  ApiResponse.error(this.message)
+      : status = Status.ERROR,
+        body = null;
 
-  bool hasData(){
+  bool hasData() {
     return status != Status.LOADING && body != null;
   }
 
