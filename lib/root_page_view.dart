@@ -37,8 +37,9 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
             currentlyPlayingSession.audio.first.files.first);
       }
     });
+    var radius = Radius.circular(15);
     return Scaffold(
-      backgroundColor: ColorConstants.greyIsTheNewGrey,
+      backgroundColor: ColorConstants.almostBlack,
       body: PageView(
         controller: ref.read(pageviewNotifierProvider).pageController,
         scrollDirection: Axis.vertical,
@@ -46,19 +47,36 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
         children: [
           Column(
             children: [
-              Expanded(child: widget.firstChild),
+              Expanded(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: radius,
+                      bottomRight: radius,
+                    ),
+                    child: widget.firstChild),
+              ),
+              height8,
               if (currentlyPlayingSession != null)
                 Consumer(builder: (context, ref, child) {
-                  return AnimatedCrossFade(
-                    duration: Duration(milliseconds: 700),
-                    crossFadeState:
-                        ref.watch(pageviewNotifierProvider).currentPage == 0
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                    firstChild: MiniPlayerWidget(
-                      sessionModel: currentlyPlayingSession,
+                  return ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: radius,
+                      topRight: radius,
                     ),
-                    secondChild: SizedBox(),
+                    child: AnimatedCrossFade(
+                      duration: Duration(milliseconds: 700),
+                      crossFadeState:
+                          ref.watch(pageviewNotifierProvider).currentPage == 0
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                      firstChild: MiniPlayerWidget(
+                        sessionModel: currentlyPlayingSession,
+                      ),
+                      secondChild: Container(
+                        height: 64,
+                        color: ColorConstants.greyIsTheNewGrey,
+                      ),
+                    ),
                   );
                 }),
             ],
