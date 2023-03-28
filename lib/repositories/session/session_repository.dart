@@ -33,7 +33,7 @@ class SessionRepositoryImpl extends SessionRepository {
   Future<List<SessionModel>> fetchSessionFromPreference() async {
     var _downloadedSessionList = <SessionModel>[];
     var _downloadedSessionFromPref =
-        await SharedPreferencesService.getStringFromSF(
+        await SharedPreferencesService.getStringFromSharedPref(
             SharedPreferenceConstants.downloads);
     if (_downloadedSessionFromPref != null) {
       var tempList = [];
@@ -47,14 +47,15 @@ class SessionRepositoryImpl extends SessionRepository {
 
   @override
   Future<void> addSessionInPreference(List<SessionModel> sessionList) async {
-    await SharedPreferencesService.addStringInSF(
+    await SharedPreferencesService.addStringInSharedPref(
       SharedPreferenceConstants.downloads,
       json.encode(sessionList),
     );
   }
+  
   @override
   Future<void> addCurrentlyPlayingSessionInPreference(SessionModel sessionList) async {
-    await SharedPreferencesService.addStringInSF(
+    await SharedPreferencesService.addStringInSharedPref(
       SharedPreferenceConstants.downloads,
       json.encode(sessionList),
     );

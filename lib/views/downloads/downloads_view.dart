@@ -1,9 +1,7 @@
-import 'package:Medito/audioplayer/media_lib.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/duration_ext.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
@@ -11,14 +9,10 @@ import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../audioplayer/audio_inherited_widget.dart';
-import '../../routes/routes.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -29,22 +23,11 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
-
-  List<MediaItem> _downloadList = [];
-  late MeditoAudioHandler _audioHandler;
-  List<SessionModel> _downloadedSessions = [];
-  @override
-  void initState() {
-    super.initState();
-
-    _refreshDownloadList();
-  }
+  List<SessionModel> downloadedSessions = [];
 
   @override
   Widget build(BuildContext context) {
     final downloadedSessions = ref.watch(downloadedSessionsProvider);
-    _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
-
     return Scaffold(
       appBar: MeditoAppBarWidget(
         title: StringConstants.DOWNLOADS,
@@ -115,11 +98,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
               await ref.read(deleteSessionFromPreferenceProvider(
                       sessionModel: item, file: item.audio.first.files.first)
                   .future);
-              // setState(() {});
             }
 
             createSnackBar(
-              '"${item.title}" removed',
+              '"${item.title}" ${StringConstants.REMOVED.toLowerCase()}',
               context,
               color: ColorConstants.moonlight,
             );
@@ -157,7 +139,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           subtitle:
               '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
           cover: item.coverUrl,
-          // colorPrimary: parseColor(item.extras?[PRIMARY_COLOUR]),
           coverSize: 70),
     );
   }
@@ -176,13 +157,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   void showSwipeToDeleteTip() {
     createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
-        color: ColorConstants.darkMoon);
-  }
-
-  void _refreshDownloadList() {
-    DownloadsBloc.fetchDownloads().then((value) {
-      _downloadList = value;
-      setState(() {});
-    });
+        color: ColorConstants.walterWhite);
   }
 }
