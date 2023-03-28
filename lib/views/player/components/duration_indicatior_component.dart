@@ -11,51 +11,44 @@ class DurationIndicatorComponent extends ConsumerWidget {
   final SessionFilesModel file;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
-    final audioPlayer = ref
-        .watch(audioPlayerNotifierProvider.notifier)
-        .sessionAudioPlayer
-        .duration;
+    final audioPlayerPositionProvider = ref.watch(audioPositionProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: StreamBuilder<int?>(
-          stream: audioPlayerPositionProvider,
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data != null) {
-              var currentDuration = snapshot.data ?? 0;
+      child: audioPlayerPositionProvider.when(
+        error: (error, stackTrace) => SizedBox(),
+        loading: () => SizedBox(),
+        data: (data) {
+          var currentDuration = data;
 
-              return Column(
-                children: [
-                  _durationLabels(context, file.duration, currentDuration),
-                  SliderTheme(
-                    data: SliderThemeData(
-                      trackHeight: 8,
-                      trackShape: CustomTrackShape(),
-                      thumbShape: RoundSliderThumbShape(
-                        enabledThumbRadius: 5.0,
-                      ),
-                    ),
-                    child: Slider(
-                      min: 0.0,
-                      activeColor: ColorConstants.walterWhite,
-                      inactiveColor: ColorConstants.greyIsTheNewGrey,
-                      max: file.duration.toDouble() + 300,
-                      value: currentDuration.toDouble(),
-                      onChanged: (value) {
-                        ref.read(slideAudioPositionProvider(
-                            duration: value.toInt()));
-                      },
-                      onChangeEnd: (value) {
-                        ref.read(slideAudioPositionProvider(
-                            duration: value.toInt()));
-                      },
-                    ),
+          return Column(
+            children: [
+              _durationLabels(context, file.duration, currentDuration),
+              SliderTheme(
+                data: SliderThemeData(
+                  trackHeight: 8,
+                  trackShape: CustomTrackShape(),
+                  thumbShape: RoundSliderThumbShape(
+                    enabledThumbRadius: 5.0,
                   ),
-                ],
-              );
-            }
-            return SizedBox();
-          }),
+                ),
+                child: Slider(
+                  min: 0.0,
+                  activeColor: ColorConstants.walterWhite,
+                  inactiveColor: ColorConstants.greyIsTheNewGrey,
+                  max: file.duration.toDouble() + 300,
+                  value: currentDuration.toDouble(),
+                  onChanged: (value) {
+                    ref.read(slideAudioPositionProvider(duration: value.toInt()));
+                  },
+                  onChangeEnd: (value) {
+                    ref.read(slideAudioPositionProvider(duration: value.toInt()));
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -84,8 +77,10 @@ class DurationIndicatorComponent extends ConsumerWidget {
   ) {
     return Text(
       label,
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
+      style: Theme.of(context)
+          .textTheme
+          .titleSmall
+          ?.copyWith(color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
     );
   }
 }
