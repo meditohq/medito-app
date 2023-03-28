@@ -40,7 +40,7 @@ class AudioSpeedViewModel extends ChangeNotifier {
     }
     audioSpeedModel = AudioSpeedModel(label: label, speed: speed);
     unawaited(
-      SharedPreferencesService.addStringInSF(
+      SharedPreferencesService.addStringInSharedPref(
         SharedPreferenceConstants.sessionAudioSpeed,
         json.encode(
           audioSpeedModel.toJson(),
@@ -51,7 +51,7 @@ class AudioSpeedViewModel extends ChangeNotifier {
   }
 
   Future<void> getAudioTrackSpeedFromPref() async {
-    var audioSpeedFromPref = await SharedPreferencesService.getStringFromSF(
+    var audioSpeedFromPref = await SharedPreferencesService.getStringFromSharedPref(
         SharedPreferenceConstants.sessionAudioSpeed);
     if (audioSpeedFromPref != null) {
       audioSpeedModel =
