@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -39,6 +41,7 @@ Future<void> addSingleSessionInPreference(AddSingleSessionInPreferenceRef ref,
   await ref.read(
       addSessionListInPreferenceProvider(sessions: _downloadedSessionList)
           .future);
+  unawaited(ref.refresh(downloadedSessionsProvider.future));
 }
 
 @riverpod
@@ -52,4 +55,5 @@ Future<void> deleteSessionFromPreference(DeleteSessionFromPreferenceRef ref,
   await ref.read(
       addSessionListInPreferenceProvider(sessions: _downloadedSessionList)
           .future);
+  unawaited(ref.refresh(downloadedSessionsProvider.future));
 }
