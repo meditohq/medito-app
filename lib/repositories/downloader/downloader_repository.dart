@@ -13,7 +13,7 @@ abstract class DownloaderRepository {
   Future<void> downloadFile(String url,
       {String? name, void Function(int, int)? onReceiveProgress});
   Future<String?> getDownloadedFile(String name);
-   Future<void> deleteDownloadedFile(String name);
+  Future<void> deleteDownloadedFile(String name);
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
