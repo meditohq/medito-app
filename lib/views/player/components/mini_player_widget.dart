@@ -37,7 +37,10 @@ class MiniPlayerWidget extends ConsumerWidget {
       child: SizedBox(
         height: 40,
         width: 40,
-        child: NetworkImageComponent(url: url),
+        child: NetworkImageComponent(
+          url: url,
+          isCache: true,
+        ),
       ),
     );
   }

@@ -5,13 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'dio_client_provider.g.dart';
 
-
 @riverpod
-DioApiService dioClient(DioClientRef ref) {
+DioApiService dioClient(ref) {
   var dio = Dio();
   dio.options = BaseOptions(
       connectTimeout: Duration(milliseconds: 60000),
-      // baseUrl: '',
       baseUrl: HTTPConstants.BASE_URL,
       headers: {
         HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,

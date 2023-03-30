@@ -26,7 +26,7 @@ const ATTRIBUTIONS = 'attrs';
 const TEXT = 'text';
 
 Future<void> clearStorage() async {
-  if(!kIsWeb) {
+  if (!kIsWeb) {
     final cacheDir = await getApplicationDocumentsDirectory();
 
     await cacheDir.list(recursive: true).forEach((element) {
@@ -43,7 +43,7 @@ Future<void> clearStorage() async {
 }
 
 Future<String> get _localPath async {
-  if(kIsWeb) return '';
+  if (kIsWeb) return '';
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
 }
@@ -71,7 +71,7 @@ Future<String?> _readCache(String id) async {
   return await file.readAsString();
 }
 
-String? encoded(dynamic obj) {
+String? encoded(obj) {
   if (obj != null) {
     return json.encode(obj);
   } else {

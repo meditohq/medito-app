@@ -14,7 +14,7 @@ class BackgroundImageComponent extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           child: NetworkImageComponent(
             url: imageUrl,
-            isCache: false,
+            isCache: true,
           ),
         ),
         Container(

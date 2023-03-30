@@ -13,7 +13,7 @@ var parameters =
 var screen;
 
 @riverpod
-Future<SessionOptionsResponse?> sessionOptionsData(SessionOptionsDataRef ref,
+Future<SessionOptionsResponse?> sessionOptionsData(ref,
     {String? id, bool skipCache = false, bool isDaily = false}) async {
   if (id == null) {
     throw Exception('Folder ID is null!');

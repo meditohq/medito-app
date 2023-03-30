@@ -29,7 +29,6 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 }
 
 @riverpod
-BackgroundSoundsRepositoryImpl backgroundSoundsRepository(
-    BackgroundSoundsRepositoryRef ref) {
+BackgroundSoundsRepositoryImpl backgroundSoundsRepository(ref) {
   return BackgroundSoundsRepositoryImpl(client: ref.watch(dioClientProvider));
 }

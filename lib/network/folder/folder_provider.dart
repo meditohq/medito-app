@@ -10,7 +10,8 @@ var folderParameters =
 var ext = 'items/folders/';
 
 @riverpod
-Future<NewFolderResponse?> folderData(FolderDataRef ref, {String? id, bool skipCache = false}) async {
+Future<NewFolderResponse?> folderData(ref,
+    {String? id, bool skipCache = false}) async {
   if (id == null) {
     throw Exception('Folder ID is null!');
   }
@@ -21,7 +22,7 @@ Future<NewFolderResponse?> folderData(FolderDataRef ref, {String? id, bool skipC
   return NewFolderResponse.fromJson(content);
 }
 
-Future<Map<String,Object?>?> _httpGet(String id, bool skipCache) {
+Future<Map<String, Object?>?> _httpGet(String id, bool skipCache) {
   return httpGet(
     BASE_URL + ext + id + folderParameters,
     fileNameForCache: BASE_URL + id + '/' + ext,
