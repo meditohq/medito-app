@@ -41,16 +41,7 @@ class NetworkImageComponent extends StatelessWidget {
               ),
             ),
           ),
-          placeholder: (context, url) => Shimmer.fromColors(
-            period: Duration(seconds: 1),
-            baseColor: ColorConstants.almostBlack,
-            highlightColor: ColorConstants.greyIsTheNewBlack,
-            child: Container(
-              color: ColorConstants.almostBlack,
-              height: height,
-              width: width,
-            ),
-          ),
+          placeholder: (context, url) => _shimmerLoading(),
           errorWidget: (context, url, error) {
             print(error);
             return const Icon(Icons.error);
@@ -71,16 +62,7 @@ class NetworkImageComponent extends StatelessWidget {
           if (loadingProgress == null) {
             return child;
           } else {
-            return Shimmer.fromColors(
-              period: Duration(seconds: 1),
-              baseColor: ColorConstants.almostBlack,
-              highlightColor: ColorConstants.greyIsTheNewBlack,
-              child: Container(
-                color: ColorConstants.almostBlack,
-                height: height,
-                width: width,
-              ),
-            );
+            return _shimmerLoading();
           }
         },
         errorBuilder: (context, error, stackTrace) {
@@ -91,5 +73,18 @@ class NetworkImageComponent extends StatelessWidget {
         },
       );
     }
+  }
+
+  Shimmer _shimmerLoading() {
+    return Shimmer.fromColors(
+      period: Duration(seconds: 1),
+      baseColor: ColorConstants.almostBlack,
+      highlightColor: ColorConstants.greyIsTheNewBlack,
+      child: Container(
+        color: ColorConstants.almostBlack,
+        height: height,
+        width: width,
+      ),
+    );
   }
 }

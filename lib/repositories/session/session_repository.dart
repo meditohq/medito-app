@@ -58,10 +58,10 @@ class SessionRepositoryImpl extends SessionRepository {
 
   @override
   Future<void> addCurrentlyPlayingSessionInPreference(
-      SessionModel sessionList) async {
+      SessionModel session) async {
     await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.downloads,
-      json.encode(sessionList),
+      SharedPreferenceConstants.currentPlayingSession,
+      json.encode(session),
     );
   }
 
