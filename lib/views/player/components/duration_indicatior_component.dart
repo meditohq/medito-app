@@ -1,6 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
@@ -16,43 +16,45 @@ class DurationIndicatorComponent extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: StreamBuilder<int?>(
-          stream: audioPlayerPositionProvider,
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data != null) {
-              var currentDuration = snapshot.data ?? 0;
-              _handleAudioCompletion(currentDuration, ref);
-              return Column(
-                children: [
-                  _durationLabels(context, file.duration, currentDuration),
-                  SliderTheme(
-                    data: SliderThemeData(
-                      trackHeight: 8,
-                      trackShape: CustomTrackShape(),
-                      thumbShape: RoundSliderThumbShape(
-                        enabledThumbRadius: 5.0,
-                      ),
-                    ),
-                    child: Slider(
-                      min: 0.0,
-                      activeColor: ColorConstants.walterWhite,
-                      inactiveColor: ColorConstants.greyIsTheNewGrey,
-                      max: file.duration.toDouble() + 300,
-                      value: currentDuration.toDouble(),
-                      onChanged: (value) {
-                        ref.read(slideAudioPositionProvider(
-                            duration: value.toInt()));
-                      },
-                      onChangeEnd: (value) {
-                        ref.read(slideAudioPositionProvider(
-                            duration: value.toInt()));
-                      },
+        stream: audioPlayerPositionProvider,
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            var currentDuration = snapshot.data ?? 0;
+            _handleAudioCompletion(currentDuration, ref);
+            return Column(
+              children: [
+                _durationLabels(context, file.duration, currentDuration),
+                SliderTheme(
+                  data: SliderThemeData(
+                    trackHeight: 8,
+                    trackShape: CustomTrackShape(),
+                    thumbShape: RoundSliderThumbShape(
+                      enabledThumbRadius: 5.0,
                     ),
                   ),
-                ],
-              );
-            }
+                  child: Slider(
+                    min: 0.0,
+                    activeColor: ColorConstants.walterWhite,
+                    inactiveColor: ColorConstants.greyIsTheNewGrey,
+                    max: file.duration.toDouble() + 300,
+                    value: currentDuration.toDouble(),
+                    onChanged: (value) {
+                      ref.read(
+                          slideAudioPositionProvider(duration: value.toInt()));
+                    },
+                    onChangeEnd: (value) {
+                      ref.read(
+                          slideAudioPositionProvider(duration: value.toInt()));
+                    },
+                  ),
+                ),
+              ],
+            );
+          } else {
             return SizedBox();
-          }),
+          }
+        },
+      )
     );
   }
 

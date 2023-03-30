@@ -5,24 +5,29 @@ extension DurationExtensions on Duration {
   /// 05:35 -> 05 min 35 sec
   String toMinutesSeconds() {
     var twoDigitMinutes = _toTwoDigits(
-        inMinutes.remainder(100)); //NB: if it's over 100 min it'll show 0:00!!
+      inMinutes.remainder(100),
+    ); //NB: if it's over 100 min it'll show 0:00!!
     var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
+
     return '$twoDigitMinutes:$twoDigitSeconds';
   }
 
   String toReadable() {
     var twoDigitMinutes = _toTwoDigits(
-        inMinutes.remainder(100)); //NB: if it's over 100 min it'll show 0:00!!
+      inMinutes.remainder(100),
+    ); //NB: if it's over 100 min it'll show 0:00!!
     var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
 
     if (twoDigitSeconds.isNotNullAndNotEmpty() && twoDigitMinutes != '00') {
       return '$twoDigitMinutes min $twoDigitSeconds sec';
     }
+
     return '$twoDigitSeconds sec';
   }
 
   String _toTwoDigits(int n) {
     if (n >= 10) return '$n';
+
     return '0$n';
   }
 }
@@ -41,9 +46,11 @@ String formatSessionLength(String? item) {
       }
       time = min.toString();
     }
+
     return '$time min';
   }
   if (item == null) return '';
+
   return item + ' min';
 }
 
