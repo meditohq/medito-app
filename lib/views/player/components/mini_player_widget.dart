@@ -1,6 +1,7 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,22 +12,27 @@ class MiniPlayerWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
-    return Container(
-      height: 64,
-      color: ColorConstants.greyIsTheNewGrey,
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                sessionCoverImage(sessionModel.coverUrl),
-                _titleAndSubtitle(context),
-              ],
+    return InkWell(
+      onTap: () {
+        ref.read(pageviewNotifierProvider).gotoNextPage();
+      },
+      child: Container(
+        height: 64,
+        color: ColorConstants.greyIsTheNewGrey,
+        child: Row(
+          children: [
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  sessionCoverImage(sessionModel.coverUrl),
+                  _titleAndSubtitle(context),
+                ],
+              ),
             ),
-          ),
-          _playPauseButton(ref)
-        ],
+            _playPauseButton(ref)
+          ],
+        ),
       ),
     );
   }
