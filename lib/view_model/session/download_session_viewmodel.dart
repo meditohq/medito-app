@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'download_session_viewmodel.g.dart';
 
 @riverpod
-Future<void> addSessionListInPreference(AddSessionListInPreferenceRef ref,
+Future<void> addSessionListInPreference(ref,
     {required List<SessionModel> sessions}) async {
   return await ref
       .read(sessionRepositoryProvider)
@@ -14,12 +14,12 @@ Future<void> addSessionListInPreference(AddSessionListInPreferenceRef ref,
 }
 
 @riverpod
-Future<List<SessionModel>> downloadedSessions(DownloadedSessionsRef ref) {
+Future<List<SessionModel>> downloadedSessions(ref) {
   return ref.watch(sessionRepositoryProvider).fetchSessionFromPreference();
 }
 
 @riverpod
-Future<void> addSingleSessionInPreference(AddSingleSessionInPreferenceRef ref,
+Future<void> addSingleSessionInPreference(ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
   var _session = sessionModel.customCopyWith();
@@ -45,7 +45,7 @@ Future<void> addSingleSessionInPreference(AddSingleSessionInPreferenceRef ref,
 }
 
 @riverpod
-Future<void> deleteSessionFromPreference(DeleteSessionFromPreferenceRef ref,
+Future<void> deleteSessionFromPreference(ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
   var _downloadedSessionList =

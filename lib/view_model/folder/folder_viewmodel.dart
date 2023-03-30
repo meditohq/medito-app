@@ -5,7 +5,7 @@ part 'folder_viewmodel.g.dart';
 
 @riverpod
 Future<FolderModel> folders(
-  FoldersRef ref, {
+  ref, {
   required int folderId,
 }) {
   final folderRepository = ref.watch(folderRepositoryProvider);

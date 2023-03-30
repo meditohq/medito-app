@@ -5,7 +5,7 @@ part 'session_viewmodel.g.dart';
 
 @riverpod
 Future<SessionModel> sessions(
-  SessionsRef ref, {
+  ref, {
   required int sessionId,
 }) {
   return ref.watch(sessionRepositoryProvider).fetchSession(sessionId);

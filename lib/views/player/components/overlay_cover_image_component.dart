@@ -9,7 +9,10 @@ class OverlayCoverImageComponent extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height / 2.1,
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-      child: NetworkImageComponent(url: imageUrl),
+      child: NetworkImageComponent(
+        url: imageUrl,
+        isCache: true,
+      ),
     );
   }
 }

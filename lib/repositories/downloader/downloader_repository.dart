@@ -10,10 +10,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'downloader_repository.g.dart';
 
 abstract class DownloaderRepository {
-  Future<dynamic> downloadFile(String url,
+  Future<void> downloadFile(String url,
       {String? name, void Function(int, int)? onReceiveProgress});
-  Future<dynamic> getDownloadedFile(String name);
-  Future<dynamic> deleteDownloadedFile(String name);
+  Future<String?> getDownloadedFile(String name);
+   Future<void> deleteDownloadedFile(String name);
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
@@ -21,7 +21,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   DownloaderRepositoryImpl({required this.client});
 
   @override
-  Future downloadFile(String url,
+  Future<void> downloadFile(String url,
       {String? name, void Function(int, int)? onReceiveProgress}) async {
     try {
       var file = await getApplicationDocumentsDirectory();
@@ -82,6 +82,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 }
 
 @riverpod
-DownloaderRepositoryImpl downloaderRepository(DownloaderRepositoryRef ref) {
+DownloaderRepositoryImpl downloaderRepository(ref) {
   return DownloaderRepositoryImpl(client: ref.watch(dioClientProvider));
 }

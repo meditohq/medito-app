@@ -24,17 +24,19 @@ class PlayerViewModel extends StateNotifier<SessionModel?> {
         break;
       }
     }
-    
+
     state = _session;
     await ref
         .read(sessionRepositoryProvider)
         .addCurrentlyPlayingSessionInPreference(_session);
   }
 
-  Future<void> getCurrentlyPlayingSession() async {
-    await ref
+  void getCurrentlyPlayingSession() {
+    ref
         .read(sessionRepositoryProvider)
         .fetchCurrentlyPlayingSessionFromPreference()
-        .then((value) => state = value);
+        .then(
+          (value) => state = value,
+        );
   }
 }

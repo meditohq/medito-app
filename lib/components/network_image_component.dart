@@ -31,7 +31,7 @@ class NetworkImageComponent extends StatelessWidget {
         return CachedNetworkImage(
           imageUrl: url,
           httpHeaders: {
-            "authorization": HTTPConstants.CONTENT_TOKEN,
+            HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
           },
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(

@@ -9,7 +9,6 @@ import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'view_model/audio_player/audio_player_viewmodel.dart';
-import 'view_model/player/audio_play_pause_viewmodel.dart';
 import 'views/player/components/mini_player_widget.dart';
 
 class RootPageView extends ConsumerStatefulWidget {
@@ -37,7 +36,7 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
             currentlyPlayingSession.audio.first.files.first);
       }
     });
-    var radius = Radius.circular(15);
+    var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
       body: PageView(
@@ -55,7 +54,7 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
                     ),
                     child: widget.firstChild),
               ),
-              height8,
+              if (currentlyPlayingSession != null) height8,
               if (currentlyPlayingSession != null)
                 Consumer(builder: (context, ref, child) {
                   return ClipRRect(
