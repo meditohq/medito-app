@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-
 import '../network/auth.dart';
 import '../network/cache.dart';
 import '../utils/bgvolume_utils.dart';
