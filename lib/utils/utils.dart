@@ -32,7 +32,6 @@ Widget getNetworkImageWidget(String? url) {
 
 NetworkImage getNetworkImage(String url) {
   final headers = {
-
     HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN
   };
   return NetworkImage(url, headers: headers);
@@ -137,6 +136,10 @@ Future<void> showBottomModal(BuildContext context, Widget child) async {
       return FractionallySizedBox(heightFactor: 0.9, child: child);
     },
   );
+}
+
+String getFileExtension(String path) {
+  return '.${path.substring(path.lastIndexOf('.') + 1)}';
 }
 
 extension AssetUrl on String {

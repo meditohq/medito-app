@@ -2,6 +2,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,45 +12,63 @@ class DurationIndicatorComponent extends ConsumerWidget {
   final SessionFilesModel file;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final audioPlayerPositionProvider = ref.watch(audioPositionProvider);
+    final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: audioPlayerPositionProvider.when(
-        error: (error, stackTrace) => SizedBox(),
-        loading: () => SizedBox(),
-        data: (data) {
-          var currentDuration = data;
-
-          return Column(
-            children: [
-              _durationLabels(context, file.duration, currentDuration),
-              SliderTheme(
-                data: SliderThemeData(
-                  trackHeight: 8,
-                  trackShape: CustomTrackShape(),
-                  thumbShape: RoundSliderThumbShape(
-                    enabledThumbRadius: 5.0,
+      child: StreamBuilder<int?>(
+        stream: audioPlayerPositionProvider,
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            var currentDuration = snapshot.data ?? 0;
+            _handleAudioCompletion(currentDuration, ref);
+            return Column(
+              children: [
+                _durationLabels(context, file.duration, currentDuration),
+                SliderTheme(
+                  data: SliderThemeData(
+                    trackHeight: 8,
+                    trackShape: CustomTrackShape(),
+                    thumbShape: RoundSliderThumbShape(
+                      enabledThumbRadius: 5.0,
+                    ),
+                  ),
+                  child: Slider(
+                    min: 0.0,
+                    activeColor: ColorConstants.walterWhite,
+                    inactiveColor: ColorConstants.greyIsTheNewGrey,
+                    max: file.duration.toDouble() + 300,
+                    value: currentDuration.toDouble(),
+                    onChanged: (value) {
+                      ref.read(
+                          slideAudioPositionProvider(duration: value.toInt()));
+                    },
+                    onChangeEnd: (value) {
+                      ref.read(
+                          slideAudioPositionProvider(duration: value.toInt()));
+                    },
                   ),
                 ),
-                child: Slider(
-                  min: 0.0,
-                  activeColor: ColorConstants.walterWhite,
-                  inactiveColor: ColorConstants.greyIsTheNewGrey,
-                  max: file.duration.toDouble() + 300,
-                  value: currentDuration.toDouble(),
-                  onChanged: (value) {
-                    ref.read(slideAudioPositionProvider(duration: value.toInt()));
-                  },
-                  onChangeEnd: (value) {
-                    ref.read(slideAudioPositionProvider(duration: value.toInt()));
-                  },
-                ),
-              ),
-            ],
-          );
+              ],
+            );
+          } else {
+            return SizedBox();
+          }
         },
-      ),
+      )
     );
+  }
+
+  void _handleAudioCompletion(int currentDuration, WidgetRef ref) {
+    if (file.duration <= currentDuration) {
+      final audioProvider = ref.watch(audioPlayerNotifierProvider);
+      audioProvider.seekValueFromSlider(0);
+      audioProvider.pauseSessionAudio();
+      audioProvider.pauseBackgroundSound();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+    }
   }
 
   Transform _durationLabels(BuildContext context, int duration, int position) {
@@ -77,10 +96,8 @@ class DurationIndicatorComponent extends ConsumerWidget {
   ) {
     return Text(
       label,
-      style: Theme.of(context)
-          .textTheme
-          .titleSmall
-          ?.copyWith(color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
     );
   }
 }

@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -52,10 +53,10 @@ class PackListItemWidget extends StatelessWidget {
   }
 
   Text _getSubtitle(BuildContext context) =>
-      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
+      Text(data.subtitle ?? '', style: Theme.of(context).textTheme.titleMedium);
 
   Text _getTitle(BuildContext context) => Text(data.title ?? '',
-      style: Theme.of(context).textTheme.headline4,
+      style: Theme.of(context).textTheme.headlineMedium,
       maxLines: 1,
       overflow: TextOverflow.ellipsis);
 
@@ -79,7 +80,7 @@ class PackListItemWidget extends StatelessWidget {
   Padding _coverImageWidget() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: data.icon ?? getNetworkImageWidget(data.cover),
+      child: data.icon ?? NetworkImageComponent(url: data.cover!),
     );
   }
 

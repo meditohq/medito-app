@@ -1,15 +1,14 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
-import 'package:Medito/views/btm_nav/downloads_widget.dart';
+import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
+import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/session/session_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../views/home/home_wrapper_widget.dart';
-import '../views/player_old/player2/player_view.dart';
 
 const String SessionPath = '/session/:sid';
 const String DailyPath = '/daily/:did';
@@ -171,11 +170,18 @@ MaterialPage<void> getSessionOptionsDailyPage(GoRouterState state) {
 
 //Can be altered to open other pages in the app other than Downloads (eg Faves)
 MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: DownloadsListWidget());
+  return MaterialPage(key: state.pageKey, child: DownloadsView());
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: PlayerWidget());
+  var session = state.extra as Map;
+  return MaterialPage(
+    key: state.pageKey,
+    child: PlayerView(
+      sessionModel: session['sessionModel'],
+      file: session['file'],
+    ),
+  );
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {

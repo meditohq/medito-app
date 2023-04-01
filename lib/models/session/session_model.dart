@@ -2,9 +2,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'session_model.freezed.dart';
 part 'session_model.g.dart';
 
-@freezed
+@unfreezed
 abstract class SessionModel with _$SessionModel {
-  const factory SessionModel(
+   const SessionModel._();
+  factory SessionModel(
       {required int id,
       required String title,
       required String description,
@@ -16,20 +17,43 @@ abstract class SessionModel with _$SessionModel {
 
   factory SessionModel.fromJson(Map<String, Object?> json) =>
       _$SessionModelFromJson(json);
+  SessionModel customCopyWith() {
+    return SessionModel(
+      id: id,
+      title: title,
+      description: description,
+      coverUrl: coverUrl,
+      isPublished: isPublished,
+      hasBackgroundSound: hasBackgroundSound,
+      artist: artist,
+      audio: [
+        ...audio
+            .map(
+              (e) => SessionAudioModel(
+                guideName: e.guideName,
+                files: [
+                  ...e.files.map((e) => e).toList(),
+                ],
+              ),
+            )
+            .toList()
+      ],
+    );
+  }
 }
 
-@freezed
+@unfreezed
 abstract class SessionArtistModel with _$SessionArtistModel {
-  const factory SessionArtistModel(
-      {required String name, required String path}) = _SessionArtistModel;
+  factory SessionArtistModel({required String name, required String path}) =
+      _SessionArtistModel;
 
   factory SessionArtistModel.fromJson(Map<String, Object?> json) =>
       _$SessionArtistModelFromJson(json);
 }
 
-@freezed
+@unfreezed
 abstract class SessionAudioModel with _$SessionAudioModel {
-  const factory SessionAudioModel(
+  factory SessionAudioModel(
       {required String guideName,
       @Default([]) List<SessionFilesModel> files}) = _SessionAudioModel;
 
@@ -37,13 +61,13 @@ abstract class SessionAudioModel with _$SessionAudioModel {
       _$SessionAudioModelFromJson(json);
 }
 
-@freezed
+@unfreezed
 abstract class SessionFilesModel with _$SessionFilesModel {
-  const factory SessionFilesModel(
-      {required int id,
-      required String path,
-      required int duration,
-      }) = _SessionFilesModel;
+  factory SessionFilesModel({
+    required int id,
+    required String path,
+    required int duration,
+  }) = _SessionFilesModel;
 
   factory SessionFilesModel.fromJson(Map<String, Object?> json) =>
       _$SessionFilesModelFromJson(json);
