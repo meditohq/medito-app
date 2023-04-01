@@ -12,8 +12,8 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:flutter_web_plugins/url_strategy.dart';
 import 'dart:async';
+
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
@@ -22,10 +22,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'audioplayer/audio_inherited_widget.dart';
 import 'network/auth.dart';
 
@@ -106,14 +108,15 @@ class _ParentWidgetState extends State<ParentWidget>
     return MaterialApp.router(
       routerConfig: router,
       theme: ThemeData(
-          splashColor: ColorConstants.moonlight,
-          canvasColor: ColorConstants.greyIsTheNewBlack,
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: SlideTransitionBuilder(),
-          }),
-          colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
-          textTheme: meditoTextTheme(context)),
+        splashColor: ColorConstants.moonlight,
+        canvasColor: ColorConstants.greyIsTheNewBlack,
+        pageTransitionsTheme: PageTransitionsTheme(builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: SlideTransitionBuilder(),
+        }),
+        colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
+        textTheme: meditoTextTheme(context),
+      ),
       title: ParentWidget._title,
     );
   }

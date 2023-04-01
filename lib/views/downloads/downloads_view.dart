@@ -2,7 +2,7 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/session/session_viewmodel.dart';

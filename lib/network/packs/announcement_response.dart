@@ -26,11 +26,13 @@ class AnnouncementResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
+    final json = <String, dynamic>{};
+    final data = this.data;
     if (data != null) {
-      data['data'] = this.data?.toJson();
+      json['data'] = data.toJson();
     }
-    return data;
+
+    return json;
   }
 }
 
@@ -44,15 +46,7 @@ class Data {
   String? timestamp;
   String? id;
 
-  Data(
-      {icon,
-      colorPrimary,
-      body,
-      buttonLabel,
-      buttonType,
-      buttonPath,
-      timestamp,
-      id});
+  Data({icon, colorPrimary, body, buttonLabel, buttonType, buttonPath, timestamp, id});
 
   Data.fromJson(Map<String, dynamic> json) {
     icon = json['icon'];
