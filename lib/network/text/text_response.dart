@@ -19,6 +19,7 @@ class TextResponse {
     if (data != null) {
       data['data'] = this.data?.toJson();
     }
+
     return data;
   }
 }
@@ -44,6 +45,7 @@ class Data {
     data['title'] = title;
     data['subtitle'] = subtitle;
     data['body'] = body;
+
     return data;
   }
 }

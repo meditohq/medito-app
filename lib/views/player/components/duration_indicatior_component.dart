@@ -1,6 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
@@ -52,7 +52,9 @@ class DurationIndicatorComponent extends ConsumerWidget {
               );
             }
             return SizedBox();
-          }),
+          }
+        },
+      )
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:Medito/services/network/dio_api_services.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'session_repository.g.dart';
 
 abstract class SessionRepository {
@@ -23,6 +24,7 @@ class SessionRepositoryImpl extends SessionRepository {
   Future<SessionModel> fetchSession(int sessionId) async {
     try {
       var res = await client.getRequest('${HTTPConstants.SESSIONS}/$sessionId');
+
       return SessionModel.fromJson(res);
     } catch (e) {
       rethrow;
@@ -60,6 +62,7 @@ class SessionRepositoryImpl extends SessionRepository {
       json.encode(sessionList),
     );
   }
+
 }
 
 @riverpod
