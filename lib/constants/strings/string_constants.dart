@@ -1,10 +1,13 @@
 class StringConstants {
   static const String DOWNLOADS = 'Downloads';
   static const String DOWNLOAD = 'Download';
+  static const String DOWNLOADED = 'Downloaded';
   static const String SOUNDS = 'Sounds';
   static const String SOUND = 'Sound';
   static const String VOLUME = 'Volume';
   static const String BEGIN = 'Begin';
+  static const String NONE = 'None';
+  static const String REMOVED = 'Removed';
   static const String PICK_NARRATOR_AND_DURATION = 'Pick a narrator & duration';
   static const String PICK_DURATION = 'Pick a duration';
   static const String SHOW_DOWNLOADS = 'Show downloads';

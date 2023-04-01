@@ -2,9 +2,10 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_completion_viewmodel.dart';
+import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,41 +24,61 @@ class PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
+  late int sessionId, fileId;
   @override
   void initState() {
-    setInitStateValues();
+    sessionId = widget.sessionModel.id;
+    fileId = widget.file.id;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkAudioLocally();
+    });
     super.initState();
   }
 
-  void setInitStateValues() {
-    ref.read(audioPlayerNotifierProvider).setSessionAudio(widget.file.path);
-    ref.read(audioPlayerNotifierProvider).playSessionAudio();
-    Future.delayed(Duration(milliseconds: 500), () {
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PLAY;
-    });
-    loadBackgroundAudio();
+  void checkAudioLocally() {
+    loadSessionAndBackgroundSound();
+    ref.read(audioPlayPauseStateProvider.notifier).state =
+        PLAY_PAUSE_AUDIO.PLAY;
   }
 
-  void loadBackgroundAudio() {
+  void loadSessionAndBackgroundSound() {
+    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+    var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
+    var _currentPlayingFileId =
+        _audioPlayerNotifier.currentlyPlayingSession?.id;
+
+    if (!isPlaying || _currentPlayingFileId != fileId) {
+      setSessionAudio(_audioPlayerNotifier);
+      setBackgroundSound(_audioPlayerNotifier);
+    }
+  }
+
+  void setSessionAudio(AudioPlayerNotifier audioPlayerNotifier) {
+    var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
+        '$sessionId-$fileId${getFileExtension(widget.file.path)}');
+    checkDownloadedFile.then((value) {
+      audioPlayerNotifier.setSessionAudio(widget.file, filePath: value);
+      audioPlayerNotifier.currentlyPlayingSession = widget.file;
+    });
+  }
+
+  void setBackgroundSound(AudioPlayerNotifier audioPlayerNotifier) {
     if (widget.sessionModel.hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
-      final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
       _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          _audioPlayerNotifier.playBackgroundSound();
+        if (_provider.selectedBgSound != null &&
+            _provider.selectedBgSound?.title != StringConstants.NONE) {
+          audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
         }
       });
       _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+        audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(audioCompletionProvider(widget.file.duration));
     return Scaffold(
       extendBody: false,
       extendBodyBehindAppBar: true,

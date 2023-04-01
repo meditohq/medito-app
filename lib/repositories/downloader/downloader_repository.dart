@@ -4,19 +4,20 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/services/network/dio_api_services.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'downloader_repository.g.dart';
 
 abstract class DownloaderRepository {
-  Future<dynamic> downloadFile(
+  Future<void> downloadFile(
     String url, {
     String? name,
     void Function(int, int)? onReceiveProgress,
   });
-
-  Future<dynamic> getDownloadedFile(String name);
+  Future<String?> getDownloadedFile(String name);
+  Future<void> deleteDownloadedFile(String name);
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
@@ -25,14 +26,16 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   DownloaderRepositoryImpl({required this.client});
 
   @override
-  Future downloadFile(
+  Future<void> downloadFile(
     String url, {
     String? name,
     void Function(int, int)? onReceiveProgress,
   }) async {
     try {
       var file = await getApplicationDocumentsDirectory();
-      var fileName = name ?? url.substring(url.lastIndexOf('/') + 1);
+      var fileName = name != null
+          ? name + '.' + url.substring(url.lastIndexOf('.') + 1)
+          : url.substring(url.lastIndexOf('/') + 1);
       var savePath = file.path + '/' + fileName;
       print(savePath);
       var isExists = await File(savePath).exists();
@@ -55,9 +58,37 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   }
 
   @override
-  Future getDownloadedFile(String name) {
-    // TODO: implement getSessionAudio
-    throw UnimplementedError();
+  Future<void> deleteDownloadedFile(
+    String fileName,
+  ) async {
+    try {
+      var file = await getApplicationDocumentsDirectory();
+      var savePath = file.path + '/' + fileName;
+      var filePath = File(savePath);
+      var checkIsExists = await filePath.exists();
+      if (checkIsExists) {
+        await filePath.delete();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> getDownloadedFile(String name) async {
+    if (kIsWeb) return null;
+    try {
+      var file = await getApplicationDocumentsDirectory();
+      var savePath = file.path + '/' + name;
+      var filePath = File(savePath);
+      if (await filePath.exists()) {
+        return filePath.path;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }
 
