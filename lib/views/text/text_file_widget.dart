@@ -13,9 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/text/text_bloc.dart';
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
@@ -62,14 +61,15 @@ class _TextFileWidgetState extends State<TextFileWidget>
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, kToolbarHeight),
         child: StreamBuilder<String>(
-            stream: _bloc.titleController.stream,
-            initialData: '...',
-            builder: (context, snapshot) {
-              return MeditoAppBarWidget(
-                isTransparent: true,
-                title: snapshot.data ?? '',
-              );
-            }), // StreamBuilder
+          stream: _bloc.titleController.stream,
+          initialData: '...',
+          builder: (context, snapshot) {
+            return MeditoAppBarWidget(
+              isTransparent: true,
+              title: snapshot.data ?? '',
+            );
+          },
+        ), // StreamBuilder
       ),
       body: RefreshIndicator(
         onRefresh: () => _bloc.fetchText(widget.id, true),
@@ -105,32 +105,43 @@ class _TextFileWidgetState extends State<TextFileWidget>
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(
-                left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
+              left: 16.0,
+              right: 16.0,
+              top: 12.0,
+              bottom: 16.0,
+            ),
             child: StreamBuilder<String>(
-                stream: _bloc.bodyController.stream,
-                initialData: 'Loading...',
-                builder: (context, snapshot) {
-                  return Markdown(
-                      data: snapshot.data ?? '',
-                      onTapLink: _linkTap,
-                      physics: NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(0),
-                      shrinkWrap: true,
-                      selectable: true,
-                      styleSheet: buildMarkdownStyleSheet(context).copyWith(
-                          horizontalRuleDecoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                width: 1.0,
-                                color: ColorConstants.meditoTextGrey,
-                              ),
-                            ),
-                          ),
-                          h2: TextStyle(
-                              color: ColorConstants.walterWhite, height: 1.5),
-                          p: TextStyle(
-                              color: ColorConstants.walterWhite, height: 1.5)));
-                }),
+              stream: _bloc.bodyController.stream,
+              initialData: 'Loading...',
+              builder: (context, snapshot) {
+                return Markdown(
+                  data: snapshot.data ?? '',
+                  onTapLink: _linkTap,
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(0),
+                  shrinkWrap: true,
+                  selectable: true,
+                  styleSheet: buildMarkdownStyleSheet(context).copyWith(
+                    horizontalRuleDecoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          width: 1.0,
+                          color: ColorConstants.meditoTextGrey,
+                        ),
+                      ),
+                    ),
+                    h2: TextStyle(
+                      color: ColorConstants.walterWhite,
+                      height: 1.5,
+                    ),
+                    p: TextStyle(
+                      color: ColorConstants.walterWhite,
+                      height: 1.5,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),

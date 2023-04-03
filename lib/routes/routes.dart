@@ -31,47 +31,47 @@ final router = GoRouter(
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
-        path: HomePath,
-        builder: (context, state) => HomeWrapperWidget(),
-        routes: [
-          _getSessionRoute(),
-          _getArticleRoute(),
-          _getDailyRoute(),
-          _getWebviewRoute(),
-          GoRoute(
-            path: 'app',
-            routes: [_getPlayerRoute()],
-            pageBuilder: (context, state) => getCollectionMaterialPage(state),
-          ),
-          GoRoute(
-            path: 'folder/:fid',
-            routes: [
-              _getSessionRoute(),
-              _getArticleRoute(),
-              _getWebviewRoute(),
-              GoRoute(
-                path: 'folder2/:f2id',
-                routes: [
-                  _getSessionRoute(),
-                  _getArticleRoute(),
-                  _getWebviewRoute(),
-                  GoRoute(
-                    path: 'folder3/:f3id',
-                    pageBuilder: (context, state) =>
-                        getFolderMaterialPage(state),
-                    routes: [
-                      _getSessionRoute(),
-                      _getArticleRoute(),
-                      _getWebviewRoute(),
-                    ],
-                  ),
-                ],
-                pageBuilder: (context, state) => getFolderMaterialPage(state),
-              ),
-            ],
-            pageBuilder: (context, state) => getFolderMaterialPage(state),
-          ),
-        ]),
+      path: HomePath,
+      builder: (context, state) => HomeWrapperWidget(),
+      routes: [
+        _getSessionRoute(),
+        _getArticleRoute(),
+        _getDailyRoute(),
+        _getWebviewRoute(),
+        GoRoute(
+          path: 'app',
+          routes: [_getPlayerRoute()],
+          pageBuilder: (context, state) => getCollectionMaterialPage(state),
+        ),
+        GoRoute(
+          path: 'folder/:fid',
+          routes: [
+            _getSessionRoute(),
+            _getArticleRoute(),
+            _getWebviewRoute(),
+            GoRoute(
+              path: 'folder2/:f2id',
+              routes: [
+                _getSessionRoute(),
+                _getArticleRoute(),
+                _getWebviewRoute(),
+                GoRoute(
+                  path: 'folder3/:f3id',
+                  pageBuilder: (context, state) => getFolderMaterialPage(state),
+                  routes: [
+                    _getSessionRoute(),
+                    _getArticleRoute(),
+                    _getWebviewRoute(),
+                  ],
+                ),
+              ],
+              pageBuilder: (context, state) => getFolderMaterialPage(state),
+            ),
+          ],
+          pageBuilder: (context, state) => getFolderMaterialPage(state),
+        ),
+      ],
+    ),
   ],
 );
 
@@ -100,11 +100,12 @@ GoRoute _getSessionRoute() {
 
 GoRoute _getPlayerRoute() {
   return GoRoute(
-      path: 'player',
-      pageBuilder: (context, state) {
-        return getPlayerMaterialPage(state);
-      },
-      routes: [_getWebviewRoute(), _getBackgroundSoundRoute()]);
+    path: 'player',
+    pageBuilder: (context, state) {
+      return getPlayerMaterialPage(state);
+    },
+    routes: [_getWebviewRoute(), _getBackgroundSoundRoute()],
+  );
 }
 
 GoRoute _getBackgroundSoundRoute() {
@@ -124,6 +125,7 @@ GoRoute _getWebviewRoute() {
     path: 'webview',
     pageBuilder: (context, state) {
       final url = state.extra! as Map;
+
       return MaterialPage(
         key: state.pageKey,
         child: WebViewComponent(url: url['url']!),
@@ -185,19 +187,19 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   if (state.params.length == 1) {
     return MaterialPage(
-        key: state.pageKey, child: FolderView(id: state.params['fid'])
-        // child: NewFolderScreen(id: state.params['fid']),
-        );
+      key: state.pageKey, child: FolderView(id: state.params['fid']),
+      // child: NewFolderScreen(id: state.params['fid']),
+    );
   } else if (state.params.length == 2) {
     return MaterialPage(
-        key: state.pageKey, child: FolderView(id: state.params['fid'])
-        // child: NewFolderScreen(id: state.params['f2id']),
-        );
+      key: state.pageKey, child: FolderView(id: state.params['fid']),
+      // child: NewFolderScreen(id: state.params['f2id']),
+    );
   } else {
     return MaterialPage(
-        key: state.pageKey, child: FolderView(id: state.params['fid'])
-        // child: NewFolderScreen(id: state.params['f3id']),
-        );
+      key: state.pageKey, child: FolderView(id: state.params['fid']),
+      // child: NewFolderScreen(id: state.params['f3id']),
+    );
   }
 }
 
@@ -234,5 +236,6 @@ String getPathFromString(String? place, List<String?> ids) {
   if (place == 'app') {
     return CollectionPath;
   }
+
   return '';
 }

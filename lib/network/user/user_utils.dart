@@ -17,6 +17,7 @@ Future<bool> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   var opened = _beginClearStorage(prefs);
   await _logAccount(prefs);
+
   return opened;
 }
 
@@ -46,6 +47,7 @@ bool _beginClearStorage(SharedPreferences prefs) {
   if (!opened) {
     unawaited(_clearStorage(prefs));
   }
+
   return opened;
 }
 
@@ -105,6 +107,7 @@ class UserRepo {
 
 Future<String?> get generatedToken async {
   var prefs = await SharedPreferences.getInstance();
+
   return prefs.getString(TOKEN);
 }
 
@@ -141,7 +144,7 @@ Future<Map<String, String>> getDeviceDetails() async {
     DEVICE_MODEL: deviceModel,
     DEVICE_OS: deviceOS,
     DEVICE_PLATFORM: devicePlatform,
-    DEVICE_LANGUAGE: deviceLanguage
+    DEVICE_LANGUAGE: deviceLanguage,
   };
 }
 

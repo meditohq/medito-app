@@ -36,11 +36,12 @@ void main() {
           isPublished: true,
           items: [
             FolderItemsModel(
-                type: 'session',
-                id: 120,
-                title: 'Complete meditation',
-                subtitle: '19 min',
-                path: 'sessions/120')
+              type: 'session',
+              id: 120,
+              title: 'Complete meditation',
+              subtitle: '19 min',
+              path: 'sessions/120',
+            ),
           ],
         );
         final mockFolderRepository = MockFolderRepository();

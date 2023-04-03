@@ -2,7 +2,7 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
 import 'package:Medito/view_model/session/session_viewmodel.dart';
@@ -44,8 +44,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           return _getDownloadList(data);
         },
         error: (err, stack) => ErrorComponent(
-            message: err.toString(),
-            onTap: () async => await ref.refresh(downloadedSessionsProvider)),
+          message: err.toString(),
+          onTap: () async => await ref.refresh(downloadedSessionsProvider),
+        ),
         loading: () => SessionShimmerComponent(),
       ),
     );
@@ -88,25 +89,27 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         _openPlayer(item, context);
       },
       child: Dismissible(
-          key: UniqueKey(),
-          direction: DismissDirection.endToStart,
-          background: _getDismissibleBackgroundWidget(),
-          onDismissed: (direction) async {
-            if (mounted) {
-              await ref.watch(audioDownloaderProvider).deleteSessionAudio(
-                  '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}');
-              await ref.read(deleteSessionFromPreferenceProvider(
-                      sessionModel: item, file: item.audio.first.files.first)
-                  .future);
-            }
-
-            createSnackBar(
-              '"${item.title}" ${StringConstants.REMOVED.toLowerCase()}',
-              context,
-              color: ColorConstants.moonlight,
-            );
-          },
-          child: _getListItemWidget(item)),
+        key: UniqueKey(),
+        direction: DismissDirection.endToStart,
+        background: _getDismissibleBackgroundWidget(),
+        onDismissed: (direction) {
+          if (mounted) {
+            ref.watch(audioDownloaderProvider).deleteSessionAudio(
+                  '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
+                );
+            ref.read(deleteSessionFromPreferenceProvider(
+              sessionModel: item,
+              file: item.audio.first.files.first,
+            ).future);
+          }
+          createSnackBar(
+            '"${item.title}" ${StringConstants.REMOVED.toLowerCase()}',
+            context,
+            color: ColorConstants.walterWhite,
+          );
+        },
+        child: _getListItemWidget(item),
+      ),
     );
   }
 

@@ -40,6 +40,7 @@ Future<bool?> checkBgSoundExists(String name) async {
   var filePath = (await getFilePath(name));
   var file = File(filePath);
   var exists = await file.exists();
+
   return exists;
 }
 
