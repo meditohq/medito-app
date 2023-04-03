@@ -75,35 +75,45 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
             return _refresh();
           },
           child: StreamBuilder<bool>(
-              stream: _bloc.connectionStreamController.stream,
-              builder: (context, connectionSnapshot) {
-                if (connectionSnapshot.hasData &&
-                    !(connectionSnapshot.data ?? true)) {
-                  return _buildErrorPacksWidget();
-                } else {
-                  return ListView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    children: [
-                      _getAppBar(context),
-                      AnnouncementBanner(
-                          key: _announceKey, hasOpened: widget.hasOpened),
-                      SmallShortcutsRowWidget(
-                        key: _shortcutKey,
-                        onTap: (type, id) => _navigate(
-                            type, id, context, Tracking.SHORTCUT_TAPPED),
-                      ),
-                      CoursesRowWidget(
+            stream: _bloc.connectionStreamController.stream,
+            builder: (context, connectionSnapshot) {
+              return connectionSnapshot.hasData &&
+                      !(connectionSnapshot.data ?? true)
+                  ? _buildErrorPacksWidget()
+                  : ListView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      children: [
+                        _getAppBar(context),
+                        AnnouncementBanner(
+                          key: _announceKey,
+                          hasOpened: widget.hasOpened,
+                        ),
+                        SmallShortcutsRowWidget(
+                          key: _shortcutKey,
+                          onTap: (type, id) => _navigate(
+                            type,
+                            id,
+                            context,
+                            Tracking.SHORTCUT_TAPPED,
+                          ),
+                        ),
+                        CoursesRowWidget(
                           key: _coursesKey,
                           onTap: (type, id) => _navigate(
-                              type, id, context, Tracking.COURSE_TAPPED)),
-                      StatsWidget(),
-                      SizedBox(height: 16),
-                      DailyMessageWidget(key: _dailyMessageKey),
-                      SizedBox(height: 24)
-                    ],
-                  );
-                }
-              }),
+                            type,
+                            id,
+                            context,
+                            Tracking.COURSE_TAPPED,
+                          ),
+                        ),
+                        StatsWidget(),
+                        SizedBox(height: 16),
+                        DailyMessageWidget(key: _dailyMessageKey),
+                        SizedBox(height: 24),
+                      ],
+                    );
+            },
+          ),
         ),
       ),
     );
@@ -134,6 +144,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     _shortcutKey.currentState?.refresh();
     _coursesKey.currentState?.refresh();
     _dailyMessageKey.currentState?.refresh();
+
     return _bloc.fetchMenu(skipCache: true);
   }
 
@@ -145,31 +156,34 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
       title: _getTitleWidget(context),
       actions: <Widget>[
         StreamBuilder<ApiResponse<MenuResponse>>(
-            stream: _bloc.menuList.stream,
-            initialData: ApiResponse.completed(MenuResponse(data: [])),
-            builder: (context, snapshot) {
-              switch (snapshot.data?.status) {
-                case Status.LOADING:
-                case Status.ERROR:
-                  return GestureDetector(
-                    onTap: () => _bloc.fetchMenu(skipCache: true),
-                    child: Icon(
-                      Icons.more_vert,
-                      color: ColorConstants.walterWhite,
-                    ),
-                  );
-                case Status.COMPLETED:
-                  return _getMenu(context, snapshot);
-                case null:
-                  return Container();
-              }
-            }),
+          stream: _bloc.menuList.stream,
+          initialData: ApiResponse.completed(MenuResponse(data: [])),
+          builder: (context, snapshot) {
+            switch (snapshot.data?.status) {
+              case Status.LOADING:
+              case Status.ERROR:
+                return GestureDetector(
+                  onTap: () => _bloc.fetchMenu(skipCache: true),
+                  child: Icon(
+                    Icons.more_vert,
+                    color: ColorConstants.walterWhite,
+                  ),
+                );
+              case Status.COMPLETED:
+                return _getMenu(context, snapshot);
+              case null:
+                return Container();
+            }
+          },
+        ),
       ],
     );
   }
 
   PopupMenuButton<MenuData> _getMenu(
-      BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
+    BuildContext context,
+    AsyncSnapshot<ApiResponse<MenuResponse>> snapshot,
+  ) {
     return PopupMenuButton<MenuData>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),

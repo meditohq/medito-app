@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/services/network/dio_api_services.dart';
+import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dio_client_provider.g.dart';
 
 @riverpod
-DioApiService dioClient(DioClientRef ref) {
+DioApiService dioClient(DioClientRef _) {
   var dio = Dio();
   dio.options = BaseOptions(
     connectTimeout: Duration(milliseconds: 60000),

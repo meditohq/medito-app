@@ -134,6 +134,7 @@ GoRoute _getWebviewRoute() {
   );
 }
 
+//ignore: prefer-match-file-name
 enum Screen {
   folder,
   player,
@@ -149,8 +150,7 @@ enum Screen {
 MaterialPage<void> getSessionOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child:
-        SessionViewScreen(id: state.params['sid'], screenKey: Screen.session),
+    child: SessionView(id: state.params['sid'], screenKey: Screen.session),
   );
 }
 
@@ -164,7 +164,7 @@ MaterialPage<void> getArticleMaterialPAge(GoRouterState state) {
 MaterialPage<void> getSessionOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: SessionViewScreen(id: state.params['did'], screenKey: Screen.daily),
+    child: SessionView(id: state.params['did'], screenKey: Screen.daily),
   );
 }
 
@@ -175,6 +175,7 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
   var session = state.extra as Map;
+
   return MaterialPage(
     key: state.pageKey,
     child: PlayerView(
@@ -185,22 +186,28 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
-  if (state.params.length == 1) {
-    return MaterialPage(
-      key: state.pageKey, child: FolderView(id: state.params['fid']),
-      // child: NewFolderScreen(id: state.params['fid']),
-    );
-  } else if (state.params.length == 2) {
-    return MaterialPage(
-      key: state.pageKey, child: FolderView(id: state.params['fid']),
-      // child: NewFolderScreen(id: state.params['f2id']),
-    );
-  } else {
-    return MaterialPage(
-      key: state.pageKey, child: FolderView(id: state.params['fid']),
-      // child: NewFolderScreen(id: state.params['f3id']),
-    );
-  }
+  return MaterialPage(
+    key: state.pageKey,
+    child: FolderView(id: state.params['fid']),
+  );
+  // if (params.length == 1) {
+  //   return MaterialPage(
+  //     key: state.pageKey, child: FolderView(id: state.params['fid']),
+  //     // child: NewFolderScreen(id: state.params['fid']),
+  //   );
+  // } else {
+  //   if (params.length == 2) {
+  //     return MaterialPage(
+  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
+  //       // child: NewFolderScreen(id: state.params['f2id']),
+  //     );
+  //   } else {
+  //     return MaterialPage(
+  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
+  //       // child: NewFolderScreen(id: state.params['f3id']),
+  //     );
+  //   }
+  // }
 }
 
 String getPathFromString(String? place, List<String?> ids) {

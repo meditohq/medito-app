@@ -13,45 +13,42 @@ class SessionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        itemCount: sessionModel.audio.length,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, i) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                sessionModel.audio[i].guideName,
-                style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                      color: ColorConstants.walterWhite,
-                    ),
-              ),
-              height8,
-              _gridList(context, i),
-              SizedBox(height: 30),
-            ],
-          );
-        });
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      itemCount: sessionModel.audio.length,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              sessionModel.audio[i].guideName,
+              style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
+                    color: ColorConstants.walterWhite,
+                  ),
+            ),
+            height8,
+            _gridList(i),
+            SizedBox(height: 30),
+          ],
+        );
+      },
+    );
   }
 
   Wrap _gridList(
-    BuildContext context,
     int i,
   ) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       alignment: WrapAlignment.spaceBetween,
-      children: sessionModel.audio[i].files
-          .map((e) => _getGridItem(context, i, e))
-          .toList(),
+      children:
+          sessionModel.audio[i].files.map((e) => _getGridItem(e)).toList(),
     );
   }
 
   Consumer _getGridItem(
-    BuildContext context,
-    int audioIndex,
     SessionFilesModel file,
   ) {
     return Consumer(
@@ -76,7 +73,9 @@ class SessionButtons extends StatelessWidget {
             child: Text(
               '${convertDurationToMinutes(milliseconds: file.duration)} mins',
               style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                  color: ColorConstants.walterWhite, fontFamily: DmMono),
+                    color: ColorConstants.walterWhite,
+                    fontFamily: DmMono,
+                  ),
             ),
           ),
         ),

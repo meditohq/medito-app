@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+//ignore:prefer-match-file-name
 class MockFolderRepository extends Mock implements FolderRepositoryImpl {}
 
 class Listener<T> extends Mock {
@@ -19,6 +20,7 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+
     return container;
   }
 
@@ -62,8 +64,11 @@ void main() {
           isA<FolderModel>()
               .having((s) => s.id, 'id', 28)
               .having((s) => s.title, 'title', 'UCLA')
-              .having((s) => s.description, 'description',
-                  'Guided meditations provided by [UCLA Mindful Awareness Research Center]'),
+              .having(
+                (s) => s.description,
+                'description',
+                'Guided meditations provided by [UCLA Mindful Awareness Research Center]',
+              ),
         );
         verify(
           () => mockFolderRepository.fetchFolders(28),

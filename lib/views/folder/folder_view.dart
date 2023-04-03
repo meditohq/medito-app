@@ -17,13 +17,16 @@ class FolderView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var folders = ref.watch(FoldersProvider(folderId: 28));
+
     return Scaffold(
       body: folders.when(
         skipLoadingOnRefresh: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(FoldersProvider(folderId: 28)),
+          onTap: () => ref.refresh(
+            FoldersProvider(folderId: 28),
+          ),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -68,6 +71,8 @@ class FolderView extends ConsumerWidget {
     String? subtitle,
     String type,
   ) {
+    var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -85,37 +90,44 @@ class FolderView extends ConsumerWidget {
               if (title.isNotNullAndNotEmpty())
                 Text(
                   title!,
-                  style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: DmSans,
-                      height: 2),
+                  style: bodyLarge?.copyWith(
+                    color: ColorConstants.walterWhite,
+                    fontFamily: DmSans,
+                    height: 2,
+                  ),
                 ),
               if (subtitle.isNotNullAndNotEmpty())
                 Text(
                   subtitle!,
-                  style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                        fontFamily: DmMono,
-                        height: 2,
-                        color: ColorConstants.newGrey,
-                      ),
-                )
+                  style: bodyLarge?.copyWith(
+                    fontFamily: DmMono,
+                    height: 2,
+                    color: ColorConstants.newGrey,
+                  ),
+                ),
             ],
           ),
-          if (type != TypeConstants.SESSION) _getIcon(type)
+          if (type != TypeConstants.SESSION) _getIcon(type),
         ],
       ),
     );
   }
 
   void _onListItemTap(
-      int? id, String? type, String? path, BuildContext context) {
+    int? id,
+    String? type,
+    String? path,
+    BuildContext context,
+  ) {
     checkConnectivity().then((value) {
       if (value) {
         var location = GoRouter.of(context).location;
         if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
             context.go(getPathFromString(
-                Folder3Path, [location.split('/')[2], this.id, id.toString()]));
+              Folder3Path,
+              [location.split('/')[2], this.id, id.toString()],
+            ));
           } else {
             context
                 .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
@@ -138,6 +150,7 @@ class FolderView extends ConsumerWidget {
     } else if (type == TypeConstants.LINK) {
       return SvgPicture.asset(AssetConstants.icLink);
     }
+
     return SizedBox();
   }
 }

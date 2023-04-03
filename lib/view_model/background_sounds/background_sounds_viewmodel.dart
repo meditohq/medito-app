@@ -13,6 +13,7 @@ part 'background_sounds_viewmodel.g.dart';
 Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
   final backgroundSoundsRepository =
       ref.watch(backgroundSoundsRepositoryProvider);
+
   return backgroundSoundsRepository.fetchBackgroundSounds();
 }
 
@@ -23,6 +24,7 @@ final backgroundSoundsNotifierProvider =
   },
 );
 
+//ignore:prefer-match-file-name
 class BackgroundSoundsNotifier extends ChangeNotifier {
   double volume = 0;
   BackgroundSoundsModel? selectedBgSound;
@@ -61,8 +63,8 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   Future<void> getBackgroundSoundFromPref() async {
     await SharedPreferencesService.getStringFromSharedPref(
-            SharedPreferenceConstants.bgSound)
-        .then(
+      SharedPreferenceConstants.bgSound,
+    ).then(
       (value) {
         if (value != null) {
           selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
@@ -74,8 +76,8 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   Future<void> getVolumeFromPref() async {
     await SharedPreferencesService.getDoubleFromSharedPref(
-            SharedPreferenceConstants.bgSoundVolume)
-        .then(
+      SharedPreferenceConstants.bgSoundVolume,
+    ).then(
       (value) {
         if (value != null) {
           volume = value;
