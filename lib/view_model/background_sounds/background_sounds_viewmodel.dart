@@ -27,21 +27,34 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   double volume = 0;
   BackgroundSoundsModel? selectedBgSound;
 
-  void handleOnChangeVolume(double _volume) async {
-    volume = _volume;
-    unawaited(SharedPreferencesService.addDoubleInSharedPref(
-        SharedPreferenceConstants.bgSoundVolume, _volume));
+  void handleOnChangeVolume(double vol) {
+    volume = vol;
+    unawaited(
+      SharedPreferencesService.addDoubleInSharedPref(
+        SharedPreferenceConstants.bgSoundVolume,
+        vol,
+      ),
+    );
     notifyListeners();
   }
 
-  void handleOnChangeSound(BackgroundSoundsModel? _sound) async {
-    selectedBgSound = _sound;
-    if (_sound != null) {
-      unawaited(SharedPreferencesService.addStringInSharedPref(
-          SharedPreferenceConstants.bgSound, json.encode(_sound.toJson())));
+  void handleOnChangeSound(BackgroundSoundsModel? sound) {
+    selectedBgSound = sound;
+    if (sound != null) {
+      unawaited(
+        SharedPreferencesService.addStringInSharedPref(
+          SharedPreferenceConstants.bgSound,
+          json.encode(
+            sound.toJson(),
+          ),
+        ),
+      );
     } else {
-      unawaited(SharedPreferencesService.removeValueFromSharedPref(
-          SharedPreferenceConstants.bgSound));
+      unawaited(
+        SharedPreferencesService.removeValueFromSharedPref(
+          SharedPreferenceConstants.bgSound,
+        ),
+      );
     }
     notifyListeners();
   }

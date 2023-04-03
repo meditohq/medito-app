@@ -1,5 +1,4 @@
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'audio_position_viewmodel.g.dart';
 
@@ -30,8 +29,7 @@ void skipAudio(
 
 final audioPositionProvider = StreamProvider.autoDispose<int>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
-  return audioPlayer.sessionAudioPlayer.positionStream
-      .map((position) => position.inMilliseconds);
+  return audioPlayer.sessionAudioPlayer.positionStream.map((position) => position.inMilliseconds);
 });
 
 enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }

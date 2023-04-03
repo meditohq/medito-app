@@ -6,6 +6,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import 'folder_provider.dart';
 
 class NewFolderScreen extends ConsumerWidget {
@@ -34,21 +35,26 @@ class NewFolderScreen extends ConsumerWidget {
       },
       child: Scaffold(
         body: CollapsibleHeaderComponent(
-            bgImage: AssetConstants.dalle,
-            title: folder?.data?.title ?? '',
-            description: folder?.data?.description,
-            children: [
-              for (int i = 0; i < (folder?.data?.items?.length ?? 0); i++)
-                GestureDetector(
-                  onTap: () => _onListItemTap(folder?.data?.items?[i].item?.id,
-                      folder?.data?.items?[i].item?.type, ref.context),
-                  child: _buildListTile(
-                      context,
-                      folder?.data?.items?[i].item?.title,
-                      folder?.data?.items?[i].item?.subtitle,
-                      true),
-                )
-            ]),
+          bgImage: AssetConstants.dalle,
+          title: folder?.data?.title ?? '',
+          description: folder?.data?.description,
+          children: [
+            for (int i = 0; i < (folder?.data?.items?.length ?? 0); i++)
+              GestureDetector(
+                onTap: () => _onListItemTap(
+                  folder?.data?.items?[i].item?.id,
+                  folder?.data?.items?[i].item?.type,
+                  ref.context,
+                ),
+                child: _buildListTile(
+                  context,
+                  folder?.data?.items?[i].item?.title,
+                  folder?.data?.items?[i].item?.subtitle,
+                  true,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
