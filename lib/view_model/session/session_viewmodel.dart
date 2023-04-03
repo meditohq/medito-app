@@ -12,12 +12,12 @@ Future<SessionModel> sessions(
 }
 
 @riverpod
-Future<List<SessionModel>> downloadedSessions(ref) {
+Future<List<SessionModel>> downloadedSessions(DownloadedSessionsRef ref) {
   return ref.watch(sessionRepositoryProvider).fetchSessionFromPreference();
 }
 
 @riverpod
-Future<void> addSessionListInPreference(ref,
+Future<void> addSessionListInPreference(AddSessionListInPreferenceRef ref,
     {required List<SessionModel> sessions}) async {
   return await ref
       .read(sessionRepositoryProvider)
@@ -25,7 +25,7 @@ Future<void> addSessionListInPreference(ref,
 }
 
 @riverpod
-Future<void> addSingleSessionInPreference(ref,
+Future<void> addSingleSessionInPreference(AddSingleSessionInPreferenceRef ref,
     {required SessionModel sessionModel,
     required SessionFilesModel file}) async {
   var _session = sessionModel.customCopyWith();
