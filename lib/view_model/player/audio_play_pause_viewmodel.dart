@@ -5,6 +5,7 @@ final audioPlayPauseStateProvider = StateProvider<PLAY_PAUSE_AUDIO>(
   (ref) {
     final audioPlayer = ref.read(audioPlayerNotifierProvider);
     audioPlayer.playSessionAudio();
+
     return PLAY_PAUSE_AUDIO.PLAY;
   },
 );
@@ -18,15 +19,18 @@ final audioPlayPauseProvider = Provider.family<PLAY_PAUSE_AUDIO, bool?>(
       if (hasBackgroundSound != null) {
         audioPlayer.playBackgroundSound();
       }
+
       return PLAY_PAUSE_AUDIO.PLAY;
     } else {
       audioPlayer.pauseSessionAudio();
       if (hasBackgroundSound != null) {
         audioPlayer.pauseBackgroundSound();
       }
+
       return PLAY_PAUSE_AUDIO.PAUSE;
     }
   },
 );
 
+//ignore: prefer-match-file-name
 enum PLAY_PAUSE_AUDIO { PLAY, PAUSE }

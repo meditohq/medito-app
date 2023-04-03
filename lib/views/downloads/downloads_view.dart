@@ -28,6 +28,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   @override
   Widget build(BuildContext context) {
     final downloadedSessions = ref.watch(downloadedSessionsProvider);
+
     return Scaffold(
       appBar: MeditoAppBarWidget(
         title: StringConstants.DOWNLOADS,
@@ -41,11 +42,12 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           if (data.isEmpty) {
             return _getEmptyWidget();
           }
+
           return _getDownloadList(data);
         },
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(downloadedSessionsProvider),
+          onTap: () => ref.refresh(downloadedSessionsProvider),
         ),
         loading: () => SessionShimmerComponent(),
       ),
@@ -136,13 +138,15 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         Duration(milliseconds: item.audio.first.files.first.duration)
             .inMinutes
             .toString();
+
     return PackListItemWidget(
       PackImageListItemData(
-          title: item.title,
-          subtitle:
-              '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
-          cover: item.coverUrl,
-          coverSize: 70),
+        title: item.title,
+        subtitle:
+            '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
+        cover: item.coverUrl,
+        coverSize: 70,
+      ),
     );
   }
 
@@ -153,13 +157,16 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       GoRouter.of(context).location + PlayerPath,
       extra: {
         'sessionModel': sessionModel,
-        'file': sessionModel.audio.first.files.first
+        'file': sessionModel.audio.first.files.first,
       },
     );
   }
 
   void showSwipeToDeleteTip() {
-    createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
-        color: ColorConstants.walterWhite);
+    createSnackBar(
+      StringConstants.SWIPE_TO_DELETE,
+      context,
+      color: ColorConstants.walterWhite,
+    );
   }
 }

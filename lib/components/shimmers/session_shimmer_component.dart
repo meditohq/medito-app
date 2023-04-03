@@ -7,7 +7,8 @@ class SessionShimmerComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    var shimmerList = _shimmerList();
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,7 +28,9 @@ class SessionShimmerComponent extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.spaceBetween,
-            children: [for (int i = 0; i < 3; i++) _shimmerList(size)],
+            children: [
+              for (int i = 0; i < 3; i++) shimmerList,
+            ],
           ),
           height8,
           height8,
@@ -41,14 +44,14 @@ class SessionShimmerComponent extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.spaceBetween,
-            children: [for (int i = 0; i < 5; i++) _shimmerList(size)],
+            children: [for (int i = 0; i < 5; i++) shimmerList],
           ),
         ],
       ),
     );
   }
 
-  Padding _shimmerList(Size size) {
+  Padding _shimmerList() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(

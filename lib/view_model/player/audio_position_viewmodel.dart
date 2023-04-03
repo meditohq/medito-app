@@ -29,7 +29,10 @@ void skipAudio(
 
 final audioPositionProvider = StreamProvider.autoDispose<int>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
-  return audioPlayer.sessionAudioPlayer.positionStream.map((position) => position.inMilliseconds);
+
+  return audioPlayer.sessionAudioPlayer.positionStream
+      .map((position) => position.inMilliseconds);
 });
 
+//ignore: prefer-match-file-name
 enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }
