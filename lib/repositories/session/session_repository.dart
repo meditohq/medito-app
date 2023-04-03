@@ -62,6 +62,7 @@ class SessionRepositoryImpl extends SessionRepository {
       json.encode(sessionList),
     );
   }
+
 }
 
 @riverpod
