@@ -45,11 +45,13 @@ Future<void> clearStorage() async {
 Future<String> get _localPath async {
   if (kIsWeb) return '';
   final directory = await getApplicationDocumentsDirectory();
+
   return directory.path;
 }
 
 Future<File> _localFile(String name) async {
   final path = await _localPath;
+
   return File('$path/$name.txt');
 }
 
@@ -72,14 +74,12 @@ Future<String?> _readCache(String id) async {
 }
 
 String? encoded(obj) {
-  if (obj != null) {
-    return json.encode(obj);
-  } else {
-    return null;
-  }
+  return obj != null ? json.encode(obj) : null;
 }
 
+//ignore:avoid-dynamic
 dynamic decoded(String obj) {
+
   return json.decode(obj);
 }
 
@@ -90,6 +90,7 @@ Future<File?> writeJSONToCache(String? body, String id) async {
 
     return file.writeAsString('$body');
   }
+
   return null;
 }
 

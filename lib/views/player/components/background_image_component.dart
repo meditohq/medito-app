@@ -8,17 +8,19 @@ class BackgroundImageComponent extends StatelessWidget {
   final String imageUrl;
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    
     return Stack(
       children: [
         SizedBox(
-          height: MediaQuery.of(context).size.height,
+          height: size.height,
           child: NetworkImageComponent(
             url: imageUrl,
             isCache: true,
           ),
         ),
         Container(
-          height: MediaQuery.of(context).size.height,
+          height: size.height,
           color: ColorConstants.almostBlack.withOpacity(0.85),
         ),
       ],

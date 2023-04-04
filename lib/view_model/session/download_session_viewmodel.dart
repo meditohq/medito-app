@@ -6,8 +6,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'download_session_viewmodel.g.dart';
 
 @riverpod
-Future<void> addSessionListInPreference(ref,
-    {required List<SessionModel> sessions}) async {
+Future<void> addSessionListInPreference(
+  ref, {
+  required List<SessionModel> sessions,
+}) async {
   return await ref
       .read(sessionRepositoryProvider)
       .addSessionInPreference(sessions);
@@ -19,9 +21,11 @@ Future<List<SessionModel>> downloadedSessions(ref) {
 }
 
 @riverpod
-Future<void> addSingleSessionInPreference(ref,
-    {required SessionModel sessionModel,
-    required SessionFilesModel file}) async {
+Future<void> addSingleSessionInPreference(
+  ref, {
+  required SessionModel sessionModel,
+  required SessionFilesModel file,
+}) async {
   var _session = sessionModel.customCopyWith();
   print(sessionModel == _session);
   print(sessionModel.audio == _session.audio);
@@ -39,21 +43,24 @@ Future<void> addSingleSessionInPreference(ref,
       await ref.read(downloadedSessionsProvider.future);
   _downloadedSessionList.add(_session);
   await ref.read(
-      addSessionListInPreferenceProvider(sessions: _downloadedSessionList)
-          .future);
+    addSessionListInPreferenceProvider(sessions: _downloadedSessionList).future,
+  );
   unawaited(ref.refresh(downloadedSessionsProvider.future));
 }
 
 @riverpod
-Future<void> deleteSessionFromPreference(ref,
-    {required SessionModel sessionModel,
-    required SessionFilesModel file}) async {
+Future<void> deleteSessionFromPreference(
+  ref, {
+//ignore:avoid-unused-parameters
+  required SessionModel sessionModel,
+  required SessionFilesModel file,
+}) async {
   var _downloadedSessionList =
       await ref.read(downloadedSessionsProvider.future);
   _downloadedSessionList.removeWhere((element) =>
       element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
   await ref.read(
-      addSessionListInPreferenceProvider(sessions: _downloadedSessionList)
-          .future);
+    addSessionListInPreferenceProvider(sessions: _downloadedSessionList).future,
+  );
   unawaited(ref.refresh(downloadedSessionsProvider.future));
 }

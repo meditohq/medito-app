@@ -12,6 +12,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
+
     return InkWell(
       onTap: () {
         ref.read(pageviewNotifierProvider).gotoNextPage();
@@ -30,7 +31,7 @@ class MiniPlayerWidget extends ConsumerWidget {
                 ],
               ),
             ),
-            _playPauseButton(ref)
+            _playPauseButton(ref),
           ],
         ),
       ),
@@ -72,35 +73,41 @@ class MiniPlayerWidget extends ConsumerWidget {
       sessionModel.title,
       textAlign: TextAlign.left,
       style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-          fontFamily: ClashDisplay,
-          color: ColorConstants.walterWhite,
-          fontSize: 16,
-          letterSpacing: 1),
+            fontFamily: ClashDisplay,
+            color: ColorConstants.walterWhite,
+            fontSize: 16,
+            letterSpacing: 1,
+          ),
     );
   }
 
   SizedBox _subtitle(BuildContext context) {
+    var titleMedium = Theme.of(context).textTheme.titleMedium;
+    var walterWhite = ColorConstants.walterWhite.withOpacity(0.9);
     if (sessionModel.artist == null) {
       return SizedBox();
     }
+
     return SizedBox(
       height: 15,
       child: MarkdownComponent(
         body:
             '${sessionModel.artist?.name ?? ''} ${sessionModel.artist?.path ?? ''}',
         textAlign: WrapAlignment.start,
-        p: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontFamily: DmMono,
-            letterSpacing: 1,
-            fontSize: 12,
-            color: ColorConstants.walterWhite.withOpacity(0.9),
-            overflow: TextOverflow.ellipsis),
-        a: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontFamily: DmMono,
-            color: ColorConstants.walterWhite.withOpacity(0.9),
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            overflow: TextOverflow.ellipsis),
+        p: titleMedium?.copyWith(
+          fontFamily: DmMono,
+          letterSpacing: 1,
+          fontSize: 12,
+          color: walterWhite,
+          overflow: TextOverflow.ellipsis,
+        ),
+        a: titleMedium?.copyWith(
+          fontFamily: DmMono,
+          color: walterWhite,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }
