@@ -56,6 +56,7 @@ Future _clearStorage(SharedPreferences prefs) async {
   await prefs.setBool(HAS_OPENED, true);
 }
 
+//ignore: prefer-match-file-name
 class UserRepo {
   static Future<Map<String, String>>? createUser() async {
     var ext = 'users/';
@@ -72,12 +73,12 @@ class UserRepo {
     } catch (e) {
       print(e);
     }
-
-    var token = '$now${UniqueKey().toString()}';
+    var uniqueKey = UniqueKey().toString();
+    var token = '$now$uniqueKey';
 
     var defaultMap = {
       'email': '$now@medito.user',
-      'password': UniqueKey().toString(),
+      'password': uniqueKey,
       'token': token,
       'app_version': version,
       'device_language': io.Platform.localeName,

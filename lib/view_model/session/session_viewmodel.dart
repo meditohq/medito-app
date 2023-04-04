@@ -54,9 +54,11 @@ Future<void> addSingleSessionInPreference(
 }
 
 @riverpod
-Future<void> addCurrentlyPlayingSessionInPreference(ref,
-    {required SessionModel sessionModel,
-    required SessionFilesModel file}) async {
+void addCurrentlyPlayingSessionInPreference(
+  _, {
+  required SessionModel sessionModel,
+  required SessionFilesModel file,
+}) {
   var _session = sessionModel.customCopyWith();
   print(sessionModel == _session);
   print(sessionModel.audio == _session.audio);
@@ -74,9 +76,12 @@ Future<void> addCurrentlyPlayingSessionInPreference(ref,
 }
 
 @riverpod
-Future<void> deleteSessionFromPreference(ref,
-    {required SessionModel sessionModel,
-    required SessionFilesModel file}) async {
+Future<void> deleteSessionFromPreference(
+  ref, {
+  //ignore:avoid-unused-parameters
+  required SessionModel sessionModel,
+  required SessionFilesModel file,
+}) async {
   var _downloadedSessionList =
       await ref.read(downloadedSessionsProvider.future);
   _downloadedSessionList.removeWhere((element) =>
