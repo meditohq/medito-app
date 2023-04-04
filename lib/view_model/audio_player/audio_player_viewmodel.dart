@@ -13,18 +13,19 @@ final audioPlayerNotifierProvider =
   return AudioPlayerNotifier();
 });
 
+//ignore:prefer-match-file-name
 class AudioPlayerNotifier extends ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
   final sessionAudioPlayer = AudioPlayer();
   SessionFilesModel? currentlyPlayingSession;
 
-  void setBackgroundAudio(BackgroundSoundsModel sound) async {
+  void setBackgroundAudio(BackgroundSoundsModel sound) {
     unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
       HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
     }));
   }
 
-  void setSessionAudio(SessionFilesModel file, {String? filePath}) async {
+  void setSessionAudio(SessionFilesModel file, {String? filePath}) {
     if (filePath != null) {
       unawaited(sessionAudioPlayer.setFilePath(filePath));
     } else {
@@ -34,14 +35,14 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  void playBackgroundSound() async {
+  void playBackgroundSound() {
     unawaited(backgroundSoundAudioPlayer.play());
     unawaited(backgroundSoundAudioPlayer.setLoopMode(LoopMode.all));
   }
 
   Future<void> playSessionAudio() async => await sessionAudioPlayer.play();
 
-  void pauseBackgroundSound() async {
+  void pauseBackgroundSound() {
     unawaited(backgroundSoundAudioPlayer.pause());
   }
 
@@ -59,7 +60,7 @@ class AudioPlayerNotifier extends ChangeNotifier {
     await sessionAudioPlayer.setSpeed(speed);
   }
 
-  void seekValueFromSlider(int duration) async {
+  void seekValueFromSlider(int duration) {
     unawaited(sessionAudioPlayer.seek(Duration(milliseconds: duration)));
   }
 
@@ -71,9 +72,10 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void skipBackward10Secs() async {
     var seekDuration = max(
-        0,
-        sessionAudioPlayer.position.inMilliseconds -
-            Duration(seconds: 10).inMilliseconds);
+      0,
+      sessionAudioPlayer.position.inMilliseconds -
+          Duration(seconds: 10).inMilliseconds,
+    );
     await sessionAudioPlayer.seek(Duration(milliseconds: seekDuration));
   }
 

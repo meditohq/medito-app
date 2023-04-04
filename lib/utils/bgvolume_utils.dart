@@ -42,6 +42,7 @@ Future<double> _getSavedVolume() async {
   }
 
   if (vol == null || vol > 1) vol = DEFAULT_VOLUME;
+
   return vol;
 }
 

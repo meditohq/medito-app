@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 class EmptyStateWidget extends StatelessWidget {
   final String? message;
   final SvgPicture? image;
+
   const EmptyStateWidget({Key? key, this.message, this.image})
       : super(key: key);
 

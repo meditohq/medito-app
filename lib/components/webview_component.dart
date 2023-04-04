@@ -13,7 +13,7 @@ class WebViewComponent extends StatefulWidget {
 
 class _WebViewComponentState extends State<WebViewComponent> {
   int _stackToView = 1;
-  void _handleLoad(String value) {
+  void _handleLoad(String _) {
     setState(() {
       _stackToView = 0;
     });
@@ -21,7 +21,6 @@ class _WebViewComponentState extends State<WebViewComponent> {
 
   @override
   Widget build(BuildContext context) {
-
     var controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
@@ -44,7 +43,7 @@ class _WebViewComponentState extends State<WebViewComponent> {
         index: _stackToView,
         children: [
           WebViewWidget(
-            controller: controller
+            controller: controller,
           ),
           const Center(
             child: CircularProgressIndicator(),

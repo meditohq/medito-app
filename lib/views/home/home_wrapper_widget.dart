@@ -42,7 +42,7 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
             key: _messengerKey,
             body: IndexedStack(
               index: _currentIndex,
-              children: [HomeWidget(_hasOpened), PackListWidget()],
+              children: [HomeWidget(_hasOpened), PacksScreen()],
             ),
             bottomNavigationBar: Container(
               decoration: BoxDecoration(
@@ -89,10 +89,13 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
 
   Widget _getLoadingWidget() {
     return Center(
-        child: CircularProgressIndicator(
-            backgroundColor: Colors.black,
-            valueColor:
-                AlwaysStoppedAnimation<Color>(ColorConstants.walterWhite)));
+      child: CircularProgressIndicator(
+        backgroundColor: Colors.black,
+        valueColor: AlwaysStoppedAnimation<Color>(
+          ColorConstants.walterWhite,
+        ),
+      ),
+    );
   }
 
   void _onTabTapped(int value) {
@@ -102,6 +105,5 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

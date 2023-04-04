@@ -25,16 +25,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../routes/routes.dart';
 
-class PackListWidget extends StatefulWidget {
-  PackListWidget({Key? key}) : super(key: key);
+class PacksScreen extends StatefulWidget {
+  PacksScreen({Key? key}) : super(key: key);
 
   @override
-  PackListWidgetState createState() {
-    return PackListWidgetState();
+  PacksScreenState createState() {
+    return PacksScreenState();
   }
 }
 
-class PackListWidgetState extends State<PackListWidget> {
+class PacksScreenState extends State<PacksScreen> {
   late PacksBloc _packsBloc;
 
   @override
@@ -61,32 +61,36 @@ class PackListWidgetState extends State<PackListWidget> {
       backgroundColor: ColorConstants.moonlight,
       onRefresh: () => _packsBloc.fetchPacksList(true),
       child: FutureBuilder<bool>(
-          initialData: false,
-          future: checkConnectivity(),
-          builder: (context, connectionSnapshot) {
-            return StreamBuilder<ApiResponse<List<PacksData>>>(
-                stream: _packsBloc.packsListController.stream,
-                initialData: ApiResponse.loading(),
-                builder: (context, snapshot) {
-                  if (snapshot.data?.status == Status.LOADING) {
-                    return getLoadingWidget();
-                  }
-
-                  if (connectionSnapshot.data == true &&
-                      connectionSnapshot.data != null &&
-                      snapshot.data?.status == Status.COMPLETED) {
-                    return _getListWidget(snapshot.data?.body);
-                  } else {
-                    return _getErrorPacksWidget();
-                  }
-                });
-          }),
+        initialData: false,
+        future: checkConnectivity(),
+        builder: (context, connectionSnapshot) {
+          return StreamBuilder<ApiResponse<List<PacksData>>>(
+            stream: _packsBloc.packsListController.stream,
+            initialData: ApiResponse.loading(),
+            builder: (context, snapshot) {
+              var status = snapshot.data?.status;
+              var data = connectionSnapshot.data;
+              if (status == Status.LOADING) {
+                return getLoadingWidget();
+              }
+              // ignore: prefer-conditional-expressions
+              if (data == true && data != null && status == Status.COMPLETED) {
+                return _getListWidget(snapshot.data?.body);
+              } else {
+                return _getErrorPacksWidget();
+              }
+            },
+          );
+        },
+      ),
     );
   }
 
   ErrorPacksWidget _getErrorPacksWidget() => ErrorPacksWidget(
         onPressed: () => _packsBloc.fetchPacksList().then((value) {
+          // ignore: no-empty-block
           setState(() {});
+          // ignore: newline-before-return
           return _packsBloc.fetchPacksList();
         }),
       );
@@ -99,12 +103,13 @@ class PackListWidgetState extends State<PackListWidget> {
         return InkWell(
           onTap: () => _navigate(data, i, context),
           child: PackListItemWidget(PackImageListItemData(
-              title: data?[i].title,
-              subtitle: data?[i].subtitle,
-              cover: data?[i].cover,
-              backgroundImage: data?[i].backgroundImageUrl,
-              colorPrimary: parseColor(data?[i].colorPrimary),
-              coverSize: 72)),
+            title: data?[i].title,
+            subtitle: data?[i].subtitle,
+            cover: data?[i].cover,
+            backgroundImage: data?[i].backgroundImageUrl,
+            colorPrimary: parseColor(data?[i].colorPrimary),
+            coverSize: 72,
+          )),
         );
       },
     );
@@ -135,19 +140,8 @@ class PackListWidgetState extends State<PackListWidget> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(height: 8),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
-          getBlankTile(ColorConstants.walterWhiteTrans),
+          for (int i = 0; i < 10; i++)
+            getBlankTile(ColorConstants.walterWhiteTrans),
         ],
       ),
     );

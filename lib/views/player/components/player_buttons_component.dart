@@ -9,8 +9,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PlayerButtonsComponent extends ConsumerWidget {
-  const PlayerButtonsComponent(
-      {super.key, required this.sessionModel, required this.file});
+  const PlayerButtonsComponent({
+    super.key,
+    required this.sessionModel,
+    required this.file,
+  });
   final SessionFilesModel file;
   final SessionModel sessionModel;
 
@@ -25,7 +28,7 @@ class PlayerButtonsComponent extends ConsumerWidget {
         SizedBox(width: 35),
         _playPauseButton(ref),
         SizedBox(width: 35),
-        _forwardButton(ref)
+        _forwardButton(ref),
       ],
     );
   }

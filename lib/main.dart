@@ -12,8 +12,8 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:flutter_web_plugins/url_strategy.dart';
 import 'dart:async';
+
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
@@ -22,10 +22,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'audioplayer/audio_inherited_widget.dart';
 import 'root_page_view.dart';
 import 'network/auth.dart';
@@ -54,9 +56,14 @@ Future<void> main() async {
   usePathUrlStrategy();
 
   if (kReleaseMode) {
-    await SentryFlutter.init((options) {
-      options.dsn = SENTRY_URL;
-    }, appRunner: () => _runApp(_audioHandler));
+    await SentryFlutter.init(
+      (options) {
+        options.dsn = SENTRY_URL;
+      },
+      appRunner: () => _runApp(
+        _audioHandler,
+      ),
+    );
   } else {
     _runApp(_audioHandler);
   }
@@ -85,11 +92,12 @@ class _ParentWidgetState extends State<ParentWidget>
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor: ColorConstants.transparent,
-          systemNavigationBarIconBrightness: Brightness.light,
-          statusBarColor: ColorConstants.transparent),
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: ColorConstants.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: ColorConstants.transparent,
+      ),
     );
 
     // listened for app background/foreground events
@@ -109,15 +117,16 @@ class _ParentWidgetState extends State<ParentWidget>
         firstChild: MaterialApp.router(
           routerConfig: router,
           theme: ThemeData(
-              splashColor: ColorConstants.moonlight,
-              canvasColor: ColorConstants.greyIsTheNewBlack,
-              pageTransitionsTheme: PageTransitionsTheme(builders: {
-                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.android: SlideTransitionBuilder(),
-              }),
-              colorScheme:
-                  ColorScheme.dark(secondary: ColorConstants.walterWhite),
-              textTheme: meditoTextTheme(context)),
+            splashColor: ColorConstants.moonlight,
+            canvasColor: ColorConstants.greyIsTheNewBlack,
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.android: SlideTransitionBuilder(),
+            }),
+            colorScheme:
+                ColorScheme.dark(secondary: ColorConstants.walterWhite),
+            textTheme: meditoTextTheme(context),
+          ),
           title: ParentWidget._title,
         ),
       ),
@@ -136,11 +145,12 @@ class _ParentWidgetState extends State<ParentWidget>
 class SlideTransitionBuilder extends PageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     animation = CurvedAnimation(curve: Curves.easeInOutExpo, parent: animation);
 
     return SlideTransition(

@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
 import 'components/background_image_component.dart';
 import 'components/bottom_actions/bottom_action_component.dart';
-import 'components/duration_indicatior_component.dart';
+import 'components/duration_indicator_component.dart';
 import 'components/overlay_cover_image_component.dart';
 import 'components/player_buttons_component.dart';
 
@@ -23,6 +23,8 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    var coverUrl = widget.sessionModel.coverUrl;
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -30,7 +32,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            BackgroundImageComponent(imageUrl: widget.sessionModel.coverUrl),
+            BackgroundImageComponent(imageUrl: coverUrl),
             SafeArea(
               child: Column(
                 children: [
@@ -44,8 +46,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                   ),
                   Spacer(),
                   ArtistTitleComponent(sessionModel: widget.sessionModel),
-                  OverlayCoverImageComponent(
-                      imageUrl: widget.sessionModel.coverUrl),
+                  OverlayCoverImageComponent(imageUrl: coverUrl),
                   DurationIndicatorComponent(file: widget.file),
                   Spacer(),
                   PlayerButtonsComponent(
@@ -70,8 +71,10 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   Future<bool> _onWillPop() async {
     if (ref.read(pageviewNotifierProvider).currentPage == 1) {
       ref.read(pageviewNotifierProvider).gotoPreviousPage();
+
       return false;
     }
+
     return true;
   }
 
