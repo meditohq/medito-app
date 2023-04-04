@@ -52,13 +52,16 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   Widget build(BuildContext context) {
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
+
     return Scaffold(
       body: backgroundSounds.when(
         skipLoadingOnRefresh: false,
-        data: (data) => _mainContent(context, data, ref),
+        data: (data) => _mainContent(
+          data,
+        ),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(backgroundSoundsProvider),
+          onTap: () => ref.refresh(backgroundSoundsProvider),
         ),
         loading: () => BackgroundSoundsShimmerComponent(),
       ),
@@ -66,7 +69,8 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   }
 
   CollapsibleHeaderComponent _mainContent(
-      BuildContext context, List<BackgroundSoundsModel> data, WidgetRef ref) {
+    List<BackgroundSoundsModel> data,
+  ) {
     return CollapsibleHeaderComponent(
       title: StringConstants.BACKGROUND_SOUNDS,
       leadingIconBgColor: ColorConstants.walterWhite,
@@ -76,10 +80,16 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         VolumeSliderComponent(),
         SoundListTileComponent(
           sound: BackgroundSoundsModel(
-              id: 0, title: StringConstants.NONE, duration: 0, path: ''),
+            id: 0,
+            title: StringConstants.NONE,
+            duration: 0,
+            path: '',
+          ),
         ),
         for (int i = 0; i < data.length; i++)
-          SoundListTileComponent(sound: data[i])
+          SoundListTileComponent(
+            sound: data[i],
+          ),
       ],
     );
   }

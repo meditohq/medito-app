@@ -30,25 +30,34 @@ class ErrorComponent extends StatelessWidget {
     );
   }
 
-  RichText _richText(BuildContext context, String title, String text,
-      {void Function()? onTap}) {
+  RichText _richText(
+    BuildContext context,
+    String title,
+    String text, {
+    void Function()? onTap,
+  }) {
+    var headlineSmall = Theme.of(context).textTheme.headlineSmall;
+
     return RichText(
       text: TextSpan(
         text: title,
-        style: Theme.of(context).textTheme.headline5?.copyWith(
-            fontSize: 18,
-            color: ColorConstants.newGrey,
-            letterSpacing: -0.3,
-            fontWeight: FontWeight.w400),
+        style: headlineSmall?.copyWith(
+          fontSize: 18,
+          color: ColorConstants.newGrey,
+          letterSpacing: -0.3,
+          fontWeight: FontWeight.w400,
+        ),
         children: <TextSpan>[
           TextSpan(
-              text: text,
-              style: Theme.of(context).textTheme.headline5?.copyWith(
-                  fontSize: 18,
-                  color: ColorConstants.link,
-                  letterSpacing: -0.3,
-                  fontWeight: FontWeight.w400),
-              recognizer: TapGestureRecognizer()..onTap = onTap)
+            text: text,
+            style: headlineSmall?.copyWith(
+              fontSize: 18,
+              color: ColorConstants.link,
+              letterSpacing: -0.3,
+              fontWeight: FontWeight.w400,
+            ),
+            recognizer: TapGestureRecognizer()..onTap = onTap,
+          ),
         ],
       ),
     );

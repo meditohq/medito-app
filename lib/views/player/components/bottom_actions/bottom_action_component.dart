@@ -17,6 +17,7 @@ class BottomActionComponent extends StatelessWidget {
   });
   final SessionModel sessionModel;
   final SessionFilesModel file;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
