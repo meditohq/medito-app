@@ -22,6 +22,9 @@
 # .vscode/
 .vscode/settings.json
 
+# Visual Studio local preferences
+.vs
+
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
