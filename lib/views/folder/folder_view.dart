@@ -16,7 +16,8 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var folders = ref.watch(FoldersProvider(folderId: 28));
+    // id=28 for testing
+    var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
 
     return Scaffold(
       body: folders.when(
@@ -25,7 +26,7 @@ class FolderView extends ConsumerWidget {
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
           onTap: () => ref.refresh(
-            FoldersProvider(folderId: 28),
+            FoldersProvider(folderId: int.parse(id!)),
           ),
         ),
         loading: () => _buildLoadingWidget(),
@@ -42,7 +43,7 @@ class FolderView extends ConsumerWidget {
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(FoldersProvider(folderId: 28));
+        return await ref.refresh(FoldersProvider(folderId: int.parse(id!)));
       },
       child: CollapsibleHeaderComponent(
         bgImage: folder.coverUrl,

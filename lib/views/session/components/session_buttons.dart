@@ -1,5 +1,9 @@
+import 'dart:async';
+
+import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/network/cache.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
@@ -56,10 +60,17 @@ class SessionButtons extends StatelessWidget {
     return Consumer(
       builder: (context, ref, child) => InkWell(
         onTap: () {
+          var dataMap = {
+            'secsListened': (Duration(milliseconds: file.duration).inSeconds),
+            'id': '${sessionModel.id}',
+          };
+          unawaited(writeJSONToCache(encoded(dataMap), STATS));
           ref
               .read(playerProvider.notifier)
               .addCurrentlyPlayingSessionInPreference(
-                  sessionModel: sessionModel, file: file);
+                sessionModel: sessionModel,
+                file: file,
+              );
           ref.read(pageviewNotifierProvider).gotoNextPage();
         },
         borderRadius: BorderRadius.circular(14),

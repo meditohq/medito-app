@@ -162,7 +162,7 @@ Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-
+  
   return streak == null ? '0' : Duration(seconds: streak).inMinutes.toString();
 }
 
