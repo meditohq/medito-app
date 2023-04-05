@@ -6,8 +6,11 @@ class OverlayCoverImageComponent extends StatelessWidget {
   final String imageUrl;
   @override
   Widget build(BuildContext context) {
+    const divisor = 2.1;
+    final coverImageHeight = MediaQuery.of(context).size.height / divisor;
+
     return Container(
-      height: MediaQuery.of(context).size.height / 2.1,
+      height: coverImageHeight,
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       child: NetworkImageComponent(
         url: imageUrl,
