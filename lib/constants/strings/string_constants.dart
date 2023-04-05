@@ -40,4 +40,9 @@ class StringConstants {
   static const String BACKGROUND_SOUNDS = 'Background Sound';
   static const String PLAYER_BG_ERROR_MSG =
       'Oops! There was an error getting the background sounds. Please try again later.';
+  static const String X1 = 'X1';
+  static const String X125 = 'X1.25';
+  static const String X15 = 'X1.5';
+  static const String X2 = 'X2';
+  static const String X06 = 'X0.6';
 }
