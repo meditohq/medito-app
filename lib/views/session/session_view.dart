@@ -30,7 +30,8 @@ class SessionView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(sessionsProvider(sessionId: 9));
+    // id=9 for testing
+    var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
 
     return Scaffold(
       body: sessions.when(
@@ -51,7 +52,10 @@ class SessionView extends ConsumerWidget {
       );
 
   RefreshIndicator _buildScaffoldWithData(
-      BuildContext context, SessionModel sessionModel, WidgetRef ref) {
+    BuildContext context,
+    SessionModel sessionModel,
+    WidgetRef ref,
+  ) {
     return RefreshIndicator(
       onRefresh: () async =>
           await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
@@ -86,7 +90,7 @@ class SessionView extends ConsumerWidget {
           height16,
           SessionButtons(
             sessionModel: sessionModel,
-          )
+          ),
         ],
       ),
     );
