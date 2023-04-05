@@ -30,12 +30,13 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedComponent> {
   Widget build(BuildContext context) {
     final _provider = ref.watch(audioSpeedProvider);
     var audioSpeedModel = _provider.audioSpeedModel;
+
     return LabelsComponent(
       label: audioSpeedModel.label,
-      bgColor: audioSpeedModel.label != 'X1'
+      bgColor: audioSpeedModel.label != StringConstants.X1
           ? ColorConstants.walterWhite
           : ColorConstants.greyIsTheNewGrey,
-      textColor: audioSpeedModel.label != 'X1'
+      textColor: audioSpeedModel.label != StringConstants.X1
           ? ColorConstants.greyIsTheNewGrey
           : ColorConstants.walterWhite,
       onTap: () {

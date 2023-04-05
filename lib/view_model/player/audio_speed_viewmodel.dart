@@ -11,32 +11,33 @@ final audioSpeedProvider = ChangeNotifierProvider<AudioSpeedViewModel>((ref) {
 });
 
 class AudioSpeedViewModel extends ChangeNotifier {
-  final List<String> _speedList = ['X1', 'X1.25', 'X1.5', 'X2', 'X0.6'];
+  final List<String> _speedList = [
+    StringConstants.X1,
+    StringConstants.X125,
+    StringConstants.X15,
+    StringConstants.X2,
+    StringConstants.X06,
+  ];
   AudioSpeedModel audioSpeedModel = AudioSpeedModel();
 
   void setAudioTrackSpeed() {
     double speed;
     String label;
     var nextIndex = _speedList.indexOf(audioSpeedModel.label) + 1;
-    if (nextIndex >= _speedList.length) {
-      label = _speedList[0];
-    } else {
-      label = _speedList[nextIndex];
-    }
-    if (label == 'X1') {
+    label =
+        nextIndex >= _speedList.length ? _speedList[0] : _speedList[nextIndex];
+    if (label == StringConstants.X1) {
       speed = 1;
-    } else if (label == 'X1.25') {
+    } else if (label == StringConstants.X125) {
       speed = 1.25;
-    } else if (label == 'X1.5') {
+    } else if (label == StringConstants.X15) {
       speed = 1.5;
-    } else if (label == 'X2') {
+    } else if (label == StringConstants.X2) {
       speed = 2;
-    } else if (label == 'X0.6') {
+    } else if (label == StringConstants.X06) {
       speed = 0.6;
-    } else if (label == 'X0.75') {
-      speed = 1;
     } else {
-      speed = 0.75;
+      speed = 1;
     }
     audioSpeedModel = AudioSpeedModel(label: label, speed: speed);
     unawaited(
@@ -51,8 +52,10 @@ class AudioSpeedViewModel extends ChangeNotifier {
   }
 
   Future<void> getAudioTrackSpeedFromPref() async {
-    var audioSpeedFromPref = await SharedPreferencesService.getStringFromSharedPref(
-        SharedPreferenceConstants.sessionAudioSpeed);
+    var audioSpeedFromPref =
+        await SharedPreferencesService.getStringFromSharedPref(
+      SharedPreferenceConstants.sessionAudioSpeed,
+    );
     if (audioSpeedFromPref != null) {
       audioSpeedModel =
           AudioSpeedModel.fromJson(json.decode(audioSpeedFromPref));
