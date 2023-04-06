@@ -217,7 +217,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   void _onBgMusicPressed(BuildContext context) {
     var location = GoRouter.of(context).location;
-    context.go(location + backgroundSounds);
+    context.go(location + BackgroundSounds);
     // var bloc = PlayerBloc();
 
     // // slight delay in case the cache returns before the sheet opens

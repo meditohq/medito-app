@@ -48,6 +48,6 @@ class MarkdownComponent extends StatelessWidget {
 
   void _linkTap(BuildContext context, String? href) {
     var location = GoRouter.of(context).location;
-    context.go(location + webviewPath, extra: {'url': href});
+    context.go(location + WebviewPath, extra: {'url': href});
   }
 }
