@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'dio_client_provider.g.dart';
 
 @riverpod
-DioApiService dioClient(DioClientRef _) {
+DioApiService dioClient(_) {
   var dio = Dio();
   dio.options = BaseOptions(
     connectTimeout: Duration(milliseconds: 60000),

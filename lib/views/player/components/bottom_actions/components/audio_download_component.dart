@@ -22,7 +22,7 @@ class AudioDownloadComponent extends ConsumerWidget {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
     var downloadFileKey = '${sessionModel.id}-${file.id}';
 
-    if (downloadAudioProvider.audioDownloadState ==
+    if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
       return LabelsComponent(
         bgColor: ColorConstants.walterWhite,
@@ -30,7 +30,7 @@ class AudioDownloadComponent extends ConsumerWidget {
         label: StringConstants.DOWNLOADED.toUpperCase(),
         onTap: () => _handleRemoveDownload(downloadAudioProvider, ref, context),
       );
-    } else if (downloadAudioProvider.audioDownloadState ==
+    } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADIING) {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
