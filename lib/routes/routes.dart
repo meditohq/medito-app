@@ -1,4 +1,5 @@
 import 'package:Medito/components/components.dart';
+import 'package:Medito/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
@@ -23,28 +24,40 @@ const String Folder3Path = '/folder/:fid/folder2/:f2id/folder3/:f3id';
 const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
 const String UrlPath = '/url';
 const String CollectionPath = '/app';
-const String webviewPath = '/webview';
-const String backgroundSounds = '/backgroundsounds';
-const String HomePath = '/';
+const String WebviewPath = '/webview';
+const String BackgroundSounds = '/backgroundsounds';
+const String HomePath = '/home';
 
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>();
 final router = GoRouter(
   debugLogDiagnostics: true,
+  navigatorKey: _rootNavigatorKey,
+  initialLocation: HomePath,
   routes: [
-    GoRoute(
-      path: HomePath,
-      builder: (context, state) => HomeWrapperWidget(),
+    ShellRoute(
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) => RootPageView(
+        firstChild: child,
+      ),
       routes: [
-        _getSessionRoute(),
-        _getArticleRoute(),
-        _getDailyRoute(),
-        _getWebviewRoute(),
         GoRoute(
-          path: 'app',
+          path: HomePath,
+          pageBuilder: (context, state) =>
+              MaterialPage(key: state.pageKey, child: HomeWrapperWidget()),
+        ),
+        _getSessionRoute(fromRoot: true),
+        _getArticleRoute(fromRoot: true),
+        _getDailyRoute(fromRoot: true),
+        _getWebviewRoute(fromRoot: true),
+        GoRoute(
+          path: CollectionPath,
           routes: [_getPlayerRoute()],
           pageBuilder: (context, state) => getCollectionMaterialPage(state),
         ),
         GoRoute(
-          path: 'folder/:fid',
+          path: FolderPath,
           routes: [
             _getSessionRoute(),
             _getArticleRoute(),
@@ -75,24 +88,24 @@ final router = GoRouter(
   ],
 );
 
-GoRoute _getDailyRoute() {
+GoRoute _getDailyRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'daily/:did',
+    path: fromRoot ? DailyPath : DailyPath.replaceFirst('/', ''),
     routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsDailyPage(state),
   );
 }
 
-GoRoute _getArticleRoute() {
+GoRoute _getArticleRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'article/:aid',
+    path: fromRoot ? ArticlePath : ArticlePath.replaceFirst('/', ''),
     pageBuilder: (context, state) => getArticleMaterialPAge(state),
   );
 }
 
-GoRoute _getSessionRoute() {
+GoRoute _getSessionRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'session/:sid',
+    path: fromRoot ? SessionPath : SessionPath.replaceFirst('/', ''),
     routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsMaterialPage(state),
   );
@@ -120,9 +133,9 @@ GoRoute _getBackgroundSoundRoute() {
   );
 }
 
-GoRoute _getWebviewRoute() {
+GoRoute _getWebviewRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'webview',
+    path: fromRoot ? WebviewPath : WebviewPath.replaceFirst('/', ''),
     pageBuilder: (context, state) {
       final url = state.extra! as Map;
 

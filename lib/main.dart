@@ -112,24 +112,19 @@ class _ParentWidgetState extends State<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: RootPageView(
-        firstChild: MaterialApp.router(
-          routerConfig: router,
-          theme: ThemeData(
-            splashColor: ColorConstants.moonlight,
-            canvasColor: ColorConstants.greyIsTheNewBlack,
-            pageTransitionsTheme: PageTransitionsTheme(builders: {
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.android: SlideTransitionBuilder(),
-            }),
-            colorScheme:
-                ColorScheme.dark(secondary: ColorConstants.walterWhite),
-            textTheme: meditoTextTheme(context),
-          ),
-          title: ParentWidget._title,
-        ),
+    return MaterialApp.router(
+      routerConfig: router,
+      theme: ThemeData(
+        splashColor: ColorConstants.moonlight,
+        canvasColor: ColorConstants.greyIsTheNewBlack,
+        pageTransitionsTheme: PageTransitionsTheme(builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: SlideTransitionBuilder(),
+        }),
+        colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
+        textTheme: meditoTextTheme(context),
       ),
+      title: ParentWidget._title,
     );
   }
 

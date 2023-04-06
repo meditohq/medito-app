@@ -34,7 +34,7 @@ class BgSoundComponent extends ConsumerWidget {
       onTap: () {
         var location = GoRouter.of(context).location;
         context.go(
-          location + routes.backgroundSounds,
+          location + routes.BackgroundSounds,
           extra: {'sessionModel': sessionModel, 'file': file},
         );
       },
