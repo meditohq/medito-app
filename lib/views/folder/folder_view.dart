@@ -16,7 +16,7 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var folders = ref.watch(FoldersProvider(folderId: 28));
+    var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
 
     return Scaffold(
       body: folders.when(
@@ -25,7 +25,7 @@ class FolderView extends ConsumerWidget {
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
           onTap: () => ref.refresh(
-            FoldersProvider(folderId: 28),
+            FoldersProvider(folderId: int.parse(id!)),
           ),
         ),
         loading: () => _buildLoadingWidget(),
@@ -42,7 +42,7 @@ class FolderView extends ConsumerWidget {
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(FoldersProvider(folderId: 28));
+        return await ref.refresh(FoldersProvider(folderId: int.parse(id!)));
       },
       child: CollapsibleHeaderComponent(
         bgImage: folder.coverUrl,
@@ -124,19 +124,19 @@ class FolderView extends ConsumerWidget {
         var location = GoRouter.of(context).location;
         if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
-            context.go(getPathFromString(
+            context.push(getPathFromString(
               Folder3Path,
               [location.split('/')[2], this.id, id.toString()],
             ));
           } else {
             context
-                .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
+                .push(getPathFromString(Folder2Path, [this.id, id.toString()]));
           }
         } else if (type == TypeConstants.LINK) {
-          context.go(location + WebviewPath, extra: {'url': path!});
+          context.push(location + WebviewPath, extra: {'url': path!});
           // context.go(getPathFromString('url', [path.toString()]));
         } else {
-          context.go(location + getPathFromString(type, [id.toString()]));
+          context.push(location + getPathFromString(type, [id.toString()]));
         }
       } else {
         createSnackBar(StringConstants.CHECK_CONNECTION, context);

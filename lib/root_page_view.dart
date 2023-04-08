@@ -32,11 +32,14 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
     final currentlyPlayingSession = ref.watch(playerProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (currentlyPlayingSession != null) {
-        checkAudioLocally(currentlyPlayingSession,
-            currentlyPlayingSession.audio.first.files.first);
+        checkAudioLocally(
+          currentlyPlayingSession,
+          currentlyPlayingSession.audio.first.files.first,
+        );
       }
     });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
+
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
       body: PageView(
@@ -48,11 +51,12 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
             children: [
               Expanded(
                 child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: radius,
-                      bottomRight: radius,
-                    ),
-                    child: widget.firstChild),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: radius,
+                    bottomRight: radius,
+                  ),
+                  child: widget.firstChild,
+                ),
               ),
               if (currentlyPlayingSession != null) height8,
               if (currentlyPlayingSession != null)
@@ -82,8 +86,9 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
           ),
           if (currentlyPlayingSession != null)
             PlayerView(
-                sessionModel: currentlyPlayingSession,
-                file: currentlyPlayingSession.audio.first.files.first)
+              sessionModel: currentlyPlayingSession,
+              file: currentlyPlayingSession.audio.first.files.first,
+            ),
         ],
       ),
     );
@@ -96,7 +101,9 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
   }
 
   void loadSessionAndBackgroundSound(
-      SessionModel sessionModel, SessionFilesModel file) {
+    SessionModel sessionModel,
+    SessionFilesModel file,
+  ) {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
     var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
     var _currentPlayingFileId =
@@ -108,10 +115,14 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
     }
   }
 
-  void setSessionAudio(AudioPlayerNotifier _audioPlayerNotifier,
-      SessionModel sessionModel, SessionFilesModel file) {
+  void setSessionAudio(
+    AudioPlayerNotifier _audioPlayerNotifier,
+    SessionModel sessionModel,
+    SessionFilesModel file,
+  ) {
     var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
-        '${sessionModel.id}-${file.id}${getFileExtension(file.path)}');
+          '${sessionModel.id}-${file.id}${getFileExtension(file.path)}',
+        );
     checkDownloadedFile.then((value) {
       _audioPlayerNotifier.setSessionAudio(file, filePath: value);
       _audioPlayerNotifier.currentlyPlayingSession = file;
@@ -119,7 +130,9 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
   }
 
   void setBackgroundSound(
-      AudioPlayerNotifier _audioPlayerNotifier, bool hasBackgroundSound) {
+    AudioPlayerNotifier _audioPlayerNotifier,
+    bool hasBackgroundSound,
+  ) {
     if (hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
       _provider.getBackgroundSoundFromPref().then((_) {
@@ -131,6 +144,8 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
       _provider.getVolumeFromPref().then((_) {
         _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
       });
+    }else{
+      _audioPlayerNotifier.pauseBackgroundSound();
     }
   }
 }

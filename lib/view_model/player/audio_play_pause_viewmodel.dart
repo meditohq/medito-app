@@ -16,14 +16,14 @@ final audioPlayPauseProvider = Provider.family<PLAY_PAUSE_AUDIO, bool?>(
     final currentState = ref.watch(audioPlayPauseStateProvider);
     if (currentState == PLAY_PAUSE_AUDIO.PLAY) {
       audioPlayer.playSessionAudio();
-      if (hasBackgroundSound != null) {
+      if (hasBackgroundSound != null && hasBackgroundSound) {
         audioPlayer.playBackgroundSound();
       }
-
+      
       return PLAY_PAUSE_AUDIO.PLAY;
     } else {
       audioPlayer.pauseSessionAudio();
-      if (hasBackgroundSound != null) {
+      if (hasBackgroundSound != null && hasBackgroundSound) {
         audioPlayer.pauseBackgroundSound();
       }
 

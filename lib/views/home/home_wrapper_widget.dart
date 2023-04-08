@@ -13,8 +13,8 @@ class HomeWrapperWidget extends StatefulWidget {
   _HomeWrapperWidgetState createState() => _HomeWrapperWidgetState();
 }
 
-class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
-    with AutomaticKeepAliveClientMixin<HomeWrapperWidget> {
+class _HomeWrapperWidgetState extends State<HomeWrapperWidget>{
+    
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
@@ -54,11 +54,11 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
               child: BottomNavigationBar(
                 selectedLabelStyle: Theme.of(context)
                     .textTheme
-                    .headline1
+                    .displayLarge
                     ?.copyWith(fontSize: 12),
                 unselectedLabelStyle: Theme.of(context)
                     .textTheme
-                    .headline2
+                    .displayMedium
                     ?.copyWith(fontSize: 12),
                 selectedItemColor: ColorConstants.walterWhite,
                 unselectedItemColor: ColorConstants.newGrey,
@@ -104,6 +104,6 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget>
     });
   }
 
-  @override
-  bool get wantKeepAlive => true;
+  // @override
+  // bool get wantKeepAlive => true;
 }
