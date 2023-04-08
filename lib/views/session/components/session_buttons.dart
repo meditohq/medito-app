@@ -59,7 +59,9 @@ class SessionButtons extends StatelessWidget {
           ref
               .read(playerProvider.notifier)
               .addCurrentlyPlayingSessionInPreference(
-                  sessionModel: sessionModel, file: file);
+                sessionModel: sessionModel,
+                file: file,
+              );
           ref.read(pageviewNotifierProvider).gotoNextPage();
         },
         borderRadius: BorderRadius.circular(14),

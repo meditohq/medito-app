@@ -25,8 +25,8 @@ const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
 const String UrlPath = '/url';
 const String CollectionPath = '/app';
 const String WebviewPath = '/webview';
-const String BackgroundSounds = '/backgroundsounds';
-const String HomePath = '/home';
+const String BackgroundSoundsPath = '/backgroundsounds';
+const String HomePath = '/';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -44,13 +44,16 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: HomePath,
-          pageBuilder: (context, state) =>
-              MaterialPage(key: state.pageKey, child: HomeWrapperWidget()),
+          pageBuilder: (context, state) => MaterialPage(
+            key: state.pageKey,
+            child: HomeWrapperWidget(),
+          ),
         ),
         _getSessionRoute(fromRoot: true),
         _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
+        _getBackgroundSoundRoute(),
         GoRoute(
           path: CollectionPath,
           routes: [_getPlayerRoute()],
@@ -117,13 +120,13 @@ GoRoute _getPlayerRoute() {
     pageBuilder: (context, state) {
       return getPlayerMaterialPage(state);
     },
-    routes: [_getWebviewRoute(), _getBackgroundSoundRoute()],
+    routes: [_getWebviewRoute()],
   );
 }
 
 GoRoute _getBackgroundSoundRoute() {
   return GoRoute(
-    path: 'backgroundSounds',
+    path: BackgroundSoundsPath,
     pageBuilder: (context, state) {
       return MaterialPage(
         key: state.pageKey,
@@ -203,24 +206,6 @@ MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
     key: state.pageKey,
     child: FolderView(id: state.params['fid']),
   );
-  // if (params.length == 1) {
-  //   return MaterialPage(
-  //     key: state.pageKey, child: FolderView(id: state.params['fid']),
-  //     // child: NewFolderScreen(id: state.params['fid']),
-  //   );
-  // } else {
-  //   if (params.length == 2) {
-  //     return MaterialPage(
-  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
-  //       // child: NewFolderScreen(id: state.params['f2id']),
-  //     );
-  //   } else {
-  //     return MaterialPage(
-  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
-  //       // child: NewFolderScreen(id: state.params['f3id']),
-  //     );
-  //   }
-  // }
 }
 
 String getPathFromString(String? place, List<String?> ids) {
