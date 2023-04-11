@@ -11,7 +11,7 @@ class BackgroundImageComponent extends StatelessWidget {
       height: MediaQuery.of(context).size.height,
       child: ImageFiltered(
         imageFilter: ColorFilter.mode(
-            ColorConstants.almostBlack.withOpacity(0.4), BlendMode.colorBurn),
+            ColorConstants.almostBlack.withOpacity(0.85), BlendMode.colorBurn),
         child: NetworkImageComponent(url: imageUrl),
       ),
     );

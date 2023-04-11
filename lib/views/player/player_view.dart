@@ -1,7 +1,5 @@
-import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
 import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
@@ -12,7 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
 import 'components/background_image_component.dart';
 import 'components/bottom_actions/bottom_action_component.dart';
-import 'components/duration_indicatior_component.dart';
+import 'components/duration_indicator_component.dart';
+import 'components/overlay_cover_image_component.dart';
 import 'components/player_buttons_component.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
@@ -55,7 +54,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void setSessionAudio(AudioPlayerNotifier audioPlayerNotifier) {
     var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
-        '$sessionId-$fileId${getFileExtension(widget.file.path)}');
+          '$sessionId-$fileId${getFileExtension(widget.file.path)}',
+        );
     checkDownloadedFile.then((value) {
       audioPlayerNotifier.setSessionAudio(widget.file, filePath: value);
       audioPlayerNotifier.currentlyPlayingSession = widget.file;
@@ -79,31 +79,35 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
+    var coverUrl = widget.sessionModel.coverUrl;
+
     return Scaffold(
       extendBody: false,
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          BackgroundImageComponent(imageUrl: widget.sessionModel.coverUrl),
+          BackgroundImageComponent(imageUrl: coverUrl),
           SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CloseButtonComponent(
-                  onPressed: () => router.pop(),
-                  bgColor: ColorConstants.walterWhite,
-                  icColor: ColorConstants.almostBlack,
+                Container(
+                  height: 4,
+                  width: 44,
+                  decoration: BoxDecoration(
+                    color: ColorConstants.walterWhite,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 Spacer(),
                 ArtistTitleComponent(sessionModel: widget.sessionModel),
+                OverlayCoverImageComponent(imageUrl: coverUrl),
+                DurationIndicatorComponent(file: widget.file),
                 Spacer(),
                 PlayerButtonsComponent(
                   file: widget.file,
                   sessionModel: widget.sessionModel,
                 ),
-                height16,
-                DurationIndicatorComponent(file: widget.file),
-                height16,
+                Spacer(),
                 BottomActionComponent(
                   sessionModel: widget.sessionModel,
                   file: widget.file,

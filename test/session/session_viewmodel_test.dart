@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+//ignore:prefer-match-file-name
 class MockSessionRepository extends Mock implements SessionRepositoryImpl {}
 
 class Listener<T> extends Mock {
@@ -19,6 +20,7 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+
     return container;
   }
 
@@ -36,8 +38,10 @@ void main() {
           audio: [
             SessionAudioModel(
               guideName: 'Will',
-              files: [SessionFilesModel(id: 59, path: '', duration: 48000)],
-            )
+              files: [
+                SessionFilesModel(id: 59, path: '', duration: 48000),
+              ],
+            ),
           ],
           hasBackgroundSound: false,
         );
@@ -55,11 +59,16 @@ void main() {
         );
         await container.read(sessionsProvider(sessionId: 1).future);
         expect(
-            container.read(sessionsProvider(sessionId: 1)).value,
-            isA<SessionModel>()
-                .having((s) => s.id, 'id', 1)
-                .having((s) => s.title, 'title', 'Welcome')
-                .having((s) => s.description, 'description', ''));
+          container.read(sessionsProvider(sessionId: 1)).value,
+          isA<SessionModel>()
+              .having((s) => s.id, 'id', 1)
+              .having((s) => s.title, 'title', 'Welcome')
+              .having(
+                (s) => s.description,
+                'description',
+                '',
+              ),
+        );
         verify(
           () => mockSessionRepository.fetchSession(1),
         ).called(1);
