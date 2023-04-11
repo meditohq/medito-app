@@ -16,8 +16,10 @@ import 'dart:async';
 
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +29,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'audioplayer/audio_inherited_widget.dart';
-import 'root_page_view.dart';
 import 'network/auth.dart';
+import 'package:Medito/view_model/player/player_viewmodel.dart';
+import 'view_model/audio_player/audio_player_viewmodel.dart';
+import 'view_model/background_sounds/background_sounds_viewmodel.dart';
+import 'view_model/player/audio_play_pause_viewmodel.dart';
+import 'view_model/player/download/audio_downloader_viewmodel.dart';
 
 late SharedPreferences sharedPreferences;
 
@@ -47,9 +52,9 @@ Future<void> main() async {
     ),
   );
 
-  _audioHandler.customEvent.stream.listen((event) async {
+  _audioHandler.customEvent.stream.listen((event) {
     if (event == STATS) {
-      await updateStatsFromBg();
+      unawaited(updateStatsFromBg());
     }
   });
 
@@ -76,20 +81,21 @@ void _runApp(MeditoAudioHandler _audioHandler) => runApp(ProviderScope(
       ),
     ));
 
-/// This Widget is the main application widget.
-class ParentWidget extends StatefulWidget {
+// This Widget is the main application widget.
+// ignore: prefer-match-file-name
+class ParentWidget extends ConsumerStatefulWidget {
   static const String _title = 'Medito';
 
   @override
-  _ParentWidgetState createState() => _ParentWidgetState();
+  ConsumerState<ParentWidget> createState() => _ParentWidgetState();
 }
 
-class _ParentWidgetState extends State<ParentWidget>
+class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-
+    ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -112,24 +118,29 @@ class _ParentWidgetState extends State<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: RootPageView(
-        firstChild: MaterialApp.router(
-          routerConfig: router,
-          theme: ThemeData(
-            splashColor: ColorConstants.moonlight,
-            canvasColor: ColorConstants.greyIsTheNewBlack,
-            pageTransitionsTheme: PageTransitionsTheme(builders: {
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.android: SlideTransitionBuilder(),
-            }),
-            colorScheme:
-                ColorScheme.dark(secondary: ColorConstants.walterWhite),
-            textTheme: meditoTextTheme(context),
-          ),
-          title: ParentWidget._title,
-        ),
+    final currentlyPlayingSession = ref.watch(playerProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (currentlyPlayingSession != null) {
+        checkAudioLocally(
+          currentlyPlayingSession,
+          currentlyPlayingSession.audio.first.files.first,
+        );
+      }
+    });
+
+    return MaterialApp.router(
+      routerConfig: router,
+      theme: ThemeData(
+        splashColor: ColorConstants.moonlight,
+        canvasColor: ColorConstants.greyIsTheNewBlack,
+        pageTransitionsTheme: PageTransitionsTheme(builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: SlideTransitionBuilder(),
+        }),
+        colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
+        textTheme: meditoTextTheme(context),
       ),
+      title: ParentWidget._title,
     );
   }
 
@@ -138,6 +149,62 @@ class _ParentWidgetState extends State<ParentWidget>
     if (state == AppLifecycleState.resumed) {
       // update session stats when app comes into foreground
       updateStatsFromBg();
+    }
+  }
+
+  void checkAudioLocally(SessionModel sessionModel, SessionFilesModel file) {
+    loadSessionAndBackgroundSound(sessionModel, file);
+  }
+
+  void loadSessionAndBackgroundSound(
+    SessionModel sessionModel,
+    SessionFilesModel file,
+  ) {
+    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+    var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
+    var _currentPlayingFileId =
+        _audioPlayerNotifier.currentlyPlayingSession?.id;
+
+    if (!isPlaying || _currentPlayingFileId != file.id) {
+      setSessionAudio(_audioPlayerNotifier, sessionModel, file);
+      setBackgroundSound(_audioPlayerNotifier, sessionModel.hasBackgroundSound);
+    }
+  }
+
+  void setSessionAudio(
+    AudioPlayerNotifier _audioPlayerNotifier,
+    SessionModel sessionModel,
+    SessionFilesModel file,
+  ) {
+    var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
+          '${sessionModel.id}-${file.id}${getFileExtension(file.path)}',
+        );
+    checkDownloadedFile.then((value) {
+      _audioPlayerNotifier.setSessionAudio(sessionModel, file, filePath: value);
+      _audioPlayerNotifier.currentlyPlayingSession = file;
+      ref.read(audioPlayPauseStateProvider.notifier).state =
+          PLAY_PAUSE_AUDIO.PLAY;
+    });
+  }
+
+  void setBackgroundSound(
+    AudioPlayerNotifier _audioPlayerNotifier,
+    bool hasBackgroundSound,
+  ) {
+    if (hasBackgroundSound) {
+      final _provider = ref.read(backgroundSoundsNotifierProvider);
+      _provider.getBackgroundSoundFromPref().then((_) {
+        if (_provider.selectedBgSound != null &&
+            _provider.selectedBgSound?.title != StringConstants.NONE) {
+          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+          _audioPlayerNotifier.playBackgroundSound();
+        }
+      });
+      _provider.getVolumeFromPref().then((_) {
+        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+      });
+    } else {
+      _audioPlayerNotifier.pauseBackgroundSound();
     }
   }
 }

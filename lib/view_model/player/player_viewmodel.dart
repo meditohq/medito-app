@@ -10,9 +10,10 @@ final playerProvider =
 class PlayerViewModel extends StateNotifier<SessionModel?> {
   PlayerViewModel(this.ref) : super(null);
   Ref ref;
-  Future<void> addCurrentlyPlayingSessionInPreference(
-      {required SessionModel sessionModel,
-      required SessionFilesModel file}) async {
+  Future<void> addCurrentlyPlayingSessionInPreference({
+    required SessionModel sessionModel,
+    required SessionFilesModel file,
+  }) async {
     var _session = sessionModel.customCopyWith();
     for (var i = 0; i < _session.audio.length; i++) {
       var element = _session.audio[i];

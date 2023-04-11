@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final audioPlayPauseStateProvider = StateProvider<PLAY_PAUSE_AUDIO>(
   (ref) {
     final audioPlayer = ref.read(audioPlayerNotifierProvider);
-    audioPlayer.playSessionAudio();
+    audioPlayer.play();
 
     return PLAY_PAUSE_AUDIO.PLAY;
   },
@@ -15,14 +15,14 @@ final audioPlayPauseProvider = Provider.family<PLAY_PAUSE_AUDIO, bool?>(
     final audioPlayer = ref.watch(audioPlayerNotifierProvider);
     final currentState = ref.watch(audioPlayPauseStateProvider);
     if (currentState == PLAY_PAUSE_AUDIO.PLAY) {
-      audioPlayer.playSessionAudio();
+      audioPlayer.play();
       if (hasBackgroundSound != null && hasBackgroundSound) {
         audioPlayer.playBackgroundSound();
       }
-
+      
       return PLAY_PAUSE_AUDIO.PLAY;
     } else {
-      audioPlayer.pauseSessionAudio();
+      audioPlayer.pause();
       if (hasBackgroundSound != null && hasBackgroundSound) {
         audioPlayer.pauseBackgroundSound();
       }

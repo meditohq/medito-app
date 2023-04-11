@@ -125,19 +125,19 @@ class FolderView extends ConsumerWidget {
         var location = GoRouter.of(context).location;
         if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
-            context.go(getPathFromString(
+            context.push(getPathFromString(
               Folder3Path,
               [location.split('/')[2], this.id, id.toString()],
             ));
           } else {
             context
-                .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
+                .push(getPathFromString(Folder2Path, [this.id, id.toString()]));
           }
         } else if (type == TypeConstants.LINK) {
-          context.go(location + webviewPath, extra: {'url': path!});
+          context.push(location + WebviewPath, extra: {'url': path!});
           // context.go(getPathFromString('url', [path.toString()]));
         } else {
-          context.go(location + getPathFromString(type, [id.toString()]));
+          context.push(location + getPathFromString(type, [id.toString()]));
         }
       } else {
         createSnackBar(StringConstants.CHECK_CONNECTION, context);
