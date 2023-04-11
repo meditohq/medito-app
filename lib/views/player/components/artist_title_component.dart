@@ -11,6 +11,7 @@ class ArtistTitleComponent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _title(context),
           _subtitle(),
@@ -22,7 +23,6 @@ class ArtistTitleComponent extends StatelessWidget {
   Text _title(BuildContext context) {
     return Text(
       sessionModel.title,
-      textAlign: TextAlign.center,
       style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
           fontFamily: ClashDisplay,
           color: ColorConstants.walterWhite,
@@ -33,10 +33,12 @@ class ArtistTitleComponent extends StatelessWidget {
 
   Padding _subtitle() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.only(right: 16.0),
       child: MarkdownComponent(
-          body:
-              '${sessionModel.artist?.name ?? ''} ${sessionModel.artist?.path ?? ''}'),
+        textAlign: WrapAlignment.start,
+        body:
+            '${sessionModel.artist?.name ?? ''} ${sessionModel.artist?.path ?? ''}',
+      ),
     );
   }
 }

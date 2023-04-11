@@ -41,7 +41,7 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
       key: _messengerKey,
       body: IndexedStack(
         index: _currentIndex,
-        children:  [HomeWidget(_hasOpened), PackListWidget()],
+        children:  [HomeWidget(_hasOpened), PacksScreen()],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

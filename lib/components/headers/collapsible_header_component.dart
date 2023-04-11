@@ -4,15 +4,16 @@ import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 
 class CollapsibleHeaderComponent extends StatefulWidget {
-  const CollapsibleHeaderComponent(
-      {super.key,
-      required this.children,
-      this.bgImage,
-      required this.title,
-      this.description,
-      this.headerHeight = 300,
-      this.leadingIconColor = Colors.white,
-      this.leadingIconBgColor = Colors.black38});
+  const CollapsibleHeaderComponent({
+    super.key,
+    required this.children,
+    this.bgImage,
+    required this.title,
+    this.description,
+    this.headerHeight = 300,
+    this.leadingIconColor = Colors.white,
+    this.leadingIconBgColor = Colors.black38,
+  });
   final List<Widget> children;
   final String? bgImage;
   final String title;
@@ -90,7 +91,7 @@ class _CollapsibleHeaderComponentState
         SliverList(
           delegate: SliverChildListDelegate([
             if (widget.description != null) _description(widget.description!),
-            ...widget.children
+            ...widget.children,
           ]),
         ),
       ],
@@ -120,13 +121,16 @@ class _CollapsibleHeaderComponentState
           child: Container(
             height: 80,
             width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
                   color: ColorConstants.almostBlack.withOpacity(0.6),
                   offset: Offset(0, 10),
                   blurRadius: 50,
-                  spreadRadius: 50)
-            ]),
+                  spreadRadius: 50,
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -152,6 +156,8 @@ class _CollapsibleHeaderComponentState
   }
 
   Container _description(String description) {
+    var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
+
     return Container(
       color: ColorConstants.greyIsTheNewGrey,
       child: Padding(
@@ -159,15 +165,17 @@ class _CollapsibleHeaderComponentState
         child: MarkdownComponent(
           body: description,
           textAlign: WrapAlignment.start,
-          p: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              height: 1.5),
-          a: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              decoration: TextDecoration.underline,
-              height: 1.5),
+          p: bodyLarge?.copyWith(
+            color: ColorConstants.walterWhite,
+            fontFamily: DmSans,
+            height: 1.5,
+          ),
+          a: bodyLarge?.copyWith(
+            color: ColorConstants.walterWhite,
+            fontFamily: DmSans,
+            decoration: TextDecoration.underline,
+            height: 1.5,
+          ),
         ),
       ),
     );

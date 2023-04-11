@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/services/network/dio_api_services.dart';
+import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -54,6 +54,15 @@ class SessionRepositoryImpl extends SessionRepository {
       json.encode(sessionList),
     );
   }
+  
+  @override
+  Future<void> addCurrentlyPlayingSessionInPreference(SessionModel sessionList) async {
+    await SharedPreferencesService.addStringInSharedPref(
+      SharedPreferenceConstants.downloads,
+      json.encode(sessionList),
+    );
+  }
+
 }
 
 @riverpod

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'components/audio_download_component.dart';
+import 'components/bg_sound_component.dart';
 
 class BottomActionComponent extends StatelessWidget {
   const BottomActionComponent({
@@ -33,9 +34,9 @@ class BottomActionComponent extends StatelessWidget {
           ),
           width8,
           if (sessionModel.hasBackgroundSound)
-            LabelsComponent(
-              label: StringConstants.SOUND.toUpperCase(),
-              onTap: () => _handleOnTapSound(context),
+            BgSoundComponent(
+              sessionModel: sessionModel,
+              file: file,
             ),
           if (sessionModel.hasBackgroundSound) width8,
         ],

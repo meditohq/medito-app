@@ -3,21 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class BoxShimmerComponent extends StatelessWidget {
-  const BoxShimmerComponent(
-      {super.key,
-      this.width,
-      this.height,
-      this.delayInMiliSeconds = 1500,
-      this.child,  this.borderRadius = 0});
+  const BoxShimmerComponent({
+    super.key,
+    this.width,
+    this.height,
+    this.delayInMiliSeconds = 1500,
+    this.child,
+    this.borderRadius = 0,
+  });
   final double? width, height;
   final int delayInMiliSeconds;
   final Widget? child;
   final double borderRadius;
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
     return SizedBox(
-      width: width ?? MediaQuery.of(context).size.width,
-      height: height ?? MediaQuery.of(context).size.height,
+      width: width ?? size.width,
+      height: height ?? size.height,
       child: Shimmer.fromColors(
         baseColor: ColorConstants.greyIsTheNewBlack,
         highlightColor: ColorConstants.greyIsTheNewGrey.withOpacity(0.4),
@@ -29,8 +33,8 @@ class BoxShimmerComponent extends StatelessWidget {
               Radius.circular(borderRadius),
             ),
           ),
-          width: width ?? MediaQuery.of(context).size.width,
-          height: height ?? MediaQuery.of(context).size.height,
+          width: width ?? size.width,
+          height: height ?? size.height,
           child: child,
         ),
       ),

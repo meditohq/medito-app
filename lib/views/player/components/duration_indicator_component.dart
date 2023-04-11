@@ -13,6 +13,9 @@ class DurationIndicatorComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
+    const minSeconds = 0.0;
+    const additionalMilliSeconds = 300;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: StreamBuilder<int?>(
@@ -21,6 +24,7 @@ class DurationIndicatorComponent extends ConsumerWidget {
           if (snapshot.hasData && snapshot.data != null) {
             var currentDuration = snapshot.data ?? 0;
             _handleAudioCompletion(currentDuration, ref);
+
             return Column(
               children: [
                 _durationLabels(context, file.duration, currentDuration),
@@ -33,18 +37,20 @@ class DurationIndicatorComponent extends ConsumerWidget {
                     ),
                   ),
                   child: Slider(
-                    min: 0.0,
+                    min: minSeconds,
                     activeColor: ColorConstants.walterWhite,
                     inactiveColor: ColorConstants.greyIsTheNewGrey,
-                    max: file.duration.toDouble() + 300,
+                    max: file.duration.toDouble() + additionalMilliSeconds,
                     value: currentDuration.toDouble(),
                     onChanged: (value) {
                       ref.read(
-                          slideAudioPositionProvider(duration: value.toInt()));
+                        slideAudioPositionProvider(duration: value.toInt()),
+                      );
                     },
                     onChangeEnd: (value) {
                       ref.read(
-                          slideAudioPositionProvider(duration: value.toInt()));
+                        slideAudioPositionProvider(duration: value.toInt()),
+                      );
                     },
                   ),
                 ),
@@ -54,7 +60,7 @@ class DurationIndicatorComponent extends ConsumerWidget {
             return SizedBox();
           }
         },
-      )
+      ),
     );
   }
 
@@ -71,22 +77,19 @@ class DurationIndicatorComponent extends ConsumerWidget {
     }
   }
 
-  Transform _durationLabels(BuildContext context, int duration, int position) {
-    return Transform.translate(
-      offset: Offset(0, 25),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _durationLabel(
-            context,
-            Duration(milliseconds: position).toMinutesSeconds(),
-          ),
-          _durationLabel(
-            context,
-            Duration(milliseconds: duration).toMinutesSeconds(),
-          ),
-        ],
-      ),
+  Row _durationLabels(BuildContext context, int duration, int position) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _durationLabel(
+          context,
+          Duration(milliseconds: position).toMinutesSeconds(),
+        ),
+        _durationLabel(
+          context,
+          Duration(milliseconds: duration).toMinutesSeconds(),
+        ),
+      ],
     );
   }
 
