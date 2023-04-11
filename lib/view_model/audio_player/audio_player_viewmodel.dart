@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -14,10 +16,16 @@ final audioPlayerNotifierProvider =
 });
 
 //ignore:prefer-match-file-name
-class AudioPlayerNotifier extends ChangeNotifier {
+class AudioPlayerNotifier extends BaseAudioHandler
+    with QueueHandler, SeekHandler, ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
   final sessionAudioPlayer = AudioPlayer();
   SessionFilesModel? currentlyPlayingSession;
+  AudioPlayerNotifier() {
+    sessionAudioPlayer.playbackEventStream
+        .map(_transformEvent)
+        .pipe(playbackState);
+  }
 
   void setBackgroundAudio(BackgroundSoundsModel sound) {
     unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
@@ -25,10 +33,16 @@ class AudioPlayerNotifier extends ChangeNotifier {
     }));
   }
 
-  void setSessionAudio(SessionFilesModel file, {String? filePath}) {
+  void setSessionAudio(
+    SessionModel sessionModel,
+    SessionFilesModel file, {
+    String? filePath,
+  }) {
     if (filePath != null) {
       unawaited(sessionAudioPlayer.setFilePath(filePath));
+      setMediaItem(sessionModel, file, filePath: filePath);
     } else {
+      setMediaItem(sessionModel, file);
       unawaited(sessionAudioPlayer.setUrl(file.path, headers: {
         HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
       }));
@@ -40,13 +54,15 @@ class AudioPlayerNotifier extends ChangeNotifier {
     unawaited(backgroundSoundAudioPlayer.setLoopMode(LoopMode.all));
   }
 
-  Future<void> playSessionAudio() async => await sessionAudioPlayer.play();
+  @override
+  Future<void> play() async => await sessionAudioPlayer.play();
 
   void pauseBackgroundSound() {
     unawaited(backgroundSoundAudioPlayer.pause());
   }
 
-  Future<void> pauseSessionAudio() async => await sessionAudioPlayer.pause();
+  @override
+  Future<void> pause() async => await sessionAudioPlayer.pause();
 
   void stopBackgroundSound() async {
     await backgroundSoundAudioPlayer.stop();
@@ -85,5 +101,54 @@ class AudioPlayerNotifier extends ChangeNotifier {
 
   void disposeSessionAudio() async {
     await sessionAudioPlayer.dispose();
+  }
+
+  void setMediaItem(
+    SessionModel sessionModel,
+    SessionFilesModel file, {
+    String? filePath,
+  }) {
+    var item = MediaItem(
+      id: filePath ?? file.path,
+      title: sessionModel.title,
+      artist: sessionModel.artist?.name,
+      duration: Duration(milliseconds: file.duration),
+      artUri: Uri.parse(
+        sessionModel.coverUrl,
+      ),
+    );
+    mediaItem.add(item);
+  }
+
+  PlaybackState _transformEvent(PlaybackEvent event) {
+    return PlaybackState(
+      controls: [
+        MediaControl.rewind,
+        if (sessionAudioPlayer.playing)
+          MediaControl.pause
+        else
+          MediaControl.play,
+        MediaControl.stop,
+        MediaControl.fastForward,
+      ],
+      systemActions: const {
+        MediaAction.seek,
+        MediaAction.seekForward,
+        MediaAction.seekBackward,
+      },
+      androidCompactActionIndices: const [0, 1, 3],
+      processingState: const {
+        ProcessingState.idle: AudioProcessingState.idle,
+        ProcessingState.loading: AudioProcessingState.loading,
+        ProcessingState.buffering: AudioProcessingState.buffering,
+        ProcessingState.ready: AudioProcessingState.ready,
+        ProcessingState.completed: AudioProcessingState.completed,
+      }[sessionAudioPlayer.processingState]!,
+      playing: sessionAudioPlayer.playing,
+      updatePosition: sessionAudioPlayer.position,
+      bufferedPosition: sessionAudioPlayer.bufferedPosition,
+      speed: sessionAudioPlayer.speed,
+      queueIndex: event.currentIndex,
+    );
   }
 }

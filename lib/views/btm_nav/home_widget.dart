@@ -132,7 +132,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
     return checkConnectivity().then(
       (value) {
         if (value) {
-          context.go(getPathFromString(type, [id]));
+          context.push(getPathFromString(type, [id]));
         } else {
           _bloc.checkConnection();
         }
