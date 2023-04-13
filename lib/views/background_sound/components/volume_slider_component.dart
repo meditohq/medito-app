@@ -13,6 +13,7 @@ class VolumeSliderComponent extends ConsumerWidget {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
     final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
     var currentVolume = bgSoundNotifierProvider.volume;
+    
     return SliderTheme(
       data: SliderThemeData(
           trackShape: BackgroundSoundVolumeTrackShapeComponent(

@@ -8,7 +8,7 @@ import 'components/background_image_component.dart';
 import 'components/bottom_actions/bottom_action_component.dart';
 import 'components/duration_indicator_component.dart';
 import 'components/overlay_cover_image_component.dart';
-import 'components/player_buttons_component.dart';
+import 'components/player_buttons/player_buttons_component.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({super.key, required this.sessionModel, required this.file});

@@ -1,18 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 final audioPlayerNotifierProvider =
     ChangeNotifierProvider<AudioPlayerNotifier>((ref) {
-  return AudioPlayerNotifier();
+  return audioHandler;
 });
 
 //ignore:prefer-match-file-name
@@ -21,7 +20,9 @@ class AudioPlayerNotifier extends BaseAudioHandler
   final backgroundSoundAudioPlayer = AudioPlayer();
   final sessionAudioPlayer = AudioPlayer();
   SessionFilesModel? currentlyPlayingSession;
-  AudioPlayerNotifier() {
+  final hasBgSound = 'hasBgSound';
+
+  void initAudioHandler() {
     sessionAudioPlayer.playbackEventStream
         .map(_transformEvent)
         .pipe(playbackState);
@@ -49,27 +50,42 @@ class AudioPlayerNotifier extends BaseAudioHandler
     }
   }
 
-  void playBackgroundSound() {
-    unawaited(backgroundSoundAudioPlayer.play());
-    unawaited(backgroundSoundAudioPlayer.setLoopMode(LoopMode.all));
+  @override
+  Future<void> play() async {
+    var checkBgAudio = mediaItemHasBGSound();
+    if (checkBgAudio) {
+      unawaited(playBackgroundSound());
+    } else {
+      unawaited(pauseBackgroundSound());
+    }
+    await sessionAudioPlayer.play();
   }
 
   @override
-  Future<void> play() async => await sessionAudioPlayer.play();
-
-  void pauseBackgroundSound() {
-    unawaited(backgroundSoundAudioPlayer.pause());
+  Future<void> pause() async {
+    unawaited(pauseBackgroundSound());
+    await sessionAudioPlayer.pause();
   }
 
   @override
-  Future<void> pause() async => await sessionAudioPlayer.pause();
-
-  void stopBackgroundSound() async {
-    await backgroundSoundAudioPlayer.stop();
-  }
-
-  void stopSessionAudio() async {
+  Future<void> stop() async {
     await sessionAudioPlayer.stop();
+    if (mediaItemHasBGSound()) {
+      await stopBackgroundSound();
+    }
+  }
+
+  Future<void> playBackgroundSound() async {
+    await backgroundSoundAudioPlayer.play();
+    await backgroundSoundAudioPlayer.setLoopMode(LoopMode.all);
+  }
+
+  Future<void> pauseBackgroundSound() async {
+    await backgroundSoundAudioPlayer.pause();
+  }
+
+  Future<void> stopBackgroundSound() async {
+    await backgroundSoundAudioPlayer.stop();
   }
 
   void setSessionAudioSpeed(double speed) async {
@@ -116,6 +132,9 @@ class AudioPlayerNotifier extends BaseAudioHandler
       artUri: Uri.parse(
         sessionModel.coverUrl,
       ),
+      extras: {
+        hasBgSound: sessionModel.hasBackgroundSound,
+      },
     );
     mediaItem.add(item);
   }
@@ -150,5 +169,12 @@ class AudioPlayerNotifier extends BaseAudioHandler
       speed: sessionAudioPlayer.speed,
       queueIndex: event.currentIndex,
     );
+  }
+
+  bool mediaItemHasBGSound() {
+    print('***********');
+    print(mediaItem.value?.extras?[hasBgSound]);
+
+    return mediaItem.value?.extras?[hasBgSound] ?? false;
   }
 }
