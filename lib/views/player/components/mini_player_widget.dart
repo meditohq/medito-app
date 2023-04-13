@@ -6,6 +6,8 @@ import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'player_buttons/play_pause_button_component.dart';
+
 class MiniPlayerWidget extends ConsumerWidget {
   const MiniPlayerWidget({super.key, required this.sessionModel});
   final SessionModel sessionModel;
@@ -31,7 +33,7 @@ class MiniPlayerWidget extends ConsumerWidget {
                 ],
               ),
             ),
-            _playPauseButton(ref),
+            _playPauseButton(),
           ],
         ),
       ),
@@ -112,34 +114,11 @@ class MiniPlayerWidget extends ConsumerWidget {
     );
   }
 
-  Padding _playPauseButton(WidgetRef ref) {
+  Padding _playPauseButton() {
     return Padding(
       padding: const EdgeInsets.only(right: 15),
-      child: InkWell(
-        onTap: () {
-          var _state = ref.watch(audioPlayPauseStateProvider.notifier).state;
-          ref.read(audioPlayPauseStateProvider.notifier).state =
-              _state == PLAY_PAUSE_AUDIO.PAUSE
-                  ? PLAY_PAUSE_AUDIO.PLAY
-                  : PLAY_PAUSE_AUDIO.PAUSE;
-        },
-        child: AnimatedCrossFade(
-          firstChild: Icon(
-            Icons.play_circle_fill,
-            size: 40,
-            color: ColorConstants.walterWhite,
-          ),
-          secondChild: Icon(
-            Icons.pause_circle_filled,
-            size: 40,
-            color: ColorConstants.walterWhite,
-          ),
-          crossFadeState:
-              ref.watch(audioPlayPauseStateProvider) == PLAY_PAUSE_AUDIO.PLAY
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-          duration: Duration(milliseconds: 500),
-        ),
+      child: PlayPauseButtonComponent(
+        iconSize: 40,
       ),
     );
   }
