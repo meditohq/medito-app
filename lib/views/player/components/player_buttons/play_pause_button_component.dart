@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PlayPauseButtonComponent extends ConsumerWidget {
-  const PlayPauseButtonComponent({super.key});
-
+  const PlayPauseButtonComponent({super.key, this.iconSize = 72});
+  final double iconSize;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(audioPlayerNotifierProvider);
@@ -22,12 +22,12 @@ class PlayPauseButtonComponent extends ConsumerWidget {
           child: AnimatedCrossFade(
             firstChild: Icon(
               Icons.play_circle_fill,
-              size: 72,
+              size: iconSize,
               color: ColorConstants.walterWhite,
             ),
             secondChild: Icon(
               Icons.pause_circle_filled,
-              size: 72,
+              size: iconSize,
               color: ColorConstants.walterWhite,
             ),
             crossFadeState:

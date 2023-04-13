@@ -158,7 +158,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     SessionModel sessionModel,
   ) {
     ref.read(playerProvider.notifier).addCurrentlyPlayingSessionInPreference(
-        sessionModel: sessionModel, file: sessionModel.audio.first.files.first);
+          sessionModel: sessionModel,
+          file: sessionModel.audio.first.files.first,
+        );
     ref.read(pageviewNotifierProvider).gotoNextPage();
   }
 

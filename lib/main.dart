@@ -174,14 +174,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         if (_provider.selectedBgSound != null &&
             _provider.selectedBgSound?.title != StringConstants.NONE) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          // _audioPlayerNotifier.playBackgroundSound();
+          _audioPlayerNotifier.playBackgroundSound();
         }
       });
       _provider.getVolumeFromPref().then((_) {
         _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
       });
     } else {
-      // _audioPlayerNotifier.pauseBackgroundSound();
+      _audioPlayerNotifier.pauseBackgroundSound();
     }
   }
 }
