@@ -13,24 +13,18 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
-
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'audioplayer/audio_inherited_widget.dart';
-import 'network/auth.dart';
 import 'package:Medito/view_model/player/player_viewmodel.dart';
 import 'view_model/audio_player/audio_player_viewmodel.dart';
 import 'view_model/background_sounds/background_sounds_viewmodel.dart';
@@ -38,48 +32,30 @@ import 'view_model/player/audio_play_pause_viewmodel.dart';
 import 'view_model/player/download/audio_downloader_viewmodel.dart';
 
 late SharedPreferences sharedPreferences;
-
+late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
   sharedPreferences = await SharedPreferences.getInstance();
 
-  var _audioHandler = await AudioService.init(
-    builder: () => MeditoAudioHandler(),
+  audioHandler = await AudioService.init(
+    builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.medito.app.channel.audio',
       androidNotificationChannelName: 'Medito Session',
+      androidNotificationOngoing: true,
     ),
   );
 
-  _audioHandler.customEvent.stream.listen((event) {
-    if (event == STATS) {
-      unawaited(updateStatsFromBg());
-    }
-  });
-
   usePathUrlStrategy();
-
-  if (kReleaseMode) {
-    await SentryFlutter.init(
-      (options) {
-        options.dsn = SENTRY_URL;
-      },
-      appRunner: () => _runApp(
-        _audioHandler,
-      ),
-    );
-  } else {
-    _runApp(_audioHandler);
-  }
+  _runApp();
 }
 
-void _runApp(MeditoAudioHandler _audioHandler) => runApp(ProviderScope(
-      child: AudioHandlerInheritedWidget(
-        audioHandler: _audioHandler,
+void _runApp() => runApp(
+      ProviderScope(
         child: ParentWidget(),
       ),
-    ));
+    );
 
 // This Widget is the main application widget.
 // ignore: prefer-match-file-name
@@ -96,6 +72,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void initState() {
     super.initState();
     ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
+    ref.read(audioPlayerNotifierProvider).initAudioHandler();
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -166,8 +143,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         _audioPlayerNotifier.currentlyPlayingSession?.id;
 
     if (!isPlaying || _currentPlayingFileId != file.id) {
-      setSessionAudio(_audioPlayerNotifier, sessionModel, file);
       setBackgroundSound(_audioPlayerNotifier, sessionModel.hasBackgroundSound);
+      setSessionAudio(_audioPlayerNotifier, sessionModel, file);
     }
   }
 
@@ -197,14 +174,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         if (_provider.selectedBgSound != null &&
             _provider.selectedBgSound?.title != StringConstants.NONE) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          _audioPlayerNotifier.playBackgroundSound();
+          // _audioPlayerNotifier.playBackgroundSound();
         }
       });
       _provider.getVolumeFromPref().then((_) {
         _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
       });
     } else {
-      _audioPlayerNotifier.pauseBackgroundSound();
+      // _audioPlayerNotifier.pauseBackgroundSound();
     }
   }
 }

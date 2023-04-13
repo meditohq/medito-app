@@ -11,7 +11,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   final SessionModel sessionModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
+    // ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
 
     return InkWell(
       onTap: () {
