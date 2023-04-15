@@ -24,6 +24,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   Widget build(BuildContext context) {
     super.build(context);
     var coverUrl = widget.sessionModel.coverUrl;
+    var artist = widget.sessionModel.artist;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -45,7 +46,17 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                     ),
                   ),
                   Spacer(),
-                  ArtistTitleComponent(sessionModel: widget.sessionModel),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 4.0,
+                    ),
+                    child: ArtistTitleComponent(
+                      sessionTitle: widget.sessionModel.title,
+                      artistName: artist?.name,
+                      artistUrlPath: artist?.path,
+                    ),
+                  ),
                   OverlayCoverImageComponent(imageUrl: coverUrl),
                   DurationIndicatorComponent(file: widget.file),
                   Spacer(),
