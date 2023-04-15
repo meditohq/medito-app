@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final audioDownloaderProvider =
-    ChangeNotifierProvider<AudioDownloaderViewModel>((ref) {
-  return AudioDownloaderViewModel(ref);
+    ChangeNotifierProvider<AudioDownloaderProvider>((ref) {
+  return AudioDownloaderProvider(ref);
 });
 
-class AudioDownloaderViewModel extends ChangeNotifier {
-  ChangeNotifierProviderRef<AudioDownloaderViewModel> ref;
-  AudioDownloaderViewModel(this.ref);
+class AudioDownloaderProvider extends ChangeNotifier {
+  ChangeNotifierProviderRef<AudioDownloaderProvider> ref;
+  AudioDownloaderProvider(this.ref);
   Map<String, double> downloadingProgress = {};
   Map<String, AUDIO_DOWNLOAD_STATE> audioDownloadState = {};
   Future<void> downloadSessionAudio(

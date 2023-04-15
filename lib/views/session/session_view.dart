@@ -17,7 +17,7 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/session/components/session_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

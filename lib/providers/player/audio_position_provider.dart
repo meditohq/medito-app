@@ -1,6 +1,6 @@
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'audio_position_viewmodel.g.dart';
+part 'audio_position_provider.g.dart';
 
 @riverpod
 void slideAudioPosition(

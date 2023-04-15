@@ -1,6 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/view_model/stats/stats_viewmodel.dart';
+import 'package:Medito/providers/stats/stats_provider.dart';
 import 'package:Medito/views/home/streak_tile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

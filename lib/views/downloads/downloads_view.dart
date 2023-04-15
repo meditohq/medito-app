@@ -1,13 +1,9 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
-import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
-import 'package:Medito/view_model/player/player_viewmodel.dart';
-import 'package:Medito/view_model/session/download_session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';

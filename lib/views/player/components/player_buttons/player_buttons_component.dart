@@ -1,12 +1,9 @@
-import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-
 import 'play_pause_button_component.dart';
 
 class PlayerButtonsComponent extends ConsumerWidget {
