@@ -1,8 +1,7 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
-import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/sound_listtile_component.dart';

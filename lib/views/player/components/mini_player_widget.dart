@@ -1,18 +1,17 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'artist_title_component.dart';
+import 'player_buttons/play_pause_button_component.dart';
 
 class MiniPlayerWidget extends ConsumerWidget {
   const MiniPlayerWidget({super.key, required this.sessionModel});
   final SessionModel sessionModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
-
     return InkWell(
       onTap: () {
         ref.read(pageviewNotifierProvider).gotoNextPage();
@@ -27,11 +26,11 @@ class MiniPlayerWidget extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   sessionCoverImage(sessionModel.coverUrl),
-                  _titleAndSubtitle(context),
+                  _titleAndSubtitle(),
                 ],
               ),
             ),
-            _playPauseButton(ref),
+            _playPauseButton(),
           ],
         ),
       ),
@@ -52,7 +51,7 @@ class MiniPlayerWidget extends ConsumerWidget {
     );
   }
 
-  Flexible _titleAndSubtitle(BuildContext context) {
+  Flexible _titleAndSubtitle() {
     return Flexible(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -60,86 +59,25 @@ class MiniPlayerWidget extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _title(context),
-            _subtitle(context),
+            ArtistTitleComponent(
+              sessionTitle: sessionModel.title,
+              artistName: sessionModel.artist?.name,
+              artistUrlPath: sessionModel.artist?.path,
+              sessionTitleFontSize: 16,
+              artistNameFontSize: 12,
+              artistUrlPathFontSize: 11,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Text _title(BuildContext context) {
-    return Text(
-      sessionModel.title,
-      textAlign: TextAlign.left,
-      style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-            fontFamily: ClashDisplay,
-            color: ColorConstants.walterWhite,
-            fontSize: 16,
-            letterSpacing: 1,
-          ),
-    );
-  }
-
-  SizedBox _subtitle(BuildContext context) {
-    var titleMedium = Theme.of(context).textTheme.titleMedium;
-    var walterWhite = ColorConstants.walterWhite.withOpacity(0.9);
-    if (sessionModel.artist == null) {
-      return SizedBox();
-    }
-
-    return SizedBox(
-      height: 15,
-      child: MarkdownComponent(
-        body:
-            '${sessionModel.artist?.name ?? ''} ${sessionModel.artist?.path ?? ''}',
-        textAlign: WrapAlignment.start,
-        p: titleMedium?.copyWith(
-          fontFamily: DmMono,
-          letterSpacing: 1,
-          fontSize: 12,
-          color: walterWhite,
-          overflow: TextOverflow.ellipsis,
-        ),
-        a: titleMedium?.copyWith(
-          fontFamily: DmMono,
-          color: walterWhite,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
-  }
-
-  Padding _playPauseButton(WidgetRef ref) {
+  Padding _playPauseButton() {
     return Padding(
       padding: const EdgeInsets.only(right: 15),
-      child: InkWell(
-        onTap: () {
-          var _state = ref.watch(audioPlayPauseStateProvider.notifier).state;
-          ref.read(audioPlayPauseStateProvider.notifier).state =
-              _state == PLAY_PAUSE_AUDIO.PAUSE
-                  ? PLAY_PAUSE_AUDIO.PLAY
-                  : PLAY_PAUSE_AUDIO.PAUSE;
-        },
-        child: AnimatedCrossFade(
-          firstChild: Icon(
-            Icons.play_circle_fill,
-            size: 40,
-            color: ColorConstants.walterWhite,
-          ),
-          secondChild: Icon(
-            Icons.pause_circle_filled,
-            size: 40,
-            color: ColorConstants.walterWhite,
-          ),
-          crossFadeState:
-              ref.watch(audioPlayPauseStateProvider) == PLAY_PAUSE_AUDIO.PLAY
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-          duration: Duration(milliseconds: 500),
-        ),
+      child: PlayPauseButtonComponent(
+        iconSize: 40,
       ),
     );
   }

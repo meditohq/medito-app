@@ -3,7 +3,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/folder/folder_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,6 +16,7 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // id=28 for testing
     var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
 
     return Scaffold(
@@ -28,12 +29,10 @@ class FolderView extends ConsumerWidget {
             FoldersProvider(folderId: int.parse(id!)),
           ),
         ),
-        loading: () => _buildLoadingWidget(),
+        loading: () => const FolderShimmerComponent(),
       ),
     );
   }
-
-  Widget _buildLoadingWidget() => const FolderShimmerComponent();
 
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,

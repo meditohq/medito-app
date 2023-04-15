@@ -1,9 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_extensions.dart';
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -75,7 +73,7 @@ class DurationIndicatorComponent extends ConsumerWidget {
     if (maxDuration <= currentDuration + additionalMilliSeconds) {
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
       audioProvider.seekValueFromSlider(0);
-      audioProvider.pauseSessionAudio();
+      audioProvider.pause();
       audioProvider.pauseBackgroundSound();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =

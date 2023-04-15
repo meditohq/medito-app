@@ -14,7 +14,8 @@ abstract class SessionRepository {
   Future<List<SessionModel>> fetchSessionFromPreference();
   Future<void> addSessionInPreference(List<SessionModel> sessionList);
   Future<void> addCurrentlyPlayingSessionInPreference(
-      SessionModel sessionModel);
+    SessionModel sessionModel,
+  );
   Future<SessionModel?> fetchCurrentlyPlayingSessionFromPreference();
 }
 
