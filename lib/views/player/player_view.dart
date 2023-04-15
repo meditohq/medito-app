@@ -1,6 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/artist_title_component.dart';
@@ -8,7 +8,7 @@ import 'components/background_image_component.dart';
 import 'components/bottom_actions/bottom_action_component.dart';
 import 'components/duration_indicator_component.dart';
 import 'components/overlay_cover_image_component.dart';
-import 'components/player_buttons_component.dart';
+import 'components/player_buttons/player_buttons_component.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({super.key, required this.sessionModel, required this.file});
@@ -24,6 +24,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   Widget build(BuildContext context) {
     super.build(context);
     var coverUrl = widget.sessionModel.coverUrl;
+    var artist = widget.sessionModel.artist;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -45,7 +46,17 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                     ),
                   ),
                   Spacer(),
-                  ArtistTitleComponent(sessionModel: widget.sessionModel),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 4.0,
+                    ),
+                    child: ArtistTitleComponent(
+                      sessionTitle: widget.sessionModel.title,
+                      artistName: artist?.name,
+                      artistUrlPath: artist?.path,
+                    ),
+                  ),
                   OverlayCoverImageComponent(imageUrl: coverUrl),
                   DurationIndicatorComponent(file: widget.file),
                   Spacer(),

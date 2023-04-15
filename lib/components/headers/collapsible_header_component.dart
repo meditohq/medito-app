@@ -13,6 +13,7 @@ class CollapsibleHeaderComponent extends StatefulWidget {
     this.headerHeight = 300,
     this.leadingIconColor = Colors.white,
     this.leadingIconBgColor = Colors.black38,
+    this.onPressedCloseBtn,
   });
   final List<Widget> children;
   final String? bgImage;
@@ -21,6 +22,7 @@ class CollapsibleHeaderComponent extends StatefulWidget {
   final double headerHeight;
   final Color leadingIconColor;
   final Color leadingIconBgColor;
+  final void Function()? onPressedCloseBtn;
   @override
   State<CollapsibleHeaderComponent> createState() =>
       _CollapsibleHeaderComponentState();
@@ -102,9 +104,10 @@ class _CollapsibleHeaderComponentState
     return CloseButtonComponent(
       bgColor: widget.leadingIconBgColor,
       icColor: widget.leadingIconColor,
-      onPressed: () {
-        router.pop();
-      },
+      onPressed: widget.onPressedCloseBtn ??
+          () {
+            router.pop();
+          },
       isShowCircle: !_isShrink,
     );
   }

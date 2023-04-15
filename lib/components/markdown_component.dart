@@ -12,11 +12,15 @@ class MarkdownComponent extends StatelessWidget {
     this.p,
     this.a,
     this.textAlign,
+    this.pFontSize = 16,
+    this.aFontSize = 13,
   });
   final String body;
   final void Function(String, String?, String)? onTapLink;
   final TextStyle? p, a;
   final WrapAlignment? textAlign;
+  final double pFontSize;
+  final double aFontSize;
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;
@@ -31,6 +35,7 @@ class MarkdownComponent extends StatelessWidget {
         p: p ??
             titleMedium?.copyWith(
               fontFamily: DmMono,
+              fontSize: pFontSize,
               letterSpacing: 1,
               color: walterWhite,
             ),
@@ -39,7 +44,7 @@ class MarkdownComponent extends StatelessWidget {
             titleMedium?.copyWith(
               fontFamily: DmMono,
               color: walterWhite,
-              fontSize: 13,
+              fontSize: aFontSize,
               fontWeight: FontWeight.w600,
             ),
       ),

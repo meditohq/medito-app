@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final pageviewNotifierProvider =
-    ChangeNotifierProvider<PageviewViewModel>((ref) {
-  return PageviewViewModel();
+    ChangeNotifierProvider<PageviewProvider>((ref) {
+  return PageviewProvider();
 });
 
-class PageviewViewModel extends ChangeNotifier {
+class PageviewProvider extends ChangeNotifier {
   final pageController = PageController(keepPage: true);
   int currentPage = 0;
 
@@ -29,10 +29,15 @@ class PageviewViewModel extends ChangeNotifier {
 
   void gotoNextPage() {
     pageController.nextPage(
-        duration: Duration(milliseconds: 500), curve: Curves.easeIn);
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeIn,
+    );
   }
+
   void gotoPreviousPage() {
     pageController.previousPage(
-        duration: Duration(milliseconds: 500), curve: Curves.easeIn);
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeIn,
+    );
   }
 }

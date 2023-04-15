@@ -1,6 +1,6 @@
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';

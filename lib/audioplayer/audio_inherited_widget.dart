@@ -15,6 +15,7 @@ class AudioHandlerInheritedWidget extends InheritedWidget {
     final result = context
         .dependOnInheritedWidgetOfExactType<AudioHandlerInheritedWidget>();
     assert(result != null, 'No AudioHandler found in context');
+    
     return result!;
   }
 
