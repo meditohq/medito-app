@@ -1,4 +1,5 @@
 import 'package:Medito/components/components.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
