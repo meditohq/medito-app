@@ -6,11 +6,11 @@ import 'package:Medito/services/shared_preference/shared_preferences_service.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final audioSpeedProvider = ChangeNotifierProvider<AudioSpeedViewModel>((ref) {
-  return AudioSpeedViewModel();
+final audioSpeedProvider = ChangeNotifierProvider<AudioSpeedProvider>((ref) {
+  return AudioSpeedProvider();
 });
 
-class AudioSpeedViewModel extends ChangeNotifier {
+class AudioSpeedProvider extends ChangeNotifier {
   final List<String> _speedList = [
     StringConstants.X1,
     StringConstants.X125,

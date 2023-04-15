@@ -1,8 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart' as routes;
-import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
-import 'package:Medito/view_model/page_view/page_view_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

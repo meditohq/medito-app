@@ -1,4 +1,4 @@
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final audioPlayPauseStateProvider = StateProvider<PLAY_PAUSE_AUDIO>(

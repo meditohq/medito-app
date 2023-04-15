@@ -25,11 +25,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Medito/view_model/player/player_viewmodel.dart';
-import 'view_model/audio_player/audio_player_viewmodel.dart';
-import 'view_model/background_sounds/background_sounds_viewmodel.dart';
-import 'view_model/player/audio_play_pause_viewmodel.dart';
-import 'view_model/player/download/audio_downloader_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 
 late SharedPreferences sharedPreferences;
 late AudioPlayerNotifier audioHandler;

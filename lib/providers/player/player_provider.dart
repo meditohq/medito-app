@@ -3,12 +3,12 @@ import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final playerProvider =
-    StateNotifierProvider<PlayerViewModel, SessionModel?>((ref) {
-  return PlayerViewModel(ref);
+    StateNotifierProvider<PlayerProvider, SessionModel?>((ref) {
+  return PlayerProvider(ref);
 });
 
-class PlayerViewModel extends StateNotifier<SessionModel?> {
-  PlayerViewModel(this.ref) : super(null);
+class PlayerProvider extends StateNotifier<SessionModel?> {
+  PlayerProvider(this.ref) : super(null);
   Ref ref;
   Future<void> addCurrentlyPlayingSessionInPreference({
     required SessionModel sessionModel,
