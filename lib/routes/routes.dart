@@ -1,5 +1,4 @@
 import 'package:Medito/components/components.dart';
-import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
@@ -207,6 +206,24 @@ MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
     key: state.pageKey,
     child: FolderView(id: state.params['fid']),
   );
+  // if (params.length == 1) {
+  //   return MaterialPage(
+  //     key: state.pageKey, child: FolderView(id: state.params['fid']),
+  //     // child: NewFolderScreen(id: state.params['fid']),
+  //   );
+  // } else {
+  //   if (params.length == 2) {
+  //     return MaterialPage(
+  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
+  //       // child: NewFolderScreen(id: state.params['f2id']),
+  //     );
+  //   } else {
+  //     return MaterialPage(
+  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
+  //       // child: NewFolderScreen(id: state.params['f3id']),
+  //     );
+  //   }
+  // }
 }
 
 String getPathFromString(String? place, List<String?> ids) {
