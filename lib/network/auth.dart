@@ -1,8 +1,8 @@
 @Deprecated('Remove after refactor')
 const BASE_URL = '';
 @Deprecated('Remove after refactor')
-***REMOVED*** '';
+const INIT_TOKEN = '';
 @Deprecated('Remove after refactor')
-***REMOVED*** '';
+const CONTENT_TOKEN = '';
 @Deprecated('Remove after refactor')
-***REMOVED*** '';
+const SENTRY_URL = '';
