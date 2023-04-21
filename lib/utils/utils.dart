@@ -151,6 +151,12 @@ String getFileExtension(String path) {
   return '.${path.substring(path.lastIndexOf('.') + 1)}';
 }
 
+extension SanitisePath on String {
+  String sanitisePath() {
+    return replaceFirst('/', '');
+  }
+}
+
 extension AssetUrl on String {
   String toAssetUrl() {
     return '${BASE_URL}assets/$this?download';

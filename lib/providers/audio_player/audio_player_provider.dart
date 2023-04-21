@@ -76,7 +76,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   Future<void> playBackgroundSound() async {
-    await backgroundSoundAudioPlayer.play();
+    unawaited(backgroundSoundAudioPlayer.play());
     await backgroundSoundAudioPlayer.setLoopMode(LoopMode.all);
   }
 
@@ -172,9 +172,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   bool mediaItemHasBGSound() {
-    print('***********');
-    print(mediaItem.value?.extras?[hasBgSound]);
-
     return mediaItem.value?.extras?[hasBgSound] ?? false;
   }
 }

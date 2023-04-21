@@ -1,10 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/views/player/components/bottom_actions/components/audio_speed_component.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 import 'components/audio_download_component.dart';
 import 'components/bg_sound_component.dart';
 

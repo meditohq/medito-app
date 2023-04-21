@@ -10,13 +10,13 @@ class NetworkImageComponent extends StatelessWidget {
   final String url;
   final double? height, width;
   final bool isCache;
-  const NetworkImageComponent(
-      {Key? key,
-      required this.url,
-      this.height,
-      this.width,
-      this.isCache = false})
-      : super(key: key);
+  const NetworkImageComponent({
+    Key? key,
+    required this.url,
+    this.height,
+    this.width,
+    this.isCache = false,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     if (url.contains('.svg')) {
@@ -43,11 +43,11 @@ class NetworkImageComponent extends StatelessWidget {
           ),
           placeholder: (context, url) => _shimmerLoading(),
           errorWidget: (context, url, error) {
-            print(error);
             return const Icon(Icons.error);
           },
         );
       }
+
       return Image.network(
         url,
         fit: BoxFit.cover,
@@ -59,11 +59,7 @@ class NetworkImageComponent extends StatelessWidget {
           HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
         },
         loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          } else {
-            return _shimmerLoading();
-          }
+          return loadingProgress == null ? child : _shimmerLoading();
         },
         errorBuilder: (context, error, stackTrace) {
           return Image.asset(

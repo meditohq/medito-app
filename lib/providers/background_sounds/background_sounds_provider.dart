@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'background_sounds_provider.g.dart';
 
 @riverpod
-Future<List<BackgroundSoundsModel>> backgroundSounds(ref) {
+Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
   final backgroundSoundsRepository =
       ref.watch(backgroundSoundsRepositoryProvider);
 

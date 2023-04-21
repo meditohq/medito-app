@@ -151,9 +151,10 @@ class _CollapsibleHeaderComponentState
         textScaleFactor: 1,
         textAlign: TextAlign.left,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-            fontFamily: ClashDisplay,
-            color: ColorConstants.walterWhite,
-            fontSize: _isShrink ? 20 : 24),
+              fontFamily: ClashDisplay,
+              color: ColorConstants.walterWhite,
+              fontSize: _isShrink ? 20 : 24,
+            ),
       ),
     );
   }

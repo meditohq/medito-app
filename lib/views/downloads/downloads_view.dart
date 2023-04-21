@@ -97,7 +97,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
                   '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
                 );
             ref.read(deleteSessionFromPreferenceProvider(
-              sessionModel: item,
               file: item.audio.first.files.first,
             ).future);
           }

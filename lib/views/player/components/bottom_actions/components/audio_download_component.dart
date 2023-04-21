@@ -98,7 +98,6 @@ class AudioDownloadComponent extends ConsumerWidget {
         '${sessionModel.id}-${file.id}${getFileExtension(file.path)}',
       );
       ref.read(deleteSessionFromPreferenceProvider(
-        sessionModel: sessionModel,
         file: file,
       ));
     } catch (e) {

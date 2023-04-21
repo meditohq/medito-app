@@ -70,7 +70,11 @@ class NewFolderScreen extends ConsumerWidget {
   }
 
   Container _buildListTile(
-      BuildContext context, String? title, String? subtitle, bool showIcon) {
+    BuildContext context,
+    String? title,
+    String? subtitle,
+    bool showIcon,
+  ) {
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
 
     return Container(
@@ -124,10 +128,14 @@ class NewFolderScreen extends ConsumerWidget {
         if (type == 'folder') {
           if (location.contains('folder2')) {
             context.go(getPathFromString(
-                Folder3Path, [location.split('/')[2], this.id, id.toString()]));
+              RouteConstants.folder3Path,
+              [location.split('/')[2], this.id, id.toString()],
+            ));
           } else {
-            context
-                .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
+            context.go(getPathFromString(
+              RouteConstants.folder2Path,
+              [this.id, id.toString()],
+            ));
           }
         } else {
           context.go(location + getPathFromString(type, [id.toString()]));

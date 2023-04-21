@@ -16,7 +16,6 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // id=28 for testing
     var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
 
     return Scaffold(
@@ -124,15 +123,16 @@ class FolderView extends ConsumerWidget {
         if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
             context.push(getPathFromString(
-              Folder3Path,
+              RouteConstants.folder3Path,
               [location.split('/')[2], this.id, id.toString()],
             ));
           } else {
-            context
-                .push(getPathFromString(Folder2Path, [this.id, id.toString()]));
+            context.push(getPathFromString(
+                RouteConstants.folder2Path, [this.id, id.toString()]));
           }
         } else if (type == TypeConstants.LINK) {
-          context.push(location + WebviewPath, extra: {'url': path!});
+          context.push(location + RouteConstants.webviewPath,
+              extra: {'url': path!});
           // context.go(getPathFromString('url', [path.toString()]));
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));

@@ -30,7 +30,6 @@ class SessionView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // id=9 for testing
     var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
 
     return Scaffold(

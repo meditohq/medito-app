@@ -1,5 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
@@ -53,6 +52,6 @@ class MarkdownComponent extends StatelessWidget {
 
   void _linkTap(BuildContext context, String? href) {
     var location = GoRouter.of(context).location;
-    context.go(location + WebviewPath, extra: {'url': href});
+    context.go(location + RouteConstants.webviewPath, extra: {'url': href});
   }
 }

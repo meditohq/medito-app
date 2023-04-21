@@ -13,8 +13,7 @@ class HomeWrapperWidget extends StatefulWidget {
   _HomeWrapperWidgetState createState() => _HomeWrapperWidgetState();
 }
 
-class _HomeWrapperWidgetState extends State<HomeWrapperWidget>{
-    
+class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
@@ -103,7 +102,4 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget>{
       _currentIndex = value;
     });
   }
-
-  // @override
-  // bool get wantKeepAlive => true;
 }

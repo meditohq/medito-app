@@ -15,7 +15,10 @@ class SoundListTileComponent extends ConsumerWidget {
 
     return InkWell(
       onTap: () => _handleItemTap(
-          bgSoundNotifierProvider, audioPlayerNotifier, isSelected),
+        bgSoundNotifierProvider,
+        audioPlayerNotifier,
+        isSelected,
+      ),
       child: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -45,8 +48,9 @@ class SoundListTileComponent extends ConsumerWidget {
   Container _radioButton(bool isSelected) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(width: 2, color: ColorConstants.walterWhite)),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(width: 2, color: ColorConstants.walterWhite),
+      ),
       padding: EdgeInsets.all(4),
       child: CircleAvatar(
         radius: 6,
@@ -57,8 +61,11 @@ class SoundListTileComponent extends ConsumerWidget {
     );
   }
 
-  void _handleItemTap(BackgroundSoundsNotifier bgSoundNotifierProvider,
-      AudioPlayerNotifier audioPlayerNotifier, bool isSelected) {
+  void _handleItemTap(
+    BackgroundSoundsNotifier bgSoundNotifierProvider,
+    AudioPlayerNotifier audioPlayerNotifier,
+    bool isSelected,
+  ) {
     if (sound.title == StringConstants.NONE) {
       bgSoundNotifierProvider.handleOnChangeSound(sound);
       audioPlayerNotifier.stopBackgroundSound();
@@ -67,7 +74,11 @@ class SoundListTileComponent extends ConsumerWidget {
         !isSelected
             ? sound
             : BackgroundSoundsModel(
-                id: 0, title: StringConstants.NONE, duration: 0, path: ''),
+                id: 0,
+                title: StringConstants.NONE,
+                duration: 0,
+                path: '',
+              ),
       );
       if (!isSelected) {
         audioPlayerNotifier.setBackgroundAudio(sound);
