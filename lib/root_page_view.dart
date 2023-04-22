@@ -8,6 +8,7 @@ import 'package:Medito/view_model/player/player_viewmodel.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'view_model/audio_player/audio_player_viewmodel.dart';
 import 'views/player/components/mini_player_widget.dart';
 
@@ -15,11 +16,12 @@ class RootPageView extends ConsumerStatefulWidget {
   final Widget firstChild;
 
   RootPageView({required this.firstChild});
+
   @override
-  ConsumerState<RootPageView> createState() => _RootPageViewtState();
+  ConsumerState<RootPageView> createState() => _RootPageViewState();
 }
 
-class _RootPageViewtState extends ConsumerState<RootPageView> {
+class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
     ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
@@ -39,52 +41,57 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
-      body: PageView(
-        controller: ref.read(pageviewNotifierProvider).pageController,
-        scrollDirection: Axis.vertical,
-        // physics: BouncingScrollPhysics(),
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: radius,
-                      bottomRight: radius,
-                    ),
-                    child: widget.firstChild),
-              ),
-              if (currentlyPlayingSession != null) height8,
-              if (currentlyPlayingSession != null)
-                Consumer(builder: (context, ref, child) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: radius,
-                      topRight: radius,
-                    ),
-                    child: AnimatedCrossFade(
-                      duration: Duration(milliseconds: 700),
-                      crossFadeState:
-                          ref.watch(pageviewNotifierProvider).currentPage == 0
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                      firstChild: MiniPlayerWidget(
-                        sessionModel: currentlyPlayingSession,
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollUpdateNotification &&
+              scrollNotification.depth == 0) {
+            ref
+                .read(pageviewNotifierProvider.notifier)
+                .updateScrollProportion(scrollNotification);
+          }
+          return true;
+        },
+        child: PageView(
+          controller: ref.read(pageviewNotifierProvider).pageController,
+          scrollDirection: Axis.vertical,
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: radius,
+                        bottomRight: radius,
                       ),
-                      secondChild: Container(
-                        height: 64,
-                        color: ColorConstants.greyIsTheNewGrey,
+                      child: widget.firstChild),
+                ),
+                if (currentlyPlayingSession != null) height8,
+                if (currentlyPlayingSession != null)
+                  Consumer(builder: (context, ref, child) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: radius,
+                        topRight: radius,
                       ),
-                    ),
-                  );
-                }),
-            ],
-          ),
-          if (currentlyPlayingSession != null)
-            PlayerView(
-                sessionModel: currentlyPlayingSession,
-                file: currentlyPlayingSession.audio.first.files.first)
-        ],
+                      child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 700),
+                        opacity: ref
+                            .watch(pageviewNotifierProvider)
+                            .scrollProportion,
+                        child: MiniPlayerWidget(
+                          sessionModel: currentlyPlayingSession,
+                        ),
+                      ),
+                    );
+                  }),
+              ],
+            ),
+            if (currentlyPlayingSession != null)
+              PlayerView(
+                  sessionModel: currentlyPlayingSession,
+                  file: currentlyPlayingSession.audio.first.files.first)
+          ],
+        ),
       ),
     );
   }
