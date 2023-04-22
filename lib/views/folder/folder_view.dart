@@ -51,6 +51,7 @@ class FolderView extends ConsumerWidget {
                   e.title,
                   e.subtitle,
                   e.type,
+                  folder.items.last == e
                 ),
               ),
             )
@@ -60,10 +61,10 @@ class FolderView extends ConsumerWidget {
   }
 
   Container _buildListTile(
-      BuildContext context, String? title, String? subtitle, String type) {
+      BuildContext context, String? title, String? subtitle, String type, bool isLast) {
     return Container(
       decoration: BoxDecoration(
-        border: Border(
+        border: isLast ? null : Border(
           bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
         ),
       ),
