@@ -9,7 +9,7 @@ final pageviewNotifierProvider =
 class PageviewProvider extends ChangeNotifier {
   final pageController = PageController(keepPage: true);
   int currentPage = 0;
-  double scrollProportion = 0;
+  double scrollProportion = 1;
 
   void addListenerToPage() {
     pageController.addListener(
