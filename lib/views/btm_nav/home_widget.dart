@@ -62,6 +62,8 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
 
   late StreamSubscription<ConnectivityResult> subscription;
 
+  ScrollController _innerScrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);

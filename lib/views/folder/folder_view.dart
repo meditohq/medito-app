@@ -50,12 +50,8 @@ class FolderView extends ConsumerWidget {
             .map(
               (e) => GestureDetector(
                 onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
-                child: _buildListTile(
-                  context,
-                  e.title,
-                  e.subtitle,
-                  e.type,
-                ),
+                child: _buildListTile(context, e.title, e.subtitle, e.type,
+                    folder.items.last == e),
               ),
             )
             .toList(),
@@ -68,14 +64,17 @@ class FolderView extends ConsumerWidget {
     String? title,
     String? subtitle,
     String type,
+    bool isLast,
   ) {
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
-        ),
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
+              ),
       ),
       constraints: BoxConstraints(minHeight: 88),
       padding: const EdgeInsets.all(20.0),
@@ -128,11 +127,15 @@ class FolderView extends ConsumerWidget {
             ));
           } else {
             context.push(getPathFromString(
-                RouteConstants.folder2Path, [this.id, id.toString()]));
+              RouteConstants.folder2Path,
+              [this.id, id.toString()],
+            ));
           }
         } else if (type == TypeConstants.LINK) {
-          context.push(location + RouteConstants.webviewPath,
-              extra: {'url': path!});
+          context.push(
+            location + RouteConstants.webviewPath,
+            extra: {'url': path!},
+          );
           // context.go(getPathFromString('url', [path.toString()]));
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));

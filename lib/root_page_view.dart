@@ -9,11 +9,12 @@ class RootPageView extends ConsumerStatefulWidget {
   final Widget firstChild;
 
   RootPageView({required this.firstChild});
+
   @override
-  ConsumerState<RootPageView> createState() => _RootPageViewtState();
+  ConsumerState<RootPageView> createState() => _RootPageViewState();
 }
 
-class _RootPageViewtState extends ConsumerState<RootPageView> {
+class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
     ref.read(pageviewNotifierProvider).addListenerToPage();
@@ -27,53 +28,59 @@ class _RootPageViewtState extends ConsumerState<RootPageView> {
 
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
-      body: PageView(
-        controller: ref.read(pageviewNotifierProvider).pageController,
-        scrollDirection: Axis.vertical,
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: radius,
-                    bottomRight: radius,
-                  ),
-                  child: widget.firstChild,
-                ),
-              ),
-              if (currentlyPlayingSession != null) height8,
-              if (currentlyPlayingSession != null)
-                Consumer(builder: (context, ref, child) {
-                  return ClipRRect(
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollUpdateNotification && scrollNotification.depth == 0) {
+            ref
+                .read(pageviewNotifierProvider.notifier)
+                .updateScrollProportion(scrollNotification);
+          }
+
+          return true;
+        },
+        child: PageView(
+          controller: ref.read(pageviewNotifierProvider).pageController,
+          scrollDirection: Axis.vertical,
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.only(
-                      topLeft: radius,
-                      topRight: radius,
+                      bottomLeft: radius,
+                      bottomRight: radius,
                     ),
-                    child: AnimatedCrossFade(
-                      duration: Duration(milliseconds: 700),
-                      crossFadeState:
-                          ref.watch(pageviewNotifierProvider).currentPage == 0
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                      firstChild: MiniPlayerWidget(
-                        sessionModel: currentlyPlayingSession,
+                    child: widget.firstChild,
+                  ),
+                ),
+                if (currentlyPlayingSession != null) height8,
+                if (currentlyPlayingSession != null)
+                  Consumer(builder: (context, ref, child) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: radius,
+                        topRight: radius,
                       ),
-                      secondChild: Container(
-                        height: 64,
-                        color: ColorConstants.greyIsTheNewGrey,
+                      child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 700),
+                        opacity: ref
+                            .watch(pageviewNotifierProvider)
+                            .scrollProportion,
+                        child: MiniPlayerWidget(
+                          sessionModel: currentlyPlayingSession,
+                        ),
                       ),
-                    ),
-                  );
-                }),
-            ],
-          ),
-          if (currentlyPlayingSession != null)
-            PlayerView(
-              sessionModel: currentlyPlayingSession,
-              file: currentlyPlayingSession.audio.first.files.first,
+                    );
+                  }),
+              ],
             ),
-        ],
+            if (currentlyPlayingSession != null)
+              PlayerView(
+                sessionModel: currentlyPlayingSession,
+                file: currentlyPlayingSession.audio.first.files.first,
+              ),
+          ],
+        ),
       ),
     );
   }

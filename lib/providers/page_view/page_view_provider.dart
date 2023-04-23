@@ -9,6 +9,7 @@ final pageviewNotifierProvider =
 class PageviewProvider extends ChangeNotifier {
   final pageController = PageController(keepPage: true);
   int currentPage = 0;
+  double scrollProportion = 0;
 
   void addListenerToPage() {
     pageController.addListener(
@@ -25,6 +26,18 @@ class PageviewProvider extends ChangeNotifier {
         }
       },
     );
+  }
+
+  void updateScrollProportion(ScrollNotification scrollNotification) {
+    var scrollPosition = scrollNotification.metrics.pixels;
+    var maxScrollExtent = scrollNotification.metrics.maxScrollExtent;
+    var totalScrollableArea = maxScrollExtent;
+
+    scrollProportion = 1 - (scrollPosition / totalScrollableArea);
+
+    scrollProportion = Curves.easeInOutCubic.transform(scrollProportion);
+
+    notifyListeners();
   }
 
   void gotoNextPage() {
