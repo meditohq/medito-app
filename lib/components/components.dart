@@ -4,6 +4,7 @@ export 'shimmers/background_sounds_shimmer_component.dart';
 export 'error_component.dart';
 export 'headers/collapsible_header_component.dart';
 export 'buttons/close_button_component.dart';
+export 'buttons/loading_button_widget.dart';
 export 'webview_component.dart';
 export 'markdown_component.dart';
 export 'network_image_component.dart';

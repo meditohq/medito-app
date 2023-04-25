@@ -1,8 +1,7 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'widgets/auth_button_widget.dart';
 
 class JoinWelcomeView extends StatelessWidget {
   const JoinWelcomeView({super.key});
@@ -10,13 +9,6 @@ class JoinWelcomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
-    var joinBenefitList = [
-      StringConstants.joinBenefits1,
-      StringConstants.joinBenefits2,
-      StringConstants.joinBenefits3,
-      StringConstants.joinBenefits4,
-      StringConstants.joinBenefits5,
-    ];
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -62,7 +54,7 @@ class JoinWelcomeView extends StatelessWidget {
                   Spacer(),
                   Align(
                     alignment: Alignment.bottomRight,
-                    child: AuthButtonWidget(
+                    child: LoadingButtonWidget(
                       onPressed: () {
                         context.push(RouteConstants.homePath);
                       },

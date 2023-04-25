@@ -1,9 +1,8 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'widgets/auth_button_widget.dart';
 
 class JoinEmailView extends StatefulWidget {
   const JoinEmailView({super.key});
@@ -63,12 +62,12 @@ class _JoinEmailViewState extends State<JoinEmailView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    AuthButtonWidget(
+                    LoadingButtonWidget(
                       onPressed: () => context.pop(),
                       btnText: StringConstants.goBack,
                     ),
                     width8,
-                    AuthButtonWidget(
+                    LoadingButtonWidget(
                       onPressed: _handleContinue,
                       btnText: StringConstants.continueTxt,
                       bgColor: ColorConstants.walterWhite,

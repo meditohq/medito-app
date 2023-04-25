@@ -1,8 +1,8 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-class AuthButtonWidget extends StatelessWidget {
-  const AuthButtonWidget({
+class LoadingButtonWidget extends StatelessWidget {
+  const LoadingButtonWidget({
     super.key,
     this.onPressed,
     required this.btnText,

@@ -1,8 +1,8 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'widgets/auth_button_widget.dart';
 
 class JoinIntroView extends StatelessWidget {
   const JoinIntroView({super.key});
@@ -63,12 +63,12 @@ class JoinIntroView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      AuthButtonWidget(
+                      LoadingButtonWidget(
                         onPressed: () {},
                         btnText: StringConstants.maybeLater,
                       ),
                       width8,
-                      AuthButtonWidget(
+                      LoadingButtonWidget(
                         onPressed: () {
                           context.push(RouteConstants.joinEmailPath);
                         },

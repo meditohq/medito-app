@@ -1,10 +1,10 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import 'widgets/auth_button_widget.dart';
 
 class JoinVerifyOTPView extends StatefulWidget {
   const JoinVerifyOTPView({super.key});
@@ -83,12 +83,12 @@ class _JoinVerifyOTPViewState extends State<JoinVerifyOTPView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    AuthButtonWidget(
+                    LoadingButtonWidget(
                       onPressed: () => context.pop(),
                       btnText: StringConstants.goBack,
                     ),
                     width8,
-                    AuthButtonWidget(
+                    LoadingButtonWidget(
                       onPressed: _handleVerify,
                       btnText: StringConstants.verify,
                       bgColor: ColorConstants.walterWhite,

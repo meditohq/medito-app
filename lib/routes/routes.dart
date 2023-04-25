@@ -23,10 +23,10 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 final router = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigatorKey,
-  initialLocation: RouteConstants.homePath,
+  initialLocation: RouteConstants.root,
   routes: [
     GoRoute(
-      path: RouteConstants.splashPath,
+      path: RouteConstants.root,
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
         child: SplashView(),
