@@ -20,10 +20,10 @@ class BgSoundComponent extends ConsumerWidget {
     final selectedBgSound =
         ref.watch(backgroundSoundsNotifierProvider).selectedBgSound;
     var checkIsBgSoundSelected = selectedBgSound != null &&
-        selectedBgSound.title != StringConstants.NONE;
+        selectedBgSound.title != StringConstants.none;
 
     return LabelsComponent(
-      label: StringConstants.SOUND.toUpperCase(),
+      label: StringConstants.sound.toUpperCase(),
       bgColor: checkIsBgSoundSelected
           ? ColorConstants.walterWhite
           : ColorConstants.greyIsTheNewGrey,

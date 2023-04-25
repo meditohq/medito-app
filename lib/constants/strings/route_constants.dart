@@ -16,4 +16,8 @@ class RouteConstants {
   static const String webviewPath = '/webview';
   static const String backgroundSoundsPath = '/backgroundsounds';
   static const String homePath = '/';
+  static const String joinIntroPath = '/joinIntro';
+  static const String joinEmailPath = '/joinEmail';
+  static const String joinVerifyOTPPath = '/joinVerifyOTP';
+  static const String joinWelcomePath = '/joinWelcome';
 }

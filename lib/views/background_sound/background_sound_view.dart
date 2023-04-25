@@ -37,7 +37,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
       _provider.getBackgroundSoundFromPref().then((_) {
         if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.NONE) {
+            _provider.selectedBgSound?.title != StringConstants.none) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
           _audioPlayerNotifier.playBackgroundSound();
         }
@@ -71,7 +71,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     List<BackgroundSoundsModel> data,
   ) {
     return CollapsibleHeaderComponent(
-      title: StringConstants.BACKGROUND_SOUNDS,
+      title: StringConstants.backgroundSounds,
       leadingIconBgColor: ColorConstants.walterWhite,
       leadingIconColor: ColorConstants.almostBlack,
       headerHeight: 130,
@@ -80,7 +80,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         SoundListTileComponent(
           sound: BackgroundSoundsModel(
             id: 0,
-            title: StringConstants.NONE,
+            title: StringConstants.none,
             duration: 0,
             path: '',
           ),

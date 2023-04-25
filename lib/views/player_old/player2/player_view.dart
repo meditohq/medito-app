@@ -75,7 +75,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if (_handler?.playbackState.value.processingState ==
               AudioProcessingState.loading &&
           mounted) {
-        createSnackBar(StringConstants.TIMEOUT, context);
+        createSnackBar(StringConstants.timeout, context);
       }
       timer.cancel();
     });

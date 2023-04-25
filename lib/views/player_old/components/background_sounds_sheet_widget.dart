@@ -212,7 +212,7 @@ class _ChooseBackgroundSoundDialogState
 
   Widget _getErrorWidget() => Padding(
         padding: const EdgeInsets.all(64.0),
-        child: Center(child: Text(StringConstants.PLAYER_BG_ERROR_MSG)),
+        child: Center(child: Text(StringConstants.playerBgErrorMsg)),
       );
 
   InkWell _getNoneListItem(currentSounds) {
@@ -340,7 +340,7 @@ class _ChooseBackgroundSoundDialogState
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 16.0, top: 8.0),
       child: Text(
-        StringConstants.BACKGROUND_SOUNDS,
+        StringConstants.backgroundSounds,
         style: Theme.of(context).textTheme.headline1,
       ),
     );

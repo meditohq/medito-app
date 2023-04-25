@@ -28,7 +28,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
     return Scaffold(
       appBar: MeditoAppBarWidget(
-        title: StringConstants.DOWNLOADS,
+        title: StringConstants.donwloads,
         isTransparent: true,
         hasCloseButton: true,
       ),
@@ -72,7 +72,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
-        message: StringConstants.EMPTY_DOWNLOADS_MESSAGE,
+        message: StringConstants.emptyDonwloadsMessage,
         image: SvgPicture.asset(
           AssetConstants.dalle,
           height: 168,
@@ -101,7 +101,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             ).future);
           }
           createSnackBar(
-            '"${item.title}" ${StringConstants.REMOVED.toLowerCase()}',
+            '"${item.title}" ${StringConstants.removed.toLowerCase()}',
             context,
             color: ColorConstants.walterWhite,
           );
@@ -161,7 +161,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   void showSwipeToDeleteTip() {
     createSnackBar(
-      StringConstants.SWIPE_TO_DELETE,
+      StringConstants.swipeToDelete,
       context,
       color: ColorConstants.walterWhite,
     );

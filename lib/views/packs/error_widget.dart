@@ -45,7 +45,7 @@ class ErrorPacksWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  StringConstants.LOADING_ERROR,
+                  StringConstants.loadingError,
                   textAlign: TextAlign.center,
                   style: titleSmall,
                 ),
@@ -57,14 +57,14 @@ class ErrorPacksWidget extends StatelessWidget {
                       style: outlineButtonStyle,
                       onPressed: () {
                         createSnackBar(
-                          StringConstants.RETRYING,
+                          StringConstants.retrying,
                           context,
                           color: ColorConstants.darkBGColor,
                         );
                         onPressed();
                       },
                       child: Text(
-                        StringConstants.TRY_AGAIN,
+                        StringConstants.tryAgain,
                         style: titleSmall,
                       ),
                     ),
@@ -75,7 +75,7 @@ class ErrorPacksWidget extends StatelessWidget {
                         context.go(RouteConstants.collectionPath),
                       },
                       child: Text(
-                        StringConstants.SHOW_DOWNLOADS,
+                        StringConstants.showDownloads,
                         style: titleSmall,
                       ),
                     ),

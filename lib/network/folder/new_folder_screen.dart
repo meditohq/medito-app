@@ -141,7 +141,7 @@ class NewFolderScreen extends ConsumerWidget {
           context.go(location + getPathFromString(type, [id.toString()]));
         }
       } else {
-        createSnackBar(StringConstants.CHECK_CONNECTION, context);
+        createSnackBar(StringConstants.checkConnection, context);
       }
     });
   }

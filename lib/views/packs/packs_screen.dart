@@ -123,7 +123,7 @@ class PacksScreenState extends State<PacksScreen> {
           return context.go(getPathFromString(pack.type, [pack.id!]));
         }
       }
-      createSnackBar(StringConstants.CHECK_CONNECTION, context);
+      createSnackBar(StringConstants.checkConnection, context);
     });
   }
 

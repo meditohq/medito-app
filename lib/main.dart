@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
@@ -92,27 +93,18 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   Widget build(BuildContext context) {
     final currentlyPlayingSession = ref.watch(playerProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (currentlyPlayingSession != null) {
-        checkAudioLocally(
-          currentlyPlayingSession,
-          currentlyPlayingSession.audio.first.files.first,
-        );
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (currentlyPlayingSession != null) {
+    //     checkAudioLocally(
+    //       currentlyPlayingSession,
+    //       currentlyPlayingSession.audio.first.files.first,
+    //     );
+    //   }
+    // });
 
     return MaterialApp.router(
       routerConfig: router,
-      theme: ThemeData(
-        splashColor: ColorConstants.moonlight,
-        canvasColor: ColorConstants.greyIsTheNewBlack,
-        pageTransitionsTheme: PageTransitionsTheme(builders: {
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.android: SlideTransitionBuilder(),
-        }),
-        colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
-        textTheme: meditoTextTheme(context),
-      ),
+      theme: appTheme(context),
       title: ParentWidget._title,
     );
   }
@@ -168,11 +160,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       final _provider = ref.read(backgroundSoundsNotifierProvider);
       _provider.getBackgroundSoundFromPref().then((_) {
         if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.NONE) {
+            _provider.selectedBgSound?.title != StringConstants.none) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
           _audioPlayerNotifier.playBackgroundSound().catchError((err) {
-          print(err);
-        });
+            print(err);
+          });
         }
       });
       _provider.getVolumeFromPref().then((_) {
@@ -181,24 +173,5 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     } else {
       _audioPlayerNotifier.pauseBackgroundSound();
     }
-  }
-}
-
-class SlideTransitionBuilder extends PageTransitionsBuilder {
-  @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    animation = CurvedAnimation(curve: Curves.easeInOutExpo, parent: animation);
-
-    return SlideTransition(
-      position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-          .animate(animation),
-      child: child,
-    );
   }
 }

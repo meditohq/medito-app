@@ -41,4 +41,6 @@ class ColorConstants {
   static const intoTheNight = Color(0xff171717);
   static const easterYellow = Color(0xfffef5c7);
   static const purple = Color(0xff4F3C9B);
+  static const onyx = Color(0xff2A2A32);
+  static const ebony = Color(0xff171718);
 }

@@ -286,7 +286,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
       if (!seen) {
         unawaited(DownloadsBloc.setSeenTip());
         createSnackBar(
-          StringConstants.SWIPE_TO_DELETE,
+          StringConstants.swipeToDelete,
           context,
           color: ColorConstants.darkMoon,
         );

@@ -16,7 +16,7 @@ class VolumeSliderComponent extends ConsumerWidget {
     return SliderTheme(
       data: SliderThemeData(
         trackShape: BackgroundSoundVolumeTrackShapeComponent(
-          leadingTitle: StringConstants.VOLUME,
+          leadingTitle: StringConstants.volume,
           tralingText: currentVolume.toString().split('.').first + '%',
         ),
         overlayShape: RoundSliderOverlayShape(overlayRadius: 0.0),

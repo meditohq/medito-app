@@ -52,6 +52,8 @@ dependencies:
   webview_flutter: ^4.0.6
   flutter_downloader: ^1.10.2
   cached_network_image: ^3.2.3
+  email_validator: '^2.1.16'
+  pin_code_fields: ^7.4.0
 
 dev_dependencies:
   flutter_test:
