@@ -16,7 +16,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +24,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
-  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  final headers = {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD};
 
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
@@ -159,6 +158,6 @@ extension SanitisePath on String {
 
 extension AssetUrl on String {
   String toAssetUrl() {
-    return '${BASE_URL}assets/$this?download';
+    return '${HTTPConstants.BASE_URL_OLD}assets/$this?download';
   }
 }

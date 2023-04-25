@@ -14,7 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/audioplayer/media_library.dart';
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:audio_service/audio_service.dart';
@@ -23,7 +23,7 @@ import 'package:pedantic/pedantic.dart';
 
 import '../user/user_utils.dart';
 
-var bgSoundsUrl = '${BASE_URL}items/background_sounds';
+var bgSoundsUrl = '${HTTPConstants.BASE_URL_OLD}items/background_sounds';
 
 final backgroundSoundsProvider =
     FutureProvider<BackgroundSoundsResponse?>((ref) async {
@@ -57,7 +57,7 @@ class PlayerRepository {
     };
     var token = await generatedToken;
     if (token != null) {
-      unawaited(httpPost(BASE_URL + _ratingExt, token, body: body));
+      unawaited(httpPost(HTTPConstants.BASE_URL_OLD + _ratingExt, token, body: body));
     }
   }
 }

@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-import '../network/auth.dart';
 import '../network/cache.dart';
 import '../utils/bgvolume_utils.dart';
 import 'media_library.dart';
@@ -119,7 +119,7 @@ class MeditoAudioHandler extends BaseAudioHandler
         // var url = '${HTTPConstants.TEST_BASE_URL}assets/${mediaItem.id}';
         var url = '${mediaItem.id}';
         _duration = await _player.setUrl(url,
-            headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+            headers: {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD});
       } else {
         _duration = await _player.setFilePath(data);
       }
