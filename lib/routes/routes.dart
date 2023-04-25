@@ -11,6 +11,7 @@ import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/session/session_view.dart';
+import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +26,14 @@ final router = GoRouter(
   initialLocation: RouteConstants.homePath,
   routes: [
     GoRoute(
-      path: RouteConstants.homePath,
+      path: RouteConstants.splashPath,
+      pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
+        child: SplashView(),
+      ),
+    ),
+    GoRoute(
+      path: RouteConstants.joinIntroPath,
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
         child: JoinIntroView(),

@@ -1,4 +1,5 @@
 class RouteConstants {
+  static const String homePath = '/';
   static const String sessionPath = '/session/:sid';
   static const String dailyPath = '/daily/:did';
   static const String donationPath = '/donation';
@@ -15,7 +16,7 @@ class RouteConstants {
   static const String collectionPath = '/app';
   static const String webviewPath = '/webview';
   static const String backgroundSoundsPath = '/backgroundsounds';
-  static const String homePath = '/';
+  static const String splashPath = '/splashPath';
   static const String joinIntroPath = '/joinIntro';
   static const String joinEmailPath = '/joinEmail';
   static const String joinVerifyOTPPath = '/joinVerifyOTP';

@@ -1,6 +1,7 @@
 class AssetConstants {
   static const String dalle = 'assets/images/dalle.png';
   static const String join = 'assets/images/join.png';
+  static const String icLogo = 'assets/images/ic_logo.svg';
   static const String icLink = 'assets/images/ic_link.svg';
   static const String icForward = 'assets/images/ic_forward.svg';
   static const String icForward30 = 'assets/images/ic_forward_30.svg';
