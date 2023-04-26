@@ -15,7 +15,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 2), () {
-      context.go(RouteConstants.homePath);
+      context.go(RouteConstants.joinIntroPath);
     });
     super.initState();
   }

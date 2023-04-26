@@ -39,7 +39,7 @@ class ValidationUtils {
     } else if (isValidateDigit(input) && input.length == 6) {
       return null;
     } else {
-      return errorMessage;
+      return errorMessage ?? _fieldRequired;
     }
   }
 }

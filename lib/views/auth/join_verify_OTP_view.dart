@@ -1,31 +1,39 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-
-class JoinVerifyOTPView extends StatefulWidget {
-  const JoinVerifyOTPView({super.key});
-
+class JoinVerifyOTPView extends ConsumerStatefulWidget {
+  const JoinVerifyOTPView({super.key, required this.email});
+  final String email;
   @override
-  State<JoinVerifyOTPView> createState() => _JoinVerifyOTPViewState();
+  ConsumerState<JoinVerifyOTPView> createState() => _JoinVerifyOTPViewState();
 }
 
-class _JoinVerifyOTPViewState extends State<JoinVerifyOTPView> {
+class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
+  late AuthNotifier auth;
   final TextEditingController _otpTextEditingController =
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  void _handleVerify() {
+  void _handleVerify() async {
     if (_formKey.currentState!.validate()) {
-      context.push(RouteConstants.joinWelcomePath);
+      try {
+        await auth.verifyOTP(widget.email, _otpTextEditingController.text);
+        context.push(RouteConstants.joinWelcomePath);
+      } catch (e) {
+        showSnackBar(context, e.toString());
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    auth = ref.watch(authProvider);
     var textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -39,7 +47,7 @@ class _JoinVerifyOTPViewState extends State<JoinVerifyOTPView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  StringConstants.whatsYourEmail,
+                  StringConstants.verifyYourAccount,
                   style: textTheme.headlineMedium?.copyWith(
                     color: ColorConstants.walterWhite,
                     fontFamily: ClashDisplay,
@@ -47,7 +55,19 @@ class _JoinVerifyOTPViewState extends State<JoinVerifyOTPView> {
                     fontSize: 24,
                   ),
                 ),
-                height8,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text(
+                    StringConstants.verifyYourAccountInstruction
+                        .replaceAll('replaceme', widget.email),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: ColorConstants.walterWhite,
+                      fontFamily: DmSans,
+                      height: 1.5,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
                 PinCodeTextField(
                   appContext: context,
                   controller: _otpTextEditingController,

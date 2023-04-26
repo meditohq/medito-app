@@ -1,30 +1,44 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/network/api_response.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class JoinEmailView extends StatefulWidget {
+class JoinEmailView extends ConsumerStatefulWidget {
   const JoinEmailView({super.key});
 
   @override
-  State<JoinEmailView> createState() => _JoinEmailViewState();
+  ConsumerState<JoinEmailView> createState() => _JoinEmailViewState();
 }
 
-class _JoinEmailViewState extends State<JoinEmailView> {
+class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
+  late AuthNotifier auth;
   final TextEditingController _emailController =
       TextEditingController(text: 'osama.asif20@gmail.com');
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  void _handleContinue() {
+  void _handleContinue() async {
     if (_formKey.currentState!.validate()) {
-      context.push(RouteConstants.joinVerifyOTPPath);
+      try {
+        var email = _emailController.text;
+        await auth.sendOTP(email);
+        await context.push(
+          RouteConstants.joinVerifyOTPPath,
+          extra: {'email': email},
+        );
+      } catch (e) {
+        showSnackBar(context, e.toString());
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
+    auth = ref.watch(authProvider);
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -72,6 +86,7 @@ class _JoinEmailViewState extends State<JoinEmailView> {
                       btnText: StringConstants.continueTxt,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
+                      isLoading: auth.sendOTPRes == ApiResponse.loading(),
                     ),
                   ],
                 ),

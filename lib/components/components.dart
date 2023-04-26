@@ -8,3 +8,4 @@ export 'buttons/loading_button_widget.dart';
 export 'webview_component.dart';
 export 'markdown_component.dart';
 export 'network_image_component.dart';
+export 'snackbar_component.dart';

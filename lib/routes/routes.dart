@@ -48,10 +48,14 @@ final router = GoRouter(
     ),
     GoRoute(
       path: RouteConstants.joinVerifyOTPPath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinVerifyOTPView(),
-      ),
+      pageBuilder: (context, state) {
+        final data = state.extra! as Map;
+
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinVerifyOTPView(email: data['email']!),
+        );
+      },
     ),
     GoRoute(
       path: RouteConstants.joinWelcomePath,

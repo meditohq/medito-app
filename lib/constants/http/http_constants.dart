@@ -7,6 +7,9 @@ class HTTPConstants {
   static String CONTENT_TOKEN = dotenv.env['CONTENT_TOKEN']!;
   static String CONTENT_TOKEN_OLD = dotenv.env['CONTENT_TOKEN_OLD']!;
   static String SENTRY_URL = dotenv.env['SENTRY_URL']!;
+
+  //END POINTS
+  static const String OTP = 'otp';
   static const String FOLDERS = 'folders';
   static const String SESSIONS = 'sessions';
   static const String BACKGROUND_SOUNDS = 'backgroundSounds';
