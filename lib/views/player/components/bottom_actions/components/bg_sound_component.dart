@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/routes/routes.dart' as routes;
-import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,11 +31,11 @@ class BgSoundComponent extends ConsumerWidget {
           ? ColorConstants.greyIsTheNewGrey
           : ColorConstants.walterWhite,
       onTap: () {
-        var location = GoRouter.of(context).location;
-        context.go(
-          location + routes.backgroundSounds,
+        context.push(
+          RouteConstants.backgroundSoundsPath,
           extra: {'sessionModel': sessionModel, 'file': file},
         );
+        ref.read(pageviewNotifierProvider).gotoPreviousPage();
       },
     );
   }

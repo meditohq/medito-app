@@ -81,11 +81,8 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
       var file = await getApplicationDocumentsDirectory();
       var savePath = file.path + '/' + name;
       var filePath = File(savePath);
-      if (await filePath.exists()) {
-        return filePath.path;
-      } else {
-        return null;
-      }
+      
+      return await filePath.exists() ? filePath.path : null;
     } catch (e) {
       rethrow;
     }
@@ -93,6 +90,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 }
 
 @riverpod
-DownloaderRepositoryImpl downloaderRepository(DownloaderRepositoryRef ref) {
+DownloaderRepositoryImpl downloaderRepository(ref) {
   return DownloaderRepositoryImpl(client: ref.watch(dioClientProvider));
 }

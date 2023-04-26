@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:Medito/audioplayer/media_library.dart';
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/duration_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -217,7 +216,7 @@ class _PositionIndicatorWidgetState extends State<PositionIndicatorWidget> {
 
   void _onBgMusicPressed(BuildContext context) {
     var location = GoRouter.of(context).location;
-    context.go(location + backgroundSounds);
+    context.go(location + RouteConstants.backgroundSoundsPath);
     // var bloc = PlayerBloc();
 
     // // slight delay in case the cache returns before the sheet opens

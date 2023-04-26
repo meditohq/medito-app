@@ -1,74 +1,79 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_extensions.dart';
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DurationIndicatorComponent extends ConsumerWidget {
   const DurationIndicatorComponent({super.key, required this.file});
   final SessionFilesModel file;
+  final minSeconds = 0.0;
+  final additionalMilliSeconds = 1000;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final audioPlayerPositionProvider = ref.watch(audioPositionProvider.stream);
-    const minSeconds = 0.0;
-    const additionalMilliSeconds = 300;
+    final audioPlayerPositionProvider = ref.watch(audioPositionProvider);
+
+    return audioPlayerPositionProvider.when(
+      data: (data) => _durationBar(context, ref, data),
+      error: (error, stackTrace) => SizedBox(),
+      loading: () => SizedBox(),
+    );
+  }
+
+  Padding _durationBar(
+    BuildContext context,
+    WidgetRef ref,
+    int currentDuration,
+  ) {
+    var maxDuration = file.duration.toDouble();
+    _handleAudioCompletion(
+      currentDuration.toInt(),
+      maxDuration.toInt(),
+      ref,
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: StreamBuilder<int?>(
-        stream: audioPlayerPositionProvider,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            var currentDuration = snapshot.data ?? 0;
-            _handleAudioCompletion(currentDuration, ref);
-
-            return Column(
-              children: [
-                _durationLabels(context, file.duration, currentDuration),
-                SliderTheme(
-                  data: SliderThemeData(
-                    trackHeight: 8,
-                    trackShape: CustomTrackShape(),
-                    thumbShape: RoundSliderThumbShape(
-                      enabledThumbRadius: 5.0,
-                    ),
-                  ),
-                  child: Slider(
-                    min: minSeconds,
-                    activeColor: ColorConstants.walterWhite,
-                    inactiveColor: ColorConstants.greyIsTheNewGrey,
-                    max: file.duration.toDouble() + additionalMilliSeconds,
-                    value: currentDuration.toDouble(),
-                    onChanged: (value) {
-                      ref.read(
-                        slideAudioPositionProvider(duration: value.toInt()),
-                      );
-                    },
-                    onChangeEnd: (value) {
-                      ref.read(
-                        slideAudioPositionProvider(duration: value.toInt()),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return SizedBox();
-          }
-        },
+      child: Column(
+        children: [
+          SliderTheme(
+            data: SliderThemeData(
+              trackHeight: 8,
+              trackShape: CustomTrackShape(),
+              thumbShape: RoundSliderThumbShape(
+                enabledThumbRadius: 5.0,
+              ),
+            ),
+            child: Slider(
+              min: minSeconds,
+              activeColor: ColorConstants.walterWhite,
+              inactiveColor: ColorConstants.greyIsTheNewGrey,
+              max: maxDuration,
+              value: currentDuration.toDouble(),
+              onChanged: (value) {
+                ref.read(slideAudioPositionProvider(
+                  duration: value.toInt(),
+                ));
+              },
+            ),
+          ),
+          _durationLabels(context, file.duration, currentDuration),
+        ],
       ),
     );
   }
 
-  void _handleAudioCompletion(int currentDuration, WidgetRef ref) {
-    if (file.duration <= currentDuration) {
+  void _handleAudioCompletion(
+    int currentDuration,
+    int maxDuration,
+    WidgetRef ref,
+  ) {
+    if (maxDuration <= currentDuration + additionalMilliSeconds) {
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
       audioProvider.seekValueFromSlider(0);
-      audioProvider.pauseSessionAudio();
+      audioProvider.pause();
       audioProvider.pauseBackgroundSound();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =
@@ -100,7 +105,10 @@ class DurationIndicatorComponent extends ConsumerWidget {
     return Text(
       label,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: ColorConstants.walterWhite, fontFamily: DmMono, fontSize: 14),
+            color: ColorConstants.walterWhite,
+            fontFamily: DmMono,
+            fontSize: 14,
+          ),
     );
   }
 }
@@ -118,35 +126,41 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     bool isEnabled = false,
     bool isDiscrete = false,
   }) {
+    var boxHeight = parentBox.size.height;
     final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
     var trackTop;
-    if (addTopPadding) {
-      trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2 + 12;
-    } else {
-      trackTop = parentBox.size.height / 2 - 2;
-    }
+    trackTop = addTopPadding
+        ? offset.dy + (boxHeight - trackHeight) / 2 + 12
+        : boxHeight / 2 - 2;
     final trackWidth = parentBox.size.width;
+
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 
   @override
-  void paint(PaintingContext context, Offset offset,
-      {required RenderBox parentBox,
-      required SliderThemeData sliderTheme,
-      required Animation<double> enableAnimation,
-      required TextDirection textDirection,
-      required Offset thumbCenter,
-      Offset? secondaryOffset,
-      bool isDiscrete = false,
-      bool isEnabled = false,
-      double additionalActiveTrackHeight = 0}) {
-    super.paint(context, offset,
-        parentBox: parentBox,
-        sliderTheme: sliderTheme,
-        enableAnimation: enableAnimation,
-        textDirection: textDirection,
-        thumbCenter: thumbCenter,
-        additionalActiveTrackHeight: 0);
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    double additionalActiveTrackHeight = 0,
+  }) {
+    super.paint(
+      context,
+      offset,
+      parentBox: parentBox,
+      sliderTheme: sliderTheme,
+      enableAnimation: enableAnimation,
+      textDirection: textDirection,
+      thumbCenter: thumbCenter,
+      additionalActiveTrackHeight: 0,
+    );
   }
 }

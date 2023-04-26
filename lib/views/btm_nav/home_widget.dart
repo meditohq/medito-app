@@ -48,7 +48,8 @@ class HomeWidget extends ConsumerStatefulWidget {
   _HomeWidgetState createState() => _HomeWidgetState();
 }
 
-class _HomeWidgetState extends ConsumerState<HomeWidget> {
+class _HomeWidgetState extends ConsumerState<HomeWidget>
+    with AutomaticKeepAliveClientMixin<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
 
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
@@ -61,8 +62,11 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   late StreamSubscription<ConnectivityResult> subscription;
 
+  ScrollController _innerScrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     _observeNetwork();
 
     _bloc.fetchMenu();
@@ -83,7 +87,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
                   : ListView(
                       physics: AlwaysScrollableScrollPhysics(),
                       children: [
-                        _getAppBar(context),
+                        _getAppBar(),
                         AnnouncementBanner(
                           key: _announceKey,
                           hasOpened: widget.hasOpened,
@@ -121,7 +125,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   Column _buildErrorPacksWidget() => Column(
         children: [
-          _getAppBar(context),
+          _getAppBar(),
           Expanded(child: ErrorPacksWidget(onPressed: () => _refresh())),
         ],
       );
@@ -130,7 +134,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     return checkConnectivity().then(
       (value) {
         if (value) {
-          context.go(getPathFromString(type, [id]));
+          context.push(getPathFromString(type, [id]));
         } else {
           _bloc.checkConnection();
         }
@@ -148,12 +152,12 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     return _bloc.fetchMenu(skipCache: true);
   }
 
-  AppBar _getAppBar(BuildContext context) {
+  AppBar _getAppBar() {
     return AppBar(
       backgroundColor: ColorConstants.darkMoon,
       elevation: 0,
       actionsIconTheme: IconThemeData(color: ColorConstants.walterWhite),
-      title: _getTitleWidget(context),
+      title: _getTitleWidget(),
       actions: <Widget>[
         StreamBuilder<ApiResponse<MenuResponse>>(
           stream: _bloc.menuList.stream,
@@ -193,22 +197,26 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
         context.go(getPathFromString(result.itemType, [result.itemPath]));
       },
       itemBuilder: (BuildContext context) {
-        if (snapshot.hasData && snapshot.data?.body != null) {
-          return snapshot.data?.body?.data?.map((MenuData data) {
+        var body = snapshot.data?.body;
+        if (snapshot.hasData && body != null) {
+          return body.data?.map((MenuData data) {
                 return PopupMenuItem<MenuData>(
                   value: data,
-                  child: Text(data.itemLabel ?? '',
-                      style: Theme.of(context).textTheme.headline4),
+                  child: Text(
+                    data.itemLabel ?? '',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                 );
               }).toList() ??
               [];
         }
+
         return [];
       },
     );
   }
 
-  Widget _getTitleWidget(BuildContext context) => FutureBuilder<String>(
+  Widget _getTitleWidget() => FutureBuilder<String>(
         future: _bloc.getTitleText(DateTime.now()),
         initialData: 'Medito',
         builder: (context, snapshot) {
@@ -216,7 +224,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
             onLongPress: () => _showVersionPopUp(context),
             child: Text(
               snapshot.data ?? '',
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.displayLarge,
             ),
           );
         },
@@ -285,4 +293,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
       }
     });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

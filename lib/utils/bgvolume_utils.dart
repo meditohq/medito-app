@@ -25,6 +25,7 @@ Future<double> retrieveSavedBgVolume() async {
 
 final volumeProvider = StateProvider((_) => Volume());
 
+//ignore: prefer-match-file-name
 class Volume {
   Future<double> getVolume() async {
     return await _getSavedVolume();

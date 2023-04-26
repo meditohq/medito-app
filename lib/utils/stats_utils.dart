@@ -19,9 +19,10 @@ import 'package:Medito/utils/utils.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+//ignore: prefer-match-file-name
 enum UnitType { day, min, sessions }
 
-String getUnits(UnitType type, int value) {
+String getUnits(UnitType type, int _) {
   switch (type) {
     case UnitType.day:
       return 'd';
@@ -55,11 +56,13 @@ Future<String> getCurrentStreak() async {
 
 Future<List<String>> getStreakList() async {
   var prefs = await SharedPreferences.getInstance();
+
   return prefs.getStringList('streakList') ?? [];
 }
 
 Future<bool> setStreakList(List<String> streakList) async {
   var prefs = await SharedPreferences.getInstance();
+
   return prefs.setStringList('streakList', streakList);
 }
 
@@ -67,6 +70,7 @@ Future<int> _getCurrentStreakInt() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('streakCount');
+
   return streak ?? 0;
 }
 
@@ -76,6 +80,7 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
   var current = await _getSecondsListened();
   var plusOne = current + (additionalSecs);
   await prefs.setInt('secsListened', plusOne);
+
   return true;
 }
 
@@ -88,6 +93,7 @@ Future<void> updateStreak({String streak = ''}) async {
     await prefs.setInt('streakCount', int.parse(streak));
     await _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomSessionToStreakList();
+
     return;
   }
 
@@ -156,22 +162,16 @@ Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-  if (streak == null) {
-    return '0';
-  } else {
-    return Duration(seconds: streak).inMinutes.toString();
-  }
+  
+  return streak == null ? '0' : Duration(seconds: streak).inMinutes.toString();
 }
 
 Future<int> _getSecondsListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-  if (streak == null) {
-    return 0;
-  } else {
-    return streak;
-  }
+
+  return streak ?? 0;
 }
 
 Future<String> getLongestStreak() async {
@@ -182,17 +182,15 @@ Future<String> getLongestStreak() async {
   }
 
   var streak = prefs.getInt('longestStreak');
-  if (streak == null) {
-    return '0';
-  } else {
-    return streak.toString();
-  }
+
+  return streak == null ? '0' : streak.toString();
 }
 
 Future<int> _getLongestStreakInt() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('longestStreak');
+
   return streak ?? 0;
 }
 
@@ -200,17 +198,15 @@ Future<String> getNumSessions() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('numSessions');
-  if (streak == null) {
-    return '0';
-  } else {
-    return streak.toString();
-  }
+
+  return streak == null ? '0' : streak.toString();
 }
 
 Future<int> getNumSessionsInt() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('numSessions');
+
   return streak ?? 0;
 }
 
@@ -220,6 +216,7 @@ Future<int> incrementNumSessions() async {
   var current = await getNumSessionsInt();
   current++;
   await prefs.setInt('numSessions', current);
+
   return current;
 }
 
@@ -247,6 +244,7 @@ Future<void> clearBgStats() {
 
 bool checkListened(String? id) {
   if (id == null) return false;
+
   return sharedPreferences.getBool('listened' + id) ?? false;
 }
 
@@ -259,6 +257,7 @@ Future<int> getVersionCopyInt() async {
   var prefs = await SharedPreferences.getInstance();
 
   var version = prefs.getInt('copy');
+
   return version ?? -1;
 }
 
@@ -270,7 +269,9 @@ bool isSameDay(DateTime day1, DateTime day2) {
 
 bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
   var thirtyTwoHoursAfterTime = DateTime.fromMillisecondsSinceEpoch(
-      lastDayInStreak.millisecondsSinceEpoch + 115200000);
+    lastDayInStreak.millisecondsSinceEpoch + 115200000,
+  );
+
   return now.isAfter(thirtyTwoHoursAfterTime);
 }
 

@@ -1,10 +1,10 @@
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'audio_position_viewmodel.g.dart';
+part 'audio_position_provider.g.dart';
 
 @riverpod
 void slideAudioPosition(
-  SlideAudioPositionRef ref, {
+  ref, {
   required int duration,
 }) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
@@ -13,7 +13,7 @@ void slideAudioPosition(
 
 @riverpod
 void skipAudio(
-  SkipAudioRef ref, {
+  ref, {
   required SKIP_AUDIO skip,
 }) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);

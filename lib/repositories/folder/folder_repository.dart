@@ -28,6 +28,6 @@ class FolderRepositoryImpl extends FolderRepository {
 }
 
 @riverpod
-FolderRepositoryImpl folderRepository(FolderRepositoryRef ref) {
+FolderRepositoryImpl folderRepository(ref) {
   return FolderRepositoryImpl(client: ref.watch(dioClientProvider));
 }

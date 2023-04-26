@@ -1,17 +1,24 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/providers/stats/stats_provider.dart';
 import 'package:Medito/views/home/streak_tile_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-class StatsWidget extends StatefulWidget {
+class StatsWidget extends ConsumerStatefulWidget {
   @override
-  _StatsWidgetState createState() => _StatsWidgetState();
+  ConsumerState<StatsWidget> createState() => _StatsWidgetState();
 }
 
-class _StatsWidgetState extends State<StatsWidget> {
+class _StatsWidgetState extends ConsumerState<StatsWidget> {
   final TextEditingController _controller = TextEditingController();
+  @override
+  void initState() {
+    ref.read(statsProvider);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +27,24 @@ class _StatsWidgetState extends State<StatsWidget> {
       child: Card(
         color: ColorConstants.deepNight,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+          borderRadius: BorderRadius.all(Radius.circular(16.0)),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Table(columnWidths: const {
-            0: FlexColumnWidth(),
-            1: FlexColumnWidth(),
-          }, children: [
-            TableRow(children: [
-              statsItem(0),
-              statsItem(1),
-              statsItem(2),
-              statsItem(3)
-            ]),
-          ]),
+          child: Table(
+            columnWidths: const {
+              0: FlexColumnWidth(),
+              1: FlexColumnWidth(),
+            },
+            children: [
+              TableRow(children: [
+                statsItem(0),
+                statsItem(1),
+                statsItem(2),
+                statsItem(3),
+              ]),
+            ],
+          ),
         ),
       ),
     );

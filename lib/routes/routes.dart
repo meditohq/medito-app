@@ -1,4 +1,6 @@
 import 'package:Medito/components/components.dart';
+import 'package:Medito/constants/constants.dart';
+import 'package:Medito/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
@@ -10,41 +12,39 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../views/home/home_wrapper_widget.dart';
 
-const String SessionPath = '/session/:sid';
-const String DailyPath = '/daily/:did';
-const String DonationPath = '/donation';
-const String PlayerPath = '/player';
-const String ArticlePath = '/article/:aid';
-const String FolderPath = '/folder/:fid';
-const String Player1 = '/folder/:fid/session/:sid';
-const String Folder2Path = '/folder/:fid/folder2/:f2id';
-const String Player2 = '/folder/:fid/folder2/:f2id/session/:sid';
-const String Folder3Path = '/folder/:fid/folder2/:f2id/folder3/:f3id';
-const String Player3 = '/folder/:fid/folder2/:f2id/folder3/:f3id/session/:sid';
-const String UrlPath = '/url';
-const String CollectionPath = '/app';
-const String webviewPath = '/webview';
-const String backgroundSounds = '/backgroundsounds';
-const String HomePath = '/';
-
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>();
 final router = GoRouter(
   debugLogDiagnostics: true,
+  navigatorKey: _rootNavigatorKey,
+  initialLocation: RouteConstants.homePath,
   routes: [
-    GoRoute(
-      path: HomePath,
-      builder: (context, state) => HomeWrapperWidget(),
+    ShellRoute(
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) => RootPageView(
+        firstChild: child,
+      ),
       routes: [
-        _getSessionRoute(),
-        _getArticleRoute(),
-        _getDailyRoute(),
-        _getWebviewRoute(),
         GoRoute(
-          path: 'app',
+          path: RouteConstants.homePath,
+          pageBuilder: (context, state) => MaterialPage(
+            key: state.pageKey,
+            child: HomeWrapperWidget(),
+          ),
+        ),
+        _getSessionRoute(fromRoot: true),
+        _getArticleRoute(fromRoot: true),
+        _getDailyRoute(fromRoot: true),
+        _getWebviewRoute(fromRoot: true),
+        _getBackgroundSoundRoute(),
+        GoRoute(
+          path: RouteConstants.collectionPath,
           routes: [_getPlayerRoute()],
           pageBuilder: (context, state) => getCollectionMaterialPage(state),
         ),
         GoRoute(
-          path: 'folder/:fid',
+          path: RouteConstants.folderPath,
           routes: [
             _getSessionRoute(),
             _getArticleRoute(),
@@ -75,24 +75,24 @@ final router = GoRouter(
   ],
 );
 
-GoRoute _getDailyRoute() {
+GoRoute _getDailyRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'daily/:did',
+    path: fromRoot ? RouteConstants.dailyPath : RouteConstants.dailyPath.sanitisePath(),
     routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsDailyPage(state),
   );
 }
 
-GoRoute _getArticleRoute() {
+GoRoute _getArticleRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'article/:aid',
+    path: fromRoot ? RouteConstants.articlePath : RouteConstants.articlePath.sanitisePath(),
     pageBuilder: (context, state) => getArticleMaterialPAge(state),
   );
 }
 
-GoRoute _getSessionRoute() {
+GoRoute _getSessionRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'session/:sid',
+    path: fromRoot ? RouteConstants.sessionPath : RouteConstants.sessionPath.sanitisePath(),
     routes: [_getPlayerRoute()],
     pageBuilder: (context, state) => getSessionOptionsMaterialPage(state),
   );
@@ -100,17 +100,17 @@ GoRoute _getSessionRoute() {
 
 GoRoute _getPlayerRoute() {
   return GoRoute(
-    path: 'player',
+    path: RouteConstants.playerPath.sanitisePath(),
     pageBuilder: (context, state) {
       return getPlayerMaterialPage(state);
     },
-    routes: [_getWebviewRoute(), _getBackgroundSoundRoute()],
+    routes: [_getWebviewRoute()],
   );
 }
 
 GoRoute _getBackgroundSoundRoute() {
   return GoRoute(
-    path: 'backgroundSounds',
+    path: RouteConstants.backgroundSoundsPath,
     pageBuilder: (context, state) {
       return MaterialPage(
         key: state.pageKey,
@@ -120,9 +120,9 @@ GoRoute _getBackgroundSoundRoute() {
   );
 }
 
-GoRoute _getWebviewRoute() {
+GoRoute _getWebviewRoute({bool fromRoot = false}) {
   return GoRoute(
-    path: 'webview',
+    path: fromRoot ? RouteConstants.webviewPath : RouteConstants.webviewPath.sanitisePath(),
     pageBuilder: (context, state) {
       final url = state.extra! as Map;
 
@@ -214,34 +214,34 @@ String getPathFromString(String? place, List<String?> ids) {
   ids.removeWhere((element) => element == null);
 
   if (place == 'session') {
-    return SessionPath.replaceAll(':sid', ids.first!);
+    return RouteConstants.sessionPath.replaceAll(':sid', ids.first!);
   }
   if (place == 'daily') {
-    return DailyPath.replaceAll(':did', ids.first!);
+    return RouteConstants.dailyPath.replaceAll(':did', ids.first!);
   }
   if (place == 'donation') {
-    return DonationPath;
+    return RouteConstants.donationPath;
   }
   if (place == 'article') {
-    return ArticlePath.replaceAll(':aid', ids.first!);
+    return RouteConstants.articlePath.replaceAll(':aid', ids.first!);
   }
   if (place != null && place.contains('folder3')) {
-    return Folder3Path.replaceAll(':fid', ids.first!)
+    return RouteConstants.folder3Path.replaceAll(':fid', ids.first!)
         .replaceAll(':f2id', ids[1]!)
         .replaceAll(':f3id', ids[2]!);
   }
   if (place != null && place.contains('folder2')) {
-    return Folder2Path.replaceAll(':fid', ids.first!)
+    return RouteConstants.folder2Path.replaceAll(':fid', ids.first!)
         .replaceAll(':f2id', ids[1]!);
   }
   if (place == 'folder') {
-    return FolderPath.replaceAll(':fid', ids.first!);
+    return RouteConstants.folderPath.replaceAll(':fid', ids.first!);
   }
   if (place == 'url') {
     launchUrl(ids.first);
   }
   if (place == 'app') {
-    return CollectionPath;
+    return RouteConstants.collectionPath;
   }
 
   return '';

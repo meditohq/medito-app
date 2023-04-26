@@ -1,18 +1,15 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -88,7 +85,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
       onTap: () {
-        _openPlayer(item, context);
+        _openPlayer(ref, item);
       },
       child: Dismissible(
         key: UniqueKey(),
@@ -100,7 +97,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
                   '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
                 );
             ref.read(deleteSessionFromPreferenceProvider(
-              sessionModel: item,
               file: item.audio.first.files.first,
             ).future);
           }
@@ -152,14 +148,15 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   String _getDuration(String? length) => formatSessionLength(length);
 
-  void _openPlayer(SessionModel sessionModel, BuildContext context) {
-    context.go(
-      GoRouter.of(context).location + PlayerPath,
-      extra: {
-        'sessionModel': sessionModel,
-        'file': sessionModel.audio.first.files.first,
-      },
-    );
+  void _openPlayer(
+    WidgetRef ref,
+    SessionModel sessionModel,
+  ) {
+    ref.read(playerProvider.notifier).addCurrentlyPlayingSessionInPreference(
+          sessionModel: sessionModel,
+          file: sessionModel.audio.first.files.first,
+        );
+    ref.read(pageviewNotifierProvider).gotoNextPage();
   }
 
   void showSwipeToDeleteTip() {

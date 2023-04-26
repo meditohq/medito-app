@@ -1,11 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
-
+import 'package:Medito/providers/providers.dart';
 import 'labels_component.dart';
 
 class AudioDownloadComponent extends ConsumerWidget {
@@ -22,7 +20,7 @@ class AudioDownloadComponent extends ConsumerWidget {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
     var downloadFileKey = '${sessionModel.id}-${file.id}';
 
-    if (downloadAudioProvider.audioDownloadState ==
+    if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
       return LabelsComponent(
         bgColor: ColorConstants.walterWhite,
@@ -30,7 +28,7 @@ class AudioDownloadComponent extends ConsumerWidget {
         label: StringConstants.DOWNLOADED.toUpperCase(),
         onTap: () => _handleRemoveDownload(downloadAudioProvider, ref, context),
       );
-    } else if (downloadAudioProvider.audioDownloadState ==
+    } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADIING) {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
@@ -42,7 +40,7 @@ class AudioDownloadComponent extends ConsumerWidget {
   }
 
   Expanded showDownloadProgress(
-    AudioDownloaderViewModel downloadAudioProvider,
+    AudioDownloaderProvider downloadAudioProvider,
     String downloadFileKey,
   ) {
     return Expanded(
@@ -64,7 +62,7 @@ class AudioDownloadComponent extends ConsumerWidget {
   }
 
   double _getDownloadProgress(
-    AudioDownloaderViewModel downloadAudioProvider,
+    AudioDownloaderProvider downloadAudioProvider,
     String downloadFileKey,
   ) {
     if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
@@ -75,7 +73,7 @@ class AudioDownloadComponent extends ConsumerWidget {
   }
 
   Future<void> _handleDownload(
-    AudioDownloaderViewModel downloadAudioProvider,
+    AudioDownloaderProvider downloadAudioProvider,
     WidgetRef ref,
     BuildContext context,
   ) async {
@@ -91,7 +89,7 @@ class AudioDownloadComponent extends ConsumerWidget {
   }
 
   Future<void> _handleRemoveDownload(
-    AudioDownloaderViewModel downloadAudioProvider,
+    AudioDownloaderProvider downloadAudioProvider,
     WidgetRef ref,
     BuildContext context,
   ) async {
@@ -100,7 +98,6 @@ class AudioDownloadComponent extends ConsumerWidget {
         '${sessionModel.id}-${file.id}${getFileExtension(file.path)}',
       );
       ref.read(deleteSessionFromPreferenceProvider(
-        sessionModel: sessionModel,
         file: file,
       ));
     } catch (e) {

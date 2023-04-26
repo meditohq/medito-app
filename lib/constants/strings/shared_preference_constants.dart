@@ -1,6 +1,7 @@
 class SharedPreferenceConstants {
-  static const bgSoundVolume  = 'bgSoundVolume';
-  static const bgSound  = 'bgSound';
-  static const sessionAudioSpeed  = 'sessionAudioSpeed';
-  static const downloads  = 'downloads';
+  static const String bgSoundVolume = 'bgSoundVolume';
+  static const String bgSound = 'bgSound';
+  static const String sessionAudioSpeed = 'sessionAudioSpeed';
+  static const String downloads = 'downloads';
+  static const String currentPlayingSession = 'currentPlayingSession';
 }

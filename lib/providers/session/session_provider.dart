@@ -1,24 +1,21 @@
+import 'dart:async';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'session_viewmodel.g.dart';
+import 'download_session_provider.dart';
+part 'session_provider.g.dart';
 
 @riverpod
 Future<SessionModel> sessions(
-  SessionsRef ref, {
+  ref, {
   required int sessionId,
 }) {
   return ref.watch(sessionRepositoryProvider).fetchSession(sessionId);
 }
 
 @riverpod
-Future<List<SessionModel>> downloadedSessions(DownloadedSessionsRef ref) {
-  return ref.watch(sessionRepositoryProvider).fetchSessionFromPreference();
-}
-
-@riverpod
 Future<void> addSessionListInPreference(
-  AddSessionListInPreferenceRef ref, {
+  ref, {
   required List<SessionModel> sessions,
 }) async {
   return await ref
@@ -28,7 +25,7 @@ Future<void> addSessionListInPreference(
 
 @riverpod
 Future<void> addSingleSessionInPreference(
-  AddSingleSessionInPreferenceRef ref, {
+  ref, {
   required SessionModel sessionModel,
   required SessionFilesModel file,
 }) async {
@@ -51,12 +48,15 @@ Future<void> addSingleSessionInPreference(
   await ref.read(
     addSessionListInPreferenceProvider(sessions: _downloadedSessionList).future,
   );
+  unawaited(ref.refresh(downloadedSessionsProvider.future));
 }
 
 @riverpod
-Future<void> addCurrentlyPlayingSessionInPreference(ref,
-    {required SessionModel sessionModel,
-    required SessionFilesModel file}) async {
+void addCurrentlyPlayingSessionInPreference(
+  _, {
+  required SessionModel sessionModel,
+  required SessionFilesModel file,
+}) {
   var _session = sessionModel.customCopyWith();
   print(sessionModel == _session);
   print(sessionModel.audio == _session.audio);
@@ -71,17 +71,4 @@ Future<void> addCurrentlyPlayingSessionInPreference(ref,
     }
   }
   print(_session);
-}
-
-@riverpod
-Future<void> deleteSessionFromPreference(ref,
-    {required SessionModel sessionModel,
-    required SessionFilesModel file}) async {
-  var _downloadedSessionList =
-      await ref.read(downloadedSessionsProvider.future);
-  _downloadedSessionList.removeWhere((element) =>
-      element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
-  await ref.read(
-    addSessionListInPreferenceProvider(sessions: _downloadedSessionList).future,
-  );
 }

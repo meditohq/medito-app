@@ -1,11 +1,10 @@
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/view_model/player/audio_play_pause_viewmodel.dart';
-import 'package:Medito/view_model/player/audio_position_viewmodel.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'play_pause_button_component.dart';
 
 class PlayerButtonsComponent extends ConsumerWidget {
   const PlayerButtonsComponent({
@@ -18,14 +17,13 @@ class PlayerButtonsComponent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(audioPlayPauseProvider(sessionModel.hasBackgroundSound));
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _rewindButton(ref),
         SizedBox(width: 35),
-        _playPauseButton(ref),
+        _playPauseButton(),
         SizedBox(width: 35),
         _forwardButton(ref),
       ],
@@ -52,36 +50,7 @@ class PlayerButtonsComponent extends ConsumerWidget {
     );
   }
 
-  InkWell _playPauseButton(WidgetRef ref) {
-    return InkWell(
-      onTap: () {
-        _handleTap(ref);
-      },
-      child: AnimatedCrossFade(
-        firstChild: Icon(
-          Icons.play_circle_fill,
-          size: 72,
-        ),
-        secondChild: Icon(
-          Icons.pause_circle_filled,
-          size: 72,
-        ),
-        crossFadeState:
-            ref.watch(audioPlayPauseStateProvider) == PLAY_PAUSE_AUDIO.PLAY
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-        duration: Duration(milliseconds: 500),
-      ),
-    );
-  }
-
-  void _handleTap(WidgetRef ref) {
-    var _state = ref.watch(audioPlayPauseStateProvider.notifier).state;
-    ref.read(addCurrentlyPlayingSessionInPreferenceProvider(
-        sessionModel: sessionModel, file: file));
-    ref.read(audioPlayPauseStateProvider.notifier).state =
-        _state == PLAY_PAUSE_AUDIO.PAUSE
-            ? PLAY_PAUSE_AUDIO.PLAY
-            : PLAY_PAUSE_AUDIO.PAUSE;
+  Widget _playPauseButton() {
+    return PlayPauseButtonComponent();
   }
 }

@@ -1,5 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
@@ -12,11 +11,15 @@ class MarkdownComponent extends StatelessWidget {
     this.p,
     this.a,
     this.textAlign,
+    this.pFontSize = 16,
+    this.aFontSize = 13,
   });
   final String body;
   final void Function(String, String?, String)? onTapLink;
   final TextStyle? p, a;
   final WrapAlignment? textAlign;
+  final double pFontSize;
+  final double aFontSize;
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;
@@ -31,6 +34,7 @@ class MarkdownComponent extends StatelessWidget {
         p: p ??
             titleMedium?.copyWith(
               fontFamily: DmMono,
+              fontSize: pFontSize,
               letterSpacing: 1,
               color: walterWhite,
             ),
@@ -39,7 +43,7 @@ class MarkdownComponent extends StatelessWidget {
             titleMedium?.copyWith(
               fontFamily: DmMono,
               color: walterWhite,
-              fontSize: 13,
+              fontSize: aFontSize,
               fontWeight: FontWeight.w600,
             ),
       ),
@@ -48,6 +52,6 @@ class MarkdownComponent extends StatelessWidget {
 
   void _linkTap(BuildContext context, String? href) {
     var location = GoRouter.of(context).location;
-    context.go(location + webviewPath, extra: {'url': href});
+    context.go(location + RouteConstants.webviewPath, extra: {'url': href});
   }
 }

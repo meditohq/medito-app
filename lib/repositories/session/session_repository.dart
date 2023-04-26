@@ -13,6 +13,10 @@ abstract class SessionRepository {
   Future<SessionModel> fetchSession(int sessionId);
   Future<List<SessionModel>> fetchSessionFromPreference();
   Future<void> addSessionInPreference(List<SessionModel> sessionList);
+  Future<void> addCurrentlyPlayingSessionInPreference(
+    SessionModel sessionModel,
+  );
+  Future<SessionModel?> fetchCurrentlyPlayingSessionFromPreference();
 }
 
 class SessionRepositoryImpl extends SessionRepository {
@@ -36,7 +40,8 @@ class SessionRepositoryImpl extends SessionRepository {
     var _downloadedSessionList = <SessionModel>[];
     var _downloadedSessionFromPref =
         await SharedPreferencesService.getStringFromSharedPref(
-            SharedPreferenceConstants.downloads);
+      SharedPreferenceConstants.downloads,
+    );
     if (_downloadedSessionFromPref != null) {
       var tempList = [];
       tempList = json.decode(_downloadedSessionFromPref);
@@ -44,6 +49,7 @@ class SessionRepositoryImpl extends SessionRepository {
         _downloadedSessionList.add(SessionModel.fromJson(element));
       });
     }
+
     return _downloadedSessionList;
   }
 
@@ -54,18 +60,31 @@ class SessionRepositoryImpl extends SessionRepository {
       json.encode(sessionList),
     );
   }
-  
+
   @override
-  Future<void> addCurrentlyPlayingSessionInPreference(SessionModel sessionList) async {
+  Future<void> addCurrentlyPlayingSessionInPreference(
+    SessionModel session,
+  ) async {
     await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.downloads,
-      json.encode(sessionList),
+      SharedPreferenceConstants.currentPlayingSession,
+      json.encode(session),
     );
   }
 
+  @override
+  Future<SessionModel?> fetchCurrentlyPlayingSessionFromPreference() async {
+    var _session = await SharedPreferencesService.getStringFromSharedPref(
+      SharedPreferenceConstants.currentPlayingSession,
+    );
+    if (_session != null) {
+      return SessionModel.fromJson(json.decode(_session));
+    }
+
+    return null;
+  }
 }
 
 @riverpod
-SessionRepository sessionRepository(SessionRepositoryRef ref) {
+SessionRepository sessionRepository(ref) {
   return SessionRepositoryImpl(client: ref.watch(dioClientProvider));
 }

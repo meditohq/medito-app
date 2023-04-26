@@ -7,7 +7,7 @@ import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'background_sounds_viewmodel.g.dart';
+part 'background_sounds_provider.g.dart';
 
 @riverpod
 Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {

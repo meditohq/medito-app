@@ -17,7 +17,7 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/session/components/session_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +30,7 @@ class SessionView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(sessionsProvider(sessionId: 9));
+    var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
 
     return Scaffold(
       body: sessions.when(
@@ -51,7 +51,10 @@ class SessionView extends ConsumerWidget {
       );
 
   RefreshIndicator _buildScaffoldWithData(
-      BuildContext context, SessionModel sessionModel, WidgetRef ref) {
+    BuildContext context,
+    SessionModel sessionModel,
+    WidgetRef ref,
+  ) {
     return RefreshIndicator(
       onRefresh: () async =>
           await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
@@ -86,7 +89,7 @@ class SessionView extends ConsumerWidget {
           height16,
           SessionButtons(
             sessionModel: sessionModel,
-          )
+          ),
         ],
       ),
     );
