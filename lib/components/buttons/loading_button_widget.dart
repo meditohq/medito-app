@@ -20,7 +20,7 @@ class LoadingButtonWidget extends StatelessWidget {
     return MaterialButton(
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       onPressed: isLoading ? null : onPressed,
-      disabledColor: bgColor,
+      disabledColor: bgColor.withOpacity(0.7),
       color: bgColor,
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

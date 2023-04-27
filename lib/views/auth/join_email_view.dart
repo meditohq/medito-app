@@ -71,6 +71,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     fontSize: 16,
                   ),
                   validator: ValidationUtils().validateEmail,
+                  onChanged: (val) => setState(() => {}),
                 ),
                 Spacer(),
                 Row(
@@ -82,7 +83,8 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     ),
                     width8,
                     LoadingButtonWidget(
-                      onPressed: _handleContinue,
+                      onPressed:
+                          _emailController.text != '' ? _handleContinue : null,
                       btnText: StringConstants.continueTxt,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,

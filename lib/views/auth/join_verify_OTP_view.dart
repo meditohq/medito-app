@@ -24,7 +24,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
     if (_formKey.currentState!.validate()) {
       try {
         await auth.verifyOTP(widget.email, _otpTextEditingController.text);
-        context.push(RouteConstants.joinWelcomePath);
+        await context.push(RouteConstants.joinWelcomePath);
       } catch (e) {
         showSnackBar(context, e.toString());
       }
@@ -97,7 +97,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   cursorColor: ColorConstants.walterWhite,
                   length: 6,
                   validator: ValidationUtils().validateOTP,
-                  onChanged: (String _) {},
+                  onChanged: (String _) => setState(() => {}),
                 ),
                 Spacer(),
                 Row(
@@ -109,7 +109,9 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                     ),
                     width8,
                     LoadingButtonWidget(
-                      onPressed: _handleVerify,
+                      onPressed: _otpTextEditingController.text != ''
+                          ? _handleVerify
+                          : null,
                       btnText: StringConstants.verify,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
