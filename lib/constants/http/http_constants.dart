@@ -9,6 +9,7 @@ class HTTPConstants {
   static String SENTRY_URL = dotenv.env['SENTRY_URL']!;
 
   //END POINTS
+  static const String USERS = 'users';
   static const String OTP = 'otp';
   static const String FOLDERS = 'folders';
   static const String SESSIONS = 'sessions';

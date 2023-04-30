@@ -2,6 +2,7 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   void _handleContinue() async {
     if (_formKey.currentState!.validate()) {
       try {
+       print (ref.read(dioClientProvider).dio.options.headers);
         var email = _emailController.text;
         await auth.sendOTP(email);
         await context.push(

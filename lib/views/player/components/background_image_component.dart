@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
@@ -15,8 +17,6 @@ class BackgroundImageComponent extends ConsumerWidget {
     var scrollProportion =
         ref.watch(pageviewNotifierProvider).scrollProportion.toDouble();
     var opacity = (1 - scrollProportion) * 0.40;
-
-    print(opacity);
 
     return Stack(
       children: [

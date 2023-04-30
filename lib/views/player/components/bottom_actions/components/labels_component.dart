@@ -23,7 +23,7 @@ class LabelsComponent extends StatelessWidget {
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.all(
-              Radius.circular(3),
+              Radius.circular(14),
             ),
           ),
           alignment: Alignment.center,

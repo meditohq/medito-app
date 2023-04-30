@@ -1,4 +1,5 @@
 class SharedPreferenceConstants {
+  static const String userToken = 'userToken';
   static const String bgSoundVolume = 'bgSoundVolume';
   static const String bgSound = 'bgSound';
   static const String sessionAudioSpeed = 'sessionAudioSpeed';

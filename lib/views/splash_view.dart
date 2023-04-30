@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,10 +17,16 @@ class SplashView extends ConsumerStatefulWidget {
 class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 2), () {
-      context.go(RouteConstants.joinIntroPath);
-    });
+    initializeUserToken();
     super.initState();
+  }
+
+  void initializeUserToken() {
+    ref.read(authProvider).initializeUserToken().then((value) {
+      context.go(RouteConstants.joinIntroPath);
+    }).catchError((e){
+      initializeUserToken();
+    });
   }
 
   @override
