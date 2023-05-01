@@ -14,4 +14,8 @@ class AssetConstants {
   static const String icYoutube = 'assets/images/ic_youtube.svg';
   static const String icInsta = 'assets/images/ic_insta.svg';
   static const String icReddit = 'assets/images/ic_reddit.svg';
+  static const String icSearch = 'assets/images/ic_search.svg';
+  static const String icStreak = 'assets/images/ic_streak.svg';
+  static const String icMenu = 'assets/images/ic_menu.svg';
+  static const String icDownload = 'assets/images/ic_download.svg';
 }

@@ -36,42 +36,50 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
       } else {
         isLandscape = false;
       }
+
       return SizeChangedLayoutNotifier(
-          child: StreamBuilder<ApiResponse<ShortcutsResponse>>(
-              stream: _bloc.shortcutList.stream,
-              initialData: ApiResponse.loading(),
-              builder: (context, snapshot) {
-                switch (snapshot.data?.status) {
-                  case Status.LOADING:
-                    return _getLoadingWidget();
-                  case Status.COMPLETED:
-                    return GridView.count(
-                      crossAxisCount: isLandscape ? 4 : 2,
-                      padding: const EdgeInsets.only(
-                          left: 12.0, right: 12.0, top: 8.0),
-                      scrollDirection: Axis.vertical,
-                      childAspectRatio: 2.6,
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: List.generate(
-                          snapshot.data?.body?.data?.length ?? 0, (index) {
-                        return Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)),
-                          clipBehavior: Clip.antiAlias,
-                          color: ColorConstants.deepNight,
-                          child: SmallShortcutWidget(
-                              snapshot.data?.body?.data?[index],
-                              widget.onTap),
-                        );
-                      }),
-                    );
-                  case Status.ERROR:
-                    return Icon(Icons.error);
-                  case null:
-                }
-                return Container();
-              }));
+        child: StreamBuilder<ApiResponse<ShortcutsResponse>>(
+          stream: _bloc.shortcutList.stream,
+          initialData: ApiResponse.loading(),
+          builder: (context, snapshot) {
+            switch (snapshot.data?.status) {
+              case Status.LOADING:
+                return _getLoadingWidget();
+              case Status.COMPLETED:
+                return GridView.count(
+                  crossAxisCount: isLandscape ? 4 : 2,
+                  padding:
+                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0),
+                  scrollDirection: Axis.vertical,
+                  childAspectRatio: 2.6,
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  children: List.generate(
+                    snapshot.data?.body?.data?.length ?? 0,
+                    (index) {
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        color: ColorConstants.deepNight,
+                        child: SmallShortcutWidget(
+                          snapshot.data?.body?.data?[index],
+                          widget.onTap,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              case Status.ERROR:
+                return Icon(Icons.error);
+              case null:
+            }
+            
+            return Container();
+          },
+        ),
+      );
     });
   }
 
@@ -94,7 +102,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
             );
           }
         }),
-  );
+      );
 
   Card _getLocalDownloadsWidget() {
     return Card(
@@ -109,8 +117,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
                 cover: null,
                 backgroundImage: null,
                 colorPrimary: '#ff282828'),
-            widget.onTap)
-    );
+            widget.onTap));
   }
 }
 
@@ -164,7 +171,8 @@ class SmallShortcutWidget extends StatelessWidget {
         ),
       );
 
-  Widget _getBackgroundImage() => data?.backgroundImage?.isNotNullAndNotEmpty() == true
-      ? getNetworkImageWidget(data?.bgImageUrl)
-      : Container();
+  Widget _getBackgroundImage() =>
+      data?.backgroundImage?.isNotNullAndNotEmpty() == true
+          ? getNetworkImageWidget(data?.bgImageUrl)
+          : Container();
 }

@@ -9,13 +9,14 @@ import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
+import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/session/session_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../views/home/home_wrapper_widget.dart';
+import '../views/home_old/home_wrapper_widget.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -23,47 +24,47 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 final router = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigatorKey,
-  initialLocation: RouteConstants.root,
+  initialLocation: RouteConstants.homePath,
   routes: [
-    GoRoute(
-      path: RouteConstants.root,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: SplashView(),
-      ),
-    ),
-    GoRoute(
-      path: RouteConstants.joinIntroPath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinIntroView(),
-      ),
-    ),
-    GoRoute(
-      path: RouteConstants.joinEmailPath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinEmailView(),
-      ),
-    ),
-    GoRoute(
-      path: RouteConstants.joinVerifyOTPPath,
-      pageBuilder: (context, state) {
-        final data = state.extra! as Map;
+    // GoRoute(
+    //   path: RouteConstants.root,
+    //   pageBuilder: (context, state) => MaterialPage(
+    //     key: state.pageKey,
+    //     child: SplashView(),
+    //   ),
+    // ),
+    // GoRoute(
+    //   path: RouteConstants.joinIntroPath,
+    //   pageBuilder: (context, state) => MaterialPage(
+    //     key: state.pageKey,
+    //     child: JoinIntroView(),
+    //   ),
+    // ),
+    // GoRoute(
+    //   path: RouteConstants.joinEmailPath,
+    //   pageBuilder: (context, state) => MaterialPage(
+    //     key: state.pageKey,
+    //     child: JoinEmailView(),
+    //   ),
+    // ),
+    // GoRoute(
+    //   path: RouteConstants.joinVerifyOTPPath,
+    //   pageBuilder: (context, state) {
+    //     final data = state.extra! as Map;
 
-        return MaterialPage(
-          key: state.pageKey,
-          child: JoinVerifyOTPView(email: data['email']!),
-        );
-      },
-    ),
-    GoRoute(
-      path: RouteConstants.joinWelcomePath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinWelcomeView(),
-      ),
-    ),
+    //     return MaterialPage(
+    //       key: state.pageKey,
+    //       child: JoinVerifyOTPView(email: data['email']!),
+    //     );
+    //   },
+    // ),
+    // GoRoute(
+    //   path: RouteConstants.joinWelcomePath,
+    //   pageBuilder: (context, state) => MaterialPage(
+    //     key: state.pageKey,
+    //     child: JoinWelcomeView(),
+    //   ),
+    // ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) => RootPageView(
@@ -74,7 +75,7 @@ final router = GoRouter(
           path: RouteConstants.homePath,
           pageBuilder: (context, state) => MaterialPage(
             key: state.pageKey,
-            child: HomeWrapperWidget(),
+            child: HomeView(),
           ),
         ),
         _getSessionRoute(fromRoot: true),
@@ -84,7 +85,9 @@ final router = GoRouter(
         _getBackgroundSoundRoute(),
         GoRoute(
           path: RouteConstants.collectionPath,
-          routes: [_getPlayerRoute()],
+          routes: [
+            _getPlayerRoute(),
+          ],
           pageBuilder: (context, state) => getCollectionMaterialPage(state),
         ),
         GoRoute(

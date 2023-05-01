@@ -68,5 +68,6 @@ class StringConstants {
   static const String welcomeMessage = 'You are now logged in. If you ever need to transfer Medito to another phone, use the same email address to log in and your preferences will be restored.';
   static const String thanksForJoining = 'Thanks for being on this journey with us.';
   static const String close = 'Close';
+  static const String search = 'Search';
 
 }

@@ -4,6 +4,7 @@ class RouteConstants {
   static const String sessionPath = '/session/:sid';
   static const String dailyPath = '/daily/:did';
   static const String donationPath = '/donation';
+  static const String downloadsPath = '/downloads';
   static const String playerPath = '/player';
   static const String articlePath = '/article/:aid';
   static const String folderPath = '/folder/:fid';
