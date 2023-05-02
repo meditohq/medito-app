@@ -75,6 +75,7 @@ final router = GoRouter(
           path: RouteConstants.homePath,
           pageBuilder: (context, state) => MaterialPage(
             key: state.pageKey,
+            // child: HomeWrapperWidget(),
             child: HomeView(),
           ),
         ),

@@ -11,35 +11,47 @@ class FilterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.start,
-        alignment: WrapAlignment.start,
-        spacing: 15,
-        runSpacing: 10,
-        runAlignment: WrapAlignment.start,
-        children: List.generate(
-          18,
-          (int index) => Container(
-            decoration: BoxDecoration(
-              color: ColorConstants.onyx,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  AssetConstants.icStreak,
-                ),
-                width4,
-                Text(
-                  'data',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ],
-            ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Column(
+          children: [
+            _filterListView(),
+            _filterListView(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox _filterListView() {
+    return SizedBox(
+      height: 40,
+      child: ListView.builder(
+        itemCount: 14,
+        scrollDirection: Axis.horizontal,
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemBuilder: (context, index) => Container(
+          // height: 40,
+          decoration: BoxDecoration(
+            color: ColorConstants.onyx,
+            borderRadius: BorderRadius.circular(16),
           ),
-        ).toList(),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                AssetConstants.icStreak,
+              ),
+              width4,
+              Text(
+                'data',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
