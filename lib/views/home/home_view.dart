@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
 import 'widgets/search/search_widget.dart';
 
@@ -15,6 +16,7 @@ class HomeView extends StatelessWidget {
             height8,
             HomeHeaderWidget(),
             SearchWidget(),
+            FilterWidget(),
           ],
         ),
       ),
