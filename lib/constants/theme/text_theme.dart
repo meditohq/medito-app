@@ -3,9 +3,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:Medito/constants/constants.dart';
 
-
-
-
 TextTheme meditoTextTheme(BuildContext context) {
   return GoogleFonts.manropeTextTheme(Theme.of(context).textTheme.copyWith(
         displayLarge: TextStyle(
@@ -16,6 +13,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w800,
           height: 1.5,
           color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
         ),
         displayMedium: TextStyle(
           // btm bar text unselected
@@ -24,6 +22,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w700,
           height: 1.5,
           color: ColorConstants.meditoTextGrey,
+          fontFamily: DmSans,
         ),
         displaySmall: TextStyle(
           // header of rows on homepage
@@ -32,6 +31,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w800,
           height: 1.3,
           color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
         ),
         headlineMedium: TextStyle(
           // packs title on home and packs screen
@@ -43,6 +43,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w600,
           height: 1.3,
           color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
         ),
         headlineSmall: TextStyle(
           // stats widget
@@ -51,6 +52,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w700,
           height: 1.2,
           color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
         ),
         titleMedium: TextStyle(
           // packs subtitle on home
@@ -60,6 +62,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w500,
           height: 1.5,
           color: ColorConstants.meditoTextGrey,
+          fontFamily: DmSans,
         ),
         titleSmall: TextStyle(
           // shortcut title
@@ -68,6 +71,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w700,
           height: 1.5,
           color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
         ),
         bodySmall: TextStyle(
           // shortcut title
@@ -76,6 +80,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w600,
           height: 1.5,
           color: ColorConstants.meditoTextGrey,
+          fontFamily: DmSans,
         ),
         bodyMedium: TextStyle(
           // error widget
@@ -84,6 +89,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.normal,
           height: 1.3,
           color: ColorConstants.meditoTextGrey,
+          fontFamily: DmSans,
         ),
         bodyLarge: TextStyle(
           // daily text and quote
@@ -92,6 +98,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w400,
           height: 1.5,
           color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
         ),
       ));
 }

@@ -7,33 +7,49 @@ class SearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
+    var outlineInputBorder = _outlineInputBorder();
+
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
       child: TextFormField(
-        // textAlign: TextAlign.center,
+        textAlign: TextAlign.center,
         cursorColor: ColorConstants.walterWhite,
         cursorWidth: 1,
         decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
           prefixIcon: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.only(left: 15.0),
             child: SvgPicture.asset(
               AssetConstants.icSearch,
             ),
           ),
+          prefixIconConstraints: BoxConstraints(minWidth: 0),
+          suffixIcon: SvgPicture.asset(
+            AssetConstants.icSearch,
+            color: ColorConstants.onyx,
+          ),
           hintText: StringConstants.search,
-          hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: ColorConstants.walterWhite,
-                fontFamily: DmSans,
-                fontSize: 16,
-              ),
+          hintStyle: textTheme.titleSmall,
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorder,
+          border: outlineInputBorder,
         ),
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              fontSize: 16,
-            ),
+        style: textTheme.bodyMedium?.copyWith(
+          color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
+          fontSize: 16,
+        ),
         onChanged: (val) => {},
       ),
     );
   }
+
+  OutlineInputBorder _outlineInputBorder({
+    Color color = ColorConstants.onyx,
+  }) =>
+      OutlineInputBorder(
+        borderSide: BorderSide(color: color, width: 0),
+        borderRadius: BorderRadius.circular(15),
+      );
 }
