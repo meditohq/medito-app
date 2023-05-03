@@ -100,6 +100,33 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: ColorConstants.walterWhite,
           fontFamily: DmSans,
         ),
+        labelLarge: TextStyle(
+          // shortcut title
+          fontSize: 20,
+          letterSpacing: 0.8,
+          fontWeight: FontWeight.w600,
+          height: 1.5,
+          color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
+        ),
+        labelMedium: TextStyle(
+          // error widget
+          fontSize: 16,
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w500,
+          height: 1.3,
+          color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
+        ),
+        labelSmall: TextStyle(
+          // daily text and quote
+          fontSize: 14,
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w400,
+          height: 1.5,
+          color: ColorConstants.walterWhite,
+          fontFamily: DmSans,
+        ),
       ));
 }
 

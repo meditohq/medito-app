@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
 import 'widgets/search/search_widget.dart';
+import 'widgets/session_cards/card_list_widget.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -18,6 +19,13 @@ class HomeView extends StatelessWidget {
             HomeHeaderWidget(),
             SearchWidget(),
             FilterWidget(),
+            CardListWidget(
+              title: 'Popular',
+            ),
+            height16,
+            CardListWidget(
+              title: '30-day challenge',
+            ),
           ],
         ),
       ),
