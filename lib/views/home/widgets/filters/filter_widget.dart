@@ -43,7 +43,7 @@ class FilterWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: SizedBox(
-        height: 50,
+        height: 45,
         child: ListView.builder(
           itemCount: items.length,
           scrollDirection: Axis.horizontal,
@@ -51,11 +51,11 @@ class FilterWidget extends StatelessWidget {
           shrinkWrap: true,
           itemBuilder: (context, index) => Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
               child: Container(
                 decoration: BoxDecoration(
                   color: ColorConstants.onyx,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 padding:
                     EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 6),
