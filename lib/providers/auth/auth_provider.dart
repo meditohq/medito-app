@@ -17,6 +17,62 @@ final authProvider = ChangeNotifierProvider.autoDispose<AuthNotifier>(
   },
 );
 
+
+
+final authTokenProvider =
+    StateNotifierProvider<AuthTokenNotifier, AsyncValue<String?>>((ref) {
+  return AuthTokenNotifier(ref);
+});
+
+//ignore: prefer-match-file-name
+class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
+  AuthTokenNotifier(this.ref) : super(const AsyncData(null));
+  final Ref ref;
+
+  Future<void> initializeUserToken() async {
+    state = const AsyncLoading();
+    var token = await SharedPreferencesService.getStringFromSharedPref(
+      SharedPreferenceConstants.userToken,
+    );
+    if (token != null) {
+      assignNewAuthToken(token+'hehey heye a');
+    } else {
+      await AsyncValue.guard(generateUserToken);
+    }
+  }
+
+  Future<void> generateUserToken() async {
+    state = const AsyncLoading();
+    final authRepository = ref.read(authRepositoryProvider);
+    state = await AsyncValue.guard(() async {
+      var res = await authRepository.generateUserToken();
+      await saveTokenInPref(res.token);
+      assignNewAuthToken(res.token);
+
+      return res.token;
+    });
+  }
+
+  Future<void> saveTokenInPref(String token) async {
+    await SharedPreferencesService.addStringInSharedPref(
+      SharedPreferenceConstants.userToken,
+      token,
+    );
+  }
+
+  void assignNewAuthToken(String token) {
+    ref
+        .read(dioClientProvider)
+        .dio
+        .options
+        .headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
+  }
+}
+
+
+
+
+
 //ignore:prefer-match-file-name
 class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this.ref, {required this.authRepository});
@@ -27,29 +83,44 @@ class AuthNotifier extends ChangeNotifier {
 
   Future<void> initializeUserToken() async {
     try {
-      var token;
-      var isToken = await SharedPreferencesService.getStringFromSharedPref(
+      var token = await SharedPreferencesService.getStringFromSharedPref(
         SharedPreferenceConstants.userToken,
       );
-      if (isToken != null) {
-        token = isToken;
+      if (token != null) {
+        assignNewAuthToken(token);
       } else {
-        var res = await authRepository.generateUserToken();
-        await SharedPreferencesService.addStringInSharedPref(
-          SharedPreferenceConstants.userToken,
-          res.token,
-        );
-        token = res.token;
+        await authRepository.generateUserToken();
       }
-
-      ref
-          .read(dioClientProvider)
-          .dio
-          .options
-          .headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<String> generateUserToken() async {
+    try {
+      var res = await authRepository.generateUserToken();
+      await saveTokenInPref(res.token);
+      // assignNewAuthToken(res.token);
+
+      return res.token;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> saveTokenInPref(String token) async {
+    await SharedPreferencesService.addStringInSharedPref(
+      SharedPreferenceConstants.userToken,
+      token + 'invalid',
+    );
+  }
+
+  void assignNewAuthToken(String token) {
+    ref
+        .read(dioClientProvider)
+        .dio
+        .options
+        .headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
   }
 
   Future<void> sendOTP(String email) async {
@@ -58,10 +129,12 @@ class AuthNotifier extends ChangeNotifier {
     try {
       var res = await authRepository.sendOTP(email);
       sendOTPRes = ApiResponse.completed(res);
+      notifyListeners();
     } catch (e) {
       sendOTPRes = ApiResponse.error(e.toString());
+      notifyListeners();
+      rethrow;
     }
-    notifyListeners();
   }
 
   Future<void> verifyOTP(String email, String OTP) async {

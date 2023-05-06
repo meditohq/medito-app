@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +20,9 @@ class _SplashViewState extends ConsumerState<SplashView> {
   }
 
   void initializeUserToken() {
-    ref.read(authProvider).initializeUserToken().then((value) {
+    ref.read(authTokenProvider.notifier).initializeUserToken().then((value) {
       context.go(RouteConstants.joinIntroPath);
-    }).catchError((e){
+    }).catchError((e) {
       initializeUserToken();
     });
   }

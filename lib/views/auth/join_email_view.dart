@@ -27,10 +27,10 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
        print (ref.read(dioClientProvider).dio.options.headers);
         var email = _emailController.text;
         await auth.sendOTP(email);
-        await context.push(
-          RouteConstants.joinVerifyOTPPath,
-          extra: {'email': email},
-        );
+        // await context.push(
+        //   RouteConstants.joinVerifyOTPPath,
+        //   extra: {'email': email},
+        // );
       } catch (e) {
         showSnackBar(context, e.toString());
       }
