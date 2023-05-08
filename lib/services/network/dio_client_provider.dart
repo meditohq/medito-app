@@ -1,13 +1,9 @@
 import 'dart:io';
-
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/auth/auth_provider.dart';
-import 'package:Medito/repositories/auth/auth_repository.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 // part 'dio_client_provider.g.dart';
 
@@ -71,8 +67,7 @@ Future<void> onError(
       print(e);
       print(s);
       handler.reject(err);
-      // Refresh token expired
-      // Redirect user to login...
     }
+      handler.reject(err);
   }
 }

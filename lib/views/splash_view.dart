@@ -1,5 +1,5 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/auth/auth_provider.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,13 +15,22 @@ class SplashView extends ConsumerStatefulWidget {
 class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
-    initializeUserToken();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initializeUserToken();
+    });
     super.initState();
   }
 
   void initializeUserToken() {
+    var auth = ref.read(authProvider);
     ref.read(authTokenProvider.notifier).initializeUserToken().then((value) {
-      context.go(RouteConstants.joinIntroPath);
+      auth.getUserEmailFromSharedPref().then((value) {
+        if (auth.userEmail != null) {
+          context.go(RouteConstants.homePath);
+        } else {
+          context.go(RouteConstants.joinIntroPath);
+        }
+      });
     }).catchError((e) {
       initializeUserToken();
     });
