@@ -68,8 +68,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-    ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
-    ref.read(audioPlayerNotifierProvider).initAudioHandler();
+    ref.read(authTokenProvider.notifier).getTokenFromSharedPref();
+      ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
+      ref.read(audioPlayerNotifierProvider).initAudioHandler();
+    
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -93,14 +95,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   Widget build(BuildContext context) {
     final currentlyPlayingSession = ref.watch(playerProvider);
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (currentlyPlayingSession != null) {
-    //     checkAudioLocally(
-    //       currentlyPlayingSession,
-    //       currentlyPlayingSession.audio.first.files.first,
-    //     );
-    //   }
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (currentlyPlayingSession != null) {
+        checkAudioLocally(
+          currentlyPlayingSession,
+          currentlyPlayingSession.audio.first.files.first,
+        );
+      }
+    });
 
     return MaterialApp.router(
       routerConfig: router,

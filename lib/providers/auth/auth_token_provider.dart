@@ -15,17 +15,22 @@ final authTokenProvider =
 class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
   AuthTokenNotifier(this.ref) : super(const AsyncData(null));
   final Ref ref;
-
   Future<void> initializeUserToken() async {
     state = const AsyncLoading();
-    var token = await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.userToken,
-    );
-    if (token != null) {
-      assignNewAuthToken(token);
+    await getTokenFromSharedPref();
+    if (state.asData?.value != null) {
+      assignNewAuthToken('${state.asData?.value}');
     } else {
       await AsyncValue.guard(generateUserToken);
     }
+  }
+
+  Future<void> getTokenFromSharedPref() async {
+    state = await AsyncValue.guard(() async {
+      return await SharedPreferencesService.getStringFromSharedPref(
+        SharedPreferenceConstants.userToken,
+      );
+    });
   }
 
   Future<void> generateUserToken() async {
@@ -34,7 +39,7 @@ class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
     state = await AsyncValue.guard(() async {
       var res = await authRepository.generateUserToken();
       await saveTokenInPref(res.token);
-      assignNewAuthToken(res.token);
+      assignNewAuthToken('Bearer ${res.token}');
 
       return res.token;
     });
@@ -43,7 +48,7 @@ class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
   Future<void> saveTokenInPref(String token) async {
     await SharedPreferencesService.addStringInSharedPref(
       SharedPreferenceConstants.userToken,
-      token,
+      'Bearer $token',
     );
   }
 
@@ -52,6 +57,6 @@ class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
         .read(dioClientProvider)
         .dio
         .options
-        .headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
+        .headers[HttpHeaders.authorizationHeader] = token;
   }
 }

@@ -24,7 +24,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initializeUserToken() {
     var auth = ref.read(authProvider);
     ref.read(authTokenProvider.notifier).initializeUserToken().then((value) {
-      auth.getUserEmailFromSharedPref().then((value) {
+      auth.getUserEmailFromSharedPref().then((_) {
         if (auth.userEmail != null) {
           context.go(RouteConstants.homePath);
         } else {
