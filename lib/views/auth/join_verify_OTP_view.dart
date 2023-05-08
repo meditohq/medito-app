@@ -25,7 +25,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
       try {
         await auth.verifyOTP(widget.email, _otpTextEditingController.text);
         await auth.setUserEmailInSharedPref(widget.email);
-        await context.push(RouteConstants.joinWelcomePath);
+        context.go(RouteConstants.joinWelcomePath);
       } catch (e) {
         showSnackBar(context, e.toString());
       }

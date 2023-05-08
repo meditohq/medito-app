@@ -56,7 +56,7 @@ class JoinWelcomeView extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     child: LoadingButtonWidget(
                       onPressed: () {
-                        context.push(RouteConstants.homePath);
+                        context.go(RouteConstants.homePath);
                       },
                       btnText: StringConstants.close,
                       bgColor: ColorConstants.walterWhite,

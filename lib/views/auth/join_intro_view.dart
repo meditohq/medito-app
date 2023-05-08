@@ -64,7 +64,9 @@ class JoinIntroView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       LoadingButtonWidget(
-                        onPressed: () {},
+                        onPressed: () {
+                           context.go(RouteConstants.homePath);
+                        },
                         btnText: StringConstants.maybeLater,
                       ),
                       width8,
