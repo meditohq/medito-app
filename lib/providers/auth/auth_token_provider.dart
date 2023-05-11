@@ -14,7 +14,9 @@ final authTokenProvider =
 //ignore: prefer-match-file-name
 class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
   AuthTokenNotifier(this.ref) : super(const AsyncData(null));
+
   final Ref ref;
+
   Future<void> initializeUserToken() async {
     state = const AsyncLoading();
     await getTokenFromSharedPref();
