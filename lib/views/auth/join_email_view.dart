@@ -25,6 +25,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
     if (_formKey.currentState!.validate()) {
       var email = _emailController.text;
       await auth.sendOTP(email);
+      auth.setCounter();
       var status = auth.sendOTPRes.status;
       if (status == Status.COMPLETED) {
         await context.push(

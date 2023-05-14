@@ -62,12 +62,16 @@ class StringConstants {
   static const String continueTxt = 'Continue';
   static const String whatsYourEmail = 'What’s your email?';
   static const String verifyYourAccount = 'Verify your account';
-  static const String verifyYourAccountInstruction = 'Enter below the 6-digit verification code sent to replaceme to complete your account setup.';
+  static const String verifyYourAccountInstruction =
+      'Enter below the 6-digit verification code sent to replaceme to complete your account setup.';
   static const String verify = 'Verify';
   static const String resendCode = 'Resend code';
-  static const String welcomeToTheMeditoFamily = 'Welcome to \nthe Medito Family';
-  static const String welcomeMessage = 'You are now logged in. If you ever need to transfer Medito to another phone, use the same email address to log in and your preferences will be restored.';
-  static const String thanksForJoining = 'Thanks for being on this journey with us.';
+  static const String resendCodeIn = 'Resend code in ';
+  static const String welcomeToTheMeditoFamily =
+      'Welcome to \nthe Medito Family';
+  static const String welcomeMessage =
+      'You are now logged in. If you ever need to transfer Medito to another phone, use the same email address to log in and your preferences will be restored.';
+  static const String thanksForJoining =
+      'Thanks for being on this journey with us.';
   static const String close = 'Close';
-
 }

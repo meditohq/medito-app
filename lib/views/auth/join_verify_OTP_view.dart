@@ -105,7 +105,9 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: _ResendCodeWidget(),
+                  child: _ResendCodeWidget(
+                    email: widget.email,
+                  ),
                 ),
                 Spacer(),
                 Row(
@@ -137,51 +139,84 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
   }
 }
 
-class _ResendCodeWidget extends StatelessWidget {
-  const _ResendCodeWidget();
-
+class _ResendCodeWidget extends ConsumerWidget {
+  const _ResendCodeWidget({required this.email});
+  final String email;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
+    var auth = ref.watch(authProvider);
+
+    void _handleResendOTP() async {
+      await auth.sendOTP(email);
+      auth.setCounter();
+      var status = auth.sendOTPRes.status;
+      if (status == Status.COMPLETED) {
+        showSnackBar(context, auth.sendOTPRes.body.toString());
+      } else if (status == Status.ERROR) {
+        showSnackBar(context, auth.sendOTPRes.message.toString());
+        auth.setCounter();
+      }
+    }
+
+    if (auth.sendOTPRes.status == Status.LOADING) {
+      return SizedBox(
+        height: 16,
+        width: 16,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: ColorConstants.walterWhite,
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: () => {},
       child: Row(
         children: [
-          Text(
-            StringConstants.resendCode,
-            style: textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              height: 1.5,
-              fontSize: 16,
-              decoration: TextDecoration.underline,
+          GestureDetector(
+            onTap: _handleResendOTP,
+            child: Text(
+              auth.counter
+                  ? StringConstants.resendCodeIn
+                  : StringConstants.resendCode,
+              style: textTheme.bodyMedium?.copyWith(
+                color: ColorConstants.walterWhite,
+                fontFamily: DmSans,
+                height: 1.5,
+                fontSize: 14,
+                decoration: auth.counter
+                    ? TextDecoration.none
+                    : TextDecoration.underline,
+              ),
             ),
           ),
-          TweenAnimationBuilder<Duration>(
-            duration: Duration(minutes: 3),
-            tween: Tween(begin: Duration(minutes: 3), end: Duration.zero),
-            onEnd: () {
-              print('Timer ended');
-            },
-            builder: (BuildContext context, Duration value, Widget? child) {
-              final minutes = value.inMinutes;
-              final seconds = value.inSeconds % 60;
+          if (auth.counter)
+            TweenAnimationBuilder<Duration>(
+              duration: Duration(seconds: 45),
+              tween: Tween(begin: Duration(seconds: 45), end: Duration.zero),
+              onEnd: () {
+                auth.setCounter();
+              },
+              builder: (BuildContext context, Duration value, Widget? child) {
+                final minutes = value.inMinutes;
+                final seconds = value.inSeconds % 60;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: Text(
-                  '$minutes:$seconds',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Text(
+                    '$minutes:$seconds',
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: ColorConstants.walterWhite,
+                      fontFamily: DmSans,
+                      height: 1.5,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
         ],
       ),
     );

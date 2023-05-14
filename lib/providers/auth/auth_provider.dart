@@ -22,7 +22,7 @@ class AuthNotifier extends ChangeNotifier {
   ApiResponse sendOTPRes = ApiResponse.completed(null);
   ApiResponse verifyOTPRes = ApiResponse.completed(null);
   String? userEmail;
-  int otpCounter = 45;
+  bool counter = false;
 
   Future<void> sendOTP(String email) async {
     sendOTPRes = ApiResponse.loading();
@@ -61,6 +61,11 @@ class AuthNotifier extends ChangeNotifier {
     );
     // await SharedPreferencesService.removeValueFromSharedPref(
     //     SharedPreferenceConstants.userEmail);
+    notifyListeners();
+  }
+
+  void setCounter() {
+    counter = !counter;
     notifyListeners();
   }
 }
