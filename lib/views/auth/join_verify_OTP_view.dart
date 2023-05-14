@@ -1,5 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/network/api_response.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +23,13 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
 
   void _handleVerify() async {
     if (_formKey.currentState!.validate()) {
-      try {
-        await auth.verifyOTP(widget.email, _otpTextEditingController.text);
+      await auth.verifyOTP(widget.email, _otpTextEditingController.text);
+      var status = auth.verifyOTPRes.status;
+      if (status == Status.COMPLETED) {
         await auth.setUserEmailInSharedPref(widget.email);
         context.go(RouteConstants.joinWelcomePath);
-      } catch (e) {
-        showSnackBar(context, e.toString());
+      } else if (status == Status.ERROR) {
+        showSnackBar(context, auth.verifyOTPRes.message.toString());
       }
     }
   }
@@ -36,6 +38,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
   Widget build(BuildContext context) {
     auth = ref.watch(authProvider);
     var textTheme = Theme.of(context).textTheme;
+    var isLoading = auth.verifyOTPRes == ApiResponse.loading();
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -100,6 +103,10 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   validator: ValidationUtils().validateOTP,
                   onChanged: (String _) => setState(() => {}),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: _ResendCodeWidget(),
+                ),
                 Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -116,6 +123,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                       btnText: StringConstants.verify,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
+                      isLoading: isLoading,
                     ),
                   ],
                 ),
@@ -124,6 +132,57 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ResendCodeWidget extends StatelessWidget {
+  const _ResendCodeWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
+
+    return GestureDetector(
+      onTap: () => {},
+      child: Row(
+        children: [
+          Text(
+            StringConstants.resendCode,
+            style: textTheme.bodyMedium?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              height: 1.5,
+              fontSize: 16,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+          TweenAnimationBuilder<Duration>(
+            duration: Duration(minutes: 3),
+            tween: Tween(begin: Duration(minutes: 3), end: Duration.zero),
+            onEnd: () {
+              print('Timer ended');
+            },
+            builder: (BuildContext context, Duration value, Widget? child) {
+              final minutes = value.inMinutes;
+              final seconds = value.inSeconds % 60;
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Text(
+                  '$minutes:$seconds',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

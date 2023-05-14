@@ -68,6 +68,7 @@ Future<void> onError(
       print(s);
       handler.reject(err);
     }
-      handler.reject(err);
+    handler.reject(err);
   }
+  handler.reject(err);
 }

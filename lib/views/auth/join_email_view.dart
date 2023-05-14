@@ -23,16 +23,16 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
 
   void _handleContinue() async {
     if (_formKey.currentState!.validate()) {
-      try {
-       print (ref.read(dioClientProvider).dio.options.headers);
-        var email = _emailController.text;
-        await auth.sendOTP(email);
+      var email = _emailController.text;
+      await auth.sendOTP(email);
+      var status = auth.sendOTPRes.status;
+      if (status == Status.COMPLETED) {
         await context.push(
           RouteConstants.joinVerifyOTPPath,
           extra: {'email': email},
         );
-      } catch (e) {
-        showSnackBar(context, e.toString());
+      } else if (status == Status.ERROR) {
+        showSnackBar(context, auth.sendOTPRes.message.toString());
       }
     }
   }
@@ -41,6 +41,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     auth = ref.watch(authProvider);
+    var isLoading = auth.sendOTPRes == ApiResponse.loading();
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -90,7 +91,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                       btnText: StringConstants.continueTxt,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
-                      isLoading: auth.sendOTPRes == ApiResponse.loading(),
+                      isLoading: isLoading,
                     ),
                   ],
                 ),

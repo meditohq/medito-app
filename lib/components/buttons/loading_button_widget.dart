@@ -30,7 +30,7 @@ class LoadingButtonWidget extends StatelessWidget {
           Text(
             btnText,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: isLoading ? bgColor : textColor,
+                  color: isLoading ? Colors.transparent : textColor,
                   fontFamily: ClashDisplay,
                   fontSize: 15,
                 ),

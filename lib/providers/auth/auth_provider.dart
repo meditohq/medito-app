@@ -22,6 +22,7 @@ class AuthNotifier extends ChangeNotifier {
   ApiResponse sendOTPRes = ApiResponse.completed(null);
   ApiResponse verifyOTPRes = ApiResponse.completed(null);
   String? userEmail;
+  int otpCounter = 45;
 
   Future<void> sendOTP(String email) async {
     sendOTPRes = ApiResponse.loading();
@@ -29,12 +30,10 @@ class AuthNotifier extends ChangeNotifier {
     try {
       var res = await authRepository.sendOTP(email);
       sendOTPRes = ApiResponse.completed(res);
-      notifyListeners();
     } catch (e) {
       sendOTPRes = ApiResponse.error(e.toString());
-      notifyListeners();
-      rethrow;
     }
+    notifyListeners();
   }
 
   Future<void> verifyOTP(String email, String OTP) async {
@@ -60,6 +59,8 @@ class AuthNotifier extends ChangeNotifier {
     userEmail = await SharedPreferencesService.getStringFromSharedPref(
       SharedPreferenceConstants.userEmail,
     );
+    // await SharedPreferencesService.removeValueFromSharedPref(
+    //     SharedPreferenceConstants.userEmail);
     notifyListeners();
   }
 }
