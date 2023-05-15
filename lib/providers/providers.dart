@@ -12,4 +12,5 @@ export 'player/audio_speed_provider.dart';
 export 'player/player_provider.dart';
 export 'player/download/audio_downloader_provider.dart';
 export 'player/current_session_player_provider.dart';
+export 'connectivity/connectivity_provider.dart';
 
