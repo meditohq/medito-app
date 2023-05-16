@@ -83,7 +83,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.initState();
     ref.read(authTokenProvider.notifier).getTokenFromSharedPref().then((_) {
       ref.read(audioPlayerNotifierProvider).setContentToken(
-            ref.read(authTokenProvider).asData?.value ??
+            ref.read(authTokenProvider).asData?.value?.token ??
                 HTTPConstants.CONTENT_TOKEN,
           );
       ref.read(playerProvider.notifier).getCurrentlyPlayingSession();

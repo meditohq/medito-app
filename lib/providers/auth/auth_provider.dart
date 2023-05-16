@@ -59,8 +59,6 @@ class AuthNotifier extends ChangeNotifier {
     userEmail = await SharedPreferencesService.getStringFromSharedPref(
       SharedPreferenceConstants.userEmail,
     );
-    // await SharedPreferencesService.removeValueFromSharedPref(
-    //     SharedPreferenceConstants.userEmail);
     notifyListeners();
   }
 
