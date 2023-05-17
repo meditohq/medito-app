@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:audio_service/audio_service.dart';

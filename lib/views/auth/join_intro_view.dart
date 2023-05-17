@@ -1,14 +1,15 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-
-class JoinIntroView extends StatelessWidget {
+class JoinIntroView extends ConsumerWidget {
   const JoinIntroView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
     var joinBenefitList = [
       StringConstants.joinBenefits1,
@@ -65,7 +66,9 @@ class JoinIntroView extends StatelessWidget {
                     children: [
                       LoadingButtonWidget(
                         onPressed: () {
-                           context.go(RouteConstants.homePath);
+                          var auth = ref.read(authProvider);
+                          auth.setIsAGuest(true);
+                          context.go(RouteConstants.homePath);
                         },
                         btnText: StringConstants.maybeLater,
                       ),

@@ -11,25 +11,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final authTokenProvider =
     StateNotifierProvider<AuthTokenNotifier, AsyncValue<UserTokenModel?>>(
   (ref) {
-    return AuthTokenNotifier(ref);
+    var authRepo = ref.read(authRepositoryProvider);
+
+    return AuthTokenNotifier(authRepository: authRepo);
   },
 );
 
 //ignore: prefer-match-file-name
 class AuthTokenNotifier extends StateNotifier<AsyncValue<UserTokenModel?>> {
-  AuthTokenNotifier(this.ref) : super(const AsyncData(null));
+  AuthTokenNotifier({required this.authRepository})
+      : super(const AsyncData(null));
 
-  final Ref ref;
+  final AuthRepository authRepository;
 
   Future<void> initializeUserToken() async {
     state = const AsyncLoading();
     await getTokenFromSharedPref();
-    if (state.asData?.value != null) {
-      assignNewAuthToken('${state.asData?.value!.token}');
-    } else {
+    if (state.asData?.value == null) {
       await generateUserToken();
       await saveTokenInPref(state.asData!.value!);
-      assignNewAuthToken('Bearer ${state.asData!.value!.token}');
     }
   }
 
@@ -48,8 +48,9 @@ class AuthTokenNotifier extends StateNotifier<AsyncValue<UserTokenModel?>> {
 
   Future<void> generateUserToken() async {
     state = const AsyncLoading();
-    final authRepository = ref.read(authRepositoryProvider);
-    state = await AsyncValue.guard(authRepository.generateUserToken);
+    state = await AsyncValue.guard(
+      () async => await authRepository.generateUserToken(),
+    );
   }
 
   Future<void> saveTokenInPref(UserTokenModel user) async {
@@ -57,13 +58,5 @@ class AuthTokenNotifier extends StateNotifier<AsyncValue<UserTokenModel?>> {
       SharedPreferenceConstants.userToken,
       json.encode(user.toJson()),
     );
-  }
-
-  void assignNewAuthToken(String token) {
-    ref
-        .read(dioClientProvider)
-        .dio
-        .options
-        .headers[HttpHeaders.authorizationHeader] = token;
   }
 }

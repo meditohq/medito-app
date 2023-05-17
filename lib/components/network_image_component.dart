@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 
-class NetworkImageComponent extends StatelessWidget {
+class NetworkImageComponent extends ConsumerWidget {
   final String url;
   final double? height, width;
   final bool isCache;
@@ -18,7 +20,8 @@ class NetworkImageComponent extends StatelessWidget {
     this.isCache = false,
   }) : super(key: key);
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var userTokenModel = ref.watch(authTokenProvider).asData?.value;
     if (url.contains('.svg')) {
       return SvgPicture.network(
         url,
@@ -31,7 +34,7 @@ class NetworkImageComponent extends StatelessWidget {
         return CachedNetworkImage(
           imageUrl: url,
           httpHeaders: {
-            HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
+            HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel?.token}',
           },
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
@@ -56,7 +59,7 @@ class NetworkImageComponent extends StatelessWidget {
         cacheHeight: height?.round(),
         cacheWidth: width?.round(),
         headers: {
-          HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
+          HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel?.token}',
         },
         loadingBuilder: (context, child, loadingProgress) {
           return loadingProgress == null ? child : _shimmerLoading();

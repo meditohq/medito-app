@@ -27,7 +27,10 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
       var status = auth.verifyOTPRes.status;
       if (status == Status.COMPLETED) {
         await auth.setUserEmailInSharedPref(widget.email);
-        context.go(RouteConstants.joinWelcomePath);
+        context.go(
+          RouteConstants.joinWelcomePath,
+          extra: {'email': widget.email},
+        );
       } else if (status == Status.ERROR) {
         showSnackBar(context, auth.verifyOTPRes.message.toString());
       }
