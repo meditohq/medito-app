@@ -2,7 +2,6 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +17,7 @@ class JoinEmailView extends ConsumerStatefulWidget {
 class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   late AuthNotifier auth;
   final TextEditingController _emailController =
-      TextEditingController(text: 'osama.asif20@gmail.com');
+      TextEditingController(text: '');
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void _handleContinue() async {
