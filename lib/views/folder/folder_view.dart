@@ -3,7 +3,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/folder/folder_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,27 +16,33 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var folders = ref.watch(FoldersProvider(folderId: 28));
+    var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
+
     return Scaffold(
       body: folders.when(
         skipLoadingOnRefresh: false,
+        skipLoadingOnReload: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(FoldersProvider(folderId: 28)),
+          onTap: () => ref.refresh(
+            FoldersProvider(folderId: int.parse(id!)),
+          ),
+          isLoading: folders.isLoading,
         ),
-        loading: () => _buildLoadingWidget(),
+        loading: () => const FolderShimmerComponent(),
       ),
     );
   }
 
-  Widget _buildLoadingWidget() => const FolderShimmerComponent();
-
   RefreshIndicator _buildScaffoldWithData(
-      BuildContext context, FolderModel folder, WidgetRef ref) {
+    BuildContext context,
+    FolderModel folder,
+    WidgetRef ref,
+  ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(FoldersProvider(folderId: 28));
+        return await ref.refresh(FoldersProvider(folderId: int.parse(id!)));
       },
       child: CollapsibleHeaderComponent(
         bgImage: folder.coverUrl,
@@ -51,6 +57,7 @@ class FolderView extends ConsumerWidget {
                   e.title,
                   e.subtitle,
                   e.type,
+                  folder.items.last == e,
                 ),
               ),
             )
@@ -60,12 +67,21 @@ class FolderView extends ConsumerWidget {
   }
 
   Container _buildListTile(
-      BuildContext context, String? title, String? subtitle, String type) {
+    BuildContext context,
+    String? title,
+    String? subtitle,
+    String type,
+    bool isLast,
+  ) {
+    var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
+
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
-        ),
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
+              ),
       ),
       constraints: BoxConstraints(minHeight: 88),
       padding: const EdgeInsets.all(20.0),
@@ -78,49 +94,61 @@ class FolderView extends ConsumerWidget {
               if (title.isNotNullAndNotEmpty())
                 Text(
                   title!,
-                  style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: DmSans,
-                      height: 2),
+                  style: bodyLarge?.copyWith(
+                    color: ColorConstants.walterWhite,
+                    fontFamily: DmSans,
+                    height: 2,
+                  ),
                 ),
               if (subtitle.isNotNullAndNotEmpty())
                 Text(
                   subtitle!,
-                  style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                        fontFamily: DmMono,
-                        height: 2,
-                        color: ColorConstants.newGrey,
-                      ),
-                )
+                  style: bodyLarge?.copyWith(
+                    fontFamily: DmMono,
+                    height: 2,
+                    color: ColorConstants.newGrey,
+                  ),
+                ),
             ],
           ),
-          if (type != TypeConstants.SESSION) _getIcon(type)
+          if (type != TypeConstants.SESSION) _getIcon(type),
         ],
       ),
     );
   }
 
   void _onListItemTap(
-      int? id, String? type, String? path, BuildContext context) {
+    int? id,
+    String? type,
+    String? path,
+    BuildContext context,
+  ) {
     checkConnectivity().then((value) {
       if (value) {
         var location = GoRouter.of(context).location;
         if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
-            context.go(getPathFromString(
-                Folder3Path, [location.split('/')[2], this.id, id.toString()]));
+            context.push(getPathFromString(
+              RouteConstants.folder3Path,
+              [location.split('/')[2], this.id, id.toString()],
+            ));
           } else {
-            context
-                .go(getPathFromString(Folder2Path, [this.id, id.toString()]));
+            context.push(getPathFromString(
+              RouteConstants.folder2Path,
+              [this.id, id.toString()],
+            ));
           }
         } else if (type == TypeConstants.LINK) {
-          context.go(location + webviewPath, extra: {'url': path!});
+          context.push(
+            location + RouteConstants.webviewPath,
+            extra: {'url': path!},
+          );
           // context.go(getPathFromString('url', [path.toString()]));
         } else {
-          context.go(location + getPathFromString(type, [id.toString()]));
+          context.push(location + getPathFromString(type, [id.toString()]));
         }
       } else {
-        createSnackBar(StringConstants.CHECK_CONNECTION, context);
+        createSnackBar(StringConstants.checkConnection, context);
       }
     });
   }
@@ -131,6 +159,7 @@ class FolderView extends ConsumerWidget {
     } else if (type == TypeConstants.LINK) {
       return SvgPicture.asset(AssetConstants.icLink);
     }
+
     return SizedBox();
   }
 }

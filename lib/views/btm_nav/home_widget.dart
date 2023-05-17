@@ -14,15 +14,16 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
-import 'package:Medito/tracking/tracking.dart';
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/home/courses_row_widget.dart';
 import 'package:Medito/views/home/daily_message_widget.dart';
@@ -47,7 +48,8 @@ class HomeWidget extends ConsumerStatefulWidget {
   _HomeWidgetState createState() => _HomeWidgetState();
 }
 
-class _HomeWidgetState extends ConsumerState<HomeWidget> {
+class _HomeWidgetState extends ConsumerState<HomeWidget>
+    with AutomaticKeepAliveClientMixin<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
 
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
@@ -60,8 +62,11 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   late StreamSubscription<ConnectivityResult> subscription;
 
+  ScrollController _innerScrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     _observeNetwork();
 
     _bloc.fetchMenu();
@@ -74,35 +79,45 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
             return _refresh();
           },
           child: StreamBuilder<bool>(
-              stream: _bloc.connectionStreamController.stream,
-              builder: (context, connectionSnapshot) {
-                if (connectionSnapshot.hasData &&
-                    !(connectionSnapshot.data ?? true)) {
-                  return _buildErrorPacksWidget();
-                } else {
-                  return ListView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    children: [
-                      _getAppBar(context),
-                      AnnouncementBanner(
-                          key: _announceKey, hasOpened: widget.hasOpened),
-                      SmallShortcutsRowWidget(
-                        key: _shortcutKey,
-                        onTap: (type, id) => _navigate(
-                            type, id, context, Tracking.SHORTCUT_TAPPED),
-                      ),
-                      CoursesRowWidget(
-                        key: _coursesKey,
-                        onTap: (type, id) => _navigate(
-                            type, id, context, Tracking.COURSE_TAPPED)),
-                      StatsWidget(),
-                      SizedBox(height: 16),
-                      DailyMessageWidget(key: _dailyMessageKey),
-                      SizedBox(height: 24)
-                    ],
-                  );
-                }
-              }),
+            stream: _bloc.connectionStreamController.stream,
+            builder: (context, connectionSnapshot) {
+              return connectionSnapshot.hasData &&
+                      !(connectionSnapshot.data ?? true)
+                  ? _buildErrorPacksWidget()
+                  : ListView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      children: [
+                        _getAppBar(),
+                        AnnouncementBanner(
+                          key: _announceKey,
+                          hasOpened: widget.hasOpened,
+                        ),
+                        SmallShortcutsRowWidget(
+                          key: _shortcutKey,
+                          onTap: (type, id) => _navigate(
+                            type,
+                            id,
+                            context,
+                            Tracking.SHORTCUT_TAPPED,
+                          ),
+                        ),
+                        CoursesRowWidget(
+                          key: _coursesKey,
+                          onTap: (type, id) => _navigate(
+                            type,
+                            id,
+                            context,
+                            Tracking.COURSE_TAPPED,
+                          ),
+                        ),
+                        StatsWidget(),
+                        SizedBox(height: 16),
+                        DailyMessageWidget(key: _dailyMessageKey),
+                        SizedBox(height: 24),
+                      ],
+                    );
+            },
+          ),
         ),
       ),
     );
@@ -110,7 +125,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
 
   Column _buildErrorPacksWidget() => Column(
         children: [
-          _getAppBar(context),
+          _getAppBar(),
           Expanded(child: ErrorPacksWidget(onPressed: () => _refresh())),
         ],
       );
@@ -119,7 +134,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     return checkConnectivity().then(
       (value) {
         if (value) {
-          context.go(getPathFromString(type, [id]));
+          context.push(getPathFromString(type, [id]));
         } else {
           _bloc.checkConnection();
         }
@@ -133,42 +148,46 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     _shortcutKey.currentState?.refresh();
     _coursesKey.currentState?.refresh();
     _dailyMessageKey.currentState?.refresh();
+
     return _bloc.fetchMenu(skipCache: true);
   }
 
-  AppBar _getAppBar(BuildContext context) {
+  AppBar _getAppBar() {
     return AppBar(
       backgroundColor: ColorConstants.darkMoon,
       elevation: 0,
       actionsIconTheme: IconThemeData(color: ColorConstants.walterWhite),
-      title: _getTitleWidget(context),
+      title: _getTitleWidget(),
       actions: <Widget>[
         StreamBuilder<ApiResponse<MenuResponse>>(
-            stream: _bloc.menuList.stream,
-            initialData: ApiResponse.completed(MenuResponse(data: [])),
-            builder: (context, snapshot) {
-              switch (snapshot.data?.status) {
-                case Status.LOADING:
-                case Status.ERROR:
-                  return GestureDetector(
-                    onTap: () => _bloc.fetchMenu(skipCache: true),
-                    child: Icon(
-                      Icons.more_vert,
-                      color: ColorConstants.walterWhite,
-                    ),
-                  );
-                case Status.COMPLETED:
-                  return _getMenu(context, snapshot);
-                case null:
-                  return Container();
-              }
-            }),
+          stream: _bloc.menuList.stream,
+          initialData: ApiResponse.completed(MenuResponse(data: [])),
+          builder: (context, snapshot) {
+            switch (snapshot.data?.status) {
+              case Status.LOADING:
+              case Status.ERROR:
+                return GestureDetector(
+                  onTap: () => _bloc.fetchMenu(skipCache: true),
+                  child: Icon(
+                    Icons.more_vert,
+                    color: ColorConstants.walterWhite,
+                  ),
+                );
+              case Status.COMPLETED:
+                return _getMenu(context, snapshot);
+              case null:
+                return Container();
+            }
+          },
+        ),
       ],
     );
   }
 
   PopupMenuButton<MenuData> _getMenu(
-      BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
+    BuildContext context,
+    AsyncSnapshot<ApiResponse<MenuResponse>> snapshot,
+  ) {
     return PopupMenuButton<MenuData>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
@@ -178,56 +197,70 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
         context.go(getPathFromString(result.itemType, [result.itemPath]));
       },
       itemBuilder: (BuildContext context) {
-        if (snapshot.hasData && snapshot.data?.body != null) {
-          return snapshot.data?.body?.data?.map((MenuData data) {
+        var body = snapshot.data?.body;
+        if (snapshot.hasData && body != null) {
+          return body.data?.map((MenuData data) {
                 return PopupMenuItem<MenuData>(
                   value: data,
-                  child: Text(data.itemLabel ?? '',
-                      style: Theme.of(context).textTheme.headline4),
+                  child: Text(
+                    data.itemLabel ?? '',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                 );
               }).toList() ??
               [];
         }
+
         return [];
       },
     );
   }
 
-  Widget _getTitleWidget(BuildContext context) => FutureBuilder<String>(
-      future: _bloc.getTitleText(DateTime.now()),
-      initialData: 'Medito',
-      builder: (context, snapshot) {
-        return GestureDetector(
-          onLongPress: () => _showVersionPopUp(context),
-          child: Text(snapshot.data ?? '',
-              style: Theme.of(context).textTheme.headline1),
-        );
-      });
+  Widget _getTitleWidget() => FutureBuilder<String>(
+        future: _bloc.getTitleText(DateTime.now()),
+        initialData: 'Medito',
+        builder: (context, snapshot) {
+          return GestureDetector(
+            onLongPress: () => _showVersionPopUp(context),
+            child: Text(
+              snapshot.data ?? '',
+              style: Theme.of(context).textTheme.displayLarge,
+            ),
+          );
+        },
+      );
 
   Future<void> _showVersionPopUp(BuildContext context) async {
     var line1 = await getDeviceInfoString();
     var prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString(USER_ID) ?? 'None';
     final snackBar = SnackBar(
-        content: GestureDetector(
-          onTap: () {
-            Share.share('$line1 $userID');
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Tap here to copy',
-                  style: TextStyle(color: ColorConstants.walterWhite)),
-              Text(line1,
-                  style: TextStyle(color: ColorConstants.meditoTextGrey)),
-              Text(userID,
-                  style: TextStyle(color: ColorConstants.meditoTextGrey))
-            ],
-          ),
+      content: GestureDetector(
+        onTap: () {
+          Share.share('$line1 $userID');
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Tap here to copy',
+              style: TextStyle(color: ColorConstants.walterWhite),
+            ),
+            Text(
+              line1,
+              style: TextStyle(color: ColorConstants.meditoTextGrey),
+            ),
+            Text(
+              userID,
+              style: TextStyle(color: ColorConstants.meditoTextGrey),
+            ),
+          ],
         ),
-        backgroundColor: ColorConstants.midnight);
+      ),
+      backgroundColor: ColorConstants.midnight,
+    );
 
     // Find the Scaffold in the Widget tree and use it to show a SnackBar!
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -252,9 +285,15 @@ class _HomeWidgetState extends ConsumerState<HomeWidget> {
     await DownloadsBloc.seenTip().then((seen) {
       if (!seen) {
         unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
-            color: ColorConstants.darkMoon);
+        createSnackBar(
+          StringConstants.swipeToDelete,
+          context,
+          color: ColorConstants.darkMoon,
+        );
       }
     });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

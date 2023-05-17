@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
@@ -53,9 +52,9 @@ class _Download {
       file.createSync();
     }
 
-    var url = BASE_URL + 'assets/' + (currentFile.id ?? '');
+    var url = HTTPConstants.BASE_URL_OLD + 'assets/' + (currentFile.id ?? '');
     var request = http.Request('GET', Uri.parse(url));
-    request.headers[HttpHeaders.authorizationHeader] = CONTENT_TOKEN;
+    request.headers[HttpHeaders.authorizationHeader] = HTTPConstants.CONTENT_TOKEN_OLD;
     var _response = await http.Client().send(request);
     _total = _response.contentLength ?? 0;
     _received = 0;
@@ -85,7 +84,7 @@ class _Download {
         }
       }
       // ignore: unnecessary_cast
-      downloadAmountListener.value = progress as double;
+      downloadAmountListener.value = progress as double; // it is necessary
     }).onDone(() async {
       try {
         await file.writeAsBytes(_bytes);
@@ -103,6 +102,7 @@ class _Download {
           ),
         );
       }
+
       return;
     });
   }
@@ -115,11 +115,8 @@ class _Download {
           .then((value) => _throwResponse = value);
       _total = _throwResponse?.contentLength ?? 0;
     }
-    if (_received != null && _total != null) {
-      return _received! / _total!;
-    } else {
-      return 0;
-    }
+
+    return (_received != null && _total != null) ? (_received! / _total!) : 0;
   }
 }
 
@@ -148,20 +145,23 @@ class DownloadSingleton {
   double getProgress(AudioFile file) {
     if (_download == null) return -1;
     if (isDownloadingMe(file)) return _download?.getProgress() ?? 0.0;
+
     return -1;
   }
 
-  bool start(BuildContext context, AudioFile file, MediaItem mediaItem) {
+  bool start(AudioFile file, MediaItem mediaItem) {
     if (_download == null) return false;
     if (_download?.isDownloadingMe(file) ?? false) return true;
     if (isDownloadingSomething()) return false;
 
     if (_download?.isThisFile(file) ?? false) {
       _download?.startDownloading(file, mediaItem);
+
       return true;
     }
     _download = _Download(file);
     _download?.startDownloading(file, mediaItem);
+
     return true;
   }
 

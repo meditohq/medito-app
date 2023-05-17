@@ -1,24 +1,15 @@
-import 'package:Medito/audioplayer/media_lib.dart';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/components/components.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/duration_ext.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/view_model/player/download/audio_downloader_viewmodel.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
-
-import '../../audioplayer/audio_inherited_widget.dart';
-import '../../routes/routes.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -29,25 +20,15 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
-
-  List<MediaItem> _downloadList = [];
-  late MeditoAudioHandler _audioHandler;
-  List<SessionModel> _downloadedSessions = [];
-  @override
-  void initState() {
-    super.initState();
-
-    _refreshDownloadList();
-  }
+  List<SessionModel> downloadedSessions = [];
 
   @override
   Widget build(BuildContext context) {
     final downloadedSessions = ref.watch(downloadedSessionsProvider);
-    _audioHandler = AudioHandlerInheritedWidget.of(context).audioHandler;
 
     return Scaffold(
       appBar: MeditoAppBarWidget(
-        title: StringConstants.DOWNLOADS,
+        title: StringConstants.donwloads,
         isTransparent: true,
         hasCloseButton: true,
       ),
@@ -58,11 +39,13 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           if (data.isEmpty) {
             return _getEmptyWidget();
           }
+
           return _getDownloadList(data);
         },
         error: (err, stack) => ErrorComponent(
-            message: err.toString(),
-            onTap: () async => await ref.refresh(downloadedSessionsProvider)),
+          message: err.toString(),
+          onTap: () => ref.refresh(downloadedSessionsProvider),
+        ),
         loading: () => SessionShimmerComponent(),
       ),
     );
@@ -89,7 +72,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
-        message: StringConstants.EMPTY_DOWNLOADS_MESSAGE,
+        message: StringConstants.emptyDonwloadsMessage,
         image: SvgPicture.asset(
           AssetConstants.dalle,
           height: 168,
@@ -102,29 +85,29 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
       onTap: () {
-        _openPlayer(item, context);
+        _openPlayer(ref, item);
       },
       child: Dismissible(
-          key: UniqueKey(),
-          direction: DismissDirection.endToStart,
-          background: _getDismissibleBackgroundWidget(),
-          onDismissed: (direction) async {
-            if (mounted) {
-              await ref.watch(audioDownloaderProvider).deleteSessionAudio(
-                  '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}');
-              await ref.read(deleteSessionFromPreferenceProvider(
-                      sessionModel: item, file: item.audio.first.files.first)
-                  .future);
-              // setState(() {});
-            }
-
-            createSnackBar(
-              '"${item.title}" removed',
-              context,
-              color: ColorConstants.moonlight,
-            );
-          },
-          child: _getListItemWidget(item)),
+        key: UniqueKey(),
+        direction: DismissDirection.endToStart,
+        background: _getDismissibleBackgroundWidget(),
+        onDismissed: (direction) {
+          if (mounted) {
+            ref.watch(audioDownloaderProvider).deleteSessionAudio(
+                  '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
+                );
+            ref.read(deleteSessionFromPreferenceProvider(
+              file: item.audio.first.files.first,
+            ).future);
+          }
+          createSnackBar(
+            '"${item.title}" ${StringConstants.removed.toLowerCase()}',
+            context,
+            color: ColorConstants.walterWhite,
+          );
+        },
+        child: _getListItemWidget(item),
+      ),
     );
   }
 
@@ -151,38 +134,36 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         Duration(milliseconds: item.audio.first.files.first.duration)
             .inMinutes
             .toString();
+
     return PackListItemWidget(
       PackImageListItemData(
-          title: item.title,
-          subtitle:
-              '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
-          cover: item.coverUrl,
-          // colorPrimary: parseColor(item.extras?[PRIMARY_COLOUR]),
-          coverSize: 70),
+        title: item.title,
+        subtitle:
+            '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
+        cover: item.coverUrl,
+        coverSize: 70,
+      ),
     );
   }
 
   String _getDuration(String? length) => formatSessionLength(length);
 
-  void _openPlayer(SessionModel sessionModel, BuildContext context) {
-    context.go(
-      GoRouter.of(context).location + PlayerPath,
-      extra: {
-        'sessionModel': sessionModel,
-        'file': sessionModel.audio.first.files.first
-      },
-    );
+  void _openPlayer(
+    WidgetRef ref,
+    SessionModel sessionModel,
+  ) {
+    ref.read(playerProvider.notifier).addCurrentlyPlayingSessionInPreference(
+          sessionModel: sessionModel,
+          file: sessionModel.audio.first.files.first,
+        );
+    ref.read(pageviewNotifierProvider).gotoNextPage();
   }
 
   void showSwipeToDeleteTip() {
-    createSnackBar(StringConstants.SWIPE_TO_DELETE, context,
-        color: ColorConstants.darkMoon);
-  }
-
-  void _refreshDownloadList() {
-    DownloadsBloc.fetchDownloads().then((value) {
-      _downloadList = value;
-      setState(() {});
-    });
+    createSnackBar(
+      StringConstants.swipeToDelete,
+      context,
+      color: ColorConstants.walterWhite,
+    );
   }
 }

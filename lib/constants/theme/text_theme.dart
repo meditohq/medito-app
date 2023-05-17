@@ -8,7 +8,7 @@ import 'package:Medito/constants/constants.dart';
 
 TextTheme meditoTextTheme(BuildContext context) {
   return GoogleFonts.manropeTextTheme(Theme.of(context).textTheme.copyWith(
-        headline1: TextStyle(
+        displayLarge: TextStyle(
           // greetings text
           // btm bar text selected
           fontSize: 18,
@@ -17,7 +17,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.5,
           color: ColorConstants.walterWhite,
         ),
-        headline2: TextStyle(
+        displayMedium: TextStyle(
           // btm bar text unselected
           fontSize: 18,
           letterSpacing: 0.5,
@@ -25,7 +25,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.5,
           color: ColorConstants.meditoTextGrey,
         ),
-        headline3: TextStyle(
+        displaySmall: TextStyle(
           // header of rows on homepage
           fontSize: 18,
           letterSpacing: 0.5,
@@ -33,7 +33,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.3,
           color: ColorConstants.walterWhite,
         ),
-        headline4: TextStyle(
+        headlineMedium: TextStyle(
           // packs title on home and packs screen
           // streak tile data (not title)
           // downloads tile session name
@@ -44,7 +44,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.3,
           color: ColorConstants.walterWhite,
         ),
-        headline5: TextStyle(
+        headlineSmall: TextStyle(
           // stats widget
           fontSize: 20,
           letterSpacing: 0.5,
@@ -52,7 +52,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.2,
           color: ColorConstants.walterWhite,
         ),
-        subtitle1: TextStyle(
+        titleMedium: TextStyle(
           // packs subtitle on home
           // downloads subtitle
           fontSize: 14,
@@ -61,7 +61,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.5,
           color: ColorConstants.meditoTextGrey,
         ),
-        subtitle2: TextStyle(
+        titleSmall: TextStyle(
           // shortcut title
           fontSize: 14,
           letterSpacing: 0.2,
@@ -69,7 +69,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.5,
           color: ColorConstants.walterWhite,
         ),
-        caption: TextStyle(
+        bodySmall: TextStyle(
           // shortcut title
           fontSize: 12,
           letterSpacing: 0.8,
@@ -77,7 +77,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.5,
           color: ColorConstants.meditoTextGrey,
         ),
-        bodyText2: TextStyle(
+        bodyMedium: TextStyle(
           // error widget
           fontSize: 16,
           letterSpacing: 0.5,
@@ -85,7 +85,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           height: 1.3,
           color: ColorConstants.meditoTextGrey,
         ),
-        bodyText1: TextStyle(
+        bodyLarge: TextStyle(
           // daily text and quote
           fontSize: 14,
           letterSpacing: 0.5,

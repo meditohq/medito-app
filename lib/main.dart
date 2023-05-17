@@ -12,87 +12,64 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:flutter_web_plugins/url_strategy.dart';
 import 'dart:async';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'audioplayer/audio_inherited_widget.dart';
-import 'network/auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Medito/providers/providers.dart';
 
 late SharedPreferences sharedPreferences;
-
+late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
   sharedPreferences = await SharedPreferences.getInstance();
 
-  var _audioHandler = await AudioService.init(
-    builder: () => MeditoAudioHandler(),
+  audioHandler = await AudioService.init(
+    builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.medito.app.channel.audio',
       androidNotificationChannelName: 'Medito Session',
+      androidNotificationOngoing: true,
     ),
   );
 
-  _audioHandler.customEvent.stream.listen((event) async {
-    if (event == STATS) {
-      await updateStatsFromBg();
-    }
-  });
-
   usePathUrlStrategy();
-
-  if (kReleaseMode) {
-    await SentryFlutter.init((options) {
-      options.dsn = SENTRY_URL;
-    }, appRunner: () => _runApp(_audioHandler));
-  } else {
-    _runApp(_audioHandler);
-  }
+  _runApp();
 }
 
-void _runApp(MeditoAudioHandler _audioHandler) => runApp(ProviderScope(
-      child: AudioHandlerInheritedWidget(
-        audioHandler: _audioHandler,
+void _runApp() => runApp(
+      ProviderScope(
         child: ParentWidget(),
       ),
-    ));
+    );
 
-/// This Widget is the main application widget.
-class ParentWidget extends StatefulWidget {
+// This Widget is the main application widget.
+// ignore: prefer-match-file-name
+class ParentWidget extends ConsumerStatefulWidget {
   static const String _title = 'Medito';
 
   @override
-  _ParentWidgetState createState() => _ParentWidgetState();
+  ConsumerState<ParentWidget> createState() => _ParentWidgetState();
 }
 
-class _ParentWidgetState extends State<ParentWidget>
+class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
+  bool isFirstTimeLoading = true;
   @override
-  void initState() {
-    super.initState();
-
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor: ColorConstants.transparent,
-          systemNavigationBarIconBrightness: Brightness.light,
-          statusBarColor: ColorConstants.transparent),
-    );
-
-    // listened for app background/foreground events
-    WidgetsBinding.instance.addObserver(this);
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // update session stats when app comes into foreground
+      updateStatsFromBg();
+    }
   }
 
   @override
@@ -102,45 +79,43 @@ class _ParentWidgetState extends State<ParentWidget>
   }
 
   @override
+  void initState() {
+    super.initState();
+    // ref.read(authTokenProvider.notifier).getTokenFromSharedPref().then((_) {
+    //   var userTokenModel = ref.read(authTokenProvider).asData?.value;
+    //   ref.read(audioPlayerNotifierProvider).setContentToken(
+    //         userTokenModel?.token ?? HTTPConstants.CONTENT_TOKEN,
+    //       );
+    //   ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
+    //   ref.read(audioPlayerNotifierProvider).initAudioHandler();
+    // });
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: ColorConstants.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: ColorConstants.transparent,
+      ),
+    );
+
+    // listened for app background/foreground events
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
+      ref.watch(currentSessionPlayerProvider);
+    }
+    isFirstTimeLoading = false;
+
     return MaterialApp.router(
       routerConfig: router,
-      theme: ThemeData(
-          splashColor: ColorConstants.moonlight,
-          canvasColor: ColorConstants.greyIsTheNewBlack,
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.android: SlideTransitionBuilder(),
-          }),
-          colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
-          textTheme: meditoTextTheme(context)),
+      theme: appTheme(context),
       title: ParentWidget._title,
-    );
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      // update session stats when app comes into foreground
-      updateStatsFromBg();
-    }
-  }
-}
-
-class SlideTransitionBuilder extends PageTransitionsBuilder {
-  @override
-  Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    animation = CurvedAnimation(curve: Curves.easeInOutExpo, parent: animation);
-
-    return SlideTransition(
-      position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-          .animate(animation),
-      child: child,
     );
   }
 }

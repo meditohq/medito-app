@@ -11,9 +11,11 @@ class UserResponse {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data?.toJson();
+    var mainData = this.data;
+    if (mainData != null) {
+      data['data'] = mainData.toJson();
     }
+
     return data;
   }
 }
@@ -30,6 +32,7 @@ class Data {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['id'] = id;
+
     return data;
   }
 }

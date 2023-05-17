@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:Medito/utils/shared_preferences_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -40,6 +40,7 @@ Future<bool?> checkBgSoundExists(String name) async {
   var filePath = (await getFilePath(name));
   var file = File(filePath);
   var exists = await file.exists();
+
   return exists;
 }
 
@@ -51,7 +52,7 @@ Future<String?> downloadBGMusicFromURL(String? url, String? name) async {
   if (await file.exists()) return file.path;
   try {
     var request = await http.get(Uri.parse(url ?? ''),
-        headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+        headers: {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD});
     var bytes = request.bodyBytes;
     await file.writeAsBytes(bytes);
     await addBgSoundToOfflineSharedPrefs(name, file.path);

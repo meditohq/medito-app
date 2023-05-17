@@ -15,30 +15,31 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 
-import 'package:Medito/network/auth.dart';
-import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/network/user/user_utils.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
-  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  final headers = {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD};
+
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }
 
 NetworkImage getNetworkImage(String url) {
   final headers = {
-    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN
+    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
   };
+
   return NetworkImage(url, headers: headers);
 }
 
 Future<bool> checkConnectivity() async {
   var connectivityResult = await Connectivity().checkConnectivity();
+
   return connectivityResult != ConnectivityResult.none;
 }
 
@@ -48,8 +49,11 @@ Color parseColor(String? color) {
   return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }
 
-void createSnackBar(String message, BuildContext context,
-    {Color color = Colors.red}) {
+void createSnackBar(
+  String message,
+  BuildContext context, {
+  Color color = Colors.red,
+}) {
   final snackBar = SnackBar(
     content: Text(message),
     backgroundColor: color,
@@ -76,13 +80,14 @@ Future<bool> launchUrl(String? href) async {
     href = href?.replaceAll('{{user_id}}', userId);
   }
 
-  if (href != null && href.startsWith('mailto') == true) {
+  if (href != null && href.startsWith('mailto')) {
     _launchEmailSubmission(href);
   } else if (href != null) {
     return await canLaunch(href)
         ? await launch(href)
         : throw 'Could not launch $href';
   }
+
   return true;
 }
 
@@ -94,9 +99,10 @@ void _launchEmailSubmission(String href) async {
   var info = '--- Please write email below this line $version, id:$userId ----';
 
   final params = Uri(
-      scheme: 'mailto',
-      path: href.replaceAll('mailto:', ''),
-      query: 'body=$info');
+    scheme: 'mailto',
+    path: href.replaceAll('mailto:', ''),
+    query: 'body=$info',
+  );
 
   var url = params.toString();
   if (await canLaunch(url)) {
@@ -110,10 +116,12 @@ int convertDurationToMinutes({required int milliseconds}) {
   return Duration(milliseconds: milliseconds).inMinutes;
 }
 
+//ignore: prefer-match-file-name
 extension EmptyOrNull on String? {
   bool isNullOrEmpty() {
     if (this == null) return true;
     if (this?.isEmpty == true) return true;
+
     return false;
   }
 
@@ -142,8 +150,14 @@ String getFileExtension(String path) {
   return '.${path.substring(path.lastIndexOf('.') + 1)}';
 }
 
+extension SanitisePath on String {
+  String sanitisePath() {
+    return replaceFirst('/', '');
+  }
+}
+
 extension AssetUrl on String {
   String toAssetUrl() {
-    return '${BASE_URL}assets/$this?download';
+    return '${HTTPConstants.BASE_URL_OLD}assets/$this?download';
   }
 }

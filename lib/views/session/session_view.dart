@@ -17,27 +17,28 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/view_model/session/session_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/session/components/session_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SessionViewScreen extends ConsumerWidget {
+class SessionView extends ConsumerWidget {
   final String? id;
   final Screen? screenKey;
 
-  SessionViewScreen({Key? key, this.id, this.screenKey}) : super(key: key);
+  SessionView({Key? key, this.id, this.screenKey}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(sessionsProvider(sessionId: 9));
+    var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
+
     return Scaffold(
       body: sessions.when(
         skipLoadingOnRefresh: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
+          onTap: () => ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -50,9 +51,13 @@ class SessionViewScreen extends ConsumerWidget {
       );
 
   RefreshIndicator _buildScaffoldWithData(
-      BuildContext context, SessionModel sessionModel, WidgetRef ref) {
+    BuildContext context,
+    SessionModel sessionModel,
+    WidgetRef ref,
+  ) {
     return RefreshIndicator(
-      onRefresh: () async => await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
+      onRefresh: () async =>
+          await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
       child: Scaffold(
         body: CollapsibleHeaderComponent(
           bgImage: sessionModel.coverUrl,
@@ -84,7 +89,7 @@ class SessionViewScreen extends ConsumerWidget {
           height16,
           SessionButtons(
             sessionModel: sessionModel,
-          )
+          ),
         ],
       ),
     );

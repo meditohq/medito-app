@@ -1,42 +1,54 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:Medito/models/models.dart';
 
 class ArtistTitleComponent extends StatelessWidget {
-  const ArtistTitleComponent({super.key, required this.sessionModel});
-  final SessionModel sessionModel;
+  const ArtistTitleComponent({
+    super.key,
+    required this.sessionTitle,
+    this.artistName,
+    this.artistUrlPath,
+    this.sessionTitleFontSize = 24,
+    this.artistNameFontSize = 16,
+    this.artistUrlPathFontSize = 13,
+  });
+  final String sessionTitle;
+  final String? artistName, artistUrlPath;
+  final double sessionTitleFontSize;
+  final double artistNameFontSize;
+  final double artistUrlPathFontSize;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
-      child: Column(
-        children: [
-          _title(context),
-          _subtitle(),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _title(context),
+        _subtitle(),
+      ],
     );
   }
 
   Text _title(BuildContext context) {
     return Text(
-      sessionModel.title,
-      textAlign: TextAlign.center,
+      sessionTitle,
       style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-          fontFamily: ClashDisplay,
-          color: ColorConstants.walterWhite,
-          fontSize: 24,
-          letterSpacing: 1),
+            fontFamily: ClashDisplay,
+            color: ColorConstants.walterWhite,
+            fontSize: sessionTitleFontSize,
+            letterSpacing: 1,
+          ),
     );
   }
 
   Padding _subtitle() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.only(right: 16.0),
       child: MarkdownComponent(
-          body:
-              '${sessionModel.artist?.name ?? ''} ${sessionModel.artist?.path ?? ''}'),
+        textAlign: WrapAlignment.start,
+        body: '${artistName ?? ''} ${artistUrlPath ?? ''}',
+        pFontSize: artistNameFontSize,
+        aFontSize: artistUrlPathFontSize,
+      ),
     );
   }
 }

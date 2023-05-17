@@ -1,8 +1,7 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/view_model/audio_player/audio_player_viewmodel.dart';
-import 'package:Medito/view_model/background_sounds/background_sounds_viewmodel.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'components/sound_listtile_component.dart';
@@ -38,7 +37,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
       _provider.getBackgroundSoundFromPref().then((_) {
         if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.NONE) {
+            _provider.selectedBgSound?.title != StringConstants.none) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
           _audioPlayerNotifier.playBackgroundSound();
         }
@@ -52,13 +51,16 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   Widget build(BuildContext context) {
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
+
     return Scaffold(
       body: backgroundSounds.when(
         skipLoadingOnRefresh: false,
-        data: (data) => _mainContent(context, data, ref),
+        data: (data) => _mainContent(
+          data,
+        ),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () async => await ref.refresh(backgroundSoundsProvider),
+          onTap: () => ref.refresh(backgroundSoundsProvider),
         ),
         loading: () => BackgroundSoundsShimmerComponent(),
       ),
@@ -66,9 +68,10 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   }
 
   CollapsibleHeaderComponent _mainContent(
-      BuildContext context, List<BackgroundSoundsModel> data, WidgetRef ref) {
+    List<BackgroundSoundsModel> data,
+  ) {
     return CollapsibleHeaderComponent(
-      title: StringConstants.BACKGROUND_SOUNDS,
+      title: StringConstants.backgroundSounds,
       leadingIconBgColor: ColorConstants.walterWhite,
       leadingIconColor: ColorConstants.almostBlack,
       headerHeight: 130,
@@ -76,10 +79,16 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         VolumeSliderComponent(),
         SoundListTileComponent(
           sound: BackgroundSoundsModel(
-              id: 0, title: StringConstants.NONE, duration: 0, path: ''),
+            id: 0,
+            title: StringConstants.none,
+            duration: 0,
+            path: '',
+          ),
         ),
         for (int i = 0; i < data.length; i++)
-          SoundListTileComponent(sound: data[i])
+          SoundListTileComponent(
+            sound: data[i],
+          ),
       ],
     );
   }

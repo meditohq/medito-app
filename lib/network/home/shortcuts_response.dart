@@ -32,9 +32,11 @@ class ShortcutsResponse {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data?.map((v) => v.toJson()).toList();
+    var shortcutData = this.data;
+    if (shortcutData != null) {
+      data['data'] = shortcutData.map((v) => v.toJson()).toList();
     }
+
     return data;
   }
 }
@@ -50,13 +52,14 @@ class ShortcutData {
   String? groundImage;
   String? colorPrimary;
 
-  ShortcutData(
-      {this.title,
-        this.type,
-        this.id,
-        this.cover,
-        this.backgroundImage,
-        this.colorPrimary});
+  ShortcutData({
+    this.title,
+    this.type,
+    this.id,
+    this.cover,
+    this.backgroundImage,
+    this.colorPrimary,
+  });
 
   ShortcutData.fromJson(Map<String, dynamic> json) {
     title = json['title'];
@@ -75,6 +78,7 @@ class ShortcutData {
     data['cover'] = cover;
     data['background_image'] = backgroundImage;
     data['color_primary'] = colorPrimary;
+
     return data;
   }
 }

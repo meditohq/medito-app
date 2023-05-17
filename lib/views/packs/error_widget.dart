@@ -18,13 +18,20 @@ import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../routes/routes.dart';
-
 class ErrorPacksWidget extends StatelessWidget {
   final onPressed;
 
   @override
   Widget build(BuildContext context) {
+    var titleSmall = Theme.of(context).textTheme.titleSmall;
+    var outlineButtonStyle = OutlinedButton.styleFrom(
+      side: BorderSide(
+        width: 1.0,
+        color: ColorConstants.walterWhite,
+        style: BorderStyle.solid,
+      ),
+    );
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -38,48 +45,42 @@ class ErrorPacksWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  StringConstants.LOADING_ERROR,
+                  StringConstants.loadingError,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.subtitle2,
+                  style: titleSmall,
                 ),
                 Container(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            width: 1.0,
-                            color: ColorConstants.walterWhite,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        onPressed: () {
-                          createSnackBar(StringConstants.RETRYING, context,
-                              color: ColorConstants.darkBGColor);
-                          onPressed();
-                        },
-                        child: Text(
-                          StringConstants.TRY_AGAIN,
-                          style: Theme.of(context).textTheme.subtitle2,
-                        )),
+                      style: outlineButtonStyle,
+                      onPressed: () {
+                        createSnackBar(
+                          StringConstants.retrying,
+                          context,
+                          color: ColorConstants.darkBGColor,
+                        );
+                        onPressed();
+                      },
+                      child: Text(
+                        StringConstants.tryAgain,
+                        style: titleSmall,
+                      ),
+                    ),
                     Container(width: 16),
                     OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            width: 1.0,
-                            color: ColorConstants.walterWhite,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        onPressed: () => {
-                          context.go(CollectionPath)},
-                        child: Text(
-                          StringConstants.SHOW_DOWNLOADS,
-                          style: Theme.of(context).textTheme.subtitle2,
-                        )),
+                      style: outlineButtonStyle,
+                      onPressed: () => {
+                        context.go(RouteConstants.collectionPath),
+                      },
+                      child: Text(
+                        StringConstants.showDownloads,
+                        style: titleSmall,
+                      ),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),

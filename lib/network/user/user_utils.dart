@@ -1,9 +1,6 @@
 import 'dart:io' as io;
-
-import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
-import 'package:Medito/network/http_get.dart';
-import 'package:Medito/network/user/user_response.dart';
+import 'package:Medito/network/user/user_repository.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
@@ -17,6 +14,7 @@ Future<bool> firstOpenOperations() async {
   var prefs = await SharedPreferences.getInstance();
   var opened = _beginClearStorage(prefs);
   await _logAccount(prefs);
+
   return opened;
 }
 
@@ -31,7 +29,7 @@ Future _logAccount(SharedPreferences prefs) async {
 }
 
 Future<void> _updateUserCredentials(SharedPreferences prefs) async {
-  var map = await UserRepo.createUser();
+  var map = await UserRepository.createUser();
   await prefs.setString(USER_ID, map?[USER_ID] ?? '');
   await prefs.setString(TOKEN, map?[TOKEN] ?? '');
 
@@ -46,6 +44,7 @@ bool _beginClearStorage(SharedPreferences prefs) {
   if (!opened) {
     unawaited(_clearStorage(prefs));
   }
+
   return opened;
 }
 
@@ -54,57 +53,11 @@ Future _clearStorage(SharedPreferences prefs) async {
   await prefs.setBool(HAS_OPENED, true);
 }
 
-class UserRepo {
-  static Future<Map<String, String>>? createUser() async {
-    var ext = 'users/';
-    var url = BASE_URL + ext;
-
-    var now = DateTime.now().millisecondsSinceEpoch.toString();
-
-    var deviceInfoMap = await getDeviceDetails();
-
-    var version = '';
-    try {
-      var packageInfo = await PackageInfo.fromPlatform();
-      version = packageInfo.buildNumber;
-    } catch (e) {
-      print(e);
-    }
-
-    var token = '$now${UniqueKey().toString()}';
-
-    var defaultMap = {
-      'email': '$now@medito.user',
-      'password': UniqueKey().toString(),
-      'token': token,
-      'app_version': version,
-      'device_language': io.Platform.localeName,
-    }..addAll(deviceInfoMap);
-
-    var id = '';
-    try {
-      final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
-      id = response != null
-          ? (UserResponse.fromJson(response).data?.id ?? 'EMPTY')
-          : 'EMPTY';
-    } catch (e, st) {
-      unawaited(
-        Sentry.captureException(
-          e,
-          stackTrace: st,
-          hint: Hint.withMap(
-            {'message': token},
-          ),
-        ),
-      );
-    } finally {
-      return {USER_ID: id, TOKEN: 'Bearer $token'};
-    }
-  }
-}
+//ignore: prefer-match-file-name
 
 Future<String?> get generatedToken async {
   var prefs = await SharedPreferences.getInstance();
+
   return prefs.getString(TOKEN);
 }
 
@@ -141,7 +94,7 @@ Future<Map<String, String>> getDeviceDetails() async {
     DEVICE_MODEL: deviceModel,
     DEVICE_OS: deviceOS,
     DEVICE_PLATFORM: devicePlatform,
-    DEVICE_LANGUAGE: deviceLanguage
+    DEVICE_LANGUAGE: deviceLanguage,
   };
 }
 

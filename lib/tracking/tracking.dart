@@ -12,7 +12,7 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_utils.dart';
@@ -51,19 +51,21 @@ class Tracking {
 
   static List<Map<String, String>> destinationData(String type, String item) {
     return [
-      {TYPE: type, ITEM: item}
+      {TYPE: type, ITEM: item},
     ];
   }
 
-  static Future<void> postUsage(String type,
-      [Map<String, String> body = const {}]) async {
+  static Future<void> postUsage(
+    String type, [
+    Map<String, String> body = const {},
+  ]) async {
     if (kReleaseMode) {
       var packageInfo = await PackageInfo.fromPlatform();
       var version = packageInfo.buildNumber;
       var deviceInfo = await getDeviceDetails();
 
       var ext = 'items/usage/';
-      var url = BASE_URL + ext;
+      var url = HTTPConstants.BASE_URL_OLD + ext;
       try {
         var token = await generatedToken;
         if (token != null) {
@@ -91,6 +93,7 @@ class Tracking {
           ),
         );
         print('post usage failed: ' + e.toString());
+
         return;
       }
     }
@@ -130,5 +133,6 @@ String mapToPlural(String fileType) {
   if (fileType.contains('daily')) {
     return 'dailies';
   }
+
   return '';
 }
