@@ -82,14 +82,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-    ref.read(authTokenProvider.notifier).getTokenFromSharedPref().then((_) {
-      ref.read(audioPlayerNotifierProvider).setContentToken(
-            ref.read(authTokenProvider).asData?.value ??
-                HTTPConstants.CONTENT_TOKEN,
-          );
-      ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
-      ref.read(audioPlayerNotifierProvider).initAudioHandler();
-    });
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
@@ -109,7 +101,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Widget build(BuildContext context) {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     final auth = ref.watch(authProvider);
-    if (!isFirstTimeLoading && auth.userEmail != null) {
+    if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
       ref.watch(currentSessionPlayerProvider);
     }
     isFirstTimeLoading = false;

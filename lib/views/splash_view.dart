@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -23,7 +26,11 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   void initializeUserToken() {
     var auth = ref.read(authProvider);
-    ref.read(authTokenProvider.notifier).initializeUserToken().then((value) {
+    var authToken = ref.read(authTokenProvider.notifier);
+    authToken.initializeUserToken().then((_) {
+      var userTokenModel = ref.read(authTokenProvider).asData?.value;
+      assignNewTokenToDio('Bearer ${userTokenModel?.token}');
+      initializeAudioPlayer('Bearer ${userTokenModel?.token}');
       auth.getUserEmailFromSharedPref().then((_) {
         if (auth.userEmail != null) {
           context.go(RouteConstants.homePath);
@@ -34,6 +41,22 @@ class _SplashViewState extends ConsumerState<SplashView> {
     }).catchError((e) {
       initializeUserToken();
     });
+  }
+
+  void assignNewTokenToDio(String token) {
+    ref
+        .read(dioClientProvider)
+        .dio
+        .options
+        .headers[HttpHeaders.authorizationHeader] = token;
+  }
+
+  void initializeAudioPlayer(String token) {
+    ref.read(audioPlayerNotifierProvider).setContentToken(
+          token,
+        );
+    ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
+    ref.read(audioPlayerNotifierProvider).initAudioHandler();
   }
 
   @override

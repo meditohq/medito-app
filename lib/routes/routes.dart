@@ -59,10 +59,16 @@ final router = GoRouter(
     ),
     GoRoute(
       path: RouteConstants.joinWelcomePath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinWelcomeView(),
-      ),
+      pageBuilder: (context, state) {
+        final data = state.extra! as Map;
+
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinWelcomeView(
+            email: data['email']!,
+          ),
+        );
+      },
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,

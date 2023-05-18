@@ -1,64 +1,62 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/user/user_token_model.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authTokenProvider =
-    StateNotifierProvider<AuthTokenNotifier, AsyncValue<String?>>((ref) {
-  return AuthTokenNotifier(ref);
-});
+    StateNotifierProvider<AuthTokenNotifier, AsyncValue<UserTokenModel?>>(
+  (ref) {
+    var authRepo = ref.read(authRepositoryProvider);
+
+    return AuthTokenNotifier(authRepository: authRepo);
+  },
+);
 
 //ignore: prefer-match-file-name
-class AuthTokenNotifier extends StateNotifier<AsyncValue<String?>> {
-  AuthTokenNotifier(this.ref) : super(const AsyncData(null));
+class AuthTokenNotifier extends StateNotifier<AsyncValue<UserTokenModel?>> {
+  AuthTokenNotifier({required this.authRepository})
+      : super(const AsyncData(null));
 
-  final Ref ref;
+  final AuthRepository authRepository;
 
   Future<void> initializeUserToken() async {
     state = const AsyncLoading();
     await getTokenFromSharedPref();
-    if (state.asData?.value != null) {
-      assignNewAuthToken('${state.asData?.value}');
-    } else {
-      await AsyncValue.guard(generateUserToken);
+    if (state.asData?.value == null) {
+      await generateUserToken();
+      await saveTokenInPref(state.asData!.value!);
     }
   }
 
   Future<void> getTokenFromSharedPref() async {
     state = await AsyncValue.guard(() async {
-      return await SharedPreferencesService.getStringFromSharedPref(
+      var user = await SharedPreferencesService.getStringFromSharedPref(
         SharedPreferenceConstants.userToken,
       );
+      if (user != null) {
+        return UserTokenModel.fromJson(json.decode(user));
+      }
+
+      return null;
     });
   }
 
   Future<void> generateUserToken() async {
     state = const AsyncLoading();
-    final authRepository = ref.read(authRepositoryProvider);
-    state = await AsyncValue.guard(() async {
-      var res = await authRepository.generateUserToken();
-      await saveTokenInPref(res.token);
-      assignNewAuthToken('Bearer ${res.token}');
-
-      return res.token;
-    });
-  }
-
-  Future<void> saveTokenInPref(String token) async {
-    await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.userToken,
-      'Bearer $token',
+    state = await AsyncValue.guard(
+      () async => await authRepository.generateUserToken(),
     );
   }
 
-  void assignNewAuthToken(String token) {
-    ref
-        .read(dioClientProvider)
-        .dio
-        .options
-        .headers[HttpHeaders.authorizationHeader] = token;
+  Future<void> saveTokenInPref(UserTokenModel user) async {
+    await SharedPreferencesService.addStringInSharedPref(
+      SharedPreferenceConstants.userToken,
+      json.encode(user.toJson()),
+    );
   }
 }
