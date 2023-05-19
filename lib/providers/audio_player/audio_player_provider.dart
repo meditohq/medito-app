@@ -86,8 +86,12 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   Future<void> playBackgroundSound() async {
-    unawaited(backgroundSoundAudioPlayer.play());
-    await backgroundSoundAudioPlayer.setLoopMode(LoopMode.all);
+    try {
+      unawaited(backgroundSoundAudioPlayer.play());
+      await backgroundSoundAudioPlayer.setLoopMode(LoopMode.all);
+    } catch (e) {
+      unawaited(pauseBackgroundSound());
+    }
   }
 
   Future<void> pauseBackgroundSound() async {

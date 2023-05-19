@@ -46,7 +46,10 @@ class NetworkImageComponent extends ConsumerWidget {
           ),
           placeholder: (context, url) => _shimmerLoading(),
           errorWidget: (context, url, error) {
-            return const Icon(Icons.error);
+            return Image.asset(
+              AssetConstants.dalle,
+              fit: BoxFit.cover,
+            );
           },
         );
       }

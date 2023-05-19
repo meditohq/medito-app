@@ -12,7 +12,11 @@ final audioPlayPauseProvider = Provider<void>(
     final audioPlayer = ref.watch(audioPlayerNotifierProvider);
     final currentState = ref.watch(audioPlayPauseStateProvider);
     if (currentState == PLAY_PAUSE_AUDIO.PLAY) {
-      audioPlayer.play();
+      try {
+        audioPlayer.play();
+      } catch (e) {
+        audioPlayer.pause();
+      }
     } else {
       audioPlayer.pause();
     }

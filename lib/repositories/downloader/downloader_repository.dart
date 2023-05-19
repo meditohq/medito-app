@@ -33,10 +33,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   }) async {
     try {
       var file = await getApplicationDocumentsDirectory();
-      var fileName = name != null
-          ? name + '.' + url.substring(url.lastIndexOf('.') + 1)
-          : url.substring(url.lastIndexOf('/') + 1);
-      var savePath = file.path + '/' + fileName;
+      var savePath = file.path + '/' + '$name';
       print(savePath);
       var isExists = await File(savePath).exists();
       if (!isExists) {
@@ -45,7 +42,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
           savePath,
           options: Options(headers: {
             HttpHeaders.acceptEncodingHeader: '*',
-            HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
           }),
           onReceiveProgress: onReceiveProgress,
         );
@@ -81,7 +77,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
       var file = await getApplicationDocumentsDirectory();
       var savePath = file.path + '/' + name;
       var filePath = File(savePath);
-      
+
       return await filePath.exists() ? filePath.path : null;
     } catch (e) {
       rethrow;

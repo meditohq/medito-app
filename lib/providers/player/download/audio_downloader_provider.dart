@@ -1,5 +1,6 @@
 import 'package:Medito/models/session/session_model.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,7 +18,8 @@ class AudioDownloaderProvider extends ChangeNotifier {
     SessionModel sessionModel,
     SessionFilesModel file,
   ) async {
-    var fileName = '${sessionModel.id}-${file.id}';
+    var fileName =
+        '${sessionModel.id}-${file.id}${getFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
       audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADIING;

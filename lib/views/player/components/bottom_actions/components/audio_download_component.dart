@@ -18,7 +18,8 @@ class AudioDownloadComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
-    var downloadFileKey = '${sessionModel.id}-${file.id}';
+    var downloadFileKey =
+        '${sessionModel.id}-${file.id}${getFileExtension(file.path)}';
 
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
@@ -49,7 +50,7 @@ class AudioDownloadComponent extends ConsumerWidget {
         decoration: BoxDecoration(
           color: ColorConstants.greyIsTheNewGrey,
           borderRadius: BorderRadius.all(
-            Radius.circular(3),
+            Radius.circular(14),
           ),
         ),
         alignment: Alignment.center,
