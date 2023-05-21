@@ -10,7 +10,7 @@ abstract class FolderModel with _$FolderModel {
     required String description,
     required String coverUrl,
     required bool isPublished,
-    @Default([]) List<FolderItemsModel> items,
+    @Default(<FolderItemsModel>[]) List<FolderItemsModel> items,
   }) = _FolderModel;
 
   factory FolderModel.fromJson(Map<String, Object?> json) =>

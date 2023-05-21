@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/user/user_token_model.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

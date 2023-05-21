@@ -1,8 +1,6 @@
-import 'dart:io';
-
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,48 +17,25 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      initializeUserToken();
+      ref.read(authInitTokenProvider.notifier).initToken();
     });
     super.initState();
   }
 
-  void initializeUserToken() {
-    var auth = ref.read(authProvider);
-    var authToken = ref.read(authTokenProvider.notifier);
-    authToken.initializeUserToken().then((_) {
-      var userTokenModel = ref.read(authTokenProvider).asData?.value;
-      assignNewTokenToDio('Bearer ${userTokenModel?.token}');
-      initializeAudioPlayer('Bearer ${userTokenModel?.token}');
-      auth.getUserEmailFromSharedPref().then((_) {
-        if (auth.userEmail != null) {
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(authInitTokenProvider, (_, next) {
+      if (next.hasValue) {
+        if (next.value != false) {
           context.go(RouteConstants.homePath);
         } else {
           context.go(RouteConstants.joinIntroPath);
         }
-      });
-    }).catchError((e) {
-      initializeUserToken();
+      } else if (next.hasError) {
+        showSnackBar(context, next.error.toString());
+      }
     });
-  }
 
-  void assignNewTokenToDio(String token) {
-    ref
-        .read(dioClientProvider)
-        .dio
-        .options
-        .headers[HttpHeaders.authorizationHeader] = token;
-  }
-
-  void initializeAudioPlayer(String token) {
-    ref.read(audioPlayerNotifierProvider).setContentToken(
-          token,
-        );
-    ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
-    ref.read(audioPlayerNotifierProvider).initAudioHandler();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: Center(
