@@ -1,40 +1,54 @@
 import 'dart:io';
+import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authInitTokenProvider =
-    StateNotifierProvider<AuthInitTokenNotifier, AsyncValue<bool?>>(
+    StateNotifierProvider<AuthInitTokenNotifier, AsyncValue<AUTH_INIT_STATUS?>>(
   (ref) {
     return AuthInitTokenNotifier(ref);
   },
 );
 
 //ignore: prefer-match-file-name
-class AuthInitTokenNotifier extends StateNotifier<AsyncValue<bool?>> {
+class AuthInitTokenNotifier
+    extends StateNotifier<AsyncValue<AUTH_INIT_STATUS?>> {
   AuthInitTokenNotifier(this.ref) : super(const AsyncData(null));
   Ref ref;
-
-  Future<void> initToken() async {
+  int retryCount = 0;
+  Future<void> initializeToken() async {
     state = AsyncValue.loading();
-    var auth = ref.read(authProvider);
     var authToken = ref.read(authTokenProvider.notifier);
-    await AsyncValue.guard(() async {
-      try {
-        await authToken.initializeUserToken();
-      } catch (e) {
-        rethrow;
+    state = await AsyncValue.guard(() async {
+      await authToken.initializeUserToken();
+      var userTokenModel = ref.read(authTokenProvider);
+      if (!userTokenModel.hasError) {
+        var token = userTokenModel.asData?.value?.token;
+        _assignNewTokenToDio('Bearer $token');
+        _initializeAudioPlayer('Bearer $token');
+
+        return AUTH_INIT_STATUS.TOKEN_INIT_COMPLETED;
+      } else {
+        retryCount++;
+        if (retryCount > 3) {
+          throw (StringConstants.timeout);
+        } else {
+          throw (userTokenModel.error.toString());
+        }
       }
     });
+  }
 
-    var userTokenModel = ref.read(authTokenProvider).asData?.value;
-    _assignNewTokenToDio('Bearer ${userTokenModel?.token}');
-    _initializeAudioPlayer('Bearer ${userTokenModel?.token}');
-
+  Future<void> initializeUser() async {
+    state = AsyncValue.loading();
+    var auth = ref.read(authProvider);
     state = await AsyncValue.guard(() async {
       await auth.getUserEmailFromSharedPref();
-      throw ('error for testing');
-      return auth.userEmail != null;
+
+      return auth.userEmail != null
+          ? AUTH_INIT_STATUS.IS_USER_PRESENT
+          : AUTH_INIT_STATUS.IS_USER_NOT_PRESENT;
     });
   }
 
@@ -47,10 +61,15 @@ class AuthInitTokenNotifier extends StateNotifier<AsyncValue<bool?>> {
   }
 
   void _initializeAudioPlayer(String token) {
-    ref.read(audioPlayerNotifierProvider).setContentToken(
-          token,
-        );
+    ref.read(audioPlayerNotifierProvider).setContentToken(token);
     ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
     ref.read(audioPlayerNotifierProvider).initAudioHandler();
   }
+}
+
+enum AUTH_INIT_STATUS {
+  TOKEN_INIT,
+  TOKEN_INIT_COMPLETED,
+  IS_USER_PRESENT,
+  IS_USER_NOT_PRESENT
 }

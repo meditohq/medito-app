@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/user/user_token_model.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authTokenProvider =
@@ -22,38 +19,31 @@ class AuthTokenNotifier extends StateNotifier<AsyncValue<UserTokenModel?>> {
   final AuthRepository authRepository;
 
   Future<void> initializeUserToken() async {
-    state = const AsyncLoading();
     await getTokenFromSharedPref();
-    if (state.asData?.value == null) {
+    if (state.value == null) {
       await generateUserToken();
-      await saveTokenInPref(state.asData!.value!);
     }
   }
 
   Future<void> getTokenFromSharedPref() async {
-    state = await AsyncValue.guard(() async {
-      var user = await SharedPreferencesService.getStringFromSharedPref(
-        SharedPreferenceConstants.userToken,
-      );
-      if (user != null) {
-        return UserTokenModel.fromJson(json.decode(user));
-      }
-
-      return null;
-    });
+    state = const AsyncLoading();
+    state =
+        await AsyncValue.guard(authRepository.getUserTokenFromSharedPreference);
   }
 
   Future<void> generateUserToken() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () async => await authRepository.generateUserToken(),
+      () async {
+        var res = await authRepository.generateUserToken();
+        await saveTokenInPref(res);
+
+        return res;
+      },
     );
   }
 
   Future<void> saveTokenInPref(UserTokenModel user) async {
-    await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.userToken,
-      json.encode(user.toJson()),
-    );
+    await authRepository.addUserTokenInSharedPreference(user);
   }
 }

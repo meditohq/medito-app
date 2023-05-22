@@ -17,7 +17,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authInitTokenProvider.notifier).initToken();
+      ref.read(authInitTokenProvider.notifier).initializeToken();
     });
     super.initState();
   }
@@ -26,12 +26,18 @@ class _SplashViewState extends ConsumerState<SplashView> {
   Widget build(BuildContext context) {
     ref.listen(authInitTokenProvider, (_, next) {
       if (next.hasValue) {
-        if (next.value != false) {
+        if (next.value == AUTH_INIT_STATUS.TOKEN_INIT_COMPLETED) {
+          ref.read(authInitTokenProvider.notifier).initializeUser();
+        } else if (next.value == AUTH_INIT_STATUS.IS_USER_PRESENT) {
           context.go(RouteConstants.homePath);
-        } else {
+        } else if (next.value == AUTH_INIT_STATUS.IS_USER_NOT_PRESENT) {
           context.go(RouteConstants.joinIntroPath);
         }
       } else if (next.hasError) {
+        var retryCount = ref.read(authInitTokenProvider.notifier).retryCount;
+        if (retryCount < 4) {
+          ref.read(authInitTokenProvider.notifier).initializeToken();
+        }
         showSnackBar(context, next.error.toString());
       }
     });
