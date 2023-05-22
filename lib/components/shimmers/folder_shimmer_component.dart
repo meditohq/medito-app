@@ -8,6 +8,7 @@ class FolderShimmerComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -15,7 +16,7 @@ class FolderShimmerComponent extends StatelessWidget {
             height: 380,
           ),
           height8,
-          for (int i = 0; i < 6; i++) _shimmerList(size)
+          for (int i = 0; i < 6; i++) _shimmerList(size),
         ],
       ),
     );
