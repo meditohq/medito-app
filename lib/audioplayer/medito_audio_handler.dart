@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
@@ -34,7 +33,8 @@ class MeditoAudioHandler extends BaseAudioHandler
 
   MeditoAudioHandler() {
     AudioSession.instance.then(
-        (session) => session.configure(AudioSessionConfiguration.speech()));
+      (session) => session.configure(AudioSessionConfiguration.speech()),
+    );
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
   }
 
@@ -118,8 +118,9 @@ class MeditoAudioHandler extends BaseAudioHandler
         // TODO
         // var url = '${HTTPConstants.TEST_BASE_URL}assets/${mediaItem.id}';
         var url = '${mediaItem.id}';
-        _duration = await _player.setUrl(url,
-            headers: {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD});
+        _duration = await _player.setUrl(url, headers: {
+          HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD
+        });
       } else {
         _duration = await _player.setFilePath(data);
       }
@@ -224,8 +225,10 @@ class MeditoAudioHandler extends BaseAudioHandler
   }
 
   void skipBackward10Secs() {
-    var seekDuration = max(0,
-        _player.position.inMilliseconds - Duration(seconds: 10).inMilliseconds);
+    var seekDuration = max(
+      0,
+      _player.position.inMilliseconds - Duration(seconds: 10).inMilliseconds,
+    );
     _player.seek(Duration(milliseconds: seekDuration));
   }
 

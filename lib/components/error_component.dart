@@ -18,27 +18,31 @@ class ErrorComponent extends StatelessWidget {
       backgroundColor: ColorConstants.ebony,
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              message,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontSize: 16,
-                    color: ColorConstants.walterWhite,
-                    fontFamily: ClashDisplay,
-                  ),
-            ),
-            height16,
-            LoadingButtonWidget(
-              btnText: StringConstants.tryAgain,
-              onPressed: onTap,
-              isLoading: isLoading,
-              bgColor: ColorConstants.walterWhite,
-              textColor: ColorConstants.greyIsTheNewGrey,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                message,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontSize: 16,
+                      color: ColorConstants.walterWhite,
+                      fontFamily: ClashDisplay,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              height16,
+              LoadingButtonWidget(
+                btnText: StringConstants.tryAgain,
+                onPressed: onTap,
+                isLoading: isLoading,
+                bgColor: ColorConstants.walterWhite,
+                textColor: ColorConstants.greyIsTheNewGrey,
+              ),
+            ],
+          ),
         ),
       ),
     );

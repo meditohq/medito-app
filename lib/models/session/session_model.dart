@@ -13,7 +13,7 @@ abstract class SessionModel with _$SessionModel {
     required bool isPublished,
     required bool hasBackgroundSound,
     @Default(null) SessionArtistModel? artist,
-    @Default([]) List<SessionAudioModel> audio,
+    @Default(<SessionAudioModel>[]) List<SessionAudioModel> audio,
   }) = _SessionModel;
 
   factory SessionModel.fromJson(Map<String, Object?> json) =>

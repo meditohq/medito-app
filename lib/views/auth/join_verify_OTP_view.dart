@@ -1,5 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/network/api_response.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +23,16 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
 
   void _handleVerify() async {
     if (_formKey.currentState!.validate()) {
-      try {
-        await auth.verifyOTP(widget.email, _otpTextEditingController.text);
-        await context.push(RouteConstants.joinWelcomePath);
-      } catch (e) {
-        showSnackBar(context, e.toString());
+      await auth.verifyOTP(widget.email, _otpTextEditingController.text);
+      var status = auth.verifyOTPRes.status;
+      if (status == Status.COMPLETED) {
+        await auth.setUserEmailInSharedPref(widget.email);
+        context.go(
+          RouteConstants.joinWelcomePath,
+          extra: {'email': widget.email},
+        );
+      } else if (status == Status.ERROR) {
+        showSnackBar(context, auth.verifyOTPRes.message.toString());
       }
     }
   }
@@ -35,6 +41,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
   Widget build(BuildContext context) {
     auth = ref.watch(authProvider);
     var textTheme = Theme.of(context).textTheme;
+    var isLoading = auth.verifyOTPRes == ApiResponse.loading();
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -99,6 +106,12 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   validator: ValidationUtils().validateOTP,
                   onChanged: (String _) => setState(() => {}),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: _ResendCodeWidget(
+                    email: widget.email,
+                  ),
+                ),
                 Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -115,6 +128,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                       btnText: StringConstants.verify,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
+                      isLoading: isLoading,
                     ),
                   ],
                 ),
@@ -124,6 +138,96 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ResendCodeWidget extends ConsumerWidget {
+  const _ResendCodeWidget({required this.email});
+  final String email;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var textTheme = Theme.of(context).textTheme;
+    var auth = ref.watch(authProvider);
+
+    void _handleResendOTP() async {
+      await auth.sendOTP(email);
+      auth.setCounter();
+      var status = auth.sendOTPRes.status;
+      if (status == Status.COMPLETED) {
+        showSnackBar(context, auth.sendOTPRes.body.toString());
+      } else if (status == Status.ERROR) {
+        showSnackBar(context, auth.sendOTPRes.message.toString());
+        auth.setCounter();
+      }
+    }
+
+    if (auth.sendOTPRes.status == Status.LOADING) {
+      return SizedBox(
+        height: 16,
+        width: 16,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: ColorConstants.walterWhite,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => {},
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _handleResendOTP,
+            child: Text(
+              auth.counter
+                  ? StringConstants.resendCodeIn
+                  : StringConstants.resendCode,
+              style: textTheme.bodyMedium?.copyWith(
+                color: ColorConstants.walterWhite,
+                fontFamily: DmSans,
+                height: 1.5,
+                fontSize: 14,
+                decoration: auth.counter
+                    ? TextDecoration.none
+                    : TextDecoration.underline,
+              ),
+            ),
+          ),
+          if (auth.counter) _counterAnimation(auth, textTheme),
+        ],
+      ),
+    );
+  }
+
+  TweenAnimationBuilder<Duration> _counterAnimation(
+    AuthNotifier auth,
+    TextTheme textTheme,
+  ) {
+    return TweenAnimationBuilder<Duration>(
+      duration: Duration(seconds: 45),
+      tween: Tween(begin: Duration(seconds: 45), end: Duration.zero),
+      onEnd: () {
+        auth.setCounter();
+      },
+      builder: (BuildContext context, Duration value, Widget? child) {
+        final minutes = value.inMinutes;
+        final seconds = value.inSeconds % 60;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Text(
+            '$minutes:$seconds',
+            textAlign: TextAlign.center,
+            style: textTheme.bodyMedium?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              height: 1.5,
+              fontSize: 14,
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:audio_service/audio_service.dart';
@@ -18,36 +17,16 @@ final audioPlayerNotifierProvider =
 class AudioPlayerNotifier extends BaseAudioHandler
     with QueueHandler, SeekHandler, ChangeNotifier {
   final backgroundSoundAudioPlayer = AudioPlayer();
-  final sessionAudioPlayer = AudioPlayer();
   SessionFilesModel? currentlyPlayingSession;
   final hasBgSound = 'hasBgSound';
+  final sessionAudioPlayer = AudioPlayer();
 
-  void initAudioHandler() {
-    sessionAudioPlayer.playbackEventStream
-        .map(_transformEvent)
-        .pipe(playbackState);
-  }
+  late String _contentToken;
 
-  void setBackgroundAudio(BackgroundSoundsModel sound) {
-    unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
-      HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
-    }));
-  }
-
-  void setSessionAudio(
-    SessionModel sessionModel,
-    SessionFilesModel file, {
-    String? filePath,
-  }) {
-    if (filePath != null) {
-      unawaited(sessionAudioPlayer.setFilePath(filePath));
-      setMediaItem(sessionModel, file, filePath: filePath);
-    } else {
-      setMediaItem(sessionModel, file);
-      unawaited(sessionAudioPlayer.setUrl(file.path, headers: {
-        HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
-      }));
-    }
+  @override
+  Future<void> pause() async {
+    unawaited(pauseBackgroundSound());
+    await sessionAudioPlayer.pause();
   }
 
   @override
@@ -62,16 +41,47 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   @override
-  Future<void> pause() async {
-    unawaited(pauseBackgroundSound());
-    await sessionAudioPlayer.pause();
-  }
-
-  @override
   Future<void> stop() async {
     await sessionAudioPlayer.stop();
     if (mediaItemHasBGSound()) {
       await stopBackgroundSound();
+    }
+  }
+
+  void setContentToken(String token) {
+    _contentToken = token;
+  }
+
+  void initAudioHandler() {
+    sessionAudioPlayer.playbackEventStream
+        .map(_transformEvent)
+        .pipe(playbackState);
+  }
+
+  void setBackgroundAudio(BackgroundSoundsModel sound) {
+    unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
+      HttpHeaders.authorizationHeader: _contentToken,
+    }));
+  }
+
+  void setSessionAudio(
+    SessionModel sessionModel,
+    SessionFilesModel file, {
+    String? filePath,
+  }) {
+    if (filePath != null) {
+      unawaited(sessionAudioPlayer.setFilePath(filePath));
+      setMediaItem(sessionModel, file, filePath: filePath);
+    } else {
+      setMediaItem(sessionModel, file);
+      unawaited(
+        sessionAudioPlayer.setUrl(
+          file.path,
+          headers: {
+            HttpHeaders.authorizationHeader: _contentToken,
+          },
+        ),
+      );
     }
   }
 
@@ -139,6 +149,10 @@ class AudioPlayerNotifier extends BaseAudioHandler
     mediaItem.add(item);
   }
 
+  bool mediaItemHasBGSound() {
+    return mediaItem.value?.extras?[hasBgSound] ?? false;
+  }
+
   PlaybackState _transformEvent(PlaybackEvent event) {
     return PlaybackState(
       controls: [
@@ -169,9 +183,5 @@ class AudioPlayerNotifier extends BaseAudioHandler
       speed: sessionAudioPlayer.speed,
       queueIndex: event.currentIndex,
     );
-  }
-
-  bool mediaItemHasBGSound() {
-    return mediaItem.value?.extras?[hasBgSound] ?? false;
   }
 }

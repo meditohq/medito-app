@@ -2,7 +2,6 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,21 +17,22 @@ class JoinEmailView extends ConsumerStatefulWidget {
 class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   late AuthNotifier auth;
   final TextEditingController _emailController =
-      TextEditingController(text: 'osama.asif20@gmail.com');
+      TextEditingController(text: '');
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void _handleContinue() async {
     if (_formKey.currentState!.validate()) {
-      try {
-       print (ref.read(dioClientProvider).dio.options.headers);
-        var email = _emailController.text;
-        await auth.sendOTP(email);
+      var email = _emailController.text;
+      await auth.sendOTP(email);
+      auth.setCounter();
+      var status = auth.sendOTPRes.status;
+      if (status == Status.COMPLETED) {
         await context.push(
           RouteConstants.joinVerifyOTPPath,
           extra: {'email': email},
         );
-      } catch (e) {
-        showSnackBar(context, e.toString());
+      } else if (status == Status.ERROR) {
+        showSnackBar(context, auth.sendOTPRes.message.toString());
       }
     }
   }
@@ -41,6 +41,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     auth = ref.watch(authProvider);
+    var isLoading = auth.sendOTPRes == ApiResponse.loading();
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -90,7 +91,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                       btnText: StringConstants.continueTxt,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
-                      isLoading: auth.sendOTPRes == ApiResponse.loading(),
+                      isLoading: isLoading,
                     ),
                   ],
                 ),

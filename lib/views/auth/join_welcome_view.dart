@@ -1,13 +1,15 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class JoinWelcomeView extends StatelessWidget {
-  const JoinWelcomeView({super.key});
-
+class JoinWelcomeView extends ConsumerWidget {
+  const JoinWelcomeView({super.key, required this.email});
+  final String email;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -56,7 +58,9 @@ class JoinWelcomeView extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     child: LoadingButtonWidget(
                       onPressed: () {
-                        context.push(RouteConstants.homePath);
+                        var auth = ref.read(authProvider.notifier);
+                        auth.setUserEmail(email);
+                        context.go(RouteConstants.homePath);
                       },
                       btnText: StringConstants.close,
                       bgColor: ColorConstants.walterWhite,

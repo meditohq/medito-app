@@ -1,5 +1,5 @@
 class StringConstants {
-  static const String donwloads = 'Downloads';
+  static const String downloads = 'Downloads';
   static const String download = 'Download';
   static const String downloaded = 'Downloaded';
   static const String sounds = 'Sounds';
@@ -12,7 +12,7 @@ class StringConstants {
   static const String pickDuration = 'Pick a duration';
   static const String showDownloads = 'Show downloads';
   static const String favourites = 'Favouites';
-  static const String emptyDonwloadsMessage =
+  static const String emptyDownloadsMessage =
       'It looks like you haven’t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
   static const String emptyFavoritesMessage = 'Favourites are coming soon.';
   static const String wellDoneCopy = 'Well done for meditating today!';
@@ -23,14 +23,7 @@ class StringConstants {
   static const String tryAgain = 'Try again';
   static const String shareText =
       "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
-  static const String loadingError =
-      "It looks like you're offline or there was little hiccup from our end.";
-  static const String checkConnection =
-      'Please check your connection and try again';
-  static const String timeout =
-      'Oops! It seems like there was an error. If the problem persists, kill the app and try again.';
   static const String swipeToDelete = 'Swipe left on a session to delete it';
-
   static const String narrator = 'Narrator';
   static const String duration = 'Duration';
   static const String downloadSession = 'Download Session';
@@ -62,12 +55,28 @@ class StringConstants {
   static const String continueTxt = 'Continue';
   static const String whatsYourEmail = 'What’s your email?';
   static const String verifyYourAccount = 'Verify your account';
-  static const String verifyYourAccountInstruction = 'Enter below the 6-digit verification code sent to replaceme to complete your account setup.';
+  static const String verifyYourAccountInstruction =
+      'Enter below the 6-digit verification code sent to replaceme to complete your account setup.';
   static const String verify = 'Verify';
-  static const String welcomeToTheMeditoFamily = 'Welcome to \nthe Medito Family';
-  static const String welcomeMessage = 'You are now logged in. If you ever need to transfer Medito to another phone, use the same email address to log in and your preferences will be restored.';
-  static const String thanksForJoining = 'Thanks for being on this journey with us.';
+  static const String resendCode = 'Resend code';
+  static const String resendCodeIn = 'Resend code in ';
+  static const String welcomeToTheMeditoFamily =
+      'Welcome to \nthe Medito Family';
+  static const String welcomeMessage =
+      'You are now logged in. If you ever need to transfer Medito to another phone, use the same email address to log in and your preferences will be restored.';
+  static const String thanksForJoining =
+      'Thanks for being on this journey with us.';
   static const String close = 'Close';
   static const String search = 'Search';
 
+  //Error
+  static const String invalidEmail = 'Invalid Email.';
+  static const String fieldRequired = 'Field is Required';
+  static const String invalidInput = 'Invalid Input';
+  static const String loadingError =
+      "It looks like you're offline or there was little hiccup from our end.";
+  static const String checkConnection =
+      'Please check your connection and try again';
+  static const String timeout =
+      'Oops! It seems like there was an error. If the problem persists, kill the app and try again.';
 }

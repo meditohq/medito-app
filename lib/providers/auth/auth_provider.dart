@@ -1,10 +1,5 @@
-import 'dart:io';
-
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,32 +19,23 @@ class AuthNotifier extends ChangeNotifier {
   final Ref ref;
   ApiResponse sendOTPRes = ApiResponse.completed(null);
   ApiResponse verifyOTPRes = ApiResponse.completed(null);
+  String? userEmail;
+  bool counter = false;
+  bool isAGuest = false;
 
-  Future<void> initializeUserToken() async {
-    try {
-      var token;
-      var isToken = await SharedPreferencesService.getStringFromSharedPref(
-        SharedPreferenceConstants.userToken,
-      );
-      if (isToken != null) {
-        token = isToken;
-      } else {
-        var res = await authRepository.generateUserToken();
-        await SharedPreferencesService.addStringInSharedPref(
-          SharedPreferenceConstants.userToken,
-          res.token,
-        );
-        token = res.token;
-      }
+  void setCounter() {
+    counter = !counter;
+    notifyListeners();
+  }
 
-      ref
-          .read(dioClientProvider)
-          .dio
-          .options
-          .headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
-    } catch (e) {
-      rethrow;
-    }
+  void setUserEmail(String email) {
+    userEmail = email;
+    notifyListeners();
+  }
+
+  void setIsAGuest(bool val) {
+    isAGuest = val;
+    notifyListeners();
   }
 
   Future<void> sendOTP(String email) async {
@@ -73,6 +59,15 @@ class AuthNotifier extends ChangeNotifier {
     } catch (e) {
       verifyOTPRes = ApiResponse.error(e.toString());
     }
+    notifyListeners();
+  }
+
+  Future<void> setUserEmailInSharedPref(String email) async {
+    await authRepository.addUserEmailInSharedPreference(email);
+  }
+
+  Future<void> getUserEmailFromSharedPref() async {
+    userEmail = await authRepository.getUserEmailFromSharedPreference();
     notifyListeners();
   }
 }
