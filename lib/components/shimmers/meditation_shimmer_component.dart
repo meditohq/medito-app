@@ -2,8 +2,8 @@ import 'package:Medito/components/shimmers/components/box_shimmer_component.dart
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-class SessionShimmerComponent extends StatelessWidget {
-  const SessionShimmerComponent({super.key});
+class MeditationShimmerComponent extends StatelessWidget {
+  const MeditationShimmerComponent({super.key});
 
   @override
   Widget build(BuildContext context) {

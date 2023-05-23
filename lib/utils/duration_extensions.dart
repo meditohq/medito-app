@@ -32,7 +32,7 @@ extension DurationExtensions on Duration {
   }
 }
 
-String formatSessionLength(String? item) {
+String formatMeditationLength(String? item) {
   if (item != null && item.contains(':')) {
     var duration = clockTimeToDuration(item);
     var time = '';

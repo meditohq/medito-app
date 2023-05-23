@@ -11,9 +11,9 @@ import 'components/overlay_cover_image_component.dart';
 import 'components/player_buttons/player_buttons_component.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
-  const PlayerView({super.key, required this.sessionModel, required this.file});
-  final SessionModel sessionModel;
-  final SessionFilesModel file;
+  const PlayerView({super.key, required this.meditationModel, required this.file});
+  final MeditationModel meditationModel;
+  final MeditationFilesModel file;
   @override
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
@@ -23,8 +23,8 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var coverUrl = widget.sessionModel.coverUrl;
-    var artist = widget.sessionModel.artist;
+    var coverUrl = widget.meditationModel.coverUrl;
+    var artist = widget.meditationModel.artist;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -52,7 +52,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                       vertical: 4.0,
                     ),
                     child: ArtistTitleComponent(
-                      sessionTitle: widget.sessionModel.title,
+                      meditationTitle: widget.meditationModel.title,
                       artistName: artist?.name,
                       artistUrlPath: artist?.path,
                     ),
@@ -62,11 +62,11 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                   Spacer(),
                   PlayerButtonsComponent(
                     file: widget.file,
-                    sessionModel: widget.sessionModel,
+                    meditationModel: widget.meditationModel,
                   ),
                   Spacer(),
                   BottomActionComponent(
-                    sessionModel: widget.sessionModel,
+                    meditationModel: widget.meditationModel,
                     file: widget.file,
                   ),
                   height16,

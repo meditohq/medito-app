@@ -20,7 +20,7 @@ import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //ignore: prefer-match-file-name
-enum UnitType { day, min, sessions }
+enum UnitType { day, min, meditations }
 
 String getUnits(UnitType type, int _) {
   switch (type) {
@@ -28,7 +28,7 @@ String getUnits(UnitType type, int _) {
       return 'd';
     case UnitType.min:
       return '';
-    case UnitType.sessions:
+    case UnitType.meditations:
       return '';
   }
 }
@@ -92,7 +92,7 @@ Future<void> updateStreak({String streak = ''}) async {
   if (streak.isNotEmpty) {
     await prefs.setInt('streakCount', int.parse(streak));
     await _updateLongestStreak(int.parse(streak), prefs);
-    await addPhantomSessionToStreakList();
+    await addPhantomMeditationToStreakList();
 
     return;
   }
@@ -118,8 +118,8 @@ Future<void> updateStreak({String streak = ''}) async {
   await setStreakList(streakList);
 }
 
-Future<void> addPhantomSessionToStreakList() async {
-  //add this session to the streak list to stop it resetting to 0,
+Future<void> addPhantomMeditationToStreakList() async {
+  //add this meditation to the streak list to stop it resetting to 0,
   // but keep a note of it in fakeStreakList
 
   var prefs = await SharedPreferences.getInstance();
@@ -162,7 +162,7 @@ Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-  
+
   return streak == null ? '0' : Duration(seconds: streak).inMinutes.toString();
 }
 
@@ -194,28 +194,28 @@ Future<int> _getLongestStreakInt() async {
   return streak ?? 0;
 }
 
-Future<String> getNumSessions() async {
+Future<String> getNumMeditations() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('numSessions');
+  var streak = prefs.getInt('numMeditations');
 
   return streak == null ? '0' : streak.toString();
 }
 
-Future<int> getNumSessionsInt() async {
+Future<int> getNumMeditationsInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('numSessions');
+  var streak = prefs.getInt('numMeditations');
 
   return streak ?? 0;
 }
 
-Future<int> incrementNumSessions() async {
-  print('increase number of sessions');
+Future<int> incrementNumMeditations() async {
+  print('increase number of meditations');
   var prefs = await SharedPreferences.getInstance();
-  var current = await getNumSessionsInt();
+  var current = await getNumMeditationsInt();
   current++;
-  await prefs.setInt('numSessions', current);
+  await prefs.setInt('numMeditations', current);
 
   return current;
 }
@@ -286,7 +286,7 @@ Future updateStatsFromBg() async {
 
     if (map != null && map.isNotEmpty) {
       await updateStreak();
-      await incrementNumSessions();
+      await incrementNumMeditations();
       markAsListened(id);
       await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
