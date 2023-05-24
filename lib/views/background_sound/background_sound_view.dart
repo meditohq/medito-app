@@ -85,10 +85,13 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
             path: '',
           ),
         ),
-        for (int i = 0; i < data.length; i++)
-          SoundListTileComponent(
-            sound: data[i],
-          ),
+        Column(
+          children: data
+              .map((e) => SoundListTileComponent(
+                    sound: e,
+                  ))
+              .toList(),
+        ),
       ],
     );
   }
