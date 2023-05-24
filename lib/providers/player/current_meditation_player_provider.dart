@@ -4,48 +4,48 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final currentSessionPlayerProvider = Provider<void>((ref) {
-  final currentlyPlayingSession = ref.watch(playerProvider);
-  if (currentlyPlayingSession != null) {
-    _loadSessionAndBackgroundSound(
+final currentMeditationPlayerProvider = Provider<void>((ref) {
+  final currentlyPlayingMeditation = ref.watch(playerProvider);
+  if (currentlyPlayingMeditation != null) {
+    _loadMeditationAndBackgroundSound(
       ref,
-      currentlyPlayingSession,
-      currentlyPlayingSession.audio.first.files.first,
+      currentlyPlayingMeditation,
+      currentlyPlayingMeditation.audio.first.files.first,
     );
   }
 });
 
-void _loadSessionAndBackgroundSound(
+void _loadMeditationAndBackgroundSound(
   Ref ref,
-  SessionModel sessionModel,
-  SessionFilesModel file,
+  MeditationModel meditationModel,
+  MeditationFilesModel file,
 ) {
   final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-  var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
-  var _currentPlayingFileId = _audioPlayerNotifier.currentlyPlayingSession?.id;
+  var isPlaying = _audioPlayerNotifier.meditationAudioPlayer.playerState.playing;
+  var _currentPlayingFileId = _audioPlayerNotifier.currentlyPlayingMeditation?.id;
 
   if (!isPlaying || _currentPlayingFileId != file.id) {
     _setBackgroundSound(
       ref,
       _audioPlayerNotifier,
-      sessionModel.hasBackgroundSound,
+      meditationModel.hasBackgroundSound,
     );
-    _setSessionAudio(ref, _audioPlayerNotifier, sessionModel, file);
+    _setMeditationAudio(ref, _audioPlayerNotifier, meditationModel, file);
   }
 }
 
-void _setSessionAudio(
+void _setMeditationAudio(
   Ref ref,
   AudioPlayerNotifier _audioPlayerNotifier,
-  SessionModel sessionModel,
-  SessionFilesModel file,
+  MeditationModel meditationModel,
+  MeditationFilesModel file,
 ) {
-  var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
-        '${sessionModel.id}-${file.id}${getFileExtension(file.path)}',
+  var checkDownloadedFile = ref.read(audioDownloaderProvider).getMeditationAudio(
+        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}',
       );
   checkDownloadedFile.then((value) {
-    _audioPlayerNotifier.setSessionAudio(sessionModel, file, filePath: value);
-    _audioPlayerNotifier.currentlyPlayingSession = file;
+    _audioPlayerNotifier.setMeditationAudio(meditationModel, file, filePath: value);
+    _audioPlayerNotifier.currentlyPlayingMeditation = file;
     ref.read(audioPlayPauseStateProvider.notifier).state =
         PLAY_PAUSE_AUDIO.PLAY;
   });

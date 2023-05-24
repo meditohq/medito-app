@@ -76,21 +76,23 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
         );
       case 3:
         return FutureBuilder<String>(
-            future: getNumSessions(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return StreakTileWidget(
-                  getNumSessions(),
-                  snapshot.data == '1'
-                      ? 'Session\nListened'
-                      : 'Sessions\nListened',
-                  optionalText: UnitType.sessions,
-                );
-              } else {
-                return Container();
-              }
-            });
+          future: getNumMeditations(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return StreakTileWidget(
+                getNumMeditations(),
+                snapshot.data == '1'
+                    ? 'Session\nListened'
+                    : 'Sessions\nListened',
+                optionalText: UnitType.meditations,
+              );
+            } else {
+              return Container();
+            }
+          },
+        );
     }
+
     return Container();
   }
 
@@ -107,8 +109,10 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             backgroundColor: ColorConstants.moonlight,
-            title: Text('How many days is your streak?',
-                style: Theme.of(context).textTheme.headline4),
+            title: Text(
+              'How many days is your streak?',
+              style: Theme.of(context).textTheme.headline4,
+            ),
             content: TextField(
               textAlign: TextAlign.center,
               style: Theme.of(context)
@@ -116,8 +120,10 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                   .subtitle2
                   ?.copyWith(letterSpacing: 1.5),
               decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red))),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red),
+                ),
+              ),
               keyboardType: TextInputType.number,
               autofocus: true,
               controller: _controller,
@@ -156,7 +162,7 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );
@@ -221,7 +227,7 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );

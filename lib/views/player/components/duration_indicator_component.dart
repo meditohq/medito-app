@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DurationIndicatorComponent extends ConsumerWidget {
   const DurationIndicatorComponent({super.key, required this.file});
-  final SessionFilesModel file;
+  final MeditationFilesModel file;
   final minSeconds = 0.0;
   final additionalMilliSeconds = 1000;
 

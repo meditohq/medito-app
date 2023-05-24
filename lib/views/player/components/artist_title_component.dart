@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 class ArtistTitleComponent extends StatelessWidget {
   const ArtistTitleComponent({
     super.key,
-    required this.sessionTitle,
+    required this.meditationTitle,
     this.artistName,
     this.artistUrlPath,
-    this.sessionTitleFontSize = 24,
+    this.meditationTitleFontSize = 24,
     this.artistNameFontSize = 16,
     this.artistUrlPathFontSize = 13,
   });
-  final String sessionTitle;
+  final String meditationTitle;
   final String? artistName, artistUrlPath;
-  final double sessionTitleFontSize;
+  final double meditationTitleFontSize;
   final double artistNameFontSize;
   final double artistUrlPathFontSize;
   @override
@@ -30,11 +30,11 @@ class ArtistTitleComponent extends StatelessWidget {
 
   Text _title(BuildContext context) {
     return Text(
-      sessionTitle,
+      meditationTitle,
       style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
             fontFamily: ClashDisplay,
             color: ColorConstants.walterWhite,
-            fontSize: sessionTitleFontSize,
+            fontSize: meditationTitleFontSize,
             letterSpacing: 1,
           ),
     );

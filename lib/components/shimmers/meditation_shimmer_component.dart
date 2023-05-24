@@ -2,14 +2,14 @@ import 'package:Medito/components/shimmers/components/box_shimmer_component.dart
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-class SessionShimmerComponent extends StatelessWidget {
-  const SessionShimmerComponent({super.key});
+class MeditationShimmerComponent extends StatelessWidget {
+  const MeditationShimmerComponent({super.key});
 
   @override
   Widget build(BuildContext context) {
     var shimmerList = _shimmerList();
 
-    var list = List.generate(3, (index) => shimmerList).toList();
+    var list = List.generate(3, (index) => shimmerList);
 
     return SingleChildScrollView(
       child: Column(

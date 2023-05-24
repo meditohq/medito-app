@@ -140,8 +140,12 @@ class PacksScreenState extends State<PacksScreen> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(height: 8),
-          for (int i = 0; i < 10; i++)
-            getBlankTile(ColorConstants.walterWhiteTrans),
+          Column(
+            children: List.generate(
+              10,
+              (index) => getBlankTile(ColorConstants.walterWhiteTrans),
+            ),
+          ),
         ],
       ),
     );
