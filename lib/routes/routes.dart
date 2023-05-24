@@ -26,51 +26,51 @@ final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: RouteConstants.homePath,
   routes: [
-    // GoRoute(
-    //   path: RouteConstants.root,
-    //   pageBuilder: (context, state) => MaterialPage(
-    //     key: state.pageKey,
-    //     child: SplashView(),
-    //   ),
-    // ),
-    // GoRoute(
-    //   path: RouteConstants.joinIntroPath,
-    //   pageBuilder: (context, state) => MaterialPage(
-    //     key: state.pageKey,
-    //     child: JoinIntroView(),
-    //   ),
-    // ),
-    // GoRoute(
-    //   path: RouteConstants.joinEmailPath,
-    //   pageBuilder: (context, state) => MaterialPage(
-    //     key: state.pageKey,
-    //     child: JoinEmailView(),
-    //   ),
-    // ),
-    // GoRoute(
-    //   path: RouteConstants.joinVerifyOTPPath,
-    //   pageBuilder: (context, state) {
-    //     final data = state.extra! as Map;
+    GoRoute(
+      path: RouteConstants.root,
+      pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
+        child: SplashView(),
+      ),
+    ),
+    GoRoute(
+      path: RouteConstants.joinIntroPath,
+      pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
+        child: JoinIntroView(),
+      ),
+    ),
+    GoRoute(
+      path: RouteConstants.joinEmailPath,
+      pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
+        child: JoinEmailView(),
+      ),
+    ),
+    GoRoute(
+      path: RouteConstants.joinVerifyOTPPath,
+      pageBuilder: (context, state) {
+        final data = state.extra! as Map;
 
-    //     return MaterialPage(
-    //       key: state.pageKey,
-    //       child: JoinVerifyOTPView(email: data['email']!),
-    //     );
-    //   },
-    // ),
-    // GoRoute(
-    //   path: RouteConstants.joinWelcomePath,
-    //   pageBuilder: (context, state) {
-    //     final data = state.extra! as Map;
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinVerifyOTPView(email: data['email']!),
+        );
+      },
+    ),
+    GoRoute(
+      path: RouteConstants.joinWelcomePath,
+      pageBuilder: (context, state) {
+        final data = state.extra! as Map;
 
-    //     return MaterialPage(
-    //       key: state.pageKey,
-    //       child: JoinWelcomeView(
-    //         email: data['email']!,
-    //       ),
-    //     );
-    //   },
-    // ),
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinWelcomeView(
+            email: data['email']!,
+          ),
+        );
+      },
+    ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) => RootPageView(
@@ -81,8 +81,7 @@ final router = GoRouter(
           path: RouteConstants.homePath,
           pageBuilder: (context, state) => MaterialPage(
             key: state.pageKey,
-            // child: HomeWrapperWidget(),
-            child: HomeView(),
+            child: HomeWrapperWidget(),
           ),
         ),
         _getMeditationRoute(fromRoot: true),
@@ -212,7 +211,8 @@ enum Screen {
 MaterialPage<void> getMeditationOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: MeditationView(id: state.params['sid'], screenKey: Screen.meditation),
+    child:
+        MeditationView(id: state.params['sid'], screenKey: Screen.meditation),
   );
 }
 

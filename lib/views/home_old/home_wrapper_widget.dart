@@ -1,10 +1,9 @@
+import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/packs/packs_screen.dart';
 import 'package:flutter/material.dart';
-
-import '../../network/user/user_utils.dart';
 import 'package:Medito/constants/constants.dart';
-import '../../utils/stats_utils.dart';
-import '../btm_nav/home_widget.dart';
-import '../packs/packs_screen.dart';
 
 class HomeWrapperWidget extends StatefulWidget {
   const HomeWrapperWidget({Key? key}) : super(key: key);
@@ -35,13 +34,15 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
+
     return _deletingCache
         ? _getLoadingWidget()
         : Scaffold(
             key: _messengerKey,
             body: IndexedStack(
               index: _currentIndex,
-              children: [HomeWidget(_hasOpened), PacksScreen()],
+              children: [HomeView(), PacksScreen()],
             ),
             bottomNavigationBar: Container(
               decoration: BoxDecoration(
@@ -51,14 +52,10 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
                 ),
               ),
               child: BottomNavigationBar(
-                selectedLabelStyle: Theme.of(context)
-                    .textTheme
-                    .displayLarge
-                    ?.copyWith(fontSize: 12),
-                unselectedLabelStyle: Theme.of(context)
-                    .textTheme
-                    .displayMedium
-                    ?.copyWith(fontSize: 12),
+                selectedLabelStyle:
+                    textTheme.displayLarge?.copyWith(fontSize: 12),
+                unselectedLabelStyle:
+                    textTheme.displayMedium?.copyWith(fontSize: 12),
                 selectedItemColor: ColorConstants.walterWhite,
                 unselectedItemColor: ColorConstants.newGrey,
                 currentIndex: _currentIndex,
