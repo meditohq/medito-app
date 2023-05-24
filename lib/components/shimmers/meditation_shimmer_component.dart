@@ -9,7 +9,7 @@ class MeditationShimmerComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     var shimmerList = _shimmerList();
 
-    var list = List.generate(3, (index) => shimmerList).toList();
+    var list = List.generate(3, (index) => shimmerList);
 
     return SingleChildScrollView(
       child: Column(
