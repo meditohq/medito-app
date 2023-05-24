@@ -1,33 +1,38 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
-  const CardWidget({super.key, this.tag, required this.title});
+  const CardWidget(
+      {super.key, this.tag, required this.title, required this.coverUrlPath});
   final String? tag;
   final String title;
+  final String coverUrlPath;
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
     var boxDecoration = BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage(AssetConstants.dalle),
-        fit: BoxFit.cover,
-        colorFilter: ColorFilter.mode(
-          Colors.black.withOpacity(0.6),
-          BlendMode.dstATop,
-        ),
-      ),
+      color: ColorConstants.transparent,
     );
 
     return Padding(
       padding: const EdgeInsets.only(left: 16),
-      child: Placeholder(
-        child: Container(
-          width: 154,
-          // decoration: boxDecoration,
-          child: _tagAndTitle(textTheme, tag: tag, title: title),
-        ),
+      child: Stack(
+        children: [
+          ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.6),
+              BlendMode.dstATop,
+            ),
+            child: NetworkImageComponent(url: coverUrlPath),
+          ),
+          Container(
+            width: 154,
+            decoration: boxDecoration,
+            child: _tagAndTitle(textTheme, tag: tag, title: title),
+          ),
+        ],
       ),
     );
   }

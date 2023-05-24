@@ -1,12 +1,13 @@
 import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:Medito/models/models.dart';
 import 'widgets/card_widget.dart';
 import 'package:flutter/material.dart';
 import 'widgets/card_title_widget.dart';
 
 class CardListWidget extends StatelessWidget {
-  const CardListWidget({super.key, required this.title});
+  const CardListWidget({super.key, required this.row});
 
-  final String title;
+  final HomeRowsModel row;
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +19,20 @@ class CardListWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          CardTitleWidget(title: title),
+          CardTitleWidget(title: row.title),
           height16,
           SizedBox(
             height: 165,
             child: ListView.builder(
-              itemCount: 10,
+              itemCount: row.items.length,
               scrollDirection: Axis.horizontal,
-              itemBuilder: (context, snapshot) {
+              itemBuilder: (context, index) {
+                var element = row.items[index];
+
                 return CardWidget(
-                  tag: 'Tag 1',
-                  title: 'The skill of mindfulness',
+                  tag: element.type,
+                  title: element.title,
+                  coverUrlPath: element.coverUrl,
                 );
               },
             ),

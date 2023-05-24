@@ -1,29 +1,12 @@
 import 'package:Medito/constants/colors/color_constants.dart';
-import 'package:Medito/constants/strings/asset_constants.dart';
-import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:Medito/models/models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:collection/collection.dart';
 
 class FilterWidget extends StatelessWidget {
-  const FilterWidget({super.key});
-
+  const FilterWidget({super.key, required this.chips});
+  final List<HomeChipsModel> chips;
   @override
   Widget build(BuildContext context) {
-    var items = [
-      '💤 Sleep',
-      '🚨 Emergency',
-      '❤️ Relationships',
-      '☁︎ Breathing',
-      '☀️ Daily',
-      '⏳ Timer',
-      '📚 Courses',
-      '🏆 Challenges',
-    ];
-
-    var row1 = items.take(items.length ~/ 2).toList();
-    var row2 = items.skip(items.length ~/ 2).toList();
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: SingleChildScrollView(
@@ -31,15 +14,15 @@ class FilterWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _filterListView(row1),
-            _filterListView(row2),
+            _filterListView(chips.last.line1),
+            _filterListView(chips.first.line2),
           ],
         ),
       ),
     );
   }
 
-  Padding _filterListView(List<String> items) {
+  Padding _filterListView(List<HomeChipsItemsModel> items) {
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: SizedBox(
@@ -60,7 +43,7 @@ class FilterWidget extends StatelessWidget {
                 padding:
                     EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 6),
                 child: Text(
-                  items[index],
+                  items[index].label,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
