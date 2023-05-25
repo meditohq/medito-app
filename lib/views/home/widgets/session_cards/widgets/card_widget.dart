@@ -3,11 +3,17 @@ import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
-  const CardWidget(
-      {super.key, this.tag, required this.title, required this.coverUrlPath});
+  const CardWidget({
+    super.key,
+    this.tag,
+    required this.title,
+    required this.coverUrlPath,
+    this.onTap,
+  });
   final String? tag;
   final String title;
   final String coverUrlPath;
+  final void Function()? onTap;
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
@@ -18,21 +24,24 @@ class CardWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(left: 16),
-      child: Stack(
-        children: [
-          ColorFiltered(
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.6),
-              BlendMode.dstATop,
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(
+          children: [
+            ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.6),
+                BlendMode.dstATop,
+              ),
+              child: NetworkImageComponent(url: coverUrlPath),
             ),
-            child: NetworkImageComponent(url: coverUrlPath),
-          ),
-          Container(
-            width: 154,
-            decoration: boxDecoration,
-            child: _tagAndTitle(textTheme, tag: tag, title: title),
-          ),
-        ],
+            Container(
+              width: 154,
+              decoration: boxDecoration,
+              child: _tagAndTitle(textTheme, tag: tag, title: title),
+            ),
+          ],
+        ),
       ),
     );
   }

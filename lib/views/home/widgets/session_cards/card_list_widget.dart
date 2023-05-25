@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:Medito/constants/types/type_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'widgets/card_widget.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +36,9 @@ class CardListWidget extends StatelessWidget {
                   tag: element.type,
                   title: element.title,
                   coverUrlPath: element.coverUrl,
+                  onTap: () {
+                    if (element.type == TypeConstants.SESSION) {}
+                  },
                 );
               },
             ),
