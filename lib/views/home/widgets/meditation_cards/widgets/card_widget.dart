@@ -28,12 +28,18 @@ class CardWidget extends StatelessWidget {
         onTap: onTap,
         child: Stack(
           children: [
-            ColorFiltered(
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.6),
-                BlendMode.dstATop,
+            SizedBox(
+              width: 154,
+              child: ColorFiltered(
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.6),
+                  BlendMode.dstATop,
+                ),
+                child: NetworkImageComponent(
+                  url: coverUrlPath,
+                  isCache: true,
+                ),
               ),
-              child: NetworkImageComponent(url: coverUrlPath),
             ),
             Container(
               width: 154,

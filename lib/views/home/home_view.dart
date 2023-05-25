@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
 import 'widgets/search/search_widget.dart';
-import 'widgets/session_cards/card_list_widget.dart';
+import 'widgets/meditation_cards/card_list_widget.dart';
 import 'package:Medito/providers/providers.dart';
 
 class HomeView extends ConsumerWidget {
