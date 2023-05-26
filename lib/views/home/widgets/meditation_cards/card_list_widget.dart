@@ -34,12 +34,10 @@ class CardListWidget extends StatelessWidget {
                 return CardWidget(
                   title: element.title,
                   coverUrlPath: element.coverUrl,
-                  onTap: () {
-                    context.push(getPathFromString(
-                      element.type,
-                      [element.id.toString()],
-                    ));
-                  },
+                  onTap: () => context.push(getPathFromString(
+                    element.type,
+                    [element.id.toString()],
+                  )),
                 );
               },
             ),

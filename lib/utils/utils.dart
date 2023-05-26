@@ -24,7 +24,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
-  final headers = {HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD};
+  final headers = {
+    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD
+  };
 
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
 }

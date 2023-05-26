@@ -1,5 +1,6 @@
 import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/home/home_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widgets/filters/filter_widget.dart';
@@ -34,16 +35,7 @@ class HomeView extends ConsumerWidget {
                       FilterWidget(
                         chips: data.chips,
                       ),
-                      Column(
-                        children: data.rows
-                            .map((e) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: CardListWidget(
-                                    row: e,
-                                  ),
-                                ))
-                            .toList(),
-                      ),
+                      _cardListWidget(data),
                       height16,
                     ],
                   ),
@@ -59,6 +51,21 @@ class HomeView extends ConsumerWidget {
         ),
         loading: () => const FolderShimmerComponent(),
       ),
+    );
+  }
+
+  Column _cardListWidget(HomeModel data) {
+    return Column(
+      children: data.rows
+          .map(
+            (e) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: CardListWidget(
+                row: e,
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
