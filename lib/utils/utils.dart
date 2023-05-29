@@ -25,7 +25,7 @@ import 'package:url_launcher/url_launcher.dart';
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
   final headers = {
-    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD
+    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD,
   };
 
   return Image.network(url!, fit: BoxFit.fill, headers: headers);
@@ -85,8 +85,12 @@ Future<bool> launchUrl(String? href) async {
   if (href != null && href.startsWith('mailto')) {
     _launchEmailSubmission(href);
   } else if (href != null) {
-    return await canLaunch(href)
-        ? await launch(href)
+    final params = Uri(
+      path: href.replaceAll('mailto:', ''),
+    );
+
+    return await canLaunchUrl(params)
+        ? await launchUrl(href)
         : throw 'Could not launch $href';
   }
 
@@ -107,8 +111,8 @@ void _launchEmailSubmission(String href) async {
   );
 
   var url = params.toString();
-  if (await canLaunch(url)) {
-    await launch(url);
+  if (await canLaunchUrl(params)) {
+    await launchUrl(url);
   } else {
     print('Could not launch $url');
   }

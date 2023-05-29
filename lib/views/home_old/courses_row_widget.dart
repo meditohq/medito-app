@@ -10,7 +10,7 @@ class CoursesRowWidget extends StatefulWidget {
 
   CoursesRowWidget({Key? key, this.onTap}) : super(key: key);
 
-  final void Function(dynamic, dynamic)? onTap;
+  final void Function(String?, String?)? onTap;
 }
 
 class CoursesRowWidgetState extends State<CoursesRowWidget> {
@@ -31,25 +31,27 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
         padding: const EdgeInsets.only(top: 24.0, left: 16, bottom: 8.0),
-        child: Text('Courses', style: Theme.of(context).textTheme.headline3),
+        child: Text('Courses', style: Theme.of(context).textTheme.displaySmall),
       ),
       SizeChangedLayoutNotifier(
         child: StreamBuilder<ApiResponse<CoursesResponse>>(
-            stream: _bloc.coursesList.stream,
-            initialData: ApiResponse.loading(),
-            builder: (context, snapshot) {
-              return AnimatedSwitcher(
-                duration: Duration(milliseconds: 100),
-                child: _buildCoursesRowWidget(snapshot),
-              );
-            }),
+          stream: _bloc.coursesList.stream,
+          initialData: ApiResponse.loading(),
+          builder: (context, snapshot) {
+            return AnimatedSwitcher(
+              duration: Duration(milliseconds: 100),
+              child: _buildCoursesRowWidget(snapshot),
+            );
+          },
+        ),
       ),
-      SizedBox(height: 24)
+      SizedBox(height: 24),
     ]);
   }
 
   Widget _buildCoursesRowWidget(
-      AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot) {
+    AsyncSnapshot<ApiResponse<CoursesResponse>> snapshot,
+  ) {
     switch (snapshot.data?.status) {
       case Status.LOADING:
         return _horizontalCoursesRow(null, ValueKey('CoursesRowLoading'));
@@ -63,7 +65,9 @@ class CoursesRowWidgetState extends State<CoursesRowWidget> {
   }
 
   Widget _horizontalCoursesRow(
-      AsyncSnapshot<ApiResponse<CoursesResponse>>? snapshot, Key key) {
+    AsyncSnapshot<ApiResponse<CoursesResponse>>? snapshot,
+    Key key,
+  ) {
     var list = <Widget>[Container(width: 16)];
     if (snapshot != null) {
       snapshot.data?.body?.data.forEach((element) {

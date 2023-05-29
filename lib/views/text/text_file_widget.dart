@@ -19,7 +19,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-
+//ignore:prefer-match-file-name
 class TextFileStateless extends StatelessWidget {
   TextFileStateless({Key? key}) : super(key: key);
 
@@ -76,6 +76,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
         child: Builder(
           builder: (BuildContext context) {
             scaffoldContext = context;
+            
             return buildSafeAreaBody();
           },
         ),
@@ -91,7 +92,7 @@ class _TextFileWidgetState extends State<TextFileWidget>
     );
   }
 
-  void _linkTap(String text, String? href, String? title) {
+  void _linkTap(String _, String? href, String? __) {
     launchUrl(href);
   }
 

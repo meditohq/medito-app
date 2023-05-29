@@ -3,9 +3,12 @@ import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class StackHeaderComponent extends StatelessWidget {
-  const StackHeaderComponent(
-      {this.title, this.description, this.imageUrl, Key? key})
-      : super(key: key);
+  const StackHeaderComponent({
+    this.title,
+    this.description,
+    this.imageUrl,
+    Key? key,
+  }) : super(key: key);
 
   final String? title;
   final String? description;
@@ -28,10 +31,11 @@ class StackHeaderComponent extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(boxShadow: [
                     BoxShadow(
-                        color: ColorConstants.almostBlack.withOpacity(0.4),
-                        offset: Offset(0, 10),
-                        blurRadius: 10,
-                        spreadRadius: 20)
+                      color: ColorConstants.almostBlack.withOpacity(0.4),
+                      offset: Offset(0, 10),
+                      blurRadius: 10,
+                      spreadRadius: 20,
+                    ),
                   ]),
                 ),
               ),
@@ -39,7 +43,7 @@ class StackHeaderComponent extends StatelessWidget {
             ],
           ),
         ),
-        if (description != null) _buildDescription(context, description!)
+        if (description != null) _buildDescription(context, description!),
       ],
     );
   }
@@ -89,8 +93,10 @@ class StackHeaderComponent extends StatelessWidget {
           title,
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).primaryTextTheme.headline4?.copyWith(
-              fontFamily: 'Clash Display', color: ColorConstants.walterWhite),
+          style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+                fontFamily: 'Clash Display',
+                color: ColorConstants.walterWhite,
+              ),
         ),
       ),
     );

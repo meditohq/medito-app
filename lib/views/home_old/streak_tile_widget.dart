@@ -18,9 +18,14 @@ import 'package:Medito/utils/stats_utils.dart';
 import 'package:flutter/material.dart';
 
 class StreakTileWidget extends StatefulWidget {
-  StreakTileWidget(this.future, this.title,
-      {Key? key, this.onClick, this.optionalText, this.editable = false})
-      : super(key: key);
+  StreakTileWidget(
+    this.future,
+    this.title, {
+    Key? key,
+    this.onClick,
+    this.optionalText,
+    this.editable = false,
+  }) : super(key: key);
 
   final Future<String>? future;
   final String title;
@@ -36,51 +41,58 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-        future: widget.future,
-        initialData: '0',
-        builder: (context, snapshot) {
-          var unit = '';
-          if (snapshot.hasData) {
-            var value = int.parse(snapshot.data ?? '');
-            unit = getUnits(widget.optionalText ?? UnitType.day, value);
-          }
-          return InkWell(
-            borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            splashColor: ColorConstants.softGrey,
-            onTap: widget.onClick,
-            child: Ink(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    _getDataTextWidget(snapshot, unit, context),
-                    SizedBox(height: 6),
-                    getDescriptionWidget(context)
-                  ],
-                ),
+      future: widget.future,
+      initialData: '0',
+      builder: (context, snapshot) {
+        var unit = '';
+        if (snapshot.hasData) {
+          var value = int.parse(snapshot.data ?? '');
+          unit = getUnits(widget.optionalText ?? UnitType.day, value);
+        }
+
+        return InkWell(
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          splashColor: ColorConstants.softGrey,
+          onTap: widget.onClick,
+          child: Ink(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  _getDataTextWidget(snapshot, unit, context),
+                  SizedBox(height: 6),
+                  getDescriptionWidget(context),
+                ],
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   Text _getDataTextWidget(
-      AsyncSnapshot<String> snapshot, String unit, BuildContext context) {
+    AsyncSnapshot<String> snapshot,
+    String unit,
+    BuildContext context,
+  ) {
     return Text(
       (snapshot.hasData ? _formatSnapshotData(snapshot) : '') + unit,
-      style: Theme.of(context).textTheme.headline5,
+      style: Theme.of(context).textTheme.headlineSmall,
       overflow: TextOverflow.fade,
       maxLines: 2,
     );
   }
 
   Text getDescriptionWidget(BuildContext context) {
-    return Text(widget.title,
-        maxLines: 2,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.subtitle1);
+    return Text(
+      widget.title,
+      maxLines: 2,
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.titleMedium,
+    );
   }
 
   String _formatSnapshotData(AsyncSnapshot<String> snapshot) {
@@ -88,6 +100,7 @@ class _StreakTileWidgetState extends State<StreakTileWidget> {
     if (value.length > 5) {
       return '999+';
     }
+
     return value;
   }
 }

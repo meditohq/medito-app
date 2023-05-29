@@ -1,12 +1,10 @@
 // ignore_for_file: avoid-dynamic
 class TextResponse {
-  @Deprecated('use fields instead')
   Data? data;
   int? get id => data?.id;
   String? get title => data?.title;
   String? get subtitle => data?.subtitle;
   String? get body => data?.body;
-
 
   TextResponse({data});
 
@@ -16,9 +14,7 @@ class TextResponse {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    if (data != null) {
-      data['data'] = this.data?.toJson();
-    }
+    data['data'] = this.data?.toJson();
 
     return data;
   }
