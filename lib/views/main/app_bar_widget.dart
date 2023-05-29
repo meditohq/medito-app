@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 //ignore: prefer-match-file-name
-class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
+class MeditoAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   const MeditoAppBarWidget({
     Key? key,
     this.title,
