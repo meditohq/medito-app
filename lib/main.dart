@@ -14,10 +14,9 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
+import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -64,11 +63,25 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
+  bool isFirstTimeLoading = true;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // update session stats when app comes into foreground
+      updateStatsFromBg();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
-    ref.read(playerProvider.notifier).getCurrentlyPlayingSession();
-    ref.read(audioPlayerNotifierProvider).initAudioHandler();
+
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -84,121 +97,17 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final currentlyPlayingSession = ref.watch(playerProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (currentlyPlayingSession != null) {
-        checkAudioLocally(
-          currentlyPlayingSession,
-          currentlyPlayingSession.audio.first.files.first,
-        );
-      }
-    });
+    final auth = ref.watch(authProvider);
+    if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
+      ref.watch(currentSessionPlayerProvider);
+    }
+    isFirstTimeLoading = false;
 
     return MaterialApp.router(
       routerConfig: router,
-      theme: ThemeData(
-        splashColor: ColorConstants.moonlight,
-        canvasColor: ColorConstants.greyIsTheNewBlack,
-        pageTransitionsTheme: PageTransitionsTheme(builders: {
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.android: SlideTransitionBuilder(),
-        }),
-        colorScheme: ColorScheme.dark(secondary: ColorConstants.walterWhite),
-        textTheme: meditoTextTheme(context),
-      ),
+      theme: appTheme(context),
       title: ParentWidget._title,
-    );
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      // update session stats when app comes into foreground
-      updateStatsFromBg();
-    }
-  }
-
-  void checkAudioLocally(SessionModel sessionModel, SessionFilesModel file) {
-    loadSessionAndBackgroundSound(sessionModel, file);
-  }
-
-  void loadSessionAndBackgroundSound(
-    SessionModel sessionModel,
-    SessionFilesModel file,
-  ) {
-    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    var isPlaying = _audioPlayerNotifier.sessionAudioPlayer.playerState.playing;
-    var _currentPlayingFileId =
-        _audioPlayerNotifier.currentlyPlayingSession?.id;
-
-    if (!isPlaying || _currentPlayingFileId != file.id) {
-      setBackgroundSound(_audioPlayerNotifier, sessionModel.hasBackgroundSound);
-      setSessionAudio(_audioPlayerNotifier, sessionModel, file);
-    }
-  }
-
-  void setSessionAudio(
-    AudioPlayerNotifier _audioPlayerNotifier,
-    SessionModel sessionModel,
-    SessionFilesModel file,
-  ) {
-    var checkDownloadedFile = ref.read(audioDownloaderProvider).getSessionAudio(
-          '${sessionModel.id}-${file.id}${getFileExtension(file.path)}',
-        );
-    checkDownloadedFile.then((value) {
-      _audioPlayerNotifier.setSessionAudio(sessionModel, file, filePath: value);
-      _audioPlayerNotifier.currentlyPlayingSession = file;
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PLAY;
-    });
-  }
-
-  void setBackgroundSound(
-    AudioPlayerNotifier _audioPlayerNotifier,
-    bool hasBackgroundSound,
-  ) {
-    if (hasBackgroundSound) {
-      final _provider = ref.read(backgroundSoundsNotifierProvider);
-      _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.NONE) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          _audioPlayerNotifier.playBackgroundSound().catchError((err) {
-          print(err);
-        });
-        }
-      });
-      _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-      });
-    } else {
-      _audioPlayerNotifier.pauseBackgroundSound();
-    }
-  }
-}
-
-class SlideTransitionBuilder extends PageTransitionsBuilder {
-  @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    animation = CurvedAnimation(curve: Curves.easeInOutExpo, parent: animation);
-
-    return SlideTransition(
-      position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-          .animate(animation),
-      child: child,
     );
   }
 }

@@ -1,6 +1,5 @@
 // ignore_for_file: avoid-dynamic
 class AnnouncementResponse {
-  @Deprecated('Use fields instead')
   Data? data;
 
   String? get icon => data?.icon;
@@ -46,7 +45,16 @@ class Data {
   String? timestamp;
   String? id;
 
-  Data({icon, colorPrimary, body, buttonLabel, buttonType, buttonPath, timestamp, id});
+  Data({
+    icon,
+    colorPrimary,
+    body,
+    buttonLabel,
+    buttonType,
+    buttonPath,
+    timestamp,
+    id,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     icon = json['icon'];
@@ -69,6 +77,7 @@ class Data {
     data['button_path'] = buttonPath;
     data['timestamp'] = timestamp;
     data['id'] = id;
+
     return data;
   }
 }

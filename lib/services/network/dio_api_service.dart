@@ -57,30 +57,31 @@ class DioApiService {
   }
 
   CustomException _returnDioErrorResponse(DioError error) {
+    var message = error.response?.data?['error'];
     if (error.type == DioErrorType.receiveTimeout) {
       throw FetchDataException('Error connection timeout');
     }
     switch (error.response?.statusCode) {
       case 400:
         throw BadRequestException(
-          error.response!.statusMessage ?? 'Bad request',
+          message ?? error.response!.statusMessage ?? 'Bad request',
         );
       case 401:
         throw UnauthorisedException(
-          'Unauthorised request: ${error.response!.statusCode}',
+          message ?? 'Unauthorised request: ${error.response!.statusCode}',
         );
       case 403:
         throw UnauthorisedException(
-          'Access forbidden: ${error.response!.statusCode}',
+          message ?? 'Access forbidden: ${error.response!.statusCode}',
         );
       case 404:
         throw FetchDataException(
-          'Api not found: ${error.response!.statusCode}',
+          message ?? 'Api not found: ${error.response!.statusCode}',
         );
       case 500:
       default:
         throw FetchDataException(
-          'Error occurred while Communication with Server ',
+          message ?? 'Error occurred while Communication with Server ',
         );
     }
   }

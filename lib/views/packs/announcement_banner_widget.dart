@@ -24,16 +24,17 @@ import 'package:go_router/go_router.dart';
 
 import '../../routes/routes.dart';
 
-class AnnouncementBanner extends StatefulWidget {
-  AnnouncementBanner({Key? key, this.hasOpened}) : super(key: key);
+class AnnouncementBannerWidget extends StatefulWidget {
+  AnnouncementBannerWidget({Key? key, this.hasOpened}) : super(key: key);
 
   final bool? hasOpened;
 
   @override
-  AnnouncementBannerState createState() => AnnouncementBannerState();
+  AnnouncementBannerWidgetState createState() =>
+      AnnouncementBannerWidgetState();
 }
 
-class AnnouncementBannerState extends State<AnnouncementBanner>
+class AnnouncementBannerWidgetState extends State<AnnouncementBannerWidget>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   var _hidden = false;
   final _bloc = AnnouncementBloc();
@@ -41,64 +42,79 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   @override
   void initState() {
     super.initState();
-    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened ?? false);
+    _bloc.fetchAnnouncement(
+      skipCache: true,
+      hasOpened: widget.hasOpened ?? false,
+    );
   }
 
   void refresh() {
-    _bloc.fetchAnnouncement(skipCache: true, hasOpened: widget.hasOpened ?? false);
+    _bloc.fetchAnnouncement(
+      skipCache: true,
+      hasOpened: widget.hasOpened ?? false,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return StreamBuilder<AnnouncementResponse>(
-        stream: _bloc.announcementController.stream ,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data == null) {
-            return Container();
-          }
+      stream: _bloc.announcementController.stream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null) {
+          return Container();
+        }
 
-          return FutureBuilder<bool>(
-              future: _bloc
-                  .shouldHideAnnouncement(snapshot.data?.timestamp?.toString()),
-              initialData: false,
-              builder: (context, showSnapshot) {
-                if (showSnapshot.data == true) {
-                  return Container();
-                }
+        return FutureBuilder<bool>(
+          future: _bloc
+              .shouldHideAnnouncement(snapshot.data?.timestamp?.toString()),
+          initialData: false,
+          builder: (context, showSnapshot) {
+            if (showSnapshot.data == true) {
+              return Container();
+            }
 
-                return ExpandedSection(
-                  expand: !_hidden,
-                  child: AnimatedOpacity(
-                    onEnd: () => {
-                      _bloc.saveAnnouncementID(
-                          snapshot.data?.timestamp.toString())
-                    },
-                    duration: Duration(milliseconds: 250),
-                    opacity: _hidden ? 0 : 1,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        buildSpacer(),
-                        Padding(
-                            padding:
-                                const EdgeInsets.only(top: 20.0, bottom: 10.0),
-                            child: MaterialBanner(
-                                backgroundColor: ColorConstants.darkMoon,
-                                content: _buildTextAndButtonColumn(
-                                    snapshot, context),
-                                leading:
-                                    snapshot.data?.icon.isNotNullAndNotEmpty() == true
-                                        ? buildCircleAvatar(snapshot)
-                                        : Container(),
-                                actions: [Container()])),
-                        buildSpacer()
-                      ],
-                    ),
+            var buildSpacer2 = buildSpacer();
+
+            return ExpandedSection(
+              expand: !_hidden,
+              child: AnimatedOpacity(
+                onEnd: () => {
+                  _bloc.saveAnnouncementID(
+                    snapshot.data?.timestamp.toString(),
                   ),
-                );
-              });
-        });
+                },
+                duration: Duration(milliseconds: 250),
+                opacity: _hidden ? 0 : 1,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    buildSpacer2,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+                      child: MaterialBanner(
+                        backgroundColor: ColorConstants.darkMoon,
+                        content: _buildTextAndButtonColumn(
+                          snapshot,
+                          context,
+                        ),
+                        leading:
+                            snapshot.data?.icon.isNotNullAndNotEmpty() == true
+                                ? buildCircleAvatar(snapshot)
+                                : Container(),
+                        actions: [Container()],
+                      ),
+                    ),
+                    buildSpacer2,
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   List<Widget> buildActionsRow(AsyncSnapshot<AnnouncementResponse> snapshot) {
@@ -106,22 +122,28 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
     if (snapshot.data?.buttonLabel?.isNullOrEmpty() == false) {
       actions.add(_buildPositiveButton(snapshot));
     }
+
     return actions;
   }
 
   Column _buildTextAndButtonColumn(
-      AsyncSnapshot<AnnouncementResponse> snapshot, BuildContext context) {
+    AsyncSnapshot<AnnouncementResponse> snapshot,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(snapshot.data?.body ?? '',
-            style: Theme.of(context)
-                .textTheme
-                .subtitle1
-                ?.copyWith(color: ColorConstants.walterWhite)),
+        Text(
+          snapshot.data?.body ?? '',
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(color: ColorConstants.walterWhite),
+        ),
         Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: buildActionsRow(snapshot))
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: buildActionsRow(snapshot),
+        ),
       ],
     );
   }
@@ -140,24 +162,29 @@ class AnnouncementBannerState extends State<AnnouncementBanner>
   }
 
   TextButton _buildPositiveButton(
-      AsyncSnapshot<AnnouncementResponse> snapshot) {
+    AsyncSnapshot<AnnouncementResponse> snapshot,
+  ) {
     return TextButton(
       style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.only(right: 30.0))),
+        padding: MaterialStateProperty.all(EdgeInsets.only(right: 30.0)),
+      ),
       onPressed: () {
         _openLink(snapshot.data?.buttonType, snapshot.data?.buttonPath);
       },
-      child: Text(snapshot.data?.buttonLabel?.toUpperCase() ?? '',
-          style:
-              TextStyle(color: ColorConstants.walterWhite, letterSpacing: 0.2)),
+      child: Text(
+        snapshot.data?.buttonLabel?.toUpperCase() ?? '',
+        style: TextStyle(color: ColorConstants.walterWhite, letterSpacing: 0.2),
+      ),
     );
   }
 
   TextButton _buildDismissButton() {
     return TextButton(
       style: ButtonStyle(
-          padding: MaterialStateProperty.all(
-              EdgeInsets.only(left: 30.0, right: 30.0))),
+        padding: MaterialStateProperty.all(
+          EdgeInsets.only(left: 30.0, right: 30.0),
+        ),
+      ),
       onPressed: () {
         setState(() {
           _hidden = true;

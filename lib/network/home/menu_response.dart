@@ -12,14 +12,17 @@ class MenuResponse extends Equatable {
       json['data'].forEach((v) {
         _data.add(MenuData.fromJson(v));
       });
+      
       return MenuResponse(data: _data);
     }
+
     return MenuResponse(data: []);
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['data'] = this.data?.map((v) => v.toJson()).toList();
+    
     return data;
   }
 
@@ -38,6 +41,7 @@ class MenuData extends Equatable {
     var _itemLabel = json['item_label'];
     var _itemType = json['item_type'];
     var _itemPath = json['item_path'];
+
     return MenuData(itemLabel: _itemLabel, itemType: _itemType, itemPath: _itemPath);
   }
 
@@ -46,6 +50,7 @@ class MenuData extends Equatable {
     data['item_label'] = itemLabel;
     data['item_type'] = itemType;
     data['item_path'] = itemPath;
+
     return data;
   }
 

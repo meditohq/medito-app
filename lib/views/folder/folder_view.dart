@@ -21,12 +21,14 @@ class FolderView extends ConsumerWidget {
     return Scaffold(
       body: folders.when(
         skipLoadingOnRefresh: false,
+        skipLoadingOnReload: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
           onTap: () => ref.refresh(
             FoldersProvider(folderId: int.parse(id!)),
           ),
+          isLoading: folders.isLoading,
         ),
         loading: () => const FolderShimmerComponent(),
       ),
@@ -50,8 +52,13 @@ class FolderView extends ConsumerWidget {
             .map(
               (e) => GestureDetector(
                 onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
-                child: _buildListTile(context, e.title, e.subtitle, e.type,
-                    folder.items.last == e),
+                child: _buildListTile(
+                  context,
+                  e.title,
+                  e.subtitle,
+                  e.type,
+                  folder.items.last == e,
+                ),
               ),
             )
             .toList(),
@@ -136,12 +143,11 @@ class FolderView extends ConsumerWidget {
             location + RouteConstants.webviewPath,
             extra: {'url': path!},
           );
-          // context.go(getPathFromString('url', [path.toString()]));
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));
         }
       } else {
-        createSnackBar(StringConstants.CHECK_CONNECTION, context);
+        createSnackBar(StringConstants.checkConnection, context);
       }
     });
   }

@@ -123,7 +123,7 @@ class PacksScreenState extends State<PacksScreen> {
           return context.go(getPathFromString(pack.type, [pack.id!]));
         }
       }
-      createSnackBar(StringConstants.CHECK_CONNECTION, context);
+      createSnackBar(StringConstants.checkConnection, context);
     });
   }
 
@@ -140,8 +140,12 @@ class PacksScreenState extends State<PacksScreen> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(height: 8),
-          for (int i = 0; i < 10; i++)
-            getBlankTile(ColorConstants.walterWhiteTrans),
+          Column(
+            children: List.generate(
+              10,
+              (index) => getBlankTile(ColorConstants.walterWhiteTrans),
+            ),
+          ),
         ],
       ),
     );

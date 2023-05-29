@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
@@ -53,9 +52,9 @@ class _Download {
       file.createSync();
     }
 
-    var url = BASE_URL + 'assets/' + (currentFile.id ?? '');
+    var url = HTTPConstants.BASE_URL_OLD + 'assets/' + (currentFile.id ?? '');
     var request = http.Request('GET', Uri.parse(url));
-    request.headers[HttpHeaders.authorizationHeader] = CONTENT_TOKEN;
+    request.headers[HttpHeaders.authorizationHeader] = HTTPConstants.CONTENT_TOKEN_OLD;
     var _response = await http.Client().send(request);
     _total = _response.contentLength ?? 0;
     _received = 0;

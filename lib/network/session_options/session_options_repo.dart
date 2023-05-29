@@ -13,12 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 
 import '../../routes/routes.dart';
 
+//ignore:prefer-match-file-name
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';
@@ -31,11 +32,9 @@ class SessionOptionsRepository {
   Future<SessionData?> fetchOptions(String id, bool skipCache) async {
     var url;
 
-    if (screen == Screen.daily) {
-      url = BASE_URL + dailiesExt + id + parameters;
-    } else {
-      url = BASE_URL + ext + id + parameters;
-    }
+    url = screen == Screen.daily
+        ? HTTPConstants.BASE_URL_OLD + dailiesExt + id + parameters
+        : HTTPConstants.BASE_URL_OLD + ext + id + parameters;
 
     final response = await httpGet(url, skipCache: skipCache);
 
@@ -43,5 +42,4 @@ class SessionOptionsRepository {
 
     return SessionOptionsResponse.fromJson(response).data;
   }
-
 }

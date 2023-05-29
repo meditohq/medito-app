@@ -25,7 +25,7 @@ class AudioDownloadComponent extends ConsumerWidget {
       return LabelsComponent(
         bgColor: ColorConstants.walterWhite,
         textColor: ColorConstants.greyIsTheNewGrey,
-        label: StringConstants.DOWNLOADED.toUpperCase(),
+        label: StringConstants.downloaded.toUpperCase(),
         onTap: () => _handleRemoveDownload(downloadAudioProvider, ref, context),
       );
     } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
@@ -33,7 +33,7 @@ class AudioDownloadComponent extends ConsumerWidget {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
       return LabelsComponent(
-        label: StringConstants.DOWNLOAD.toUpperCase(),
+        label: StringConstants.download.toUpperCase(),
         onTap: () => _handleDownload(downloadAudioProvider, ref, context),
       );
     }

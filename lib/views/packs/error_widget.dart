@@ -17,7 +17,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+//ignore:prefer-match-file-name
 class ErrorPacksWidget extends StatelessWidget {
   final onPressed;
 
@@ -45,7 +45,7 @@ class ErrorPacksWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  StringConstants.LOADING_ERROR,
+                  StringConstants.loadingError,
                   textAlign: TextAlign.center,
                   style: titleSmall,
                 ),
@@ -57,14 +57,14 @@ class ErrorPacksWidget extends StatelessWidget {
                       style: outlineButtonStyle,
                       onPressed: () {
                         createSnackBar(
-                          StringConstants.RETRYING,
+                          StringConstants.retrying,
                           context,
                           color: ColorConstants.darkBGColor,
                         );
                         onPressed();
                       },
                       child: Text(
-                        StringConstants.TRY_AGAIN,
+                        StringConstants.tryAgain,
                         style: titleSmall,
                       ),
                     ),
@@ -75,7 +75,7 @@ class ErrorPacksWidget extends StatelessWidget {
                         context.go(RouteConstants.collectionPath),
                       },
                       child: Text(
-                        StringConstants.SHOW_DOWNLOADS,
+                        StringConstants.showDownloads,
                         style: titleSmall,
                       ),
                     ),

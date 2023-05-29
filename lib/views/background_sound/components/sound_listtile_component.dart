@@ -66,7 +66,7 @@ class SoundListTileComponent extends ConsumerWidget {
     AudioPlayerNotifier audioPlayerNotifier,
     bool isSelected,
   ) {
-    if (sound.title == StringConstants.NONE) {
+    if (sound.title == StringConstants.none) {
       bgSoundNotifierProvider.handleOnChangeSound(sound);
       audioPlayerNotifier.stopBackgroundSound();
     } else {
@@ -75,7 +75,7 @@ class SoundListTileComponent extends ConsumerWidget {
             ? sound
             : BackgroundSoundsModel(
                 id: 0,
-                title: StringConstants.NONE,
+                title: StringConstants.none,
                 duration: 0,
                 path: '',
               ),

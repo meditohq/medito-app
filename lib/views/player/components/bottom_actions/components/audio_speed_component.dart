@@ -32,10 +32,10 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedComponent> {
 
     return LabelsComponent(
       label: audioSpeedModel.label,
-      bgColor: audioSpeedModel.label != StringConstants.X1
+      bgColor: audioSpeedModel.label != StringConstants.x1
           ? ColorConstants.walterWhite
           : ColorConstants.greyIsTheNewGrey,
-      textColor: audioSpeedModel.label != StringConstants.X1
+      textColor: audioSpeedModel.label != StringConstants.x1
           ? ColorConstants.greyIsTheNewGrey
           : ColorConstants.walterWhite,
       onTap: () {

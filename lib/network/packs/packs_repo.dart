@@ -13,15 +13,17 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/packs/packs_response.dart';
 
+//ignore: prefer-match-file-name
 class PacksRepository {
-
   Future<List<PacksData>?> fetchPacks(bool skipCache) async {
-    final response =
-        await httpGet(BASE_URL + 'items/packs', skipCache: skipCache);
+    final response = await httpGet(
+      HTTPConstants.BASE_URL_OLD + 'items/packs',
+      skipCache: skipCache,
+    );
     if (response == null) return null;
 
     return PacksResponse.fromJson(response).data;

@@ -46,7 +46,7 @@ class NewFolderScreen extends ConsumerWidget {
           bgImage: AssetConstants.dalle,
           title: data?.title ?? '',
           description: data?.description,
-          children: [
+          children:  [
             for (int i = 0; i < (items?.length ?? 0); i++)
               GestureDetector(
                 onTap: () => _onListItemTap(
@@ -141,7 +141,7 @@ class NewFolderScreen extends ConsumerWidget {
           context.go(location + getPathFromString(type, [id.toString()]));
         }
       } else {
-        createSnackBar(StringConstants.CHECK_CONNECTION, context);
+        createSnackBar(StringConstants.checkConnection, context);
       }
     });
   }

@@ -15,8 +15,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:http/http.dart';
@@ -24,21 +23,20 @@ import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 //move this to network package later
-Future<Map<String, dynamic>?> httpGet(String url,
-    {bool skipCache = false, String? fileNameForCache}) async {
+Future<Map<String, dynamic>?> httpGet(
+  String url, {
+  bool skipCache = false,
+  String? fileNameForCache,
+}) async {
   var cache;
 
   if (!await checkConnectivity()) {
     skipCache = false;
   }
 
-  if (skipCache) {
-    cache = null;
-  } else {
-    cache = await readJSONFromCache(fileNameForCache ?? url);
-  }
+  cache = skipCache ? null : await readJSONFromCache(fileNameForCache ?? url);
 
-  var auth = CONTENT_TOKEN;
+  var auth = HTTPConstants.CONTENT_TOKEN_OLD;
   assert(auth.isNotEmpty);
 
   if (cache == null) {
@@ -53,7 +51,7 @@ Future<Map<String, dynamic>?> httpGet(String url,
         HttpHeaders.accessControlAllowMethodsHeader: 'POST, OPTIONS, HEAD, GET',
         HttpHeaders.contentTypeHeader: ContentType.json.value,
         HttpHeaders.refererHeader: 'no-referrer-when-downgrade',
-        HttpHeaders.acceptHeader: '*/*'
+        HttpHeaders.acceptHeader: '*/*',
       },
     );
 
@@ -61,7 +59,8 @@ Future<Map<String, dynamic>?> httpGet(String url,
       await writeJSONToCache(response.body, fileNameForCache ?? url);
     } else {
       unawaited(Sentry.captureMessage(
-          'response code: ${response.statusCode}, url: $url, headers: ${response.headers} reason: ${response.reasonPhrase}'));
+        'response code: ${response.statusCode}, url: $url, headers: ${response.headers} reason: ${response.reasonPhrase}',
+      ));
       print('----GET----');
       print('CACHE USED: ${cache != null}');
       print('FILE NAME FOR CACHE: ${fileNameForCache ?? ''}');
@@ -76,6 +75,7 @@ Future<Map<String, dynamic>?> httpGet(String url,
 
     try {
       var decode = json.decode(response.body);
+
       return decode;
     } catch (e, str) {
       unawaited(
@@ -87,14 +87,19 @@ Future<Map<String, dynamic>?> httpGet(String url,
           ),
         ),
       );
+
       return null;
     }
   }
+
   return json.decode(cache);
 }
 
-Future httpPost(String url, String token,
-    {Map<String, String> body = const <String, String>{}}) async {
+Future httpPost(
+  String url,
+  String token, {
+  Map<String, String> body = const <String, String>{},
+}) async {
   assert(token.isNotEmpty);
   try {
     final response = await post(
@@ -102,7 +107,7 @@ Future httpPost(String url, String token,
       body: encoded(body),
       headers: {
         HttpHeaders.authorizationHeader: token,
-        HttpHeaders.contentTypeHeader: 'application/json'
+        HttpHeaders.contentTypeHeader: 'application/json',
       },
     );
     if (response.statusCode == 200) {
@@ -119,6 +124,7 @@ Future httpPost(String url, String token,
     }
   } catch (e) {
     print(e);
+
     return null;
   }
 }

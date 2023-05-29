@@ -1,7 +1,6 @@
+import 'package:Medito/constants/http/http_constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../auth.dart';
 import 'new_folder_response.dart';
 part 'folder_provider.g.dart';
 
@@ -28,8 +27,8 @@ Future<NewFolderResponse?> folderData(
 
 Future<Map<String, Object?>?> _httpGet(String id, bool skipCache) {
   return httpGet(
-    BASE_URL + ext + id + folderParameters,
-    fileNameForCache: BASE_URL + id + '/' + ext,
+    HTTPConstants.BASE_URL_OLD + ext + id + folderParameters,
+    fileNameForCache: HTTPConstants.BASE_URL_OLD + id + '/' + ext,
     skipCache: skipCache,
   );
 }

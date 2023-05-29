@@ -1,5 +1,5 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class ErrorComponent extends StatelessWidget {
@@ -7,58 +7,43 @@ class ErrorComponent extends StatelessWidget {
     Key? key,
     required this.onTap,
     required this.message,
+    this.isLoading = false,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
-
+  final bool isLoading;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _richText(
-            context,
-            message,
-            ' Retry',
-            onTap: onTap,
+    return Scaffold(
+      backgroundColor: ColorConstants.ebony,
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                message,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontSize: 16,
+                      color: ColorConstants.walterWhite,
+                      fontFamily: ClashDisplay,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              height16,
+              LoadingButtonWidget(
+                btnText: StringConstants.tryAgain,
+                onPressed: onTap,
+                isLoading: isLoading,
+                bgColor: ColorConstants.walterWhite,
+                textColor: ColorConstants.greyIsTheNewGrey,
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  RichText _richText(
-    BuildContext context,
-    String title,
-    String text, {
-    void Function()? onTap,
-  }) {
-    var headlineSmall = Theme.of(context).textTheme.headlineSmall;
-
-    return RichText(
-      text: TextSpan(
-        text: title,
-        style: headlineSmall?.copyWith(
-          fontSize: 18,
-          color: ColorConstants.newGrey,
-          letterSpacing: -0.3,
-          fontWeight: FontWeight.w400,
         ),
-        children: <TextSpan>[
-          TextSpan(
-            text: text,
-            style: headlineSmall?.copyWith(
-              fontSize: 18,
-              color: ColorConstants.link,
-              letterSpacing: -0.3,
-              fontWeight: FontWeight.w400,
-            ),
-            recognizer: TapGestureRecognizer()..onTap = onTap,
-          ),
-        ],
       ),
     );
   }

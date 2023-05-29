@@ -9,6 +9,8 @@ class SessionShimmerComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     var shimmerList = _shimmerList();
 
+    var list = List.generate(3, (index) => shimmerList);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,9 +30,7 @@ class SessionShimmerComponent extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.spaceBetween,
-            children: [
-              for (int i = 0; i < 3; i++) shimmerList,
-            ],
+            children: list,
           ),
           height8,
           height8,
@@ -44,7 +44,7 @@ class SessionShimmerComponent extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.spaceBetween,
-            children: [for (int i = 0; i < 5; i++) shimmerList],
+            children: list,
           ),
         ],
       ),

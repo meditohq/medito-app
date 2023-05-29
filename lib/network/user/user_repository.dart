@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
@@ -13,7 +12,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 class UserRepository {
   static Future<Map<String, String>>? createUser() async {
     var ext = 'users/';
-    var url = BASE_URL + ext;
+    var url = HTTPConstants.BASE_URL_OLD + ext;
 
     var now = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -39,7 +38,7 @@ class UserRepository {
 
     var id = '';
     try {
-      final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
+      final response = await httpPost(url, HTTPConstants.INIT_TOKEN, body: defaultMap);
       id = response != null
           ? (UserResponse.fromJson(response).data?.id ?? 'EMPTY')
           : 'EMPTY';

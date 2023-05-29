@@ -12,7 +12,7 @@ Affero GNU General Public License for more details.
 
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-import 'package:Medito/network/auth.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_utils.dart';
@@ -65,7 +65,7 @@ class Tracking {
       var deviceInfo = await getDeviceDetails();
 
       var ext = 'items/usage/';
-      var url = BASE_URL + ext;
+      var url = HTTPConstants.BASE_URL_OLD + ext;
       try {
         var token = await generatedToken;
         if (token != null) {

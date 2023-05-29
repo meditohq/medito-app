@@ -66,7 +66,8 @@ Duration clockTimeToDuration(String? lengthText) {
   }
 
   return Duration(
-      hours: tempListInts[0],
-      minutes: tempListInts[1],
-      seconds: tempListInts[2]);
+    hours: tempListInts[0],
+    minutes: tempListInts[1],
+    seconds: tempListInts[2],
+  );
 }

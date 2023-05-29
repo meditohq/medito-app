@@ -1,4 +1,3 @@
-import 'package:Medito/network/session_options/background_sounds.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const BG_SOUND_PREF = 'bg_sound_prefs';
@@ -36,7 +35,9 @@ Future<int> daysSinceDate(key) async {
 }
 
 Future<void> addBgSoundSelectionToSharedPrefs(
-    String? file, String? name) async {
+  String? file,
+  String? name,
+) async {
   var prefs = await SharedPreferences.getInstance();
   if (file != null) {
     await prefs.setString(BG_SOUND_PREF, file);
@@ -55,29 +56,6 @@ Future<void> addBgSoundToOfflineSharedPrefs(String? name, String file) async {
     name + '%%' + file,
   ); // %% acts a delimiter when retrieving the strings
   await prefs.setStringList(BG_OFFLINE_PREF, offlineSounds);
-}
-
-Future<List<BackgroundSoundData>> getBgSoundFromOfflineSharedPrefs() async {
-  var prefs = await SharedPreferences.getInstance();
-  var list = prefs.getStringList(BG_OFFLINE_PREF) ?? [];
-  var bgSoundDataList = List<BackgroundSoundData>.filled(
-    0,
-    BackgroundSoundData(),
-    growable: true,
-  );
-  for (var i = 0; i < list.length; ++i) {
-    var splittedArr = list[i].split('%%');
-    var name = splittedArr[0];
-    var filePath = splittedArr[1];
-    try {
-      bgSoundDataList
-          .add(BackgroundSoundData(id: i, name: name, file: filePath));
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  return bgSoundDataList.toList();
 }
 
 Future<String> getBgSoundFileFromSharedPrefs() async {

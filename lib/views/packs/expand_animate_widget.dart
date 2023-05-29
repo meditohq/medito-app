@@ -14,7 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:flutter/material.dart';
-
+//ignore:prefer-match-file-name
 class ExpandedSection extends StatefulWidget {
 
   final Widget? child;
@@ -40,7 +40,7 @@ class _ExpandedSectionState extends State<ExpandedSection> with SingleTickerProv
   void prepareAnimations() {
     expandController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500)
+      duration: Duration(milliseconds: 500),
     );
     animation = CurvedAnimation(
       parent: expandController,
@@ -73,7 +73,7 @@ class _ExpandedSectionState extends State<ExpandedSection> with SingleTickerProv
   Widget build(BuildContext context) {
     return SizeChangedLayoutNotifier(
       child: SizeTransition(
-          axisAlignment: 1.0, sizeFactor: animation, child: widget.child),
+          axisAlignment: 1.0, sizeFactor: animation, child: widget.child,),
     );
   }
 }

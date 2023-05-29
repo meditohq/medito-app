@@ -16,8 +16,6 @@ class BackgroundImageComponent extends ConsumerWidget {
         ref.watch(pageviewNotifierProvider).scrollProportion.toDouble();
     var opacity = (1 - scrollProportion) * 0.40;
 
-    print(opacity);
-
     return Stack(
       children: [
         Container(
