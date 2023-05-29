@@ -48,35 +48,36 @@ class DailyMessageItemWidget extends StatelessWidget {
   }
 
   Widget _buildMarkdownBody(BuildContext context) {
-    if (data != null) {
-      return MarkdownBody(
-        data: data?.body ?? '',
-        onTapLink: _launchUrl,
-        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-            .copyWith(p: Theme.of(context).textTheme.bodyText1),
-      );
-    } else {
-      return LoadingTextBoxWidget(height: 60);
-    }
+    return data != null
+        ? MarkdownBody(
+            data: data?.body ?? '',
+            onTapLink: (String text, String? href, String? title) => _launchUrl,
+            styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                .copyWith(p: Theme.of(context).textTheme.bodyLarge),
+          )
+        : LoadingTextBoxWidget(height: 60);
   }
 
   Widget _buildTitle(BuildContext context) {
     if (data != null) {
-      return Text(data?.title?.toUpperCase() ?? '', style: Theme.of(context).textTheme.subtitle2);
-    } else {
-      return LoadingTextBoxWidget(height: 23);
+      return Text(
+        data?.title?.toUpperCase() ?? '',
+        style: Theme.of(context).textTheme.titleSmall,
+      );
     }
+
+    return LoadingTextBoxWidget(height: 23);
   }
 
-  Future<void> Function() _createShareAction(DailyMessageResponse? data) {
+  void Function()? _createShareAction(DailyMessageResponse? data) {
     if (data != null) {
       return () => Share.share('${data.body} https://medito.app');
-    } else {
-      return () async {};
     }
+
+    return null;
   }
 
-  void _launchUrl(String text, String? href, String? title) {
-    launchUrl(href);
+  Future<void> _launchUrl(String? href) async {
+    await launchUrl(href);
   }
 }

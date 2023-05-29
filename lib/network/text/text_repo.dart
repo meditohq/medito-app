@@ -17,6 +17,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/text/text_response.dart';
 import 'package:Medito/network/http_get.dart';
 
+//ignore: prefer-match-file-name
 class TextRepository {
   var ext = 'items/articles/';
 

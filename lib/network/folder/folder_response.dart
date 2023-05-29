@@ -49,6 +49,7 @@ class FolderResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['data'] = _data?.toJson();
+    
     return data;
   }
 }
@@ -90,6 +91,7 @@ class Data {
     if (items != null) {
       data['items'] = items?.map((v) => v.toJson()).toList();
     }
+
     return data;
   }
 }
@@ -106,6 +108,7 @@ class Items {
     if (item != null) {
       data['item'] = item?.toJson();
     }
+
     return data;
   }
 }
@@ -119,11 +122,8 @@ class Item {
     if (type == 'session') return FileType.session;
     if (type == 'article') return FileType.text;
     if (type == 'folder') return FileType.folder;
-    if (type == 'url') {
-      return FileType.folder;
-    } else {
-      return FileType.app;
-    }
+
+    return type == 'url' ? FileType.folder : FileType.app;
   }
 
   String? type;
@@ -144,6 +144,7 @@ class Item {
     data['type'] = type;
     data['title'] = title;
     data['subtitle'] = subtitle;
+
     return data;
   }
 }

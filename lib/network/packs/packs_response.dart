@@ -34,6 +34,7 @@ class PacksResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['data'] = this.data?.map((v) => v.toJson()).toList();
+    
     return data;
   }
 }
@@ -56,6 +57,7 @@ class PacksData {
     if (type == 'folder') return FileType.folder;
     if (type == 'url') return FileType.url;
     if (type == 'daily') return FileType.daily;
+
     return FileType.session;
   }
 
@@ -83,6 +85,7 @@ class PacksData {
     data['color_primary'] = colorPrimary;
     data['color_secondary'] = colorSecondary;
     data['cover'] = _coverOld;
+
     return data;
   }
 }

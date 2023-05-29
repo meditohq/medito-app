@@ -12,7 +12,7 @@ class SmallShortcutsRowWidget extends StatefulWidget {
 
   SmallShortcutsRowWidget({Key? key, this.onTap}) : super(key: key);
 
-  final void Function(dynamic, dynamic)? onTap;
+  final void Function(String?, String?)? onTap;
 }
 
 class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
@@ -122,7 +122,7 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
 
 class SmallShortcutWidget extends StatelessWidget {
   final ShortcutData? data;
-  final Function(dynamic, dynamic)? onTap;
+  final Function(String?, String?)? onTap;
 
   SmallShortcutWidget(this.data, this.onTap);
 
@@ -146,13 +146,15 @@ class SmallShortcutWidget extends StatelessWidget {
     );
   }
 
-  Widget _getTitle(BuildContext context) => AutoSizeText(data?.title ?? '',
-      maxFontSize: 14,
-      stepGranularity: 2,
-      overflow: TextOverflow.visible,
-      wrapWords: false,
-      maxLines: 2,
-      style: Theme.of(context).textTheme.subtitle2);
+  Widget _getTitle(BuildContext context) => AutoSizeText(
+        data?.title ?? '',
+        maxFontSize: 14,
+        stepGranularity: 2,
+        overflow: TextOverflow.visible,
+        wrapWords: false,
+        maxLines: 2,
+        style: Theme.of(context).textTheme.titleSmall,
+      );
 
   Widget _getListItemLeadingImageWidget() => Container(
         color: parseColor(data?.colorPrimary ?? ''),

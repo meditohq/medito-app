@@ -29,11 +29,15 @@ class AnnouncementBloc {
     _repo = AnnouncementRepository();
   }
 
-  Future<void> fetchAnnouncement(
-      {bool skipCache = false, bool hasOpened = false}) async {
+  Future<void> fetchAnnouncement({
+    bool skipCache = false,
+    bool hasOpened = false,
+  }) async {
     try {
       var data = await _repo.fetchAnnouncements(
-          skipCache: skipCache, hasOpened: hasOpened);
+        skipCache: skipCache,
+        hasOpened: hasOpened,
+      );
       if (data == null) return;
       announcementController.add(data);
     } catch (e) {
@@ -47,11 +51,13 @@ class AnnouncementBloc {
 
   Future<List<String>> _getAnnouncementID() async {
     var prefs = await SharedPreferences.getInstance();
+
     return prefs.getStringList('announcementID') ?? [];
   }
 
   Future<bool> shouldHideAnnouncement(String? id) async {
     var prefs = await SharedPreferences.getInstance();
+
     return prefs.getStringList('announcementID')?.contains(id) ?? false;
   }
 

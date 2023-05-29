@@ -16,12 +16,13 @@ class NewFolderResponse with _$NewFolderResponse {
 
 @freezed
 class Data with _$Data {
-  const factory Data(
-      {int? id,
-      String? title,
-      String? subtitle,
-      String? description,
-      List<FolderItem>? items}) = _Data;
+  const factory Data({
+    int? id,
+    String? title,
+    String? subtitle,
+    String? description,
+    List<FolderItem>? items,
+  }) = _Data;
 
   factory Data.fromJson(Map<String, Object?> json) => _$DataFromJson(json);
 }
