@@ -17,16 +17,17 @@ import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
-  const MeditoAppBarWidget(
-      {Key? key,
-      this.title,
-      this.titleWidget,
-      this.isTransparent = false,
-      this.hasCloseButton = false,
-      this.actions,
-      this.closePressed})
-      : super(key: key);
+//ignore: prefer-match-file-name
+class MeditoAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
+  const MeditoAppBarWidget({
+    Key? key,
+    this.title,
+    this.titleWidget,
+    this.isTransparent = false,
+    this.hasCloseButton = false,
+    this.actions,
+    this.closePressed,
+  }) : super(key: key);
 
   final void Function()? closePressed;
   final Widget? titleWidget;
@@ -38,30 +39,26 @@ class MeditoAppBarWidget extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        leading: hasCloseButton
-            ? CloseButton(onPressed: closePressed ?? closePressed)
-            : null,
-        centerTitle: true,
-        actions: actions,
-        elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.dark,
-            systemStatusBarContrastEnforced: true),
-        backgroundColor:
-            isTransparent ? Colors.transparent : ColorConstants.moonlight,
-        title: getTitleWidget(context));
+      leading: hasCloseButton
+          ? CloseButton(onPressed: closePressed ?? closePressed)
+          : null,
+      centerTitle: true,
+      actions: actions,
+      elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+        systemStatusBarContrastEnforced: true,
+      ),
+      backgroundColor:
+          isTransparent ? Colors.transparent : ColorConstants.moonlight,
+      title: getTitleWidget(context),
+    );
   }
 
   Widget getTitleWidget(BuildContext context) {
-    if (titleWidget == null) {
-      return Text(title ?? '', style: Theme.of(context).textTheme.headline1);
-    } else {
-      return Row(
-        children: [
-          titleWidget ?? Container(),
-        ],
-      );
-    }
+    return titleWidget == null
+        ? Text(title ?? '', style: Theme.of(context).textTheme.displayLarge)
+        : Row(children: [titleWidget ?? Container()]);
   }
 
   @override

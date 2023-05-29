@@ -2,8 +2,12 @@ import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class BackgroundSoundVolumeTrackShapeComponent extends RectangularSliderTrackShape {
-  BackgroundSoundVolumeTrackShapeComponent({required this.leadingTitle, required this.tralingText});
+class BackgroundSoundVolumeTrackShapeComponent
+    extends RectangularSliderTrackShape {
+  BackgroundSoundVolumeTrackShapeComponent({
+    required this.leadingTitle,
+    required this.tralingText,
+  });
   final String tralingText;
   final String leadingTitle;
 
@@ -20,20 +24,24 @@ class BackgroundSoundVolumeTrackShapeComponent extends RectangularSliderTrackSha
     var trackTop;
     trackTop = parentBox.size.height - trackHeight;
     final trackWidth = parentBox.size.width;
+
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 
   @override
-  void paint(PaintingContext context, Offset offset,
-      {required RenderBox parentBox,
-      required SliderThemeData sliderTheme,
-      required Animation<double> enableAnimation,
-      required TextDirection textDirection,
-      required Offset thumbCenter,
-      Offset? secondaryOffset,
-      bool isDiscrete = false,
-      bool isEnabled = false,
-      double additionalActiveTrackHeight = 0}) {
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    double additionalActiveTrackHeight = 0,
+  }) {
     super.paint(
       context,
       offset,
@@ -50,9 +58,10 @@ class BackgroundSoundVolumeTrackShapeComponent extends RectangularSliderTrackSha
       color: ColorConstants.walterWhite,
     );
     TextPainter textPainter(span) => TextPainter(
-        text: span,
-        textAlign: TextAlign.left,
-        textDirection: TextDirection.ltr);
+          text: span,
+          textAlign: TextAlign.left,
+          textDirection: TextDirection.ltr,
+        );
     var span = TextSpan(
       style: textStyle,
       text: leadingTitle,

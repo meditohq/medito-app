@@ -35,6 +35,8 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
+
     return _deletingCache
         ? _getLoadingWidget()
         : Scaffold(
@@ -51,14 +53,10 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
                 ),
               ),
               child: BottomNavigationBar(
-                selectedLabelStyle: Theme.of(context)
-                    .textTheme
-                    .displayLarge
-                    ?.copyWith(fontSize: 12),
-                unselectedLabelStyle: Theme.of(context)
-                    .textTheme
-                    .displayMedium
-                    ?.copyWith(fontSize: 12),
+                selectedLabelStyle:
+                    textTheme.displayLarge?.copyWith(fontSize: 12),
+                unselectedLabelStyle:
+                    textTheme.displayMedium?.copyWith(fontSize: 12),
                 selectedItemColor: ColorConstants.walterWhite,
                 unselectedItemColor: ColorConstants.newGrey,
                 currentIndex: _currentIndex,
