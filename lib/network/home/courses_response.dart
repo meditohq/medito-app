@@ -18,6 +18,7 @@ class CoursesResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['data'] = this.data.map((v) => v.toJson()).toList();
+    
     return data;
   }
 }
@@ -33,14 +34,15 @@ class Data {
   String? backgroundImage;
   String? colorPrimary;
 
-  Data(
-      {this.title,
-      this.subtitle,
-      this.type,
-      this.id,
-      this.cover,
-      this.backgroundImage,
-      this.colorPrimary});
+  Data({
+    this.title,
+    this.subtitle,
+    this.type,
+    this.id,
+    this.cover,
+    this.backgroundImage,
+    this.colorPrimary,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     title = json['title'];
@@ -61,6 +63,7 @@ class Data {
     data['cover'] = cover;
     data['background_image'] = backgroundImage;
     data['color_primary'] = colorPrimary;
+
     return data;
   }
 }

@@ -17,6 +17,7 @@ import 'package:Medito/components/components.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
+//ignore:prefer-match-file-name
 class PackListItemWidget extends StatelessWidget {
   final PackImageListItemData data;
 
@@ -24,6 +25,8 @@ class PackListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var notNullAndNotEmpty = data.subtitle.isNotNullAndNotEmpty();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
@@ -38,12 +41,8 @@ class PackListItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _getTitle(context),
-                data.subtitle.isNotNullAndNotEmpty()
-                    ? Container(height: 4)
-                    : Container(),
-                data.subtitle.isNotNullAndNotEmpty()
-                    ? _getSubtitle(context)
-                    : Container()
+                notNullAndNotEmpty ? Container(height: 4) : Container(),
+                notNullAndNotEmpty ? _getSubtitle(context) : Container(),
               ],
             ),
           ),
@@ -55,25 +54,28 @@ class PackListItemWidget extends StatelessWidget {
   Text _getSubtitle(BuildContext context) =>
       Text(data.subtitle ?? '', style: Theme.of(context).textTheme.titleMedium);
 
-  Text _getTitle(BuildContext context) => Text(data.title ?? '',
-      style: Theme.of(context).textTheme.headlineMedium,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis);
+  Text _getTitle(BuildContext context) => Text(
+        data.title ?? '',
+        style: Theme.of(context).textTheme.headlineMedium,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
 
   Widget _getListItemLeadingImageWidget() => ClipRRect(
         borderRadius: BorderRadius.circular(3.0),
         child: Container(
           color: data.colorPrimary,
           child: SizedBox(
-              height: data.coverSize,
-              width: data.coverSize,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  _backgroundImageWidget(),
-                  _coverImageWidget(),
-                ],
-              )),
+            height: data.coverSize,
+            width: data.coverSize,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                _backgroundImageWidget(),
+                _coverImageWidget(),
+              ],
+            ),
+          ),
         ),
       );
 
@@ -100,12 +102,13 @@ class PackImageListItemData {
   double? coverSize;
   Widget? icon;
 
-  PackImageListItemData(
-      {this.title,
-      this.subtitle,
-      this.colorPrimary,
-      this.cover,
-      this.coverSize,
-      this.icon,
-      this.backgroundImage});
+  PackImageListItemData({
+    this.title,
+    this.subtitle,
+    this.colorPrimary,
+    this.cover,
+    this.coverSize,
+    this.icon,
+    this.backgroundImage,
+  });
 }

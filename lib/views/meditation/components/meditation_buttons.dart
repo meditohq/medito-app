@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';

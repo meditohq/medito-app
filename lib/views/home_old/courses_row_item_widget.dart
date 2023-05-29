@@ -8,7 +8,7 @@ class CoursesRowItemWidget extends StatelessWidget {
   const CoursesRowItemWidget({required this.data, Key? key, this.onTap})
       : super(key: key);
 
-  final void Function(dynamic, dynamic)? onTap;
+  final void Function(String?, String?)? onTap;
 
   final Data? data;
 
@@ -47,41 +47,44 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _createSubtitle(BuildContext context) {
-    if (data != null) {
-      return Text(data?.subtitle ?? '', style: Theme.of(context).textTheme.subtitle1);
-    } else {
-      return Container(height: 0, width: 0); //LoadingTextBoxWidget(height: 21);
-    }
+    return data != null
+        ? Text(
+            data?.subtitle ?? '',
+            style: Theme.of(context).textTheme.titleMedium,
+          )
+        : Container(height: 0, width: 0);
   }
 
   Widget _createTitle(BuildContext context) {
-    if (data != null) {
-      return Text(data?.title ?? '', style: Theme.of(context).textTheme.headline4);
-    } else {
-      return LoadingTextBoxWidget(height: 42);
-    }
+    return data != null
+        ? Text(
+            data?.title ?? '',
+            style: Theme.of(context).textTheme.headlineMedium,
+          )
+        : LoadingTextBoxWidget(height: 42);
   }
 
   void Function() _createOnTap() {
-    if (data != null && onTap != null) {
-      return () => onTap!(data?.type, data?.id);
-    } else {
-      return () {};
-    }
+    return data != null && onTap != null
+        ? () => onTap!(data?.type, data?.id)
+        : () => {};
   }
 
   Widget _imageStack() {
     return Container(
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(2))),
+      decoration:
+          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(2))),
       child: Stack(
         children: [
           SizedBox(width: 132, height: 132, child: _buildCardBackground()),
           Positioned.fill(
             child: Center(
               child: SizedBox(
-                  width: 92, height: 92, child: _getNetworkImageWidget()),
+                width: 92,
+                height: 92,
+                child: _getNetworkImageWidget(),
+              ),
             ),
           ),
         ],
@@ -90,33 +93,26 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _getNetworkImageWidget() {
-    if (data != null) {
-      return getNetworkImageWidget(data?.coverUrl);
-    } else {
-      return Container(
-        color: ColorConstants.moonlight,
-      );
-    }
+    return data != null
+        ? getNetworkImageWidget(data?.coverUrl)
+        : Container(color: ColorConstants.moonlight);
   }
 
   Widget _buildCardBackground() {
     if (data != null) {
       return _isBgImageUnavailable()
-          ? Container(
-              color: _getColor())
+          ? Container(color: _getColor())
           : getNetworkImageWidget(data?.backgroundImageUrl);
-    } else {
-      return Container(
-        color: ColorConstants.moonlight,
-      );
     }
+
+    return Container(color: ColorConstants.moonlight);
   }
 
   bool _isBgImageUnavailable() => data?.backgroundImage.isNullOrEmpty() == true;
 
   Color _getColor() {
     return data?.colorPrimary.isNullOrEmpty() == true
-                ? ColorConstants.moonlight
-                : parseColor(data?.colorPrimary);
+        ? ColorConstants.moonlight
+        : parseColor(data?.colorPrimary);
   }
 }
