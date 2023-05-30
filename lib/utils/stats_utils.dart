@@ -197,7 +197,7 @@ Future<int> _getLongestStreakInt() async {
 Future<String> getNumMeditations() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('numMeditations');
+  var streak = prefs.getInt('numSessions');
 
   return streak == null ? '0' : streak.toString();
 }
@@ -205,7 +205,7 @@ Future<String> getNumMeditations() async {
 Future<int> getNumMeditationsInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('numMeditations');
+  var streak = prefs.getInt('numSessions');
 
   return streak ?? 0;
 }
@@ -215,7 +215,7 @@ Future<int> incrementNumMeditations() async {
   var prefs = await SharedPreferences.getInstance();
   var current = await getNumMeditationsInt();
   current++;
-  await prefs.setInt('numMeditations', current);
+  await prefs.setInt('numSessions', current);
 
   return current;
 }
