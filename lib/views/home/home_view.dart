@@ -25,7 +25,9 @@ class HomeView extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               height8,
-              HomeHeaderWidget(),
+              HomeHeaderWidget(
+                homeMenuModel: data.menu,
+              ),
               height16,
               Expanded(
                 child: SingleChildScrollView(
