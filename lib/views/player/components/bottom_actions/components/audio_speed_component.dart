@@ -21,7 +21,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedComponent> {
     _provider.getAudioTrackSpeedFromPref().then((_) {
       ref
           .read(audioPlayerNotifierProvider)
-          .setSessionAudioSpeed(_provider.audioSpeedModel.speed);
+          .setMeditationAudioSpeed(_provider.audioSpeedModel.speed);
     });
   }
 
@@ -42,7 +42,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedComponent> {
         _provider.setAudioTrackSpeed();
         ref
             .read(audioPlayerNotifierProvider)
-            .setSessionAudioSpeed(_provider.audioSpeedModel.speed);
+            .setMeditationAudioSpeed(_provider.audioSpeedModel.speed);
       },
     );
   }

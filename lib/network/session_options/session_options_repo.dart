@@ -19,6 +19,7 @@ import 'package:Medito/network/session_options/session_opts.dart';
 
 import '../../routes/routes.dart';
 
+//ignore:prefer-match-file-name
 class SessionOptionsRepository {
   var ext = 'items/sessions/';
   var dailiesExt = 'items/dailies/';

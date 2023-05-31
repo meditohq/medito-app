@@ -17,11 +17,13 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/packs/packs_response.dart';
 
+//ignore: prefer-match-file-name
 class PacksRepository {
-
   Future<List<PacksData>?> fetchPacks(bool skipCache) async {
-    final response =
-        await httpGet(HTTPConstants.BASE_URL_OLD + 'items/packs', skipCache: skipCache);
+    final response = await httpGet(
+      HTTPConstants.BASE_URL_OLD + 'items/packs',
+      skipCache: skipCache,
+    );
     if (response == null) return null;
 
     return PacksResponse.fromJson(response).data;

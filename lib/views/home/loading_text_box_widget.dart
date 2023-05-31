@@ -9,11 +9,13 @@ class LoadingTextBoxWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(10.0),
+      child: Container(
         child: Container(
-            child: Container(
           color: ColorConstants.moonlight,
           height: height,
-        )));
+        ),
+      ),
+    );
   }
 }

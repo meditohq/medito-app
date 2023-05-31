@@ -38,7 +38,7 @@ Future<void> main() async {
     builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.medito.app.channel.audio',
-      androidNotificationChannelName: 'Medito Session',
+      androidNotificationChannelName: 'Medito Meditation',
       androidNotificationOngoing: true,
     ),
   );
@@ -99,17 +99,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    var connectivityStatus = ref.watch(connectivityStatusProvider);
     final auth = ref.watch(authProvider);
     if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
-      ref.watch(currentSessionPlayerProvider);
+      ref.watch(currentMeditationPlayerProvider);
     }
     isFirstTimeLoading = false;
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
-      return MaterialApp(
-        home: ErrorComponent(onTap: () => {}, message: 'message'),
-      );
-    }
 
     return MaterialApp.router(
       routerConfig: router,

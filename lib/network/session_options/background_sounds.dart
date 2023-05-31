@@ -1,4 +1,5 @@
 // ignore_for_file: avoid-dynamic
+//ignore:prefer-match-file-name
 class BackgroundSoundsResponse {
   List<BackgroundSoundData>? data;
 
@@ -16,6 +17,7 @@ class BackgroundSoundsResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['data'] = this.data?.map((v) => v.toJson()).toList();
+
     return data;
   }
 }
@@ -41,6 +43,7 @@ class BackgroundSoundData {
     data['name'] = name;
     data['file'] = file;
     data['sort'] = sort;
+
     return data;
   }
 }

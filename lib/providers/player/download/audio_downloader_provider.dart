@@ -1,8 +1,8 @@
-import 'package:Medito/models/session/session_model.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:Medito/models/models.dart';
 
 final audioDownloaderProvider =
     ChangeNotifierProvider<AudioDownloaderProvider>((ref) {
@@ -14,12 +14,12 @@ class AudioDownloaderProvider extends ChangeNotifier {
   AudioDownloaderProvider(this.ref);
   Map<String, double> downloadingProgress = {};
   Map<String, AUDIO_DOWNLOAD_STATE> audioDownloadState = {};
-  Future<void> downloadSessionAudio(
-    SessionModel sessionModel,
-    SessionFilesModel file,
+  Future<void> downloadMeditationAudio(
+    MeditationModel meditationModel,
+    MeditationFilesModel file,
   ) async {
     var fileName =
-        '${sessionModel.id}-${file.id}${getFileExtension(file.path)}';
+        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
       audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADIING;
@@ -44,14 +44,14 @@ class AudioDownloaderProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteSessionAudio(String fileName) async {
+  Future<void> deleteMeditationAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
     audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOAD;
     notifyListeners();
   }
 
-  Future<String?> getSessionAudio(String fileName) async {
+  Future<String?> getMeditationAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
     audioDownloadState[fileName] = audioPath != null

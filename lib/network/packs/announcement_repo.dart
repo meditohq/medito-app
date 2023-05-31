@@ -17,14 +17,19 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/packs/announcement_response.dart';
 
+//ignore: prefer-match-file-name
 class AnnouncementRepository {
   var ext = 'items/announcement';
   var welcome_ext = 'items/welcome_announcement';
 
-  Future<AnnouncementResponse?> fetchAnnouncements(
-      {bool skipCache = false, bool hasOpened = false,}) async {
-    final response =
-        await httpGet(HTTPConstants.BASE_URL_OLD + getExt(hasOpened), skipCache: skipCache);
+  Future<AnnouncementResponse?> fetchAnnouncements({
+    bool skipCache = false,
+    bool hasOpened = false,
+  }) async {
+    final response = await httpGet(
+      HTTPConstants.BASE_URL_OLD + getExt(hasOpened),
+      skipCache: skipCache,
+    );
     if (response == null) return null;
 
     return AnnouncementResponse.fromJson(response);

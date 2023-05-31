@@ -30,7 +30,7 @@ void skipAudio(
 final audioPositionProvider = StreamProvider.autoDispose<int>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
 
-  return audioPlayer.sessionAudioPlayer.positionStream
+  return audioPlayer.meditationAudioPlayer.positionStream
       .map((position) => position.inMilliseconds);
 });
 

@@ -67,7 +67,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                             .watch(pageviewNotifierProvider)
                             .scrollProportion,
                         child: MiniPlayerWidget(
-                          sessionModel: currentlyPlayingSession,
+                          meditationModel: currentlyPlayingSession,
                         ),
                       ),
                     );
@@ -76,7 +76,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
             ),
             if (currentlyPlayingSession != null)
               PlayerView(
-                sessionModel: currentlyPlayingSession,
+                meditationModel: currentlyPlayingSession,
                 file: currentlyPlayingSession.audio.first.files.first,
               ),
           ],

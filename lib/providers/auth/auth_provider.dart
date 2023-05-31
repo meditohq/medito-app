@@ -1,7 +1,5 @@
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,16 +63,11 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   Future<void> setUserEmailInSharedPref(String email) async {
-    await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.userEmail,
-      email,
-    );
+    await authRepository.addUserEmailInSharedPreference(email);
   }
 
   Future<void> getUserEmailFromSharedPref() async {
-    userEmail = await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.userEmail,
-    );
+    userEmail = await authRepository.getUserEmailFromSharedPreference();
     notifyListeners();
   }
 }
