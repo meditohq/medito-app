@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'chips/home_chips_model.dart';
+import 'chips/home_chips_items_model.dart';
 import 'menu/home_menu_model.dart';
 import 'rows/home_rows_model.dart';
 
@@ -10,7 +10,8 @@ part 'home_model.g.dart';
 abstract class HomeModel with _$HomeModel {
   const factory HomeModel({
     @Default(<HomeMenuModel>[]) List<HomeMenuModel> menu,
-    @Default(<HomeChipsModel>[]) List<HomeChipsModel> chips,
+    @Default(<List<HomeChipsItemsModel>>[])
+        List<List<HomeChipsItemsModel>> chips,
     @Default(<HomeRowsModel>[]) List<HomeRowsModel> rows,
   }) = _HomeModel;
 

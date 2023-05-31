@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 class FilterWidget extends StatelessWidget {
   const FilterWidget({super.key, required this.chips});
-  final List<HomeChipsModel> chips;
+  final List<List<HomeChipsItemsModel>> chips;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -15,10 +15,7 @@ class FilterWidget extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _filterListView(chips.last.line1),
-            _filterListView(chips.first.line2),
-          ],
+          children: chips.map((e) => _filterListView(e)).toList(),
         ),
       ),
     );
@@ -60,7 +57,7 @@ class FilterWidget extends StatelessWidget {
                       top: 6,
                     ),
                     child: Text(
-                      element.label,
+                      element.title,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),

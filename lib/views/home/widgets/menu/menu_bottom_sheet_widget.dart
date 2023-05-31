@@ -1,3 +1,4 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:flutter/material.dart';
@@ -18,34 +19,50 @@ class MenuBottomSheetWidget extends StatelessWidget {
         BuildContext context,
         ScrollController scrollController,
       ) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                height: 8,
-                width: 30,
-              ),
+        return Container(
+          decoration: BoxDecoration(
+            color: ColorConstants.onyx,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
             ),
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: homeMenuModel.length,
-                itemBuilder: (BuildContext context, int index) {
-                  var element = homeMenuModel[index];
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              height16,
+              Center(
+                child: Container(
+                  height: 4,
+                  width: 44,
+                  decoration: BoxDecoration(
+                    color: ColorConstants.walterWhite,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              height16,
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: homeMenuModel.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    var element = homeMenuModel[index];
 
-                  return ListTile(
-                    horizontalTitleGap: 0,
-                    leading: SvgPicture.asset(
-                      getLeadingIconPath(element.icon),
-                      height: 14,
-                    ),
-                    title: Text('${element.title}'),
-                  );
-                },
+                    return ListTile(
+                      horizontalTitleGap: 0,
+                      leading: SvgPicture.asset(
+                        getLeadingIconPath(element.icon),
+                        height: 14,
+                      ),
+                      minVerticalPadding: 0,
+                      title: Text('${element.title}'),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

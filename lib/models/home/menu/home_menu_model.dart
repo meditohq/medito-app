@@ -6,6 +6,7 @@ part 'home_menu_model.g.dart';
 @freezed
 abstract class HomeMenuModel with _$HomeMenuModel {
   const factory HomeMenuModel({
+    required int id,
     required String icon,
     required String type,
     required String title,

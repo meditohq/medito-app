@@ -32,6 +32,7 @@ class HomeHeaderWidget extends StatelessWidget {
                 onTap: () {
                   showModalBottomSheet<void>(
                     context: context,
+                    backgroundColor: ColorConstants.transparent,
                     builder: (BuildContext context) {
                       return MenuBottomSheetWidget(
                         homeMenuModel: homeMenuModel,
