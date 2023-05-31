@@ -76,15 +76,15 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
         );
       case 3:
         return FutureBuilder<String>(
-          future: getNumSessions(),
+          future: getNumMeditations(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               return StreakTileWidget(
-                getNumSessions(),
+                getNumMeditations(),
                 snapshot.data == '1'
                     ? 'Session\nListened'
                     : 'Sessions\nListened',
-                optionalText: UnitType.sessions,
+                optionalText: UnitType.meditations,
               );
             }
 

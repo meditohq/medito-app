@@ -8,11 +8,11 @@ import 'components/bg_sound_component.dart';
 class BottomActionComponent extends StatelessWidget {
   const BottomActionComponent({
     super.key,
-    required this.sessionModel,
+    required this.meditationModel,
     required this.file,
   });
-  final SessionModel sessionModel;
-  final SessionFilesModel file;
+  final MeditationModel meditationModel;
+  final MeditationFilesModel file;
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +25,16 @@ class BottomActionComponent extends StatelessWidget {
           AudioSpeedComponent(),
           width8,
           AudioDownloadComponent(
-            sessionModel: sessionModel,
+            meditationModel: meditationModel,
             file: file,
           ),
           width8,
-          if (sessionModel.hasBackgroundSound)
+          if (meditationModel.hasBackgroundSound)
             BgSoundComponent(
-              sessionModel: sessionModel,
+              meditationModel: meditationModel,
               file: file,
             ),
-          if (sessionModel.hasBackgroundSound) width8,
+          if (meditationModel.hasBackgroundSound) width8,
         ],
       ),
     );

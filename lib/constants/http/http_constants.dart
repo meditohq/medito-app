@@ -12,6 +12,6 @@ class HTTPConstants {
   static const String USERS = 'users';
   static const String OTP = 'otp';
   static const String FOLDERS = 'folders';
-  static const String SESSIONS = 'sessions';
+  static const String MEDITATIONS = 'meditations';
   static const String BACKGROUND_SOUNDS = 'backgroundSounds';
 }

@@ -21,10 +21,8 @@ void _loadMeditationAndBackgroundSound(
   MeditationFilesModel file,
 ) {
   final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-  var isPlaying =
-      _audioPlayerNotifier.meditationAudioPlayer.playerState.playing;
-  var _currentPlayingFileId =
-      _audioPlayerNotifier.currentlyPlayingMeditation?.id;
+  var isPlaying = _audioPlayerNotifier.meditationAudioPlayer.playerState.playing;
+  var _currentPlayingFileId = _audioPlayerNotifier.currentlyPlayingMeditation?.id;
 
   if (!isPlaying || _currentPlayingFileId != file.id) {
     _setBackgroundSound(
@@ -42,16 +40,11 @@ void _setMeditationAudio(
   MeditationModel meditationModel,
   MeditationFilesModel file,
 ) {
-  var checkDownloadedFile =
-      ref.read(audioDownloaderProvider).getMeditationAudio(
-            '${meditationModel.id}-${file.id}${getFileExtension(file.path)}',
-          );
+  var checkDownloadedFile = ref.read(audioDownloaderProvider).getMeditationAudio(
+        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}',
+      );
   checkDownloadedFile.then((value) {
-    _audioPlayerNotifier.setMeditationAudio(
-      meditationModel,
-      file,
-      filePath: value,
-    );
+    _audioPlayerNotifier.setMeditationAudio(meditationModel, file, filePath: value);
     _audioPlayerNotifier.currentlyPlayingMeditation = file;
     ref.read(audioPlayPauseStateProvider.notifier).state =
         PLAY_PAUSE_AUDIO.PLAY;

@@ -8,23 +8,23 @@ import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SessionButtons extends StatelessWidget {
-  final SessionModel sessionModel;
-  const SessionButtons({super.key, required this.sessionModel});
+class MeditationButtons extends StatelessWidget {
+  final MeditationModel meditationModel;
+  const MeditationButtons({super.key, required this.meditationModel});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: EdgeInsets.zero,
       shrinkWrap: true,
-      itemCount: sessionModel.audio.length,
+      itemCount: meditationModel.audio.length,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, i) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              sessionModel.audio[i].guideName,
+              meditationModel.audio[i].guideName,
               style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                     color: ColorConstants.walterWhite,
                   ),
@@ -46,25 +46,25 @@ class SessionButtons extends StatelessWidget {
       runSpacing: 8,
       alignment: WrapAlignment.spaceBetween,
       children:
-          sessionModel.audio[i].files.map((e) => _getGridItem(e)).toList(),
+          meditationModel.audio[i].files.map((e) => _getGridItem(e)).toList(),
     );
   }
 
   Consumer _getGridItem(
-    SessionFilesModel file,
+    MeditationFilesModel file,
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
         onTap: () {
           var dataMap = {
             'secsListened': (Duration(milliseconds: file.duration).inSeconds),
-            'id': '${sessionModel.id}',
+            'id': '${meditationModel.id}',
           };
           unawaited(writeJSONToCache(encoded(dataMap), STATS));
           ref
               .read(playerProvider.notifier)
-              .addCurrentlyPlayingSessionInPreference(
-                sessionModel: sessionModel,
+              .addCurrentlyPlayingMeditationInPreference(
+                meditationModel: meditationModel,
                 file: file,
               );
           ref.read(pageviewNotifierProvider).gotoNextPage();
