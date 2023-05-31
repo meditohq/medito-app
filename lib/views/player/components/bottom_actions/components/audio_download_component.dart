@@ -18,7 +18,8 @@ class AudioDownloadComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
-    var downloadFileKey = '${meditationModel.id}-${file.id}${getFileExtension(file.path)}';
+    var downloadFileKey =
+        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}';
 
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
@@ -68,7 +69,7 @@ class AudioDownloadComponent extends ConsumerWidget {
     if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
       return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
     }
-    // ignore: newline-before-return
+
     return 0;
   }
 
@@ -78,7 +79,10 @@ class AudioDownloadComponent extends ConsumerWidget {
     BuildContext context,
   ) async {
     try {
-      await downloadAudioProvider.downloadMeditationAudio(meditationModel, file);
+      await downloadAudioProvider.downloadMeditationAudio(
+        meditationModel,
+        file,
+      );
       await ref.read(addSingleMeditationInPreferenceProvider(
         meditationModel: meditationModel,
         file: file,
