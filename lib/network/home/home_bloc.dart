@@ -34,6 +34,7 @@ class HomeBloc {
   Future<void> checkConnection() async {
     var connection = await checkConnectivity();
     connectionStreamController.sink.add(connection);
+    
     return;
   }
 

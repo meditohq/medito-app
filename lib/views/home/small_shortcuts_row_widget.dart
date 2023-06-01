@@ -12,7 +12,7 @@ class SmallShortcutsRowWidget extends StatefulWidget {
 
   SmallShortcutsRowWidget({Key? key, this.onTap}) : super(key: key);
 
-  final void Function(dynamic, dynamic)? onTap;
+  final void Function(String?, String?)? onTap;
 }
 
 class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
@@ -31,47 +31,54 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(builder: (context, orientation) {
-      if (MediaQuery.of(context).size.width > 600) {
-        isLandscape = true;
-      } else {
-        isLandscape = false;
-      }
+      isLandscape = MediaQuery.of(context).size.width > 600;
+
       return SizeChangedLayoutNotifier(
-          child: StreamBuilder<ApiResponse<ShortcutsResponse>>(
-              stream: _bloc.shortcutList.stream,
-              initialData: ApiResponse.loading(),
-              builder: (context, snapshot) {
-                switch (snapshot.data?.status) {
-                  case Status.LOADING:
-                    return _getLoadingWidget();
-                  case Status.COMPLETED:
-                    return GridView.count(
-                      crossAxisCount: isLandscape ? 4 : 2,
-                      padding: const EdgeInsets.only(
-                          left: 12.0, right: 12.0, top: 8.0),
-                      scrollDirection: Axis.vertical,
-                      childAspectRatio: 2.6,
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: List.generate(
-                          snapshot.data?.body?.data?.length ?? 0, (index) {
-                        return Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)),
-                          clipBehavior: Clip.antiAlias,
-                          color: ColorConstants.deepNight,
-                          child: SmallShortcutWidget(
-                              snapshot.data?.body?.data?[index],
-                              widget.onTap),
-                        );
-                      }),
-                    );
-                  case Status.ERROR:
-                    return Icon(Icons.error);
-                  case null:
-                }
-                return Container();
-              }));
+        child: StreamBuilder<ApiResponse<ShortcutsResponse>>(
+          stream: _bloc.shortcutList.stream,
+          initialData: ApiResponse.loading(),
+          builder: (context, snapshot) {
+            switch (snapshot.data?.status) {
+              case Status.LOADING:
+                return _getLoadingWidget();
+              case Status.COMPLETED:
+                return GridView.count(
+                  crossAxisCount: isLandscape ? 4 : 2,
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    right: 12.0,
+                    top: 8.0,
+                  ),
+                  scrollDirection: Axis.vertical,
+                  childAspectRatio: 2.6,
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  children: List.generate(
+                    snapshot.data?.body?.data?.length ?? 0,
+                    (index) {
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        color: ColorConstants.deepNight,
+                        child: SmallShortcutWidget(
+                          snapshot.data?.body?.data?[index],
+                          widget.onTap,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              case Status.ERROR:
+                return Icon(Icons.error);
+              case null:
+            }
+
+            return Container();
+          },
+        ),
+      );
     });
   }
 
@@ -83,40 +90,39 @@ class SmallShortcutsRowWidgetState extends State<SmallShortcutsRowWidget> {
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         children: List.generate(4, (index) {
-          if (index == 0) {
-            // Show a link to the downloads page when the app is loading
-            return _getLocalDownloadsWidget();
-          } else {
-            return Card(
-              clipBehavior: Clip.antiAlias,
-              color: ColorConstants.deepNight,
-              child: Container(),
-            );
-          }
+          return index == 0
+              ? _getLocalDownloadsWidget()
+              : Card(
+                  clipBehavior: Clip.antiAlias,
+                  color: ColorConstants.deepNight,
+                  child: Container(),
+                );
         }),
-  );
+      );
 
   Card _getLocalDownloadsWidget() {
     return Card(
-        clipBehavior: Clip.antiAlias,
-        color: ColorConstants.almostBlack,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SmallShortcutWidget(
-            ShortcutData(
-                title: 'Downloads',
-                type: 'app',
-                id: 'downloads',
-                cover: null,
-                backgroundImage: null,
-                colorPrimary: '#ff282828'),
-            widget.onTap)
+      clipBehavior: Clip.antiAlias,
+      color: ColorConstants.almostBlack,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: SmallShortcutWidget(
+        ShortcutData(
+          title: 'Downloads',
+          type: 'app',
+          id: 'downloads',
+          cover: null,
+          backgroundImage: null,
+          colorPrimary: '#ff282828',
+        ),
+        widget.onTap,
+      ),
     );
   }
 }
 
 class SmallShortcutWidget extends StatelessWidget {
   final ShortcutData? data;
-  final Function(dynamic, dynamic)? onTap;
+  final Function(String?, String?)? onTap;
 
   SmallShortcutWidget(this.data, this.onTap);
 
@@ -140,13 +146,15 @@ class SmallShortcutWidget extends StatelessWidget {
     );
   }
 
-  Widget _getTitle(BuildContext context) => AutoSizeText(data?.title ?? '',
-      maxFontSize: 14,
-      stepGranularity: 2,
-      overflow: TextOverflow.visible,
-      wrapWords: false,
-      maxLines: 2,
-      style: Theme.of(context).textTheme.subtitle2);
+  Widget _getTitle(BuildContext context) => AutoSizeText(
+        data?.title ?? '',
+        maxFontSize: 14,
+        stepGranularity: 2,
+        overflow: TextOverflow.visible,
+        wrapWords: false,
+        maxLines: 2,
+        style: Theme.of(context).textTheme.titleSmall,
+      );
 
   Widget _getListItemLeadingImageWidget() => Container(
         color: parseColor(data?.colorPrimary ?? ''),
@@ -164,7 +172,8 @@ class SmallShortcutWidget extends StatelessWidget {
         ),
       );
 
-  Widget _getBackgroundImage() => data?.backgroundImage?.isNotNullAndNotEmpty() == true
-      ? getNetworkImageWidget(data?.bgImageUrl)
-      : Container();
+  Widget _getBackgroundImage() =>
+      data?.backgroundImage?.isNotNullAndNotEmpty() == true
+          ? getNetworkImageWidget(data?.bgImageUrl)
+          : Container();
 }

@@ -8,8 +8,8 @@ import 'artist_title_component.dart';
 import 'player_buttons/play_pause_button_component.dart';
 
 class MiniPlayerWidget extends ConsumerWidget {
-  const MiniPlayerWidget({super.key, required this.sessionModel});
-  final SessionModel sessionModel;
+  const MiniPlayerWidget({super.key, required this.meditationModel});
+  final MeditationModel meditationModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
@@ -25,7 +25,7 @@ class MiniPlayerWidget extends ConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  sessionCoverImage(sessionModel.coverUrl),
+                  meditationCoverImage(meditationModel.coverUrl),
                   _titleAndSubtitle(),
                 ],
               ),
@@ -37,7 +37,7 @@ class MiniPlayerWidget extends ConsumerWidget {
     );
   }
 
-  Padding sessionCoverImage(String url) {
+  Padding meditationCoverImage(String url) {
     return Padding(
       padding: const EdgeInsets.only(left: 15),
       child: SizedBox(
@@ -60,10 +60,10 @@ class MiniPlayerWidget extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ArtistTitleComponent(
-              sessionTitle: sessionModel.title,
-              artistName: sessionModel.artist?.name,
-              artistUrlPath: sessionModel.artist?.path,
-              sessionTitleFontSize: 16,
+              meditationTitle: meditationModel.title,
+              artistName: meditationModel.artist?.name,
+              artistUrlPath: meditationModel.artist?.path,
+              meditationTitleFontSize: 16,
               artistNameFontSize: 12,
               artistUrlPathFontSize: 11,
             ),

@@ -20,11 +20,11 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
-  List<SessionModel> downloadedSessions = [];
+  List<MeditationModel> downloadedMeditations = [];
 
   @override
   Widget build(BuildContext context) {
-    final downloadedSessions = ref.watch(downloadedSessionsProvider);
+    final downloadedMeditations = ref.watch(downloadedMeditationsProvider);
 
     return Scaffold(
       appBar: MeditoAppBarWidget(
@@ -33,7 +33,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         hasCloseButton: true,
       ),
       key: scaffoldKey,
-      body: downloadedSessions.when(
+      body: downloadedMeditations.when(
         skipLoadingOnRefresh: false,
         data: (data) {
           if (data.isEmpty) {
@@ -44,14 +44,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         },
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () => ref.refresh(downloadedSessionsProvider),
+          onTap: () => ref.refresh(downloadedMeditationsProvider),
         ),
-        loading: () => SessionShimmerComponent(),
+        loading: () => MeditationShimmerComponent(),
       ),
     );
   }
 
-  Widget _getDownloadList(List<SessionModel> sessions) {
+  Widget _getDownloadList(List<MeditationModel> meditations) {
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
     return ReorderableListView(
@@ -61,13 +61,13 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
-          var reorderedItem = sessions.removeAt(oldIndex);
-          sessions.insert(newIndex, reorderedItem);
+          var reorderedItem = meditations.removeAt(oldIndex);
+          meditations.insert(newIndex, reorderedItem);
           // To ensure, that the new list order is saved
-          ref.read(addSessionListInPreferenceProvider(sessions: sessions));
+          ref.read(addMeditationListInPreferenceProvider(meditations: meditations));
         });
       },
-      children: sessions.map((item) => _getSlidingItem(item, context)).toList(),
+      children: meditations.map((item) => _getSlidingItem(item, context)).toList(),
     );
   }
 
@@ -80,7 +80,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         ),
       );
 
-  Widget _getSlidingItem(SessionModel item, BuildContext context) {
+  Widget _getSlidingItem(MeditationModel item, BuildContext context) {
     return InkWell(
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
@@ -93,10 +93,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         background: _getDismissibleBackgroundWidget(),
         onDismissed: (direction) {
           if (mounted) {
-            ref.watch(audioDownloaderProvider).deleteSessionAudio(
+            ref.watch(audioDownloaderProvider).deleteMeditationAudio(
                   '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
                 );
-            ref.read(deleteSessionFromPreferenceProvider(
+            ref.read(deleteMeditationFromPreferenceProvider(
               file: item.audio.first.files.first,
             ).future);
           }
@@ -129,7 +129,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         ),
       );
 
-  PackListItemWidget _getListItemWidget(SessionModel item) {
+  PackListItemWidget _getListItemWidget(MeditationModel item) {
     var audioLength =
         Duration(milliseconds: item.audio.first.files.first.duration)
             .inMinutes
@@ -146,15 +146,15 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  String _getDuration(String? length) => formatSessionLength(length);
+  String _getDuration(String? length) => formatMeditationLength(length);
 
   void _openPlayer(
     WidgetRef ref,
-    SessionModel sessionModel,
+    MeditationModel meditationModel,
   ) {
-    ref.read(playerProvider.notifier).addCurrentlyPlayingSessionInPreference(
-          sessionModel: sessionModel,
-          file: sessionModel.audio.first.files.first,
+    ref.read(playerProvider.notifier).addCurrentlyPlayingMeditationInPreference(
+          meditationModel: meditationModel,
+          file: meditationModel.audio.first.files.first,
         );
     ref.read(pageviewNotifierProvider).gotoNextPage();
   }

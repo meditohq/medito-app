@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 //This widget is the quote box on the home screen
 class DailyMessageWidget extends StatefulWidget {
-
   @override
   DailyMessageWidgetState createState() => DailyMessageWidgetState();
 
@@ -25,22 +24,25 @@ class DailyMessageWidgetState extends State<DailyMessageWidget> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: StreamBuilder<ApiResponse<DailyMessageResponse>>(
-          stream: _bloc.coursesList.stream,
-          initialData: ApiResponse.loading(),
-          builder: (context, snapshot) {
-            return AnimatedSwitcher(
-              duration: Duration(milliseconds: 100),
-              child: _buildDailyMessageItemWidget(snapshot),
-            );
-          }),
+        stream: _bloc.coursesList.stream,
+        initialData: ApiResponse.loading(),
+        builder: (context, snapshot) {
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 100),
+            child: _buildDailyMessageItemWidget(snapshot),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildDailyMessageItemWidget(
-      AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot) {
+    AsyncSnapshot<ApiResponse<DailyMessageResponse>> snapshot,
+  ) {
     if (snapshot.data == ApiResponse.loading()) {
       return DailyMessageItemWidget.loading(
-          key: ValueKey('DailyMessageLoading'));
+        key: ValueKey('DailyMessageLoading'),
+      );
     } else {
       switch (snapshot.data?.status) {
         case Status.LOADING:
