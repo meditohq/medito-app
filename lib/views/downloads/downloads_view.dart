@@ -28,7 +28,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
     return Scaffold(
       appBar: MeditoAppBarWidget(
-        title: StringConstants.donwloads,
+        title: StringConstants.downloads,
         isTransparent: true,
         hasCloseButton: true,
       ),
@@ -72,7 +72,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
-        message: StringConstants.emptyDonwloadsMessage,
+        message: StringConstants.emptyDownloadsMessage,
         image: SvgPicture.asset(
           AssetConstants.dalle,
           height: 168,

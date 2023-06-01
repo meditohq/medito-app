@@ -143,7 +143,6 @@ class FolderView extends ConsumerWidget {
             location + RouteConstants.webviewPath,
             extra: {'url': path!},
           );
-          // context.go(getPathFromString('url', [path.toString()]));
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));
         }
