@@ -67,7 +67,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // update session stats when app comes into foreground
+      // update session stats when app comes into foreground 
       updateStatsFromBg();
     }
   }
