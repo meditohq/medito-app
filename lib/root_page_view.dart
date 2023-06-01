@@ -30,7 +30,8 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       backgroundColor: ColorConstants.almostBlack,
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
-          if (scrollNotification is ScrollUpdateNotification && scrollNotification.depth == 0) {
+          if (scrollNotification is ScrollUpdateNotification &&
+              scrollNotification.depth == 0) {
             ref
                 .read(pageviewNotifierProvider.notifier)
                 .updateScrollProportion(scrollNotification);

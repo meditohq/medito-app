@@ -9,28 +9,27 @@ final connectivityStatusProvider = StateNotifierProvider((ref) {
 enum ConnectivityStatus { NotDetermined, isConnected, isDisonnected }
 
 class ConnectivityStatusNotifier extends StateNotifier<ConnectivityStatus> {
-  ConnectivityStatus? lastResult;
-  ConnectivityStatus? newState;
-
   ConnectivityStatusNotifier() : super(ConnectivityStatus.isConnected) {
-    lastResult = state == ConnectivityStatus.isConnected
-        ? ConnectivityStatus.isConnected
-        : ConnectivityStatus.isDisonnected;
-    lastResult = ConnectivityStatus.NotDetermined;
+    checkConnectivity();
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      switch (result) {
-        case ConnectivityResult.mobile:
-        case ConnectivityResult.wifi:
-          newState = ConnectivityStatus.isConnected;
-          break;
-        case ConnectivityResult.none:
-          newState = ConnectivityStatus.isDisonnected;
-          break;
-      }
-      if (newState != lastResult) {
-        state = newState!;
-        lastResult = newState;
-      }
+      _setConnectivityStatus(result);
     });
+  }
+
+  Future<void> checkConnectivity() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    _setConnectivityStatus(connectivityResult);
+  }
+
+  void _setConnectivityStatus(ConnectivityResult result) {
+    switch (result) {
+      case ConnectivityResult.mobile:
+      case ConnectivityResult.wifi:
+        state = ConnectivityStatus.isConnected;
+        break;
+      case ConnectivityResult.none:
+        state = ConnectivityStatus.isDisonnected;
+        break;
+    }
   }
 }

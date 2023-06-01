@@ -13,11 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
-import 'package:Medito/components/error_component.dart';
+import 'package:Medito/components/components.dart';
+import 'package:Medito/components/errors/error_component.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,7 +109,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     isFirstTimeLoading = false;
     if (connectivityStatus == ConnectivityStatus.isDisonnected) {
       return MaterialApp(
-        home: ErrorComponent(onTap: () => {}, message: 'message'),
+        home: ConnectivityErrorComponent(),
       );
     }
 
