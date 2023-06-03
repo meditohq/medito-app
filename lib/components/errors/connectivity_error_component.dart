@@ -4,6 +4,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ConnectivityErrorComponent extends ConsumerStatefulWidget {
   const ConnectivityErrorComponent({super.key});
@@ -22,6 +23,25 @@ class _ConnectivityErrorComponentState
           PLAY_PAUSE_AUDIO.PAUSE;
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _refreshAPI();
+    super.dispose();
+  }
+
+  void _refreshAPI() {
+    var location = GoRouter.of(context).location;
+    var id = location.split('/');
+    var isFolder = location.contains('folder');
+    var isMeditation = location.contains('meditation');
+
+    if (isFolder && isMeditation) {
+      ref.read(meditationsProvider(meditationId: int.parse(id.last)));
+    } else if (isFolder && !isMeditation) {
+      ref.read(FoldersProvider(folderId: int.parse(id.last)));
+    }
   }
 
   @override

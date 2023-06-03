@@ -101,17 +101,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    var connectivityStatus = ref.watch(connectivityStatusProvider);
     final auth = ref.watch(authProvider);
     if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
       ref.watch(currentMeditationPlayerProvider);
     }
     isFirstTimeLoading = false;
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
-      return MaterialApp(
-        home: ConnectivityErrorComponent(),
-      );
-    }
 
     return MaterialApp.router(
       routerConfig: router,
