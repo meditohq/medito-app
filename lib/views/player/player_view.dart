@@ -1,3 +1,4 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -37,14 +38,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
             SafeArea(
               child: Column(
                 children: [
-                  Container(
-                    height: 4,
-                    width: 44,
-                    decoration: BoxDecoration(
-                      color: ColorConstants.walterWhite,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  HandleBarWidget(),
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -92,3 +86,4 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   @override
   bool get wantKeepAlive => true;
 }
+

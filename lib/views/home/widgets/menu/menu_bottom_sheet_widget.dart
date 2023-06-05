@@ -1,8 +1,9 @@
+import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+
+import 'row_item_widget.dart';
 
 class MenuBottomSheetWidget extends StatelessWidget {
   const MenuBottomSheetWidget({super.key, required this.homeMenuModel});
@@ -10,59 +11,30 @@ class MenuBottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.5,
-      minChildSize: 0.4,
-      maxChildSize: 1,
-      expand: false,
-      builder: (
-        BuildContext context,
-        ScrollController scrollController,
-      ) {
-        return Container(
-          decoration: BoxDecoration(
-            color: ColorConstants.onyx,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              height16,
-              Center(
-                child: Container(
-                  height: 4,
-                  width: 44,
-                  decoration: BoxDecoration(
-                    color: ColorConstants.walterWhite,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              height16,
-              Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: homeMenuModel.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    var element = homeMenuModel[index];
+    return DraggableSheetWidget(
+      child: (scrollController) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            height16,
+            HandleBarWidget(),
+            height16,
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: homeMenuModel.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var element = homeMenuModel[index];
 
-                    return ListTile(
-                      horizontalTitleGap: 0,
-                      leading: SvgPicture.asset(
-                        getLeadingIconPath(element.icon),
-                        height: 14,
-                      ),
-                      minVerticalPadding: 0,
-                      title: Text('${element.title}'),
-                    );
-                  },
-                ),
+                  return RowItemWidget(
+                    leadingIcon: getLeadingIconPath(element.icon),
+                    title: element.title,
+                    isShowUnderline: index < homeMenuModel.length - 1,
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

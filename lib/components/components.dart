@@ -11,3 +11,5 @@ export 'webview_component.dart';
 export 'markdown_component.dart';
 export 'network_image_component.dart';
 export 'snackbar_component.dart';
+export 'handle_bar_widget.dart';
+export 'draggable_sheet_widget.dart';
