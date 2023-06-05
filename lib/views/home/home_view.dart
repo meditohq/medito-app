@@ -51,7 +51,7 @@ class HomeView extends ConsumerWidget {
           onTap: () => ref.refresh(homeProvider),
           isLoading: homeRes.isLoading,
         ),
-        loading: () => const FolderShimmerComponent(),
+        loading: () => const HomeShimmerComponent(),
       ),
     );
   }
