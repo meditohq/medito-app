@@ -33,14 +33,14 @@ class _ConnectivityErrorComponentState
 
   void _refreshAPI() {
     var location = GoRouter.of(context).location;
-    var id = location.split('/');
+    var id = location.split('/').last;
     var isFolder = location.contains('folder');
     var isMeditation = location.contains('meditation');
 
     if (isFolder && isMeditation) {
-      ref.read(meditationsProvider(meditationId: int.parse(id.last)));
+      ref.read(meditationsProvider(meditationId: int.parse(id)));
     } else if (isFolder && !isMeditation) {
-      ref.read(FoldersProvider(folderId: int.parse(id.last)));
+      ref.read(FoldersProvider(folderId: int.parse(id)));
     }
   }
 
