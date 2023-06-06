@@ -3,8 +3,8 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'components/components.dart';
-import 'views/player/components/mini_player_widget.dart';
+import 'widgets/widgets.dart';
+import 'views/player/widgets/mini_player_widget.dart';
 
 class RootPageView extends ConsumerStatefulWidget {
   final Widget firstChild;
@@ -28,7 +28,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     final currentlyPlayingSession = ref.watch(playerProvider);
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
     if (connectivityStatus == ConnectivityStatus.isDisonnected) {
-      return ConnectivityErrorComponent();
+      return ConnectivityErrorWidget();
     }
 
     return Scaffold(

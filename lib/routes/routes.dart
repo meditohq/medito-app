@@ -1,4 +1,4 @@
-import 'package:Medito/components/components.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
@@ -186,7 +186,7 @@ GoRoute _getWebviewRoute({bool fromRoot = false}) {
 
       return MaterialPage(
         key: state.pageKey,
-        child: WebViewComponent(url: url['url']!),
+        child: MeditoWebViewWidget(url: url['url']!),
       );
     },
   );
@@ -208,7 +208,8 @@ enum Screen {
 MaterialPage<void> getMeditationOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: MeditationView(id: state.params['sid'], screenKey: Screen.meditation),
+    child:
+        MeditationView(id: state.params['sid'], screenKey: Screen.meditation),
   );
 }
 
