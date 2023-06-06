@@ -11,8 +11,11 @@ import 'widgets/overlay_cover_image_widget.dart';
 import 'widgets/player_buttons/player_buttons_widget.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
-  const PlayerView(
-      {super.key, required this.meditationModel, required this.file});
+  const PlayerView({
+    super.key,
+    required this.meditationModel,
+    required this.file,
+  });
   final MeditationModel meditationModel;
   final MeditationFilesModel file;
   @override
