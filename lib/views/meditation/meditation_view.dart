@@ -30,7 +30,8 @@ class MeditationView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var meditations = ref.watch(meditationsProvider(meditationId: int.parse(id!)));
+    var meditations =
+        ref.watch(meditationsProvider(meditationId: int.parse(id!)));
 
     return Scaffold(
       body: meditations.when(
@@ -38,7 +39,8 @@ class MeditationView extends ConsumerWidget {
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () => ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
+          onTap: () =>
+              ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
         ),
         loading: () => _buildLoadingWidget(),
       ),
