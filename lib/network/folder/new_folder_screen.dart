@@ -1,4 +1,4 @@
-import 'package:Medito/components/headers/collapsible_header_component.dart';
+import 'package:Medito/widgets/headers/collapsible_header_widget.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/folder/new_folder_response.dart';
 import 'package:Medito/routes/routes.dart';
@@ -42,11 +42,11 @@ class NewFolderScreen extends ConsumerWidget {
         return await ref.refresh(folderDataProvider(id: id, skipCache: true));
       },
       child: Scaffold(
-        body: CollapsibleHeaderComponent(
+        body: CollapsibleHeaderWidget(
           bgImage: AssetConstants.dalle,
           title: data?.title ?? '',
           description: data?.description,
-          children:  [
+          children: [
             for (int i = 0; i < (items?.length ?? 0); i++)
               GestureDetector(
                 onTap: () => _onListItemTap(
