@@ -18,27 +18,29 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/views/session/components/session_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'components/meditation_buttons.dart';
 
-class SessionView extends ConsumerWidget {
+class MeditationView extends ConsumerWidget {
   final String? id;
   final Screen? screenKey;
 
-  SessionView({Key? key, this.id, this.screenKey}) : super(key: key);
+  MeditationView({Key? key, this.id, this.screenKey}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var sessions = ref.watch(sessionsProvider(sessionId: int.parse(id!)));
+    var meditations =
+        ref.watch(meditationsProvider(meditationId: int.parse(id!)));
 
     return Scaffold(
-      body: sessions.when(
+      body: meditations.when(
         skipLoadingOnRefresh: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => ErrorComponent(
           message: err.toString(),
-          onTap: () => ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
+          onTap: () =>
+              ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -47,31 +49,31 @@ class SessionView extends ConsumerWidget {
 
   Padding _buildLoadingWidget() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: const SessionShimmerComponent(),
+        child: const MeditationShimmerComponent(),
       );
 
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
-    SessionModel sessionModel,
+    MeditationModel meditationModel,
     WidgetRef ref,
   ) {
     return RefreshIndicator(
       onRefresh: () async =>
-          await ref.refresh(sessionsProvider(sessionId: int.parse(id!))),
+          await ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
       child: Scaffold(
         body: CollapsibleHeaderComponent(
-          bgImage: sessionModel.coverUrl,
-          title: sessionModel.title,
-          description: sessionModel.description,
+          bgImage: meditationModel.coverUrl,
+          title: meditationModel.title,
+          description: meditationModel.description,
           children: [
-            _mainContent(context, sessionModel),
+            _mainContent(context, meditationModel),
           ],
         ),
       ),
     );
   }
 
-  Widget _mainContent(BuildContext context, SessionModel sessionModel) {
+  Widget _mainContent(BuildContext context, MeditationModel meditationModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -87,8 +89,8 @@ class SessionView extends ConsumerWidget {
                 ?.copyWith(color: ColorConstants.newGrey, fontFamily: DmSans),
           ),
           height16,
-          SessionButtons(
-            sessionModel: sessionModel,
+          MeditationButtons(
+            meditationModel: meditationModel,
           ),
         ],
       ),

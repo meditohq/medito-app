@@ -18,6 +18,7 @@ class DailyMessageResponse {
     if (_data != null) {
       data['data'] = _data?.toJson();
     }
+    
     return data;
   }
 
@@ -38,6 +39,7 @@ class Data {
     final data = <String, dynamic>{};
     data['title'] = title;
     data['body'] = body;
+
     return data;
   }
 }

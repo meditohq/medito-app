@@ -3,39 +3,39 @@ import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final playerProvider =
-    StateNotifierProvider<PlayerProvider, SessionModel?>((ref) {
+    StateNotifierProvider<PlayerProvider, MeditationModel?>((ref) {
   return PlayerProvider(ref);
 });
 
-class PlayerProvider extends StateNotifier<SessionModel?> {
+class PlayerProvider extends StateNotifier<MeditationModel?> {
   PlayerProvider(this.ref) : super(null);
   Ref ref;
-  Future<void> addCurrentlyPlayingSessionInPreference({
-    required SessionModel sessionModel,
-    required SessionFilesModel file,
+  Future<void> addCurrentlyPlayingMeditationInPreference({
+    required MeditationModel meditationModel,
+    required MeditationFilesModel file,
   }) async {
-    var _session = sessionModel.customCopyWith();
-    for (var i = 0; i < _session.audio.length; i++) {
-      var element = _session.audio[i];
+    var _meditation = meditationModel.customCopyWith();
+    for (var i = 0; i < _meditation.audio.length; i++) {
+      var element = _meditation.audio[i];
       var fileIndex = element.files.indexWhere((e) => e.id == file.id);
       if (fileIndex != -1) {
-        _session.audio.removeWhere((e) => e.guideName != element.guideName);
-        _session.audio.first.files
+        _meditation.audio.removeWhere((e) => e.guideName != element.guideName);
+        _meditation.audio.first.files
             .removeWhere((e) => e.id != element.files[fileIndex].id);
         break;
       }
     }
 
-    state = _session;
+    state = _meditation;
     await ref
-        .read(sessionRepositoryProvider)
-        .addCurrentlyPlayingSessionInPreference(_session);
+        .read(meditationRepositoryProvider)
+        .addCurrentlyPlayingMeditationInPreference(_meditation);
   }
 
-  void getCurrentlyPlayingSession() {
+  void getCurrentlyPlayingMeditation() {
     ref
-        .read(sessionRepositoryProvider)
-        .fetchCurrentlyPlayingSessionFromPreference()
+        .read(meditationRepositoryProvider)
+        .fetchCurrentlyPlayingMeditationFromPreference()
         .then(
           (value) => state = value,
         );

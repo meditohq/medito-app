@@ -17,13 +17,11 @@ import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
-import 'package:Medito/network/downloads/downloads_bloc.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/home/courses_row_widget.dart';
 import 'package:Medito/views/home/daily_message_widget.dart';
@@ -35,7 +33,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pedantic/pedantic.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,7 +49,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
     with AutomaticKeepAliveClientMixin<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
 
-  final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
+  final GlobalKey<AnnouncementBannerWidgetState> _announceKey = GlobalKey();
 
   final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
 
@@ -88,7 +85,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
                       physics: AlwaysScrollableScrollPhysics(),
                       children: [
                         _getAppBar(),
-                        AnnouncementBanner(
+                        AnnouncementBannerWidget(
                           key: _announceKey,
                           hasOpened: widget.hasOpened,
                         ),
@@ -98,7 +95,6 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
                             type,
                             id,
                             context,
-                            Tracking.SHORTCUT_TAPPED,
                           ),
                         ),
                         CoursesRowWidget(
@@ -107,7 +103,6 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
                             type,
                             id,
                             context,
-                            Tracking.COURSE_TAPPED,
                           ),
                         ),
                         StatsWidget(),
@@ -130,7 +125,7 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
         ],
       );
 
-  Future<void> _navigate(type, id, BuildContext context, String origin) {
+  Future<void> _navigate(type, id, BuildContext context) {
     return checkConnectivity().then(
       (value) {
         if (value) {
@@ -278,19 +273,6 @@ class _HomeWidgetState extends ConsumerState<HomeWidget>
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
       _refresh();
-    });
-  }
-
-  void showSwipeToDeleteTip() async {
-    await DownloadsBloc.seenTip().then((seen) {
-      if (!seen) {
-        unawaited(DownloadsBloc.setSeenTip());
-        createSnackBar(
-          StringConstants.swipeToDelete,
-          context,
-          color: ColorConstants.darkMoon,
-        );
-      }
     });
   }
 

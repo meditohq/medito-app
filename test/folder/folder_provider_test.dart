@@ -38,11 +38,11 @@ void main() {
           isPublished: true,
           items: [
             FolderItemsModel(
-              type: 'session',
+              type: 'meditation',
               id: 120,
               title: 'Complete meditation',
               subtitle: '19 min',
-              path: 'sessions/120',
+              path: 'meditations/120',
             ),
           ],
         );

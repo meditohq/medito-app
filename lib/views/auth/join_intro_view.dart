@@ -40,16 +40,7 @@ class JoinIntroView extends ConsumerWidget {
                       fontSize: 24,
                     ),
                   ),
-                  for (int i = 0; i < joinBenefitList.length; i++)
-                    Text(
-                      joinBenefitList[i],
-                      style: textTheme.labelMedium?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: ClashDisplay,
-                        height: 1.8,
-                        fontSize: 16,
-                      ),
-                    ),
+                  _benefitPoints(joinBenefitList, textTheme),
                   Text(
                     StringConstants.itsFreeForever,
                     style: textTheme.headlineSmall?.copyWith(
@@ -61,28 +52,7 @@ class JoinIntroView extends ConsumerWidget {
                   ),
                   height8,
                   Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      LoadingButtonWidget(
-                        onPressed: () {
-                          var auth = ref.read(authProvider);
-                          auth.setIsAGuest(true);
-                          context.go(RouteConstants.homePath);
-                        },
-                        btnText: StringConstants.maybeLater,
-                      ),
-                      width8,
-                      LoadingButtonWidget(
-                        onPressed: () {
-                          context.push(RouteConstants.joinEmailPath);
-                        },
-                        btnText: StringConstants.joinNow,
-                        bgColor: ColorConstants.walterWhite,
-                        textColor: ColorConstants.greyIsTheNewGrey,
-                      ),
-                    ],
-                  ),
+                  _bottomButtons(ref, context),
                   height8,
                 ],
               ),
@@ -90,6 +60,48 @@ class JoinIntroView extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Column _benefitPoints(List<String> joinBenefitList, TextTheme textTheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: joinBenefitList
+          .map((e) => Text(
+                e,
+                style: textTheme.labelMedium?.copyWith(
+                  color: ColorConstants.walterWhite,
+                  fontFamily: ClashDisplay,
+                  height: 1.8,
+                  fontSize: 16,
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  Row _bottomButtons(WidgetRef ref, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        LoadingButtonWidget(
+          onPressed: () {
+            var auth = ref.read(authProvider);
+            auth.setIsAGuest(true);
+            context.go(RouteConstants.homePath);
+          },
+          btnText: StringConstants.maybeLater,
+        ),
+        width8,
+        LoadingButtonWidget(
+          onPressed: () {
+            context.push(RouteConstants.joinEmailPath);
+          },
+          btnText: StringConstants.joinNow,
+          bgColor: ColorConstants.walterWhite,
+          textColor: ColorConstants.greyIsTheNewGrey,
+        ),
+      ],
     );
   }
 }

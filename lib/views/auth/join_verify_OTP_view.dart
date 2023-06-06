@@ -194,34 +194,40 @@ class _ResendCodeWidget extends ConsumerWidget {
               ),
             ),
           ),
-          if (auth.counter)
-            TweenAnimationBuilder<Duration>(
-              duration: Duration(seconds: 45),
-              tween: Tween(begin: Duration(seconds: 45), end: Duration.zero),
-              onEnd: () {
-                auth.setCounter();
-              },
-              builder: (BuildContext context, Duration value, Widget? child) {
-                final minutes = value.inMinutes;
-                final seconds = value.inSeconds % 60;
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
-                    '$minutes:$seconds',
-                    textAlign: TextAlign.center,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: DmSans,
-                      height: 1.5,
-                      fontSize: 14,
-                    ),
-                  ),
-                );
-              },
-            ),
+          if (auth.counter) _counterAnimation(auth, textTheme),
         ],
       ),
+    );
+  }
+
+  TweenAnimationBuilder<Duration> _counterAnimation(
+    AuthNotifier auth,
+    TextTheme textTheme,
+  ) {
+    return TweenAnimationBuilder<Duration>(
+      duration: Duration(seconds: 45),
+      tween: Tween(begin: Duration(seconds: 45), end: Duration.zero),
+      onEnd: () {
+        auth.setCounter();
+      },
+      builder: (BuildContext context, Duration value, Widget? child) {
+        final minutes = value.inMinutes;
+        final seconds = value.inSeconds % 60;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Text(
+            '$minutes:$seconds',
+            textAlign: TextAlign.center,
+            style: textTheme.bodyMedium?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              height: 1.5,
+              fontSize: 14,
+            ),
+          ),
+        );
+      },
     );
   }
 }

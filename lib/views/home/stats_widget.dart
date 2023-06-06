@@ -76,25 +76,28 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
         );
       case 3:
         return FutureBuilder<String>(
-            future: getNumSessions(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return StreakTileWidget(
-                  getNumSessions(),
-                  snapshot.data == '1'
-                      ? 'Session\nListened'
-                      : 'Sessions\nListened',
-                  optionalText: UnitType.sessions,
-                );
-              } else {
-                return Container();
-              }
-            });
+          future: getNumMeditations(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return StreakTileWidget(
+                getNumMeditations(),
+                snapshot.data == '1'
+                    ? 'Session\nListened'
+                    : 'Sessions\nListened',
+                optionalText: UnitType.meditations,
+              );
+            }
+
+            return Container();
+          },
+        );
     }
+
     return Container();
   }
 
   void openEditDialog() {
+    var textTheme = Theme.of(context).textTheme;
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -107,17 +110,18 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             backgroundColor: ColorConstants.moonlight,
-            title: Text('How many days is your streak?',
-                style: Theme.of(context).textTheme.headline4),
+            title: Text(
+              'How many days is your streak?',
+              style: textTheme.headlineMedium,
+            ),
             content: TextField(
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .subtitle2
-                  ?.copyWith(letterSpacing: 1.5),
+              style: textTheme.titleSmall?.copyWith(letterSpacing: 1.5),
               decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red))),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red),
+                ),
+              ),
               keyboardType: TextInputType.number,
               autofocus: true,
               controller: _controller,
@@ -133,10 +137,11 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                       height: 38,
                       child: TextButton(
                         onPressed: _onCancelTap,
-                        child: Text('CANCEL',
-                            style: Theme.of(context).textTheme.subtitle1
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                        child: Text(
+                          'CANCEL',
+                          style: textTheme.titleMedium,
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     Container(
@@ -147,16 +152,18 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                       child: TextButton(
                         onPressed: _onSaveTap,
                         style: TextButton.styleFrom(
-                            foregroundColor: ColorConstants.walterWhite),
-                        child: Text('SAVE',
-                            style: Theme.of(context).textTheme.headline3
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          foregroundColor: ColorConstants.walterWhite,
+                        ),
+                        child: Text(
+                          'SAVE',
+                          style: textTheme.displaySmall,
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );
@@ -171,20 +178,24 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
   }
 
   void openResetDialog() {
+    var textTheme = Theme.of(context).textTheme;
     showDialog(
       barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return Theme(
           data: ThemeData(
-              primaryColor: ColorConstants.walterWhite,
-              hintColor: Colors.green),
+            primaryColor: ColorConstants.walterWhite,
+            hintColor: Colors.green,
+          ),
           child: AlertDialog(
             backgroundColor: ColorConstants.moonlight,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text('Reset longest streak to your current streak?',
-                style: Theme.of(context).textTheme.headline4),
+            title: Text(
+              'Reset longest streak to your current streak?',
+              style: textTheme.headlineMedium,
+            ),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
@@ -197,11 +208,13 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                       child: TextButton(
                         onPressed: _onCancelTap,
                         style: TextButton.styleFrom(
-                            foregroundColor: ColorConstants.moonlight),
-                        child: Text('CANCEL',
-                            style: Theme.of(context).textTheme.subtitle1
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          foregroundColor: ColorConstants.moonlight,
+                        ),
+                        child: Text(
+                          'CANCEL',
+                          style: textTheme.titleMedium,
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     Container(
@@ -212,16 +225,17 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
                       child: TextButton(
                         onPressed: _onResetTap,
                         style: TextButton.styleFrom(
-                            foregroundColor: ColorConstants.walterWhite),
-                        child: Text('RESET',
-                            style: Theme.of(context).textTheme.headline3
-                            // .copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          foregroundColor: ColorConstants.walterWhite,
+                        ),
+                        child: Text(
+                          'RESET', style: textTheme.displaySmall,
+                          // .copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );
@@ -232,7 +246,7 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
   void _onResetTap() {
     setLongestStreakToCurrentStreak();
     Navigator.pop(context, _controller.text);
-    setState(() {});
+    setState(() => {});
   }
 
   void _onSaveTap() {

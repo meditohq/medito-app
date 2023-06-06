@@ -9,11 +9,11 @@ import 'play_pause_button_component.dart';
 class PlayerButtonsComponent extends ConsumerWidget {
   const PlayerButtonsComponent({
     super.key,
-    required this.sessionModel,
+    required this.meditationModel,
     required this.file,
   });
-  final SessionFilesModel file;
-  final SessionModel sessionModel;
+  final MeditationFilesModel file;
+  final MeditationModel meditationModel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

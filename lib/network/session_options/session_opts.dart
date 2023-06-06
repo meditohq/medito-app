@@ -1,6 +1,7 @@
 import 'package:Medito/utils/utils.dart';
 
 // ignore_for_file: avoid-dynamic
+//ignore:prefer-match-file-name
 class SessionOptionsResponse {
   SessionData? data;
 
@@ -13,6 +14,7 @@ class SessionOptionsResponse {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['data'] = this.data?.toJson();
+
     return data;
   }
 }
@@ -72,6 +74,7 @@ class SessionData {
     if (_audio != null) {
       data['audio'] = _audio?.map((v) => v.toJson()).toList();
     }
+
     return data;
   }
 }
@@ -86,6 +89,7 @@ class Author {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['body'] = body;
+
     return data;
   }
 }
@@ -104,6 +108,7 @@ class Audio {
     if (file != null) {
       data['file'] = file?.toJson();
     }
+
     return data;
   }
 }
@@ -124,6 +129,7 @@ class AudioFile {
     data['id'] = id;
     data['voice'] = voice;
     data['length'] = length;
+
     return data;
   }
 }

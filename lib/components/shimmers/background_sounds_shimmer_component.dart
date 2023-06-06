@@ -8,6 +8,7 @@ class BackgroundSoundsShimmerComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -15,7 +16,9 @@ class BackgroundSoundsShimmerComponent extends StatelessWidget {
             height: 130,
           ),
           height8,
-          for (int i = 0; i < 6; i++) _shimmerList(size)
+          Column(
+            children: List.generate(6, (index) => _shimmerList(size)),
+          ),
         ],
       ),
     );

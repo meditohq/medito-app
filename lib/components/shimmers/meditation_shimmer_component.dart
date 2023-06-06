@@ -2,12 +2,14 @@ import 'package:Medito/components/shimmers/components/box_shimmer_component.dart
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-class SessionShimmerComponent extends StatelessWidget {
-  const SessionShimmerComponent({super.key});
+class MeditationShimmerComponent extends StatelessWidget {
+  const MeditationShimmerComponent({super.key});
 
   @override
   Widget build(BuildContext context) {
     var shimmerList = _shimmerList();
+
+    var list = List.generate(3, (index) => shimmerList);
 
     return SingleChildScrollView(
       child: Column(
@@ -28,9 +30,7 @@ class SessionShimmerComponent extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.spaceBetween,
-            children: [
-              for (int i = 0; i < 3; i++) shimmerList,
-            ],
+            children: list,
           ),
           height8,
           height8,
@@ -44,7 +44,7 @@ class SessionShimmerComponent extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.spaceBetween,
-            children: [for (int i = 0; i < 5; i++) shimmerList],
+            children: list,
           ),
         ],
       ),

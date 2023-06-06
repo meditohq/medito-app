@@ -25,7 +25,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void deactivate() {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.sessionAudioPlayer.playerState.playing) {
+    if (!_audioPlayerNotifier.meditationAudioPlayer.playerState.playing) {
       _audioPlayerNotifier.stopBackgroundSound();
     }
     super.deactivate();
@@ -85,10 +85,13 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
             path: '',
           ),
         ),
-        for (int i = 0; i < data.length; i++)
-          SoundListTileComponent(
-            sound: data[i],
-          ),
+        Column(
+          children: data
+              .map((e) => SoundListTileComponent(
+                    sound: e,
+                  ))
+              .toList(),
+        ),
       ],
     );
   }
