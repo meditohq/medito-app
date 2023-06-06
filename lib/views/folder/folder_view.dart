@@ -1,4 +1,4 @@
-import 'package:Medito/components/components.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
@@ -23,14 +23,14 @@ class FolderView extends ConsumerWidget {
         skipLoadingOnRefresh: false,
         skipLoadingOnReload: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
-        error: (err, stack) => ErrorComponent(
+        error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(
             FoldersProvider(folderId: int.parse(id!)),
           ),
           isLoading: folders.isLoading,
         ),
-        loading: () => const FolderShimmerComponent(),
+        loading: () => const FolderShimmerWidget(),
       ),
     );
   }
@@ -44,7 +44,7 @@ class FolderView extends ConsumerWidget {
       onRefresh: () async {
         return await ref.refresh(FoldersProvider(folderId: int.parse(id!)));
       },
-      child: CollapsibleHeaderComponent(
+      child: CollapsibleHeaderWidget(
         bgImage: folder.coverUrl,
         title: '${folder.title}',
         description: folder.description,

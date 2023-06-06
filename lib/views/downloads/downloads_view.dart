@@ -1,4 +1,4 @@
-import 'package:Medito/components/components.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/duration_extensions.dart';
@@ -42,11 +42,11 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
           return _getDownloadList(data);
         },
-        error: (err, stack) => ErrorComponent(
+        error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(downloadedMeditationsProvider),
         ),
-        loading: () => MeditationShimmerComponent(),
+        loading: () => MeditationShimmerWidget(),
       ),
     );
   }
@@ -64,10 +64,12 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           var reorderedItem = meditations.removeAt(oldIndex);
           meditations.insert(newIndex, reorderedItem);
           // To ensure, that the new list order is saved
-          ref.read(addMeditationListInPreferenceProvider(meditations: meditations));
+          ref.read(
+              addMeditationListInPreferenceProvider(meditations: meditations));
         });
       },
-      children: meditations.map((item) => _getSlidingItem(item, context)).toList(),
+      children:
+          meditations.map((item) => _getSlidingItem(item, context)).toList(),
     );
   }
 
