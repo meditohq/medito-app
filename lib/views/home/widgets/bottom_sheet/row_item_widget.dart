@@ -1,4 +1,3 @@
-
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,16 +6,21 @@ class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
     super.key,
     required this.title,
+    this.subTitle,
     required this.leadingIcon,
     this.isShowUnderline = true,
     this.onTap,
+    this.isTrailingIcon = true,
+    this.titleStyle,
   });
 
   final String title;
+  final String? subTitle;
   final String leadingIcon;
   final bool isShowUnderline;
   final void Function()? onTap;
-
+  final bool isTrailingIcon;
+  final TextStyle? titleStyle;
   @override
   Widget build(BuildContext context) {
     var border = Border(
@@ -51,17 +55,40 @@ class RowItemWidget extends StatelessWidget {
                     height: 14,
                   ),
                   width16,
-                  Text(title),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: titleStyle ??
+                            Theme.of(context).textTheme.labelMedium,
+                      ),
+                      if (subTitle != null) _subtitle(context),
+                    ],
+                  ),
                 ],
               ),
-              SvgPicture.asset(
-                AssetConstants.icForward,
-                height: 14,
+              Visibility(
+                visible: isTrailingIcon,
+                child: SvgPicture.asset(
+                  AssetConstants.icForward,
+                  height: 14,
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Text _subtitle(BuildContext context) {
+    return Text(
+      subTitle!,
+      style: Theme.of(context)
+          .textTheme
+          .titleSmall
+          ?.copyWith(color: ColorConstants.graphite),
     );
   }
 }

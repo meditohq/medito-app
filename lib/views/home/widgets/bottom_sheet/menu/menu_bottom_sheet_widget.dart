@@ -3,7 +3,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-import 'row_item_widget.dart';
+import '../row_item_widget.dart';
 
 class MenuBottomSheetWidget extends StatelessWidget {
   const MenuBottomSheetWidget({super.key, required this.homeMenuModel});

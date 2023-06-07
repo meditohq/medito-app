@@ -45,4 +45,5 @@ class ColorConstants {
   static const purple = Color(0xff4F3C9B);
   static const onyx = Color(0xff2A2A32);
   static const ebony = Color(0xff171718);
+  static const graphite = Color(0xffAAAAAA);
 }
