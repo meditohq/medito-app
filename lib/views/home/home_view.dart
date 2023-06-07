@@ -1,6 +1,6 @@
-import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/home/home_model.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widgets/filters/filter_widget.dart';
@@ -46,12 +46,12 @@ class HomeView extends ConsumerWidget {
             ],
           ),
         ),
-        error: (err, stack) => ErrorComponent(
+        error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(homeProvider),
           isLoading: homeRes.isLoading,
         ),
-        loading: () => const HomeShimmerComponent(),
+        loading: () => const HomeShimmerWidget(),
       ),
     );
   }
