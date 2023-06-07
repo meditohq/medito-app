@@ -1,16 +1,21 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../row_item_widget.dart';
 
-class StatsBottomSheetWidget extends StatelessWidget {
+class StatsBottomSheetWidget extends ConsumerWidget {
   const StatsBottomSheetWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var stats = ref.watch(remoteStatsProvider);
+
     return DraggableSheetWidget(
+      initialChildSize: 1,
       child: (scrollController) {
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -18,28 +23,46 @@ class StatsBottomSheetWidget extends StatelessWidget {
             height16,
             HandleBarWidget(),
             height16,
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: 4,
-                itemBuilder: (BuildContext context, int index) {
-                  return RowItemWidget(
-                    leadingIcon: getLeadingIconPath('ic_help'),
-                    title: 'element.title $index',
-                    subTitle: 'Subtitle $index',
-                    isShowUnderline: index < 4,
-                    isTrailingIcon: false,
-                    titleStyle: Theme.of(context)
-                        .textTheme
-                        .labelMedium
-                        ?.copyWith(fontSize: 18),
-                  );
-                },
+            stats.when(
+              skipLoadingOnRefresh: false,
+              data: (data) => _statsList(scrollController, data, ref),
+              error: (err, stack) => Expanded(
+                child: MeditoErrorWidget(
+                  message: err.toString(),
+                  onTap: () => ref.refresh(remoteStatsProvider),
+                ),
               ),
+              loading: () => CircularProgressIndicator(),
             ),
           ],
         );
       },
+    );
+  }
+
+  Expanded _statsList(
+    ScrollController scrollController,
+    StatsModel stats,
+    WidgetRef ref,
+  ) {
+    return Expanded(
+      child: ListView.builder(
+        controller: scrollController,
+        itemCount: stats.all.length,
+        itemBuilder: (BuildContext context, int index) {
+          var all = stats.all[index];
+
+          return RowItemWidget(
+            leadingIcon: getLeadingIconPath('ic_help'),
+            title: all.title,
+            subTitle: all.subtitle,
+            isShowUnderline: index < stats.all.length - 1,
+            isTrailingIcon: false,
+            titleStyle:
+                Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
+          );
+        },
+      ),
     );
   }
 

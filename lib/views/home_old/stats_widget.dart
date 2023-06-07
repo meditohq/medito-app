@@ -16,7 +16,7 @@ class _StatsWidgetState extends ConsumerState<StatsWidget> {
   final TextEditingController _controller = TextEditingController();
   @override
   void initState() {
-    ref.read(statsProvider);
+    ref.read(localStatsProvider);
     super.initState();
   }
 

@@ -7,3 +7,6 @@ export 'home/home_model.dart';
 export 'home/chips/home_chips_items_model.dart';
 export 'home/rows/home_rows_model.dart';
 export 'home/menu/home_menu_model.dart';
+export 'stats/stats_model.dart';
+export 'stats/mini_stats/mini_stats_model.dart';
+export 'stats/all_stats/all_stats_model.dart';
