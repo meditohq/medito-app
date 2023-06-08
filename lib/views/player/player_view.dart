@@ -3,15 +3,19 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'components/artist_title_component.dart';
-import 'components/background_image_component.dart';
-import 'components/bottom_actions/bottom_action_component.dart';
-import 'components/duration_indicator_component.dart';
-import 'components/overlay_cover_image_component.dart';
-import 'components/player_buttons/player_buttons_component.dart';
+import 'widgets/artist_title_widget.dart';
+import 'widgets/background_image_widget.dart';
+import 'widgets/bottom_actions/bottom_action_widget.dart';
+import 'widgets/duration_indicator_widget.dart';
+import 'widgets/overlay_cover_image_widget.dart';
+import 'widgets/player_buttons/player_buttons_widget.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
-  const PlayerView({super.key, required this.meditationModel, required this.file});
+  const PlayerView({
+    super.key,
+    required this.meditationModel,
+    required this.file,
+  });
   final MeditationModel meditationModel;
   final MeditationFilesModel file;
   @override
@@ -33,7 +37,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            BackgroundImageComponent(imageUrl: coverUrl),
+            BackgroundImageWidget(imageUrl: coverUrl),
             SafeArea(
               child: Column(
                 children: [
@@ -51,21 +55,21 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                       horizontal: 20.0,
                       vertical: 4.0,
                     ),
-                    child: ArtistTitleComponent(
+                    child: ArtistTitleWidget(
                       meditationTitle: widget.meditationModel.title,
                       artistName: artist?.name,
                       artistUrlPath: artist?.path,
                     ),
                   ),
-                  OverlayCoverImageComponent(imageUrl: coverUrl),
-                  DurationIndicatorComponent(file: widget.file),
+                  OverlayCoverImageWidget(imageUrl: coverUrl),
+                  DurationIndicatorWidget(file: widget.file),
                   Spacer(),
-                  PlayerButtonsComponent(
+                  PlayerButtonsWidget(
                     file: widget.file,
                     meditationModel: widget.meditationModel,
                   ),
                   Spacer(),
-                  BottomActionComponent(
+                  BottomActionWidget(
                     meditationModel: widget.meditationModel,
                     file: widget.file,
                   ),

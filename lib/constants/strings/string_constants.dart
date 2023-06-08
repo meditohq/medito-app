@@ -76,7 +76,7 @@ class StringConstants {
   static const String loadingError =
       "It looks like you're offline or there was little hiccup from our end.";
   static const String checkConnection =
-      'Please check your connection and try again';
+      'It seems you are offline. Please connect to the internet to continue.';
   static const String timeout =
       'Oops! It seems like there was an error. If the problem persists, kill the app and try again.';
 }

@@ -1,5 +1,5 @@
-import 'package:Medito/components/components.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
@@ -35,7 +35,7 @@ class CardWidget extends StatelessWidget {
                   Colors.black.withOpacity(0.6),
                   BlendMode.dstATop,
                 ),
-                child: NetworkImageComponent(
+                child: NetworkImageWidget(
                   url: coverUrlPath,
                   isCache: true,
                 ),

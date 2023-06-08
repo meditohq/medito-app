@@ -13,14 +13,14 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/components/components.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'components/meditation_buttons.dart';
+import 'widgets/meditation_buttons_widget.dart';
 
 class MeditationView extends ConsumerWidget {
   final String? id;
@@ -30,15 +30,17 @@ class MeditationView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var meditations = ref.watch(meditationsProvider(meditationId: int.parse(id!)));
+    var meditations =
+        ref.watch(meditationsProvider(meditationId: int.parse(id!)));
 
     return Scaffold(
       body: meditations.when(
         skipLoadingOnRefresh: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
-        error: (err, stack) => ErrorComponent(
+        error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () => ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
+          onTap: () =>
+              ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -47,7 +49,7 @@ class MeditationView extends ConsumerWidget {
 
   Padding _buildLoadingWidget() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: const MeditationShimmerComponent(),
+        child: const MeditationShimmerWidget(),
       );
 
   RefreshIndicator _buildScaffoldWithData(
@@ -59,7 +61,7 @@ class MeditationView extends ConsumerWidget {
       onRefresh: () async =>
           await ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
       child: Scaffold(
-        body: CollapsibleHeaderComponent(
+        body: CollapsibleHeaderWidget(
           bgImage: meditationModel.coverUrl,
           title: meditationModel.title,
           description: meditationModel.description,
@@ -87,7 +89,7 @@ class MeditationView extends ConsumerWidget {
                 ?.copyWith(color: ColorConstants.newGrey, fontFamily: DmSans),
           ),
           height16,
-          MeditationButtons(
+          MeditationButtonsWidget(
             meditationModel: meditationModel,
           ),
         ],
