@@ -1,11 +1,11 @@
-import 'package:Medito/components/components.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'components/sound_listtile_component.dart';
-import 'components/volume_slider_component.dart';
+import 'widgets/sound_listtile_widget.dart';
+import 'widgets/volume_slider_widget.dart';
 
 class BackgroundSoundView extends ConsumerStatefulWidget {
   const BackgroundSoundView({Key? key}) : super(key: key);
@@ -58,26 +58,26 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         data: (data) => _mainContent(
           data,
         ),
-        error: (err, stack) => ErrorComponent(
+        error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(backgroundSoundsProvider),
         ),
-        loading: () => BackgroundSoundsShimmerComponent(),
+        loading: () => BackgroundSoundsShimmerWidget(),
       ),
     );
   }
 
-  CollapsibleHeaderComponent _mainContent(
+  CollapsibleHeaderWidget _mainContent(
     List<BackgroundSoundsModel> data,
   ) {
-    return CollapsibleHeaderComponent(
+    return CollapsibleHeaderWidget(
       title: StringConstants.backgroundSounds,
       leadingIconBgColor: ColorConstants.walterWhite,
       leadingIconColor: ColorConstants.almostBlack,
       headerHeight: 130,
       children: [
-        VolumeSliderComponent(),
-        SoundListTileComponent(
+        VolumeSliderWidget(),
+        SoundListTileWidget(
           sound: BackgroundSoundsModel(
             id: 0,
             title: StringConstants.none,
@@ -87,7 +87,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         ),
         Column(
           children: data
-              .map((e) => SoundListTileComponent(
+              .map((e) => SoundListTileWidget(
                     sound: e,
                   ))
               .toList(),
