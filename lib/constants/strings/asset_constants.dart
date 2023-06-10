@@ -1,4 +1,5 @@
 class AssetConstants {
+  static const String rootPath = 'assets/images';
   static const String dalle = 'assets/images/dalle.png';
   static const String join = 'assets/images/join.png';
   static const String icLogo = 'assets/images/ic_logo.svg';

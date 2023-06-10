@@ -8,7 +8,7 @@ part 'stats_model.g.dart';
 @freezed
 abstract class StatsModel with _$StatsModel {
   const factory StatsModel({
-    @Default([]) List<MiniStatsModel> mini,
+    required MiniStatsModel mini,
     @Default([]) List<AllStatsModel> all,
   }) = _StatsModel;
 

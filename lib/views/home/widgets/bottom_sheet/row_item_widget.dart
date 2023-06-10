@@ -12,6 +12,7 @@ class RowItemWidget extends StatelessWidget {
     this.onTap,
     this.isTrailingIcon = true,
     this.titleStyle,
+    this.iconSize = 14,
   });
 
   final String title;
@@ -21,6 +22,7 @@ class RowItemWidget extends StatelessWidget {
   final void Function()? onTap;
   final bool isTrailingIcon;
   final TextStyle? titleStyle;
+  final double iconSize;
   @override
   Widget build(BuildContext context) {
     var border = Border(
@@ -52,7 +54,7 @@ class RowItemWidget extends StatelessWidget {
                 children: [
                   SvgPicture.asset(
                     leadingIcon,
-                    height: 14,
+                    height: iconSize,
                   ),
                   width16,
                   Column(

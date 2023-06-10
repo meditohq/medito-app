@@ -32,7 +32,11 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                   onTap: () => ref.refresh(remoteStatsProvider),
                 ),
               ),
-              loading: () => CircularProgressIndicator(),
+              loading: () => Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
             ),
           ],
         );
@@ -53,7 +57,8 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           var all = stats.all[index];
 
           return RowItemWidget(
-            leadingIcon: getLeadingIconPath('ic_help'),
+            leadingIcon: getLeadingIconPath(all.icon),
+            iconSize: 20,
             title: all.title,
             subTitle: all.subtitle,
             isShowUnderline: index < stats.all.length - 1,
@@ -67,14 +72,6 @@ class StatsBottomSheetWidget extends ConsumerWidget {
   }
 
   String getLeadingIconPath(String path) {
-    if (path == 'ic_help') {
-      return AssetConstants.icHelpCircle;
-    } else if (path == 'ic_email') {
-      return AssetConstants.icHelpCircle;
-    } else if (path == 'ic_medito') {
-      return AssetConstants.icMedito;
-    }
-
-    return AssetConstants.icMedito;
+    return '${AssetConstants.rootPath}/$path.svg';
   }
 }
