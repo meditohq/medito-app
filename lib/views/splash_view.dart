@@ -29,7 +29,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
         if (next.value == AUTH_INIT_STATUS.TOKEN_INIT_COMPLETED) {
           ref.read(authInitTokenProvider.notifier).initializeUser();
         } else if (next.value == AUTH_INIT_STATUS.IS_USER_PRESENT) {
-          context.go(RouteConstants.homePath);
+          context.go(RouteConstants.bottomNavbarPath);
         } else if (next.value == AUTH_INIT_STATUS.IS_USER_NOT_PRESENT) {
           context.go(RouteConstants.joinIntroPath);
         }

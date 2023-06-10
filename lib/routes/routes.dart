@@ -16,7 +16,7 @@ import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../views/home_old/home_wrapper_widget.dart';
+import '../views/bottom_navbar/bottom_navbar_widget.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -78,10 +78,10 @@ final router = GoRouter(
       ),
       routes: [
         GoRoute(
-          path: RouteConstants.homePath,
+          path: RouteConstants.bottomNavbarPath,
           pageBuilder: (context, state) => MaterialPage(
             key: state.pageKey,
-            child: HomeWrapperWidget(),
+            child: BottomNavbarWidget(),
           ),
         ),
         _getMeditationRoute(fromRoot: true),

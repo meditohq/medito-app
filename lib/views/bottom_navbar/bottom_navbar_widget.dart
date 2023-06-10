@@ -5,14 +5,14 @@ import 'package:Medito/views/packs/packs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:Medito/constants/constants.dart';
 
-class HomeWrapperWidget extends StatefulWidget {
-  const HomeWrapperWidget({Key? key}) : super(key: key);
+class BottomNavbarWidget extends StatefulWidget {
+  const BottomNavbarWidget({Key? key}) : super(key: key);
 
   @override
-  _HomeWrapperWidgetState createState() => _HomeWrapperWidgetState();
+  _BottomNavbarWidgetState createState() => _BottomNavbarWidgetState();
 }
 
-class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
+class _BottomNavbarWidgetState extends State<BottomNavbarWidget> {
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
