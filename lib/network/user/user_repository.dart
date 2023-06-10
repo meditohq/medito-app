@@ -38,7 +38,8 @@ class UserRepository {
 
     var id = '';
     try {
-      final response = await httpPost(url, HTTPConstants.INIT_TOKEN, body: defaultMap);
+      final response =
+          await httpPost(url, HTTPConstants.INIT_TOKEN, body: defaultMap);
       id = response != null
           ? (UserResponse.fromJson(response).data?.id ?? 'EMPTY')
           : 'EMPTY';
