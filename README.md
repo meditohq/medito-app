@@ -28,8 +28,6 @@ The best way to start is by opening the project with [Android Studio](https://de
 
 You will need an API key to build the project. (See "Contributing" below)
 
-The API documentation is available on the [wiki](https://github.com/meditohq/medito-app/wiki/).
-
 Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues).
 
 ## Contributing
