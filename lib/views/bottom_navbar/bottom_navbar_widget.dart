@@ -1,19 +1,18 @@
+import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/packs/packs_screen.dart';
 import 'package:flutter/material.dart';
-
-import '../../network/user/user_utils.dart';
 import 'package:Medito/constants/constants.dart';
-import '../../utils/stats_utils.dart';
-import '../btm_nav/home_widget.dart';
-import '../packs/packs_screen.dart';
 
-class HomeWrapperWidget extends StatefulWidget {
-  const HomeWrapperWidget({Key? key}) : super(key: key);
+class BottomNavbarWidget extends StatefulWidget {
+  const BottomNavbarWidget({Key? key}) : super(key: key);
 
   @override
-  _HomeWrapperWidgetState createState() => _HomeWrapperWidgetState();
+  _BottomNavbarWidgetState createState() => _BottomNavbarWidgetState();
 }
 
-class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
+class _BottomNavbarWidgetState extends State<BottomNavbarWidget> {
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
@@ -43,7 +42,7 @@ class _HomeWrapperWidgetState extends State<HomeWrapperWidget> {
             key: _messengerKey,
             body: IndexedStack(
               index: _currentIndex,
-              children: [HomeWidget(_hasOpened), PacksScreen()],
+              children: [HomeView(), PacksScreen()],
             ),
             bottomNavigationBar: Container(
               decoration: BoxDecoration(

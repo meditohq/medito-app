@@ -20,6 +20,7 @@ class ColorConstants {
   static const walterWhiteTrans = Color(0x30595F65);
   static const darkBGColor = Color(0xff22282D);
   static const almostBlack = Color(0xEE000000);
+  static const black = Colors.black;
 
   static const greyIsTheNewBlack = Color(0xFF1C1C1E);
   static const greyIsTheNewGrey = Color(0xFF2C2C2E);
@@ -29,6 +30,7 @@ class ColorConstants {
 
   static const moonlight = Color(0xff282828);
   static const peacefulBlue = Color(0xffd1f6fe);
+  static const ashWhite = Color(0xffD5D3D1);
 
   // V2
   static const transparent = Color(0x00ffffff);

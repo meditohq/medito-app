@@ -67,6 +67,7 @@ class StringConstants {
   static const String thanksForJoining =
       'Thanks for being on this journey with us.';
   static const String close = 'Close';
+  static const String search = 'Search';
 
   //Error
   static const String invalidEmail = 'Invalid Email.';

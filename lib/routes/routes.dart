@@ -9,13 +9,14 @@ import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
+import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/meditation/meditation_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../views/home/home_wrapper_widget.dart';
+import '../views/bottom_navbar/bottom_navbar_widget.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -23,7 +24,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 final router = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigatorKey,
-  initialLocation: RouteConstants.root,
+  initialLocation: RouteConstants.bottomNavbarPath,
   routes: [
     GoRoute(
       path: RouteConstants.root,
@@ -77,10 +78,10 @@ final router = GoRouter(
       ),
       routes: [
         GoRoute(
-          path: RouteConstants.homePath,
+          path: RouteConstants.bottomNavbarPath,
           pageBuilder: (context, state) => MaterialPage(
             key: state.pageKey,
-            child: HomeWrapperWidget(),
+            child: BottomNavbarWidget(),
           ),
         ),
         _getMeditationRoute(fromRoot: true),
@@ -90,7 +91,9 @@ final router = GoRouter(
         _getBackgroundSoundRoute(),
         GoRoute(
           path: RouteConstants.collectionPath,
-          routes: [_getPlayerRoute()],
+          routes: [
+            _getPlayerRoute(),
+          ],
           pageBuilder: (context, state) => getCollectionMaterialPage(state),
         ),
         GoRoute(
