@@ -10,3 +10,4 @@ export 'home/menu/home_menu_model.dart';
 export 'stats/stats_model.dart';
 export 'stats/mini_stats/mini_stats_model.dart';
 export 'stats/all_stats/all_stats_model.dart';
+export 'device_info/device_info_model.dart';

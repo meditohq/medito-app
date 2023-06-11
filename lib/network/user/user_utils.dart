@@ -1,7 +1,7 @@
 import 'dart:io' as io;
 import 'package:Medito/network/cache.dart';
 import 'package:Medito/network/user/user_repository.dart';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pedantic/pedantic.dart';
