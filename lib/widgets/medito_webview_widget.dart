@@ -43,6 +43,8 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
       backgroundColor: ColorConstants.greyIsTheNewGrey,
       appBar: MeditoAppBarWidget(
