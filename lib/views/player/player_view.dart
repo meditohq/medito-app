@@ -53,6 +53,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                       meditationTitle: widget.meditationModel.title,
                       artistName: artist?.name,
                       artistUrlPath: artist?.path,
+                      isPlayerScreen: true,
                     ),
                   ),
                   OverlayCoverImageWidget(imageUrl: coverUrl),

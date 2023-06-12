@@ -27,7 +27,7 @@ class MarkdownWidget extends StatelessWidget {
 
     return Markdown(
       data: body,
-      onTapLink: (text, href, title) => _linkTap(context, href),
+      onTapLink: onTapLink ?? (text, href, title) => _linkTap(context, href),
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
