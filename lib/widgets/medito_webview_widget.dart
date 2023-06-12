@@ -1,5 +1,7 @@
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -11,17 +13,14 @@ class MeditoWebViewWidget extends StatefulWidget {
   _MeditoWebViewWidgetState createState() => _MeditoWebViewWidgetState();
 }
 
-class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
+class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget>
+    with AutomaticKeepAliveClientMixin<MeditoWebViewWidget> {
+  var controller = WebViewController();
   int _stackToView = 1;
-  void _handleLoad(String _) {
-    setState(() {
-      _stackToView = 0;
-    });
-  }
 
   @override
-  Widget build(BuildContext context) {
-    var controller = WebViewController()
+  void initState() {
+    controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
@@ -33,6 +32,18 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+    super.initState();
+  }
+
+  void _handleLoad(String _) {
+    setState(() {
+      _stackToView = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
 
     return Scaffold(
       backgroundColor: ColorConstants.greyIsTheNewGrey,
@@ -44,6 +55,8 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
         children: [
           WebViewWidget(
             controller: controller,
+            gestureRecognizers: Set()
+              ..add(Factory(() => EagerGestureRecognizer())),
           ),
           const Center(
             child: CircularProgressIndicator(),
@@ -52,4 +65,7 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
