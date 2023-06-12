@@ -1,4 +1,3 @@
-import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
