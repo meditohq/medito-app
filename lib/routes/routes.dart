@@ -83,6 +83,9 @@ final router = GoRouter(
             key: state.pageKey,
             child: BottomNavbarWidget(),
           ),
+          routes: [
+            _getWebviewRoute(),
+          ],
         ),
         _getMeditationRoute(fromRoot: true),
         _getArticleRoute(fromRoot: true),

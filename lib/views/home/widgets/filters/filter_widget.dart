@@ -1,4 +1,5 @@
 import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +41,7 @@ class FilterWidget extends StatelessWidget {
             var element = items[index];
 
             return InkWell(
-              // onTap: () => context.push(getPathFromString(
-              //   element.type,
-              //   [element.id.toString()],
-              // )),
+              onTap: () => handleChipPress(context, element),
               child: Center(
                 child: Padding(
                   padding:
@@ -57,7 +55,7 @@ class FilterWidget extends StatelessWidget {
                       top: 6,
                     ),
                     child: Text(
-                      element.title,
+                      element.type,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
@@ -68,5 +66,22 @@ class FilterWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void handleChipPress(
+    BuildContext context,
+    HomeChipsItemsModel element,
+  ) {
+    var location = GoRouter.of(context).location;
+    if (element.type == TypeConstants.LINK) {
+      context.push(
+        location + RouteConstants.webviewPath,
+        extra: {'url': element.path},
+      );
+    }
+    context.push(getPathFromString(
+      element.type,
+      [element.id.toString()],
+    ));
   }
 }
