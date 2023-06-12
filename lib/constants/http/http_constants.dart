@@ -14,4 +14,5 @@ class HTTPConstants {
   static const String FOLDERS = 'folders';
   static const String MEDITATIONS = 'meditations';
   static const String BACKGROUND_SOUNDS = 'backgroundSounds';
+  static const String HOME = 'home';
 }

@@ -1,6 +1,7 @@
 export 'auth/auth_provider.dart';
 export 'auth/auth_token_provider.dart';
 export 'auth/auth_init_token_provider.dart';
+export 'home/home_provider.dart';
 export 'audio_player/audio_player_provider.dart';
 export 'background_sounds/background_sounds_provider.dart';
 export 'folder/folder_provider.dart';

@@ -24,7 +24,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 final router = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigatorKey,
-  initialLocation: RouteConstants.bottomNavbarPath,
+  initialLocation: RouteConstants.root,
   routes: [
     GoRoute(
       path: RouteConstants.root,
@@ -83,6 +83,9 @@ final router = GoRouter(
             key: state.pageKey,
             child: BottomNavbarWidget(),
           ),
+          routes: [
+            _getWebviewRoute(),
+          ],
         ),
         _getMeditationRoute(fromRoot: true),
         _getArticleRoute(fromRoot: true),

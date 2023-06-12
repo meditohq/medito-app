@@ -9,6 +9,7 @@ Future<FolderModel> folders(
   required int folderId,
 }) {
   final folderRepository = ref.watch(folderRepositoryProvider);
+  ref.keepAlive();
 
   return folderRepository.fetchFolders(folderId);
 }

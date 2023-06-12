@@ -10,7 +10,10 @@ Future<MeditationModel> meditations(
   ref, {
   required int meditationId,
 }) {
-  return ref.watch(meditationRepositoryProvider).fetchMeditation(meditationId);
+  var meditationRepository = ref.watch(meditationRepositoryProvider);
+  ref.keepAlive();
+
+  return meditationRepository.fetchMeditation(meditationId);
 }
 
 @riverpod
@@ -46,7 +49,9 @@ Future<void> addSingleMeditationInPreference(
       await ref.read(downloadedMeditationsProvider.future);
   _downloadedMeditationList.add(_meditation);
   await ref.read(
-    addMeditationListInPreferenceProvider(meditations: _downloadedMeditationList).future,
+    addMeditationListInPreferenceProvider(
+            meditations: _downloadedMeditationList)
+        .future,
   );
   unawaited(ref.refresh(downloadedMeditationsProvider.future));
 }

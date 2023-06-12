@@ -111,7 +111,7 @@ class FolderView extends ConsumerWidget {
                 ),
             ],
           ),
-          if (type != TypeConstants.SESSION) _getIcon(type),
+          if (type != TypeConstants.MEDITATION) _getIcon(type),
         ],
       ),
     );
