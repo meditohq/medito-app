@@ -1,12 +1,17 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DebugBottomSheetWidget extends StatelessWidget {
+class DebugBottomSheetWidget extends ConsumerWidget {
   const DebugBottomSheetWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var userTokenModel = ref.read(authTokenProvider).asData?.value;
+    var deviceInfo = ref.read(deviceInfoProvider).asData?.value;
+
     return DraggableSheetWidget(
       child: (scrollController) {
         return Column(
@@ -18,12 +23,12 @@ class DebugBottomSheetWidget extends StatelessWidget {
             _debugRowItem(
               context,
               StringConstants.id,
-              '1ddf1478-9beb-428d-97c1-f0085ff16768',
+              userTokenModel?.id,
             ),
             _debugRowItem(
               context,
               StringConstants.email,
-              'medito@medito.com',
+              '',
             ),
             _debugRowItem(
               context,
@@ -33,7 +38,17 @@ class DebugBottomSheetWidget extends StatelessWidget {
             _debugRowItem(
               context,
               StringConstants.deviceModel,
-              'xxxx',
+              deviceInfo?.model,
+            ),
+            _debugRowItem(
+              context,
+              StringConstants.deviceOs,
+              deviceInfo?.os,
+            ),
+            _debugRowItem(
+              context,
+              StringConstants.devicePlatform,
+              deviceInfo?.platform,
             ),
           ],
         );
@@ -41,7 +56,7 @@ class DebugBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  Padding _debugRowItem(BuildContext context, String title, String text) {
+  Padding _debugRowItem(BuildContext context, String title, String? text) {
     var labelMedium = Theme.of(context).textTheme.labelMedium;
 
     return Padding(
@@ -53,7 +68,7 @@ class DebugBottomSheetWidget extends StatelessWidget {
             style: labelMedium,
           ),
           Text(
-            text,
+            text ?? '',
             style: labelMedium,
           ),
         ],

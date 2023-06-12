@@ -47,7 +47,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
   Expanded _statsList(
     ScrollController scrollController,
     StatsModel stats,
-    WidgetRef ref,
+    WidgetRef _,
   ) {
     return Expanded(
       child: ListView.builder(
