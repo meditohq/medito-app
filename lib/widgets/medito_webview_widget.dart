@@ -13,7 +13,8 @@ class MeditoWebViewWidget extends StatefulWidget {
   _MeditoWebViewWidgetState createState() => _MeditoWebViewWidgetState();
 }
 
-class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
+class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget>
+    with AutomaticKeepAliveClientMixin<MeditoWebViewWidget> {
   var controller = WebViewController();
   int _stackToView = 1;
 
@@ -42,6 +43,8 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
       backgroundColor: ColorConstants.greyIsTheNewGrey,
       appBar: MeditoAppBarWidget(
@@ -62,4 +65,7 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
