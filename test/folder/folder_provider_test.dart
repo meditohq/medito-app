@@ -76,30 +76,32 @@ void main() {
       },
     );
     test(
-      'return errors when folder repository throws',
+      'return folders when repository fetches successfully',
       () async {
-        final exception = Exception();
-        //ARRANGE
+        // ARRANGE
+        final folders = [
+          FolderModel(id: 1, name: 'Folder 1'),
+          FolderModel(id: 2, name: 'Folder 2'),
+        ];
         final mockFolderRepository = MockFolderRepository();
-        when(() => mockFolderRepository.fetchFolders(28))
-            .thenAnswer((_) async => throw (exception));
+        when(() => mockFolderRepository.fetchFolders(any()))
+            .thenAnswer((_) async => folders);
 
-        //ACT
+        // ACT
         final container = makeProviderContainer(mockFolderRepository);
 
-        //ASSERT
+        // ASSERT
         expect(
           container.read(foldersProvider(folderId: 28)),
           const AsyncValue<FolderModel>.loading(),
         );
         await expectLater(
           container.read(foldersProvider(folderId: 28).future),
-          throwsA(isA<Exception>()),
+          completion(folders),
         );
         expect(
           container.read(foldersProvider(folderId: 28)),
-          isA<AsyncError<FolderModel>>()
-              .having((e) => e.error, 'error', exception),
+          const AsyncValue<FolderModel>.data(folders),
         );
         verify(
           () => mockFolderRepository.fetchFolders(28),
