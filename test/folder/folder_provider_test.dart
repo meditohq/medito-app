@@ -75,6 +75,8 @@ void main() {
         ).called(1);
       },
     );
+
+    /// Test case to ensure that folders are returned when the repository fetches successfully.
     test(
       'return folders when repository fetches successfully',
       () async {
