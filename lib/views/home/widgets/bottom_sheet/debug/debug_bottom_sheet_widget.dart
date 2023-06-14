@@ -1,4 +1,5 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ class DebugBottomSheetWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var userTokenModel = ref.read(authTokenProvider).asData?.value;
-    var deviceInfo = ref.read(deviceInfoProvider).asData?.value;
+    var me = ref.watch(meProvider);
+    var deviceInfo = ref.watch(deviceAndAppInfoProvider).asData?.value;
 
     return DraggableSheetWidget(
       child: (scrollController) {
@@ -20,39 +21,70 @@ class DebugBottomSheetWidget extends ConsumerWidget {
             height16,
             HandleBarWidget(),
             height16,
-            _debugRowItem(
-              context,
-              StringConstants.id,
-              userTokenModel?.id,
-            ),
-            _debugRowItem(
-              context,
-              StringConstants.email,
-              '',
-            ),
-            _debugRowItem(
-              context,
-              StringConstants.appVersion,
-              '2.1.3',
-            ),
-            _debugRowItem(
-              context,
-              StringConstants.deviceModel,
-              deviceInfo?.model,
-            ),
-            _debugRowItem(
-              context,
-              StringConstants.deviceOs,
-              deviceInfo?.os,
-            ),
-            _debugRowItem(
-              context,
-              StringConstants.devicePlatform,
-              deviceInfo?.platform,
+            me.when(
+              skipLoadingOnRefresh: false,
+              data: (data) => _debugItemsList(context, data, deviceInfo),
+              error: (err, stack) => Expanded(
+                child: MeditoErrorWidget(
+                  message: err.toString(),
+                  onTap: () => ref.refresh(meProvider),
+                ),
+              ),
+              loading: () => Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
             ),
           ],
         );
       },
+    );
+  }
+
+  Column _debugItemsList(
+    BuildContext context,
+    MeModel? me,
+    DeviceAndAppInfoModel? deviceInfo,
+  ) {
+    return Column(
+      children: [
+        _debugRowItem(
+          context,
+          StringConstants.id,
+          me?.id,
+        ),
+        _debugRowItem(
+          context,
+          StringConstants.email,
+          me?.email,
+        ),
+        _debugRowItem(
+          context,
+          StringConstants.appVersion,
+          deviceInfo?.appVersion,
+        ),
+        _debugRowItem(
+          context,
+          StringConstants.deviceModel,
+          deviceInfo?.model,
+        ),
+        _debugRowItem(
+          context,
+          StringConstants.deviceOs,
+          deviceInfo?.os,
+        ),
+        _debugRowItem(
+          context,
+          StringConstants.devicePlatform,
+          deviceInfo?.platform,
+        ),
+        _debugRowItem(
+          context,
+          StringConstants.buidNumber,
+          deviceInfo?.buildNumber,
+        ),
+      ],
     );
   }
 

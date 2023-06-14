@@ -17,7 +17,7 @@ import 'package:Medito/network/folder/folder_response.dart';
 import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 

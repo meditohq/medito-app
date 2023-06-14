@@ -6,7 +6,7 @@ import 'package:Medito/audioplayer/media_library.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
 import 'package:Medito/network/session_options/session_opts.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DownloadsBloc {

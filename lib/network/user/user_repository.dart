@@ -4,7 +4,7 @@ import 'package:Medito/network/http_get.dart';
 import 'package:Medito/network/user/user_response.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'dart:io' as io;
 
 import 'package:sentry_flutter/sentry_flutter.dart';

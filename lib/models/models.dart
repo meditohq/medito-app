@@ -1,4 +1,5 @@
 export 'user/user_token_model.dart';
+export 'me/me_model.dart';
 export 'folder/folder_model.dart';
 export 'meditation/meditation_model.dart';
 export 'background_sounds/background_sounds_model.dart';
@@ -10,4 +11,4 @@ export 'home/menu/home_menu_model.dart';
 export 'stats/stats_model.dart';
 export 'stats/mini_stats/mini_stats_model.dart';
 export 'stats/all_stats/all_stats_model.dart';
-export 'device_info/device_info_model.dart';
+export 'device_info/device_and_app_info_model.dart';

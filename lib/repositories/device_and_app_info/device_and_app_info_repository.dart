@@ -1,46 +1,52 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Medito/models/models.dart';
 
-part 'device_info_repository.g.dart';
+part 'device_and_app_info_repository.g.dart';
 
-abstract class DeviceInfoRepository {
-  Future<DeviceInfoModel> getDeviceInfo();
+abstract class DeviceAndAppInfoRepository {
+  Future<DeviceAndAppInfoModel> getDeviceAndAppInfo();
 }
 
-class DeviceInfoRepositoryImpl extends DeviceInfoRepository {
+class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
   DeviceInfoRepositoryImpl();
 
   @override
-  Future<DeviceInfoModel> getDeviceInfo() async {
+  Future<DeviceAndAppInfoModel> getDeviceAndAppInfo() async {
     var deviceModel;
     var deviceOS;
     var devicePlatform;
     var buildNumber;
+    var appVersion;
     try {
       var deviceInfo = DeviceInfoPlugin();
+      var packageInfo = await PackageInfo.fromPlatform();
+      buildNumber = packageInfo.buildNumber;
+      appVersion = packageInfo.version;
+
       if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
         deviceModel = iosInfo.utsname.machine;
         deviceOS = iosInfo.utsname.sysname;
-        buildNumber = iosInfo.utsname.nodename;
         devicePlatform = 'iOS';
       } else if (Platform.isAndroid) {
         var androidInfo = await deviceInfo.androidInfo;
         deviceModel = androidInfo.model;
         deviceOS = androidInfo.version.release;
-        buildNumber = androidInfo.serialNumber;
         devicePlatform = 'android';
       }
+
       var data = {
         'model': deviceModel,
         'os': deviceOS,
         'platform': devicePlatform,
         'buildNumber': buildNumber,
+        'appVersion': appVersion,
       };
 
-      return DeviceInfoModel.fromJson(data);
+      return DeviceAndAppInfoModel.fromJson(data);
     } catch (e) {
       rethrow;
     }
@@ -48,6 +54,6 @@ class DeviceInfoRepositoryImpl extends DeviceInfoRepository {
 }
 
 @riverpod
-DeviceInfoRepository deviceInfoRepository(_) {
+DeviceAndAppInfoRepository deviceAndAppInfoRepository(_) {
   return DeviceInfoRepositoryImpl();
 }
