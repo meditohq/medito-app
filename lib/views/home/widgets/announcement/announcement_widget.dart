@@ -1,15 +1,15 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/constants/strings/string_constants.dart';
+import 'package:Medito/models/home/announcement/announcement_model.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class AnnouncementWidget extends StatelessWidget {
-  const AnnouncementWidget({super.key});
-
+  const AnnouncementWidget({super.key, this.announcement});
+  final AnnouncementModel? announcement;
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: ColorConstants.lightPurple,
+      color: ColorConstants.getColorFromString(announcement!.colorBackground),
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
@@ -22,8 +22,12 @@ class AnnouncementWidget extends StatelessWidget {
               ),
               Flexible(
                 child: Text(
-                  '''We just had the most incredible time at the second medito retreat. Watch the video to see some highlights.''',
-                  style: Theme.of(context).textTheme.titleSmall,
+                  announcement?.text ?? '',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: ColorConstants.getColorFromString(
+                          announcement!.colorText,
+                        ),
+                      ),
                 ),
               ),
             ],

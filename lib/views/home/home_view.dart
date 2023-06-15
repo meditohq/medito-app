@@ -25,7 +25,10 @@ class HomeView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AnnouncementWidget(),
+              if (data.announcement != null)
+                AnnouncementWidget(
+                  announcement: data.announcement,
+                ),
               HomeHeaderWidget(
                 homeMenuModel: data.menu,
               ),
