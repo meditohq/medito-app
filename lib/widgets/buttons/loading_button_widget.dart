@@ -9,17 +9,24 @@ class LoadingButtonWidget extends StatelessWidget {
     this.bgColor = ColorConstants.greyIsTheNewGrey,
     this.textColor = ColorConstants.walterWhite,
     this.isLoading = false,
+    this.elevation = 2,
+    this.fontWeight = FontWeight.w500,
+    this.fontSize = 15,
   });
   final void Function()? onPressed;
   final String btnText;
   final Color bgColor;
   final Color textColor;
   final bool isLoading;
+  final double elevation;
+  final FontWeight fontWeight;
+  final double fontSize;
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       onPressed: isLoading ? null : onPressed,
+      elevation: elevation,
       disabledColor: bgColor.withOpacity(0.7),
       color: bgColor,
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
@@ -32,7 +39,8 @@ class LoadingButtonWidget extends StatelessWidget {
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: isLoading ? Colors.transparent : textColor,
                   fontFamily: ClashDisplay,
-                  fontSize: 15,
+                  fontSize: fontSize,
+                  fontWeight: fontWeight,
                 ),
           ),
           if (isLoading)

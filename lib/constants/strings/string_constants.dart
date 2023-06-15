@@ -75,6 +75,8 @@ class StringConstants {
   static const String deviceOs = 'deviceOs';
   static const String devicePlatform = 'devicePlatform';
   static const String buidNumber = 'buidNumber';
+  static const String dismiss = 'Dismiss';
+  static const String watch = 'Watch';
 
   //Error
   static const String invalidEmail = 'Invalid Email.';
