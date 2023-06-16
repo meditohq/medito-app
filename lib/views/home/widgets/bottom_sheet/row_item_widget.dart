@@ -7,7 +7,7 @@ class RowItemWidget extends StatelessWidget {
     super.key,
     required this.title,
     this.subTitle,
-    required this.leadingIcon,
+    required this.iconCodePoint,
     this.isShowUnderline = true,
     this.onTap,
     this.isTrailingIcon = true,
@@ -17,7 +17,7 @@ class RowItemWidget extends StatelessWidget {
 
   final String title;
   final String? subTitle;
-  final String leadingIcon;
+  final String iconCodePoint;
   final bool isShowUnderline;
   final void Function()? onTap;
   final bool isTrailingIcon;
@@ -33,6 +33,7 @@ class RowItemWidget extends StatelessWidget {
             )
           : BorderSide.none,
     );
+    var icon = int.parse('0x$iconCodePoint');
 
     return InkWell(
       onTap: onTap,
@@ -52,10 +53,7 @@ class RowItemWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(
-                    leadingIcon,
-                    height: iconSize,
-                  ),
+                  Icon(IconData(icon, fontFamily: 'MaterialIcons')),
                   width16,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

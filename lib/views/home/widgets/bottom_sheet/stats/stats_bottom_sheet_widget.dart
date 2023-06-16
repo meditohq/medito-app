@@ -57,7 +57,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           var all = stats.all[index];
 
           return RowItemWidget(
-            leadingIcon: getLeadingIconPath(all.icon),
+            iconCodePoint: all.icon,
             iconSize: 20,
             title: all.title,
             subTitle: all.subtitle,
@@ -69,9 +69,5 @@ class StatsBottomSheetWidget extends ConsumerWidget {
         },
       ),
     );
-  }
-
-  String getLeadingIconPath(String path) {
-    return '${AssetConstants.rootPath}/$path.svg';
   }
 }
