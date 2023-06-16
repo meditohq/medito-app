@@ -27,7 +27,7 @@ class MenuBottomSheetWidget extends StatelessWidget {
                   var element = homeMenuModel[index];
 
                   return RowItemWidget(
-                    leadingIcon: getLeadingIconPath(element.icon),
+                    iconCodePoint: element.icon,
                     title: element.title,
                     isShowUnderline: index < homeMenuModel.length - 1,
                   );
@@ -38,17 +38,5 @@ class MenuBottomSheetWidget extends StatelessWidget {
         );
       },
     );
-  }
-
-  String getLeadingIconPath(String path) {
-    if (path == 'ic_help') {
-      return AssetConstants.icHelpCircle;
-    } else if (path == 'ic_email') {
-      return AssetConstants.icHelpCircle;
-    } else if (path == 'ic_medito') {
-      return AssetConstants.icMedito;
-    }
-
-    return AssetConstants.icMedito;
   }
 }

@@ -24,7 +24,7 @@ class StatsBottomSheetWidget extends StatelessWidget {
                 itemCount: 4,
                 itemBuilder: (BuildContext context, int index) {
                   return RowItemWidget(
-                    leadingIcon: getLeadingIconPath('ic_help'),
+                    iconCodePoint: getLeadingIconPath('ic_help'),
                     title: 'element.title $index',
                     subTitle: 'Subtitle $index',
                     isShowUnderline: index < 4,
