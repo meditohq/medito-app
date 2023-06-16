@@ -1,4 +1,3 @@
-
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,13 +6,13 @@ class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
     super.key,
     required this.title,
-    required this.leadingIcon,
+    required this.iconCodePoint,
     this.isShowUnderline = true,
     this.onTap,
   });
 
   final String title;
-  final String leadingIcon;
+  final String iconCodePoint;
   final bool isShowUnderline;
   final void Function()? onTap;
 
@@ -27,6 +26,7 @@ class RowItemWidget extends StatelessWidget {
             )
           : BorderSide.none,
     );
+    var icon = int.parse('0x$iconCodePoint');
 
     return InkWell(
       onTap: onTap,
@@ -46,10 +46,7 @@ class RowItemWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(
-                    leadingIcon,
-                    height: 14,
-                  ),
+                  Icon(IconData(icon, fontFamily: 'MaterialIcons')),
                   width16,
                   Text(title),
                 ],
