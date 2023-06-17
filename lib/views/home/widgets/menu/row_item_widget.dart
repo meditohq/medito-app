@@ -7,19 +7,19 @@ class RowItemWidget extends StatelessWidget {
     super.key,
     required this.title,
     required this.iconCodePoint,
-    this.isShowUnderline = true,
+    this.hasUnderline = true,
     this.onTap,
   });
 
   final String title;
   final String iconCodePoint;
-  final bool isShowUnderline;
+  final bool hasUnderline;
   final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     var border = Border(
-      bottom: isShowUnderline
+      bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
               color: ColorConstants.darkMoon,

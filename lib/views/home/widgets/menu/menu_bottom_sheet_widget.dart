@@ -29,7 +29,7 @@ class MenuBottomSheetWidget extends StatelessWidget {
                   return RowItemWidget(
                     iconCodePoint: element.icon,
                     title: element.title,
-                    isShowUnderline: index < homeMenuModel.length - 1,
+                    hasUnderline: index < homeMenuModel.length - 1,
                   );
                 },
               ),
