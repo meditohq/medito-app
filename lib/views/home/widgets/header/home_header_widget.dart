@@ -1,14 +1,19 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+
+import '../menu/menu_bottom_sheet_widget.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({
     super.key,
     this.streakCount,
+    required this.homeMenuModel,
   });
   final String? streakCount;
+  final List<HomeMenuModel> homeMenuModel;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -23,7 +28,20 @@ class HomeHeaderWidget extends StatelessWidget {
               width16,
               _downloadWidget(context),
               width16,
-              SvgPicture.asset(AssetConstants.icMenu),
+              InkWell(
+                onTap: () {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    backgroundColor: ColorConstants.transparent,
+                    builder: (BuildContext context) {
+                      return MenuBottomSheetWidget(
+                        homeMenuModel: homeMenuModel,
+                      );
+                    },
+                  );
+                },
+                child: SvgPicture.asset(AssetConstants.icMenu),
+              ),
             ],
           ),
         ],

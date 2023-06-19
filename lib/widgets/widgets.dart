@@ -1,5 +1,6 @@
 export 'shimmers/folder_shimmer_widget.dart';
 export 'shimmers/meditation_shimmer_widget.dart';
+export 'shimmers/home_shimmer_widget.dart';
 export 'shimmers/background_sounds_shimmer_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'errors/connectivity_error_widget.dart';
@@ -10,3 +11,5 @@ export 'medito_webview_widget.dart';
 export 'markdown_widget.dart';
 export 'network_image_widget.dart';
 export 'snackbar_widget.dart';
+export 'draggable_sheet_widget.dart';
+export 'handle_bar_widget.dart';

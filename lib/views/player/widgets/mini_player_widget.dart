@@ -18,7 +18,7 @@ class MiniPlayerWidget extends ConsumerWidget {
       },
       child: Container(
         height: 64,
-        color: ColorConstants.greyIsTheNewGrey,
+        color: ColorConstants.onyx,
         child: Row(
           children: [
             Expanded(

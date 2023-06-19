@@ -1,6 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widgets/artist_title_widget.dart';
@@ -41,14 +42,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
             SafeArea(
               child: Column(
                 children: [
-                  Container(
-                    height: 4,
-                    width: 44,
-                    decoration: BoxDecoration(
-                      color: ColorConstants.walterWhite,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  HandleBarWidget(),
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.symmetric(

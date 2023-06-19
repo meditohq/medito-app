@@ -1,6 +1,5 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/home/home_model.dart';
-import 'package:Medito/widgets/shimmers/home_shimmer_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,7 +25,9 @@ class HomeView extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               height8,
-              HomeHeaderWidget(),
+              HomeHeaderWidget(
+                homeMenuModel: data.menu,
+              ),
               height16,
               Expanded(
                 child: SingleChildScrollView(
