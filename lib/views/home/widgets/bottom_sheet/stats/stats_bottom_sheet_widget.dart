@@ -25,7 +25,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             height16,
             stats.when(
               skipLoadingOnRefresh: false,
-              data: (data) => _statsList(scrollController, data, ref),
+              data: (data) => _statsList(scrollController, data),
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(
                   message: err.toString(),
@@ -44,11 +44,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     );
   }
 
-  Expanded _statsList(
-    ScrollController scrollController,
-    StatsModel stats,
-    WidgetRef _,
-  ) {
+  Expanded _statsList(ScrollController scrollController, StatsModel stats) {
     return Expanded(
       child: ListView.builder(
         controller: scrollController,
@@ -57,11 +53,12 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           var all = stats.all[index];
 
           return RowItemWidget(
-            leadingIcon: getLeadingIconPath(all.icon),
+            iconCodePoint: all.icon,
+            iconColor: all.color,
             iconSize: 20,
             title: all.title,
             subTitle: all.subtitle,
-            isShowUnderline: index < stats.all.length - 1,
+            hasUnderline: index < stats.all.length - 1,
             isTrailingIcon: false,
             titleStyle:
                 Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
@@ -69,9 +66,5 @@ class StatsBottomSheetWidget extends ConsumerWidget {
         },
       ),
     );
-  }
-
-  String getLeadingIconPath(String path) {
-    return '${AssetConstants.rootPath}/$path.svg';
   }
 }

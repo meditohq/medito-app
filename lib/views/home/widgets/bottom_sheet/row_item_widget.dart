@@ -7,32 +7,36 @@ class RowItemWidget extends StatelessWidget {
     super.key,
     required this.title,
     this.subTitle,
-    required this.leadingIcon,
-    this.isShowUnderline = true,
+    required this.iconCodePoint,
+    this.hasUnderline = true,
     this.onTap,
     this.isTrailingIcon = true,
     this.titleStyle,
     this.iconSize = 14,
+    this.iconColor,
   });
 
   final String title;
   final String? subTitle;
-  final String leadingIcon;
-  final bool isShowUnderline;
+  final String iconCodePoint;
+  final String? iconColor;
+  final bool hasUnderline;
   final void Function()? onTap;
   final bool isTrailingIcon;
   final TextStyle? titleStyle;
   final double iconSize;
+
   @override
   Widget build(BuildContext context) {
     var border = Border(
-      bottom: isShowUnderline
+      bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
               color: ColorConstants.darkMoon,
             )
           : BorderSide.none,
     );
+    var icon = int.parse('0x$iconCodePoint');
 
     return InkWell(
       onTap: onTap,
@@ -52,9 +56,11 @@ class RowItemWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(
-                    leadingIcon,
-                    height: iconSize,
+                  Icon(
+                    IconData(icon, fontFamily: 'MaterialIcons'),
+                    color: iconColor != null
+                        ? ColorConstants.getColorFromString(iconColor!)
+                        : null,
                   ),
                   width16,
                   Column(

@@ -46,4 +46,9 @@ class ColorConstants {
   static const onyx = Color(0xff2A2A32);
   static const ebony = Color(0xff171718);
   static const graphite = Color(0xffAAAAAA);
+  static Color getColorFromString(String name) {
+    var color = int.parse(name.replaceAll('#', '0xff'));
+
+    return Color(color);
+  }
 }
