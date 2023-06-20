@@ -68,6 +68,8 @@ class HomeHeaderWidget extends StatelessWidget {
       onTap: () {
         showModalBottomSheet<void>(
           context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
           backgroundColor: ColorConstants.transparent,
           builder: (BuildContext context) {
             return StatsBottomSheetWidget();
