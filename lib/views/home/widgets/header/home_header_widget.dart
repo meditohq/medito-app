@@ -1,10 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/views/home/widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-
+import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import '../bottom_sheet/menu/menu_bottom_sheet_widget.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
@@ -15,7 +14,7 @@ class HomeHeaderWidget extends StatelessWidget {
   });
   final String? streakCount;
   final List<HomeMenuModel> homeMenuModel;
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
