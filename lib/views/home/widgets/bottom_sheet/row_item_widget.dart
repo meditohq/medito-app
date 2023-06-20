@@ -66,6 +66,7 @@ class RowItemWidget extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Icon(Icons),
                       Text(
                         title,
                         style: titleStyle ??

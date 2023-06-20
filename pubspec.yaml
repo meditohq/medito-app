@@ -34,10 +34,10 @@ dependencies:
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2
-  package_info: ^2.0.0
+  package_info_plus: ^4.0.2
   pedantic: ^1.11.0
   connectivity: ^3.0.3
-  device_info: ^2.0.0
+  device_info_plus: ^9.0.2
   equatable: ^2.0.0
   sentry_flutter: ^7.0.0
   back_button_interceptor: ^6.0.2

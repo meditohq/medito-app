@@ -1,8 +1,10 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import '../bottom_sheet/menu/menu_bottom_sheet_widget.dart';
 
@@ -22,7 +24,7 @@ class HomeHeaderWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SvgPicture.asset(AssetConstants.icLogo),
+          _logo(context),
           Row(
             children: [
               _statsWidget(context, streakCount: streakCount),
@@ -34,6 +36,20 @@ class HomeHeaderWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  LongPressDetectorWidget _logo(BuildContext context) {
+    return LongPressDetectorWidget(
+      onLongPress: () => showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: ColorConstants.transparent,
+        builder: (BuildContext context) {
+          return DebugBottomSheetWidget();
+        },
+      ),
+      duration: Duration(seconds: 0),
+      child: SvgPicture.asset(AssetConstants.icLogo),
     );
   }
 
