@@ -8,13 +8,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../row_item_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../share_btn/share_btn_widget.dart';
+
 class StatsBottomSheetWidget extends ConsumerWidget {
   const StatsBottomSheetWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var stats = ref.watch(remoteStatsProvider);
-    var _globalKey = GlobalKey();
+    var globalKey = GlobalKey();
 
     return DraggableSheetWidget(
       initialChildSize: 0.7,
@@ -30,7 +32,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             stats.when(
               skipLoadingOnRefresh: false,
               data: (data) =>
-                  _statsList(context, scrollController, _globalKey, data),
+                  _statsList(context, scrollController, globalKey, data),
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(
                   message: err.toString(),
@@ -83,34 +85,12 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: LoadingButtonWidget(
-                onPressed: () => _handleShare(context, key),
-                btnText: StringConstants.share,
-                bgColor: ColorConstants.walterWhite,
-                textColor: ColorConstants.greyIsTheNewGrey,
-              ),
+            ShareBtnWidget(
+              globalKey: key,
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _handleShare(BuildContext context, GlobalKey key) async {
-    try {
-      var file = await capturePng(key);
-      if (file != null) {
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: StringConstants.shareStatsText,
-        );
-      } else {
-        showSnackBar(context, StringConstants.someThingWentWrong);
-      }
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
   }
 }
