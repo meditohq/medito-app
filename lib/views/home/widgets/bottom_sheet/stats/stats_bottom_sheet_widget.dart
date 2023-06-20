@@ -25,7 +25,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             height16,
             stats.when(
               skipLoadingOnRefresh: false,
-              data: (data) => _statsList(scrollController, data, ref),
+              data: (data) => _statsList(scrollController, data),
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(
                   message: err.toString(),
@@ -44,11 +44,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     );
   }
 
-  Expanded _statsList(
-    ScrollController scrollController,
-    StatsModel stats,
-    WidgetRef ref,
-  ) {
+  Expanded _statsList(ScrollController scrollController, StatsModel stats) {
     return Expanded(
       child: ListView.builder(
         controller: scrollController,
@@ -58,6 +54,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
 
           return RowItemWidget(
             iconCodePoint: all.icon,
+            iconColor: all.color,
             iconSize: 20,
             title: all.title,
             subTitle: all.subtitle,

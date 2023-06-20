@@ -13,16 +13,19 @@ class RowItemWidget extends StatelessWidget {
     this.isTrailingIcon = true,
     this.titleStyle,
     this.iconSize = 14,
+    this.iconColor,
   });
 
   final String title;
   final String? subTitle;
   final String iconCodePoint;
+  final String? iconColor;
   final bool isShowUnderline;
   final void Function()? onTap;
   final bool isTrailingIcon;
   final TextStyle? titleStyle;
   final double iconSize;
+
   @override
   Widget build(BuildContext context) {
     var border = Border(
@@ -53,7 +56,12 @@ class RowItemWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(IconData(icon, fontFamily: 'MaterialIcons')),
+                  Icon(
+                    IconData(icon, fontFamily: 'MaterialIcons'),
+                    color: iconColor != null
+                        ? ColorConstants.getColorFromString(iconColor!)
+                        : null,
+                  ),
                   width16,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
