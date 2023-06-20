@@ -8,7 +8,7 @@ class RowItemWidget extends StatelessWidget {
     required this.title,
     this.subTitle,
     required this.iconCodePoint,
-    this.isShowUnderline = true,
+    this.hasUnderline = true,
     this.onTap,
     this.isTrailingIcon = true,
     this.titleStyle,
@@ -20,7 +20,7 @@ class RowItemWidget extends StatelessWidget {
   final String? subTitle;
   final String iconCodePoint;
   final String? iconColor;
-  final bool isShowUnderline;
+  final bool hasUnderline;
   final void Function()? onTap;
   final bool isTrailingIcon;
   final TextStyle? titleStyle;
@@ -29,7 +29,7 @@ class RowItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var border = Border(
-      bottom: isShowUnderline
+      bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
               color: ColorConstants.darkMoon,

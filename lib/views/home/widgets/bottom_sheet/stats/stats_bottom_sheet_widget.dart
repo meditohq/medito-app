@@ -58,7 +58,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             iconSize: 20,
             title: all.title,
             subTitle: all.subtitle,
-            isShowUnderline: index < stats.all.length - 1,
+            hasUnderline: index < stats.all.length - 1,
             isTrailingIcon: false,
             titleStyle:
                 Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
