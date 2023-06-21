@@ -1,4 +1,5 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -36,7 +37,6 @@ class RowItemWidget extends StatelessWidget {
             )
           : BorderSide.none,
     );
-    var icon = int.parse('0x$iconCodePoint');
 
     return InkWell(
       onTap: onTap,
@@ -57,7 +57,10 @@ class RowItemWidget extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    IconData(icon, fontFamily: 'MaterialIcons'),
+                    IconData(
+                      formatIcon(iconCodePoint),
+                      fontFamily: 'MaterialIcons',
+                    ),
                     color: iconColor != null
                         ? ColorConstants.getColorFromString(iconColor!)
                         : null,

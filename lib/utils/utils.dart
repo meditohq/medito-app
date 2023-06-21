@@ -184,6 +184,10 @@ Future<File?> capturePng(GlobalKey globalKey) async {
   }
 }
 
+int formatIcon(String icon) {
+  return int.parse('0x$icon');
+}
+
 extension SanitisePath on String {
   String sanitisePath() {
     return replaceFirst('/', '');
