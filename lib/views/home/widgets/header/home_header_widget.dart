@@ -48,7 +48,7 @@ class HomeHeaderWidget extends StatelessWidget {
           return DebugBottomSheetWidget();
         },
       ),
-      duration: Duration(seconds: 0),
+      duration: Duration(seconds: 3),
       child: SvgPicture.asset(AssetConstants.icLogo),
     );
   }
