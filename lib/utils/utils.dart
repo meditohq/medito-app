@@ -19,8 +19,11 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:ui' as ui;
 
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
@@ -154,6 +157,31 @@ Future<void> showBottomModal(BuildContext context, Widget child) async {
 
 String getFileExtension(String path) {
   return '.${path.substring(path.lastIndexOf('.') + 1)}';
+}
+
+Future<File?> capturePng(GlobalKey globalKey) async {
+  try {
+    var boundary =
+        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    var image = await boundary.toImage();
+    var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    var pngBytes = byteData?.buffer.asUint8List();
+
+    // Get the path to the app's temporary directory
+    final directory = await getTemporaryDirectory();
+
+    // Create a file in the temporary directory
+    final file = File('${directory.path}/stats.png');
+
+    // Write the bytes to the file
+    if (pngBytes != null) {
+      return await file.writeAsBytes(pngBytes);
+    }
+
+    return null;
+  } catch (e) {
+    rethrow;
+  }
 }
 
 extension SanitisePath on String {

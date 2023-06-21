@@ -8,18 +8,20 @@ class DraggableSheetWidget extends StatelessWidget {
     this.initialChildSize = 0.5,
     this.minChildSize = 0.4,
     this.maxChildSize = 1,
+    this.expand = true,
   });
   final Widget Function(ScrollController scrollController) child;
   final double initialChildSize;
   final double minChildSize;
   final double maxChildSize;
+  final bool expand;
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: initialChildSize,
       minChildSize: minChildSize,
       maxChildSize: maxChildSize,
-      expand: false,
+      expand: expand,
       builder: (
         BuildContext context,
         ScrollController scrollController,

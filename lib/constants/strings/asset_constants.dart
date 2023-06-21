@@ -19,8 +19,5 @@ class AssetConstants {
   static const String icStreak = 'assets/images/ic_streak.svg';
   static const String icMenu = 'assets/images/ic_menu.svg';
   static const String icDownload = 'assets/images/ic_download.svg';
-  static const String icHelpCircle = 'assets/images/ic_help_circle.svg';
-  static const String icHeart = 'assets/images/ic_heart.svg';
-  static const String icEdit = 'assets/images/ic_edit.svg';
   static const String icMedito = 'assets/images/ic_medito.svg';
 }

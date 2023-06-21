@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/widgets/widgets.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +48,7 @@ class HomeHeaderWidget extends StatelessWidget {
           return DebugBottomSheetWidget();
         },
       ),
-      duration: Duration(seconds: 0),
+      duration: Duration(seconds: 3),
       child: SvgPicture.asset(AssetConstants.icLogo),
     );
   }
@@ -85,6 +84,8 @@ class HomeHeaderWidget extends StatelessWidget {
       onTap: () {
         showModalBottomSheet<void>(
           context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
           backgroundColor: ColorConstants.transparent,
           builder: (BuildContext context) {
             return StatsBottomSheetWidget();
