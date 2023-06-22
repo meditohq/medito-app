@@ -13,7 +13,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var me = ref.watch(meProvider);
-    var deviceInfo = ref.watch(deviceAndAppInfoProvider).asData?.value;
+    var deviceInfo = ref.watch(deviceAndAppInfoProvider);
     var globalKey = GlobalKey();
 
     return DraggableSheetWidget(
@@ -34,7 +34,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
                 scrollController,
                 globalKey,
                 data,
-                deviceInfo,
+                deviceInfo.value,
               ),
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(

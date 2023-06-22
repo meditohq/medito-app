@@ -26,6 +26,8 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
       buildNumber = packageInfo.buildNumber;
       appVersion = packageInfo.version;
 
+      var x = await deviceInfo.deviceInfo;
+      x.data;
       if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
         deviceModel = iosInfo.utsname.machine;
