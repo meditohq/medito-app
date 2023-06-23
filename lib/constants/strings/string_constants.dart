@@ -68,6 +68,13 @@ class StringConstants {
       'Thanks for being on this journey with us.';
   static const String close = 'Close';
   static const String search = 'Search';
+  static const String id = 'id';
+  static const String email = 'email';
+  static const String appVersion = 'appVersion';
+  static const String deviceModel = 'deviceModel';
+  static const String deviceOs = 'deviceOs';
+  static const String devicePlatform = 'devicePlatform';
+  static const String buidNumber = 'buidNumber';
 
   //Error
   static const String invalidEmail = 'Invalid Email.';
