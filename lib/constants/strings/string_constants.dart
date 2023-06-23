@@ -79,6 +79,7 @@ class StringConstants {
   static const String buidNumber = 'buidNumber';
   static const String dismiss = 'Dismiss';
   static const String watch = 'Watch';
+  static const String selectGuideOrDuration = 'Select a guide / duration';
 
   //Error
   static const String someThingWentWrong = '''Something wen't wrong''';

@@ -15,6 +15,7 @@ class SoundListTileWidget extends ConsumerWidget {
 
     return InkWell(
       onTap: () => _handleItemTap(
+        ref,
         bgSoundNotifierProvider,
         audioPlayerNotifier,
         isSelected,
@@ -62,6 +63,7 @@ class SoundListTileWidget extends ConsumerWidget {
   }
 
   void _handleItemTap(
+    WidgetRef ref,
     BackgroundSoundsNotifier bgSoundNotifierProvider,
     AudioPlayerNotifier audioPlayerNotifier,
     bool isSelected,
@@ -83,9 +85,20 @@ class SoundListTileWidget extends ConsumerWidget {
       if (!isSelected) {
         audioPlayerNotifier.setBackgroundAudio(sound);
         audioPlayerNotifier.playBackgroundSound();
+        _handleTrackEvent(ref, sound.id);
       } else {
         audioPlayerNotifier.stopBackgroundSound();
       }
     }
+  }
+
+  void _handleTrackEvent(WidgetRef ref, int bgSoundId) {
+    var bgSelectedSoundModel =
+        BgSoundSelectedModel(backgroundSoundId: bgSoundId);
+    var event = EventsModel(
+      name: EventTypes.backgroundSoundSelected,
+      payload: bgSelectedSoundModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
