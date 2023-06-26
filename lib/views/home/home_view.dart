@@ -19,7 +19,7 @@ class HomeView extends ConsumerWidget {
 
     return Scaffold(
       body: homeRes.when(
-        skipLoadingOnRefresh: false,
+        skipLoadingOnRefresh: true,
         skipLoadingOnReload: false,
         data: (data) => SafeArea(
           child: Column(
@@ -27,23 +27,26 @@ class HomeView extends ConsumerWidget {
             children: [
               if (data.announcement != null)
                 AnnouncementWidget(
-                  announcement: data.announcement,
+                  announcement: data.announcement!,
                 ),
               HomeHeaderWidget(
                 homeMenuModel: data.menu,
               ),
               height16,
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SearchWidget(),
-                      FilterWidget(
-                        chips: data.chips,
-                      ),
-                      _cardListWidget(data),
-                      height16,
-                    ],
+                child: RefreshIndicator(
+                  onRefresh: () => ref.refresh(homeProvider.future),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SearchWidget(),
+                        FilterWidget(
+                          chips: data.chips,
+                        ),
+                        _cardListWidget(data),
+                        height16,
+                      ],
+                    ),
                   ),
                 ),
               ),
