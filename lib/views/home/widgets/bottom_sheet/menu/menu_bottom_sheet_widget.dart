@@ -1,16 +1,18 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../row_item_widget.dart';
 
-class MenuBottomSheetWidget extends StatelessWidget {
+class MenuBottomSheetWidget extends ConsumerWidget {
   const MenuBottomSheetWidget({super.key, required this.homeMenuModel});
   final List<HomeMenuModel> homeMenuModel;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return DraggableSheetWidget(
       child: (scrollController) {
         return Column(
@@ -30,6 +32,9 @@ class MenuBottomSheetWidget extends StatelessWidget {
                     iconCodePoint: element.icon,
                     title: element.title,
                     hasUnderline: index < homeMenuModel.length - 1,
+                    onTap: () {
+                      _handleTrackEvent(ref, element.id, element.title);
+                    },
                   );
                 },
               ),
@@ -38,5 +43,15 @@ class MenuBottomSheetWidget extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _handleTrackEvent(WidgetRef ref, int itemId, String itemTitle) {
+    var menuItemTappedModel =
+        MenuItemTappedModel(itemId: itemId, itemTitle: itemTitle);
+    var event = EventsModel(
+      name: EventTypes.menuItemTapped,
+      payload: menuItemTappedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
