@@ -177,4 +177,3 @@ class FolderView extends ConsumerWidget {
     ref.read(eventsProvider(event: event.toJson()));
   }
 }
-

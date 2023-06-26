@@ -57,7 +57,10 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                     ),
                   ),
                   OverlayCoverImageWidget(imageUrl: coverUrl),
-                  DurationIndicatorWidget(file: widget.file),
+                  DurationIndicatorWidget(
+                    file: widget.file,
+                    meditationId: widget.meditationModel.id,
+                  ),
                   Spacer(),
                   PlayerButtonsWidget(
                     file: widget.file,
