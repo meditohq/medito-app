@@ -20,6 +20,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   void initState() {
     ref.read(deviceAndAppInfoProvider);
     ref.read(remoteStatsProvider);
+    ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
     super.initState();
   }
