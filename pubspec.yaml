@@ -55,6 +55,9 @@ dependencies:
   email_validator: '^2.1.16'
   pin_code_fields: ^7.4.0
   share_plus: ^7.0.2
+  firebase_messaging: ^14.6.4
+  firebase_core: ^2.14.0
+  flutter_local_notifications: ^9.5.2
   
 
 dev_dependencies:
