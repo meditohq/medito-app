@@ -20,6 +20,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,13 +29,18 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/providers/providers.dart';
 
+import 'services/notifications/notifications_service.dart';
+
 late SharedPreferences sharedPreferences;
 late AudioPlayerNotifier audioHandler;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
   sharedPreferences = await SharedPreferences.getInstance();
-
+  await Firebase.initializeApp();
+  await registerNotification();
+  
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(

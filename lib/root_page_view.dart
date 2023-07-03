@@ -3,6 +3,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'services/notifications/notifications_service.dart';
 import 'widgets/widgets.dart';
 import 'views/player/widgets/mini_player_widget.dart';
 
@@ -22,6 +23,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
+    requestPermission();
     super.initState();
   }
 
