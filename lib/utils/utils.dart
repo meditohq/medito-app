@@ -166,14 +166,9 @@ Future<File?> capturePng(GlobalKey globalKey) async {
     var image = await boundary.toImage();
     var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData?.buffer.asUint8List();
-
-    // Get the path to the app's temporary directory
     final directory = await getTemporaryDirectory();
-
-    // Create a file in the temporary directory
     final file = File('${directory.path}/stats.png');
 
-    // Write the bytes to the file
     if (pngBytes != null) {
       return await file.writeAsBytes(pngBytes);
     }
