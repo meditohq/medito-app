@@ -53,7 +53,10 @@ Future<void> requestPermission() async {
 Future<void> initialiazeLocalNotification() async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
-  var initializationSettingsIOS = const DarwinInitializationSettings();
+  var initializationSettingsIOS = DarwinInitializationSettings(
+    onDidReceiveLocalNotification: (id, title, body, payload) =>
+        _showNotification(title, body, payload),
+  );
 
   var initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,

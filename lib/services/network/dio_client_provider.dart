@@ -33,8 +33,7 @@ final dioClientProvider = Provider<DioApiService>((ref) {
   ));
   dio.interceptors.add(InterceptorsWrapper(
     onError: (e, handler) {
-      // ref.read(authProvider);
-      onError(e, handler, dio, ref);
+      // onError(e, handler, dio, ref);
     },
   ));
   var dioApiService = DioApiService(dio: dio);
