@@ -1,23 +1,21 @@
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-class JoinWelcomeView extends ConsumerWidget {
-  const JoinWelcomeView({super.key, required this.email});
-  final String email;
+class NotificationPermissionView extends ConsumerWidget {
+  const NotificationPermissionView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
+    var size = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(AssetConstants.join),
+          Image.asset(AssetConstants.dalleNotifications),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
@@ -25,7 +23,7 @@ class JoinWelcomeView extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    StringConstants.welcomeToTheMeditoFamily,
+                    StringConstants.allowNotificationsTitle,
                     style: textTheme.headlineMedium?.copyWith(
                       color: ColorConstants.walterWhite,
                       fontFamily: ClashDisplay,
@@ -35,7 +33,7 @@ class JoinWelcomeView extends ConsumerWidget {
                   ),
                   height8,
                   Text(
-                    StringConstants.welcomeMessage,
+                    StringConstants.allowNotificationsDesc,
                     style: textTheme.bodyMedium?.copyWith(
                       color: ColorConstants.walterWhite,
                       fontFamily: ClashDisplay,
@@ -43,28 +41,27 @@ class JoinWelcomeView extends ConsumerWidget {
                       fontSize: 16,
                     ),
                   ),
-                  Text(
-                    StringConstants.thanksForJoining,
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 3,
-                      fontSize: 16,
+                  height8,
+                  Spacer(),
+                  SizedBox(
+                    width: size.width,
+                    child: LoadingButtonWidget(
+                      onPressed: () {},
+                      btnText: StringConstants.allowNotifications,
+                      bgColor: ColorConstants.walterWhite,
+                      fontWeight: FontWeight.w600,
+                      textColor: ColorConstants.greyIsTheNewGrey,
                     ),
                   ),
                   height8,
-                  Spacer(),
-                  Align(
-                    alignment: Alignment.bottomRight,
+                  SizedBox(
+                    width: size.width,
                     child: LoadingButtonWidget(
-                      onPressed: () {
-                        var auth = ref.read(authProvider.notifier);
-                        auth.setUserEmail(email);
-                        context.go(RouteConstants.bottomNavbarPath);
-                      },
-                      btnText: StringConstants.close,
-                      bgColor: ColorConstants.walterWhite,
-                      textColor: ColorConstants.greyIsTheNewGrey,
+                      onPressed: () {},
+                      btnText: StringConstants.notNow,
+                      bgColor: ColorConstants.onyx,
+                      fontWeight: FontWeight.w600,
+                      textColor: ColorConstants.walterWhite,
                     ),
                   ),
                   height8,

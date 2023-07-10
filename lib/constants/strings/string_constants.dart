@@ -23,7 +23,8 @@ class StringConstants {
   static const String tryAgain = 'Try again';
   static const String shareText =
       "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
-  static const String shareStatsText = '''Just wrapped up another calming session with #Medito! 🧘‍♀️ If you're looking for a free, user-friendly meditation app, give Medito a try. Download now at [www.medito.app](http://www.medito.app/) and start your journey towards inner peace. #Mindfulness #SelfCare #MentalHealthAwareness''';
+  static const String shareStatsText =
+      '''Just wrapped up another calming session with #Medito! 🧘‍♀️ If you're looking for a free, user-friendly meditation app, give Medito a try. Download now at [www.medito.app](http://www.medito.app/) and start your journey towards inner peace. #Mindfulness #SelfCare #MentalHealthAwareness''';
   static const String swipeToDelete = 'Swipe left on a session to delete it';
   static const String narrator = 'Narrator';
   static const String duration = 'Duration';
@@ -80,6 +81,11 @@ class StringConstants {
   static const String dismiss = 'Dismiss';
   static const String watch = 'Watch';
   static const String selectGuideOrDuration = 'Select a guide / duration';
+  static const String allowNotificationsTitle = 'Never miss a moment of calm';
+  static const String allowNotificationsDesc =
+      'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
+  static const String allowNotifications = 'Allow notifications';
+  static const String notNow = 'Not now';
 
   //Error
   static const String someThingWentWrong = '''Something wen't wrong''';
