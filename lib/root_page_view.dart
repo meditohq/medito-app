@@ -1,4 +1,5 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(deviceAndAppInfoProvider);
     ref.read(remoteStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
+    ref.read(playerProvider.notifier).getCurrentlyPlayingMeditation();
     super.initState();
   }
 
@@ -28,6 +30,18 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   Widget build(BuildContext context) {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
+    ref.listen(playerProvider, (prev, next) {
+      var prevId = prev?.audio.first.files.first.id;
+      var nextId = next?.audio.first.files.first.id;
+      if (next != null &&
+          (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
+        _handleTrackEvent(
+          ref,
+          next.id,
+          next.audio.first.files.first.id,
+        );
+      }
+    });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
     if (connectivityStatus == ConnectivityStatus.isDisonnected) {
       return ConnectivityErrorWidget();
@@ -91,5 +105,19 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ),
       ),
     );
+  }
+
+  void _handleTrackEvent(
+    WidgetRef ref,
+    int meditationId,
+    int audioFileId,
+  ) {
+    var audio =
+        AudioStartedModel(audioFileId: audioFileId, meditationId: meditationId);
+    var event = EventsModel(
+      name: EventTypes.audioStarted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
