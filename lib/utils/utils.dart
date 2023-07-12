@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:connectivity/connectivity.dart';
@@ -166,14 +165,9 @@ Future<File?> capturePng(GlobalKey globalKey) async {
     var image = await boundary.toImage();
     var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData?.buffer.asUint8List();
-
-    // Get the path to the app's temporary directory
     final directory = await getTemporaryDirectory();
-
-    // Create a file in the temporary directory
     final file = File('${directory.path}/stats.png');
 
-    // Write the bytes to the file
     if (pngBytes != null) {
       return await file.writeAsBytes(pngBytes);
     }

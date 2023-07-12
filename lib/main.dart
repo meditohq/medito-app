@@ -122,7 +122,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         );
         ref.read(eventsProvider(event: event.toJson()));
       }
-      print('The counter changed $info');
     });
     final auth = ref.watch(authProvider);
     if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {

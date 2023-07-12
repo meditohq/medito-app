@@ -23,7 +23,8 @@ class StringConstants {
   static const String tryAgain = 'Try again';
   static const String shareText =
       "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
-  static const String shareStatsText = '''Just wrapped up another calming session with #Medito! 🧘‍♀️ If you're looking for a free, user-friendly meditation app, give Medito a try. Download now at [www.medito.app](http://www.medito.app/) and start your journey towards inner peace. #Mindfulness #SelfCare #MentalHealthAwareness''';
+  static const String shareStatsText =
+      '''Just wrapped up another calming session with #Medito! 🧘‍♀️ If you're looking for a free, user-friendly meditation app, give Medito a try. Download now at [www.medito.app](http://www.medito.app/) and start your journey towards inner peace. #Mindfulness #SelfCare #MentalHealthAwareness''';
   static const String swipeToDelete = 'Swipe left on a session to delete it';
   static const String narrator = 'Narrator';
   static const String duration = 'Duration';
@@ -82,7 +83,7 @@ class StringConstants {
   static const String selectGuideOrDuration = 'Select a guide / duration';
 
   //Error
-  static const String someThingWentWrong = '''Something wen't wrong''';
+  static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';
