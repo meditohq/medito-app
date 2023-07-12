@@ -87,6 +87,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             ),
             ShareBtnWidget(
               globalKey: key,
+              shareText: StringConstants.shareStatsText,
             ),
           ],
         ),
