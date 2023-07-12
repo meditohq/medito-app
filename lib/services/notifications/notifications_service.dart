@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:Medito/constants/constants.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 late final FirebaseMessaging _messaging;
@@ -66,28 +64,20 @@ Future<void> initialiazeLocalNotification() async {
 }
 
 void onSelect(NotificationResponse? data) async {
-  // var res = json.decode(data!);
   print(data);
-  // _pushRoute(const NotificationScreen());
 }
 
 void checkForInitialMessage() async {
   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   //ignore: no-empty-block
   if (initialMessage != null) {
-    // _navigationAction(initialMessage);
   } else {
     onMessageAppOpened();
   }
 }
 
 void onMessageAppOpened() {
-  FirebaseMessaging.onMessageOpenedApp
-      .listen((RemoteMessage message) => _navigationAction(message));
-}
-
-void _navigationAction(RemoteMessage _) {
-  // Will use this function for navigation =>> _pushRoute();
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) => {});
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -124,26 +114,4 @@ Future<void> _showNotification(
     platformChannelSpecifics,
     payload: payload,
   );
-}
-
-_pushRoute(Widget _widget) {
-  // serviceLocatorInstance<NavigationService>().navigatorKey.currentState!.push(
-  //       MaterialPageRoute(
-  //         builder: (context) => _widget,
-  //       ),
-  //     );
-}
-
-class PushNotification {
-  PushNotification({
-    this.title,
-    this.body,
-    this.dataTitle,
-    this.dataBody,
-  });
-
-  String? title;
-  String? body;
-  String? dataTitle;
-  String? dataBody;
 }
