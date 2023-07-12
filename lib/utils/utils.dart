@@ -187,6 +187,12 @@ extension SanitisePath on String {
     return replaceFirst('/', '');
   }
 }
+extension GetIdFromPath on String {
+  String getIdFromPath() {
+    return split('/').last;
+  }
+}
+
 
 extension AssetUrl on String {
   String toAssetUrl() {

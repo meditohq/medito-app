@@ -2,6 +2,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -56,7 +57,7 @@ class FilterWidget extends ConsumerWidget {
                       top: 6,
                     ),
                     child: Text(
-                      element.type,
+                      element.title,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
@@ -84,7 +85,7 @@ class FilterWidget extends ConsumerWidget {
     }
     context.push(getPathFromString(
       element.type,
-      [element.id.toString()],
+      [element.path.toString().getIdFromPath()],
     ));
   }
 
