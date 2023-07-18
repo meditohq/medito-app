@@ -3,6 +3,7 @@ import 'package:Medito/models/home/home_model.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
 import 'widgets/search/search_widget.dart';
@@ -24,7 +25,7 @@ class HomeView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              height8,
+              _getAnnouncementBanner(data),
               HomeHeaderWidget(
                 homeMenuModel: data.menu,
               ),
@@ -69,5 +70,15 @@ class HomeView extends ConsumerWidget {
           )
           .toList(),
     );
+  }
+
+  Widget _getAnnouncementBanner(HomeModel data) {
+    if (data.announcement != null) {
+      return AnnouncementWidget(
+        announcement: data.announcement!,
+      );
+    }
+
+    return SizedBox();
   }
 }
