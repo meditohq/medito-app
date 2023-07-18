@@ -25,10 +25,7 @@ class HomeView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (data.announcement != null)
-                AnnouncementWidget(
-                  announcement: data.announcement,
-                ),
+              _getAnnouncementBanner(data),
               HomeHeaderWidget(
                 homeMenuModel: data.menu,
               ),
@@ -73,5 +70,15 @@ class HomeView extends ConsumerWidget {
           )
           .toList(),
     );
+  }
+
+  Widget _getAnnouncementBanner(HomeModel data) {
+    if (data.announcement != null) {
+      return AnnouncementWidget(
+        announcement: data.announcement!,
+      );
+    }
+
+    return SizedBox();
   }
 }

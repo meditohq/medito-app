@@ -5,12 +5,12 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class AnnouncementWidget extends StatelessWidget {
-  const AnnouncementWidget({super.key, this.announcement});
-  final AnnouncementModel? announcement;
+  const AnnouncementWidget({super.key, required this.announcement});
+  final AnnouncementModel announcement;
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: ColorConstants.getColorFromString(announcement!.colorBackground),
+      color: ColorConstants.getColorFromString(announcement.colorBackground),
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
@@ -56,10 +56,10 @@ class AnnouncementWidget extends StatelessWidget {
   Flexible _text(BuildContext context) {
     return Flexible(
       child: Text(
-        announcement?.text ?? '',
+        announcement.text,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: ColorConstants.getColorFromString(
-                announcement!.colorText,
+                announcement.colorText,
               ),
             ),
       ),
@@ -67,12 +67,12 @@ class AnnouncementWidget extends StatelessWidget {
   }
 
   Widget _icon() {
-    if (announcement?.icon != null) {
+    if (announcement.icon != null) {
       return Padding(
         padding: const EdgeInsets.only(top: 0, right: 10),
         child: Icon(
           IconData(
-            formatIcon(announcement!.icon!),
+            formatIcon(announcement.icon!),
             fontFamily: 'MaterialIcons',
           ),
         ),
