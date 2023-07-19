@@ -54,8 +54,7 @@ dependencies:
   cached_network_image: ^3.2.3
   email_validator: '^2.1.16'
   pin_code_fields: ^7.4.0
-  share_plus: ^7.0.2
-  
+  share_plus: ^7.0.2  
 
 dev_dependencies:
   flutter_test:

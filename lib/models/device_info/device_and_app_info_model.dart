@@ -10,6 +10,7 @@ abstract class DeviceAndAppInfoModel with _$DeviceAndAppInfoModel {
     required String platform,
     required String buildNumber,
     required String appVersion,
+    required String languageCode,
   }) = _DeviceAndAppInfoModel;
 
   factory DeviceAndAppInfoModel.fromJson(Map<String, Object?> json) =>

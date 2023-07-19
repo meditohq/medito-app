@@ -105,7 +105,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         var val = info.value;
         var appOpenedModel = AppOpenedModel(
           deviceOs: val?.os ?? '',
-          deviceLanguage: 'English',
+          deviceLanguage: val?.languageCode ?? '',
           deviceModel: val?.model ?? '',
           buildNumber: val?.buildNumber ?? '',
           appVersion: val?.appVersion ?? '',

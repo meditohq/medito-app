@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -25,7 +26,7 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
       var packageInfo = await PackageInfo.fromPlatform();
       buildNumber = packageInfo.buildNumber;
       appVersion = packageInfo.version;
-
+      var languageCode = window.locale.languageCode;
       if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
         deviceModel = iosInfo.utsname.machine;
@@ -44,6 +45,7 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
         'platform': devicePlatform,
         'buildNumber': buildNumber,
         'appVersion': appVersion,
+        'languageCode': languageCode,
       };
 
       return DeviceAndAppInfoModel.fromJson(data);
