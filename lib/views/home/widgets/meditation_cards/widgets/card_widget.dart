@@ -23,7 +23,7 @@ class CardWidget extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: 15),
       child: InkWell(
         onTap: onTap,
         child: Stack(

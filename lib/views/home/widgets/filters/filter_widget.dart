@@ -31,7 +31,7 @@ class FilterWidget extends ConsumerWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 10),
       child: SizedBox(
         height: 45,
         child: ListView.builder(
@@ -47,7 +47,7 @@ class FilterWidget extends ConsumerWidget {
               child: Center(
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                   child: Container(
                     decoration: boxDecoration,
                     padding: EdgeInsets.only(

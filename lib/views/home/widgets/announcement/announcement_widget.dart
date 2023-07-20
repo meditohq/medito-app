@@ -5,6 +5,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class AnnouncementWidget extends ConsumerWidget {
   const AnnouncementWidget({super.key, required this.announcement});
@@ -24,32 +25,47 @@ class AnnouncementWidget extends ConsumerWidget {
             ],
           ),
           height16,
-          _actionBtn(ref, announcement),
+          _actionBtn(context, ref, announcement),
         ],
       ),
     );
   }
 
-  Row _actionBtn(WidgetRef ref, AnnouncementModel announcement) {
+  Row _actionBtn(
+    BuildContext context,
+    WidgetRef ref,
+    AnnouncementModel announcement,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        LoadingButtonWidget(
-          onPressed: () {
-            ref.invalidate(homeProvider);
-            ref.read(homeProvider);
-            _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
-          },
-          btnText: StringConstants.dismiss,
-          bgColor: ColorConstants.lightPurple,
-          textColor: ColorConstants.walterWhite,
-          elevation: 0,
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: InkWell(
+            onTap: () {
+              ref.invalidate(homeProvider);
+              ref.read(homeProvider);
+              _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
+            },
+            child: Text(
+              StringConstants.dismiss,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: ColorConstants.walterWhite,
+                    fontFamily: ClashDisplay,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
         ),
         LoadingButtonWidget(
           onPressed: () {
             _handleTrackEvent(ref, announcement.id, announcement.ctaTitle);
+            // var location = GoRouter.of(context).location;
+            // context.push(
+            //   location + RouteConstants.webviewPath,
+            //   extra: {'url': announcement.path},
+            // );
           },
           btnText: StringConstants.watch,
           bgColor: ColorConstants.walterWhite,
