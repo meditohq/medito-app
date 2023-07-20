@@ -51,7 +51,8 @@ class FolderView extends ConsumerWidget {
         children: folder.items
             .map(
               (e) => GestureDetector(
-                onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
+                onTap: () =>
+                    _onListItemTap(ref, e.id, e.type, e.path, ref.context),
                 child: _buildListTile(
                   context,
                   e.title,
@@ -117,7 +118,18 @@ class FolderView extends ConsumerWidget {
     );
   }
 
+  Widget _getIcon(String type) {
+    if (type == TypeConstants.FOLDER) {
+      return SvgPicture.asset(AssetConstants.icForward);
+    } else if (type == TypeConstants.LINK) {
+      return SvgPicture.asset(AssetConstants.icLink);
+    }
+
+    return SizedBox();
+  }
+
   void _onListItemTap(
+    WidgetRef ref,
     int? id,
     String? type,
     String? path,
@@ -145,6 +157,9 @@ class FolderView extends ConsumerWidget {
           );
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));
+          if (type == TypeConstants.MEDITATION) {
+            _handleTrackEvent(ref, id ?? 0);
+          }
         }
       } else {
         createSnackBar(StringConstants.checkConnection, context);
@@ -152,13 +167,13 @@ class FolderView extends ConsumerWidget {
     });
   }
 
-  Widget _getIcon(String type) {
-    if (type == TypeConstants.FOLDER) {
-      return SvgPicture.asset(AssetConstants.icForward);
-    } else if (type == TypeConstants.LINK) {
-      return SvgPicture.asset(AssetConstants.icLink);
-    }
-
-    return SizedBox();
+  void _handleTrackEvent(WidgetRef ref, int meditationId) {
+    var meditationViewedModel =
+        MeditationViewedModel(meditationId: meditationId);
+    var event = EventsModel(
+      name: EventTypes.meditationViewed,
+      payload: meditationViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }

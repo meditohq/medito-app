@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DurationIndicatorWidget extends ConsumerWidget {
-  const DurationIndicatorWidget({super.key, required this.file});
+  const DurationIndicatorWidget(
+      {super.key, required this.file, required this.meditationId});
   final MeditationFilesModel file;
+  final int meditationId;
   final minSeconds = 0.0;
   final additionalMilliSeconds = 1000;
 
@@ -65,23 +67,6 @@ class DurationIndicatorWidget extends ConsumerWidget {
     );
   }
 
-  void _handleAudioCompletion(
-    int currentDuration,
-    int maxDuration,
-    WidgetRef ref,
-  ) {
-    if (maxDuration <= currentDuration + additionalMilliSeconds) {
-      final audioProvider = ref.watch(audioPlayerNotifierProvider);
-      audioProvider.seekValueFromSlider(0);
-      audioProvider.pause();
-      audioProvider.pauseBackgroundSound();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(audioPlayPauseStateProvider.notifier).state =
-            PLAY_PAUSE_AUDIO.PAUSE;
-      });
-    }
-  }
-
   Row _durationLabels(BuildContext context, int duration, int position) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,6 +95,36 @@ class DurationIndicatorWidget extends ConsumerWidget {
             fontSize: 14,
           ),
     );
+  }
+
+  void _handleAudioCompletion(
+    int currentDuration,
+    int maxDuration,
+    WidgetRef ref,
+  ) {
+    if (maxDuration <= currentDuration + additionalMilliSeconds) {
+      final audioProvider = ref.watch(audioPlayerNotifierProvider);
+      _handleTrackEvent(ref, file.id, meditationId);
+      audioProvider.seekValueFromSlider(0);
+      audioProvider.pause();
+      audioProvider.pauseBackgroundSound();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+    }
+  }
+
+  void _handleTrackEvent(WidgetRef ref, int audioFileId, int meditationId) {
+    var audio = AudioCompletedModel(
+      audioFileId: audioFileId,
+      meditationId: meditationId,
+    );
+    var event = EventsModel(
+      name: EventTypes.audioCompleted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
 

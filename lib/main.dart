@@ -16,6 +16,7 @@ import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
@@ -68,7 +69,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // update session stats when app comes into foreground 
+      // update session stats when app comes into foreground
       updateStatsFromBg();
     }
   }
@@ -99,6 +100,23 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(deviceAndAppInfoProvider, (_, info) {
+      if (info.hasValue) {
+        var val = info.value;
+        var appOpenedModel = AppOpenedModel(
+          deviceOs: val?.os ?? '',
+          deviceLanguage: val?.languageCode ?? '',
+          deviceModel: val?.model ?? '',
+          buildNumber: val?.buildNumber ?? '',
+          appVersion: val?.appVersion ?? '',
+        );
+        var event = EventsModel(
+          name: EventTypes.appOpened,
+          payload: appOpenedModel.toJson(),
+        );
+        ref.read(eventsProvider(event: event.toJson()));
+      }
+    });
     final auth = ref.watch(authProvider);
     if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
       ref.watch(currentMeditationPlayerProvider);

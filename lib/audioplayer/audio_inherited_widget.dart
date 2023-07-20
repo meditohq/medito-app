@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'medito_audio_handler.dart';
 
+// ignore: prefer-match-file-name
 class AudioHandlerInheritedWidget extends InheritedWidget {
   const AudioHandlerInheritedWidget({
     Key? key,
@@ -15,7 +16,7 @@ class AudioHandlerInheritedWidget extends InheritedWidget {
     final result = context
         .dependOnInheritedWidgetOfExactType<AudioHandlerInheritedWidget>();
     assert(result != null, 'No AudioHandler found in context');
-    
+
     return result!;
   }
 

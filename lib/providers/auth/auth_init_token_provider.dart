@@ -62,7 +62,6 @@ class AuthInitTokenNotifier
 
   void _initializeAudioPlayer(String token) {
     ref.read(audioPlayerNotifierProvider).setContentToken(token);
-    ref.read(playerProvider.notifier).getCurrentlyPlayingMeditation();
     ref.read(audioPlayerNotifierProvider).initAudioHandler();
   }
 }

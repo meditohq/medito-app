@@ -82,7 +82,7 @@ class MeditationView extends ConsumerWidget {
         children: [
           Container(height: 24),
           Text(
-            'Select a guide / duration',
+            StringConstants.selectGuideOrDuration,
             style: Theme.of(context)
                 .primaryTextTheme
                 .bodyLarge

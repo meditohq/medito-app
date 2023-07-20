@@ -4,7 +4,6 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../share_btn/share_btn_widget.dart';
 
 class DebugBottomSheetWidget extends ConsumerWidget {
@@ -13,7 +12,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var me = ref.watch(meProvider);
-    var deviceInfo = ref.watch(deviceAndAppInfoProvider).asData?.value;
+    var deviceInfo = ref.watch(deviceAndAppInfoProvider);
     var globalKey = GlobalKey();
 
     return DraggableSheetWidget(
@@ -34,7 +33,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
                 scrollController,
                 globalKey,
                 data,
-                deviceInfo,
+                deviceInfo.value,
               ),
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(

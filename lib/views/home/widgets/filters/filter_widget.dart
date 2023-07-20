@@ -1,27 +1,29 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class FilterWidget extends StatelessWidget {
+class FilterWidget extends ConsumerWidget {
   const FilterWidget({super.key, required this.chips});
   final List<List<HomeChipsItemsModel>> chips;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: chips.map((e) => _filterListView(e)).toList(),
+          children: chips.map((e) => _filterListView(ref, e)).toList(),
         ),
       ),
     );
   }
 
-  Padding _filterListView(List<HomeChipsItemsModel> items) {
+  Padding _filterListView(WidgetRef ref, List<HomeChipsItemsModel> items) {
     var boxDecoration = BoxDecoration(
       color: ColorConstants.onyx,
       borderRadius: BorderRadius.circular(12),
@@ -40,7 +42,7 @@ class FilterWidget extends StatelessWidget {
             var element = items[index];
 
             return InkWell(
-              onTap: () => handleChipPress(context, element),
+              onTap: () => handleChipPress(context, ref, element),
               child: Center(
                 child: Padding(
                   padding:
@@ -69,9 +71,11 @@ class FilterWidget extends StatelessWidget {
 
   void handleChipPress(
     BuildContext context,
+    WidgetRef ref,
     HomeChipsItemsModel element,
   ) {
     var location = GoRouter.of(context).location;
+    _handleTrackEvent(ref, element.id, element.title);
     if (element.type == TypeConstants.LINK) {
       context.push(
         location + RouteConstants.webviewPath,
@@ -82,5 +86,14 @@ class FilterWidget extends StatelessWidget {
       element.type,
       [element.id.toString()],
     ));
+  }
+
+  void _handleTrackEvent(WidgetRef ref, int chipId, String chipTitle) {
+    var chipViewedModel = ChipTappedModel(chipId: chipId, chipTitle: chipTitle);
+    var event = EventsModel(
+      name: EventTypes.chipTapped,
+      payload: chipViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
