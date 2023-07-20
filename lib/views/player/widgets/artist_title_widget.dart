@@ -50,7 +50,7 @@ class ArtistTitleWidget extends ConsumerWidget {
       padding: const EdgeInsets.only(right: 16.0),
       child: MarkdownWidget(
         textAlign: WrapAlignment.start,
-        body: '${artistName ?? ''} ${artistUrlPath ?? ''}',
+        body: '${artistName ?? ''}',
         pFontSize: artistNameFontSize,
         aFontSize: artistUrlPathFontSize,
         onTapLink: (text, href, title) {

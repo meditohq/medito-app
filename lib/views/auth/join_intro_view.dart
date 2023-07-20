@@ -88,7 +88,7 @@ class JoinIntroView extends ConsumerWidget {
           onPressed: () {
             var auth = ref.read(authProvider);
             auth.setIsAGuest(true);
-            context.go(RouteConstants.bottomNavbarPath);
+            context.go(RouteConstants.homePath);
           },
           btnText: StringConstants.maybeLater,
         ),

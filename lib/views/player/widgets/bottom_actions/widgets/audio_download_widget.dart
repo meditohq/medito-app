@@ -50,7 +50,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         decoration: BoxDecoration(
           color: ColorConstants.greyIsTheNewGrey,
           borderRadius: BorderRadius.all(
-            Radius.circular(3),
+            Radius.circular(14),
           ),
         ),
         alignment: Alignment.center,

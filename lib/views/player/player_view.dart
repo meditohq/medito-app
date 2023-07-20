@@ -31,8 +31,8 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     var coverUrl = widget.meditationModel.coverUrl;
     var artist = widget.meditationModel.artist;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return BackButtonListener(
+      onBackButtonPressed: _onWillPop,
       child: Scaffold(
         extendBody: false,
         extendBodyBehindAppBar: true,
@@ -85,10 +85,10 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     if (ref.read(pageviewNotifierProvider).currentPage == 1) {
       ref.read(pageviewNotifierProvider).gotoPreviousPage();
 
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   @override
