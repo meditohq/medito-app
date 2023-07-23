@@ -17,6 +17,7 @@ class HomeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var homeRes = ref.watch(homeProvider);
 
+
     return Scaffold(
       body: homeRes.when(
         skipLoadingOnRefresh: true,
@@ -28,6 +29,7 @@ class HomeView extends ConsumerWidget {
               _getAnnouncementBanner(data),
               HomeHeaderWidget(
                 homeMenuModel: data.menu,
+                streakCount: '5',
               ),
               height16,
               Expanded(
