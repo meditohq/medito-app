@@ -1,13 +1,10 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../row_item_widget.dart';
-import 'package:share_plus/share_plus.dart';
-
 import '../share_btn/share_btn_widget.dart';
 
 class StatsBottomSheetWidget extends ConsumerWidget {

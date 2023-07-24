@@ -16,20 +16,21 @@ class HomeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var homeRes = ref.watch(homeProvider);
+    var stats = ref.watch(remoteStatsProvider);
 
     return Scaffold(
       body: homeRes.when(
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: false,
         data: (data) => SafeArea(
-          top: false,
+          top: data.announcement == null,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               _getAnnouncementBanner(data),
               HomeHeaderWidget(
                 homeMenuModel: data.menu,
-                streakCount: '5',
+                miniStatsModel: stats.asData?.value.mini,
               ),
               height16,
               Expanded(
