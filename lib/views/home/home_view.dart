@@ -32,7 +32,6 @@ class HomeView extends ConsumerWidget {
                 homeMenuModel: data.menu,
                 miniStatsModel: stats.asData?.value.mini,
               ),
-              height16,
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () => ref.refresh(homeProvider.future),

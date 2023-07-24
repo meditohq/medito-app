@@ -42,7 +42,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  LongPressDetectorWidget _logo(BuildContext context) {
+  Widget _logo(BuildContext context) {
     return LongPressDetectorWidget(
       onLongPress: () => showModalBottomSheet<void>(
         context: context,
@@ -52,9 +52,9 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         },
       ),
       duration: Duration(seconds: 3),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: SvgPicture.asset(
+      child: IconButton(
+        onPressed: () => {},
+        icon: SvgPicture.asset(
           AssetConstants.icLogo,
           width: 32,
         ),
@@ -82,13 +82,16 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  IconButton _downloadWidget(BuildContext context) {
-    return IconButton(
-      icon: const Icon(
-        Icons.downloading,
-        size: 24,
+  Transform _downloadWidget(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(5, 0),
+      child: IconButton(
+        icon: const Icon(
+          Icons.downloading,
+          size: 24,
+        ),
+        onPressed: () => context.push(RouteConstants.collectionPath),
       ),
-      onPressed: () => context.push(RouteConstants.collectionPath),
     );
   }
 
@@ -124,7 +127,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
             color: ColorConstants.walterWhite,
           ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 3, vertical: 0),
+        padding: EdgeInsets.symmetric(horizontal: 3, vertical: 0.6),
         child: Row(
           children: [
             Icon(
