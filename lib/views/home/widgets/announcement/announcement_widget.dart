@@ -13,28 +13,33 @@ class AnnouncementWidget extends ConsumerWidget {
   final AnnouncementModel announcement;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: ColorConstants.getColorFromString(
-        announcement.colorBackground,
-      ).withOpacity(0.68),
-    ));
+    var bgColor =
+        ColorConstants.getColorFromString(announcement.colorBackground);
 
-    return Container(
-      color: ColorConstants.getColorFromString(announcement.colorBackground),
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        Container(
+          color: bgColor,
+          height: MediaQuery.of(context).viewPadding.top,
+        ),
+        Container(
+          color: bgColor,
+          padding: EdgeInsets.all(16),
+          child: Column(
             children: [
-              _icon(announcement.icon),
-              _text(context, announcement.text),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _icon(announcement.icon),
+                  _text(context, announcement.text),
+                ],
+              ),
+              height16,
+              _actionBtn(context, ref, announcement),
             ],
           ),
-          height16,
-          _actionBtn(context, ref, announcement),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

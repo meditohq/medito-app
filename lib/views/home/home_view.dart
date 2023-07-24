@@ -17,12 +17,12 @@ class HomeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var homeRes = ref.watch(homeProvider);
 
-
     return Scaffold(
       body: homeRes.when(
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: false,
         data: (data) => SafeArea(
+          top: false,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
