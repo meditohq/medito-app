@@ -18,16 +18,13 @@ class CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    var boxDecoration = BoxDecoration(
-      color: ColorConstants.transparent,
-    );
-
     return InkWell(
       onTap: onTap,
       child: Stack(
         children: [
           SizedBox(
             width: 154,
+            height: 156,
             child: Container(
               foregroundDecoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -47,7 +44,8 @@ class CardWidget extends StatelessWidget {
           ),
           Container(
             width: 154,
-            decoration: boxDecoration,
+            height: 154,
+            color: ColorConstants.transparent,
             child: _tagAndTitle(textTheme, tag: tag, title: title),
           ),
         ],
