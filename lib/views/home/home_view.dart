@@ -27,26 +27,30 @@ class HomeView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _getAnnouncementBanner(data),
-              HomeHeaderWidget(
-                homeMenuModel: data.menu,
-                miniStatsModel: stats.asData?.value.mini,
-              ),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () => ref.refresh(homeProvider.future),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        SearchWidget(),
-                        height8,
-                        FilterWidget(
-                          chips: data.chips,
+                        _getAnnouncementBanner(data),
+                        HomeHeaderWidget(
+                          homeMenuModel: data.menu,
+                          miniStatsModel: stats.asData?.value.mini,
                         ),
-                        height16,
-                        height16,
-                        _cardListWidget(data),
-                        height16,
+                        Column(
+                          children: [
+                            SearchWidget(),
+                            height8,
+                            FilterWidget(
+                              chips: data.chips,
+                            ),
+                            height16,
+                            height16,
+                            _cardListWidget(data),
+                            height16,
+                          ],
+                        ),
                       ],
                     ),
                   ),
