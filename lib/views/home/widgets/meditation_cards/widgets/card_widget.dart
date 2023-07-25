@@ -22,32 +22,35 @@ class CardWidget extends StatelessWidget {
       color: ColorConstants.transparent,
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 15),
-      child: InkWell(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            SizedBox(
-              width: 154,
-              child: ColorFiltered(
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.6),
-                  BlendMode.dstATop,
-                ),
-                child: NetworkImageWidget(
-                  url: coverUrlPath,
-                  isCache: true,
+    return InkWell(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          SizedBox(
+            width: 154,
+            child: Container(
+              foregroundDecoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    ColorConstants.almostBlack.withOpacity(0.15),
+                    ColorConstants.almostBlack,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
+              child: NetworkImageWidget(
+                url: coverUrlPath,
+                isCache: true,
+              ),
             ),
-            Container(
-              width: 154,
-              decoration: boxDecoration,
-              child: _tagAndTitle(textTheme, tag: tag, title: title),
-            ),
-          ],
-        ),
+          ),
+          Container(
+            width: 154,
+            decoration: boxDecoration,
+            child: _tagAndTitle(textTheme, tag: tag, title: title),
+          ),
+        ],
       ),
     );
   }
@@ -93,10 +96,7 @@ class CardWidget extends StatelessWidget {
         title,
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
-        style: textTheme.labelMedium?.copyWith(
-          fontSize: 15,
-          color: ColorConstants.walterWhite,
-        ),
+        style: textTheme.labelMedium?.copyWith(letterSpacing: 0, height: 1.1),
       ),
     );
   }

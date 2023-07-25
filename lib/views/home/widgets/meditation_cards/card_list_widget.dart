@@ -29,16 +29,23 @@ class CardListWidget extends StatelessWidget {
             child: ListView.builder(
               itemCount: row.items.length,
               scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
               itemBuilder: (context, index) {
                 var element = row.items[index];
 
-                return CardWidget(
-                  title: element.title,
-                  coverUrlPath: element.coverUrl,
-                  onTap: () => context.push(getPathFromString(
-                    element.type,
-                    [element.path.toString().getIdFromPath()],
-                  )),
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal:
+                        index == 0 || index == row.items.length - 1 ? 16 : 8,
+                  ),
+                  child: CardWidget(
+                    title: element.title,
+                    coverUrlPath: element.coverUrl,
+                    onTap: () => context.push(getPathFromString(
+                      element.type,
+                      [element.path.toString().getIdFromPath()],
+                    )),
+                  ),
                 );
               },
             ),
