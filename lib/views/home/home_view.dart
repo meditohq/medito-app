@@ -39,9 +39,12 @@ class HomeView extends ConsumerWidget {
                     child: Column(
                       children: [
                         SearchWidget(),
+                        height8,
                         FilterWidget(
                           chips: data.chips,
                         ),
+                        height16,
+                        height16,
                         _cardListWidget(data),
                         height16,
                       ],
