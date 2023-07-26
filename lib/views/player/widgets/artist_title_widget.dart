@@ -15,6 +15,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     this.artistNameFontSize = 16,
     this.artistUrlPathFontSize = 13,
     this.isPlayerScreen = false,
+    this.titleMaxLine,
   });
   final String meditationTitle;
   final String? artistName, artistUrlPath;
@@ -22,6 +23,7 @@ class ArtistTitleWidget extends ConsumerWidget {
   final double artistNameFontSize;
   final double artistUrlPathFontSize;
   final bool isPlayerScreen;
+  final int? titleMaxLine;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
@@ -42,6 +44,8 @@ class ArtistTitleWidget extends ConsumerWidget {
             fontSize: meditationTitleFontSize,
             letterSpacing: 1,
           ),
+      maxLines: titleMaxLine,
+      overflow: TextOverflow.ellipsis,
     );
   }
 

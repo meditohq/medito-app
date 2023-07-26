@@ -40,12 +40,15 @@ class MiniPlayerWidget extends ConsumerWidget {
   Padding meditationCoverImage(String url) {
     return Padding(
       padding: const EdgeInsets.only(left: 15),
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: NetworkImageWidget(
-          url: url,
-          isCache: true,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: SizedBox(
+          height: 40,
+          width: 40,
+          child: NetworkImageWidget(
+            url: url,
+            isCache: true,
+          ),
         ),
       ),
     );
@@ -66,6 +69,7 @@ class MiniPlayerWidget extends ConsumerWidget {
               meditationTitleFontSize: 16,
               artistNameFontSize: 12,
               artistUrlPathFontSize: 11,
+              titleMaxLine: 1,
             ),
           ],
         ),

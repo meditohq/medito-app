@@ -35,7 +35,7 @@ class MarkdownWidget extends StatelessWidget {
             titleMedium?.copyWith(
               fontFamily: DmMono,
               fontSize: pFontSize,
-              letterSpacing: 1,
+              letterSpacing: 0,
               color: walterWhite,
             ),
         textAlign: textAlign ?? WrapAlignment.center,
