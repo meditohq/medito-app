@@ -51,8 +51,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     GlobalKey key,
     StatsModel stats,
   ) {
-    // var x = [...stats.all, ...stats.all];
-
+    
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
