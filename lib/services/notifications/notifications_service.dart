@@ -33,8 +33,6 @@ Future<void> requestPermission() async {
   );
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('User granted permission');
-
     // For handling the received notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showNotification(
@@ -43,8 +41,6 @@ Future<void> requestPermission() async {
         json.encode(message.data),
       );
     });
-  } else {
-    print('User declined or has not accepted permission');
   }
 }
 
@@ -64,6 +60,7 @@ Future<void> initialiazeLocalNotification() async {
 }
 
 void onSelect(NotificationResponse? data) async {
+  // TODO
   print(data);
 }
 
