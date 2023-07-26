@@ -11,6 +11,5 @@ export 'medito_webview_widget.dart';
 export 'markdown_widget.dart';
 export 'network_image_widget.dart';
 export 'snackbar_widget.dart';
-export 'draggable_sheet_widget.dart';
 export 'handle_bar_widget.dart';
 export 'long_press_detector_widget.dart';
