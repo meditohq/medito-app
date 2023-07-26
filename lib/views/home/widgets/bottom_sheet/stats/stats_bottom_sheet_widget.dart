@@ -15,12 +15,11 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     var stats = ref.watch(remoteStatsProvider);
     var globalKey = GlobalKey();
 
-    return DraggableSheetWidget(
-      initialChildSize: 0.7,
-      maxChildSize: 0.8,
-      expand: false,
-      child: (scrollController) {
-        return Column(
+    return Container(
+      decoration: bottomSheetBoxDecoration,
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             height16,
@@ -28,8 +27,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             height16,
             stats.when(
               skipLoadingOnRefresh: false,
-              data: (data) =>
-                  _statsList(context, scrollController, globalKey, data),
+              data: (data) => _statsList(context, globalKey, data),
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(
                   message: err.toString(),
@@ -43,52 +41,49 @@ class StatsBottomSheetWidget extends ConsumerWidget {
               ),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Expanded _statsList(
+  Column _statsList(
     BuildContext context,
-    ScrollController scrollController,
     GlobalKey key,
     StatsModel stats,
   ) {
-    return Expanded(
-      child: SingleChildScrollView(
-        controller: scrollController,
-        child: Column(
-          children: [
-            RepaintBoundary(
-              key: key,
-              child: Container(
-                color: ColorConstants.onyx,
-                child: Column(
-                  children: stats.all.map((e) {
-                    return RowItemWidget(
-                      iconCodePoint: e.icon,
-                      iconColor: e.color,
-                      iconSize: 20,
-                      title: e.title,
-                      subTitle: e.subtitle,
-                      hasUnderline: e.title != stats.all.last.title,
-                      isTrailingIcon: false,
-                      titleStyle: Theme.of(context)
-                          .textTheme
-                          .labelMedium
-                          ?.copyWith(fontSize: 18),
-                    );
-                  }).toList(),
-                ),
-              ),
+    // var x = [...stats.all, ...stats.all];
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RepaintBoundary(
+          key: key,
+          child: Container(
+            color: ColorConstants.onyx,
+            child: Column(
+              children: stats.all.map((e) {
+                return RowItemWidget(
+                  iconCodePoint: e.icon,
+                  iconColor: e.color,
+                  iconSize: 20,
+                  title: e.title,
+                  subTitle: e.subtitle,
+                  hasUnderline: e.title != stats.all.last.title,
+                  isTrailingIcon: false,
+                  titleStyle: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(fontSize: 18),
+                );
+              }).toList(),
             ),
-            ShareBtnWidget(
-              globalKey: key,
-              shareText: StringConstants.shareStatsText,
-            ),
-          ],
+          ),
         ),
-      ),
+        ShareBtnWidget(
+          globalKey: key,
+          shareText: StringConstants.shareStatsText,
+        ),
+      ],
     );
   }
 }

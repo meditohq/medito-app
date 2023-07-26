@@ -32,8 +32,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
                   .map((element) => RowItemWidget(
                         iconCodePoint: element.icon,
                         title: element.title,
-                        hasUnderline: element.id !=
-                            homeMenuModel[homeMenuModel.length - 1].id,
+                        hasUnderline: element.id != homeMenuModel.last.id,
                         onTap: () {
                           handleItemPress(context, ref, element);
                         },
