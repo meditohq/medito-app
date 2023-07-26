@@ -98,10 +98,11 @@ class RowItemWidget extends StatelessWidget {
   Text _subtitle(BuildContext context) {
     return Text(
       subTitle!,
-      style: Theme.of(context)
-          .textTheme
-          .titleSmall
-          ?.copyWith(color: ColorConstants.graphite),
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: ColorConstants.graphite,
+            letterSpacing: 0,
+            height: 1.7,
+          ),
     );
   }
 }
