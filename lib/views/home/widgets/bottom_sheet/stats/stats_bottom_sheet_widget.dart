@@ -51,7 +51,6 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     GlobalKey key,
     StatsModel stats,
   ) {
-    
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -64,7 +63,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                 return RowItemWidget(
                   iconCodePoint: e.icon,
                   iconColor: e.color,
-                  iconSize: 20,
+                  trailingIconSize: 20,
                   title: e.title,
                   subTitle: e.subtitle,
                   hasUnderline: e.title != stats.all.last.title,
