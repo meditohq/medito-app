@@ -46,7 +46,7 @@ class ArtistTitleWidget extends ConsumerWidget {
               fontFamily: ClashDisplay,
               color: ColorConstants.walterWhite,
               fontSize: meditationTitleFontSize,
-              letterSpacing: 1,
+              letterSpacing: 0.2,
             ),
         blankSpace: 50,
         velocity: 10,

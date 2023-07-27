@@ -42,6 +42,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
             SafeArea(
               child: Column(
                 children: [
+                  height16,
                   HandleBarWidget(),
                   Spacer(),
                   Padding(
@@ -66,7 +67,9 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                     file: widget.file,
                     meditationModel: widget.meditationModel,
                   ),
-                  Spacer(),
+                  Spacer(
+                    flex: 2,
+                  ),
                   BottomActionWidget(
                     meditationModel: widget.meditationModel,
                     file: widget.file,

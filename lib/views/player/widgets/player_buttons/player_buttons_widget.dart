@@ -1,9 +1,7 @@
-import 'package:Medito/constants/strings/asset_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'play_pause_button_widget.dart';
 
 class PlayerButtonsWidget extends ConsumerWidget {
@@ -32,20 +30,24 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   InkWell _rewindButton(WidgetRef ref) {
     return InkWell(
-      onTap: () =>
-          ref.read(skipAudioProvider(skip: SKIP_AUDIO.SKIP_BACKWARD_10)),
-      child: SvgPicture.asset(
-        AssetConstants.icReplay10,
+      onTap: () => ref.read(
+        skipAudioProvider(skip: SKIP_AUDIO.SKIP_BACKWARD_10),
+      ),
+      child: Icon(
+        Icons.replay_10,
+        size: 40,
       ),
     );
   }
 
   InkWell _forwardButton(WidgetRef ref) {
     return InkWell(
-      onTap: () =>
-          ref.read(skipAudioProvider(skip: SKIP_AUDIO.SKIP_FORWARD_30)),
-      child: SvgPicture.asset(
-        AssetConstants.icForward30,
+      onTap: () => ref.read(
+        skipAudioProvider(skip: SKIP_AUDIO.SKIP_FORWARD_30),
+      ),
+      child: Icon(
+        Icons.forward_30,
+        size: 40,
       ),
     );
   }

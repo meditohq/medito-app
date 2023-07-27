@@ -14,7 +14,7 @@ class BackgroundImageWidget extends ConsumerWidget {
     var size = MediaQuery.of(context).size;
     var scrollProportion =
         ref.watch(pageviewNotifierProvider).scrollProportion.toDouble();
-    var opacity = (1 - scrollProportion) * 0.40;
+    var opacity = (1 - scrollProportion) * 0.05;
 
     return Stack(
       children: [
