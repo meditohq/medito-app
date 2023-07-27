@@ -35,7 +35,7 @@ String getUnits(UnitType type, int _) {
 
 Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
-
+  
   var streak = prefs.getInt('streakCount') ?? 0;
   var streakList = await getStreakList();
 

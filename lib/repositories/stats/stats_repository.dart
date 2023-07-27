@@ -11,6 +11,7 @@ part 'stats_repository.g.dart';
 abstract class StatsRepository {
   Future<StatsModel> fetchStatsFromRemote();
   Future<Map<String, dynamic>?> fetchStatsFromPreference();
+  Future<void> removeStatsFromPreference();
 }
 
 class StatsRepositoryImpl extends StatsRepository {
@@ -34,10 +35,10 @@ class StatsRepositoryImpl extends StatsRepository {
     try {
       var pref = await SharedPreferences.getInstance();
       var keys = pref.getKeys();
-      var listenedSessionIds = [];
+      List<int> listenedSessionIds = [];
       keys.forEach((element) {
         if (element.startsWith('listened')) {
-          listenedSessionIds.add(element.replaceAll('listened', ''));
+          listenedSessionIds.add(int.parse(element.replaceAll('listened', '')));
         }
       });
       if (listenedSessionIds.isNotEmpty) {
@@ -46,10 +47,10 @@ class StatsRepositoryImpl extends StatsRepository {
         String? numSessions = await getNumMeditations();
         String? longestStreak = await getLongestStreak();
         var data = {
-          'currentStreak': currentStreak,
-          'minutesListened': minutesListened,
-          'listendedSessionsNum': numSessions,
-          'longestStreak': longestStreak,
+          'currentStreak': int.parse(currentStreak),
+          'minutesListened': int.parse(minutesListened),
+          'listendedSessionsNum': int.parse(numSessions),
+          'longestStreak': int.parse(longestStreak),
           'listenedSessionIds': listenedSessionIds,
         };
         print(data);
@@ -58,6 +59,29 @@ class StatsRepositoryImpl extends StatsRepository {
       }
 
       return null;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeStatsFromPreference() async {
+    try {
+      var pref = await SharedPreferences.getInstance();
+      var keys = pref.getKeys();
+      var listenedSessionIdKeys = [];
+      keys.forEach((element) {
+        if (element.startsWith('listened')) {
+          listenedSessionIdKeys.add(element);
+        }
+      });
+      for (var element in listenedSessionIdKeys) {
+        await pref.remove(element);
+      }
+      await pref.remove('streakCount');
+      await pref.remove('secsListened');
+      await pref.remove('numSessions');
+      await pref.remove('longestStreak');
     } catch (e) {
       rethrow;
     }
