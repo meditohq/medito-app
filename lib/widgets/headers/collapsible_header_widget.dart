@@ -11,8 +11,8 @@ class CollapsibleHeaderWidget extends StatefulWidget {
     required this.title,
     this.description,
     this.headerHeight = 300,
-    this.leadingIconColor = Colors.white,
-    this.leadingIconBgColor = Colors.black38,
+    this.leadingIconColor = ColorConstants.black,
+    this.leadingIconBgColor = ColorConstants.walterWhite,
     this.onPressedCloseBtn,
   });
   final List<Widget> children;
@@ -67,7 +67,7 @@ class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
       slivers: <Widget>[
         SliverAppBar(
           leading: Padding(
-            padding: const EdgeInsets.all(2.0),
+            padding: EdgeInsets.only(top: _isShrink ? 0 : 12),
             child: _leadingButton(),
           ),
           leadingWidth: 80,
@@ -76,6 +76,7 @@ class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
           pinned: true,
           snap: false,
           elevation: 50,
+          // toolbarHeight: kToolbarHeight ,
           backgroundColor: ColorConstants.deepNight,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
@@ -102,7 +103,7 @@ class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
   CloseButtonWidget _leadingButton() {
     return CloseButtonWidget(
       bgColor: widget.leadingIconBgColor,
-      icColor: widget.leadingIconColor,
+      icColor: _isShrink ? widget.leadingIconBgColor : widget.leadingIconColor,
       onPressed: widget.onPressedCloseBtn ??
           () {
             router.pop();
