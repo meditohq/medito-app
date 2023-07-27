@@ -34,9 +34,9 @@ class CardListWidget extends StatelessWidget {
                 var element = row.items[index];
 
                 return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal:
-                        index == 0 || index == row.items.length - 1 ? 16 : 8,
+                  padding: EdgeInsets.only(
+                    right: 16,
+                    left: index == 0 ? 16 : 0,
                   ),
                   child: CardWidget(
                     title: element.title,

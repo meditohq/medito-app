@@ -74,7 +74,9 @@ class HomeView extends ConsumerWidget {
       children: data.rows
           .map(
             (e) => Padding(
-              padding: const EdgeInsets.only(bottom: 32),
+              padding: EdgeInsets.only(
+                bottom: e.title == data.rows.last.title ? 16 : 32,
+              ),
               child: CardListWidget(
                 row: e,
               ),

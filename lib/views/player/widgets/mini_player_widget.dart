@@ -69,7 +69,7 @@ class MiniPlayerWidget extends ConsumerWidget {
               meditationTitleFontSize: 16,
               artistNameFontSize: 12,
               artistUrlPathFontSize: 11,
-              titleMaxLine: 1,
+              titleHeight: 22,
             ),
           ],
         ),
