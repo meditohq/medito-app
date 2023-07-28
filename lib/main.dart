@@ -40,7 +40,7 @@ Future<void> main() async {
   sharedPreferences = await SharedPreferences.getInstance();
   await Firebase.initializeApp();
   await registerNotification();
-
+  
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
