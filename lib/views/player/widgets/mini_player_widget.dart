@@ -17,8 +17,10 @@ class MiniPlayerWidget extends ConsumerWidget {
         ref.read(pageviewNotifierProvider).gotoNextPage();
       },
       child: Container(
-        height: 64,
+        height: 55 + kBottomNavigationBarHeight,
+        // height: 64,
         color: ColorConstants.onyx,
+        padding: EdgeInsets.only(bottom: 45),
         child: Row(
           children: [
             Expanded(

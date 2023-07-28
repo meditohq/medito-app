@@ -17,6 +17,7 @@ class HomeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
+    final currentlyPlayingSession = ref.watch(playerProvider);
 
     return Scaffold(
       body: homeRes.when(
@@ -24,6 +25,7 @@ class HomeView extends ConsumerWidget {
         skipLoadingOnReload: false,
         data: (data) => SafeArea(
           top: data.announcement == null,
+          bottom: false,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -48,7 +50,9 @@ class HomeView extends ConsumerWidget {
                             height16,
                             height16,
                             _cardListWidget(data),
-                            height16,
+                            SizedBox(
+                              height: currentlyPlayingSession != null ? 16 : 48,
+                            ),
                           ],
                         ),
                       ],

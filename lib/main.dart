@@ -95,8 +95,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: ColorConstants.transparent,
-        systemNavigationBarIconBrightness: Brightness.light,
+        // systemNavigationBarIconBrightness: Brightness.light,
       ),
+    );
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: [
+        SystemUiOverlay.top, // Shows Status bar and hides Navigation bar
+      ],
     );
 
     // listened for app background/foreground events

@@ -78,25 +78,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                     child: widget.firstChild,
                   ),
                 ),
-                if (currentlyPlayingSession != null) height8,
-                if (currentlyPlayingSession != null)
-                  Consumer(builder: (context, ref, child) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: radius,
-                        topRight: radius,
-                      ),
-                      child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 700),
-                        opacity: ref
-                            .watch(pageviewNotifierProvider)
-                            .scrollProportion,
-                        child: MiniPlayerWidget(
-                          meditationModel: currentlyPlayingSession,
-                        ),
-                      ),
-                    );
-                  }),
+                _miniPlayer(radius, currentlyPlayingSession),
               ],
             ),
             if (currentlyPlayingSession != null)
@@ -108,6 +90,33 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ),
       ),
     );
+  }
+
+  Widget _miniPlayer(Radius radius, MeditationModel? currentlyPlayingSession) {
+    if (currentlyPlayingSession != null) {
+      return Column(
+        children: [
+          height8,
+          Consumer(builder: (context, ref, child) {
+            return ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: radius,
+                topRight: radius,
+              ),
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 700),
+                opacity: ref.watch(pageviewNotifierProvider).scrollProportion,
+                child: MiniPlayerWidget(
+                  meditationModel: currentlyPlayingSession,
+                ),
+              ),
+            );
+          }),
+        ],
+      );
+    }
+
+    return SizedBox();
   }
 
   void _handleTrackEvent(

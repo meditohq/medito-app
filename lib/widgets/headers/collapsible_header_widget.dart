@@ -92,8 +92,12 @@ class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
         ),
         SliverList(
           delegate: SliverChildListDelegate([
-            if (widget.description != null) _description(widget.description!),
+            if (widget.description != null && widget.description!.isNotEmpty)
+              _description(widget.description!),
             ...widget.children,
+            SizedBox(
+              height: 42,
+            ),
           ]),
         ),
       ],

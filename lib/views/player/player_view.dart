@@ -34,7 +34,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     return BackButtonListener(
       onBackButtonPressed: _onWillPop,
       child: Scaffold(
-        extendBody: false,
+        extendBody: true,
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
