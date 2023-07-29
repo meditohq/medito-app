@@ -25,7 +25,15 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
     requestPermission();
-    ref.read(playerProvider.notifier).getCurrentlyPlayingMeditation();
+    ref
+        .read(playerProvider.notifier)
+        .getCurrentlyPlayingMeditation()
+        .then((value) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+    });
     super.initState();
   }
 

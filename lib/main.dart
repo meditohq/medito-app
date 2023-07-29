@@ -40,7 +40,7 @@ Future<void> main() async {
   sharedPreferences = await SharedPreferences.getInstance();
   await Firebase.initializeApp();
   await registerNotification();
-  
+
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
@@ -130,7 +130,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     });
     final auth = ref.watch(authProvider);
     if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
-      ref.watch(currentMeditationPlayerProvider);
+      // ref.watch(currentMeditationPlayerProvider);
     }
     isFirstTimeLoading = false;
 
