@@ -12,15 +12,19 @@ class MiniPlayerWidget extends ConsumerWidget {
   final MeditationModel meditationModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var systemGestureInsets = MediaQuery.of(context).systemGestureInsets;
+    print(systemGestureInsets.bottom);
+    var bottom = 32.0;
+    bottom = systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 16;
+
     return InkWell(
       onTap: () {
         ref.read(pageviewNotifierProvider).gotoNextPage();
       },
       child: Container(
-        height: 55 + kBottomNavigationBarHeight,
-        // height: 64,
+        height: bottom + 64,
         color: ColorConstants.onyx,
-        padding: EdgeInsets.only(bottom: 45),
+        padding: EdgeInsets.only(bottom: bottom),
         child: Row(
           children: [
             Expanded(

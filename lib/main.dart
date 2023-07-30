@@ -131,6 +131,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     final auth = ref.watch(authProvider);
     if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
       // ref.watch(currentMeditationPlayerProvider);
+     
     }
     isFirstTimeLoading = false;
 
