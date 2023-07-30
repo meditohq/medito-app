@@ -59,10 +59,7 @@ Future<void> initialiazeLocalNotification() async {
   );
 }
 
-void onSelect(NotificationResponse? data) async {
-  // TODO
-  print(data);
-}
+void onSelect(NotificationResponse? data) async {}
 
 void checkForInitialMessage() async {
   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
@@ -78,7 +75,6 @@ void onMessageAppOpened() {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('myBackgroundMessageHandler message: $message');
   await _showNotification(
     message.notification?.title,
     message.notification?.body,
