@@ -1,3 +1,4 @@
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -12,10 +13,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   final MeditationModel meditationModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var systemGestureInsets = MediaQuery.of(context).systemGestureInsets;
-    print(systemGestureInsets.bottom);
-    var bottom = 32.0;
-    bottom = systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 16;
+    var bottom = getBottomPadding(context);
 
     return InkWell(
       onTap: () {
