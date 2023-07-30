@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DurationIndicatorWidget extends ConsumerWidget {
-  const DurationIndicatorWidget(
-      {super.key, required this.file, required this.meditationId});
+  const DurationIndicatorWidget({
+    super.key,
+    required this.file,
+    required this.meditationId,
+  });
   final MeditationFilesModel file;
   final int meditationId;
   final minSeconds = 0.0;
-  final additionalMilliSeconds = 1000;
+  final additionalMilliSeconds = 200;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
