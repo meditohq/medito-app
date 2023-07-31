@@ -23,19 +23,32 @@ class MeditationButtonsWidget extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              meditationModel.audio[i].guideName,
-              style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                    color: ColorConstants.walterWhite,
-                  ),
-            ),
-            height8,
+            _guideName(context, meditationModel.audio[i].guideName),
             _gridList(i),
             SizedBox(height: 30),
           ],
         );
       },
     );
+  }
+
+  Widget _guideName(BuildContext context, String? guideName) {
+    if (guideName != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            guideName,
+            style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
+                  color: ColorConstants.walterWhite,
+                ),
+          ),
+          height8,
+        ],
+      );
+    }
+
+    return SizedBox();
   }
 
   Wrap _gridList(

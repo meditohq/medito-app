@@ -40,7 +40,6 @@ Future<void> main() async {
   sharedPreferences = await SharedPreferences.getInstance();
   await Firebase.initializeApp();
   await registerNotification();
-  await requestPermission();
 
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerNotifier(),
@@ -72,7 +71,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  bool isFirstTimeLoading = true;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -96,9 +94,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: ColorConstants.transparent,
-        systemNavigationBarIconBrightness: Brightness.light,
-        statusBarColor: ColorConstants.transparent,
+        // systemNavigationBarIconBrightness: Brightness.light,
       ),
+    );
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: [
+        SystemUiOverlay.top, // Shows Status bar and hides Navigation bar
+      ],
     );
 
     // listened for app background/foreground events
@@ -112,7 +115,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         var val = info.value;
         var appOpenedModel = AppOpenedModel(
           deviceOs: val?.os ?? '',
-          deviceLanguage: 'English',
+          deviceLanguage: val?.languageCode ?? '',
           deviceModel: val?.model ?? '',
           buildNumber: val?.buildNumber ?? '',
           appVersion: val?.appVersion ?? '',
@@ -123,13 +126,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         );
         ref.read(eventsProvider(event: event.toJson()));
       }
-      print('The counter changed $info');
     });
-    final auth = ref.watch(authProvider);
-    if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
-      ref.watch(currentMeditationPlayerProvider);
-    }
-    isFirstTimeLoading = false;
 
     return MaterialApp.router(
       routerConfig: router,

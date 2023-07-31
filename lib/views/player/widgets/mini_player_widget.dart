@@ -1,3 +1,4 @@
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -12,13 +13,16 @@ class MiniPlayerWidget extends ConsumerWidget {
   final MeditationModel meditationModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var bottom = getBottomPadding(context);
+
     return InkWell(
       onTap: () {
         ref.read(pageviewNotifierProvider).gotoNextPage();
       },
       child: Container(
-        height: 64,
+        height: bottom + 64,
         color: ColorConstants.onyx,
+        padding: EdgeInsets.only(bottom: bottom),
         child: Row(
           children: [
             Expanded(
@@ -40,12 +44,15 @@ class MiniPlayerWidget extends ConsumerWidget {
   Padding meditationCoverImage(String url) {
     return Padding(
       padding: const EdgeInsets.only(left: 15),
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: NetworkImageWidget(
-          url: url,
-          isCache: true,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: SizedBox(
+          height: 40,
+          width: 40,
+          child: NetworkImageWidget(
+            url: url,
+            isCache: true,
+          ),
         ),
       ),
     );
@@ -66,6 +73,7 @@ class MiniPlayerWidget extends ConsumerWidget {
               meditationTitleFontSize: 16,
               artistNameFontSize: 12,
               artistUrlPathFontSize: 11,
+              titleHeight: 22,
             ),
           ],
         ),

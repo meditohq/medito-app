@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ShareBtnWidget extends StatelessWidget {
-  const ShareBtnWidget({super.key, required this.globalKey});
+  const ShareBtnWidget({super.key, required this.globalKey, this.shareText});
   final GlobalKey globalKey;
+  final String? shareText;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -26,7 +27,7 @@ class ShareBtnWidget extends StatelessWidget {
       if (file != null) {
         await Share.shareXFiles(
           [XFile(file.path)],
-          text: StringConstants.shareStatsText,
+          text: shareText,
         );
       } else {
         showSnackBar(context, StringConstants.someThingWentWrong);

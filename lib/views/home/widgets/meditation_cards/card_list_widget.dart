@@ -1,6 +1,7 @@
 import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/card_widget.dart';
 import 'package:flutter/material.dart';
@@ -28,16 +29,23 @@ class CardListWidget extends StatelessWidget {
             child: ListView.builder(
               itemCount: row.items.length,
               scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
               itemBuilder: (context, index) {
                 var element = row.items[index];
 
-                return CardWidget(
-                  title: element.title,
-                  coverUrlPath: element.coverUrl,
-                  onTap: () => context.push(getPathFromString(
-                    element.type,
-                    [element.id.toString()],
-                  )),
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: 16,
+                    left: index == 0 ? 16 : 0,
+                  ),
+                  child: CardWidget(
+                    title: element.title,
+                    coverUrlPath: element.coverUrl,
+                    onTap: () => context.push(getPathFromString(
+                      element.type,
+                      [element.path.toString().getIdFromPath()],
+                    )),
+                  ),
                 );
               },
             ),

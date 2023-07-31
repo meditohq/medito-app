@@ -80,14 +80,8 @@ class MeditationView extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(height: 24),
-          Text(
-            StringConstants.selectGuideOrDuration,
-            style: Theme.of(context)
-                .primaryTextTheme
-                .bodyLarge
-                ?.copyWith(color: ColorConstants.newGrey, fontFamily: DmSans),
-          ),
+          height8,
+          _getSubTitle(context, meditationModel.subtitle),
           height16,
           MeditationButtonsWidget(
             meditationModel: meditationModel,
@@ -95,5 +89,24 @@ class MeditationView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Widget _getSubTitle(BuildContext context, String? subTitle) {
+    if (subTitle != null) {
+      return Column(
+        children: [
+          height16,
+          Text(
+            subTitle,
+            style: Theme.of(context)
+                .primaryTextTheme
+                .bodyLarge
+                ?.copyWith(color: ColorConstants.newGrey, fontFamily: DmSans),
+          ),
+        ],
+      );
+    }
+
+    return SizedBox();
   }
 }

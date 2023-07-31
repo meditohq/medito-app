@@ -53,7 +53,9 @@ class JoinIntroView extends ConsumerWidget {
                   height8,
                   Spacer(),
                   _bottomButtons(ref, context),
-                  height8,
+                  height16,
+                  height16,
+                  height16,
                 ],
               ),
             ),
@@ -88,7 +90,7 @@ class JoinIntroView extends ConsumerWidget {
           onPressed: () {
             var auth = ref.read(authProvider);
             auth.setIsAGuest(true);
-            context.go(RouteConstants.bottomNavbarPath);
+            context.go(RouteConstants.homePath);
           },
           btnText: StringConstants.maybeLater,
         ),

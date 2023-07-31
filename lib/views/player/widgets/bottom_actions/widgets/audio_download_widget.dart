@@ -46,11 +46,11 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) {
     return Expanded(
       child: Container(
-        height: 40,
+        height: 44,
         decoration: BoxDecoration(
           color: ColorConstants.greyIsTheNewGrey,
           borderRadius: BorderRadius.all(
-            Radius.circular(3),
+            Radius.circular(14),
           ),
         ),
         alignment: Alignment.center,

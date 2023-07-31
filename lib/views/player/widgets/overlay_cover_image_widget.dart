@@ -15,6 +15,8 @@ class OverlayCoverImageWidget extends StatelessWidget {
       child: NetworkImageWidget(
         url: imageUrl,
         isCache: true,
+        height: 342,
+        width: 342,
       ),
     );
   }

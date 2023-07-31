@@ -88,7 +88,7 @@ class StringConstants {
   static const String notNow = 'Not now';
 
   //Error
-  static const String someThingWentWrong = '''Something wen't wrong''';
+  static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';

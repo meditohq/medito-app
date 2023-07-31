@@ -5,32 +5,55 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class AnnouncementWidget extends ConsumerWidget {
   const AnnouncementWidget({super.key, required this.announcement});
   final AnnouncementModel announcement;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      color: ColorConstants.getColorFromString(announcement.colorBackground),
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    var bgColor =
+        ColorConstants.getColorFromString(announcement.colorBackground);
+
+    return Column(
+      children: [
+        Container(
+          color: bgColor,
+          height: MediaQuery.of(context).viewPadding.top,
+        ),
+        Container(
+          color: bgColor,
+          padding: EdgeInsets.all(16),
+          child: Column(
             children: [
-              _icon(announcement.icon),
-              _text(context, announcement.text),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _icon(announcement.icon),
+                  _text(context, announcement.text),
+                ],
+              ),
+              height16,
+              _actionBtn(context, ref, announcement),
             ],
           ),
-          height16,
-          _actionBtn(ref, announcement),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Row _actionBtn(WidgetRef ref, AnnouncementModel announcement) {
+  Row _actionBtn(
+    BuildContext context,
+    WidgetRef ref,
+    AnnouncementModel announcement,
+  ) {
+    var textColor = ColorConstants.getColorFromString(
+      announcement.colorText,
+    );
+    var bgColor = ColorConstants.getColorFromString(
+      announcement.colorBackground,
+    );
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -41,21 +64,28 @@ class AnnouncementWidget extends ConsumerWidget {
             _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
           },
           btnText: StringConstants.dismiss,
-          bgColor: ColorConstants.lightPurple,
-          textColor: ColorConstants.walterWhite,
-          elevation: 0,
+          bgColor: bgColor,
+          textColor: textColor,
           fontWeight: FontWeight.w600,
           fontSize: 14,
+          elevation: 0,
         ),
+        width4,
         LoadingButtonWidget(
           onPressed: () {
             _handleTrackEvent(ref, announcement.id, announcement.ctaTitle);
+            var location = GoRouter.of(context).location;
+            context.push(
+              location + RouteConstants.webviewPath,
+              extra: {'url': announcement.ctaPath},
+            );
           },
-          btnText: StringConstants.watch,
-          bgColor: ColorConstants.walterWhite,
-          textColor: ColorConstants.lightPurple,
+          btnText: announcement.ctaTitle ?? '',
+          bgColor: textColor,
+          textColor: bgColor,
           fontWeight: FontWeight.w600,
           fontSize: 14,
+          elevation: 0,
         ),
       ],
     );
@@ -65,10 +95,12 @@ class AnnouncementWidget extends ConsumerWidget {
     return Flexible(
       child: Text(
         title ?? '',
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: ColorConstants.getColorFromString(
                 announcement.colorText,
               ),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
       ),
     );
@@ -83,6 +115,7 @@ class AnnouncementWidget extends ConsumerWidget {
             formatIcon(announcement.icon!),
             fontFamily: 'MaterialIcons',
           ),
+          size: 24,
         ),
       );
     }

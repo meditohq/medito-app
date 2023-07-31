@@ -1,5 +1,7 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +25,17 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
-    Future.delayed(Duration(seconds: 2), () {
-      context.push(RouteConstants.notificationPermissionPath);
+    _saveFcmTokenEvent(ref);
+    // context.push(RouteConstants.notificationPermissionPath);
+    requestPermission();
+    ref
+        .read(playerProvider.notifier)
+        .getCurrentlyPlayingMeditation()
+        .then((value) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
     });
     super.initState();
   }
@@ -33,6 +44,18 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   Widget build(BuildContext context) {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
+    ref.listen(playerProvider, (prev, next) {
+      var prevId = prev?.audio.first.files.first.id;
+      var nextId = next?.audio.first.files.first.id;
+      if (next != null &&
+          (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
+        _handleTrackEvent(
+          ref,
+          next.id,
+          next.audio.first.files.first.id,
+        );
+      }
+    });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
     if (connectivityStatus == ConnectivityStatus.isDisonnected) {
       return ConnectivityErrorWidget();
@@ -66,25 +89,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                     child: widget.firstChild,
                   ),
                 ),
-                if (currentlyPlayingSession != null) height8,
-                if (currentlyPlayingSession != null)
-                  Consumer(builder: (context, ref, child) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: radius,
-                        topRight: radius,
-                      ),
-                      child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 700),
-                        opacity: ref
-                            .watch(pageviewNotifierProvider)
-                            .scrollProportion,
-                        child: MiniPlayerWidget(
-                          meditationModel: currentlyPlayingSession,
-                        ),
-                      ),
-                    );
-                  }),
+                _miniPlayer(radius, currentlyPlayingSession),
               ],
             ),
             if (currentlyPlayingSession != null)
@@ -96,5 +101,58 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ),
       ),
     );
+  }
+
+  Widget _miniPlayer(Radius radius, MeditationModel? currentlyPlayingSession) {
+    if (currentlyPlayingSession != null) {
+      return Column(
+        children: [
+          height8,
+          Consumer(builder: (context, ref, child) {
+            return ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: radius,
+                topRight: radius,
+              ),
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 700),
+                opacity: ref.watch(pageviewNotifierProvider).scrollProportion,
+                child: MiniPlayerWidget(
+                  meditationModel: currentlyPlayingSession,
+                ),
+              ),
+            );
+          }),
+        ],
+      );
+    }
+
+    return SizedBox();
+  }
+
+  void _handleTrackEvent(
+    WidgetRef ref,
+    int meditationId,
+    int audioFileId,
+  ) {
+    var audio =
+        AudioStartedModel(audioFileId: audioFileId, meditationId: meditationId);
+    var event = EventsModel(
+      name: EventTypes.audioStarted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  void _saveFcmTokenEvent(
+    WidgetRef ref,
+  ) async {
+    var token = await requestGenerateFirebaseToken();
+    var fcm = SaveFcmTokenModel(fcmToken: token ?? '');
+    var event = EventsModel(
+      name: EventTypes.saveFcmToken,
+      payload: fcm.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
