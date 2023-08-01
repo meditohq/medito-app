@@ -90,7 +90,6 @@ final router = GoRouter(
         _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
-        _getBackgroundSoundRoute(),
         GoRoute(
           path: RouteConstants.collectionPath,
           routes: [
@@ -127,6 +126,7 @@ final router = GoRouter(
         ),
       ],
     ),
+    _getBackgroundSoundRoute(),
   ],
 );
 
@@ -174,6 +174,7 @@ GoRoute _getPlayerRoute() {
 
 GoRoute _getBackgroundSoundRoute() {
   return GoRoute(
+    parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.backgroundSoundsPath,
     pageBuilder: (context, state) {
       return MaterialPage(
