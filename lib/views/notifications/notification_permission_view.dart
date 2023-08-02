@@ -1,7 +1,11 @@
+import 'package:Medito/services/notifications/notifications_service.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationPermissionView extends ConsumerWidget {
   const NotificationPermissionView({super.key});
@@ -9,68 +13,82 @@ class NotificationPermissionView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
     var size = MediaQuery.of(context).size;
+    var bottom = getBottomPadding(context);
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(AssetConstants.dalleNotifications),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    StringConstants.allowNotificationsTitle,
-                    style: textTheme.headlineMedium?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 1.2,
-                      fontSize: 24,
+      body: Padding(
+        padding: EdgeInsets.only(bottom: bottom),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(AssetConstants.dalleNotifications),
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      StringConstants.allowNotificationsTitle,
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: ColorConstants.walterWhite,
+                        fontFamily: ClashDisplay,
+                        height: 1.2,
+                        fontSize: 24,
+                      ),
                     ),
-                  ),
-                  height8,
-                  Text(
-                    StringConstants.allowNotificationsDesc,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 1.6,
-                      fontSize: 16,
+                    height8,
+                    Text(
+                      StringConstants.allowNotificationsDesc,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: ColorConstants.walterWhite,
+                        fontFamily: ClashDisplay,
+                        height: 1.6,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  height8,
-                  Spacer(),
-                  SizedBox(
-                    width: size.width,
-                    child: LoadingButtonWidget(
-                      onPressed: () {},
-                      btnText: StringConstants.allowNotifications,
-                      bgColor: ColorConstants.walterWhite,
-                      fontWeight: FontWeight.w600,
-                      textColor: ColorConstants.greyIsTheNewGrey,
+                    height8,
+                    Spacer(),
+                    SizedBox(
+                      width: size.width,
+                      child: LoadingButtonWidget(
+                        onPressed: () => _allowNotification(context),
+                        btnText: StringConstants.allowNotifications,
+                        bgColor: ColorConstants.walterWhite,
+                        fontWeight: FontWeight.w600,
+                        textColor: ColorConstants.greyIsTheNewGrey,
+                      ),
                     ),
-                  ),
-                  height8,
-                  SizedBox(
-                    width: size.width,
-                    child: LoadingButtonWidget(
-                      onPressed: () {},
-                      btnText: StringConstants.notNow,
-                      bgColor: ColorConstants.onyx,
-                      fontWeight: FontWeight.w600,
-                      textColor: ColorConstants.walterWhite,
+                    height8,
+                    SizedBox(
+                      width: size.width,
+                      child: LoadingButtonWidget(
+                        onPressed: () => _handleNotNow(context),
+                        btnText: StringConstants.notNow,
+                        bgColor: ColorConstants.onyx,
+                        fontWeight: FontWeight.w600,
+                        textColor: ColorConstants.walterWhite,
+                      ),
                     ),
-                  ),
-                  height8,
-                ],
+                    height8,
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  void _allowNotification(BuildContext context) async {
+    await requestPermission();
+    context.pop();
+  }
+
+  void _handleNotNow(BuildContext context) {
+    context.pop();
   }
 }

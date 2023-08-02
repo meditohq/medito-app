@@ -21,7 +21,7 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def appMinSdkVersion = localProperties.getProperty('flutter.minSdkVersion').toInteger()
+def appMinSdkVersion = localProperties.getProperty('flutter.minSdkVersion')
 if (appMinSdkVersion == null) {
     appMinSdkVersion = 21
 }
