@@ -43,7 +43,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   void _checkNotificationPermission() {
     Future.delayed(Duration(seconds: 4), () {
       checkNotificationPermission().then((value) {
-        if (value == AuthorizationStatus.authorized) {
+        if (value == AuthorizationStatus.notDetermined) {
           context.push(RouteConstants.notificationPermissionPath);
         }
       });

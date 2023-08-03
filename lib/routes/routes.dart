@@ -91,8 +91,6 @@ final router = GoRouter(
         _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
-        _getBackgroundSoundRoute(),
-        _getNotificationPermissionRoute(),
         GoRoute(
           path: RouteConstants.collectionPath,
           routes: [
@@ -129,6 +127,8 @@ final router = GoRouter(
         ),
       ],
     ),
+    _getBackgroundSoundRoute(),
+    _getNotificationPermissionRoute(),
   ],
 );
 
@@ -176,6 +176,7 @@ GoRoute _getPlayerRoute() {
 
 GoRoute _getBackgroundSoundRoute() {
   return GoRoute(
+    parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.backgroundSoundsPath,
     pageBuilder: (context, state) {
       return MaterialPage(
@@ -188,6 +189,7 @@ GoRoute _getBackgroundSoundRoute() {
 
 GoRoute _getNotificationPermissionRoute() {
   return GoRoute(
+    parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.notificationPermissionPath,
     pageBuilder: (context, state) {
       return MaterialPage(

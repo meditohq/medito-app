@@ -1,6 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -72,14 +73,7 @@ class AnnouncementWidget extends ConsumerWidget {
         ),
         width4,
         LoadingButtonWidget(
-          onPressed: () {
-            _handleTrackEvent(ref, announcement.id, announcement.ctaTitle);
-            var location = GoRouter.of(context).location;
-            context.push(
-              location + RouteConstants.webviewPath,
-              extra: {'url': announcement.ctaPath},
-            );
-          },
+          onPressed: () => _handleCtaTitlePress(context, ref, announcement),
           btnText: announcement.ctaTitle ?? '',
           bgColor: textColor,
           textColor: bgColor,
@@ -121,6 +115,25 @@ class AnnouncementWidget extends ConsumerWidget {
     }
 
     return SizedBox();
+  }
+
+  void _handleCtaTitlePress(
+    BuildContext context,
+    WidgetRef ref,
+    AnnouncementModel element,
+  ) {
+    var location = GoRouter.of(context).location;
+    _handleTrackEvent(ref, element.id, element.ctaTitle);
+    if (element.ctaType == TypeConstants.LINK) {
+      context.push(
+        location + RouteConstants.webviewPath,
+        extra: {'url': element.ctaPath},
+      );
+    }
+    context.push(getPathFromString(
+      element.ctaType,
+      [element.ctaPath.toString().getIdFromPath()],
+    ));
   }
 
   void _handleTrackEvent(WidgetRef ref, int announcementId, String? ctaTitle) {
