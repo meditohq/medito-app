@@ -112,8 +112,8 @@ class NewFolderScreen extends ConsumerWidget {
             ],
           ),
           if (showIcon)
-            Icon(
-              _getIcon(),
+            const Icon(
+              Icons.check_circle_outline_sharp,
               color: Colors.white,
             ),
         ],
@@ -144,11 +144,5 @@ class NewFolderScreen extends ConsumerWidget {
         createSnackBar(StringConstants.checkConnection, context);
       }
     });
-  }
-
-  IconData _getIcon() {
-    return Icons.check_circle_outline_sharp;
-    // return Icons.article_outlined;
-    // return Icons.arrow_forward_ios_sharp;
   }
 }
