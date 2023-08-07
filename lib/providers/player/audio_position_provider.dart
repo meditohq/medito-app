@@ -34,11 +34,13 @@ final audioPositionAndPlayerStateProvider =
     StreamProvider.autoDispose<PositionAndPlayerStateState>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
 
-  return Rx.combineLatest2<Duration, PlayerState, PositionAndPlayerStateState>(
+  return Rx.combineLatest3<Duration, Duration?, PlayerState,
+      PositionAndPlayerStateState>(
     audioPlayer.meditationAudioPlayer.positionStream,
+    audioPlayer.meditationAudioPlayer.durationStream,
     audioPlayer.meditationAudioPlayer.playerStateStream,
-    (position, playerState) =>
-        PositionAndPlayerStateState(playerState, position),
+    (position, duration, playerState) =>
+        PositionAndPlayerStateState(playerState, duration, position),
   );
 });
 
@@ -48,6 +50,7 @@ enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }
 class PositionAndPlayerStateState {
   final PlayerState playerState;
   final Duration position;
+  final Duration? duration;
 
-  PositionAndPlayerStateState(this.playerState, this.position);
+  PositionAndPlayerStateState(this.playerState, this.duration, this.position);
 }

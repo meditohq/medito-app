@@ -26,11 +26,12 @@ class _DurationIndicatorWidgetState
     extends ConsumerState<DurationIndicatorWidget> {
   final _minSeconds = 0.0;
   double? _dragSeekbarValue;
-  late double _maxDuration;
+  double _maxDuration = 0.0;
   bool _draggingSeekbar = false;
+
   @override
   void initState() {
-    _maxDuration = getMaxDuration(ref);
+    _maxDuration = widget.file.duration.toDouble();
     super.initState();
   }
 
@@ -47,6 +48,9 @@ class _DurationIndicatorWidgetState
         );
         if (_dragSeekbarValue != null && !_draggingSeekbar) {
           _dragSeekbarValue = null;
+        }
+        if (data.duration != null) {
+          _maxDuration = data.duration!.inMilliseconds.toDouble();
         }
 
         return _durationBar(
@@ -186,17 +190,6 @@ class _DurationIndicatorWidgetState
       payload: audio.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
-  }
-
-  double getMaxDuration(
-    WidgetRef ref,
-  ) {
-    var audioDuration =
-        ref.read(audioPlayerNotifierProvider).getAudioDuration();
-
-    return audioDuration != null
-        ? audioDuration.inMilliseconds.toDouble()
-        : widget.file.duration.toDouble();
   }
 }
 

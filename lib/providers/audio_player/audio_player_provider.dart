@@ -110,10 +110,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
     meditationAudioPlayer.stop();
   }
 
-  Duration? getAudioDuration() {
-    return meditationAudioPlayer.duration;
-  }
-
   void skipForward30Secs() async {
     var seekDuration = meditationAudioPlayer.position.inMilliseconds +
         Duration(seconds: 30).inMilliseconds;
