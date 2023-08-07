@@ -1,3 +1,4 @@
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
@@ -55,7 +56,9 @@ class JoinIntroView extends ConsumerWidget {
                   _bottomButtons(ref, context),
                   height16,
                   height16,
-                  height16,
+                  SizedBox(
+                    height: getBottomPadding(context),
+                  ),
                 ],
               ),
             ),

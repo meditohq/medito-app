@@ -25,26 +25,26 @@ class AudioPlayerNotifier extends BaseAudioHandler
 
   @override
   Future<void> pause() async {
-    unawaited(pauseBackgroundSound());
-    await meditationAudioPlayer.pause();
+    pauseBackgroundSound();
+    unawaited(meditationAudioPlayer.pause());
   }
 
   @override
   Future<void> play() async {
     var checkBgAudio = mediaItemHasBGSound();
     if (checkBgAudio) {
-      unawaited(playBackgroundSound());
+      playBackgroundSound();
     } else {
-      unawaited(pauseBackgroundSound());
+      pauseBackgroundSound();
     }
-    await meditationAudioPlayer.play();
+    unawaited(meditationAudioPlayer.play());
   }
 
   @override
   Future<void> stop() async {
-    await meditationAudioPlayer.stop();
+    unawaited(meditationAudioPlayer.stop());
     if (mediaItemHasBGSound()) {
-      await stopBackgroundSound();
+      stopBackgroundSound();
     }
   }
 
@@ -85,25 +85,33 @@ class AudioPlayerNotifier extends BaseAudioHandler
     }
   }
 
-  Future<void> playBackgroundSound() async {
-    unawaited(backgroundSoundAudioPlayer.play());
-    await backgroundSoundAudioPlayer.setLoopMode(LoopMode.all);
+  void playBackgroundSound() {
+    backgroundSoundAudioPlayer.play();
+    backgroundSoundAudioPlayer.setLoopMode(LoopMode.all);
   }
 
-  Future<void> pauseBackgroundSound() async {
-    await backgroundSoundAudioPlayer.pause();
+  void pauseBackgroundSound() {
+    backgroundSoundAudioPlayer.pause();
   }
 
-  Future<void> stopBackgroundSound() async {
-    await backgroundSoundAudioPlayer.stop();
+  void stopBackgroundSound() {
+    backgroundSoundAudioPlayer.stop();
   }
 
-  void setMeditationAudioSpeed(double speed) async {
-    await meditationAudioPlayer.setSpeed(speed);
+  void setMeditationAudioSpeed(double speed) {
+    meditationAudioPlayer.setSpeed(speed);
   }
 
   void seekValueFromSlider(int duration) {
-    unawaited(meditationAudioPlayer.seek(Duration(milliseconds: duration)));
+    meditationAudioPlayer.seek(Duration(milliseconds: duration));
+  }
+
+  void stopMeditation() {
+    meditationAudioPlayer.stop();
+  }
+
+  Duration? getAudioDuration() {
+    return meditationAudioPlayer.duration;
   }
 
   void skipForward30Secs() async {
@@ -138,7 +146,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
       id: filePath ?? file.path,
       title: meditationModel.title,
       artist: meditationModel.artist?.name,
-      duration: Duration(milliseconds: file.duration),
+      // duration: Duration(milliseconds: file.duration),
       artUri: Uri.parse(
         meditationModel.coverUrl,
       ),

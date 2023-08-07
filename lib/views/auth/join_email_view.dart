@@ -1,3 +1,4 @@
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
@@ -95,7 +96,9 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     ),
                   ],
                 ),
-                height8,
+                SizedBox(
+                  height: getBottomPadding(context),
+                ),
               ],
             ),
           ),
