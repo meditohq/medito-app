@@ -30,15 +30,14 @@ class _DurationIndicatorWidgetState
   bool _draggingSeekbar = false;
 
   @override
-  void initState() {
-    _maxDuration = widget.file.duration.toDouble();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final audioPositionAndPlayerState =
         ref.watch(audioPositionAndPlayerStateProvider);
+    final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+    final audioDuration = audioPlayer.meditationAudioPlayer.duration;
+    _maxDuration = audioDuration != null
+        ? audioDuration.inMilliseconds.toDouble()
+        : widget.file.duration.toDouble();
 
     return audioPositionAndPlayerState.when(
       data: (data) {
@@ -170,7 +169,7 @@ class _DurationIndicatorWidgetState
     if (audioProcessingState == ProcessingState.completed) {
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
       _handleTrackEvent(ref, widget.file.id, widget.meditationId);
-      audioProvider.stopMeditation();
+      audioProvider.pause();
       audioProvider.seekValueFromSlider(0);
       audioProvider.pauseBackgroundSound();
       WidgetsBinding.instance.addPostFrameCallback((_) {

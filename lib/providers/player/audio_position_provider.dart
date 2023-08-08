@@ -31,7 +31,7 @@ void skipAudio(
 }
 
 final audioPositionAndPlayerStateProvider =
-    StreamProvider.autoDispose<PositionAndPlayerStateState>((ref) {
+    StreamProvider<PositionAndPlayerStateState>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
 
   return Rx.combineLatest3<Duration, Duration?, PlayerState,

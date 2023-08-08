@@ -1,8 +1,5 @@
-import 'dart:async';
-import 'package:Medito/audioplayer/medito_audio_handler.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/network/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
@@ -69,11 +66,6 @@ class MeditationButtonsWidget extends StatelessWidget {
     return Consumer(
       builder: (context, ref, child) => InkWell(
         onTap: () {
-          var dataMap = {
-            'secsListened': (Duration(milliseconds: file.duration).inSeconds),
-            'id': '${meditationModel.id}',
-          };
-          unawaited(writeJSONToCache(encoded(dataMap), STATS));
           ref
               .read(playerProvider.notifier)
               .addCurrentlyPlayingMeditationInPreference(
