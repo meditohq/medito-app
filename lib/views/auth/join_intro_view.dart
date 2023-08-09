@@ -11,6 +11,7 @@ class JoinIntroView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var size = MediaQuery.of(context).size;
     var textTheme = Theme.of(context).textTheme;
     var joinBenefitList = [
       StringConstants.joinBenefits1,
@@ -22,48 +23,57 @@ class JoinIntroView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(AssetConstants.join),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    StringConstants.joinTheMeditoFamily,
-                    style: textTheme.headlineMedium?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 2,
-                      fontSize: 24,
+      body: SizedBox(
+        height: size.height,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(
+              AssetConstants.join,
+              height: size.height * 0.44,
+              width: size.width,
+              fit: BoxFit.cover,
+            ),
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      StringConstants.joinTheMeditoFamily,
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: ColorConstants.walterWhite,
+                        fontFamily: ClashDisplay,
+                        height: 2,
+                        fontSize: 24,
+                      ),
                     ),
-                  ),
-                  _benefitPoints(joinBenefitList, textTheme),
-                  Text(
-                    StringConstants.itsFreeForever,
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 3,
-                      fontSize: 16,
+                    _benefitPoints(joinBenefitList, textTheme),
+                    Text(
+                      StringConstants.itsFreeForever,
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: ColorConstants.walterWhite,
+                        fontFamily: ClashDisplay,
+                        height: 3,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  height8,
-                  Spacer(),
-                  _bottomButtons(ref, context),
-                  height16,
-                  height16,
-                  SizedBox(
-                    height: getBottomPadding(context),
-                  ),
-                ],
+                    height8,
+                    Spacer(),
+                    _bottomButtons(ref, context),
+                    // height16,
+                    // height16,
+                    SizedBox(
+                      height: getBottomPadding(context),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

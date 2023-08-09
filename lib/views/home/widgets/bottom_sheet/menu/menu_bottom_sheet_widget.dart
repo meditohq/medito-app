@@ -53,6 +53,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
   ) {
     var location = GoRouter.of(context).location;
     _handleTrackEvent(ref, element.id, element.title);
+    Navigator.pop(context);
     if (element.type == TypeConstants.LINK) {
       context.push(
         location + RouteConstants.webviewPath,

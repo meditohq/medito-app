@@ -2,7 +2,6 @@ import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +21,12 @@ class NotificationPermissionView extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(AssetConstants.dalleNotifications),
+            Image.asset(
+              AssetConstants.dalleNotifications,
+              height: size.height * 0.45,
+              width: size.width,
+              fit: BoxFit.cover,
+            ),
             Expanded(
               child: Padding(
                 padding:
