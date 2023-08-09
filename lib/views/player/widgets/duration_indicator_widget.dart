@@ -33,11 +33,7 @@ class _DurationIndicatorWidgetState
   Widget build(BuildContext context) {
     final audioPositionAndPlayerState =
         ref.watch(audioPositionAndPlayerStateProvider);
-    final audioPlayer = ref.watch(audioPlayerNotifierProvider);
-    final audioDuration = audioPlayer.meditationAudioPlayer.duration;
-    _maxDuration = audioDuration != null
-        ? audioDuration.inMilliseconds.toDouble()
-        : widget.file.duration.toDouble();
+    _maxDuration = widget.file.duration.toDouble();
 
     return audioPositionAndPlayerState.when(
       data: (data) {
@@ -47,9 +43,6 @@ class _DurationIndicatorWidgetState
         );
         if (_dragSeekbarValue != null && !_draggingSeekbar) {
           _dragSeekbarValue = null;
-        }
-        if (data.duration != null) {
-          _maxDuration = data.duration!.inMilliseconds.toDouble();
         }
 
         return _durationBar(
@@ -100,13 +93,8 @@ class _DurationIndicatorWidgetState
                 setState(() {
                   _dragSeekbarValue = val;
                 });
-                print('onChanged $val');
               },
               onChangeEnd: (val) {
-                print('onChangeEnd ${val.round()}');
-                print(
-                  'Duration ${Duration(milliseconds: val.round()).toMinutesSeconds()}',
-                );
                 ref.read(slideAudioPositionProvider(
                   duration: val.round(),
                 ));
@@ -114,10 +102,6 @@ class _DurationIndicatorWidgetState
               },
             ),
           ),
-          // _durationLabel(
-          //   context,
-          //   audioProcessingState.name,
-          // ),
           _durationLabels(
             context,
             currentDuration.round(),

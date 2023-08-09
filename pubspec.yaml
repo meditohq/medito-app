@@ -28,9 +28,9 @@ dependencies:
   flutter_markdown: ^0.6.7
   shared_preferences: ^2.0.5
   auto_size_text: ^3.0.0-nullsafety.0
-  just_audio: ^0.9.28
-  audio_session: ^0.1.10
-  audio_service: ^0.18.7
+  just_audio: ^0.9.34
+  audio_session: ^0.1.16
+  audio_service: ^0.18.10
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2

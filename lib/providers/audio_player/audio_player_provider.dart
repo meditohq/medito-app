@@ -142,7 +142,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
       id: filePath ?? file.path,
       title: meditationModel.title,
       artist: meditationModel.artist?.name,
-      // duration: Duration(milliseconds: file.duration),
+      duration: Duration(milliseconds: file.duration),
       artUri: Uri.parse(
         meditationModel.coverUrl,
       ),
