@@ -34,9 +34,12 @@ class HomeShimmerWidget extends StatelessWidget {
         children: List.generate(
           5,
           (index) => Flexible(
-            child: BoxShimmerWidget(
-              height: 40,
-              borderRadius: 12,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: BoxShimmerWidget(
+                height: 40,
+                borderRadius: 12,
+              ),
             ),
           ),
         ),
