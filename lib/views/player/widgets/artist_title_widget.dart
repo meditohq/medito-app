@@ -1,5 +1,4 @@
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,25 +54,36 @@ class ArtistTitleWidget extends ConsumerWidget {
   }
 
   Padding _subtitle(BuildContext context, WidgetRef ref) {
+    var style = Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontFamily: DmMono,
+          fontSize: artistNameFontSize,
+          letterSpacing: 0,
+          color: ColorConstants.walterWhite.withOpacity(0.9),
+        );
+
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
-      child: MarkdownWidget(
-        textAlign: WrapAlignment.start,
-        body: '${artistName ?? ''}',
-        pFontSize: artistNameFontSize,
-        aFontSize: artistUrlPathFontSize,
-        onTapLink: (text, href, title) {
-          var getCurrentLocation = GoRouter.of(context);
-          if (isPlayerScreen) {
-            ref.read(pageviewNotifierProvider).gotoPreviousPage();
+      child: InkWell(
+        child: Text(
+          artistName ?? '',
+          style: style,
+        ),
+        onTap: () {
+          if (isPlayerScreen && artistUrlPath != null) {
+            var getCurrentLocation = GoRouter.of(context);
+            if (isPlayerScreen) {
+              ref.read(pageviewNotifierProvider).gotoPreviousPage();
+            }
+            var location = getCurrentLocation.location;
+            if (location.contains(RouteConstants.webviewPath)) {
+              context.pop();
+            }
+            location = getCurrentLocation.location;
+            context.go(
+              location + RouteConstants.webviewPath,
+              extra: {'url': artistUrlPath},
+            );
           }
-          var location = getCurrentLocation.location;
-          if (location.contains(RouteConstants.webviewPath)) {
-            context.pop();
-          }
-          location = getCurrentLocation.location;
-          context
-              .go(location + RouteConstants.webviewPath, extra: {'url': href});
         },
       ),
     );
