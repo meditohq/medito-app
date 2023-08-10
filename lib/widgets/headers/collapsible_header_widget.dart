@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
