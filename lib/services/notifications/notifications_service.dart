@@ -55,19 +55,8 @@ Future<void> initialiazeLocalNotification() async {
   );
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: onSelect,
+    onDidReceiveNotificationResponse: (_) => {},
   );
-}
-
-void onSelect(NotificationResponse? data) async {}
-
-void checkForInitialMessage() async {
-  var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  //ignore: no-empty-block
-  if (initialMessage != null) {
-  } else {
-    onMessageAppOpened();
-  }
 }
 
 void onMessageAppOpened() {
