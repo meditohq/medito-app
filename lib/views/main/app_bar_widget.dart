@@ -18,7 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 //ignore: prefer-match-file-name
-class MeditoAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
+class MeditoAppBarWidget extends StatelessWidget
+    implements PreferredSizeWidget {
   const MeditoAppBarWidget({
     Key? key,
     this.title,
@@ -45,10 +46,6 @@ class MeditoAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
       centerTitle: true,
       actions: actions,
       elevation: 0,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        systemStatusBarContrastEnforced: true,
-      ),
       backgroundColor:
           isTransparent ? Colors.transparent : ColorConstants.moonlight,
       title: getTitleWidget(context),

@@ -152,12 +152,9 @@ class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
   }
 
   Transform _title(BuildContext context) {
-    var titleLeftSpacing = Platform.isIOS ? 0.0 : -40.0;
-
     return Transform(
       // you can forcefully translate values left side using Transform
-      transform:
-          Matrix4.translationValues(_isShrink ? 0 : titleLeftSpacing, 0.0, 0.0),
+      transform: Matrix4.translationValues(_isShrink ? 0 : 0.0, 0.0, 0.0),
       child: Text(
         '${widget.title}',
         maxLines: _isShrink ? 1 : 3,
