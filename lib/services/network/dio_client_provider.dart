@@ -31,11 +31,11 @@ final dioClientProvider = Provider<DioApiService>((ref) {
     requestBody: true,
     error: true,
   ));
-  dio.interceptors.add(InterceptorsWrapper(
-    onError: (e, handler) {
-      // onError(e, handler, dio, ref);
-    },
-  ));
+  // dio.interceptors.add(InterceptorsWrapper(
+  //   onError: (e, handler) {
+  //     // onError(e, handler, dio, ref);
+  //   },
+  // ));
   var dioApiService = DioApiService(dio: dio);
 
   return dioApiService;

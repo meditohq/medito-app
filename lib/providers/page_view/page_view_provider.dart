@@ -34,7 +34,11 @@ class PageviewProvider extends ChangeNotifier {
     var totalScrollableArea = maxScrollExtent;
 
     scrollProportion = 1 - (scrollPosition / totalScrollableArea);
-
+    if (scrollProportion > 1) {
+      scrollProportion = 1;
+    } else if (scrollProportion < 0) {
+      scrollProportion = 0;
+    }
     scrollProportion = Curves.easeInOutCubic.transform(scrollProportion);
 
     notifyListeners();

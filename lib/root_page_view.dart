@@ -114,6 +114,8 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   }
 
   Widget _miniPlayer(Radius radius, MeditationModel? currentlyPlayingSession) {
+    var opacity = ref.watch(pageviewNotifierProvider).scrollProportion;
+
     if (currentlyPlayingSession != null) {
       return Column(
         children: [
@@ -126,7 +128,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
               ),
               child: AnimatedOpacity(
                 duration: Duration(milliseconds: 700),
-                opacity: ref.watch(pageviewNotifierProvider).scrollProportion,
+                opacity: opacity,
                 child: MiniPlayerWidget(
                   meditationModel: currentlyPlayingSession,
                 ),

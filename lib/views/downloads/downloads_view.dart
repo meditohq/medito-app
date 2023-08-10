@@ -9,7 +9,6 @@ import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -76,11 +75,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   Widget _getEmptyWidget() => EmptyStateWidget(
         message: StringConstants.emptyDownloadsMessage,
-        image: SvgPicture.asset(
-          AssetConstants.dalle,
-          height: 168,
-          width: 178,
-        ),
       );
 
   Widget _getSlidingItem(MeditationModel item, BuildContext context) {
