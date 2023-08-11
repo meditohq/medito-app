@@ -30,12 +30,13 @@ class MarkdownWidget extends StatelessWidget {
       onTapLink: onTapLink ?? (text, href, title) => _linkTap(context, href),
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
+      physics: NeverScrollableScrollPhysics(),
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
         p: p ??
             titleMedium?.copyWith(
               fontFamily: DmMono,
               fontSize: pFontSize,
-              letterSpacing: 1,
+              letterSpacing: 0,
               color: walterWhite,
             ),
         textAlign: textAlign ?? WrapAlignment.center,
@@ -52,6 +53,6 @@ class MarkdownWidget extends StatelessWidget {
 
   void _linkTap(BuildContext context, String? href) {
     var location = GoRouter.of(context).location;
-    context.go(location + RouteConstants.webviewPath, extra: {'url': href});
+    context.push(location + RouteConstants.webviewPath, extra: {'url': href});
   }
 }

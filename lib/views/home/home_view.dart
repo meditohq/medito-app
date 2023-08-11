@@ -16,32 +16,45 @@ class HomeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var homeRes = ref.watch(homeProvider);
+    var stats = ref.watch(remoteStatsProvider);
+    final currentlyPlayingSession = ref.watch(playerProvider);
 
     return Scaffold(
       body: homeRes.when(
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: false,
         data: (data) => SafeArea(
+          top: data.announcement == null,
+          bottom: false,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _getAnnouncementBanner(data),
-              HomeHeaderWidget(
-                homeMenuModel: data.menu,
-              ),
-              height16,
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () => ref.refresh(homeProvider.future),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        SearchWidget(),
-                        FilterWidget(
-                          chips: data.chips,
+                        _getAnnouncementBanner(data),
+                        HomeHeaderWidget(
+                          homeMenuModel: data.menu,
+                          miniStatsModel: stats.asData?.value.mini,
                         ),
-                        _cardListWidget(data),
-                        height16,
+                        Column(
+                          children: [
+                            SearchWidget(),
+                            height8,
+                            FilterWidget(
+                              chips: data.chips,
+                            ),
+                            height16,
+                            height16,
+                            _cardListWidget(data),
+                            SizedBox(
+                              height: currentlyPlayingSession != null ? 16 : 48,
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -65,7 +78,9 @@ class HomeView extends ConsumerWidget {
       children: data.rows
           .map(
             (e) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.only(
+                bottom: e.title == data.rows.last.title ? 16 : 32,
+              ),
               child: CardListWidget(
                 row: e,
               ),

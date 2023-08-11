@@ -19,7 +19,7 @@ class LabelsWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          height: 40,
+          height: 44,
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.all(

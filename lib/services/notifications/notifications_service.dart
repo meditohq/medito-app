@@ -55,22 +55,8 @@ Future<void> initialiazeLocalNotification() async {
   );
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: onSelect,
+    onDidReceiveNotificationResponse: (_) => {},
   );
-}
-
-void onSelect(NotificationResponse? data) async {
-  // TODO
-  print(data);
-}
-
-void checkForInitialMessage() async {
-  var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  //ignore: no-empty-block
-  if (initialMessage != null) {
-  } else {
-    onMessageAppOpened();
-  }
 }
 
 void onMessageAppOpened() {
@@ -78,7 +64,6 @@ void onMessageAppOpened() {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('myBackgroundMessageHandler message: $message');
   await _showNotification(
     message.notification?.title,
     message.notification?.body,

@@ -31,10 +31,10 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     var coverUrl = widget.meditationModel.coverUrl;
     var artist = widget.meditationModel.artist;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return BackButtonListener(
+      onBackButtonPressed: _onWillPop,
       child: Scaffold(
-        extendBody: false,
+        extendBody: true,
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
@@ -42,6 +42,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
             SafeArea(
               child: Column(
                 children: [
+                  height16,
                   HandleBarWidget(),
                   Spacer(),
                   Padding(
@@ -66,7 +67,9 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                     file: widget.file,
                     meditationModel: widget.meditationModel,
                   ),
-                  Spacer(),
+                  Spacer(
+                    flex: 2,
+                  ),
                   BottomActionWidget(
                     meditationModel: widget.meditationModel,
                     file: widget.file,
@@ -85,10 +88,10 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     if (ref.read(pageviewNotifierProvider).currentPage == 1) {
       ref.read(pageviewNotifierProvider).gotoPreviousPage();
 
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   @override

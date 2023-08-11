@@ -8,6 +8,7 @@ abstract class MeditationModel with _$MeditationModel {
   factory MeditationModel({
     required int id,
     required String title,
+    String? subtitle,
     required String description,
     required String coverUrl,
     required bool isPublished,
@@ -22,6 +23,7 @@ abstract class MeditationModel with _$MeditationModel {
     return MeditationModel(
       id: id,
       title: title,
+      subtitle: subtitle,
       description: description,
       coverUrl: coverUrl,
       isPublished: isPublished,
@@ -55,7 +57,7 @@ abstract class MeditationArtistModel with _$MeditationArtistModel {
 @unfreezed
 abstract class MeditationAudioModel with _$MeditationAudioModel {
   factory MeditationAudioModel({
-    required String guideName,
+    String? guideName,
     @Default([]) List<MeditationFilesModel> files,
   }) = _MeditationAudioModel;
 

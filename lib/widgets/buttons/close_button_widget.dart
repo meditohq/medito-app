@@ -1,3 +1,4 @@
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:flutter/material.dart';
 
 class CloseButtonWidget extends StatelessWidget {
@@ -5,8 +6,8 @@ class CloseButtonWidget extends StatelessWidget {
     super.key,
     this.onPressed,
     this.isShowCircle = true,
-    this.bgColor = Colors.black38,
-    this.icColor = Colors.white,
+    this.bgColor = ColorConstants.walterWhite,
+    this.icColor = Colors.black,
   });
   final void Function()? onPressed;
   final bool isShowCircle;
@@ -18,7 +19,9 @@ class CloseButtonWidget extends StatelessWidget {
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       onPressed: onPressed,
       color: isShowCircle ? bgColor : null,
-      padding: EdgeInsets.all(14),
+      height: 40,
+      minWidth: 40,
+      padding: EdgeInsets.all(0),
       shape: isShowCircle ? CircleBorder() : null,
       child: Icon(
         Icons.close,

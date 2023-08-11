@@ -60,14 +60,16 @@ class JoinWelcomeView extends ConsumerWidget {
                       onPressed: () {
                         var auth = ref.read(authProvider.notifier);
                         auth.setUserEmail(email);
-                        context.go(RouteConstants.bottomNavbarPath);
+                        context.go(RouteConstants.homePath);
                       },
                       btnText: StringConstants.close,
                       bgColor: ColorConstants.walterWhite,
                       textColor: ColorConstants.greyIsTheNewGrey,
                     ),
                   ),
-                  height8,
+                  height16,
+                  height16,
+                  height16,
                 ],
               ),
             ),

@@ -15,12 +15,11 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     var deviceInfo = ref.watch(deviceAndAppInfoProvider);
     var globalKey = GlobalKey();
 
-    return DraggableSheetWidget(
-      initialChildSize: 0.6,
-      maxChildSize: 0.8,
-      expand: false,
-      child: (scrollController) {
-        return Column(
+    return Container(
+      decoration: bottomSheetBoxDecoration,
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             height16,
@@ -30,7 +29,6 @@ class DebugBottomSheetWidget extends ConsumerWidget {
               skipLoadingOnRefresh: false,
               data: (data) => _debugItemsList(
                 context,
-                scrollController,
                 globalKey,
                 data,
                 deviceInfo.value,
@@ -48,74 +46,69 @@ class DebugBottomSheetWidget extends ConsumerWidget {
               ),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Expanded _debugItemsList(
+  Column _debugItemsList(
     BuildContext context,
-    ScrollController scrollController,
     GlobalKey key,
     MeModel? me,
     DeviceAndAppInfoModel? deviceInfo,
   ) {
-    return Expanded(
-      child: SingleChildScrollView(
-        controller: scrollController,
-        child: Column(
-          children: [
-            RepaintBoundary(
-              key: key,
-              child: Container(
-                color: ColorConstants.onyx,
-                child: Column(
-                  children: [
-                    _debugRowItem(
-                      context,
-                      StringConstants.id,
-                      me?.id,
-                    ),
-                    _debugRowItem(
-                      context,
-                      StringConstants.email,
-                      me?.email,
-                    ),
-                    _debugRowItem(
-                      context,
-                      StringConstants.appVersion,
-                      deviceInfo?.appVersion,
-                    ),
-                    _debugRowItem(
-                      context,
-                      StringConstants.deviceModel,
-                      deviceInfo?.model,
-                    ),
-                    _debugRowItem(
-                      context,
-                      StringConstants.deviceOs,
-                      deviceInfo?.os,
-                    ),
-                    _debugRowItem(
-                      context,
-                      StringConstants.devicePlatform,
-                      deviceInfo?.platform,
-                    ),
-                    _debugRowItem(
-                      context,
-                      StringConstants.buidNumber,
-                      deviceInfo?.buildNumber,
-                    ),
-                  ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RepaintBoundary(
+          key: key,
+          child: Container(
+            color: ColorConstants.onyx,
+            child: Column(
+              children: [
+                _debugRowItem(
+                  context,
+                  StringConstants.id,
+                  me?.id,
                 ),
-              ),
+                _debugRowItem(
+                  context,
+                  StringConstants.email,
+                  me?.email,
+                ),
+                _debugRowItem(
+                  context,
+                  StringConstants.appVersion,
+                  deviceInfo?.appVersion,
+                ),
+                _debugRowItem(
+                  context,
+                  StringConstants.deviceModel,
+                  deviceInfo?.model,
+                ),
+                _debugRowItem(
+                  context,
+                  StringConstants.deviceOs,
+                  deviceInfo?.os,
+                ),
+                _debugRowItem(
+                  context,
+                  StringConstants.devicePlatform,
+                  deviceInfo?.platform,
+                ),
+                _debugRowItem(
+                  context,
+                  StringConstants.buidNumber,
+                  deviceInfo?.buildNumber,
+                ),
+              ],
             ),
-            ShareBtnWidget(
-              globalKey: key,
-            ),
-          ],
+          ),
         ),
-      ),
+        ShareBtnWidget(
+          globalKey: key,
+        ),
+      ],
     );
   }
 

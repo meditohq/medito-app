@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
@@ -13,7 +12,8 @@ class RowItemWidget extends StatelessWidget {
     this.onTap,
     this.isTrailingIcon = true,
     this.titleStyle,
-    this.iconSize = 14,
+    this.trailingIconSize = 24,
+    this.leadingIconSize = 24,
     this.iconColor,
   });
 
@@ -25,7 +25,8 @@ class RowItemWidget extends StatelessWidget {
   final void Function()? onTap;
   final bool isTrailingIcon;
   final TextStyle? titleStyle;
-  final double iconSize;
+  final double leadingIconSize;
+  final double trailingIconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +65,7 @@ class RowItemWidget extends StatelessWidget {
                     color: iconColor != null
                         ? ColorConstants.getColorFromString(iconColor!)
                         : null,
+                    size: leadingIconSize,
                   ),
                   width16,
                   Column(
@@ -81,9 +83,9 @@ class RowItemWidget extends StatelessWidget {
               ),
               Visibility(
                 visible: isTrailingIcon,
-                child: SvgPicture.asset(
-                  AssetConstants.icForward,
-                  height: 14,
+                child: Icon(
+                  Icons.chevron_right,
+                  size: trailingIconSize,
                 ),
               ),
             ],
@@ -96,10 +98,11 @@ class RowItemWidget extends StatelessWidget {
   Text _subtitle(BuildContext context) {
     return Text(
       subTitle!,
-      style: Theme.of(context)
-          .textTheme
-          .titleSmall
-          ?.copyWith(color: ColorConstants.graphite),
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: ColorConstants.graphite,
+            letterSpacing: 0,
+            height: 1.7,
+          ),
     );
   }
 }

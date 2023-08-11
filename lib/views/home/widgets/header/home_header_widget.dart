@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,38 +9,40 @@ import '../bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import '../bottom_sheet/menu/menu_bottom_sheet_widget.dart';
 
-class HomeHeaderWidget extends StatelessWidget {
+class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   const HomeHeaderWidget({
     super.key,
-    this.streakCount,
     required this.homeMenuModel,
+    this.miniStatsModel,
   });
-  final String? streakCount;
+
   final List<HomeMenuModel> homeMenuModel;
+  final MiniStatsModel? miniStatsModel;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, top: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _logo(context),
-          Row(
-            children: [
-              _statsWidget(context, streakCount: streakCount),
-              width16,
-              _downloadWidget(context),
-              width16,
-              _menuWidget(context),
-            ],
-          ),
-        ],
+    return SizedBox(
+      height: 56,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 12, right: 2),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _logo(context),
+            Row(
+              children: [
+                _statsWidget(context),
+                _downloadWidget(context),
+                _menuWidget(context),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  LongPressDetectorWidget _logo(BuildContext context) {
+  Widget _logo(BuildContext context) {
     return LongPressDetectorWidget(
       onLongPress: () => showModalBottomSheet<void>(
         context: context,
@@ -49,13 +52,23 @@ class HomeHeaderWidget extends StatelessWidget {
         },
       ),
       duration: Duration(seconds: 3),
-      child: SvgPicture.asset(AssetConstants.icLogo),
+      child: IconButton(
+        onPressed: () => {},
+        icon: SvgPicture.asset(
+          AssetConstants.icLogo,
+          width: 32,
+        ),
+      ),
     );
   }
 
-  InkWell _menuWidget(BuildContext context) {
-    return InkWell(
-      onTap: () {
+  IconButton _menuWidget(BuildContext context) {
+    return IconButton(
+      icon: const Icon(
+        Icons.more_vert,
+        size: 24,
+      ),
+      onPressed: () {
         showModalBottomSheet<void>(
           context: context,
           backgroundColor: ColorConstants.transparent,
@@ -66,21 +79,35 @@ class HomeHeaderWidget extends StatelessWidget {
           },
         );
       },
-      child: SvgPicture.asset(AssetConstants.icMenu),
     );
   }
 
-  InkWell _downloadWidget(BuildContext context) {
-    return InkWell(
-      onTap: () => context.push(RouteConstants.collectionPath),
-      child: SvgPicture.asset(
-        AssetConstants.icDownload,
+  Transform _downloadWidget(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(5, 0),
+      child: IconButton(
+        icon: const Icon(
+          Icons.downloading,
+          size: 24,
+        ),
+        onPressed: () => context.push(RouteConstants.collectionPath),
       ),
     );
   }
 
-  InkWell _statsWidget(BuildContext context, {String? streakCount}) {
+  InkWell _statsWidget(BuildContext context) {
+    var icon = miniStatsModel?.icon != null
+        ? IconData(
+            formatIcon(miniStatsModel!.icon),
+            fontFamily: 'MaterialIcons',
+          )
+        : Icons.local_fire_department_outlined;
+    var streakCount = miniStatsModel?.value.toString() ?? '0';
+
     return InkWell(
+      customBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       onTap: () {
         showModalBottomSheet<void>(
           context: context,
@@ -96,22 +123,28 @@ class HomeHeaderWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            width: 1,
+            width: 2,
             color: ColorConstants.walterWhite,
           ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+        padding: EdgeInsets.symmetric(horizontal: 3, vertical: 0.6),
         child: Row(
           children: [
-            SvgPicture.asset(AssetConstants.icStreak),
+            Icon(
+              icon,
+              size: 14,
+            ),
             width4,
             Text(
-              streakCount ?? '0',
-              style: Theme.of(context).textTheme.titleMedium,
+              streakCount,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           ],
         ),
       ),
     );
   }
+
+  @override
+  Size get preferredSize => Size.fromHeight(56.0);
 }

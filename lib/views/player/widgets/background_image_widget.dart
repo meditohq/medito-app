@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
@@ -14,15 +16,15 @@ class BackgroundImageWidget extends ConsumerWidget {
     var size = MediaQuery.of(context).size;
     var scrollProportion =
         ref.watch(pageviewNotifierProvider).scrollProportion.toDouble();
-    var opacity = (1 - scrollProportion) * 0.40;
+    var opacity = (1 - scrollProportion) * 0.18;
 
     return Stack(
       children: [
         Container(
           height: size.height,
           color: Color.lerp(
-            ColorConstants.greyIsTheNewBlack,
-            ColorConstants.greyIsTheNewGrey,
+            ColorConstants.black,
+            ColorConstants.onyx,
             scrollProportion,
           ),
         ),
