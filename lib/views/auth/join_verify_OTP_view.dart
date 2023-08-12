@@ -1,3 +1,4 @@
+import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
@@ -26,6 +27,8 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
       await auth.verifyOTP(widget.email, _otpTextEditingController.text);
       var status = auth.verifyOTPRes.status;
       if (status == Status.COMPLETED) {
+        await removeFirebaseToken();
+        await requestGenerateFirebaseToken();
         await auth.setUserEmailInSharedPref(widget.email);
         context.go(
           RouteConstants.joinWelcomePath,

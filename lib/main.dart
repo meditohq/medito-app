@@ -71,7 +71,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  bool isFirstTimeLoading = true;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -127,11 +126,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         ref.read(eventsProvider(event: event.toJson()));
       }
     });
-    final auth = ref.watch(authProvider);
-    if (!isFirstTimeLoading && auth.userEmail != null || auth.isAGuest) {
-      ref.watch(currentMeditationPlayerProvider);
-    }
-    isFirstTimeLoading = false;
 
     return MaterialApp.router(
       routerConfig: router,

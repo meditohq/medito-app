@@ -18,6 +18,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: bottomSheetBoxDecoration,
+      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(

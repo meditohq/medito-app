@@ -6,6 +6,7 @@ class TypeConstants {
 
 class EventTypes {
   static const String appOpened = 'appOpened';
+  static const String saveFcmToken = 'saveFcmToken';
   static const String audioStarted = 'audioStarted';
   static const String audioCompleted = 'audioCompleted';
   static const String backgroundSoundSelected = 'backgroundSoundSelected';

@@ -138,22 +138,6 @@ extension EmptyOrNull on String? {
   }
 }
 
-Future<void> showBottomModal(BuildContext context, Widget child) async {
-  await showModalBottomSheet(
-    context: context,
-    barrierColor: ColorConstants.almostBlack,
-    backgroundColor: ColorConstants.greyIsTheNewGrey,
-    isScrollControlled: false,
-    elevation: 10,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10.0),
-    ),
-    builder: (BuildContext context) {
-      return FractionallySizedBox(heightFactor: 0.9, child: child);
-    },
-  );
-}
-
 String getFileExtension(String path) {
   return '.${path.substring(path.lastIndexOf('.') + 1)}';
 }
@@ -178,6 +162,14 @@ Future<File?> capturePng(GlobalKey globalKey) async {
   }
 }
 
+double getBottomPadding(BuildContext context) {
+  var systemGestureInsets = MediaQuery.of(context).systemGestureInsets;
+  var bottom = 32.0;
+  bottom = systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 16;
+  
+  return bottom;
+}
+
 int formatIcon(String icon) {
   return int.parse('0x$icon');
 }
@@ -187,12 +179,12 @@ extension SanitisePath on String {
     return replaceFirst('/', '');
   }
 }
+
 extension GetIdFromPath on String {
   String getIdFromPath() {
     return split('/').last;
   }
 }
-
 
 extension AssetUrl on String {
   String toAssetUrl() {

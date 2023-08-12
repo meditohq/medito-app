@@ -1,6 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,36 +18,34 @@ class DebugBottomSheetWidget extends ConsumerWidget {
 
     return Container(
       decoration: bottomSheetBoxDecoration,
-      child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            height16,
-            HandleBarWidget(),
-            height16,
-            me.when(
-              skipLoadingOnRefresh: false,
-              data: (data) => _debugItemsList(
-                context,
-                globalKey,
-                data,
-                deviceInfo.value,
-              ),
-              error: (err, stack) => Expanded(
-                child: MeditoErrorWidget(
-                  message: err.toString(),
-                  onTap: () => ref.refresh(meProvider),
-                ),
-              ),
-              loading: () => Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          height16,
+          HandleBarWidget(),
+          height16,
+          me.when(
+            skipLoadingOnRefresh: false,
+            data: (data) => _debugItemsList(
+              context,
+              globalKey,
+              data,
+              deviceInfo.value,
+            ),
+            error: (err, stack) => Expanded(
+              child: MeditoErrorWidget(
+                message: err.toString(),
+                onTap: () => ref.refresh(meProvider),
               ),
             ),
-          ],
-        ),
+            loading: () => Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

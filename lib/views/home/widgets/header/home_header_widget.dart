@@ -44,13 +44,16 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _logo(BuildContext context) {
     return LongPressDetectorWidget(
-      onLongPress: () => showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: ColorConstants.transparent,
-        builder: (BuildContext context) {
-          return DebugBottomSheetWidget();
-        },
-      ),
+      onLongPress: () {
+        showModalBottomSheet<void>(
+          context: context,
+          useRootNavigator: true,
+          backgroundColor: ColorConstants.onyx,
+          builder: (BuildContext context) {
+            return DebugBottomSheetWidget();
+          },
+        );
+      },
       duration: Duration(seconds: 3),
       child: IconButton(
         onPressed: () => {},
@@ -71,7 +74,8 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
       onPressed: () {
         showModalBottomSheet<void>(
           context: context,
-          backgroundColor: ColorConstants.transparent,
+          useRootNavigator: true,
+          backgroundColor: ColorConstants.onyx,
           builder: (BuildContext context) {
             return MenuBottomSheetWidget(
               homeMenuModel: homeMenuModel,
@@ -112,8 +116,8 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         showModalBottomSheet<void>(
           context: context,
           isScrollControlled: true,
-          useSafeArea: true,
-          backgroundColor: ColorConstants.transparent,
+          useRootNavigator: true,
+          backgroundColor: ColorConstants.onyx,
           builder: (BuildContext context) {
             return StatsBottomSheetWidget();
           },

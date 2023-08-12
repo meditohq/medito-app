@@ -24,8 +24,17 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
+    _saveFcmTokenEvent(ref);
     requestPermission();
-    ref.read(playerProvider.notifier).getCurrentlyPlayingMeditation();
+    ref
+        .read(playerProvider.notifier)
+        .getCurrentlyPlayingMeditation()
+        .then((value) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+    });
     super.initState();
   }
 
@@ -129,6 +138,18 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var event = EventsModel(
       name: EventTypes.audioStarted,
       payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  void _saveFcmTokenEvent(
+    WidgetRef ref,
+  ) async {
+    var token = await requestGenerateFirebaseToken();
+    var fcm = SaveFcmTokenModel(fcmToken: token ?? '');
+    var event = EventsModel(
+      name: EventTypes.saveFcmToken,
+      payload: fcm.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
   }
