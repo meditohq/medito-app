@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 late final FirebaseMessaging _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -30,7 +33,6 @@ Future<AuthorizationStatus> checkNotificationPermission() async {
 }
 
 Future<AuthorizationStatus> requestPermission() async {
-  await initialiazeLocalNotification();
   var settings = await _messaging.requestPermission(
     alert: true,
     badge: true,
@@ -38,21 +40,23 @@ Future<AuthorizationStatus> requestPermission() async {
     sound: true,
   );
 
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    // For handling the received notifications
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showNotification(
-        message.notification?.title,
-        message.notification?.body,
-        json.encode(message.data),
-      );
-    });
-  }
-
   return settings.authorizationStatus;
 }
 
-Future<void> initialiazeLocalNotification() async {
+Future<void> initializeNotification(WidgetRef ref) async {
+  await initialiazeLocalNotification(ref);
+
+  // For handling the received notifications
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _showNotification(
+      message.notification?.title,
+      message.notification?.body,
+      json.encode(message.data),
+    );
+  });
+}
+
+Future<void> initialiazeLocalNotification(WidgetRef ref) async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
   var initializationSettingsIOS = DarwinInitializationSettings(
@@ -66,13 +70,26 @@ Future<void> initialiazeLocalNotification() async {
   );
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: onSelect,
+    onDidReceiveNotificationResponse: (res) => onSelect(ref, res),
   );
 }
 
-void onSelect(NotificationResponse? data) async {
-  // TODO
-  print(data);
+void onSelect(WidgetRef ref, NotificationResponse? data) {
+  if (data != null && data.payload != null) {
+    var payload = json.decode(data.payload!);
+    var notificationPayload = NotificationPayloadModel.fromJson(payload);
+    var context = ref.read(goRouterProvider);
+    if (notificationPayload.type == TypeConstants.LINK) {
+      context.push(
+        RouteConstants.webviewPath,
+        extra: {'url': notificationPayload.path},
+      );
+    }
+    context.push(getPathFromString(
+      notificationPayload.type,
+      [notificationPayload.id.toString()],
+    ));
+  }
 }
 
 void checkForInitialMessage() async {

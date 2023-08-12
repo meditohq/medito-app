@@ -2,8 +2,9 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CollapsibleHeaderWidget extends StatefulWidget {
+class CollapsibleHeaderWidget extends ConsumerStatefulWidget {
   const CollapsibleHeaderWidget({
     super.key,
     required this.children,
@@ -24,11 +25,12 @@ class CollapsibleHeaderWidget extends StatefulWidget {
   final Color leadingIconBgColor;
   final void Function()? onPressedCloseBtn;
   @override
-  State<CollapsibleHeaderWidget> createState() =>
+  ConsumerState<CollapsibleHeaderWidget> createState() =>
       _CollapsibleHeaderWidgetState();
 }
 
-class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
+class _CollapsibleHeaderWidgetState
+    extends ConsumerState<CollapsibleHeaderWidget> {
   ScrollController? _scrollController;
   bool lastStatus = true;
 
@@ -115,7 +117,8 @@ class _CollapsibleHeaderWidgetState extends State<CollapsibleHeaderWidget> {
       icColor: _isShrink ? widget.leadingIconBgColor : widget.leadingIconColor,
       onPressed: widget.onPressedCloseBtn ??
           () {
-            router.pop();
+            // router.pop();
+            ref.read(goRouterProvider).pop();
           },
       isShowCircle: !_isShrink,
     );
