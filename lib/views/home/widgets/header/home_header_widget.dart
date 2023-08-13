@@ -115,17 +115,17 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       onTap: () {
-        ref.refresh(remoteStatsProvider.future).then((value) {
-          showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            useRootNavigator: true,
-            backgroundColor: ColorConstants.onyx,
-            builder: (BuildContext context) {
-              return StatsBottomSheetWidget();
-            },
-          );
-        });
+        ref.invalidate(remoteStatsProvider);
+        ref.read(remoteStatsProvider);
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: true,
+          backgroundColor: ColorConstants.onyx,
+          builder: (BuildContext context) {
+            return StatsBottomSheetWidget();
+          },
+        );
       },
       child: Container(
         decoration: BoxDecoration(
