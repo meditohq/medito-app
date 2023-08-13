@@ -106,7 +106,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         SystemUiOverlay.top, // Shows Status bar and hides Navigation bar
       ],
     );
-
+    onMessageAppOpened(ref);
+    initializeNotification(ref);
     // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }

@@ -37,6 +37,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       });
     });
     _checkNotificationPermission();
+    checkInitialMessage(ref);
     super.initState();
   }
 
@@ -45,8 +46,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       checkNotificationPermission().then((value) {
         if (value == AuthorizationStatus.notDetermined) {
           context.push(RouteConstants.notificationPermissionPath);
-        } else if (value == AuthorizationStatus.authorized) {
-          initializeNotification(ref);
         }
       });
     });

@@ -60,6 +60,10 @@ Future<void> initialiazeLocalNotification(WidgetRef ref) async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
   var initializationSettingsIOS = DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+    requestCriticalPermission: false,
     onDidReceiveLocalNotification: (id, title, body, payload) =>
         _showNotification(title, body, payload),
   );
@@ -70,40 +74,54 @@ Future<void> initialiazeLocalNotification(WidgetRef ref) async {
   );
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: (res) => onSelect(ref, res),
+    onDidReceiveNotificationResponse: (res) {
+      if (res.payload != null) {
+        var payload = json.decode(res.payload!);
+        var notificationPaylaod = NotificationPayloadModel.fromJson(payload);
+        _navigate(ref, notificationPaylaod);
+      }
+    },
   );
 }
 
-void onSelect(WidgetRef ref, NotificationResponse? data) {
-  if (data != null && data.payload != null) {
-    var payload = json.decode(data.payload!);
-    var notificationPayload = NotificationPayloadModel.fromJson(payload);
-    var context = ref.read(goRouterProvider);
-    if (notificationPayload.type == TypeConstants.LINK) {
-      context.push(
-        RouteConstants.webviewPath,
-        extra: {'url': notificationPayload.path},
-      );
-    }
-    context.push(getPathFromString(
-      notificationPayload.type,
-      [notificationPayload.id.toString()],
-    ));
-  }
-}
-
-void checkForInitialMessage() async {
+void checkInitialMessage(WidgetRef ref) async {
   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  //ignore: no-empty-block
   if (initialMessage != null) {
-  } else {
-    onMessageAppOpened();
+    var notificationPaylaod =
+        NotificationPayloadModel.fromJson(initialMessage.data);
+    _navigate(ref, notificationPaylaod);
   }
 }
 
-void onMessageAppOpened() {
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) => {});
+void onMessageAppOpened(WidgetRef ref) {
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    var notificationPaylaod = NotificationPayloadModel.fromJson(message.data);
+    _navigate(ref, notificationPaylaod);
+  });
 }
+
+void _navigate(WidgetRef ref, NotificationPayloadModel data) {
+  var context = ref.read(goRouterProvider);
+  if (data.type == TypeConstants.LINK) {
+    context.push(
+      RouteConstants.webviewPath,
+      extra: {'url': data.path},
+    );
+  }
+  context.push(getPathFromString(
+    data.type,
+    [data.id.toString()],
+  ));
+}
+
+// void checkForInitialMessage() async {
+//   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+//   //ignore: no-empty-block
+//   if (initialMessage != null) {
+//   } else {
+//     onMessageAppOpened();
+//   }
+// }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('myBackgroundMessageHandler message: $message');
