@@ -6,7 +6,7 @@ part 'meditation_model.g.dart';
 abstract class MeditationModel with _$MeditationModel {
   const MeditationModel._();
   factory MeditationModel({
-    required int id,
+    required String id,
     required String title,
     String? subtitle,
     required String description,
@@ -68,7 +68,7 @@ abstract class MeditationAudioModel with _$MeditationAudioModel {
 @unfreezed
 abstract class MeditationFilesModel with _$MeditationFilesModel {
   factory MeditationFilesModel({
-    required int id,
+    required String id,
     required String path,
     required int duration,
   }) = _MeditationFilesModel;

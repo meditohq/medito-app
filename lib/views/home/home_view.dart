@@ -31,7 +31,12 @@ class HomeView extends ConsumerWidget {
             children: [
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: () => ref.refresh(homeProvider.future),
+                  onRefresh: () async {
+                    ref.invalidate(homeProvider);
+                    await ref.read(homeProvider.future);
+                    ref.invalidate(remoteStatsProvider);
+                    await ref.read(remoteStatsProvider.future);
+                  },
                   child: SingleChildScrollView(
                     child: Column(
                       children: [

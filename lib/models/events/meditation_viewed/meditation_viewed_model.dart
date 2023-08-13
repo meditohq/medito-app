@@ -5,7 +5,7 @@ part 'meditation_viewed_model.g.dart';
 @freezed
 abstract class MeditationViewedModel with _$MeditationViewedModel {
   const factory MeditationViewedModel({
-    required int meditationId,
+    required String meditationId,
   }) = _MeditationViewedModel;
 
   factory MeditationViewedModel.fromJson(Map<String, Object?> json) =>

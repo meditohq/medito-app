@@ -30,7 +30,7 @@ void main() {
       () async {
         //ARRANGE
         final meditationResponseData = MeditationModel(
-          id: 1,
+          id: '1',
           title: 'Welcome',
           description: '',
           coverUrl: '',
@@ -39,7 +39,7 @@ void main() {
             MeditationAudioModel(
               guideName: 'Will',
               files: [
-                MeditationFilesModel(id: 59, path: '', duration: 48000),
+                MeditationFilesModel(id: '59', path: '', duration: 48000),
               ],
             ),
           ],

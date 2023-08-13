@@ -30,7 +30,7 @@ void main() {
       () async {
         //ARRANGE
         final folderResponseData = FolderModel(
-          id: 28,
+          id: '28',
           title: 'UCLA',
           description:
               'Guided meditations provided by [UCLA Mindful Awareness Research Center]',
@@ -39,7 +39,7 @@ void main() {
           items: [
             FolderItemsModel(
               type: 'meditation',
-              id: 120,
+              id: '120',
               title: 'Complete meditation',
               subtitle: '19 min',
               path: 'meditations/120',

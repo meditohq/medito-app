@@ -130,7 +130,7 @@ class FolderView extends ConsumerWidget {
 
   void _onListItemTap(
     WidgetRef ref,
-    int? id,
+    String? id,
     String? type,
     String? path,
     BuildContext context,
@@ -158,7 +158,7 @@ class FolderView extends ConsumerWidget {
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));
           if (type == TypeConstants.MEDITATION) {
-            _handleTrackEvent(ref, id ?? 0);
+            _handleTrackEvent(ref, id ?? '0');
           }
         }
       } else {
@@ -167,7 +167,7 @@ class FolderView extends ConsumerWidget {
     });
   }
 
-  void _handleTrackEvent(WidgetRef ref, int meditationId) {
+  void _handleTrackEvent(WidgetRef ref, String meditationId) {
     var meditationViewedModel =
         MeditationViewedModel(meditationId: meditationId);
     var event = EventsModel(

@@ -16,7 +16,7 @@ abstract class HomeRowsModel with _$HomeRowsModel {
 @freezed
 abstract class HomeRowItemsModel with _$HomeRowItemsModel {
   const factory HomeRowItemsModel({
-    required int id,
+    required String id,
     required String type,
     required String title,
     required String path,

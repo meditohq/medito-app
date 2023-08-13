@@ -5,7 +5,7 @@ part 'menuItem_tapped_model.g.dart';
 @freezed
 abstract class MenuItemTappedModel with _$MenuItemTappedModel {
   const factory MenuItemTappedModel({
-    required int itemId,
+    required String itemId,
     required String itemTitle,
   }) = _MenuItemTappedModel;
 

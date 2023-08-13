@@ -79,7 +79,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         VolumeSliderWidget(),
         SoundListTileWidget(
           sound: BackgroundSoundsModel(
-            id: 0,
+            id: '0',
             title: StringConstants.none,
             duration: 0,
             path: '',
