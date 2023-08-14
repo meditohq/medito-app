@@ -59,6 +59,7 @@ dependencies:
   firebase_core: ^1.24.0
   flutter_local_notifications: ^15.0.0
   marquee: ^2.2.3
+  flutter_foreground_task: ^6.0.0+1
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
