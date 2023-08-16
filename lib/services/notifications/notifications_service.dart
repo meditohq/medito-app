@@ -23,7 +23,13 @@ Future removeFirebaseToken() async {
   return await _messaging.deleteToken();
 }
 
-Future<void> requestPermission() async {
+Future<AuthorizationStatus> checkNotificationPermission() async {
+  var settings = await _messaging.getNotificationSettings();
+
+  return settings.authorizationStatus;
+}
+
+Future<AuthorizationStatus> requestPermission() async {
   await initialiazeLocalNotification();
   var settings = await _messaging.requestPermission(
     alert: true,
@@ -42,12 +48,17 @@ Future<void> requestPermission() async {
       );
     });
   }
+
+  return settings.authorizationStatus;
 }
 
 Future<void> initialiazeLocalNotification() async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
-  var initializationSettingsIOS = const DarwinInitializationSettings();
+  var initializationSettingsIOS = DarwinInitializationSettings(
+    onDidReceiveLocalNotification: (id, title, body, payload) =>
+        _showNotification(title, body, payload),
+  );
 
   var initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,

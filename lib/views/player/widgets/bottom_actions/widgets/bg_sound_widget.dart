@@ -35,7 +35,6 @@ class BgSoundWidget extends ConsumerWidget {
           RouteConstants.backgroundSoundsPath,
           extra: {'meditationModel': meditationModel, 'file': file},
         );
-        ref.read(pageviewNotifierProvider).gotoPreviousPage();
       },
     );
   }

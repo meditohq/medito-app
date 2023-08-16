@@ -1,3 +1,5 @@
+import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/root_page_view.dart';
@@ -9,7 +11,6 @@ import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
-import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/meditation/meditation_view.dart';
 import 'package:Medito/views/splash_view.dart';
@@ -90,7 +91,6 @@ final router = GoRouter(
         _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
-        _getBackgroundSoundRoute(),
         GoRoute(
           path: RouteConstants.collectionPath,
           routes: [
@@ -127,6 +127,8 @@ final router = GoRouter(
         ),
       ],
     ),
+    _getBackgroundSoundRoute(),
+    _getNotificationPermissionRoute(),
   ],
 );
 
@@ -174,11 +176,25 @@ GoRoute _getPlayerRoute() {
 
 GoRoute _getBackgroundSoundRoute() {
   return GoRoute(
+    parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.backgroundSoundsPath,
     pageBuilder: (context, state) {
       return MaterialPage(
         key: state.pageKey,
         child: BackgroundSoundView(),
+      );
+    },
+  );
+}
+
+GoRoute _getNotificationPermissionRoute() {
+  return GoRoute(
+    parentNavigatorKey: _rootNavigatorKey,
+    path: RouteConstants.notificationPermissionPath,
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: NotificationPermissionView(),
       );
     },
   );

@@ -81,6 +81,12 @@ class StringConstants {
   static const String dismiss = 'Dismiss';
   static const String watch = 'Watch';
   static const String selectGuideOrDuration = 'Select a guide / duration';
+  static const String allowNotificationsTitle = 'Never miss a moment of calm';
+  static const String allowNotificationsDesc =
+      'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
+  static const String allowNotifications = 'Allow notifications';
+  static const String notNow = 'Not now';
+
   //Error
   static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';

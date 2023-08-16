@@ -1,10 +1,12 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/views/player/player_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'services/notifications/notifications_service.dart';
+import 'package:go_router/go_router.dart';
 import 'widgets/widgets.dart';
 import 'views/player/widgets/mini_player_widget.dart';
 
@@ -25,7 +27,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
     _saveFcmTokenEvent(ref);
-    requestPermission();
     ref
         .read(playerProvider.notifier)
         .getCurrentlyPlayingMeditation()
@@ -35,7 +36,18 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
             PLAY_PAUSE_AUDIO.PAUSE;
       });
     });
+    _checkNotificationPermission();
     super.initState();
+  }
+
+  void _checkNotificationPermission() {
+    Future.delayed(Duration(seconds: 4), () {
+      checkNotificationPermission().then((value) {
+        if (value == AuthorizationStatus.notDetermined) {
+          context.push(RouteConstants.notificationPermissionPath);
+        }
+      });
+    });
   }
 
   @override
