@@ -6,4 +6,5 @@ class SharedPreferenceConstants {
   static const String sessionAudioSpeed = 'sessionAudioSpeed';
   static const String downloads = 'downloads';
   static const String currentPlayingMeditation = 'currentPlayingMeditation';
+  static const String audioForBgEvent = 'audioForBgEvent';
 }

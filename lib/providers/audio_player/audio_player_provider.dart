@@ -148,6 +148,8 @@ class AudioPlayerNotifier extends BaseAudioHandler
       ),
       extras: {
         hasBgSound: meditationModel.hasBackgroundSound,
+        'meditationId': meditationModel.id,
+        'fileId': file.id,
       },
     );
     mediaItem.add(item);
@@ -157,7 +159,19 @@ class AudioPlayerNotifier extends BaseAudioHandler
     return mediaItem.value?.extras?[hasBgSound] ?? false;
   }
 
+  // void checkAudioCompletion(ProcessingState processingState) {
+  //   if (processingState == ProcessingState.completed) {
+  //     var extras = audioProvider.mediaItem.value?.extras;
+  //     if (extras != null) {
+  //       print('in extras if');
+
+  //     }
+  //   }
+  // }
+
   PlaybackState _transformEvent(PlaybackEvent event) {
+    // print([meditationAudioPlayer.processingState]);
+
     return PlaybackState(
       controls: [
         MediaControl.rewind,

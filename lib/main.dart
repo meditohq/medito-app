@@ -13,7 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/models/models.dart';
@@ -28,12 +27,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/providers/providers.dart';
-
 import 'services/notifications/notifications_service.dart';
 
 late SharedPreferences sharedPreferences;
 late AudioPlayerNotifier audioHandler;
-
+const audioBgEvent = 'com.medito.audio.bg.event';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
@@ -74,8 +72,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // update session stats when app comes into foreground
-      updateStatsFromBg();
+      unawaited(updateStatsFromBg());
     } else if (state == AppLifecycleState.detached) {
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
       audioProvider.stop();
@@ -91,7 +88,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -115,6 +111,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
+
     ref.listen(deviceAndAppInfoProvider, (_, info) {
       if (info.hasValue) {
         var val = info.value;
