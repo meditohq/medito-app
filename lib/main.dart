@@ -25,6 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/providers/providers.dart';
 import 'services/notifications/notifications_service.dart';
@@ -69,6 +70,7 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
+  int count = 0;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -88,6 +90,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
+    audioHandler.meditationAudioPlayer.playerStateStream.listen((event) {
+      if (event.processingState == ProcessingState.completed) {
+        print('parent widget: ${event.processingState}');
+        print(count);
+        count += count;
+        _handleAudioCompletion(ref);
+      }
+    });
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -104,8 +114,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
     onMessageAppOpened(ref);
     initializeNotification(ref);
+
     // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Future.delayed(Duration(seconds: 4), () {
+    //     checkCompletedAudioInPreference();
+    //   });
+    // });
   }
 
   @override
@@ -135,5 +151,70 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       theme: appTheme(context),
       title: ParentWidget._title,
     );
+  }
+
+  void checkCompletedAudioInPreference() {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    var res = audioProvider.checkCompletedAudioInPreference();
+    if (res != null) {
+      _handleTrackEvent(ref, res['fileId'], res['meditationId']);
+      audioProvider.removeAudioFromPreference();
+    }
+  }
+
+  void _handleTrackEvent(
+    WidgetRef ref,
+    String audioFileId,
+    String meditationId,
+  ) {
+    var audio = AudioCompletedModel(
+      audioFileId: audioFileId,
+      meditationId: meditationId,
+    );
+    var event = EventsModel(
+      name: EventTypes.audioCompleted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  void _handleAudioCompletion(
+    WidgetRef ref,
+  ) {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    var extras = audioHandler.mediaItem.value?.extras;
+    if (extras != null) {
+      _handleAudioCompletionEvent(
+        ref,
+        extras['fileId'],
+        extras['meditationId'],
+      );
+      // audioProvider.pause();
+      // audioProvider.seekValueFromSlider(0);
+      // audioProvider.pauseBackgroundSound();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+      // Future.delayed(Duration(seconds: 3), () {
+      //   audioProvider.removeAudioFromPreference();
+      // });
+    }
+  }
+
+  void _handleAudioCompletionEvent(
+    WidgetRef ref,
+    String audioFileId,
+    String meditationId,
+  ) {
+    var audio = AudioCompletedModel(
+      audioFileId: audioFileId,
+      meditationId: meditationId,
+    );
+    var event = EventsModel(
+      name: EventTypes.audioCompleted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
