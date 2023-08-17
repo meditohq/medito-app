@@ -70,7 +70,7 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  int count = 0;
+  AppLifecycleState currentState = AppLifecycleState.resumed;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -79,6 +79,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
       audioProvider.stop();
     }
+    currentState = state;
   }
 
   @override
@@ -90,14 +91,15 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-    audioHandler.meditationAudioPlayer.playerStateStream.listen((event) {
-      if (event.processingState == ProcessingState.completed) {
-        print('parent widget: ${event.processingState}');
-        print(count);
-        count += count;
+    var streamEvent = audioHandler.meditationAudioPlayer.playerStateStream
+        .map((event) => event.processingState)
+        .distinct();
+    streamEvent.forEach((element) {
+      if (element == ProcessingState.completed) {
         _handleAudioCompletion(ref);
       }
     });
+
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -114,14 +116,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
     onMessageAppOpened(ref);
     initializeNotification(ref);
-
-    // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Future.delayed(Duration(seconds: 4), () {
-    //     checkCompletedAudioInPreference();
-    //   });
-    // });
   }
 
   @override
@@ -189,16 +184,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         extras['fileId'],
         extras['meditationId'],
       );
-      // audioProvider.pause();
-      // audioProvider.seekValueFromSlider(0);
-      // audioProvider.pauseBackgroundSound();
+      audioProvider.seekValueFromSlider(0);
+      audioProvider.pause();
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
       });
-      // Future.delayed(Duration(seconds: 3), () {
-      //   audioProvider.removeAudioFromPreference();
-      // });
     }
   }
 
