@@ -129,32 +129,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       title: ParentWidget._title,
     );
   }
-
-  void checkCompletedAudioInPreference() {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
-    var res = audioProvider.checkCompletedAudioInPreference();
-    if (res != null) {
-      _handleTrackEvent(ref, res['fileId'], res['meditationId']);
-      audioProvider.removeAudioFromPreference();
-    }
-  }
-
-  void _handleTrackEvent(
-    WidgetRef ref,
-    String audioFileId,
-    String meditationId,
-  ) {
-    var audio = AudioCompletedModel(
-      audioFileId: audioFileId,
-      meditationId: meditationId,
-    );
-    var event = EventsModel(
-      name: EventTypes.audioCompleted,
-      payload: audio.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
-  }
-
+  
   void _handleAudioCompletion(
     WidgetRef ref,
   ) {

@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:audio_service/audio_service.dart';
@@ -162,40 +159,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     return mediaItem.value?.extras?[hasBgSound] ?? false;
   }
 
-  void saveCompletedAudio(ProcessingState processingState) {
-    if (processingState == ProcessingState.completed) {
-      var extras = audioHandler.mediaItem.value?.extras;
-      if (extras != null) {
-        sharedPreferences.setString(
-          SharedPreferenceConstants.audioForBgEvent,
-          json.encode(extras),
-        );
-      }
-    }
-  }
-
-  Map<String, dynamic>? checkCompletedAudioInPreference() {
-    var res = sharedPreferences.getString(
-      SharedPreferenceConstants.audioForBgEvent,
-    );
-    if (res != null) {
-      return json.decode(res);
-    }
-
-    return null;
-  }
-
-  void removeAudioFromPreference() async {
-    var x = checkCompletedAudioInPreference();
-    await sharedPreferences.remove(
-      SharedPreferenceConstants.audioForBgEvent,
-    );
-  }
-
   PlaybackState _transformEvent(PlaybackEvent event) {
-    // print(meditationAudioPlayer.processingState);
-    // saveCompletedAudio(meditationAudioPlayer.processingState);
-
     return PlaybackState(
       controls: [
         MediaControl.rewind,
