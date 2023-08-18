@@ -236,8 +236,7 @@ enum Screen {
 MaterialPage<void> getMeditationOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child:
-        MeditationView(id: state.params['sid'], screenKey: Screen.meditation),
+    child: MeditationView(id: state.params['sid'] ?? ''),
   );
 }
 
@@ -251,7 +250,7 @@ MaterialPage<void> getArticleMaterialPAge(GoRouterState state) {
 MaterialPage<void> getMeditationOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: MeditationView(id: state.params['did'], screenKey: Screen.daily),
+    child: MeditationView(id: state.params['did'] ?? ''),
   );
 }
 
@@ -275,7 +274,7 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: FolderView(id: state.params['fid']),
+    child: FolderView(id: state.params['fid'] ?? ''),
   );
   // if (params.length == 1) {
   //   return MaterialPage(

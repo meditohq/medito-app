@@ -9,14 +9,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class FolderView extends ConsumerWidget {
+class FolderView extends ConsumerStatefulWidget {
   const FolderView({Key? key, required this.id}) : super(key: key);
 
-  final String? id;
+  final String id;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
+  ConsumerState<FolderView> createState() => _FolderViewState();
+}
+
+class _FolderViewState extends ConsumerState<FolderView>
+    with AutomaticKeepAliveClientMixin<FolderView> {
+  @override
+  void initState() {
+    _handleTrackEvent(ref, widget.id);
+    super.initState();
+  }
+
+  void _handleTrackEvent(WidgetRef ref, String folderId) {
+    var folderViewedModel = FolderViewedModel(folderId: folderId);
+    var event = EventsModel(
+      name: EventTypes.folderViewed,
+      payload: folderViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    var folders = ref.watch(FoldersProvider(folderId: int.parse(widget.id)));
 
     return Scaffold(
       body: folders.when(
@@ -26,7 +48,7 @@ class FolderView extends ConsumerWidget {
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(
-            FoldersProvider(folderId: int.parse(id!)),
+            FoldersProvider(folderId: int.parse(widget.id)),
           ),
           isLoading: folders.isLoading,
         ),
@@ -42,7 +64,8 @@ class FolderView extends ConsumerWidget {
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(FoldersProvider(folderId: int.parse(id!)));
+        return await ref
+            .refresh(FoldersProvider(folderId: int.parse(widget.id)));
       },
       child: CollapsibleHeaderWidget(
         bgImage: folder.coverUrl,
@@ -51,8 +74,7 @@ class FolderView extends ConsumerWidget {
         children: folder.items
             .map(
               (e) => GestureDetector(
-                onTap: () =>
-                    _onListItemTap(ref, e.id, e.type, e.path, ref.context),
+                onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
                 child: _buildListTile(
                   context,
                   e.title,
@@ -129,7 +151,6 @@ class FolderView extends ConsumerWidget {
   }
 
   void _onListItemTap(
-    WidgetRef ref,
     String? id,
     String? type,
     String? path,
@@ -142,12 +163,12 @@ class FolderView extends ConsumerWidget {
           if (location.contains('folder2')) {
             context.push(getPathFromString(
               RouteConstants.folder3Path,
-              [location.split('/')[2], this.id, id.toString()],
+              [location.split('/')[2], widget.id, id.toString()],
             ));
           } else {
             context.push(getPathFromString(
               RouteConstants.folder2Path,
-              [this.id, id.toString()],
+              [widget.id, id.toString()],
             ));
           }
         } else if (type == TypeConstants.LINK) {
@@ -157,9 +178,6 @@ class FolderView extends ConsumerWidget {
           );
         } else {
           context.push(location + getPathFromString(type, [id.toString()]));
-          if (type == TypeConstants.MEDITATION) {
-            _handleTrackEvent(ref, id ?? '0');
-          }
         }
       } else {
         createSnackBar(StringConstants.checkConnection, context);
@@ -167,13 +185,6 @@ class FolderView extends ConsumerWidget {
     });
   }
 
-  void _handleTrackEvent(WidgetRef ref, String meditationId) {
-    var meditationViewedModel =
-        MeditationViewedModel(meditationId: meditationId);
-    var event = EventsModel(
-      name: EventTypes.meditationViewed,
-      payload: meditationViewedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
-  }
+  @override
+  bool get wantKeepAlive => true;
 }

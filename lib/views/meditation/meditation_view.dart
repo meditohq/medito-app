@@ -16,22 +16,42 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widgets/meditation_buttons_widget.dart';
 
-class MeditationView extends ConsumerWidget {
-  final String? id;
-  final Screen? screenKey;
+class MeditationView extends ConsumerStatefulWidget {
+  final String id;
 
-  MeditationView({Key? key, this.id, this.screenKey}) : super(key: key);
+  MeditationView({Key? key, required this.id}) : super(key: key);
+  @override
+  ConsumerState<MeditationView> createState() => _MeditationViewState();
+}
+
+class _MeditationViewState extends ConsumerState<MeditationView>
+    with AutomaticKeepAliveClientMixin<MeditationView> {
+  @override
+  void initState() {
+    _handleTrackEvent(ref, widget.id);
+    super.initState();
+  }
+
+  void _handleTrackEvent(WidgetRef ref, String meditationId) {
+    var meditationViewedModel =
+        MeditationViewedModel(meditationId: meditationId);
+    var event = EventsModel(
+      name: EventTypes.meditationViewed,
+      payload: meditationViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    super.build(context);
     var meditations =
-        ref.watch(meditationsProvider(meditationId: int.parse(id!)));
+        ref.watch(meditationsProvider(meditationId: int.parse(widget.id)));
 
     return Scaffold(
       body: meditations.when(
@@ -39,8 +59,8 @@ class MeditationView extends ConsumerWidget {
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () =>
-              ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
+          onTap: () => ref
+              .refresh(meditationsProvider(meditationId: int.parse(widget.id))),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -58,8 +78,8 @@ class MeditationView extends ConsumerWidget {
     WidgetRef ref,
   ) {
     return RefreshIndicator(
-      onRefresh: () async =>
-          await ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
+      onRefresh: () async => await ref
+          .refresh(meditationsProvider(meditationId: int.parse(widget.id))),
       child: Scaffold(
         body: CollapsibleHeaderWidget(
           bgImage: meditationModel.coverUrl,
@@ -109,4 +129,7 @@ class MeditationView extends ConsumerWidget {
 
     return SizedBox();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
