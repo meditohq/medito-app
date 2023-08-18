@@ -123,24 +123,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
 
-    ref.listen(deviceAndAppInfoProvider, (_, info) {
-      if (info.hasValue) {
-        var val = info.value;
-        var appOpenedModel = AppOpenedModel(
-          deviceOs: val?.os ?? '',
-          deviceLanguage: val?.languageCode ?? '',
-          deviceModel: val?.model ?? '',
-          buildNumber: val?.buildNumber ?? '',
-          appVersion: val?.appVersion ?? '',
-        );
-        var event = EventsModel(
-          name: EventTypes.appOpened,
-          payload: appOpenedModel.toJson(),
-        );
-        ref.read(eventsProvider(event: event.toJson()));
-      }
-    });
-
     return MaterialApp.router(
       routerConfig: goRouter,
       theme: appTheme(context),

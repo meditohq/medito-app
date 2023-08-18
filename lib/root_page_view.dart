@@ -22,7 +22,6 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
-    ref.read(deviceAndAppInfoProvider);
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
