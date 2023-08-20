@@ -77,7 +77,7 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-Future<bool> launchUrl(String? href) async {
+Future<bool> launchUrlMedito(String? href) async {
   var prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString(USER_ID);
   if (userId != null) {
@@ -92,7 +92,7 @@ Future<bool> launchUrl(String? href) async {
     );
 
     return await canLaunchUrl(params)
-        ? await launchUrl(href)
+        ? await launchUrlMedito(href)
         : throw 'Could not launch $href';
   }
 
@@ -114,7 +114,7 @@ void _launchEmailSubmission(String href) async {
 
   var url = params.toString();
   if (await canLaunchUrl(params)) {
-    await launchUrl(url);
+    await launchUrlMedito(url);
   } else {
     print('Could not launch $url');
   }
@@ -166,7 +166,7 @@ double getBottomPadding(BuildContext context) {
   var systemGestureInsets = MediaQuery.of(context).systemGestureInsets;
   var bottom = 32.0;
   bottom = systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 16;
-  
+
   return bottom;
 }
 
