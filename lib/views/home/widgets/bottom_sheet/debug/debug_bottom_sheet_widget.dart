@@ -57,52 +57,16 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     MeModel? me,
     DeviceAndAppInfoModel? deviceInfo,
   ) {
+    var info = _formatString(me, deviceInfo);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         RepaintBoundary(
           key: key,
-          child: Container(
-            color: ColorConstants.onyx,
-            child: Column(
-              children: [
-                _debugRowItem(
-                  context,
-                  StringConstants.id,
-                  me?.id,
-                ),
-                _debugRowItem(
-                  context,
-                  StringConstants.email,
-                  me?.email,
-                ),
-                _debugRowItem(
-                  context,
-                  StringConstants.appVersion,
-                  deviceInfo?.appVersion,
-                ),
-                _debugRowItem(
-                  context,
-                  StringConstants.deviceModel,
-                  deviceInfo?.model,
-                ),
-                _debugRowItem(
-                  context,
-                  StringConstants.deviceOs,
-                  deviceInfo?.os,
-                ),
-                _debugRowItem(
-                  context,
-                  StringConstants.devicePlatform,
-                  deviceInfo?.platform,
-                ),
-                _debugRowItem(
-                  context,
-                  StringConstants.buidNumber,
-                  deviceInfo?.buildNumber,
-                ),
-              ],
-            ),
+          child: _debugRowItem(
+            context,
+            info,
           ),
         ),
         ShareBtnWidget(
@@ -114,22 +78,14 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     );
   }
 
-  Padding _debugRowItem(BuildContext context, String title, String? text) {
+  Padding _debugRowItem(BuildContext context, String info) {
     var labelMedium = Theme.of(context).textTheme.labelMedium;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Row(
-        children: [
-          Text(
-            '$title:',
-            style: labelMedium,
-          ),
-          Text(
-            text ?? '',
-            style: labelMedium,
-          ),
-        ],
+      child: SelectableText(
+        '$info',
+        style: labelMedium,
       ),
     );
   }
@@ -172,5 +128,27 @@ class DebugBottomSheetWidget extends ConsumerWidget {
         color: ColorConstants.darkBGColor,
       );
     }
+  }
+
+  String _formatString(
+    MeModel? me,
+    DeviceAndAppInfoModel? deviceInfo,
+  ) {
+    var id = StringConstants.id + ': ${me?.id ?? ''}';
+    var email = StringConstants.email + ': ${me?.email ?? ''}';
+    var appVersion =
+        '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
+    var deviceModel =
+        '${StringConstants.deviceModel}: ${deviceInfo?.model ?? ''}';
+    var deviceOs = '${StringConstants.deviceOs}: ${deviceInfo?.os ?? ''}';
+    var devicePlatform =
+        '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
+    var buidNumber =
+        '${StringConstants.buidNumber}: ${deviceInfo?.buildNumber ?? ''}';
+
+    var formattedString =
+        '$id\n$email\n$appVersion\n$deviceModel\n$deviceOs\n$devicePlatform\n$buidNumber';
+
+    return formattedString;
   }
 }

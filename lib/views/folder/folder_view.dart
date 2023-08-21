@@ -71,6 +71,8 @@ class _FolderViewState extends ConsumerState<FolderView>
         bgImage: folder.coverUrl,
         title: '${folder.title}',
         description: folder.description,
+        selectableTitle: true,
+        selectableDescription: true,
         children: folder.items
             .map(
               (e) => GestureDetector(

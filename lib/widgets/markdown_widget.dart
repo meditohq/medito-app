@@ -13,6 +13,7 @@ class MarkdownWidget extends StatelessWidget {
     this.textAlign,
     this.pFontSize = 16,
     this.aFontSize = 13,
+    this.selectable = false,
   });
   final String body;
   final void Function(String, String?, String)? onTapLink;
@@ -20,6 +21,7 @@ class MarkdownWidget extends StatelessWidget {
   final WrapAlignment? textAlign;
   final double pFontSize;
   final double aFontSize;
+  final bool selectable;
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;
@@ -31,6 +33,7 @@ class MarkdownWidget extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
       physics: NeverScrollableScrollPhysics(),
+      selectable: selectable,
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
         p: p ??
             titleMedium?.copyWith(

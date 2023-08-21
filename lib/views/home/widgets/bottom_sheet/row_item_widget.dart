@@ -15,6 +15,7 @@ class RowItemWidget extends StatelessWidget {
     this.trailingIconSize = 24,
     this.leadingIconSize = 24,
     this.iconColor,
+    this.enableInteractiveSelection = true,
   });
 
   final String title;
@@ -27,7 +28,7 @@ class RowItemWidget extends StatelessWidget {
   final TextStyle? titleStyle;
   final double leadingIconSize;
   final double trailingIconSize;
-
+  final bool enableInteractiveSelection;
   @override
   Widget build(BuildContext context) {
     var border = Border(
@@ -68,16 +69,21 @@ class RowItemWidget extends StatelessWidget {
                     size: leadingIconSize,
                   ),
                   width16,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: titleStyle ??
-                            Theme.of(context).textTheme.labelMedium,
-                      ),
-                      if (subTitle != null) _subtitle(context),
-                    ],
+                  SelectableText.rich(
+                    enableInteractiveSelection: enableInteractiveSelection,
+                    onTap: onTap,
+                    scrollPhysics: NeverScrollableScrollPhysics(),
+                    TextSpan(
+                      style: TextStyle(fontSize: 18.0),
+                      children: [
+                        TextSpan(
+                          text: title,
+                          style: titleStyle ??
+                              Theme.of(context).textTheme.labelMedium,
+                        ),
+                        if (subTitle != null) _subtitle(context),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -95,9 +101,9 @@ class RowItemWidget extends StatelessWidget {
     );
   }
 
-  Text _subtitle(BuildContext context) {
-    return Text(
-      subTitle!,
+  TextSpan _subtitle(BuildContext context) {
+    return TextSpan(
+      text: '${subTitle != null ? '\n$subTitle' : ''}',
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
             color: ColorConstants.graphite,
             letterSpacing: 0,

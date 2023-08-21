@@ -85,6 +85,8 @@ class _MeditationViewState extends ConsumerState<MeditationView>
           bgImage: meditationModel.coverUrl,
           title: meditationModel.title,
           description: meditationModel.description,
+          selectableTitle: true,
+          selectableDescription: true,
           children: [
             _mainContent(context, meditationModel),
           ],
