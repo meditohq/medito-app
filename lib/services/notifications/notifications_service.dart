@@ -107,11 +107,12 @@ void _navigate(WidgetRef ref, NotificationPayloadModel data) {
       RouteConstants.webviewPath,
       extra: {'url': data.path},
     );
+  } else {
+    context.push(getPathFromString(
+      data.type,
+      [data.id.toString()],
+    ));
   }
-  context.push(getPathFromString(
-    data.type,
-    [data.id.toString()],
-  ));
 }
 
 // void checkForInitialMessage() async {
