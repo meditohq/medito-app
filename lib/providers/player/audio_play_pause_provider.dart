@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final audioPlayPauseStateProvider = StateProvider<PLAY_PAUSE_AUDIO>(
   (ref) {
-    return PLAY_PAUSE_AUDIO.PLAY;
+    return PLAY_PAUSE_AUDIO.PAUSE;
   },
 );
 

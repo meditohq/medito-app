@@ -34,32 +34,34 @@ class PlayerProvider extends StateNotifier<MeditationModel?> {
         .read(meditationRepositoryProvider)
         .addCurrentlyPlayingMeditationInPreference(_meditation);
 
-    _loadMeditationAndBackgroundSound(
+    await _loadMeditationAndBackgroundSound(
       ref,
       _meditation,
       _meditation.audio.first.files.first,
     );
   }
 
-  Future<void> getCurrentlyPlayingMeditation() async {
+  Future<void> getCurrentlyPlayingMeditation({bool isPlayAudio = true}) async {
     var res = await ref
         .read(meditationRepositoryProvider)
         .fetchCurrentlyPlayingMeditationFromPreference();
     state = res;
     if (res != null) {
-      _loadMeditationAndBackgroundSound(
+      await _loadMeditationAndBackgroundSound(
         ref,
         res,
         res.audio.first.files.first,
+        isPlayAudio: isPlayAudio,
       );
     }
   }
 
-  void _loadMeditationAndBackgroundSound(
+  Future<void> _loadMeditationAndBackgroundSound(
     Ref ref,
     MeditationModel meditationModel,
-    MeditationFilesModel file,
-  ) {
+    MeditationFilesModel file, {
+    bool isPlayAudio = true,
+  }) async {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
     var isPlaying =
         _audioPlayerNotifier.meditationAudioPlayer.playerState.playing;
@@ -71,46 +73,57 @@ class PlayerProvider extends StateNotifier<MeditationModel?> {
         ref,
         _audioPlayerNotifier,
         meditationModel.hasBackgroundSound,
+        isPlayAudio: isPlayAudio,
       );
-      _setMeditationAudio(ref, _audioPlayerNotifier, meditationModel, file);
+      await _setMeditationAudio(
+        ref,
+        _audioPlayerNotifier,
+        meditationModel,
+        file,
+        isPlayAudio: isPlayAudio,
+      );
     }
   }
 
-  void _setMeditationAudio(
+  Future<void> _setMeditationAudio(
     Ref ref,
     AudioPlayerNotifier _audioPlayerNotifier,
     MeditationModel meditationModel,
-    MeditationFilesModel file,
-  ) {
+    MeditationFilesModel file, {
+    bool isPlayAudio = true,
+  }) async {
     var checkDownloadedFile =
         ref.read(audioDownloaderProvider).getMeditationAudio(
               '${meditationModel.id}-${file.id}${getFileExtension(file.path)}',
             );
-    checkDownloadedFile.then((value) {
-      _audioPlayerNotifier.setMeditationAudio(
-        meditationModel,
-        file,
-        filePath: value,
-      );
-      _audioPlayerNotifier.currentlyPlayingMeditation = file;
+    var res = await checkDownloadedFile;
+    _audioPlayerNotifier.setMeditationAudio(
+      meditationModel,
+      file,
+      filePath: res,
+    );
+    _audioPlayerNotifier.currentlyPlayingMeditation = file;
+    if (isPlayAudio) {
       ref.read(audioPlayPauseStateProvider.notifier).state =
           PLAY_PAUSE_AUDIO.PLAY;
-    });
+    }
   }
 
   void _setBackgroundSound(
     Ref ref,
     AudioPlayerNotifier _audioPlayerNotifier,
-    bool hasBackgroundSound,
-  ) {
+    bool hasBackgroundSound, {
+    bool isPlayAudio = true,
+  }) {
     if (hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
       _provider.getBackgroundSoundFromPref().then((_) {
         if (_provider.selectedBgSound != null &&
             _provider.selectedBgSound?.title != StringConstants.none) {
           _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-
-          _audioPlayerNotifier.playBackgroundSound();
+          if (isPlayAudio) {
+            _audioPlayerNotifier.playBackgroundSound();
+          }
         }
       });
       _provider.getVolumeFromPref().then((_) {
