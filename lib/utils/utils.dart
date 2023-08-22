@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/user/user_utils.dart';
 import 'package:connectivity/connectivity.dart';
@@ -23,6 +24,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
+import 'package:image/image.dart' as img;
 
 Widget getNetworkImageWidget(String? url) {
   if (url.isNullOrEmpty()) return Container();
@@ -146,14 +148,18 @@ Future<File?> capturePng(GlobalKey globalKey) async {
   try {
     var boundary =
         globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    var image = await boundary.toImage();
+    var image = await boundary.toImage(pixelRatio: 3.0);
     var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData?.buffer.asUint8List();
-    final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/stats.png');
 
     if (pngBytes != null) {
-      return await file.writeAsBytes(pngBytes);
+      var imgImage = img.decodeImage(Uint8List.fromList(pngBytes))!;
+      var exportedPng = img.encodePng(imgImage);
+
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/stats.png');
+      
+      return await file.writeAsBytes(exportedPng);
     }
 
     return null;
