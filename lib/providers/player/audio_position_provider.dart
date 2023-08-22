@@ -1,5 +1,7 @@
 import 'package:Medito/providers/providers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:rxdart/rxdart.dart';
 part 'audio_position_provider.g.dart';
 
 @riverpod
@@ -8,6 +10,7 @@ void slideAudioPosition(
   required int duration,
 }) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+
   audioPlayer.seekValueFromSlider(duration);
 }
 
@@ -27,12 +30,27 @@ void skipAudio(
   }
 }
 
-final audioPositionProvider = StreamProvider.autoDispose<int>((ref) {
+final audioPositionAndPlayerStateProvider =
+    StreamProvider<PositionAndPlayerStateState>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
 
-  return audioPlayer.meditationAudioPlayer.positionStream
-      .map((position) => position.inMilliseconds);
+  return Rx.combineLatest3<Duration, Duration?, PlayerState,
+      PositionAndPlayerStateState>(
+    audioPlayer.meditationAudioPlayer.positionStream,
+    audioPlayer.meditationAudioPlayer.durationStream,
+    audioPlayer.meditationAudioPlayer.playerStateStream,
+    (position, duration, playerState) =>
+        PositionAndPlayerStateState(playerState, duration, position),
+  );
 });
 
 //ignore: prefer-match-file-name
 enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }
+
+class PositionAndPlayerStateState {
+  final PlayerState playerState;
+  final Duration position;
+  final Duration? duration;
+
+  PositionAndPlayerStateState(this.playerState, this.duration, this.position);
+}

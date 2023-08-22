@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
@@ -35,7 +33,7 @@ class BackgroundImageWidget extends ConsumerWidget {
             height: size.height,
             child: NetworkImageWidget(
               url: imageUrl,
-              isCache: true,
+              isCache: false,
             ),
           ),
         ),

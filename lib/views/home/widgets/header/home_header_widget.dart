@@ -54,7 +54,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
           },
         );
       },
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1, milliseconds: 500),
       child: IconButton(
         onPressed: () => {},
         icon: SvgPicture.asset(

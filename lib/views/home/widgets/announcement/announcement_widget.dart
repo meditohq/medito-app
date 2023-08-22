@@ -60,9 +60,9 @@ class AnnouncementWidget extends ConsumerWidget {
       children: [
         LoadingButtonWidget(
           onPressed: () {
+            _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
             ref.invalidate(homeProvider);
             ref.read(homeProvider);
-            _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,

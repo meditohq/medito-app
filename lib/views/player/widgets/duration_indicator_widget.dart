@@ -1,11 +1,14 @@
+import 'dart:math';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 
-class DurationIndicatorWidget extends ConsumerWidget {
+class DurationIndicatorWidget extends ConsumerStatefulWidget {
   const DurationIndicatorWidget({
     super.key,
     required this.file,
@@ -13,15 +16,42 @@ class DurationIndicatorWidget extends ConsumerWidget {
   });
   final MeditationFilesModel file;
   final int meditationId;
-  final minSeconds = 0.0;
-  final additionalMilliSeconds = 200;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final audioPlayerPositionProvider = ref.watch(audioPositionProvider);
+  ConsumerState<DurationIndicatorWidget> createState() =>
+      _DurationIndicatorWidgetState();
+}
 
-    return audioPlayerPositionProvider.when(
-      data: (data) => _durationBar(context, ref, data),
+class _DurationIndicatorWidgetState
+    extends ConsumerState<DurationIndicatorWidget> {
+  final _minSeconds = 0.0;
+  double? _dragSeekbarValue;
+  double _maxDuration = 0.0;
+  bool _draggingSeekbar = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final audioPositionAndPlayerState =
+        ref.watch(audioPositionAndPlayerStateProvider);
+    _maxDuration = widget.file.duration.toDouble();
+
+    return audioPositionAndPlayerState.when(
+      data: (data) {
+        final value = min(
+          _dragSeekbarValue ?? data.position.inMilliseconds,
+          _maxDuration,
+        );
+        if (_dragSeekbarValue != null && !_draggingSeekbar) {
+          _dragSeekbarValue = null;
+        }
+
+        return _durationBar(
+          context,
+          ref,
+          value,
+          data.playerState.processingState,
+        );
+      },
       error: (error, stackTrace) => SizedBox(),
       loading: () => SizedBox(),
     );
@@ -30,13 +60,12 @@ class DurationIndicatorWidget extends ConsumerWidget {
   Padding _durationBar(
     BuildContext context,
     WidgetRef ref,
-    int currentDuration,
+    num currentDuration,
+    ProcessingState audioProcessingState,
   ) {
-    var maxDuration = file.duration.toDouble();
     _handleAudioCompletion(
-      currentDuration.toInt(),
-      maxDuration.toInt(),
       ref,
+      audioProcessingState,
     );
 
     return Padding(
@@ -52,25 +81,42 @@ class DurationIndicatorWidget extends ConsumerWidget {
               ),
             ),
             child: Slider(
-              min: minSeconds,
+              min: _minSeconds,
               activeColor: ColorConstants.walterWhite,
               inactiveColor: ColorConstants.greyIsTheNewGrey,
-              max: maxDuration,
+              max: _maxDuration,
               value: currentDuration.toDouble(),
-              onChanged: (value) {
+              onChanged: (val) {
+                if (!_draggingSeekbar) {
+                  _draggingSeekbar = true;
+                }
+                setState(() {
+                  _dragSeekbarValue = val;
+                });
+              },
+              onChangeEnd: (val) {
                 ref.read(slideAudioPositionProvider(
-                  duration: value.toInt(),
+                  duration: val.round(),
                 ));
+                _draggingSeekbar = false;
               },
             ),
           ),
-          _durationLabels(context, file.duration, currentDuration),
+          _durationLabels(
+            context,
+            currentDuration.round(),
+            _maxDuration.round(),
+          ),
         ],
       ),
     );
   }
 
-  Row _durationLabels(BuildContext context, int duration, int position) {
+  Row _durationLabels(
+    BuildContext context,
+    int position,
+    int duration,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -101,15 +147,14 @@ class DurationIndicatorWidget extends ConsumerWidget {
   }
 
   void _handleAudioCompletion(
-    int currentDuration,
-    int maxDuration,
     WidgetRef ref,
+    ProcessingState audioProcessingState,
   ) {
-    if (maxDuration <= currentDuration + additionalMilliSeconds) {
+    if (audioProcessingState == ProcessingState.completed) {
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
-      _handleTrackEvent(ref, file.id, meditationId);
-      audioProvider.seekValueFromSlider(0);
+      _handleTrackEvent(ref, widget.file.id, widget.meditationId);
       audioProvider.pause();
+      audioProvider.seekValueFromSlider(0);
       audioProvider.pauseBackgroundSound();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =

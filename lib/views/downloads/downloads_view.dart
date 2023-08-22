@@ -9,7 +9,6 @@ import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -65,7 +64,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           meditations.insert(newIndex, reorderedItem);
           // To ensure, that the new list order is saved
           ref.read(
-              addMeditationListInPreferenceProvider(meditations: meditations));
+            addMeditationListInPreferenceProvider(meditations: meditations),
+          );
         });
       },
       children:
@@ -75,11 +75,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   Widget _getEmptyWidget() => EmptyStateWidget(
         message: StringConstants.emptyDownloadsMessage,
-        image: SvgPicture.asset(
-          AssetConstants.dalle,
-          height: 168,
-          width: 178,
-        ),
       );
 
   Widget _getSlidingItem(MeditationModel item, BuildContext context) {
@@ -136,12 +131,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         Duration(milliseconds: item.audio.first.files.first.duration)
             .inMinutes
             .toString();
+    var guideName = item.audio.first.guideName;
+    var duration = _getDuration(audioLength);
+    var subTitle = guideName != null ? '$guideName — $duration' : '$duration';
 
     return PackListItemWidget(
       PackImageListItemData(
         title: item.title,
-        subtitle:
-            '${item.audio.first.guideName} — ${_getDuration(audioLength)}',
+        subtitle: subTitle,
         cover: item.coverUrl,
         coverSize: 70,
       ),

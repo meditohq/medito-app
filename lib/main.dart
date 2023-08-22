@@ -76,6 +76,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     if (state == AppLifecycleState.resumed) {
       // update session stats when app comes into foreground
       updateStatsFromBg();
+    } else if (state == AppLifecycleState.detached) {
+      final audioProvider = ref.watch(audioPlayerNotifierProvider);
+      audioProvider.stop();
     }
   }
 
@@ -94,6 +97,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: ColorConstants.transparent,
+        statusBarColor: ColorConstants.transparent,
       ),
     );
     SystemChrome.setEnabledSystemUIMode(

@@ -1,3 +1,4 @@
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/network/api_response.dart';
@@ -46,6 +47,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
+        bottom: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
           child: Form(
@@ -68,6 +70,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                   cursorColor: ColorConstants.walterWhite,
                   cursorHeight: 22,
                   cursorWidth: 1,
+                  keyboardType: TextInputType.emailAddress,
                   style: textTheme.bodyMedium?.copyWith(
                     color: ColorConstants.walterWhite,
                     fontFamily: DmSans,
@@ -95,7 +98,9 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     ),
                   ],
                 ),
-                height8,
+                SizedBox(
+                  height: getBottomPadding(context),
+                ),
               ],
             ),
           ),
