@@ -107,24 +107,15 @@ void _navigate(WidgetRef ref, NotificationPayloadModel data) {
       RouteConstants.webviewPath,
       extra: {'url': data.path},
     );
+  } else {
+    context.push(getPathFromString(
+      data.type,
+      [data.id.toString()],
+    ));
   }
-  context.push(getPathFromString(
-    data.type,
-    [data.id.toString()],
-  ));
 }
 
-// void checkForInitialMessage() async {
-//   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-//   //ignore: no-empty-block
-//   if (initialMessage != null) {
-//   } else {
-//     onMessageAppOpened();
-//   }
-// }
-
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('myBackgroundMessageHandler message: $message');
   await _showNotification(
     message.notification?.title,
     message.notification?.body,
