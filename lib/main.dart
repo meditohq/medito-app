@@ -106,13 +106,15 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         SystemUiOverlay.top,
       ],
     );
-
+    onMessageAppOpened(ref);
+    initializeNotification(ref);
     // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   Widget build(BuildContext context) {
+    final goRouter = ref.watch(goRouterProvider);
     ref.listen(deviceAndAppInfoProvider, (_, info) {
       if (info.hasValue) {
         var val = info.value;
@@ -132,7 +134,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     });
 
     return MaterialApp.router(
-      routerConfig: router,
+      routerConfig: goRouter,
       theme: appTheme(context),
       title: ParentWidget._title,
     );

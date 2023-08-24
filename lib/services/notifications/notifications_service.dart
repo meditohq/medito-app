@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 late final FirebaseMessaging _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -30,7 +33,6 @@ Future<AuthorizationStatus> checkNotificationPermission() async {
 }
 
 Future<AuthorizationStatus> requestPermission() async {
-  await initialiazeLocalNotification();
   var settings = await _messaging.requestPermission(
     alert: true,
     badge: true,
@@ -38,24 +40,30 @@ Future<AuthorizationStatus> requestPermission() async {
     sound: true,
   );
 
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    // For handling the received notifications
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showNotification(
-        message.notification?.title,
-        message.notification?.body,
-        json.encode(message.data),
-      );
-    });
-  }
-
   return settings.authorizationStatus;
 }
 
-Future<void> initialiazeLocalNotification() async {
+Future<void> initializeNotification(WidgetRef ref) async {
+  await initializeLocalNotification(ref);
+
+  // For handling the received notifications
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _showNotification(
+      message.notification?.title,
+      message.notification?.body,
+      json.encode(message.data),
+    );
+  });
+}
+
+Future<void> initializeLocalNotification(WidgetRef ref) async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
   var initializationSettingsIOS = DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+    requestCriticalPermission: false,
     onDidReceiveLocalNotification: (id, title, body, payload) =>
         _showNotification(title, body, payload),
   );
@@ -66,12 +74,45 @@ Future<void> initialiazeLocalNotification() async {
   );
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: (_) => {},
+    onDidReceiveNotificationResponse: (res) {
+      if (res.payload != null) {
+        var payload = json.decode(res.payload!);
+        var notificationPaylaod = NotificationPayloadModel.fromJson(payload);
+        _navigate(ref, notificationPaylaod);
+      }
+    },
   );
 }
 
-void onMessageAppOpened() {
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) => {});
+void checkInitialMessage(WidgetRef ref) async {
+  var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    var notificationPaylaod =
+        NotificationPayloadModel.fromJson(initialMessage.data);
+    _navigate(ref, notificationPaylaod);
+  }
+}
+
+void onMessageAppOpened(WidgetRef ref) {
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    var notificationPaylaod = NotificationPayloadModel.fromJson(message.data);
+    _navigate(ref, notificationPaylaod);
+  });
+}
+
+void _navigate(WidgetRef ref, NotificationPayloadModel data) {
+  var context = ref.read(goRouterProvider);
+  if (data.type == TypeConstants.LINK) {
+    context.push(
+      RouteConstants.webviewPath,
+      extra: {'url': data.path},
+    );
+  } else {
+    context.push(getPathFromString(
+      data.type,
+      [data.id.toString()],
+    ));
+  }
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

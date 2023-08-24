@@ -16,8 +16,12 @@ import 'package:Medito/views/meditation/meditation_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+final goRouterProvider = Provider<GoRouter>((ref) {
+  return router;
+});
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>();

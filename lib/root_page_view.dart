@@ -37,6 +37,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       });
     });
     _checkNotificationPermission();
+    checkInitialMessage(ref);
     super.initState();
   }
 
