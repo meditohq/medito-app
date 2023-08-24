@@ -16,7 +16,7 @@ class FolderView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var folders = ref.watch(FoldersProvider(folderId: int.parse(id!)));
+    var folders = ref.watch(FoldersProvider(folderId: id!));
 
     return Scaffold(
       body: folders.when(
@@ -26,7 +26,7 @@ class FolderView extends ConsumerWidget {
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(
-            FoldersProvider(folderId: int.parse(id!)),
+            FoldersProvider(folderId: id!),
           ),
           isLoading: folders.isLoading,
         ),
@@ -42,7 +42,7 @@ class FolderView extends ConsumerWidget {
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(FoldersProvider(folderId: int.parse(id!)));
+        return await ref.refresh(FoldersProvider(folderId: id!));
       },
       child: CollapsibleHeaderWidget(
         bgImage: folder.coverUrl,

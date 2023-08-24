@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'meditation_repository.g.dart';
 
 abstract class MeditationRepository {
-  Future<MeditationModel> fetchMeditation(int meditationId);
+  Future<MeditationModel> fetchMeditation(String meditationId);
   Future<List<MeditationModel>> fetchMeditationFromPreference();
   Future<void> addMeditationInPreference(List<MeditationModel> meditationList);
   Future<void> addCurrentlyPlayingMeditationInPreference(
@@ -24,7 +24,7 @@ class MeditationRepositoryImpl extends MeditationRepository {
   MeditationRepositoryImpl({required this.client});
 
   @override
-  Future<MeditationModel> fetchMeditation(int meditationId) async {
+  Future<MeditationModel> fetchMeditation(String meditationId) async {
     try {
       var res =
           await client.getRequest('${HTTPConstants.MEDITATIONS}/$meditationId');

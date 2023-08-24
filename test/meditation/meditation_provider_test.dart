@@ -6,7 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 //ignore:prefer-match-file-name
-class MockMeditationRepository extends Mock implements MeditationRepositoryImpl {}
+class MockMeditationRepository extends Mock
+    implements MeditationRepositoryImpl {}
 
 class Listener<T> extends Mock {
   void call(T? previous, T next);
@@ -46,7 +47,7 @@ void main() {
           hasBackgroundSound: false,
         );
         final mockMeditationRepository = MockMeditationRepository();
-        when(() => mockMeditationRepository.fetchMeditation(1))
+        when(() => mockMeditationRepository.fetchMeditation('1'))
             .thenAnswer((_) async => meditationResponseData);
 
         //ACT
@@ -54,14 +55,14 @@ void main() {
 
         //ASSERT
         expect(
-          container.read(meditationsProvider(meditationId: 1)),
+          container.read(meditationsProvider(meditationId: '1')),
           const AsyncValue<MeditationModel>.loading(),
         );
-        await container.read(meditationsProvider(meditationId: 1).future);
+        await container.read(meditationsProvider(meditationId: '1').future);
         expect(
-          container.read(meditationsProvider(meditationId: 1)).value,
+          container.read(meditationsProvider(meditationId: '1')).value,
           isA<MeditationModel>()
-              .having((s) => s.id, 'id', 1)
+              .having((s) => s.id, 'id', '1')
               .having((s) => s.title, 'title', 'Welcome')
               .having(
                 (s) => s.description,
@@ -70,7 +71,7 @@ void main() {
               ),
         );
         verify(
-          () => mockMeditationRepository.fetchMeditation(1),
+          () => mockMeditationRepository.fetchMeditation('1'),
         ).called(1);
       },
     );
@@ -80,7 +81,7 @@ void main() {
         final exception = Exception();
         //ARRANGE
         final mockMeditationRepository = MockMeditationRepository();
-        when(() => mockMeditationRepository.fetchMeditation(1))
+        when(() => mockMeditationRepository.fetchMeditation('1'))
             .thenAnswer((_) async => throw (exception));
 
         //ACT
@@ -88,20 +89,20 @@ void main() {
 
         //ASSERT
         expect(
-          container.read(meditationsProvider(meditationId: 1)),
+          container.read(meditationsProvider(meditationId: '1')),
           const AsyncValue<MeditationModel>.loading(),
         );
         await expectLater(
-          container.read(meditationsProvider(meditationId: 1).future),
+          container.read(meditationsProvider(meditationId: '1').future),
           throwsA(isA<Exception>()),
         );
         expect(
-          container.read(meditationsProvider(meditationId: 1)),
+          container.read(meditationsProvider(meditationId: '1')),
           isA<AsyncError<MeditationModel>>()
               .having((e) => e.error, 'error', exception),
         );
         verify(
-          () => mockMeditationRepository.fetchMeditation(1),
+          () => mockMeditationRepository.fetchMeditation('1'),
         ).called(1);
       },
     );
