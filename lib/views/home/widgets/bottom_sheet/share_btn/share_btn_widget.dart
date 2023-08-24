@@ -29,7 +29,7 @@ class ShareBtnWidget extends StatelessWidget {
 
   Future<void> _handleShare(BuildContext context, GlobalKey key) async {
     try {
-      var file = await capturePng(key);
+      var file = await capturePng(context, key);
       if (file != null) {
         await Share.shareXFiles(
           [XFile(file.path)],

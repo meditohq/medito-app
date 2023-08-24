@@ -144,11 +144,12 @@ String getFileExtension(String path) {
   return '.${path.substring(path.lastIndexOf('.') + 1)}';
 }
 
-Future<File?> capturePng(GlobalKey globalKey) async {
+Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
   try {
+    var pixelRatio = MediaQuery.of(context).devicePixelRatio;
     var boundary =
         globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    var image = await boundary.toImage(pixelRatio: 3.0);
+    var image = await boundary.toImage(pixelRatio: pixelRatio);
     var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData?.buffer.asUint8List();
 
