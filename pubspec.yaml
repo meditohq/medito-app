@@ -21,7 +21,6 @@ dependencies:
     sdk: flutter
   http: ^0.13.3
   dio: ^5.0.2
-  google_fonts: ^4.0.3
   flutter_svg: ^1.1.6
   path_provider: ^2.0.1
   url_launcher: ^6.0.3
@@ -85,4 +84,17 @@ flutter:
       fonts:
         - asset: assets/fonts/clash-display/ClashDisplay-Medium.otf
         - asset: assets/fonts/clash-display/ClashDisplay-Semibold.otf
+
+    - family: DM Mono
+      fonts:
+        - asset: assets/fonts/dm-mono/DMMono-Medium.ttf
+        - asset: assets/fonts/dm-mono/DMMono-Regular.ttf
+    
+    - family: DM Sans
+      fonts:
+        - asset: assets/fonts/dm-sans/DMSans-Bold.ttf
+        - asset: assets/fonts/dm-sans/DMSans-Medium.ttf
+        - asset: assets/fonts/dm-sans/DMSans-Regular.ttf
+        - asset: assets/fonts/dm-sans/DMSans-SemiBold.ttf
+
   uses-material-design: true

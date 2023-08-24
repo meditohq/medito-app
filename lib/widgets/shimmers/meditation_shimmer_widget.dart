@@ -19,33 +19,41 @@ class MeditationShimmerWidget extends StatelessWidget {
           BoxShimmerWidget(
             height: 380,
           ),
-          height8,
-          height8,
-          BoxShimmerWidget(
-            height: 15,
-            width: 150,
-            borderRadius: 14,
-          ),
-          height8,
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.spaceBetween,
-            children: list,
-          ),
-          height8,
-          height8,
-          BoxShimmerWidget(
-            height: 15,
-            width: 150,
-            borderRadius: 14,
-          ),
-          height8,
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.spaceBetween,
-            children: list,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                height8,
+                height8,
+                BoxShimmerWidget(
+                  height: 15,
+                  width: 150,
+                  borderRadius: 14,
+                ),
+                height8,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.spaceBetween,
+                  children: list,
+                ),
+                height8,
+                height8,
+                BoxShimmerWidget(
+                  height: 15,
+                  width: 150,
+                  borderRadius: 14,
+                ),
+                height8,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.spaceBetween,
+                  children: list,
+                ),
+              ],
+            ),
           ),
         ],
       ),
