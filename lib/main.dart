@@ -138,7 +138,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   void _handleAudioCompletion(
     WidgetRef ref,
-  ) {
+  ) async {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
     var extras = audioHandler.mediaItem.value?.extras;
     if (extras != null) {
@@ -148,12 +148,19 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         extras['meditationId'],
       );
       audioProvider.seekValueFromSlider(0);
-      audioProvider.pause();
+      unawaited(audioProvider.pause());
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
       });
+      var router = ref.read(goRouterProvider);
+      if (!(await _checkUser(ref))) {
+        await router.push(
+          RouteConstants.joinIntroPath,
+          extra: {'screen': Screen.meditation},
+        );
+      }
     }
   }
 
@@ -171,5 +178,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       payload: audio.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  Future<bool> _checkUser(
+    WidgetRef ref,
+  ) async {
+    await ref.read(authInitTokenProvider.notifier).initializeUser();
+    var user = ref.read(authInitTokenProvider).value;
+
+    return user == AUTH_INIT_STATUS.IS_USER_PRESENT;
   }
 }

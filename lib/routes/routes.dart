@@ -38,39 +38,55 @@ final router = GoRouter(
       ),
     ),
     GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinIntroPath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinIntroView(),
-      ),
-    ),
-    GoRoute(
-      path: RouteConstants.joinEmailPath,
-      pageBuilder: (context, state) => MaterialPage(
-        key: state.pageKey,
-        child: JoinEmailView(),
-      ),
-    ),
-    GoRoute(
-      path: RouteConstants.joinVerifyOTPPath,
       pageBuilder: (context, state) {
-        final data = state.extra! as Map;
+        final screen = state.extra != null ? state.extra as Map : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinVerifyOTPView(email: data['email']!),
+          child: JoinIntroView(fromScreen: screen?['screen'] ?? Screen.splash),
         );
       },
     ),
     GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RouteConstants.joinEmailPath,
+      pageBuilder: (context, state) {
+        final screen = state.extra != null ? state.extra as Map : null;
+
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinEmailView(fromScreen: screen?['screen'] ?? Screen.splash),
+        );
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RouteConstants.joinVerifyOTPPath,
+      pageBuilder: (context, state) {
+        final data = state.extra != null ? state.extra as Map : null;
+
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinVerifyOTPView(
+            email: data?['email'] ?? '',
+            fromScreen: data?['screen'] ?? Screen.splash,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinWelcomePath,
       pageBuilder: (context, state) {
-        final data = state.extra! as Map;
+        final data = state.extra != null ? state.extra as Map : null;
 
         return MaterialPage(
           key: state.pageKey,
           child: JoinWelcomeView(
-            email: data['email']!,
+            email: data?['email'] ?? '',
+            fromScreen: data?['screen'] ?? Screen.splash,
           ),
         );
       },
@@ -222,6 +238,7 @@ GoRoute _getWebviewRoute({bool fromRoot = false}) {
 
 //ignore: prefer-match-file-name
 enum Screen {
+  splash,
   folder,
   player,
   article,

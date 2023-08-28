@@ -19,7 +19,6 @@ class SoundListTileWidget extends ConsumerWidget {
         ref,
         bgSoundNotifierProvider,
         audioPlayerNotifier,
-        isSelected,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -67,7 +66,6 @@ class SoundListTileWidget extends ConsumerWidget {
     WidgetRef ref,
     BackgroundSoundsNotifier bgSoundNotifierProvider,
     AudioPlayerNotifier audioPlayerNotifier,
-    bool isSelected,
   ) {
     if (sound.title == StringConstants.none) {
       bgSoundNotifierProvider.handleOnChangeSound(sound);

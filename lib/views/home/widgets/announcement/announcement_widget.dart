@@ -46,32 +46,27 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
           curve: Curves.easeInOut,
           child: Visibility(
             visible: !_isCollapsed,
-            child: Column(
-              children: [
-                Container(
-                  color: bgColor,
-                  height: topPadding,
-                  width: size.width,
-                ),
-                Container(
-                  color: bgColor,
-                  width: size.width,
-                  padding: EdgeInsets.all(16),
-                  child: Column(
+            child: Container(
+              color: bgColor,
+              width: size.width,
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: topPadding,
+                    width: size.width,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _icon(widget.announcement.icon),
-                          _text(context, widget.announcement.text),
-                        ],
-                      ),
-                      height16,
-                      _actionBtn(context, ref, widget.announcement),
+                      _icon(widget.announcement.icon),
+                      _text(context, widget.announcement.text),
                     ],
                   ),
-                ),
-              ],
+                  height16,
+                  _actionBtn(context, ref, widget.announcement),
+                ],
+              ),
             ),
           ),
         ),
@@ -102,6 +97,8 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
           onPressed: () {
             _toggleCollapse();
             _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
+            ref.invalidate(remoteStatsProvider);
+            ref.read(remoteStatsProvider);
             ref.invalidate(homeProvider);
             ref.read(homeProvider);
           },

@@ -1,3 +1,4 @@
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
@@ -9,7 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class JoinEmailView extends ConsumerStatefulWidget {
-  const JoinEmailView({super.key});
+  const JoinEmailView({super.key, required this.fromScreen});
+  final Screen fromScreen;
 
   @override
   ConsumerState<JoinEmailView> createState() => _JoinEmailViewState();
@@ -30,7 +32,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
       if (status == Status.COMPLETED) {
         await context.push(
           RouteConstants.joinVerifyOTPPath,
-          extra: {'email': email},
+          extra: {'email': email, 'screen': widget.fromScreen},
         );
       } else if (status == Status.ERROR) {
         showSnackBar(context, auth.sendOTPRes.message.toString());

@@ -1,9 +1,11 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class MeditationButtonsWidget extends StatelessWidget {
   final MeditationModel meditationModel;
@@ -65,15 +67,7 @@ class MeditationButtonsWidget extends StatelessWidget {
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
-        onTap: () {
-          ref
-              .read(playerProvider.notifier)
-              .addCurrentlyPlayingMeditationInPreference(
-                meditationModel: meditationModel,
-                file: file,
-              );
-          ref.read(pageviewNotifierProvider).gotoNextPage();
-        },
+        onTap: () => _handleTap(context, ref, file),
         borderRadius: BorderRadius.circular(14),
         child: Ink(
           width: 171,
@@ -96,5 +90,34 @@ class MeditationButtonsWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleTap(
+    BuildContext context,
+    WidgetRef ref,
+    MeditationFilesModel file,
+  ) async {
+    if (!(await _checkUser(ref))) {
+      await context.push(
+        RouteConstants.joinIntroPath,
+        extra: {'screen': Screen.meditation},
+      );
+    }
+    await ref
+        .read(playerProvider.notifier)
+        .addCurrentlyPlayingMeditationInPreference(
+          meditationModel: meditationModel,
+          file: file,
+        );
+    ref.read(pageviewNotifierProvider).gotoNextPage();
+  }
+
+  Future<bool> _checkUser(
+    WidgetRef ref,
+  ) async {
+    await ref.read(authInitTokenProvider.notifier).initializeUser();
+    var user = ref.read(authInitTokenProvider).value;
+
+    return user == AUTH_INIT_STATUS.IS_USER_PRESENT;
   }
 }
