@@ -136,7 +136,7 @@ class AnnouncementWidget extends ConsumerWidget {
     ));
   }
 
-  void _handleTrackEvent(WidgetRef ref, int announcementId, String? ctaTitle) {
+  void _handleTrackEvent(WidgetRef ref, String announcementId, String? ctaTitle) {
     var announcement = AnnouncementCtaTappedModel(
       announcementId: announcementId,
       ctaTitle: ctaTitle ?? '',

@@ -5,7 +5,7 @@ part 'chip_tapped_model.g.dart';
 @freezed
 abstract class ChipTappedModel with _$ChipTappedModel {
   const factory ChipTappedModel({
-    required int chipId,
+    required String chipId,
     required String chipTitle,
   }) = _ChipTappedModel;
 

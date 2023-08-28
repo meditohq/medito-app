@@ -66,7 +66,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     ));
   }
 
-  void _handleTrackEvent(WidgetRef ref, int itemId, String itemTitle) {
+  void _handleTrackEvent(WidgetRef ref, String itemId, String itemTitle) {
     var menuItemTappedModel =
         MenuItemTappedModel(itemId: itemId, itemTitle: itemTitle);
     var event = EventsModel(

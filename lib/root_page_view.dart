@@ -145,8 +145,8 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
 
   void _handleTrackEvent(
     WidgetRef ref,
-    int meditationId,
-    int audioFileId,
+    String meditationId,
+    String audioFileId,
   ) {
     var audio =
         AudioStartedModel(audioFileId: audioFileId, meditationId: meditationId);

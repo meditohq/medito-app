@@ -5,7 +5,7 @@ part 'announcement_cta_tapped_model.g.dart';
 @freezed
 abstract class AnnouncementCtaTappedModel with _$AnnouncementCtaTappedModel {
   const factory AnnouncementCtaTappedModel({
-    required int announcementId,
+    required String announcementId,
     required String ctaTitle,
   }) = _AnnouncementCtaTappedModel;
 

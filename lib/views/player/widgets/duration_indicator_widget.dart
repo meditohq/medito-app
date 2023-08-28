@@ -15,7 +15,7 @@ class DurationIndicatorWidget extends ConsumerStatefulWidget {
     required this.meditationId,
   });
   final MeditationFilesModel file;
-  final int meditationId;
+  final String meditationId;
 
   @override
   ConsumerState<DurationIndicatorWidget> createState() =>
@@ -163,7 +163,7 @@ class _DurationIndicatorWidgetState
     }
   }
 
-  void _handleTrackEvent(WidgetRef ref, int audioFileId, int meditationId) {
+  void _handleTrackEvent(WidgetRef ref, String audioFileId, String meditationId) {
     var audio = AudioCompletedModel(
       audioFileId: audioFileId,
       meditationId: meditationId,

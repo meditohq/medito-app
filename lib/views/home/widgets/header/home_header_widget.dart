@@ -1,15 +1,17 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import '../bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import '../bottom_sheet/menu/menu_bottom_sheet_widget.dart';
 
-class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
+class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   const HomeHeaderWidget({
     super.key,
     required this.homeMenuModel,
@@ -20,7 +22,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final MiniStatsModel? miniStatsModel;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       height: 56,
       child: Padding(
@@ -31,7 +33,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
             _logo(context),
             Row(
               children: [
-                _statsWidget(context),
+                _statsWidget(context, ref),
                 _downloadWidget(context),
                 _menuWidget(context),
               ],
@@ -99,7 +101,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  InkWell _statsWidget(BuildContext context) {
+  InkWell _statsWidget(BuildContext context, WidgetRef ref) {
     var icon = miniStatsModel?.icon != null
         ? IconData(
             formatIcon(miniStatsModel!.icon),
@@ -113,6 +115,8 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       onTap: () {
+        ref.invalidate(remoteStatsProvider);
+        ref.read(remoteStatsProvider);
         showModalBottomSheet<void>(
           context: context,
           isScrollControlled: true,

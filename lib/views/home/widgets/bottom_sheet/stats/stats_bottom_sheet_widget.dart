@@ -36,7 +36,8 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                   onTap: () => ref.refresh(remoteStatsProvider),
                 ),
               ),
-              loading: () => Expanded(
+              loading: () => SizedBox(
+                height: 300,
                 child: Center(
                   child: CircularProgressIndicator(),
                 ),

@@ -83,7 +83,7 @@ class FilterWidget extends ConsumerWidget {
     ));
   }
 
-  void _handleTrackEvent(WidgetRef ref, int chipId, String chipTitle) {
+  void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {
     var chipViewedModel = ChipTappedModel(chipId: chipId, chipTitle: chipTitle);
     var event = EventsModel(
       name: EventTypes.chipTapped,

@@ -5,7 +5,7 @@ part 'bg_sound_selected_model.g.dart';
 @freezed
 abstract class BgSoundSelectedModel with _$BgSoundSelectedModel {
   const factory BgSoundSelectedModel({
-    required int backgroundSoundId,
+    required String backgroundSoundId,
   }) = _BgSoundSelectedModel;
 
   factory BgSoundSelectedModel.fromJson(Map<String, Object?> json) =>

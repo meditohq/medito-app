@@ -76,7 +76,7 @@ class SoundListTileWidget extends ConsumerWidget {
         !isSelected
             ? sound
             : BackgroundSoundsModel(
-                id: 0,
+                id: '0',
                 title: StringConstants.none,
                 duration: 0,
                 path: '',
@@ -92,7 +92,7 @@ class SoundListTileWidget extends ConsumerWidget {
     }
   }
 
-  void _handleTrackEvent(WidgetRef ref, int bgSoundId) {
+  void _handleTrackEvent(WidgetRef ref, String bgSoundId) {
     var bgSelectedSoundModel =
         BgSoundSelectedModel(backgroundSoundId: bgSoundId);
     var event = EventsModel(
