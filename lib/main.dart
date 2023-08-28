@@ -111,7 +111,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,
       overlays: [
-        SystemUiOverlay.top, // Shows Status bar and hides Navigation bar
+        SystemUiOverlay.top,
       ],
     );
     onMessageAppOpened(ref);
