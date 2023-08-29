@@ -57,46 +57,61 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         );
       },
       duration: Duration(milliseconds: 500),
-      child: IconButton(
-        onPressed: () => {},
-        icon: SvgPicture.asset(
-          AssetConstants.icLogo,
-          width: 32,
+      child: Material(
+        type: MaterialType.transparency,
+        shape: CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        child: IconButton(
+          onPressed: () => {},
+          icon: SvgPicture.asset(
+            AssetConstants.icLogo,
+            width: 32,
+          ),
         ),
       ),
     );
   }
 
-  IconButton _menuWidget(BuildContext context) {
-    return IconButton(
-      icon: const Icon(
-        Icons.more_vert,
-        size: 24,
+  Material _menuWidget(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      shape: CircleBorder(),
+      clipBehavior: Clip.hardEdge,
+      child: IconButton(
+        icon: const Icon(
+          Icons.more_vert,
+          size: 24,
+        ),
+        onPressed: () {
+          showModalBottomSheet<void>(
+            context: context,
+            useRootNavigator: true,
+            backgroundColor: ColorConstants.onyx,
+            builder: (BuildContext context) {
+              return MenuBottomSheetWidget(
+                homeMenuModel: homeMenuModel,
+              );
+            },
+          );
+        },
       ),
-      onPressed: () {
-        showModalBottomSheet<void>(
-          context: context,
-          useRootNavigator: true,
-          backgroundColor: ColorConstants.onyx,
-          builder: (BuildContext context) {
-            return MenuBottomSheetWidget(
-              homeMenuModel: homeMenuModel,
-            );
-          },
-        );
-      },
     );
   }
 
   Transform _downloadWidget(BuildContext context) {
     return Transform.translate(
       offset: Offset(5, 0),
-      child: IconButton(
-        icon: const Icon(
-          Icons.downloading,
-          size: 24,
+      child: Material(
+        type: MaterialType.transparency,
+        shape: CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        child: IconButton(
+          icon: const Icon(
+            Icons.downloading,
+            size: 24,
+          ),
+          onPressed: () => context.push(RouteConstants.downloadsPath),
         ),
-        onPressed: () => context.push(RouteConstants.downloadsPath),
       ),
     );
   }
