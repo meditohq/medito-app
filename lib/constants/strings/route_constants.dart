@@ -18,6 +18,7 @@ class RouteConstants {
   static const String urlPath = '/url';
   static const String collectionPath = '/app';
   static const String webviewPath = '/webview';
+  static const String connectivityErrorPath = '/connectivityError';
   static const String backgroundSoundsPath = '/backgroundsounds';
   static const String notificationPermissionPath = '/notificationPermission';
   static const String joinIntroPath = '/joinIntro';

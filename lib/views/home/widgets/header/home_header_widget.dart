@@ -96,7 +96,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
           Icons.downloading,
           size: 24,
         ),
-        onPressed: () => context.push(RouteConstants.collectionPath),
+        onPressed: () => context.push(RouteConstants.downloadsPath),
       ),
     );
   }

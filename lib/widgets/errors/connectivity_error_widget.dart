@@ -18,17 +18,13 @@ class _ConnectivityErrorComponentState
     extends ConsumerState<ConnectivityErrorWidget> {
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PAUSE;
-    });
     super.initState();
   }
 
   @override
-  void dispose() {
+  void didChangeDependencies() {
     _refreshAPI();
-    super.dispose();
+    super.didChangeDependencies();
   }
 
   void _refreshAPI() {
@@ -48,17 +44,22 @@ class _ConnectivityErrorComponentState
   Widget build(BuildContext context) {
     ref.watch(audioPlayPauseProvider);
 
-    return MeditoErrorWidget(
-      onTap: () {
-        var connectivityStatus = ref.read(connectivityStatusProvider.notifier);
-        connectivityStatus.checkConnectivity();
-        createSnackBar(
-          StringConstants.retrying,
-          context,
-          color: ColorConstants.darkBGColor,
-        );
-      },
-      message: StringConstants.checkConnection,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: MeditoErrorWidget(
+        onTap: () {
+          var connectivityStatus =
+              ref.read(connectivityStatusProvider.notifier);
+          connectivityStatus.checkConnectivity();
+          createSnackBar(
+            StringConstants.retrying,
+            context,
+            color: ColorConstants.darkBGColor,
+          );
+        },
+        message: StringConstants.checkConnection,
+        showCheckDownloadText: true,
+      ),
     );
   }
 }

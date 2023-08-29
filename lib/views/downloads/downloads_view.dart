@@ -9,6 +9,7 @@ import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:Medito/views/packs/pack_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -28,6 +29,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     return Scaffold(
       appBar: MeditoAppBarWidget(
         title: StringConstants.downloads,
+        closePressed: () => context.pop(),
         isTransparent: true,
         hasCloseButton: true,
       ),

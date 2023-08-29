@@ -19,6 +19,7 @@ class StringConstants {
   static const String wellDoneCopy = 'Well done for meditating today!';
   static const String wellDoneSubtitle =
       'The mind is everything. What you think, you become.';
+  static const String meanWhileCheck = 'Meanwhile, you can check';
   static const String loading = 'Loading';
   static const String retrying = 'Retrying...';
   static const String tryAgain = 'Try again';

@@ -111,6 +111,8 @@ final router = GoRouter(
         _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
+        _getConnectivityErrorRoute(fromRoot: true),
+        _getDownloadsRoute(fromRoot: true),
         GoRoute(
           path: RouteConstants.collectionPath,
           routes: [
@@ -231,6 +233,36 @@ GoRoute _getWebviewRoute({bool fromRoot = false}) {
       return MaterialPage(
         key: state.pageKey,
         child: MeditoWebViewWidget(url: url['url']!),
+      );
+    },
+  );
+}
+
+GoRoute _getConnectivityErrorRoute({bool fromRoot = false}) {
+  return GoRoute(
+    parentNavigatorKey: _shellNavigatorKey,
+    path: fromRoot
+        ? RouteConstants.connectivityErrorPath
+        : RouteConstants.connectivityErrorPath.sanitisePath(),
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: ConnectivityErrorWidget(),
+      );
+    },
+  );
+}
+
+GoRoute _getDownloadsRoute({bool fromRoot = false}) {
+  return GoRoute(
+    parentNavigatorKey: _shellNavigatorKey,
+    path: fromRoot
+        ? RouteConstants.downloadsPath
+        : RouteConstants.downloadsPath.sanitisePath(),
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: DownloadsView(),
       );
     },
   );
