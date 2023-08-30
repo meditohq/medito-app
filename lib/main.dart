@@ -32,7 +32,6 @@ import 'services/notifications/notifications_service.dart';
 
 late SharedPreferences sharedPreferences;
 late AudioPlayerNotifier audioHandler;
-const audioBgEvent = 'com.medito.audio.bg.event';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
@@ -91,15 +90,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-    var streamEvent = audioHandler.meditationAudioPlayer.playerStateStream
-        .map((event) => event.processingState)
-        .distinct();
-    streamEvent.forEach((element) {
-      if (element == ProcessingState.completed) {
-        _handleAudioCompletion(ref);
-      }
-    });
-
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -128,42 +118,5 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       theme: appTheme(context),
       title: ParentWidget._title,
     );
-  }
-  
-  void _handleAudioCompletion(
-    WidgetRef ref,
-  ) {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
-    var extras = audioHandler.mediaItem.value?.extras;
-    if (extras != null) {
-      _handleAudioCompletionEvent(
-        ref,
-        extras['fileId'],
-        extras['meditationId'],
-      );
-      audioProvider.seekValueFromSlider(0);
-      audioProvider.pause();
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(audioPlayPauseStateProvider.notifier).state =
-            PLAY_PAUSE_AUDIO.PAUSE;
-      });
-    }
-  }
-
-  void _handleAudioCompletionEvent(
-    WidgetRef ref,
-    String audioFileId,
-    String meditationId,
-  ) {
-    var audio = AudioCompletedModel(
-      audioFileId: audioFileId,
-      meditationId: meditationId,
-    );
-    var event = EventsModel(
-      name: EventTypes.audioCompleted,
-      payload: audio.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
   }
 }
