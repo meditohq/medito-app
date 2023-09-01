@@ -22,6 +22,7 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
+    ref.read(audioPlayerNotifierProvider).initAudioHandler();
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(meProvider);
@@ -62,12 +63,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       }
     });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
-
-    // ref.listen(connectivityStatusProvider, (prev, next) {
-    //   if (next == ConnectivityStatus.isDisonnected) {
-    //     context.push(RouteConstants.connectivityErrorPath);
-    //   }
-    // });
 
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
