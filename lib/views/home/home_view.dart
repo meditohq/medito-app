@@ -24,7 +24,7 @@ class HomeView extends ConsumerWidget {
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
         data: (data) => SafeArea(
-          // top: data.announcement == null,
+          top: data.announcement == null,
           bottom: false,
           child: Container(
             color: data.announcement?.colorBackground != null
