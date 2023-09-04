@@ -35,7 +35,7 @@ class AnnouncementBannerWidget extends StatefulWidget {
 }
 
 class AnnouncementBannerWidgetState extends State<AnnouncementBannerWidget>
-    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+    with SingleTickerProviderStateMixin {
   var _hidden = false;
   final _bloc = AnnouncementBloc();
 
@@ -57,8 +57,6 @@ class AnnouncementBannerWidgetState extends State<AnnouncementBannerWidget>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     return StreamBuilder<AnnouncementResponse>(
       stream: _bloc.announcementController.stream,
       builder: (context, snapshot) {
@@ -216,7 +214,4 @@ class AnnouncementBannerWidgetState extends State<AnnouncementBannerWidget>
     _bloc.dispose();
     super.dispose();
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

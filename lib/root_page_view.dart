@@ -7,6 +7,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
+import 'main.dart';
 import 'widgets/widgets.dart';
 import 'views/player/widgets/mini_player_widget.dart';
 
@@ -22,7 +24,6 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
-    ref.read(deviceAndAppInfoProvider);
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
@@ -38,6 +39,14 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     });
     _checkNotificationPermission();
     checkInitialMessage(ref);
+    var streamEvent = audioHandler.meditationAudioPlayer.playerStateStream
+        .map((event) => event.processingState)
+        .distinct();
+    streamEvent.forEach((element) {
+      if (element == ProcessingState.completed) {
+        _handleAudioCompletion(ref);
+      }
+    });
     super.initState();
   }
 
@@ -165,6 +174,43 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var event = EventsModel(
       name: EventTypes.saveFcmToken,
       payload: fcm.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  void _handleAudioCompletion(
+    WidgetRef ref,
+  ) {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    var extras = audioHandler.mediaItem.value?.extras;
+    if (extras != null) {
+      _handleAudioCompletionEvent(
+        ref,
+        extras['fileId'],
+        extras['meditationId'],
+      );
+      audioProvider.seekValueFromSlider(0);
+      audioProvider.pause();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(audioPlayPauseStateProvider.notifier).state =
+            PLAY_PAUSE_AUDIO.PAUSE;
+      });
+    }
+  }
+
+  void _handleAudioCompletionEvent(
+    WidgetRef ref,
+    String audioFileId,
+    String meditationId,
+  ) {
+    var audio = AudioCompletedModel(
+      audioFileId: audioFileId,
+      meditationId: meditationId,
+    );
+    var event = EventsModel(
+      name: EventTypes.audioCompleted,
+      payload: audio.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
   }

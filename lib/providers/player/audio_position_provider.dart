@@ -44,6 +44,13 @@ final audioPositionAndPlayerStateProvider =
   );
 });
 
+final audioPlaybackStreamProvider = StreamProvider<ProcessingState>((ref) {
+  final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+
+  return audioPlayer.meditationAudioPlayer.playbackEventStream
+      .map((event) => event.processingState);
+});
+
 //ignore: prefer-match-file-name
 enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }
 

@@ -148,6 +148,8 @@ class AudioPlayerNotifier extends BaseAudioHandler
       ),
       extras: {
         hasBgSound: meditationModel.hasBackgroundSound,
+        'meditationId': meditationModel.id,
+        'fileId': file.id,
       },
     );
     mediaItem.add(item);

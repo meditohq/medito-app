@@ -31,7 +31,7 @@ class ArtistTitleWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _title(context),
-        _subtitle(context, ref),
+        if (artistName != null) _subtitle(context, ref),
       ],
     );
   }

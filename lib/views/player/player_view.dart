@@ -24,7 +24,7 @@ class PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<PlayerView>
-    with AutomaticKeepAliveClientMixin<PlayerView> {
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);

@@ -13,10 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
-import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
@@ -28,12 +26,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/providers/providers.dart';
-
 import 'services/notifications/notifications_service.dart';
 
 late SharedPreferences sharedPreferences;
 late AudioPlayerNotifier audioHandler;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
@@ -71,15 +67,16 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
+  AppLifecycleState currentState = AppLifecycleState.resumed;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // update session stats when app comes into foreground
-      updateStatsFromBg();
+      unawaited(updateStatsFromBg());
     } else if (state == AppLifecycleState.detached) {
       final audioProvider = ref.watch(audioPlayerNotifierProvider);
       audioProvider.stop();
     }
+    currentState = state;
   }
 
   @override
@@ -91,7 +88,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -108,30 +104,12 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
     onMessageAppOpened(ref);
     initializeNotification(ref);
-    // listened for app background/foreground events
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
-    ref.listen(deviceAndAppInfoProvider, (_, info) {
-      if (info.hasValue) {
-        var val = info.value;
-        var appOpenedModel = AppOpenedModel(
-          deviceOs: val?.os ?? '',
-          deviceLanguage: val?.languageCode ?? '',
-          deviceModel: val?.model ?? '',
-          buildNumber: val?.buildNumber ?? '',
-          appVersion: val?.appVersion ?? '',
-        );
-        var event = EventsModel(
-          name: EventTypes.appOpened,
-          payload: appOpenedModel.toJson(),
-        );
-        ref.read(eventsProvider(event: event.toJson()));
-      }
-    });
 
     return MaterialApp.router(
       routerConfig: goRouter,
