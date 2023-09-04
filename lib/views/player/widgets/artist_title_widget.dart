@@ -79,7 +79,7 @@ class ArtistTitleWidget extends ConsumerWidget {
               context.pop();
             }
             location = getCurrentLocation.location;
-            context.go(
+            context.push(
               location + RouteConstants.webviewPath,
               extra: {'url': artistUrlPath},
             );
