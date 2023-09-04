@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
@@ -46,6 +47,8 @@ Future<void> onError(
 ) async {
   if (err.response?.statusCode == 401) {
     var router = ref.read(goRouterProvider);
+    ref.read(audioPlayPauseStateProvider.notifier).state =
+        PLAY_PAUSE_AUDIO.PAUSE;
     await SharedPreferencesService.removeValueFromSharedPref(
       SharedPreferenceConstants.userToken,
     );
