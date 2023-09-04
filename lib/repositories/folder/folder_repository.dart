@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'folder_repository.g.dart';
 
 abstract class FolderRepository {
-  Future<FolderModel> fetchFolders(int folderId);
+  Future<FolderModel> fetchFolders(String folderId);
 }
 
 class FolderRepositoryImpl extends FolderRepository {
@@ -16,7 +16,7 @@ class FolderRepositoryImpl extends FolderRepository {
   FolderRepositoryImpl({required this.client});
 
   @override
-  Future<FolderModel> fetchFolders(int folderId) async {
+  Future<FolderModel> fetchFolders(String folderId) async {
     try {
       var res = await client.getRequest('${HTTPConstants.FOLDERS}/$folderId');
 

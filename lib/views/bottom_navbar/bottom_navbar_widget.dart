@@ -16,12 +16,10 @@ class _BottomNavbarWidgetState extends State<BottomNavbarWidget> {
   var _currentIndex = 0;
   final _messengerKey = GlobalKey<ScaffoldState>();
   var _deletingCache = true;
-  bool _hasOpened = false;
 
   @override
   void initState() {
     firstOpenOperations().then((hasOpened) {
-      _hasOpened = hasOpened;
       setState(() {
         _deletingCache = false;
       });

@@ -30,8 +30,7 @@ class MeditationView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var meditations =
-        ref.watch(meditationsProvider(meditationId: int.parse(id!)));
+    var meditations = ref.watch(meditationsProvider(meditationId: id!));
 
     return Scaffold(
       body: meditations.when(
@@ -39,8 +38,7 @@ class MeditationView extends ConsumerWidget {
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () =>
-              ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
+          onTap: () => ref.refresh(meditationsProvider(meditationId: id!)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -59,7 +57,7 @@ class MeditationView extends ConsumerWidget {
   ) {
     return RefreshIndicator(
       onRefresh: () async =>
-          await ref.refresh(meditationsProvider(meditationId: int.parse(id!))),
+          await ref.refresh(meditationsProvider(meditationId: id!)),
       child: Scaffold(
         body: CollapsibleHeaderWidget(
           bgImage: meditationModel.coverUrl,
