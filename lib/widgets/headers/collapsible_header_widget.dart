@@ -69,7 +69,7 @@ class _CollapsibleHeaderWidgetState
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: _scrollController,
-      physics: AlwaysScrollableScrollPhysics(),
+      physics: ClampingScrollPhysics(),
       slivers: <Widget>[
         SliverAppBar(
           leading: Padding(
