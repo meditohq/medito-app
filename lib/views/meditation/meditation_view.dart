@@ -51,7 +51,7 @@ class _MeditationViewState extends ConsumerState<MeditationView>
   Widget build(BuildContext context) {
     super.build(context);
     var meditations =
-        ref.watch(meditationsProvider(meditationId: int.parse(widget.id)));
+        ref.watch(meditationsProvider(meditationId: widget.id));
 
     return Scaffold(
       body: meditations.when(
@@ -60,7 +60,7 @@ class _MeditationViewState extends ConsumerState<MeditationView>
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref
-              .refresh(meditationsProvider(meditationId: int.parse(widget.id))),
+              .refresh(meditationsProvider(meditationId: widget.id)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -76,7 +76,7 @@ class _MeditationViewState extends ConsumerState<MeditationView>
   ) {
     return RefreshIndicator(
       onRefresh: () async => await ref
-          .refresh(meditationsProvider(meditationId: int.parse(widget.id))),
+          .refresh(meditationsProvider(meditationId: widget.id)),
       child: Scaffold(
         body: CollapsibleHeaderWidget(
           bgImage: meditationModel.coverUrl,
