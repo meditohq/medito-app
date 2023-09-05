@@ -151,8 +151,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       unawaited(audioProvider.pause());
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(audioPlayPauseStateProvider.notifier).state =
-            PLAY_PAUSE_AUDIO.PAUSE;
+        audioProvider.pause();
       });
       var router = ref.read(goRouterProvider);
       if (!(await _checkUser(ref))) {

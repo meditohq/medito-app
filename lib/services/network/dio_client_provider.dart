@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
@@ -47,8 +48,7 @@ Future<void> onError(
 ) async {
   if (err.response?.statusCode == 401) {
     var router = ref.read(goRouterProvider);
-    ref.read(audioPlayPauseStateProvider.notifier).state =
-        PLAY_PAUSE_AUDIO.PAUSE;
+    unawaited(ref.read(audioPlayerNotifierProvider).pause());
     await SharedPreferencesService.removeValueFromSharedPref(
       SharedPreferenceConstants.userToken,
     );

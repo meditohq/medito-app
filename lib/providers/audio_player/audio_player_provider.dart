@@ -59,9 +59,16 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   void setBackgroundAudio(BackgroundSoundsModel sound) {
-    unawaited(backgroundSoundAudioPlayer.setUrl(sound.path, headers: {
-      HttpHeaders.authorizationHeader: _contentToken,
-    }));
+    unawaited(
+      backgroundSoundAudioPlayer.setAudioSource(
+        AudioSource.uri(
+          Uri.parse(sound.path),
+          headers: {
+            HttpHeaders.authorizationHeader: _contentToken,
+          },
+        ),
+      ),
+    );
   }
 
   void setMeditationAudio(
@@ -75,12 +82,12 @@ class AudioPlayerNotifier extends BaseAudioHandler
     } else {
       setMediaItem(meditationModel, file);
       unawaited(
-        meditationAudioPlayer.setUrl(
-          file.path,
+        meditationAudioPlayer.setAudioSource(AudioSource.uri(
+          Uri.parse(file.path),
           headers: {
             HttpHeaders.authorizationHeader: _contentToken,
           },
-        ),
+        )),
       );
     }
   }
@@ -191,17 +198,3 @@ class AudioPlayerNotifier extends BaseAudioHandler
     );
   }
 }
-
-
-
-  // final container = ProviderContainer();
-  //       var audio = AudioCompletedModel(
-  //         audioFileId: extras['fileId'],
-  //         meditationId: extras['meditationId'],
-  //       );
-  //       var event = EventsModel(
-  //         name: EventTypes.audioCompleted,
-  //         payload: audio.toJson(),
-  //       );
-  //       container.read(eventsProvider(event: event.toJson()));
-  //       container.dispose();

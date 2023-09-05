@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -104,8 +106,7 @@ class PlayerProvider extends StateNotifier<MeditationModel?> {
     );
     _audioPlayerNotifier.currentlyPlayingMeditation = file;
     if (isPlayAudio) {
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PLAY;
+      unawaited(_audioPlayerNotifier.play());
     }
   }
 
