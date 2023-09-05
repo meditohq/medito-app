@@ -47,7 +47,7 @@ void main() {
           ],
         );
         final mockFolderRepository = MockFolderRepository();
-        when(() => mockFolderRepository.fetchFolders(28))
+        when(() => mockFolderRepository.fetchFolders('28'))
             .thenAnswer((_) async => folderResponseData);
 
         //ACT
@@ -55,14 +55,14 @@ void main() {
 
         //ASSERT
         expect(
-          container.read(foldersProvider(folderId: 28)),
+          container.read(foldersProvider(folderId: '28')),
           const AsyncValue<FolderModel>.loading(),
         );
-        await container.read(foldersProvider(folderId: 28).future);
+        await container.read(foldersProvider(folderId: '28').future);
         expect(
-          container.read(foldersProvider(folderId: 28)).value,
+          container.read(foldersProvider(folderId: '28')).value,
           isA<FolderModel>()
-              .having((s) => s.id, 'id', 28)
+              .having((s) => s.id, 'id', '28')
               .having((s) => s.title, 'title', 'UCLA')
               .having(
                 (s) => s.description,
@@ -71,7 +71,7 @@ void main() {
               ),
         );
         verify(
-          () => mockFolderRepository.fetchFolders(28),
+          () => mockFolderRepository.fetchFolders('28'),
         ).called(1);
       },
     );
@@ -81,7 +81,7 @@ void main() {
         final exception = Exception();
         //ARRANGE
         final mockFolderRepository = MockFolderRepository();
-        when(() => mockFolderRepository.fetchFolders(28))
+        when(() => mockFolderRepository.fetchFolders('28'))
             .thenAnswer((_) async => throw (exception));
 
         //ACT
@@ -89,20 +89,20 @@ void main() {
 
         //ASSERT
         expect(
-          container.read(foldersProvider(folderId: 28)),
+          container.read(foldersProvider(folderId: '28')),
           const AsyncValue<FolderModel>.loading(),
         );
         await expectLater(
-          container.read(foldersProvider(folderId: 28).future),
+          container.read(foldersProvider(folderId: '28').future),
           throwsA(isA<Exception>()),
         );
         expect(
-          container.read(foldersProvider(folderId: 28)),
+          container.read(foldersProvider(folderId: '28')),
           isA<AsyncError<FolderModel>>()
               .having((e) => e.error, 'error', exception),
         );
         verify(
-          () => mockFolderRepository.fetchFolders(28),
+          () => mockFolderRepository.fetchFolders('28'),
         ).called(1);
       },
     );

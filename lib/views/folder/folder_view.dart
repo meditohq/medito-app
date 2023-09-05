@@ -38,7 +38,7 @@ class _FolderViewState extends ConsumerState<FolderView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var folders = ref.watch(FoldersProvider(folderId: int.parse(widget.id)));
+    var folders = ref.watch(FoldersProvider(folderId: widget.id));
 
     return Scaffold(
       body: folders.when(
@@ -48,7 +48,7 @@ class _FolderViewState extends ConsumerState<FolderView>
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(
-            FoldersProvider(folderId: int.parse(widget.id)),
+            FoldersProvider(folderId: widget.id),
           ),
           isLoading: folders.isLoading,
         ),
@@ -64,8 +64,7 @@ class _FolderViewState extends ConsumerState<FolderView>
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref
-            .refresh(FoldersProvider(folderId: int.parse(widget.id)));
+        return await ref.refresh(FoldersProvider(folderId: widget.id));
       },
       child: CollapsibleHeaderWidget(
         bgImage: folder.coverUrl,
