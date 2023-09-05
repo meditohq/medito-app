@@ -98,8 +98,10 @@ class _FolderViewState extends ConsumerState<FolderView>
     bool isLast,
   ) {
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
+    var hasSubtitle = subtitle.isNotNullAndNotEmpty();
 
     return Container(
+      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         border: isLast
             ? null
@@ -108,47 +110,52 @@ class _FolderViewState extends ConsumerState<FolderView>
               ),
       ),
       constraints: BoxConstraints(minHeight: 88),
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title.isNotNullAndNotEmpty())
-                Text(
-                  title!,
-                  style: bodyLarge?.copyWith(
-                    color: ColorConstants.walterWhite,
-                    fontFamily: DmSans,
-                    height: 2,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (title.isNotNullAndNotEmpty())
+                  Padding(
+                    padding: EdgeInsets.only(top: hasSubtitle ? 8 : 0),
+                    child: Text(
+                      title!,
+                      style: bodyLarge?.copyWith(
+                        color: ColorConstants.walterWhite,
+                        fontFamily: DmSans,
+                        height: 2,
+                      ),
+                    ),
                   ),
-                ),
-              if (subtitle.isNotNullAndNotEmpty())
-                Text(
-                  subtitle!,
-                  style: bodyLarge?.copyWith(
-                    fontFamily: DmMono,
-                    height: 2,
-                    color: ColorConstants.newGrey,
+                if (hasSubtitle)
+                  Flexible(
+                    child: Text(
+                      subtitle!,
+                      style: bodyLarge?.copyWith(
+                        fontFamily: DmMono,
+                        height: 2,
+                        color: ColorConstants.newGrey,
+                      ),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
-          if (type != TypeConstants.MEDITATION) _getIcon(type),
+          _getIcon(type),
         ],
       ),
     );
   }
 
   Widget _getIcon(String type) {
-    if (type == TypeConstants.FOLDER) {
-      return SvgPicture.asset(AssetConstants.icForward);
-    } else if (type == TypeConstants.LINK) {
-      return SvgPicture.asset(AssetConstants.icLink);
-    }
-
-    return SizedBox();
+    return type == TypeConstants.LINK
+        ? SvgPicture.asset(AssetConstants.icLink)
+        : SizedBox();
   }
 
   void _onListItemTap(
