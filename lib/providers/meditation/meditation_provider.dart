@@ -8,7 +8,7 @@ part 'meditation_provider.g.dart';
 @riverpod
 Future<MeditationModel> meditations(
   ref, {
-  required int meditationId,
+  required String meditationId,
 }) {
   var meditationRepository = ref.watch(meditationRepositoryProvider);
   ref.keepAlive();

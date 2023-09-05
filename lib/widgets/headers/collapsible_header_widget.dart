@@ -115,7 +115,6 @@ class _CollapsibleHeaderWidgetState
       icColor: _isShrink ? widget.leadingIconBgColor : widget.leadingIconColor,
       onPressed: widget.onPressedCloseBtn ??
           () {
-            // router.pop();
             ref.read(goRouterProvider).pop();
           },
       isShowCircle: !_isShrink,
