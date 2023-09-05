@@ -16,7 +16,7 @@ final audioPlayerNotifierProvider =
 //ignore:prefer-match-file-name
 class AudioPlayerNotifier extends BaseAudioHandler
     with QueueHandler, SeekHandler, ChangeNotifier {
-  final backgroundSoundAudioPlayer = AudioPlayer();
+  var backgroundSoundAudioPlayer = AudioPlayer();
   MeditationFilesModel? currentlyPlayingMeditation;
   final hasBgSound = 'hasBgSound';
   final meditationAudioPlayer = AudioPlayer();

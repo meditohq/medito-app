@@ -326,7 +326,7 @@ String getPathFromString(String? place, List<String?> ids) {
     return RouteConstants.folderPath.replaceAll(':fid', ids.first!);
   }
   if (place == 'url') {
-    launchUrl(ids.first);
+    launchUrlMedito(ids.first);
   }
   if (place == 'app') {
     return RouteConstants.collectionPath;

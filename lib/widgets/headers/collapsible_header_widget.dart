@@ -63,8 +63,6 @@ class _CollapsibleHeaderWidgetState
 
   @override
   Widget build(BuildContext context) {
-    print(_isShrink);
-
     return CustomScrollView(
       controller: _scrollController,
       physics: AlwaysScrollableScrollPhysics(),

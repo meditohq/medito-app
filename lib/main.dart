@@ -73,8 +73,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     if (state == AppLifecycleState.resumed) {
       unawaited(updateStatsFromBg());
     } else if (state == AppLifecycleState.detached) {
-      final audioProvider = ref.watch(audioPlayerNotifierProvider);
-      audioProvider.stop();
+      final audioProvider = ref.read(audioPlayerNotifierProvider);
+      audioProvider.meditationAudioPlayer.dispose();
+      audioProvider.backgroundSoundAudioPlayer.dispose();
+      audioProvider.dispose();
     }
     currentState = state;
   }
@@ -82,6 +84,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    audioProvider.meditationAudioPlayer.dispose();
+    audioProvider.backgroundSoundAudioPlayer.dispose();
+    audioProvider.dispose();
     super.dispose();
   }
 

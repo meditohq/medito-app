@@ -5,15 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ShareBtnWidget extends StatelessWidget {
-  const ShareBtnWidget({super.key, required this.globalKey, this.shareText});
+  const ShareBtnWidget({
+    super.key,
+    required this.globalKey,
+    this.shareText,
+    this.onPressed,
+  });
   final GlobalKey globalKey;
   final String? shareText;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: LoadingButtonWidget(
-        onPressed: () => _handleShare(context, globalKey),
+        onPressed: onPressed ?? () => _handleShare(context, globalKey),
         btnText: StringConstants.share,
         bgColor: ColorConstants.walterWhite,
         textColor: ColorConstants.greyIsTheNewGrey,

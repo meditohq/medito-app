@@ -6,6 +6,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../share_btn/share_btn_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DebugBottomSheetWidget extends ConsumerWidget {
   const DebugBottomSheetWidget({super.key});
@@ -106,6 +107,8 @@ class DebugBottomSheetWidget extends ConsumerWidget {
         ),
         ShareBtnWidget(
           globalKey: key,
+          onPressed: () =>
+              _handleShare(context, me?.id ?? '', me?.email ?? '', deviceInfo),
         ),
       ],
     );
@@ -129,5 +132,45 @@ class DebugBottomSheetWidget extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _handleShare(
+    BuildContext context,
+    String userId,
+    String userEmail,
+    DeviceAndAppInfoModel? deviceInfo,
+  ) async {
+    var id = StringConstants.id + ': ' + userId;
+    var email = StringConstants.email + ': ' + userEmail;
+    var appVersion =
+        '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
+    var deviceModel =
+        '${StringConstants.deviceModel}: ${deviceInfo?.model ?? ''}';
+    var deviceOs = '${StringConstants.deviceOs}: ${deviceInfo?.os ?? ''}';
+    var devicePlatform =
+        '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
+    var buidNumber =
+        '${StringConstants.buidNumber}: ${deviceInfo?.buildNumber ?? ''}';
+
+    var info =
+        '--- Please write email below this line \n$id\n$email\n$appVersion\n$deviceModel\n$deviceOs\n$devicePlatform\n$buidNumber';
+
+    final params = Uri(
+      scheme: 'mailto',
+      path: StringConstants.supportEmail,
+      query: 'body=$info',
+    );
+
+    try {
+      if (await canLaunchUrl(params)) {
+        await launchUrl(params);
+      }
+    } catch (e) {
+      createSnackBar(
+        e.toString(),
+        context,
+        color: ColorConstants.darkBGColor,
+      );
+    }
   }
 }

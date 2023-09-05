@@ -3,6 +3,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 
 class SoundListTileWidget extends ConsumerWidget {
   const SoundListTileWidget({required this.sound}) : super();
@@ -71,24 +72,14 @@ class SoundListTileWidget extends ConsumerWidget {
     if (sound.title == StringConstants.none) {
       bgSoundNotifierProvider.handleOnChangeSound(sound);
       audioPlayerNotifier.stopBackgroundSound();
+      audioPlayerNotifier.backgroundSoundAudioPlayer.dispose();
+      audioPlayerNotifier.backgroundSoundAudioPlayer = AudioPlayer();
+      _handleTrackEvent(ref, sound.id);
     } else {
-      bgSoundNotifierProvider.handleOnChangeSound(
-        !isSelected
-            ? sound
-            : BackgroundSoundsModel(
-                id: '0',
-                title: StringConstants.none,
-                duration: 0,
-                path: '',
-              ),
-      );
-      if (!isSelected) {
-        audioPlayerNotifier.setBackgroundAudio(sound);
-        audioPlayerNotifier.playBackgroundSound();
-        _handleTrackEvent(ref, sound.id);
-      } else {
-        audioPlayerNotifier.stopBackgroundSound();
-      }
+      bgSoundNotifierProvider.handleOnChangeSound(sound);
+      audioPlayerNotifier.setBackgroundAudio(sound);
+      audioPlayerNotifier.playBackgroundSound();
+      _handleTrackEvent(ref, sound.id);
     }
   }
 
