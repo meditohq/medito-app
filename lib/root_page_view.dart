@@ -69,7 +69,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       var nextId = next?.audio.first.files.first.id;
       if (next != null &&
           (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
-        _handleTrackEvent(
+        _handleAudioStartedEvent(
           ref,
           next.id,
           next.audio.first.files.first.id,
@@ -152,7 +152,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     return SizedBox();
   }
 
-  void _handleTrackEvent(
+  void _handleAudioStartedEvent(
     WidgetRef ref,
     String meditationId,
     String audioFileId,
