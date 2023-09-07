@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:Medito/models/models.dart';
-import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';

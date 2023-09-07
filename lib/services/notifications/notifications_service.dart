@@ -6,6 +6,7 @@ import 'package:Medito/routes/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 late final FirebaseMessaging _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -32,15 +33,10 @@ Future<AuthorizationStatus> checkNotificationPermission() async {
   return settings.authorizationStatus;
 }
 
-Future<AuthorizationStatus> requestPermission() async {
-  var settings = await _messaging.requestPermission(
-    alert: true,
-    badge: true,
-    provisional: false,
-    sound: true,
-  );
+Future<PermissionStatus> requestPermission() async {
+  var settings = await Permission.notification.request();
 
-  return settings.authorizationStatus;
+  return settings;
 }
 
 Future<void> initializeNotification(WidgetRef ref) async {
@@ -114,15 +110,6 @@ void _navigate(WidgetRef ref, NotificationPayloadModel data) {
     ));
   }
 }
-
-// void checkForInitialMessage() async {
-//   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-//   //ignore: no-empty-block
-//   if (initialMessage != null) {
-//   } else {
-//     onMessageAppOpened();
-//   }
-// }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('myBackgroundMessageHandler message: $message');

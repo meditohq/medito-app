@@ -59,7 +59,8 @@ dependencies:
   flutter_local_notifications: ^15.0.0
   marquee: ^2.2.3
   image: ^4.0.17
-  
+  permission_handler: ^10.4.5
+
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
 
@@ -71,7 +72,7 @@ dev_dependencies:
   #USAGE: dart run build_runner watch --delete-conflicting-outputs
   #dart run build_runner watch
   #flutter pub run build_runner build --delete-conflicting-outputs
-  riverpod_generator: ^2.1.0  
+  riverpod_generator: ^2.1.0
   json_serializable: ^6.5.4
   dart_code_metrics: ^5.7.0 #USAGE: flutter pub run dart_code_metrics:metrics lib
 
@@ -89,7 +90,7 @@ flutter:
       fonts:
         - asset: assets/fonts/dm-mono/DMMono-Medium.ttf
         - asset: assets/fonts/dm-mono/DMMono-Regular.ttf
-    
+
     - family: DM Sans
       fonts:
         - asset: assets/fonts/dm-sans/DMSans-Bold.ttf
