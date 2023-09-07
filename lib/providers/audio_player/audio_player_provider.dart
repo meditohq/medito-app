@@ -191,17 +191,3 @@ class AudioPlayerNotifier extends BaseAudioHandler
     );
   }
 }
-
-
-
-  // final container = ProviderContainer();
-  //       var audio = AudioCompletedModel(
-  //         audioFileId: extras['fileId'],
-  //         meditationId: extras['meditationId'],
-  //       );
-  //       var event = EventsModel(
-  //         name: EventTypes.audioCompleted,
-  //         payload: audio.toJson(),
-  //       );
-  //       container.read(eventsProvider(event: event.toJson()));
-  //       container.dispose();
