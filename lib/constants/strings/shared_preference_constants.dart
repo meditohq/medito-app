@@ -8,4 +8,5 @@ class SharedPreferenceConstants {
   static const String currentPlayingMeditation = 'currentPlayingMeditation';
   static const String audioForBgEvent = 'audioForBgEvent';
   static const String notificationPermission = 'notificationPermission';
+  static const String meditationOpenedFirstTime = 'meditationOpenedFirstTime';
 }

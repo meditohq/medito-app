@@ -13,12 +13,14 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'widgets/meditation_buttons_widget.dart';
 
 class MeditationView extends ConsumerStatefulWidget {
@@ -50,8 +52,18 @@ class _MeditationViewState extends ConsumerState<MeditationView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var meditations =
-        ref.watch(meditationsProvider(meditationId: widget.id));
+    ref.watch(meditationOpenedFirstTimeProvider);
+    var meditations = ref.watch(meditationsProvider(meditationId: widget.id));
+    ref.listen(meditationOpenedFirstTimeProvider, (prev, next) {
+      var _user =
+          ref.read(authProvider.notifier).userRes.body as UserTokenModel;
+      if (_user.email == null && next.value != null && next.value!) {
+        context.push(
+          RouteConstants.joinIntroPath,
+          extra: {'screen': Screen.meditation},
+        );
+      }
+    });
 
     return Scaffold(
       body: meditations.when(
@@ -59,8 +71,8 @@ class _MeditationViewState extends ConsumerState<MeditationView>
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () => ref
-              .refresh(meditationsProvider(meditationId: widget.id)),
+          onTap: () =>
+              ref.refresh(meditationsProvider(meditationId: widget.id)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
@@ -75,8 +87,8 @@ class _MeditationViewState extends ConsumerState<MeditationView>
     WidgetRef ref,
   ) {
     return RefreshIndicator(
-      onRefresh: () async => await ref
-          .refresh(meditationsProvider(meditationId: widget.id)),
+      onRefresh: () async =>
+          await ref.refresh(meditationsProvider(meditationId: widget.id)),
       child: Scaffold(
         body: CollapsibleHeaderWidget(
           bgImage: meditationModel.coverUrl,

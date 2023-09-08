@@ -37,11 +37,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
         var appOpenedEventRes =
             ref.read(eventsProvider(event: data.toJson()).future);
         appOpenedEventRes.then((value) {
-          if (_user.email != null) {
-            context.go(RouteConstants.homePath);
-          } else {
-            context.go(RouteConstants.joinIntroPath);
-          }
+          context.go(RouteConstants.homePath);
         }).catchError((err) {
           _handleRetry(err.toString());
         });
