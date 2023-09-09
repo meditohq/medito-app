@@ -69,19 +69,14 @@ class FilterWidget extends ConsumerWidget {
     WidgetRef ref,
     HomeChipsItemsModel element,
   ) {
-    var location = GoRouter.of(context).location;
     _handleTrackEvent(ref, element.id, element.title);
-    if (element.type == TypeConstants.LINK) {
-      context.push(
-        location + RouteConstants.webviewPath,
-        extra: {'url': element.path},
-      );
-    } else {
-      context.push(getPathFromString(
+    context.push(
+      getPathFromString(
         element.type,
         [element.path.toString().getIdFromPath()],
-      ));
-    }
+      ),
+      extra: {'url': element.path},
+    );
   }
 
   void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {

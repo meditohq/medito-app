@@ -52,21 +52,15 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     WidgetRef ref,
     HomeMenuModel element,
   ) {
-    var location = GoRouter.of(context).location;
-    var path = element.path.toString();
     _handleTrackEvent(ref, element.id, element.title);
     Navigator.pop(context);
-    if (element.type == TypeConstants.LINK) {
-      context.push(
-        location + RouteConstants.webviewPath,
-        extra: {'url': path},
-      );
-    } else {
-      context.push(getPathFromString(
+    context.push(
+      getPathFromString(
         element.type,
         [element.path.toString().getIdFromPath()],
-      ));
-    }
+      ),
+      extra: {'url': element.path},
+    );
   }
 
   void _handleTrackEvent(WidgetRef ref, String itemId, String itemTitle) {

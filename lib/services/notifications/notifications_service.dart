@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -98,17 +99,13 @@ void onMessageAppOpened(WidgetRef ref) {
 
 void _navigate(WidgetRef ref, NotificationPayloadModel data) {
   var context = ref.read(goRouterProvider);
-  if (data.type == TypeConstants.LINK) {
-    context.push(
-      RouteConstants.webviewPath,
-      extra: {'url': data.path},
-    );
-  } else {
-    context.push(getPathFromString(
+  context.push(
+    getPathFromString(
       data.type,
-      [data.id.toString()],
-    ));
-  }
+      [data.id.toString().getIdFromPath()],
+    ),
+    extra: {'url': data.path},
+  );
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
