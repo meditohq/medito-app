@@ -21,7 +21,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   final ScrollController _scrollController = ScrollController();
   Color _backgroundColor = ColorConstants.ebony;
   var _announcementColor;
-
+  var hasAnnouncement = false;
   @override
   void initState() {
     super.initState();
@@ -35,10 +35,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   void _onScroll() {
-    if (_announcementColor != null) {
-      final newColor = _scrollController.offset > 100
-          ? ColorConstants.ebony
-          : _announcementColor;
+    final newColor = _scrollController.offset > 100
+        ? ColorConstants.ebony
+        : _announcementColor;
+    if (_backgroundColor != newColor) {
       setState(() {
         _backgroundColor = newColor;
       });
@@ -56,70 +56,68 @@ class _HomeViewState extends ConsumerState<HomeView> {
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
         data: (data) {
-          var hasAnnouncement = data.announcement == null;
-          if (!hasAnnouncement) {
-            _announcementColor = ColorConstants.getColorFromString(
-              data.announcement!.colorBackground,
-            );
-          }
+          hasAnnouncement = data.announcement == null;
+          _announcementColor = !hasAnnouncement
+              ? ColorConstants.getColorFromString(
+                  data.announcement!.colorBackground,
+                )
+              : ColorConstants.ebony;
 
           return SafeArea(
             top: hasAnnouncement,
             bottom: false,
-            child: Stack(
-              children: [
-                Container(
-                  color: _backgroundColor,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            ref.invalidate(homeProvider);
-                            await ref.read(homeProvider.future);
-                            ref.invalidate(remoteStatsProvider);
-                            await ref.read(remoteStatsProvider.future);
-                          },
-                          child: SingleChildScrollView(
-                            controller: _scrollController,
-                            physics: BouncingScrollPhysics(),
-                            child: Container(
-                              color: ColorConstants.ebony,
-                              child: Column(
+            child: Container(
+              color: _backgroundColor,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        ref.invalidate(homeProvider);
+                        await ref.read(homeProvider.future);
+                        ref.invalidate(remoteStatsProvider);
+                        await ref.read(remoteStatsProvider.future);
+                      },
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        physics: AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        child: Container(
+                          color: ColorConstants.ebony,
+                          child: Column(
+                            children: [
+                              _getAnnouncementBanner(data),
+                              HomeHeaderWidget(
+                                homeMenuModel: data.menu,
+                                miniStatsModel: stats.asData?.value.mini,
+                              ),
+                              Column(
                                 children: [
-                                  _getAnnouncementBanner(data),
-                                  HomeHeaderWidget(
-                                    homeMenuModel: data.menu,
-                                    miniStatsModel: stats.asData?.value.mini,
+                                  SearchWidget(),
+                                  height8,
+                                  FilterWidget(
+                                    chips: data.chips,
                                   ),
-                                  Column(
-                                    children: [
-                                      SearchWidget(),
-                                      height8,
-                                      FilterWidget(
-                                        chips: data.chips,
-                                      ),
-                                      height16,
-                                      height16,
-                                      _cardListWidget(data),
-                                      SizedBox(
-                                        height: currentlyPlayingSession != null
-                                            ? 16
-                                            : 48,
-                                      ),
-                                    ],
+                                  height16,
+                                  height16,
+                                  _cardListWidget(data),
+                                  SizedBox(
+                                    height: currentlyPlayingSession != null
+                                        ? 16
+                                        : 48,
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -154,6 +152,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     if (data.announcement != null) {
       return AnnouncementWidget(
         announcement: data.announcement!,
+        onPressedDismiss: () {
+          setState(() {
+            _backgroundColor = ColorConstants.ebony;
+          });
+        },
       );
     }
 

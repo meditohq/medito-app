@@ -9,8 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class AnnouncementWidget extends ConsumerStatefulWidget {
-  const AnnouncementWidget({super.key, required this.announcement});
+  const AnnouncementWidget({
+    super.key,
+    required this.announcement,
+    this.onPressedDismiss,
+  });
   final AnnouncementModel announcement;
+  final void Function()? onPressedDismiss;
   @override
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
@@ -95,6 +100,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       children: [
         LoadingButtonWidget(
           onPressed: () {
+            if (widget.onPressedDismiss != null) {
+              widget.onPressedDismiss!();
+            }
             _toggleCollapse();
             _handleTrackEvent(
               ref,
