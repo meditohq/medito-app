@@ -87,7 +87,14 @@ Future<bool> launchUrlMedito(String? href) async {
   }
 
   if (href != null && href.startsWith('mailto')) {
-    _launchEmailSubmission(href);
+    var version = await getDeviceInfoString();
+    var userId = prefs.getString(USER_ID);
+    var info =
+        '--- Please write email below this line $version, id:$userId ----';
+
+    await launchEmailSubmission(href, body: info);
+
+    return true;
   } else if (href != null) {
     final params = Uri(
       path: href.replaceAll('mailto:', ''),
@@ -101,23 +108,17 @@ Future<bool> launchUrlMedito(String? href) async {
   return true;
 }
 
-void _launchEmailSubmission(String href) async {
-  var version = await getDeviceInfoString();
-
-  var prefs = await SharedPreferences.getInstance();
-  var userId = prefs.getString(USER_ID);
-  var info = '--- Please write email below this line $version, id:$userId ----';
-
+Future<void> launchEmailSubmission(String href, {String? body}) async {
   final params = Uri(
     scheme: 'mailto',
     path: href.replaceAll('mailto:', ''),
-    query: 'body=$info',
+    query: body != null ? 'body=$body' : null,
   );
 
-  var url = params.toString();
   if (await canLaunchUrl(params)) {
-    await launchUrlMedito(url);
+    await launchUrl(params);
   } else {
+    var url = params.toString();
     print('Could not launch $url');
   }
 }
@@ -159,7 +160,7 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
 
       final directory = await getTemporaryDirectory();
       final file = File('${directory.path}/stats.png');
-      
+
       return await file.writeAsBytes(exportedPng);
     }
 

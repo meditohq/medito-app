@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -171,15 +173,24 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     BuildContext context,
     WidgetRef ref,
     AnnouncementModel element,
-  ) {
+  ) async {
     _handleTrackEvent(ref, element.id, element.ctaTitle);
-    context.push(
-      getPathFromString(
-        element.ctaType,
-        [element.ctaPath.toString().getIdFromPath()],
-      ),
-      extra: {'url': element.ctaPath},
-    );
+    if (element.ctaType == TypeConstants.EMAIL) {
+      var deviceAppAndUserInfo =
+          await ref.read(deviceAppAndUserInfoProvider.future);
+      unawaited(launchEmailSubmission(
+        element.ctaPath.toString(),
+        body: deviceAppAndUserInfo,
+      ));
+    } else {
+      unawaited(context.push(
+        getPathFromString(
+          element.ctaType,
+          [element.ctaPath.toString().getIdFromPath()],
+        ),
+        extra: {'url': element.ctaPath},
+      ));
+    }
   }
 
   void _handleTrackEvent(
