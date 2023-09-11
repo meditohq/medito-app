@@ -44,6 +44,13 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
     var topPadding = MediaQuery.of(context).viewPadding.top;
     var size = MediaQuery.of(context).size;
+    var curvedAnimation = CurvedAnimation(
+      parent: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500),
+      )..forward(),
+      curve: Curves.easeInOut,
+    );
 
     return Column(
       children: [
@@ -51,22 +58,10 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
           axisAlignment: -1.0,
           sizeFactor: _isCollapsed
               ? Tween<double>(begin: 1.0, end: 0.0).animate(
-                  CurvedAnimation(
-                    parent: AnimationController(
-                      vsync: this,
-                      duration: Duration(milliseconds: 500),
-                    )..forward(),
-                    curve: Curves.easeInOut,
-                  ),
+                  curvedAnimation,
                 )
               : Tween<double>(begin: 0.0, end: 1.0).animate(
-                  CurvedAnimation(
-                    parent: AnimationController(
-                      vsync: this,
-                      duration: Duration(milliseconds: 500),
-                    )..forward(),
-                    curve: Curves.easeInOut,
-                  ),
+                  curvedAnimation,
                 ),
           child: Container(
             color: bgColor,
@@ -95,15 +90,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
           SizedBox(
             height: topPadding,
           ),
-        InkWell(
-          onTap: () {
-            _toggleCollapse();
-          },
-          child: Icon(
-            Icons.abc,
-            size: 50,
-          ),
-        ),
       ],
     );
   }
@@ -125,19 +111,19 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       children: [
         LoadingButtonWidget(
           onPressed: () {
-            // if (widget.onPressedDismiss != null) {
-            //   widget.onPressedDismiss!();
-            // }
+            if (widget.onPressedDismiss != null) {
+              widget.onPressedDismiss!();
+            }
             _toggleCollapse();
-            // _handleTrackEvent(
-            //   ref,
-            //   announcement.id,
-            //   StringConstants.dismiss.toLowerCase(),
-            // );
-            // ref.invalidate(remoteStatsProvider);
-            // ref.read(remoteStatsProvider);
-            // ref.invalidate(homeProvider);
-            // ref.read(homeProvider);
+            _handleTrackEvent(
+              ref,
+              announcement.id,
+              StringConstants.dismiss.toLowerCase(),
+            );
+            ref.invalidate(remoteStatsProvider);
+            ref.read(remoteStatsProvider);
+            ref.invalidate(homeProvider);
+            ref.read(homeProvider);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,
