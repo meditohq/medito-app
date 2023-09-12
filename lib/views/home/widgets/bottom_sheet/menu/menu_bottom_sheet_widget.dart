@@ -55,6 +55,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     HomeMenuModel element,
   ) async {
     _handleTrackEvent(ref, element.id, element.title);
+    Navigator.pop(context);
     if (element.type == TypeConstants.EMAIL) {
       var deviceAppAndUserInfo =
           await ref.read(deviceAppAndUserInfoProvider.future);
@@ -63,7 +64,6 @@ class MenuBottomSheetWidget extends ConsumerWidget {
         body: deviceAppAndUserInfo,
       ));
     } else {
-      Navigator.pop(context);
       unawaited(context.push(
         getPathFromString(
           element.type,
