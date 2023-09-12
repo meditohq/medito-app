@@ -17,8 +17,19 @@ class HomeView extends ConsumerStatefulWidget {
   ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends ConsumerState<HomeView> {
+class _HomeViewState extends ConsumerState<HomeView>
+    with TickerProviderStateMixin {
+  bool _isCollapsed = false;
   final ScrollController _scrollController = ScrollController();
+
+  late CurvedAnimation curvedAnimation = CurvedAnimation(
+    parent: AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1000),
+    )..forward(),
+    curve: Curves.easeInOut,
+  );
+
   Color _backgroundColor = ColorConstants.ebony;
   var _announcementColor;
   var hasAnnouncement = false;
@@ -45,11 +56,27 @@ class _HomeViewState extends ConsumerState<HomeView> {
     }
   }
 
+  void _handleCollapse() {
+    setState(() {
+      _isCollapsed = !_isCollapsed;
+      hasAnnouncement = !hasAnnouncement;
+      _backgroundColor = ColorConstants.ebony;
+    });
+    curvedAnimation = CurvedAnimation(
+      parent: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 1000),
+      )..forward(),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
+    var topPadding = MediaQuery.of(context).viewPadding.top;
 
     return Scaffold(
       body: homeRes.when(
@@ -57,7 +84,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         skipLoadingOnReload: true,
         data: (data) {
           hasAnnouncement = data.announcement == null;
-          _announcementColor = !hasAnnouncement
+          _announcementColor = !_isCollapsed && !hasAnnouncement
               ? ColorConstants.getColorFromString(
                   data.announcement!.colorBackground,
                 )
@@ -89,6 +116,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           child: Column(
                             children: [
                               _getAnnouncementBanner(data),
+                              Visibility(
+                                visible: hasAnnouncement ? false : _isCollapsed,
+                                child: SizedBox(
+                                  height: topPadding,
+                                ),
+                              ),
                               HomeHeaderWidget(
                                 homeMenuModel: data.menu,
                                 miniStatsModel: stats.asData?.value.mini,
@@ -150,13 +183,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Widget _getAnnouncementBanner(HomeModel data) {
     if (data.announcement != null) {
-      return AnnouncementWidget(
-        announcement: data.announcement!,
-        onPressedDismiss: () {
-          setState(() {
-            _backgroundColor = ColorConstants.ebony;
-          });
-        },
+      return SizeTransition(
+        axisAlignment: -1,
+        sizeFactor: _isCollapsed
+            ? Tween<double>(begin: 1.0, end: 0.0).animate(
+                curvedAnimation,
+              )
+            : Tween<double>(begin: 0.0, end: 1.0).animate(
+                curvedAnimation,
+              ),
+        child: AnnouncementWidget(
+          announcement: data.announcement!,
+          onPressedDismiss: _handleCollapse,
+        ),
       );
     }
 
