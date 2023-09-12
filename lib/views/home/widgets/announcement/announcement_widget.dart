@@ -20,76 +20,38 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
 
-class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
-    with TickerProviderStateMixin {
-  bool _isCollapsed = true;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _toggleCollapse();
-    });
-    super.initState();
-  }
-
-  void _toggleCollapse() {
-    setState(() {
-      _isCollapsed = !_isCollapsed;
-    });
-  }
-
+class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   @override
   Widget build(BuildContext context) {
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
     var topPadding = MediaQuery.of(context).viewPadding.top;
     var size = MediaQuery.of(context).size;
-    var curvedAnimation = CurvedAnimation(
-      parent: AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: 500),
-      )..forward(),
-      curve: Curves.easeInOut,
-    );
 
     return Column(
       children: [
-        SizeTransition(
-          axisAlignment: -1.0,
-          sizeFactor: _isCollapsed
-              ? Tween<double>(begin: 1.0, end: 0.0).animate(
-                  curvedAnimation,
-                )
-              : Tween<double>(begin: 0.0, end: 1.0).animate(
-                  curvedAnimation,
-                ),
-          child: Container(
-            color: bgColor,
-            width: size.width,
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: topPadding,
-                  width: size.width,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _icon(widget.announcement.icon),
-                    _text(context, widget.announcement.text),
-                  ],
-                ),
-                height16,
-                _actionBtn(context, ref, widget.announcement),
-              ],
-            ),
+        Container(
+          color: bgColor,
+          width: size.width,
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              SizedBox(
+                height: topPadding,
+                width: size.width,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _icon(widget.announcement.icon),
+                  _text(context, widget.announcement.text),
+                ],
+              ),
+              height16,
+              _actionBtn(context, ref, widget.announcement),
+            ],
           ),
         ),
-        if (_isCollapsed)
-          SizedBox(
-            height: topPadding,
-          ),
       ],
     );
   }
@@ -114,16 +76,13 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             if (widget.onPressedDismiss != null) {
               widget.onPressedDismiss!();
             }
-            _toggleCollapse();
             _handleTrackEvent(
               ref,
               announcement.id,
               StringConstants.dismiss.toLowerCase(),
             );
-            ref.invalidate(remoteStatsProvider);
-            ref.read(remoteStatsProvider);
-            ref.invalidate(homeProvider);
-            ref.read(homeProvider);
+            //ignore: unused_result
+            ref.refresh(homeProvider);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,
@@ -183,14 +142,19 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     WidgetRef ref,
     AnnouncementModel element,
   ) {
+    var location = GoRouter.of(context).location;
     _handleTrackEvent(ref, element.id, element.ctaTitle);
-    context.push(
-      getPathFromString(
+    if (element.ctaType == TypeConstants.LINK) {
+      context.push(
+        location + RouteConstants.webviewPath,
+        extra: {'url': element.ctaPath},
+      );
+    } else {
+      context.push(getPathFromString(
         element.ctaType,
         [element.ctaPath.toString().getIdFromPath()],
-      ),
-      extra: {'url': element.ctaPath},
-    );
+      ));
+    }
   }
 
   void _handleTrackEvent(
