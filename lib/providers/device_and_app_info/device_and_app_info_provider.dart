@@ -15,8 +15,8 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(ref) {
 
 final deviceAppAndUserInfoProvider =
     FutureProvider.autoDispose<String>((ref) async {
-  var me = await ref.read(meProvider.future);
-  var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+  var me = await ref.watch(meProvider.future);
+  var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
 
   return _formatString(me, deviceInfo);
 });
