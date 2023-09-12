@@ -18,7 +18,7 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   bool _isCollapsed = false;
   final ScrollController _scrollController = ScrollController();
 
@@ -73,6 +73,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
@@ -201,4 +202,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     return SizedBox();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
