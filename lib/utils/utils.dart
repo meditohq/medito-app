@@ -108,11 +108,24 @@ Future<bool> launchUrlMedito(String? href) async {
   return true;
 }
 
-Future<void> launchEmailSubmission(String href, {String? body}) async {
+Future<void> launchEmailSubmission(
+  String href, {
+  String? subject,
+  String? body,
+}) async {
+  var query = '';
+  if (subject != null) {
+    query = 'subject=$subject';
+  }
+  if (body != null) {
+    var _body = body.replaceAll('\n', '\r\n');
+    query = query != '' ? '$query&body=$_body' : 'body=$_body';
+  }
+
   final params = Uri(
     scheme: 'mailto',
     path: href.replaceAll('mailto:', ''),
-    query: body != null ? 'body=$body' : null,
+    query: query,
   );
 
   if (await canLaunchUrl(params)) {
