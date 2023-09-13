@@ -88,6 +88,7 @@ class StringConstants {
       'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
   static const String allowNotifications = 'Allow notifications';
   static const String notNow = 'Not now';
+  static const String bugReport = 'Bug report';
   static const String debugInfo = '--- Debug info ---';
   static const String writeBelowThisLine = '--- Write below this line ---';
 
