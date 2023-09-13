@@ -59,10 +59,13 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     if (element.type == TypeConstants.EMAIL) {
       var deviceAppAndUserInfo =
           await ref.read(deviceAppAndUserInfoProvider.future);
-      unawaited(launchEmailSubmission(
+      var _info =
+          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+      await launchEmailSubmission(
         element.path.toString(),
-        body: deviceAppAndUserInfo,
-      ));
+        body: _info,
+      );
     } else {
       unawaited(context.push(
         getPathFromString(
