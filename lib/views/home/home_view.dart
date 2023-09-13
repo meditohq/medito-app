@@ -106,6 +106,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                         await ref.read(homeProvider.future);
                         ref.invalidate(remoteStatsProvider);
                         await ref.read(remoteStatsProvider.future);
+                        setState(() {
+                          _isCollapsed = false;
+                        });
                       },
                       child: SingleChildScrollView(
                         controller: _scrollController,
