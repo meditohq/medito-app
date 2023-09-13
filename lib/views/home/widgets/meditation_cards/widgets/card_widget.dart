@@ -1,9 +1,8 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardWidget extends ConsumerStatefulWidget {
+class CardWidget extends StatelessWidget {
   const CardWidget({
     super.key,
     this.tag,
@@ -15,67 +14,42 @@ class CardWidget extends ConsumerStatefulWidget {
   final String title;
   final String coverUrlPath;
   final void Function()? onTap;
-
-  @override
-  ConsumerState<CardWidget> createState() => _CardWidgetState();
-}
-
-class _CardWidgetState extends ConsumerState<CardWidget> {
-  double _scale = 1.0;
-
-  void _onTapDown() {
-    setState(() {
-      _scale = _scale == 1.0 ? 0.95 : 1.0;
-    });
-  }
-
-  void _onTapUp() {
-    setState(() {
-      _scale = _scale == 0.95 ? 1.0 : 0.95;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        AnimatedContainer(
-          duration: Duration(milliseconds: 5),
-          curve: Curves.easeInOut,
-          width: 154 * _scale,
-          height: _scale == 0.95 ? 154 * _scale : 156 * _scale,
-          child: NetworkImageWidget(
-            url: widget.coverUrlPath,
-            isCache: true,
-            gradient: LinearGradient(
-              colors: [
-                ColorConstants.almostBlack.withOpacity(0.15),
-                ColorConstants.almostBlack,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+    return InkWell(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          SizedBox(
+            width: 154,
+            height: 156,
+            child: Container(
+              foregroundDecoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    ColorConstants.almostBlack.withOpacity(0.15),
+                    ColorConstants.almostBlack,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: NetworkImageWidget(
+                url: coverUrlPath,
+                isCache: true,
+              ),
             ),
           ),
-        ),
-        GestureDetector(
-          onTapDown: (_) => _onTapDown(),
-          onTapUp: (_) => _onTapUp(),
-          onTapCancel: _onTapUp,
-          onTap: widget.onTap,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            width: 154 * _scale,
-            height: 154 * _scale,
+          Container(
+            width: 154,
+            height: 154,
             color: ColorConstants.transparent,
-            child:
-                _tagAndTitle(textTheme, tag: widget.tag, title: widget.title),
+            child: _tagAndTitle(textTheme, tag: tag, title: title),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
