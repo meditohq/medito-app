@@ -87,7 +87,7 @@ class AnnouncementWidget extends ConsumerWidget {
 
   Flexible _text(BuildContext context, String? title) {
     return Flexible(
-      child: Text(
+      child: SelectableText(
         title ?? '',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: ColorConstants.getColorFromString(
@@ -136,7 +136,8 @@ class AnnouncementWidget extends ConsumerWidget {
     ));
   }
 
-  void _handleTrackEvent(WidgetRef ref, String announcementId, String? ctaTitle) {
+  void _handleTrackEvent(
+      WidgetRef ref, String announcementId, String? ctaTitle) {
     var announcement = AnnouncementCtaTappedModel(
       announcementId: announcementId,
       ctaTitle: ctaTitle ?? '',

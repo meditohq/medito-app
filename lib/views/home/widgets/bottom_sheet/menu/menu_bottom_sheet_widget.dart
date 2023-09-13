@@ -31,6 +31,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: homeMenuModel
                   .map((element) => RowItemWidget(
+                        enableInteractiveSelection: false,
                         iconCodePoint: element.icon,
                         title: element.title,
                         hasUnderline: element.id != homeMenuModel.last.id,
@@ -52,18 +53,20 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     HomeMenuModel element,
   ) {
     var location = GoRouter.of(context).location;
+    var path = element.path.toString();
     _handleTrackEvent(ref, element.id, element.title);
     Navigator.pop(context);
     if (element.type == TypeConstants.LINK) {
       context.push(
         location + RouteConstants.webviewPath,
-        extra: {'url': element.path},
+        extra: {'url': path},
       );
+    } else {
+      context.push(getPathFromString(
+        element.type,
+        [element.path.toString().getIdFromPath()],
+      ));
     }
-    context.push(getPathFromString(
-      element.type,
-      [element.path.toString().getIdFromPath()],
-    ));
   }
 
   void _handleTrackEvent(WidgetRef ref, String itemId, String itemTitle) {

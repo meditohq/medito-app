@@ -25,7 +25,7 @@ class StringConstants {
   static const String shareText =
       "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
   static const String shareStatsText =
-      '''Just wrapped up another calming session with #Medito! 🧘‍♀️ If you're looking for a free, user-friendly meditation app, give Medito a try. Download now at [www.medito.app](http://www.medito.app/) and start your journey towards inner peace. #Mindfulness #SelfCare #MentalHealthAwareness''';
+      '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
   static const String swipeToDelete = 'Swipe left on a session to delete it';
   static const String narrator = 'Narrator';
   static const String duration = 'Duration';
@@ -87,6 +87,8 @@ class StringConstants {
       'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
   static const String allowNotifications = 'Allow notifications';
   static const String notNow = 'Not now';
+  static const String debugInfo = '--- Debug info ---';
+  static const String writeBelowThisLine = '--- Write below this line ---';
 
   //Error
   static const String someThingWentWrong = 'Something went wrong';

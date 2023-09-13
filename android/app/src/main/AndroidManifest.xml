@@ -44,7 +44,12 @@
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
+            android:grantUriPermissions="true"
             android:windowSoftInputMode="adjustResize">
+
+            <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/provider_paths" />
 
             <!-- Deep linking -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />

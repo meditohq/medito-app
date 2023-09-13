@@ -15,6 +15,8 @@ class CollapsibleHeaderWidget extends ConsumerStatefulWidget {
     this.leadingIconColor = ColorConstants.black,
     this.leadingIconBgColor = ColorConstants.walterWhite,
     this.onPressedCloseBtn,
+    this.selectableTitle = false,
+    this.selectableDescription = false,
   });
   final List<Widget> children;
   final String? bgImage;
@@ -23,6 +25,8 @@ class CollapsibleHeaderWidget extends ConsumerStatefulWidget {
   final double headerHeight;
   final Color leadingIconColor;
   final Color leadingIconBgColor;
+  final bool selectableTitle;
+  final bool selectableDescription;
   final void Function()? onPressedCloseBtn;
   @override
   ConsumerState<CollapsibleHeaderWidget> createState() =>
@@ -150,21 +154,35 @@ class _CollapsibleHeaderWidgetState
   }
 
   Transform _title(BuildContext context) {
+    var maxLines = _isShrink ? 1 : 3;
+    const textScaleFactor = 1.0;
+    const textAlign = TextAlign.left;
+    var style = Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+          fontFamily: ClashDisplay,
+          color: ColorConstants.walterWhite,
+          fontSize: _isShrink ? 20 : 24,
+        );
+
     return Transform(
       // you can forcefully translate values left side using Transform
       transform: Matrix4.translationValues(_isShrink ? 0 : 0.0, 0.0, 0.0),
-      child: Text(
-        '${widget.title}',
-        maxLines: _isShrink ? 1 : 3,
-        overflow: TextOverflow.ellipsis,
-        textScaleFactor: 1,
-        textAlign: TextAlign.left,
-        style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: ClashDisplay,
-              color: ColorConstants.walterWhite,
-              fontSize: _isShrink ? 20 : 24,
+      child: widget.selectableTitle
+          ? SelectableText(
+              '${widget.title}',
+              maxLines: maxLines,
+              minLines: 1,
+              textScaleFactor: textScaleFactor,
+              textAlign: textAlign,
+              style: style,
+            )
+          : Text(
+              '${widget.title}',
+              maxLines: maxLines,
+              overflow: TextOverflow.ellipsis,
+              textScaleFactor: textScaleFactor,
+              textAlign: textAlign,
+              style: style,
             ),
-      ),
     );
   }
 
@@ -177,6 +195,7 @@ class _CollapsibleHeaderWidgetState
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: MarkdownWidget(
           body: description,
+          selectable: widget.selectableDescription,
           textAlign: WrapAlignment.start,
           p: bodyLarge?.copyWith(
             color: ColorConstants.walterWhite,

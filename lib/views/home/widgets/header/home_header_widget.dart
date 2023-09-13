@@ -56,7 +56,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
           },
         );
       },
-      duration: Duration(seconds: 1, milliseconds: 500),
+      duration: Duration(milliseconds: 500),
       child: IconButton(
         onPressed: () => {},
         icon: SvgPicture.asset(
