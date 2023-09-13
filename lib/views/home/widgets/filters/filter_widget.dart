@@ -76,11 +76,12 @@ class FilterWidget extends ConsumerWidget {
         location + RouteConstants.webviewPath,
         extra: {'url': element.path},
       );
+    } else {
+      context.push(getPathFromString(
+        element.type,
+        [element.path.toString().getIdFromPath()],
+      ));
     }
-    context.push(getPathFromString(
-      element.type,
-      [element.path.toString().getIdFromPath()],
-    ));
   }
 
   void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {

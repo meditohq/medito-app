@@ -26,17 +26,12 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   void initState() {
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
+    ref.read(meProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
     _saveFcmTokenEvent(ref);
     ref
         .read(playerProvider.notifier)
-        .getCurrentlyPlayingMeditation()
-        .then((value) {
-      Future.delayed(Duration(milliseconds: 500), () {
-        ref.read(audioPlayPauseStateProvider.notifier).state =
-            PLAY_PAUSE_AUDIO.PAUSE;
-      });
-    });
+        .getCurrentlyPlayingMeditation(isPlayAudio: false);
     _checkNotificationPermission();
     checkInitialMessage(ref);
     var streamEvent = audioHandler.meditationAudioPlayer.playerStateStream
