@@ -26,6 +26,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/providers/providers.dart';
 import 'services/notifications/notifications_service.dart';
@@ -39,7 +40,12 @@ Future<void> main() async {
   sharedPreferences = await SharedPreferences.getInstance();
   await Firebase.initializeApp();
   await registerNotification();
-
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = HTTPConstants.SENTRY_DSN;
+      options.tracesSampleRate = 1.0;
+    },
+  );
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
@@ -105,7 +111,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         _handleAudioCompletion(ref);
       }
     });
-
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,

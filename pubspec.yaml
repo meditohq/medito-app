@@ -38,7 +38,7 @@ dependencies:
   connectivity: ^3.0.3
   device_info_plus: ^9.0.2
   equatable: ^2.0.0
-  sentry_flutter: ^7.0.0
+  sentry_flutter: ^7.9.0
   back_button_interceptor: ^6.0.2
   go_router: ^6.5.5
   flutter_riverpod: ^2.1.3
