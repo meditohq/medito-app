@@ -18,8 +18,12 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   bool _isCollapsed = false;
+  Color _backgroundColor = ColorConstants.ebony;
+  var _announcementColor;
+  var hasAnnouncement = false;
+
   final ScrollController _scrollController = ScrollController();
 
   late CurvedAnimation curvedAnimation = CurvedAnimation(
@@ -30,9 +34,6 @@ class _HomeViewState extends ConsumerState<HomeView>
     curve: Curves.easeInOut,
   );
 
-  Color _backgroundColor = ColorConstants.ebony;
-  var _announcementColor;
-  var hasAnnouncement = false;
   @override
   void initState() {
     super.initState();
@@ -73,6 +74,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
@@ -105,6 +107,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                         await ref.read(homeProvider.future);
                         ref.invalidate(remoteStatsProvider);
                         await ref.read(remoteStatsProvider.future);
+                        if (_isCollapsed) {
+                          _handleCollapse();
+                        }
                       },
                       child: SingleChildScrollView(
                         controller: _scrollController,
@@ -201,4 +206,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     return SizedBox();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

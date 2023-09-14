@@ -55,6 +55,7 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       var res = await authRepository.generateUserToken();
+      await saveUserInSharedPref(res);
       userRes = ApiResponse.completed(res);
     } catch (e) {
       userRes = ApiResponse.error(e.toString());
