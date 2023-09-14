@@ -5,7 +5,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../share_btn/share_btn_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class DebugBottomSheetWidget extends ConsumerWidget {
   const DebugBottomSheetWidget({super.key});
@@ -87,16 +86,12 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     var _info =
         '${StringConstants.debugInfo}\n$deviceInfo\n${StringConstants.writeBelowThisLine}';
 
-    final params = Uri(
-      scheme: 'mailto',
-      path: StringConstants.supportEmail,
-      query: 'body=$_info',
-    );
-
     try {
-      if (await canLaunchUrl(params)) {
-        await launchUrl(params);
-      }
+      await launchEmailSubmission(
+        StringConstants.supportEmail,
+        subject: StringConstants.bugReport,
+        body: _info,
+      );
     } catch (e) {
       createSnackBar(
         e.toString(),
