@@ -84,7 +84,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
               StringConstants.dismiss.toLowerCase(),
             );
             //ignore: unused_result
-            ref.refresh(homeProvider);
+            // ref.refresh(homeProvider);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,
@@ -148,10 +148,12 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     if (element.ctaType == TypeConstants.EMAIL) {
       var deviceAppAndUserInfo =
           await ref.read(deviceAppAndUserInfoProvider.future);
-      unawaited(launchEmailSubmission(
+      var _info =
+          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+      await launchEmailSubmission(
         element.ctaPath.toString(),
-        body: deviceAppAndUserInfo,
-      ));
+        body: _info,
+      );
     } else {
       unawaited(context.push(
         getPathFromString(

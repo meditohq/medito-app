@@ -184,10 +184,13 @@ class _FolderViewState extends ConsumerState<FolderView>
         } else if (type == TypeConstants.EMAIL) {
           var deviceAppAndUserInfo =
               await ref.read(deviceAppAndUserInfoProvider.future);
-          unawaited(launchEmailSubmission(
+          var _info =
+              '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+          await launchEmailSubmission(
             path.toString(),
-            body: deviceAppAndUserInfo,
-          ));
+            body: _info,
+          );
         } else {
           unawaited(context.push(
             getPathFromString(
