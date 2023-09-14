@@ -84,7 +84,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
               StringConstants.dismiss.toLowerCase(),
             );
             //ignore: unused_result
-            ref.refresh(homeProvider);
+            // ref.refresh(homeProvider);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,
