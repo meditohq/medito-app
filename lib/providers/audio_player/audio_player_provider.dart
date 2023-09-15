@@ -7,6 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 final audioPlayerNotifierProvider =
     ChangeNotifierProvider<AudioPlayerNotifier>((ref) {
@@ -76,18 +77,25 @@ class AudioPlayerNotifier extends BaseAudioHandler
     MeditationFilesModel file, {
     String? filePath,
   }) {
-    if (filePath != null) {
-      unawaited(meditationAudioPlayer.setFilePath(filePath));
-      setMediaItem(meditationModel, file, filePath: filePath);
-    } else {
-      setMediaItem(meditationModel, file);
-      unawaited(
-        meditationAudioPlayer.setAudioSource(AudioSource.uri(
-          Uri.parse(file.path),
-          headers: {
-            HttpHeaders.authorizationHeader: _contentToken,
-          },
-        )),
+    try {
+      if (filePath != null) {
+        unawaited(meditationAudioPlayer.setFilePath(filePath));
+        setMediaItem(meditationModel, file, filePath: filePath);
+      } else {
+        setMediaItem(meditationModel, file);
+        unawaited(
+          meditationAudioPlayer.setAudioSource(AudioSource.uri(
+            Uri.parse(file.path),
+            headers: {
+              HttpHeaders.authorizationHeader: _contentToken,
+            },
+          )),
+        );
+      }
+    } catch (e) {
+      Sentry.captureException(
+        e,
+        stackTrace: e,
       );
     }
   }
