@@ -14,12 +14,12 @@ class AudioDownloaderProvider extends ChangeNotifier {
   AudioDownloaderProvider(this.ref);
   Map<String, double> downloadingProgress = {};
   Map<String, AUDIO_DOWNLOAD_STATE> audioDownloadState = {};
-  Future<void> downloadMeditationAudio(
-    MeditationModel meditationModel,
-    MeditationFilesModel file,
+  Future<void> downloadTrackAudio(
+    TrackModel trackModel,
+    TrackFilesModel file,
   ) async {
     var fileName =
-        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}';
+        '${trackModel.id}-${file.id}${getFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
       audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADIING;
@@ -44,14 +44,14 @@ class AudioDownloaderProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteMeditationAudio(String fileName) async {
+  Future<void> deleteTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
     audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOAD;
     notifyListeners();
   }
 
-  Future<String?> getMeditationAudio(String fileName) async {
+  Future<String?> getTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
     audioDownloadState[fileName] = audioPath != null

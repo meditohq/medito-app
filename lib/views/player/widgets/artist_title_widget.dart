@@ -8,18 +8,18 @@ import 'package:marquee/marquee.dart';
 class ArtistTitleWidget extends ConsumerWidget {
   const ArtistTitleWidget({
     super.key,
-    required this.meditationTitle,
+    required this.trackTitle,
     this.artistName,
     this.artistUrlPath,
-    this.meditationTitleFontSize = 24,
+    this.trackTitleFontSize = 24,
     this.artistNameFontSize = 16,
     this.artistUrlPathFontSize = 13,
     this.isPlayerScreen = false,
     this.titleHeight = 35,
   });
-  final String meditationTitle;
+  final String trackTitle;
   final String? artistName, artistUrlPath;
-  final double meditationTitleFontSize;
+  final double trackTitleFontSize;
   final double artistNameFontSize;
   final double artistUrlPathFontSize;
   final bool isPlayerScreen;
@@ -40,11 +40,11 @@ class ArtistTitleWidget extends ConsumerWidget {
     return SizedBox(
       height: titleHeight,
       child: Marquee(
-        text: meditationTitle,
+        text: trackTitle,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
               fontFamily: ClashDisplay,
               color: ColorConstants.walterWhite,
-              fontSize: meditationTitleFontSize,
+              fontSize: trackTitleFontSize,
               letterSpacing: 0.2,
             ),
         blankSpace: 50,

@@ -80,7 +80,7 @@ class JoinWelcomeView extends ConsumerWidget {
                             auth.setUserEmail(email);
                             if (fromScreen == Screen.splash) {
                               context.go(RouteConstants.homePath);
-                            } else if (fromScreen == Screen.meditation) {
+                            } else if (fromScreen == Screen.track) {
                               context.pop();
                               context.pop();
                               context.pop();

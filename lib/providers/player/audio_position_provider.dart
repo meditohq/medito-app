@@ -36,9 +36,9 @@ final audioPositionAndPlayerStateProvider =
 
   return Rx.combineLatest3<Duration, Duration?, PlayerState,
       PositionAndPlayerStateState>(
-    audioPlayer.meditationAudioPlayer.positionStream,
-    audioPlayer.meditationAudioPlayer.durationStream,
-    audioPlayer.meditationAudioPlayer.playerStateStream,
+    audioPlayer.trackAudioPlayer.positionStream,
+    audioPlayer.trackAudioPlayer.durationStream,
+    audioPlayer.trackAudioPlayer.playerStateStream,
     (position, duration, playerState) =>
         PositionAndPlayerStateState(playerState, duration, position),
   );
@@ -47,7 +47,7 @@ final audioPositionAndPlayerStateProvider =
 final audioPlaybackStreamProvider = StreamProvider<ProcessingState>((ref) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
 
-  return audioPlayer.meditationAudioPlayer.playbackEventStream
+  return audioPlayer.trackAudioPlayer.playbackEventStream
       .map((event) => event.processingState);
 });
 

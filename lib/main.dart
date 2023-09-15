@@ -83,7 +83,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       unawaited(updateStatsFromBg());
     } else if (state == AppLifecycleState.detached) {
       final audioProvider = ref.read(audioPlayerNotifierProvider);
-      audioProvider.meditationAudioPlayer.dispose();
+      audioProvider.trackAudioPlayer.dispose();
       audioProvider.backgroundSoundAudioPlayer.dispose();
       audioProvider.dispose();
     }
@@ -94,7 +94,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    audioProvider.meditationAudioPlayer.dispose();
+    audioProvider.trackAudioPlayer.dispose();
     audioProvider.backgroundSoundAudioPlayer.dispose();
     audioProvider.dispose();
     super.dispose();
@@ -103,7 +103,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-    var streamEvent = audioHandler.meditationAudioPlayer.playerStateStream
+    var streamEvent = audioHandler.trackAudioPlayer.playerStateStream
         .map((event) => event.processingState)
         .distinct();
     streamEvent.forEach((element) {
@@ -150,7 +150,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       _handleAudioCompletionEvent(
         ref,
         extras['fileId'],
-        extras['meditationId'],
+        extras['trackId'],
       );
       audioProvider.seekValueFromSlider(0);
       unawaited(audioProvider.pause());
@@ -162,7 +162,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       if (!(await _checkUser(ref))) {
         await router.push(
           RouteConstants.joinIntroPath,
-          extra: {'screen': Screen.meditation},
+          extra: {'screen': Screen.track},
         );
       }
     }
@@ -171,11 +171,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _handleAudioCompletionEvent(
     WidgetRef ref,
     String audioFileId,
-    String meditationId,
+    String trackId,
   ) {
     var audio = AudioCompletedModel(
       audioFileId: audioFileId,
-      meditationId: meditationId,
+      trackId: trackId,
     );
     var event = EventsModel(
       name: EventTypes.audioCompleted,

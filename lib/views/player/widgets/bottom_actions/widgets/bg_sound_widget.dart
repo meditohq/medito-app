@@ -10,11 +10,11 @@ import 'labels_widget.dart';
 class BgSoundWidget extends ConsumerWidget {
   const BgSoundWidget({
     super.key,
-    required this.meditationModel,
+    required this.trackModel,
     required this.file,
   });
-  final MeditationModel meditationModel;
-  final MeditationFilesModel file;
+  final TrackModel trackModel;
+  final TrackFilesModel file;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedBgSound =
@@ -33,7 +33,7 @@ class BgSoundWidget extends ConsumerWidget {
       onTap: () {
         context.push(
           RouteConstants.backgroundSoundsPath,
-          extra: {'meditationModel': meditationModel, 'file': file},
+          extra: {'trackModel': trackModel, 'file': file},
         );
       },
     );

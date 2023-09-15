@@ -121,7 +121,7 @@ class JoinIntroView extends ConsumerWidget {
   void _handleMaybeLater(WidgetRef ref, BuildContext context) {
     var auth = ref.read(authProvider);
     auth.setIsAGuest(true);
-    if (fromScreen == Screen.meditation) {
+    if (fromScreen == Screen.track) {
       context.pop();
     } else {
       context.go(RouteConstants.homePath);

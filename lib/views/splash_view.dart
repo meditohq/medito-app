@@ -52,7 +52,9 @@ class _SplashViewState extends ConsumerState<SplashView> {
       Future.delayed(Duration(seconds: 2), () {
         _handleUserInitialization();
       });
-      showSnackBar(context, err);
+      if (err != 'Invalid token') {
+        showSnackBar(context, err);
+      }
       retryCount = ++retryCount;
     } else {
       showSnackBar(context, StringConstants.timeout);

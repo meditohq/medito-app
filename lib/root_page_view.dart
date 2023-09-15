@@ -33,7 +33,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     _saveFcmTokenEvent(ref);
     ref
         .read(playerProvider.notifier)
-        .getCurrentlyPlayingMeditation(isPlayAudio: false);
+        .getCurrentlyPlayingTrack(isPlayAudio: false);
     _checkNotificationPermission();
     checkInitialMessage(ref);
     super.initState();
@@ -110,7 +110,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
             ),
             if (currentlyPlayingSession != null)
               PlayerView(
-                meditationModel: currentlyPlayingSession,
+                trackModel: currentlyPlayingSession,
                 file: currentlyPlayingSession.audio.first.files.first,
               ),
           ],
@@ -119,7 +119,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     );
   }
 
-  Widget _miniPlayer(Radius radius, MeditationModel? currentlyPlayingSession) {
+  Widget _miniPlayer(Radius radius, TrackModel? currentlyPlayingSession) {
     var opacity = ref.watch(pageviewNotifierProvider).scrollProportion;
 
     if (currentlyPlayingSession != null) {
@@ -136,7 +136,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                 duration: Duration(milliseconds: 700),
                 opacity: opacity,
                 child: MiniPlayerWidget(
-                  meditationModel: currentlyPlayingSession,
+                  trackModel: currentlyPlayingSession,
                 ),
               ),
             );
@@ -161,11 +161,11 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
 
   void _handleAudioStartedEvent(
     WidgetRef ref,
-    String meditationId,
+    String trackId,
     String audioFileId,
   ) {
     var audio =
-        AudioStartedModel(audioFileId: audioFileId, meditationId: meditationId);
+        AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
     var event = EventsModel(
       name: EventTypes.audioStarted,
       payload: audio.toJson(),

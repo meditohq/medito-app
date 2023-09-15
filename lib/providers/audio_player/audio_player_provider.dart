@@ -17,16 +17,16 @@ final audioPlayerNotifierProvider =
 class AudioPlayerNotifier extends BaseAudioHandler
     with QueueHandler, SeekHandler, ChangeNotifier {
   var backgroundSoundAudioPlayer = AudioPlayer();
-  MeditationFilesModel? currentlyPlayingMeditation;
+  TrackFilesModel? currentlyPlayingTrack;
   final hasBgSound = 'hasBgSound';
-  final meditationAudioPlayer = AudioPlayer();
+  final trackAudioPlayer = AudioPlayer();
 
   late String _contentToken;
 
   @override
   Future<void> pause() async {
     pauseBackgroundSound();
-    unawaited(meditationAudioPlayer.pause());
+    unawaited(trackAudioPlayer.pause());
   }
 
   @override
@@ -37,12 +37,12 @@ class AudioPlayerNotifier extends BaseAudioHandler
     } else {
       pauseBackgroundSound();
     }
-    unawaited(meditationAudioPlayer.play());
+    unawaited(trackAudioPlayer.play());
   }
 
   @override
   Future<void> stop() async {
-    unawaited(meditationAudioPlayer.stop());
+    unawaited(trackAudioPlayer.stop());
     if (mediaItemHasBGSound()) {
       stopBackgroundSound();
     }
@@ -53,7 +53,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   void initAudioHandler() {
-    meditationAudioPlayer.playbackEventStream
+    trackAudioPlayer.playbackEventStream
         .map(_transformEvent)
         .pipe(playbackState);
   }
@@ -71,18 +71,18 @@ class AudioPlayerNotifier extends BaseAudioHandler
     );
   }
 
-  void setMeditationAudio(
-    MeditationModel meditationModel,
-    MeditationFilesModel file, {
+  void setTrackAudio(
+    TrackModel trackModel,
+    TrackFilesModel file, {
     String? filePath,
   }) {
     if (filePath != null) {
-      unawaited(meditationAudioPlayer.setFilePath(filePath));
-      setMediaItem(meditationModel, file, filePath: filePath);
+      unawaited(trackAudioPlayer.setFilePath(filePath));
+      setMediaItem(trackModel, file, filePath: filePath);
     } else {
-      setMediaItem(meditationModel, file);
+      setMediaItem(trackModel, file);
       unawaited(
-        meditationAudioPlayer.setAudioSource(AudioSource.uri(
+        trackAudioPlayer.setAudioSource(AudioSource.uri(
           Uri.parse(file.path),
           headers: {
             HttpHeaders.authorizationHeader: _contentToken,
@@ -105,57 +105,57 @@ class AudioPlayerNotifier extends BaseAudioHandler
     backgroundSoundAudioPlayer.stop();
   }
 
-  void setMeditationAudioSpeed(double speed) {
-    meditationAudioPlayer.setSpeed(speed);
+  void setTrackAudioSpeed(double speed) {
+    trackAudioPlayer.setSpeed(speed);
   }
 
   void seekValueFromSlider(int duration) {
-    meditationAudioPlayer.seek(Duration(milliseconds: duration));
+    trackAudioPlayer.seek(Duration(milliseconds: duration));
   }
 
-  void stopMeditation() {
-    meditationAudioPlayer.stop();
+  void stopTrack() {
+    trackAudioPlayer.stop();
   }
 
   void skipForward30Secs() async {
-    var seekDuration = meditationAudioPlayer.position.inMilliseconds +
+    var seekDuration = trackAudioPlayer.position.inMilliseconds +
         Duration(seconds: 30).inMilliseconds;
-    await meditationAudioPlayer.seek(Duration(milliseconds: seekDuration));
+    await trackAudioPlayer.seek(Duration(milliseconds: seekDuration));
   }
 
   void skipBackward10Secs() async {
     var seekDuration = max(
       0,
-      meditationAudioPlayer.position.inMilliseconds -
+      trackAudioPlayer.position.inMilliseconds -
           Duration(seconds: 10).inMilliseconds,
     );
-    await meditationAudioPlayer.seek(Duration(milliseconds: seekDuration));
+    await trackAudioPlayer.seek(Duration(milliseconds: seekDuration));
   }
 
   void setBackgroundSoundVolume(double volume) async {
     await backgroundSoundAudioPlayer.setVolume(volume / 100);
   }
 
-  void disposeMeditationAudio() async {
-    await meditationAudioPlayer.dispose();
+  void disposeTrackAudio() async {
+    await trackAudioPlayer.dispose();
   }
 
   void setMediaItem(
-    MeditationModel meditationModel,
-    MeditationFilesModel file, {
+    TrackModel trackModel,
+    TrackFilesModel file, {
     String? filePath,
   }) {
     var item = MediaItem(
       id: filePath ?? file.path,
-      title: meditationModel.title,
-      artist: meditationModel.artist?.name,
+      title: trackModel.title,
+      artist: trackModel.artist?.name,
       duration: Duration(milliseconds: file.duration),
       artUri: Uri.parse(
-        meditationModel.coverUrl,
+        trackModel.coverUrl,
       ),
       extras: {
-        hasBgSound: meditationModel.hasBackgroundSound,
-        'meditationId': meditationModel.id,
+        hasBgSound: trackModel.hasBackgroundSound,
+        'trackId': trackModel.id,
         'fileId': file.id,
       },
     );
@@ -170,7 +170,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     return PlaybackState(
       controls: [
         MediaControl.rewind,
-        if (meditationAudioPlayer.playing)
+        if (trackAudioPlayer.playing)
           MediaControl.pause
         else
           MediaControl.play,
@@ -189,11 +189,11 @@ class AudioPlayerNotifier extends BaseAudioHandler
         ProcessingState.buffering: AudioProcessingState.buffering,
         ProcessingState.ready: AudioProcessingState.ready,
         ProcessingState.completed: AudioProcessingState.completed,
-      }[meditationAudioPlayer.processingState]!,
-      playing: meditationAudioPlayer.playing,
-      updatePosition: meditationAudioPlayer.position,
-      bufferedPosition: meditationAudioPlayer.bufferedPosition,
-      speed: meditationAudioPlayer.speed,
+      }[trackAudioPlayer.processingState]!,
+      playing: trackAudioPlayer.playing,
+      updatePosition: trackAudioPlayer.position,
+      bufferedPosition: trackAudioPlayer.bufferedPosition,
+      speed: trackAudioPlayer.speed,
       queueIndex: event.currentIndex,
     );
   }

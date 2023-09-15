@@ -2,7 +2,7 @@ class RouteConstants {
   static const String root = '/';
   static const String bottomNavbarPath = '/bottomNavbar';
   static const String homePath = '/home';
-  static const String meditationPath = '/meditation/:sid';
+  static const String trackPath = '/track/:sid';
   static const String dailyPath = '/daily/:did';
   static const String donationPath = '/donation';
   static const String downloadsPath = '/downloads';

@@ -10,10 +10,10 @@ class DurationIndicatorWidget extends ConsumerStatefulWidget {
   const DurationIndicatorWidget({
     super.key,
     required this.file,
-    required this.meditationId,
+    required this.trackId,
   });
-  final MeditationFilesModel file;
-  final String meditationId;
+  final TrackFilesModel file;
+  final String trackId;
 
   @override
   ConsumerState<DurationIndicatorWidget> createState() =>

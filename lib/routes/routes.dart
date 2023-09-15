@@ -12,7 +12,7 @@ import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/folder/folder_view.dart';
 import 'package:Medito/views/player/player_view.dart';
-import 'package:Medito/views/meditation/meditation_view.dart';
+import 'package:Medito/views/track/track_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
@@ -107,7 +107,7 @@ final router = GoRouter(
             _getWebviewRoute(),
           ],
         ),
-        _getMeditationRoute(fromRoot: true),
+        _getTrackRoute(fromRoot: true),
         _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
@@ -123,20 +123,20 @@ final router = GoRouter(
         GoRoute(
           path: RouteConstants.folderPath,
           routes: [
-            _getMeditationRoute(),
+            _getTrackRoute(),
             _getArticleRoute(),
             _getWebviewRoute(),
             GoRoute(
               path: 'folder2/:f2id',
               routes: [
-                _getMeditationRoute(),
+                _getTrackRoute(),
                 _getArticleRoute(),
                 _getWebviewRoute(),
                 GoRoute(
                   path: 'folder3/:f3id',
                   pageBuilder: (context, state) => getFolderMaterialPage(state),
                   routes: [
-                    _getMeditationRoute(),
+                    _getTrackRoute(),
                     _getArticleRoute(),
                     _getWebviewRoute(),
                   ],
@@ -160,7 +160,7 @@ GoRoute _getDailyRoute({bool fromRoot = false}) {
         ? RouteConstants.dailyPath
         : RouteConstants.dailyPath.sanitisePath(),
     routes: [_getPlayerRoute()],
-    pageBuilder: (context, state) => getMeditationOptionsDailyPage(state),
+    pageBuilder: (context, state) => getTrackOptionsDailyPage(state),
   );
 }
 
@@ -173,16 +173,16 @@ GoRoute _getArticleRoute({bool fromRoot = false}) {
   );
 }
 
-GoRoute _getMeditationRoute({bool fromRoot = false}) {
+GoRoute _getTrackRoute({bool fromRoot = false}) {
   return GoRoute(
     path: fromRoot
-        ? RouteConstants.meditationPath
-        : RouteConstants.meditationPath.sanitisePath(),
+        ? RouteConstants.trackPath
+        : RouteConstants.trackPath.sanitisePath(),
     routes: [
       _getPlayerRoute(),
       _getWebviewRoute(),
     ],
-    pageBuilder: (context, state) => getMeditationOptionsMaterialPage(state),
+    pageBuilder: (context, state) => getTrackOptionsMaterialPage(state),
   );
 }
 
@@ -275,17 +275,17 @@ enum Screen {
   player,
   article,
   stats,
-  meditation,
+  track,
   daily,
   donation,
   url,
   collection
 }
 
-MaterialPage<void> getMeditationOptionsMaterialPage(GoRouterState state) {
+MaterialPage<void> getTrackOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: MeditationView(id: state.params['sid'] ?? ''),
+    child: TrackView(id: state.params['sid'] ?? ''),
   );
 }
 
@@ -296,10 +296,10 @@ MaterialPage<void> getArticleMaterialPAge(GoRouterState state) {
   );
 }
 
-MaterialPage<void> getMeditationOptionsDailyPage(GoRouterState state) {
+MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
-    child: MeditationView(id: state.params['did'] ?? ''),
+    child: TrackView(id: state.params['did'] ?? ''),
   );
 }
 
@@ -309,13 +309,13 @@ MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  var meditation = state.extra as Map;
+  var track = state.extra as Map;
 
   return MaterialPage(
     key: state.pageKey,
     child: PlayerView(
-      meditationModel: meditation['meditationModel'],
-      file: meditation['file'],
+      trackModel: track['trackModel'],
+      file: track['file'],
     ),
   );
 }
@@ -333,8 +333,8 @@ MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
 String getPathFromString(String? place, List<String?> ids) {
   ids.removeWhere((element) => element == null);
 
-  if (place == 'meditation') {
-    return RouteConstants.meditationPath.replaceAll(':sid', ids.first!);
+  if (place == 'track') {
+    return RouteConstants.trackPath.replaceAll(':sid', ids.first!);
   }
   if (place == 'daily') {
     return RouteConstants.dailyPath.replaceAll(':did', ids.first!);

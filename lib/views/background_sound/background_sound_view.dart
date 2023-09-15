@@ -25,7 +25,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void deactivate() {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.meditationAudioPlayer.playerState.playing) {
+    if (!_audioPlayerNotifier.trackAudioPlayer.playerState.playing) {
       _audioPlayerNotifier.stopBackgroundSound();
     }
     super.deactivate();

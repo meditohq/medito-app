@@ -31,11 +31,11 @@ class _ConnectivityErrorComponentState
     var location = GoRouter.of(context).location;
     var id = location.split('/').last;
     var isFolder = location.contains('folder');
-    var isMeditation = location.contains('meditation');
+    var isTrack = location.contains('track');
 
-    if (isFolder && isMeditation) {
-      ref.read(meditationsProvider(meditationId: id));
-    } else if (isFolder && !isMeditation) {
+    if (isFolder && isTrack) {
+      ref.read(tracksProvider(trackId: id));
+    } else if (isFolder && !isTrack) {
       ref.read(FoldersProvider(folderId: id));
     }
   }

@@ -33,16 +33,16 @@ void main() {
           id: '28',
           title: 'UCLA',
           description:
-              'Guided meditations provided by [UCLA Mindful Awareness Research Center]',
+              'Guided tracks provided by [UCLA Mindful Awareness Research Center]',
           coverUrl: 'Some test cover url',
           isPublished: true,
           items: [
             FolderItemsModel(
-              type: 'meditation',
+              type: 'track',
               id: '120',
-              title: 'Complete meditation',
+              title: 'Complete track',
               subtitle: '19 min',
-              path: 'meditations/120',
+              path: 'tracks/120',
             ),
           ],
         );
@@ -67,7 +67,7 @@ void main() {
               .having(
                 (s) => s.description,
                 'description',
-                'Guided meditations provided by [UCLA Mindful Awareness Research Center]',
+                'Guided tracks provided by [UCLA Mindful Awareness Research Center]',
               ),
         );
         verify(

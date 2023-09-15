@@ -14,11 +14,11 @@ import 'widgets/player_buttons/player_buttons_widget.dart';
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({
     super.key,
-    required this.meditationModel,
+    required this.trackModel,
     required this.file,
   });
-  final MeditationModel meditationModel;
-  final MeditationFilesModel file;
+  final TrackModel trackModel;
+  final TrackFilesModel file;
   @override
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
@@ -31,8 +31,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    var coverUrl = widget.meditationModel.coverUrl;
-    var artist = widget.meditationModel.artist;
+    var coverUrl = widget.trackModel.coverUrl;
+    var artist = widget.trackModel.artist;
 
     return BackButtonListener(
       onBackButtonPressed: _onWillPop,
@@ -54,7 +54,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                       vertical: 4.0,
                     ),
                     child: ArtistTitleWidget(
-                      meditationTitle: widget.meditationModel.title,
+                      trackTitle: widget.trackModel.title,
                       artistName: artist?.name,
                       artistUrlPath: artist?.path,
                       isPlayerScreen: true,
@@ -63,18 +63,18 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                   OverlayCoverImageWidget(imageUrl: coverUrl),
                   DurationIndicatorWidget(
                     file: widget.file,
-                    meditationId: widget.meditationModel.id,
+                    trackId: widget.trackModel.id,
                   ),
                   Spacer(),
                   PlayerButtonsWidget(
                     file: widget.file,
-                    meditationModel: widget.meditationModel,
+                    trackModel: widget.trackModel,
                   ),
                   Spacer(
                     flex: 2,
                   ),
                   BottomActionWidget(
-                    meditationModel: widget.meditationModel,
+                    trackModel: widget.trackModel,
                     file: widget.file,
                   ),
                   height16,

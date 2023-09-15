@@ -21,30 +21,30 @@ import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'widgets/meditation_buttons_widget.dart';
+import 'widgets/track_buttons_widget.dart';
 
-class MeditationView extends ConsumerStatefulWidget {
+class TrackView extends ConsumerStatefulWidget {
   final String id;
 
-  MeditationView({Key? key, required this.id}) : super(key: key);
+  TrackView({Key? key, required this.id}) : super(key: key);
   @override
-  ConsumerState<MeditationView> createState() => _MeditationViewState();
+  ConsumerState<TrackView> createState() => _TrackViewState();
 }
 
-class _MeditationViewState extends ConsumerState<MeditationView>
-    with AutomaticKeepAliveClientMixin<MeditationView> {
+class _TrackViewState extends ConsumerState<TrackView>
+    with AutomaticKeepAliveClientMixin<TrackView> {
   @override
   void initState() {
     _handleTrackEvent(ref, widget.id);
     super.initState();
   }
 
-  void _handleTrackEvent(WidgetRef ref, String meditationId) {
-    var meditationViewedModel =
-        MeditationViewedModel(meditationId: meditationId);
+  void _handleTrackEvent(WidgetRef ref, String trackId) {
+    var trackViewedModel =
+        TrackViewedModel(trackId: trackId);
     var event = EventsModel(
-      name: EventTypes.meditationViewed,
-      payload: meditationViewedModel.toJson(),
+      name: EventTypes.trackViewed,
+      payload: trackViewedModel.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
   }
@@ -52,59 +52,59 @@ class _MeditationViewState extends ConsumerState<MeditationView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    ref.watch(meditationOpenedFirstTimeProvider);
-    var meditations = ref.watch(meditationsProvider(meditationId: widget.id));
-    ref.listen(meditationOpenedFirstTimeProvider, (prev, next) {
+    ref.watch(trackOpenedFirstTimeProvider);
+    var tracks = ref.watch(tracksProvider(trackId: widget.id));
+    ref.listen(trackOpenedFirstTimeProvider, (prev, next) {
       var _user =
           ref.read(authProvider.notifier).userRes.body as UserTokenModel;
       if (_user.email == null && next.value != null && next.value!) {
         context.push(
           RouteConstants.joinIntroPath,
-          extra: {'screen': Screen.meditation},
+          extra: {'screen': Screen.track},
         );
       }
     });
 
     return Scaffold(
-      body: meditations.when(
+      body: tracks.when(
         skipLoadingOnRefresh: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () =>
-              ref.refresh(meditationsProvider(meditationId: widget.id)),
+              ref.refresh(tracksProvider(trackId: widget.id)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
     );
   }
 
-  MeditationShimmerWidget _buildLoadingWidget() =>
-      const MeditationShimmerWidget();
+  TrackShimmerWidget _buildLoadingWidget() =>
+      const TrackShimmerWidget();
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
-    MeditationModel meditationModel,
+    TrackModel trackModel,
     WidgetRef ref,
   ) {
     return RefreshIndicator(
       onRefresh: () async =>
-          await ref.refresh(meditationsProvider(meditationId: widget.id)),
+          await ref.refresh(tracksProvider(trackId: widget.id)),
       child: Scaffold(
         body: CollapsibleHeaderWidget(
-          bgImage: meditationModel.coverUrl,
-          title: meditationModel.title,
-          description: meditationModel.description,
+          bgImage: trackModel.coverUrl,
+          title: trackModel.title,
+          description: trackModel.description,
           selectableTitle: true,
           selectableDescription: true,
           children: [
-            _mainContent(context, meditationModel),
+            _mainContent(context, trackModel),
           ],
         ),
       ),
     );
   }
 
-  Widget _mainContent(BuildContext context, MeditationModel meditationModel) {
+  Widget _mainContent(BuildContext context, TrackModel trackModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -112,10 +112,10 @@ class _MeditationViewState extends ConsumerState<MeditationView>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           height8,
-          _getSubTitle(context, meditationModel.subtitle),
+          _getSubTitle(context, trackModel.subtitle),
           height16,
-          MeditationButtonsWidget(
-            meditationModel: meditationModel,
+          TrackButtonsWidget(
+            trackModel: trackModel,
           ),
         ],
       ),

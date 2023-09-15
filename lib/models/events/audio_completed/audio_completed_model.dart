@@ -6,7 +6,7 @@ part 'audio_completed_model.g.dart';
 abstract class AudioCompletedModel with _$AudioCompletedModel {
   const factory AudioCompletedModel({
     required String audioFileId,
-    required String meditationId,
+    required String trackId,
   }) = _AudioCompletedModel;
 
   factory AudioCompletedModel.fromJson(Map<String, Object?> json) =>

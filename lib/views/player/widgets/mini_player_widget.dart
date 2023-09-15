@@ -9,8 +9,8 @@ import 'artist_title_widget.dart';
 import 'player_buttons/play_pause_button_widget.dart';
 
 class MiniPlayerWidget extends ConsumerWidget {
-  const MiniPlayerWidget({super.key, required this.meditationModel});
-  final MeditationModel meditationModel;
+  const MiniPlayerWidget({super.key, required this.trackModel});
+  final TrackModel trackModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var bottom = getBottomPadding(context);
@@ -29,7 +29,7 @@ class MiniPlayerWidget extends ConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  meditationCoverImage(meditationModel.coverUrl),
+                  trackCoverImage(trackModel.coverUrl),
                   _titleAndSubtitle(),
                 ],
               ),
@@ -41,7 +41,7 @@ class MiniPlayerWidget extends ConsumerWidget {
     );
   }
 
-  Padding meditationCoverImage(String url) {
+  Padding trackCoverImage(String url) {
     return Padding(
       padding: const EdgeInsets.only(left: 15),
       child: ClipRRect(
@@ -67,10 +67,10 @@ class MiniPlayerWidget extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ArtistTitleWidget(
-              meditationTitle: meditationModel.title,
-              artistName: meditationModel.artist?.name,
-              artistUrlPath: meditationModel.artist?.path,
-              meditationTitleFontSize: 16,
+              trackTitle: trackModel.title,
+              artistName: trackModel.artist?.name,
+              artistUrlPath: trackModel.artist?.path,
+              trackTitleFontSize: 16,
               artistNameFontSize: 12,
               artistUrlPathFontSize: 11,
               titleHeight: 22,

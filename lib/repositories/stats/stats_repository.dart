@@ -44,7 +44,7 @@ class StatsRepositoryImpl extends StatsRepository {
       if (listenedSessionIds.isNotEmpty) {
         String? currentStreak = await getCurrentStreak();
         String? minutesListened = await getMinutesListened();
-        String? numSessions = await getNumMeditations();
+        String? numSessions = await getNumTracks();
         String? longestStreak = await getLongestStreak();
         var data = {
           'currentStreak': int.parse(currentStreak),
