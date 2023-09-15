@@ -39,9 +39,7 @@ Future<void> addTrackListInPreference(
   ref, {
   required List<TrackModel> tracks,
 }) async {
-  return await ref
-      .read(trackRepositoryProvider)
-      .addTrackInPreference(tracks);
+  return await ref.read(trackRepositoryProvider).addTrackInPreference(tracks);
 }
 
 @riverpod
@@ -63,8 +61,7 @@ Future<void> addSingleTrackInPreference(
       break;
     }
   }
-  var _downloadedTrackList =
-      await ref.read(downloadedTracksProvider.future);
+  var _downloadedTrackList = await ref.read(downloadedTracksProvider.future);
   _downloadedTrackList.add(_track);
   await ref.read(
     addTrackListInPreferenceProvider(
