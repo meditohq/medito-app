@@ -7,6 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 final audioPlayerNotifierProvider =
     ChangeNotifierProvider<AudioPlayerNotifier>((ref) {
@@ -76,18 +77,25 @@ class AudioPlayerNotifier extends BaseAudioHandler
     TrackFilesModel file, {
     String? filePath,
   }) {
-    if (filePath != null) {
-      unawaited(trackAudioPlayer.setFilePath(filePath));
-      setMediaItem(trackModel, file, filePath: filePath);
-    } else {
-      setMediaItem(trackModel, file);
-      unawaited(
-        trackAudioPlayer.setAudioSource(AudioSource.uri(
-          Uri.parse(file.path),
-          headers: {
-            HttpHeaders.authorizationHeader: _contentToken,
-          },
-        )),
+    try {
+      if (filePath != null) {
+        unawaited(trackAudioPlayer.setFilePath(filePath));
+        setMediaItem(trackModel, file, filePath: filePath);
+      } else {
+        setMediaItem(trackModel, file);
+        unawaited(
+          trackAudioPlayer.setAudioSource(AudioSource.uri(
+            Uri.parse(file.path),
+            headers: {
+              HttpHeaders.authorizationHeader: _contentToken,
+            },
+          )),
+        );
+      }
+    } catch (e) {
+      Sentry.captureException(
+        e,
+        stackTrace: e,
       );
     }
   }
@@ -170,10 +178,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     return PlaybackState(
       controls: [
         MediaControl.rewind,
-        if (trackAudioPlayer.playing)
-          MediaControl.pause
-        else
-          MediaControl.play,
+        if (trackAudioPlayer.playing) MediaControl.pause else MediaControl.play,
         MediaControl.stop,
         MediaControl.fastForward,
       ],
