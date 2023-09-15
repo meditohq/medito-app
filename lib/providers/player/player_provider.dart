@@ -65,10 +65,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     bool isPlayAudio = true,
   }) async {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    var isPlaying =
-        _audioPlayerNotifier.trackAudioPlayer.playerState.playing;
-    var _currentPlayingFileId =
-        _audioPlayerNotifier.currentlyPlayingTrack?.id;
+    var isPlaying = _audioPlayerNotifier.trackAudioPlayer.playerState.playing;
+    var _currentPlayingFileId = _audioPlayerNotifier.currentlyPlayingTrack?.id;
 
     if (!isPlaying || _currentPlayingFileId != file.id) {
       _setBackgroundSound(
@@ -94,10 +92,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackFilesModel file, {
     bool isPlayAudio = true,
   }) async {
-    var checkDownloadedFile =
-        ref.read(audioDownloaderProvider).getTrackAudio(
-              '${trackModel.id}-${file.id}${getFileExtension(file.path)}',
-            );
+    var checkDownloadedFile = ref.read(audioDownloaderProvider).getTrackAudio(
+          '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
+        );
     var res = await checkDownloadedFile;
     _audioPlayerNotifier.setTrackAudio(
       trackModel,

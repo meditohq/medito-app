@@ -70,8 +70,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           );
         });
       },
-      children:
-          tracks.map((item) => _getSlidingItem(item, context)).toList(),
+      children: tracks.map((item) => _getSlidingItem(item, context)).toList(),
     );
   }
 
@@ -93,7 +92,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         onDismissed: (direction) {
           if (mounted) {
             ref.watch(audioDownloaderProvider).deleteTrackAudio(
-                  '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
+                  '${item.id}-${item.audio.first.files.first.id}${getAudioFileExtension(item.audio.first.files.first.path)}',
                 );
             ref.read(deleteTrackFromPreferenceProvider(
               file: item.audio.first.files.first,
