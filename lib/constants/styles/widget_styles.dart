@@ -1,9 +1,8 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-final String? DmMono = GoogleFonts.dmMono().fontFamily;
-final String? DmSans = GoogleFonts.dmSans().fontFamily;
+final String DmMono = 'DM Mono';
+final String DmSans = 'DM Sans';
 const String ClashDisplay = 'Clash Display';
 const defaultPadding = 16.0;
 const height16 = SizedBox(height: 16);

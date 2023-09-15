@@ -66,11 +66,8 @@ class _MeditationViewState extends ConsumerState<MeditationView>
     );
   }
 
-  Padding _buildLoadingWidget() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: const MeditationShimmerWidget(),
-      );
-
+  MeditationShimmerWidget _buildLoadingWidget() =>
+      const MeditationShimmerWidget();
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
     MeditationModel meditationModel,

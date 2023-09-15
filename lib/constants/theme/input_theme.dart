@@ -1,20 +1,21 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 InputDecorationTheme inputDecorationTheme() {
   var outlineInputBorder = _outlineInputBorder();
 
   return InputDecorationTheme(
-    labelStyle: GoogleFonts.raleway(
+    labelStyle: TextStyle(
       fontSize: 14.0,
       fontStyle: FontStyle.normal,
       color: ColorConstants.walterWhite,
+      fontFamily: DmSans,
     ),
-    floatingLabelStyle: GoogleFonts.raleway(
+    floatingLabelStyle: TextStyle(
       fontSize: 15.0,
       fontStyle: FontStyle.normal,
       color: ColorConstants.walterWhite,
+      fontFamily: DmSans,
     ),
     enabledBorder: outlineInputBorder,
     focusedBorder: outlineInputBorder,

@@ -1,6 +1,5 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class BackgroundSoundVolumeTrackShapeWidget
     extends RectangularSliderTrackShape {
@@ -52,10 +51,11 @@ class BackgroundSoundVolumeTrackShapeWidget
       thumbCenter: thumbCenter,
     );
     final canvas = context.canvas;
-    final textStyle = GoogleFonts.dmSans(
+    final textStyle = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w500,
       color: ColorConstants.walterWhite,
+      fontFamily: DmSans,
     );
     TextPainter textPainter(span) => TextPainter(
           text: span,

@@ -18,38 +18,38 @@ class CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
-      onTap: onTap,
-      child: Stack(
-        children: [
-          SizedBox(
-            width: 154,
-            height: 156,
-            child: Container(
-              foregroundDecoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ColorConstants.almostBlack.withOpacity(0.15),
-                    ColorConstants.almostBlack,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: NetworkImageWidget(
-                url: coverUrlPath,
-                isCache: true,
+    return Stack(
+      children: [
+        SizedBox(
+          width: 154,
+          height: 156,
+          child: Container(
+            foregroundDecoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  ColorConstants.almostBlack.withOpacity(0.15),
+                  ColorConstants.almostBlack,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
+            child: NetworkImageWidget(
+              url: coverUrlPath,
+              isCache: true,
+            ),
           ),
-          Container(
+        ),
+        InkWell(
+          onTap: onTap,
+          child: Container(
             width: 154,
             height: 154,
             color: ColorConstants.transparent,
             child: _tagAndTitle(textTheme, tag: tag, title: title),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
