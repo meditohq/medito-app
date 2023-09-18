@@ -35,7 +35,7 @@ String getUnits(UnitType type, int _) {
 
 Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
-  
+
   var streak = prefs.getInt('streakCount') ?? 0;
   var streakList = await getStreakList();
 
@@ -162,7 +162,7 @@ Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
   var streak = prefs.getInt('secsListened');
-  
+
   return streak == null ? '0' : Duration(seconds: streak).inMinutes.toString();
 }
 

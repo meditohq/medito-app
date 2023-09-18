@@ -79,7 +79,6 @@ String? encoded(obj) {
 
 //ignore:avoid-dynamic
 dynamic decoded(String obj) {
-
   return json.decode(obj);
 }
 

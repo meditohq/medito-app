@@ -50,7 +50,7 @@ class PostLocalStatsNotifier
         );
         try {
           await ref.read(eventsProvider(event: event.toJson()).future);
-          await statsProvider.removeStatsFromPreference();
+          // await statsProvider.removeStatsFromPreference();
         } catch (e) {
           rethrow;
         }
