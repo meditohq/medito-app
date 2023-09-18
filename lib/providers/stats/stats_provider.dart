@@ -49,8 +49,11 @@ class PostLocalStatsNotifier
           payload: statsModel.toJson(),
         );
         try {
-          await ref.read(eventsProvider(event: event.toJson()).future);
-          // await statsProvider.removeStatsFromPreference();
+          await ref
+              .read(eventsProvider(event: event.toJson()).future)
+              .then((_) async {
+            await statsProvider.removeStatsFromPreference();
+          });
         } catch (e) {
           rethrow;
         }

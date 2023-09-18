@@ -3,6 +3,7 @@ import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/models/models.dart';
 
@@ -61,7 +62,11 @@ class StatsRepositoryImpl extends StatsRepository {
       }
 
       return null;
-    } catch (e) {
+    } catch (err) {
+      await Sentry.captureException(
+        err,
+        stackTrace: err.toString(),
+      );
       rethrow;
     }
   }
@@ -84,7 +89,11 @@ class StatsRepositoryImpl extends StatsRepository {
       await pref.remove('secsListened');
       await pref.remove('numSessions');
       await pref.remove('longestStreak');
-    } catch (e) {
+    } catch (err) {
+      await Sentry.captureException(
+        err,
+        stackTrace: err.toString(),
+      );
       rethrow;
     }
   }

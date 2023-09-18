@@ -42,6 +42,7 @@
         <activity
             android:name="com.ryanheise.audioservice.AudioServiceActivity"
             android:exported="true"
+            android:allowBackup="false"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
