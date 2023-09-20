@@ -22,50 +22,62 @@ class HomeView extends ConsumerWidget {
     return Scaffold(
       body: homeRes.when(
         skipLoadingOnRefresh: true,
-        skipLoadingOnReload: false,
+        skipLoadingOnReload: true,
         data: (data) => SafeArea(
           top: data.announcement == null,
           bottom: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(homeProvider);
-                    await ref.read(homeProvider.future);
-                    ref.invalidate(remoteStatsProvider);
-                    await ref.read(remoteStatsProvider.future);
-                  },
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _getAnnouncementBanner(data),
-                        HomeHeaderWidget(
-                          homeMenuModel: data.menu,
-                          miniStatsModel: stats.asData?.value.mini,
-                        ),
-                        Column(
+          child: Container(                                                                                   
+            color: data.announcement?.colorBackground != null
+                ? ColorConstants.getColorFromString(
+                    data.announcement!.colorBackground,
+                  )
+                : null,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      ref.invalidate(homeProvider);
+                      await ref.read(homeProvider.future);
+                      ref.invalidate(remoteStatsProvider);
+                      await ref.read(remoteStatsProvider.future);
+                    },
+                    child: SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: Container(
+                        color: ColorConstants.ebony,
+                        child: Column(
                           children: [
-                            SearchWidget(),
-                            height8,
-                            FilterWidget(
-                              chips: data.chips,
+                            _getAnnouncementBanner(data),
+                            HomeHeaderWidget(
+                              homeMenuModel: data.menu,
+                              miniStatsModel: stats.asData?.value.mini,
                             ),
-                            height16,
-                            height16,
-                            _cardListWidget(data),
-                            SizedBox(
-                              height: currentlyPlayingSession != null ? 16 : 48,
+                            Column(
+                              children: [
+                                SearchWidget(),
+                                height8,
+                                FilterWidget(
+                                  chips: data.chips,
+                                ),
+                                height16,
+                                height16,
+                                _cardListWidget(data),
+                                SizedBox(
+                                  height:
+                                      currentlyPlayingSession != null ? 16 : 48,
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         error: (err, stack) => MeditoErrorWidget(

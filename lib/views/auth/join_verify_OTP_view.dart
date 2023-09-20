@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:Medito/models/models.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
@@ -10,7 +14,12 @@ import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class JoinVerifyOTPView extends ConsumerStatefulWidget {
-  const JoinVerifyOTPView({super.key, required this.email});
+  const JoinVerifyOTPView({
+    super.key,
+    required this.email,
+    required this.fromScreen,
+  });
+  final Screen fromScreen;
   final String email;
   @override
   ConsumerState<JoinVerifyOTPView> createState() => _JoinVerifyOTPViewState();
@@ -30,10 +39,12 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
         await removeFirebaseToken();
         await requestGenerateFirebaseToken();
         await auth.setUserEmailInSharedPref(widget.email);
-        context.go(
+        var params = JoinRouteParamsModel(
+            screen: widget.fromScreen, email: widget.email);
+        unawaited(context.push(
           RouteConstants.joinWelcomePath,
-          extra: {'email': widget.email},
-        );
+          extra: params,
+        ));
       } else if (status == Status.ERROR) {
         showSnackBar(context, auth.verifyOTPRes.message.toString());
       }

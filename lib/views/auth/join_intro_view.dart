@@ -1,3 +1,5 @@
+import 'package:Medito/models/models.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
@@ -7,8 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class JoinIntroView extends ConsumerWidget {
-  const JoinIntroView({super.key});
-
+  const JoinIntroView({super.key, required this.fromScreen});
+  final Screen fromScreen;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
@@ -63,8 +65,6 @@ class JoinIntroView extends ConsumerWidget {
                     height8,
                     Spacer(),
                     _bottomButtons(ref, context),
-                    // height16,
-                    // height16,
                     SizedBox(
                       height: getBottomPadding(context),
                     ),
@@ -100,17 +100,17 @@ class JoinIntroView extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         LoadingButtonWidget(
-          onPressed: () {
-            var auth = ref.read(authProvider);
-            auth.setIsAGuest(true);
-            context.go(RouteConstants.homePath);
-          },
+          onPressed: () => _handleMaybeLater(ref, context),
           btnText: StringConstants.maybeLater,
         ),
         width8,
         LoadingButtonWidget(
           onPressed: () {
-            context.push(RouteConstants.joinEmailPath);
+            var params = JoinRouteParamsModel(screen: fromScreen);
+            context.push(
+              RouteConstants.joinEmailPath,
+              extra: params,
+            );
           },
           btnText: StringConstants.joinNow,
           bgColor: ColorConstants.walterWhite,
@@ -118,5 +118,15 @@ class JoinIntroView extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  void _handleMaybeLater(WidgetRef ref, BuildContext context) {
+    var auth = ref.read(authProvider);
+    auth.setIsAGuest(true);
+    if (fromScreen == Screen.meditation) {
+      context.pop();
+    } else {
+      context.go(RouteConstants.homePath);
+    }
   }
 }

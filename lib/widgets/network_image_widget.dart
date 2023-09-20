@@ -12,12 +12,14 @@ class NetworkImageWidget extends ConsumerWidget {
   final String url;
   final double? height, width;
   final bool isCache;
+  final Gradient? gradient;
   const NetworkImageWidget({
     Key? key,
     required this.url,
     this.height,
     this.width,
     this.isCache = false,
+    this.gradient,
   }) : super(key: key);
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,6 +44,9 @@ class NetworkImageWidget extends ConsumerWidget {
                 image: imageProvider,
                 fit: BoxFit.cover,
               ),
+            ),
+            foregroundDecoration: BoxDecoration(
+              gradient: gradient,
             ),
           ),
           placeholder: (context, url) => _shimmerLoading(),

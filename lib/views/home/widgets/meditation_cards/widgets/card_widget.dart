@@ -1,8 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardWidget extends StatelessWidget {
+class CardWidget extends ConsumerWidget {
   const CardWidget({
     super.key,
     this.tag,
@@ -14,8 +15,9 @@ class CardWidget extends StatelessWidget {
   final String title;
   final String coverUrlPath;
   final void Function()? onTap;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
 
     return Stack(
