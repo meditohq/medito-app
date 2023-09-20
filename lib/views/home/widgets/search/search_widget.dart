@@ -13,6 +13,7 @@ class SearchWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
       child: TextFormField(
+        enabled: false,
         textAlign: TextAlign.center,
         cursorColor: ColorConstants.walterWhite,
         cursorWidth: 1,
@@ -33,6 +34,7 @@ class SearchWidget extends StatelessWidget {
           hintStyle: textTheme.titleSmall,
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorder,
+          disabledBorder: outlineInputBorder,
           border: outlineInputBorder,
         ),
         style: textTheme.bodyMedium?.copyWith(
@@ -40,7 +42,6 @@ class SearchWidget extends StatelessWidget {
           fontFamily: DmSans,
           fontSize: 16,
         ),
-        onChanged: (val) => {},
       ),
     );
   }

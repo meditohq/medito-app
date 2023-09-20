@@ -3,6 +3,7 @@ import 'package:Medito/models/home/home_model.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
@@ -133,7 +134,11 @@ class _HomeViewState extends ConsumerState<HomeView>
                               ),
                               Column(
                                 children: [
-                                  SearchWidget(),
+                                  GestureDetector(
+                                    onTap: () =>
+                                        context.push(RouteConstants.search),
+                                    child: SearchWidget(),
+                                  ),
                                   height8,
                                   FilterWidget(
                                     chips: data.chips,
