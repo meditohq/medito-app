@@ -11,28 +11,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class FolderView extends ConsumerStatefulWidget {
-  const FolderView({Key? key, required this.id}) : super(key: key);
+class PackView extends ConsumerStatefulWidget {
+  const PackView({Key? key, required this.id}) : super(key: key);
 
   final String id;
 
   @override
-  ConsumerState<FolderView> createState() => _FolderViewState();
+  ConsumerState<PackView> createState() => _FolderViewState();
 }
 
-class _FolderViewState extends ConsumerState<FolderView>
-    with AutomaticKeepAliveClientMixin<FolderView> {
+class _FolderViewState extends ConsumerState<PackView>
+    with AutomaticKeepAliveClientMixin<PackView> {
   @override
   void initState() {
     _handleTrackEvent(ref, widget.id);
     super.initState();
   }
 
-  void _handleTrackEvent(WidgetRef ref, String folderId) {
-    var folderViewedModel = FolderViewedModel(folderId: folderId);
+  void _handleTrackEvent(WidgetRef ref, String packId) {
+    var packViewedModel = PackViewedModel(packId: packId);
     var event = EventsModel(
-      name: EventTypes.folderViewed,
-      payload: folderViewedModel.toJson(),
+      name: EventTypes.packViewed,
+      payload: packViewedModel.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
   }
@@ -40,19 +40,19 @@ class _FolderViewState extends ConsumerState<FolderView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var folders = ref.watch(FoldersProvider(folderId: widget.id));
+    var packs = ref.watch(PacksProvider(packId: widget.id));
 
     return Scaffold(
-      body: folders.when(
+      body: packs.when(
         skipLoadingOnRefresh: false,
         skipLoadingOnReload: false,
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(
-            FoldersProvider(folderId: widget.id),
+            PacksProvider(packId: widget.id),
           ),
-          isLoading: folders.isLoading,
+          isLoading: packs.isLoading,
         ),
         loading: () => const FolderShimmerWidget(),
       ),
@@ -61,20 +61,20 @@ class _FolderViewState extends ConsumerState<FolderView>
 
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
-    FolderModel folder,
+    PackModel pack,
     WidgetRef ref,
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        return await ref.refresh(FoldersProvider(folderId: widget.id));
+        return await ref.refresh(PacksProvider(packId: widget.id));
       },
       child: CollapsibleHeaderWidget(
-        bgImage: folder.coverUrl,
-        title: '${folder.title}',
-        description: folder.description,
+        bgImage: pack.coverUrl,
+        title: '${pack.title}',
+        description: pack.description,
         selectableTitle: true,
         selectableDescription: true,
-        children: folder.items
+        children: pack.items
             .map(
               (e) => GestureDetector(
                 onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
@@ -83,7 +83,7 @@ class _FolderViewState extends ConsumerState<FolderView>
                   e.title,
                   e.subtitle,
                   e.type,
-                  folder.items.last == e,
+                  pack.items.last == e,
                 ),
               ),
             )
@@ -169,15 +169,15 @@ class _FolderViewState extends ConsumerState<FolderView>
     checkConnectivity().then((value) async {
       if (value) {
         var location = GoRouter.of(context).location;
-        if (type == TypeConstants.FOLDER) {
-          if (location.contains('folder2')) {
+        if (type == TypeConstants.PACK) {
+          if (location.contains('pack2')) {
             unawaited(context.push(getPathFromString(
-              RouteConstants.folder3Path,
+              RouteConstants.pack3Path,
               [location.split('/')[2], widget.id, id.toString()],
             )));
           } else {
             unawaited(context.push(getPathFromString(
-              RouteConstants.folder2Path,
+              RouteConstants.pack2Path,
               [widget.id, id.toString()],
             )));
           }

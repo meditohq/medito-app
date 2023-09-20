@@ -11,7 +11,7 @@ import 'package:Medito/views/auth/join_verify_OTP_view.dart';
 import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
-import 'package:Medito/views/folder/folder_view.dart';
+import 'package:Medito/views/pack/pack_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/track/track_view.dart';
 import 'package:Medito/views/splash_view.dart';
@@ -123,19 +123,19 @@ final router = GoRouter(
           pageBuilder: (context, state) => getCollectionMaterialPage(state),
         ),
         GoRoute(
-          path: RouteConstants.folderPath,
+          path: RouteConstants.packPath,
           routes: [
             _getTrackRoute(),
             _getArticleRoute(),
             _getWebviewRoute(),
             GoRoute(
-              path: 'folder2/:f2id',
+              path: 'pack2/:p2id',
               routes: [
                 _getTrackRoute(),
                 _getArticleRoute(),
                 _getWebviewRoute(),
                 GoRoute(
-                  path: 'folder3/:f3id',
+                  path: 'pack3/:p3id',
                   pageBuilder: (context, state) => getFolderMaterialPage(state),
                   routes: [
                     _getTrackRoute(),
@@ -286,7 +286,7 @@ GoRoute _getDownloadsRoute({bool fromRoot = false}) {
 //ignore: prefer-match-file-name
 enum Screen {
   splash,
-  folder,
+  pack,
   player,
   article,
   stats,
@@ -336,12 +336,12 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
-  var folderId =
-      state.params['f3id'] ?? state.params['f2id'] ?? state.params['fid'];
+  var packId =
+      state.params['p3id'] ?? state.params['p2id'] ?? state.params['pid'];
 
   return MaterialPage(
     key: state.pageKey,
-    child: FolderView(id: folderId ?? ''),
+    child: PackView(id: packId ?? ''),
   );
 }
 
@@ -360,19 +360,19 @@ String getPathFromString(String? place, List<String?> ids) {
   if (place == 'article') {
     return RouteConstants.articlePath.replaceAll(':aid', ids.first!);
   }
-  if (place != null && place.contains('folder3')) {
-    return RouteConstants.folder3Path
-        .replaceAll(':fid', ids.first!)
-        .replaceAll(':f2id', ids[1]!)
-        .replaceAll(':f3id', ids[2]!);
+  if (place != null && place.contains('pack3')) {
+    return RouteConstants.pack3Path
+        .replaceAll(':pid', ids.first!)
+        .replaceAll(':p2id', ids[1]!)
+        .replaceAll(':p3id', ids[2]!);
   }
-  if (place != null && place.contains('folder2')) {
-    return RouteConstants.folder2Path
-        .replaceAll(':fid', ids.first!)
-        .replaceAll(':f2id', ids[1]!);
+  if (place != null && place.contains('pack2')) {
+    return RouteConstants.pack2Path
+        .replaceAll(':pid', ids.first!)
+        .replaceAll(':p2id', ids[1]!);
   }
-  if (place == 'folder') {
-    return RouteConstants.folderPath.replaceAll(':fid', ids.first!);
+  if (place == 'pack') {
+    return RouteConstants.packPath.replaceAll(':pid', ids.first!);
   }
   if (place == 'url') {
     launchUrlMedito(ids.first);

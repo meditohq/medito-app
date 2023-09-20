@@ -6,17 +6,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 //ignore:prefer-match-file-name
-class MockFolderRepository extends Mock implements FolderRepositoryImpl {}
+class MockPackRepository extends Mock implements PackRepositoryImpl {}
 
 class Listener<T> extends Mock {
   void call(T? previous, T next);
 }
 
 void main() {
-  ProviderContainer makeProviderContainer(MockFolderRepository repository) {
+  ProviderContainer makeProviderContainer(MockPackRepository repository) {
     final container = ProviderContainer(
       overrides: [
-        folderRepositoryProvider.overrideWithValue(repository),
+        packRepositoryProvider.overrideWithValue(repository),
       ],
     );
     addTearDown(container.dispose);
@@ -24,12 +24,12 @@ void main() {
     return container;
   }
 
-  group('getFolders', () {
+  group('getPacks', () {
     test(
-      'get folders using the folder repository',
+      'get packs using the pack repository',
       () async {
         //ARRANGE
-        final folderResponseData = FolderModel(
+        final packResponseData = PackModel(
           id: '28',
           title: 'UCLA',
           description:
@@ -37,7 +37,7 @@ void main() {
           coverUrl: 'Some test cover url',
           isPublished: true,
           items: [
-            FolderItemsModel(
+            PackItemsModel(
               type: 'track',
               id: '120',
               title: 'Complete track',
@@ -46,22 +46,22 @@ void main() {
             ),
           ],
         );
-        final mockFolderRepository = MockFolderRepository();
-        when(() => mockFolderRepository.fetchFolders('28'))
-            .thenAnswer((_) async => folderResponseData);
+        final mockPackRepository = MockPackRepository();
+        when(() => mockPackRepository.fetchPacks('28'))
+            .thenAnswer((_) async => packResponseData);
 
         //ACT
-        final container = makeProviderContainer(mockFolderRepository);
+        final container = makeProviderContainer(mockPackRepository);
 
         //ASSERT
         expect(
-          container.read(foldersProvider(folderId: '28')),
-          const AsyncValue<FolderModel>.loading(),
+          container.read(packsProvider(packId: '28')),
+          const AsyncValue<PackModel>.loading(),
         );
-        await container.read(foldersProvider(folderId: '28').future);
+        await container.read(packsProvider(packId: '28').future);
         expect(
-          container.read(foldersProvider(folderId: '28')).value,
-          isA<FolderModel>()
+          container.read(packsProvider(packId: '28')).value,
+          isA<PackModel>()
               .having((s) => s.id, 'id', '28')
               .having((s) => s.title, 'title', 'UCLA')
               .having(
@@ -71,38 +71,38 @@ void main() {
               ),
         );
         verify(
-          () => mockFolderRepository.fetchFolders('28'),
+          () => mockPackRepository.fetchPacks('28'),
         ).called(1);
       },
     );
     test(
-      'return errors when folder repository throws',
+      'return errors when pack repository throws',
       () async {
         final exception = Exception();
         //ARRANGE
-        final mockFolderRepository = MockFolderRepository();
-        when(() => mockFolderRepository.fetchFolders('28'))
+        final mockPackRepository = MockPackRepository();
+        when(() => mockPackRepository.fetchPacks('28'))
             .thenAnswer((_) async => throw (exception));
 
         //ACT
-        final container = makeProviderContainer(mockFolderRepository);
+        final container = makeProviderContainer(mockPackRepository);
 
         //ASSERT
         expect(
-          container.read(foldersProvider(folderId: '28')),
-          const AsyncValue<FolderModel>.loading(),
+          container.read(packsProvider(packId: '28')),
+          const AsyncValue<PackModel>.loading(),
         );
         await expectLater(
-          container.read(foldersProvider(folderId: '28').future),
+          container.read(packsProvider(packId: '28').future),
           throwsA(isA<Exception>()),
         );
         expect(
-          container.read(foldersProvider(folderId: '28')),
-          isA<AsyncError<FolderModel>>()
+          container.read(packsProvider(packId: '28')),
+          isA<AsyncError<PackModel>>()
               .having((e) => e.error, 'error', exception),
         );
         verify(
-          () => mockFolderRepository.fetchFolders('28'),
+          () => mockPackRepository.fetchPacks('28'),
         ).called(1);
       },
     );

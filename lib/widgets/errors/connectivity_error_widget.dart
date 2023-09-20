@@ -36,7 +36,7 @@ class _ConnectivityErrorComponentState
     if (isFolder && isTrack) {
       ref.read(tracksProvider(trackId: id));
     } else if (isFolder && !isTrack) {
-      ref.read(FoldersProvider(folderId: id));
+      ref.read(PacksProvider(packId: id));
     }
   }
 

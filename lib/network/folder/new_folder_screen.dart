@@ -125,15 +125,15 @@ class NewFolderScreen extends ConsumerWidget {
     checkConnectivity().then((value) {
       if (value) {
         var location = GoRouter.of(context).location;
-        if (type == 'folder') {
-          if (location.contains('folder2')) {
+        if (type == 'pack') {
+          if (location.contains('pack2')) {
             context.go(getPathFromString(
-              RouteConstants.folder3Path,
+              RouteConstants.pack3Path,
               [location.split('/')[2], this.id, id.toString()],
             ));
           } else {
             context.go(getPathFromString(
-              RouteConstants.folder2Path,
+              RouteConstants.pack2Path,
               [this.id, id.toString()],
             ));
           }

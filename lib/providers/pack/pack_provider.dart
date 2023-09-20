@@ -1,15 +1,15 @@
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'folder_provider.g.dart';
+part 'pack_provider.g.dart';
 
 @riverpod
-Future<FolderModel> folders(
+Future<PackModel> packs(
   ref, {
-  required String folderId,
+  required String packId,
 }) {
-  final folderRepository = ref.watch(folderRepositoryProvider);
+  final packRepository = ref.watch(packRepositoryProvider);
   ref.keepAlive();
 
-  return folderRepository.fetchFolders(folderId);
+  return packRepository.fetchPacks(packId);
 }

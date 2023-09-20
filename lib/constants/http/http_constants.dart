@@ -11,7 +11,7 @@ class HTTPConstants {
   //END POINTS
   static const String USERS = 'users';
   static const String OTP = 'otp';
-  static const String FOLDERS = 'folders';
+  static const String PACKS = 'packs';
   static const String TRACKS = 'tracks';
   static const String BACKGROUND_SOUNDS = 'backgroundSounds';
   static const String HOME = 'home';
