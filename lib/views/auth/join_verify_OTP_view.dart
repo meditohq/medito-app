@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -38,9 +39,11 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
         await removeFirebaseToken();
         await requestGenerateFirebaseToken();
         await auth.setUserEmailInSharedPref(widget.email);
+        var params = JoinRouteParamsModel(
+            screen: widget.fromScreen, email: widget.email);
         unawaited(context.push(
           RouteConstants.joinWelcomePath,
-          extra: {'email': widget.email, 'screen': widget.fromScreen},
+          extra: params,
         ));
       } else if (status == Status.ERROR) {
         showSnackBar(context, auth.verifyOTPRes.message.toString());

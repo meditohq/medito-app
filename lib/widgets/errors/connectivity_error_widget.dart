@@ -34,9 +34,9 @@ class _ConnectivityErrorComponentState
     var isMeditation = location.contains('meditation');
 
     if (isFolder && isMeditation) {
-      ref.read(meditationsProvider(meditationId: int.parse(id)));
+      ref.read(meditationsProvider(meditationId: id));
     } else if (isFolder && !isMeditation) {
-      ref.read(FoldersProvider(folderId: int.parse(id)));
+      ref.read(FoldersProvider(folderId: id));
     }
   }
 
