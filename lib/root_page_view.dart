@@ -73,12 +73,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
 
-    // ref.listen(connectivityStatusProvider, (prev, next) {
-    //   if (next == ConnectivityStatus.isDisonnected) {
-    //     context.push(RouteConstants.connectivityErrorPath);
-    //   }
-    // });
-
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
       body: NotificationListener<ScrollNotification>(
