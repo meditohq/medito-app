@@ -15,7 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 //ignore: prefer-match-file-name
 class MeditoAppBarWidget extends StatelessWidget

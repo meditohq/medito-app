@@ -26,7 +26,7 @@ class HomeView extends ConsumerWidget {
         data: (data) => SafeArea(
           top: data.announcement == null,
           bottom: false,
-          child: Container(                                                                                   
+          child: Container(
             color: data.announcement?.colorBackground != null
                 ? ColorConstants.getColorFromString(
                     data.announcement!.colorBackground,

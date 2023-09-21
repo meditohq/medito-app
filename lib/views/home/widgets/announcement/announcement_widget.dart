@@ -96,7 +96,11 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
         LoadingButtonWidget(
           onPressed: () {
             _toggleCollapse();
-            _handleTrackEvent(ref, announcement.id, StringConstants.dismiss);
+            _handleTrackEvent(
+              ref,
+              announcement.id,
+              StringConstants.dismiss.toLowerCase(),
+            );
             ref.invalidate(remoteStatsProvider);
             ref.read(remoteStatsProvider);
             ref.invalidate(homeProvider);

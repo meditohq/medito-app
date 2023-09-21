@@ -72,9 +72,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       }
     });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
-      return ConnectivityErrorWidget();
-    }
 
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
@@ -101,7 +98,10 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                       bottomLeft: radius,
                       bottomRight: radius,
                     ),
-                    child: widget.firstChild,
+                    child: _renderChild(
+                      context,
+                      connectivityStatus as ConnectivityStatus,
+                    ),
                   ),
                 ),
                 _miniPlayer(radius, currentlyPlayingSession),
@@ -145,6 +145,17 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     }
 
     return SizedBox();
+  }
+
+  Widget _renderChild(BuildContext context, ConnectivityStatus status) {
+    var location = GoRouter.of(context).location;
+    if (location == RouteConstants.downloadsPath) {
+      return widget.firstChild;
+    } else if (status == ConnectivityStatus.isDisonnected) {
+      return ConnectivityErrorWidget();
+    } else {
+      return widget.firstChild;
+    }
   }
 
   void _handleAudioStartedEvent(

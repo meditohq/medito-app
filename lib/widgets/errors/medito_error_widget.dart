@@ -1,7 +1,8 @@
-
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MeditoErrorWidget extends StatelessWidget {
   const MeditoErrorWidget({
@@ -9,12 +10,20 @@ class MeditoErrorWidget extends StatelessWidget {
     required this.onTap,
     required this.message,
     this.isLoading = false,
+    this.showCheckDownloadText = false,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
   final bool isLoading;
+  final bool showCheckDownloadText;
   @override
   Widget build(BuildContext context) {
+    var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
+          fontSize: 16,
+          color: ColorConstants.walterWhite,
+          fontFamily: ClashDisplay,
+        );
+
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SizedBox(
@@ -25,13 +34,29 @@ class MeditoErrorWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                message,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontSize: 16,
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                    ),
+              RichText(
+                text: TextSpan(
+                  text: '$message ',
+                  style: textStyle,
+                  children: <TextSpan>[
+                    if (showCheckDownloadText)
+                      TextSpan(
+                        text: '${StringConstants.meanWhileCheck} ',
+                        style: textStyle,
+                      ),
+                    if (showCheckDownloadText)
+                      TextSpan(
+                        text: '${StringConstants.downloads.toLowerCase()}',
+                        style: textStyle?.copyWith(
+                          decoration: TextDecoration.underline,
+                          color: ColorConstants.purple,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap =
+                              () => context.push(RouteConstants.downloadsPath),
+                      ),
+                  ],
+                ),
                 textAlign: TextAlign.center,
               ),
               height16,
