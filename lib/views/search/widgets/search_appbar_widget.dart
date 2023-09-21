@@ -13,6 +13,7 @@ class SearchAppbarWidget extends StatelessWidget
 
     return AppBar(
       backgroundColor: ColorConstants.onyx,
+      elevation: 0.0,
       titleSpacing: 0,
       leading: IconButton(
         splashRadius: 20,
@@ -24,9 +25,13 @@ class SearchAppbarWidget extends StatelessWidget
         cursorWidth: 1,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(top: 11.5),
-          suffixIcon: Icon(
-            Icons.close,
-            color: ColorConstants.walterWhite,
+          suffixIcon: IconButton(
+            splashRadius: 20,
+            onPressed: () => {},
+            icon: Icon(
+              Icons.close,
+              color: ColorConstants.walterWhite,
+            ),
           ),
           hintText: StringConstants.whatAreYouLookingFor,
           hintStyle: textTheme.titleSmall

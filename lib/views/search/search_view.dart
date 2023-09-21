@@ -8,24 +8,21 @@ class SearchView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const listViewPadding =
+        EdgeInsets.only(top: 20, bottom: 60, left: 15, right: 15);
+
     return Scaffold(
       appBar: SearchAppbarWidget(),
       body: Column(
         children: [
           Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 15.0,
-                childAspectRatio: 0.72,
-              ),
-              padding:
-                  EdgeInsets.only(top: 15, bottom: 60, left: 15, right: 15),
+            child: ListView.builder(
+              padding: listViewPadding,
               itemBuilder: (BuildContext context, int index) {
                 return SearchResultCardWidget(
                   title: 'Practice',
-                  description: 'Anti-racism with your friends & loved ones',
+                  description:
+                      'A trip to a cabin near a beautiful lake during summer',
                   coverUrlPath:
                       'https://images.medito.space/nsUsoAf9PMwuBXNk.png',
                 );
