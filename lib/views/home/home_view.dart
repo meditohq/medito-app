@@ -97,7 +97,8 @@ class _HomeViewState extends ConsumerState<HomeView>
                                   FilterWidget(
                                     chips: data.chips,
                                   ),
-                                  if (data.announcement != null)
+                                  if (data.announcement != null &&
+                                      !_isCollapsed)
                                     SizedBox(
                                       height: 32,
                                     ),
