@@ -97,11 +97,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                                   FilterWidget(
                                     chips: data.chips,
                                   ),
-                                  if (data.announcement != null &&
-                                      !_isCollapsed)
-                                    SizedBox(
-                                      height: 32,
-                                    ),
                                   _getAnnouncementBanner(data),
                                   height16,
                                   height16,
@@ -162,9 +157,12 @@ class _HomeViewState extends ConsumerState<HomeView>
             : Tween<double>(begin: 0.0, end: 1.0).animate(
                 curvedAnimation,
               ),
-        child: AnnouncementWidget(
-          announcement: data.announcement!,
-          onPressedDismiss: _handleCollapse,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 32.0),
+          child: AnnouncementWidget(
+            announcement: data.announcement!,
+            onPressedDismiss: _handleCollapse,
+          ),
         ),
       );
     }
