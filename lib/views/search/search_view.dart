@@ -8,7 +8,10 @@ class SearchView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SearchAppbarWidget(),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SearchAppbarWidget(),
+      ),
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [

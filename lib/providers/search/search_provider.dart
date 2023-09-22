@@ -5,11 +5,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'search_provider.g.dart';
 
 @riverpod
-Future<List<SearchModel>> search(ref) async {
+Future<SearchModel> search(ref) async {
   var query = ref.watch(searchQueryProvider);
   final searchRepository = ref.watch(searchRepositoryProvider);
 
-  return query != '' ? searchRepository.fetchSearchResult(query) : [];
+  return query != ''
+      ? searchRepository.fetchSearchResult(query)
+      : SearchModel();
 }
 
 final searchQueryProvider = StateProvider((ref) => '');

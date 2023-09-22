@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'search_repository.g.dart';
 
 abstract class SearchRepository {
-  Future<List<SearchModel>> fetchSearchResult(String query);
+  Future<SearchModel> fetchSearchResult(String query);
 }
 
 class SearchRepositoryImpl extends SearchRepository {
@@ -16,17 +16,23 @@ class SearchRepositoryImpl extends SearchRepository {
   SearchRepositoryImpl({required this.client});
 
   @override
-  Future<List<SearchModel>> fetchSearchResult(String query) async {
+  Future<SearchModel> fetchSearchResult(String query) async {
     try {
       var res = await client
           .postRequest('${HTTPConstants.SEARCH}', data: {'query': '$query'});
-      var searchResults = <SearchModel>[];
-      var list = res as List;
-      for (var element in list) {
-        searchResults.add(SearchModel.fromJson(element));
+      var searchResults = <SearchItemsModel>[];
+      var searhModel = SearchModel();
+      if (res is Map) {
+        searhModel = searhModel.copyWith(message: res['message']);
+      } else {
+        var list = res as List;
+        for (var element in list) {
+          searchResults.add(SearchItemsModel.fromJson(element));
+        }
+        searhModel = searhModel.copyWith(items: searchResults);
       }
 
-      return searchResults;
+      return searhModel;
     } catch (e) {
       rethrow;
     }

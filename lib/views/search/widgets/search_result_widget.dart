@@ -24,36 +24,41 @@ class SearchResultWidget extends ConsumerWidget {
 
     return searchResult.when(
       data: (data) {
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: ListView.builder(
-            padding: listViewPadding,
-            itemBuilder: (BuildContext context, int index) {
-              var element = data[index];
+        if (data.message != null) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+            child: Text(
+              data.message.toString(),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    letterSpacing: 0,
+                    color: ColorConstants.walterWhite,
+                    fontSize: 14,
+                  ),
+            ),
+          );
+        }
 
-              return SearchResultCardWidget(
-                title: element.category,
-                description: element.title,
-                coverUrlPath: element.coverUrl,
-                onTap: () =>
-                    _handleTap(context, element.id, element.type, element.path),
-              );
-            },
-            itemCount: data.length,
-          ),
+        return ListView.builder(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: listViewPadding,
+          itemBuilder: (BuildContext context, int index) {
+            var element = data.items[index];
+
+            return SearchResultCardWidget(
+              title: element.category,
+              description: element.title,
+              coverUrlPath: element.coverUrl,
+              onTap: () =>
+                  _handleTap(context, element.id, element.type, element.path),
+            );
+          },
+          itemCount: data.items.length,
         );
       },
-      error: (err, stack) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-        child: Text(
-          err.toString(),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                letterSpacing: 0,
-                color: ColorConstants.walterWhite,
-                fontSize: 14,
-              ),
-        ),
+      error: (err, stack) => MeditoErrorWidget(
+        message: err.toString(),
+        onTap: () => ref.refresh(searchProvider),
+        isLoading: searchResult.isLoading,
       ),
       loading: () => const SearchResultShimmerWidget(),
     );

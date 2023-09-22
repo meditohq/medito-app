@@ -4,14 +4,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class SearchAppbarWidget extends ConsumerWidget implements PreferredSizeWidget {
+class SearchAppbarWidget extends ConsumerStatefulWidget {
   const SearchAppbarWidget({super.key});
+  @override
+  ConsumerState<SearchAppbarWidget> createState() => _SearchAppbarWidgetState();
+}
+
+class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
+  bool showCancelIcon = false;
+  FocusNode searchInputFocusNode = FocusNode();
+  var textEditingController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    textEditingController.text = ref.read(searchQueryProvider);
+    showCancelIcon = textEditingController.text != '';
+    super.initState();
+  }
+
+  void openKeyboard() {
+    FocusScope.of(context).requestFocus(searchInputFocusNode);
+    setState(() {
+      showCancelIcon = false;
+    });
+  }
+
+  void handleCancelIconVisibility(String val) {
+    if (val.isNotEmpty && !showCancelIcon) {
+      setState(() {
+        showCancelIcon = true;
+      });
+    } else if (val.isEmpty && showCancelIcon) {
+      setState(() {
+      showCancelIcon = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
-    final textEditingController =
-        TextEditingController(text: ref.read(searchQueryProvider));
     var outlineInputBorder = _outlineInputBorder();
 
     return AppBar(
@@ -24,20 +56,25 @@ class SearchAppbarWidget extends ConsumerWidget implements PreferredSizeWidget {
         icon: Icon(Icons.arrow_back),
       ),
       title: TextFormField(
+        focusNode: searchInputFocusNode,
         controller: textEditingController,
         cursorColor: ColorConstants.walterWhite,
         cursorWidth: 1,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(top: 11.5),
-          suffixIcon: IconButton(
-            splashRadius: 20,
-            onPressed: () {
-              ref.read(searchQueryProvider.notifier).state = '';
-              textEditingController.text = '';
-            },
-            icon: Icon(
-              Icons.close,
-              color: ColorConstants.walterWhite,
+          suffixIcon: Visibility(
+            visible: showCancelIcon,
+            child: IconButton(
+              splashRadius: 20,
+              onPressed: () {
+                ref.read(searchQueryProvider.notifier).state = '';
+                textEditingController.text = '';
+                openKeyboard();
+              },
+              icon: Icon(
+                Icons.close,
+                color: ColorConstants.walterWhite,
+              ),
             ),
           ),
           hintText: StringConstants.whatAreYouLookingFor,
@@ -57,6 +94,7 @@ class SearchAppbarWidget extends ConsumerWidget implements PreferredSizeWidget {
         onFieldSubmitted: (val) {
           ref.read(searchQueryProvider.notifier).state = val;
         },
+        onChanged: (val) => handleCancelIconVisibility(val),
       ),
     );
   }
@@ -68,7 +106,4 @@ class SearchAppbarWidget extends ConsumerWidget implements PreferredSizeWidget {
         borderSide: BorderSide(color: color, width: 0),
         borderRadius: BorderRadius.circular(15),
       );
-
-  @override
-  Size get preferredSize => Size.fromHeight(56.0);
 }
