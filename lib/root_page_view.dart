@@ -60,18 +60,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   Widget build(BuildContext context) {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
-    ref.listen(playerProvider, (prev, next) {
-      var prevId = prev?.audio.first.files.first.id;
-      var nextId = next?.audio.first.files.first.id;
-      if (next != null &&
-          (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
-        _handleAudioStartedEvent(
-          ref,
-          next.id,
-          next.audio.first.files.first.id,
-        );
-      }
-    });
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
 
     return Scaffold(
@@ -158,19 +146,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     } else {
       return widget.firstChild;
     }
-  }
-
-  void _handleAudioStartedEvent(
-    WidgetRef ref,
-    String trackId,
-    String audioFileId,
-  ) {
-    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
-    var event = EventsModel(
-      name: EventTypes.audioStarted,
-      payload: audio.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
   }
 
   void _saveFcmTokenEvent(

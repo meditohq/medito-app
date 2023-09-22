@@ -34,22 +34,6 @@ class TrackView extends ConsumerStatefulWidget {
 class _TrackViewState extends ConsumerState<TrackView>
     with AutomaticKeepAliveClientMixin<TrackView> {
   @override
-  void initState() {
-    _handleTrackEvent(ref, widget.id);
-    super.initState();
-  }
-
-  void _handleTrackEvent(WidgetRef ref, String trackId) {
-    var trackViewedModel =
-        TrackViewedModel(trackId: trackId);
-    var event = EventsModel(
-      name: EventTypes.trackViewed,
-      payload: trackViewedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
-  }
-
-  @override
   Widget build(BuildContext context) {
     super.build(context);
     ref.watch(trackOpenedFirstTimeProvider);
@@ -71,16 +55,14 @@ class _TrackViewState extends ConsumerState<TrackView>
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () =>
-              ref.refresh(tracksProvider(trackId: widget.id)),
+          onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
     );
   }
 
-  TrackShimmerWidget _buildLoadingWidget() =>
-      const TrackShimmerWidget();
+  TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
     TrackModel trackModel,
