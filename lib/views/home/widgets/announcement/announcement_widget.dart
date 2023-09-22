@@ -27,34 +27,31 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   Widget build(BuildContext context) {
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
-    var topPadding = MediaQuery.of(context).viewPadding.top;
     var size = MediaQuery.of(context).size;
 
-    return Column(
-      children: [
-        Container(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        width: size.width,
+        decoration: BoxDecoration(
           color: bgColor,
-          width: size.width,
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              SizedBox(
-                height: topPadding,
-                width: size.width,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _icon(widget.announcement.icon),
-                  _text(context, widget.announcement.text),
-                ],
-              ),
-              height16,
-              _actionBtn(context, ref, widget.announcement),
-            ],
-          ),
+          borderRadius: BorderRadius.circular(14),
         ),
-      ],
+        padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 24),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _icon(widget.announcement.icon),
+                _text(context, widget.announcement.text),
+              ],
+            ),
+            height16,
+            _actionBtn(context, ref, widget.announcement),
+          ],
+        ),
+      ),
     );
   }
 
@@ -83,8 +80,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
               announcement.id,
               StringConstants.dismiss.toLowerCase(),
             );
-            //ignore: unused_result
-            // ref.refresh(homeProvider);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,

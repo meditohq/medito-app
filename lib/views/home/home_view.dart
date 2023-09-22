@@ -21,10 +21,6 @@ class HomeView extends ConsumerStatefulWidget {
 class _HomeViewState extends ConsumerState<HomeView>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   bool _isCollapsed = false;
-  Color _backgroundColor = ColorConstants.ebony;
-  var _announcementColor;
-  var hasAnnouncement = false;
-
   final ScrollController _scrollController = ScrollController();
 
   late CurvedAnimation curvedAnimation = CurvedAnimation(
@@ -35,34 +31,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     curve: Curves.easeInOut,
   );
 
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final newColor = _scrollController.offset > 100
-        ? ColorConstants.ebony
-        : _announcementColor;
-    if (_backgroundColor != newColor) {
-      setState(() {
-        _backgroundColor = newColor;
-      });
-    }
-  }
-
   void _handleCollapse() {
     setState(() {
       _isCollapsed = !_isCollapsed;
-      hasAnnouncement = !hasAnnouncement;
-      _backgroundColor = ColorConstants.ebony;
     });
     curvedAnimation = CurvedAnimation(
       parent: AnimationController(
@@ -79,25 +50,15 @@ class _HomeViewState extends ConsumerState<HomeView>
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
-    var topPadding = MediaQuery.of(context).viewPadding.top;
 
     return Scaffold(
       body: homeRes.when(
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
         data: (data) {
-          hasAnnouncement = data.announcement == null;
-          _announcementColor = !_isCollapsed && !hasAnnouncement
-              ? ColorConstants.getColorFromString(
-                  data.announcement!.colorBackground,
-                )
-              : ColorConstants.ebony;
-
           return SafeArea(
-            top: hasAnnouncement,
             bottom: false,
             child: Container(
-              color: _backgroundColor,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -121,13 +82,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                           color: ColorConstants.ebony,
                           child: Column(
                             children: [
-                              _getAnnouncementBanner(data),
-                              Visibility(
-                                visible: hasAnnouncement ? false : _isCollapsed,
-                                child: SizedBox(
-                                  height: topPadding,
-                                ),
-                              ),
                               HomeHeaderWidget(
                                 homeMenuModel: data.menu,
                                 miniStatsModel: stats.asData?.value.mini,
@@ -143,6 +97,11 @@ class _HomeViewState extends ConsumerState<HomeView>
                                   FilterWidget(
                                     chips: data.chips,
                                   ),
+                                  if (data.announcement != null)
+                                    SizedBox(
+                                      height: 32,
+                                    ),
+                                  _getAnnouncementBanner(data),
                                   height16,
                                   height16,
                                   _cardListWidget(data),

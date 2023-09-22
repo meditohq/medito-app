@@ -10,7 +10,7 @@ class SearchResultShimmerWidget extends StatelessWidget {
     return SingleChildScrollView(
       padding: EdgeInsets.only(top: 20, left: 15, right: 15),
       child: Column(
-        children: List.generate(5, (index) => _shimmerList()),
+        children: List.generate(8, (index) => _shimmerList()),
       ),
     );
   }
