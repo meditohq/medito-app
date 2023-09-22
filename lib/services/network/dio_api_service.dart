@@ -57,7 +57,8 @@ class DioApiService {
   }
 
   CustomException _returnDioErrorResponse(DioError error) {
-    var message = error.response?.data?['error'];
+    var data = error.response?.data;
+    var message = data?['error'] ?? data?['message'];
     if (error.type == DioErrorType.receiveTimeout) {
       throw FetchDataException('Error connection timeout');
     }

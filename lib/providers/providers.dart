@@ -16,3 +16,4 @@ export 'connectivity/connectivity_provider.dart';
 export 'stats/stats_provider.dart';
 export 'device_and_app_info/device_and_app_info_provider.dart';
 export 'events/events_provider.dart';
+export 'search/search_provider.dart';

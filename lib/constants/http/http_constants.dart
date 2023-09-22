@@ -18,4 +18,5 @@ class HTTPConstants {
   static const String STATS = 'stats';
   static const String ME = 'me';
   static const String EVENTS = 'events';
+  static const String SEARCH = 'search';
 }

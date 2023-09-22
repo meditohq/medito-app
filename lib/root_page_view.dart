@@ -76,6 +76,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
 
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
+      resizeToAvoidBottomInset: false,
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
           if (scrollNotification is ScrollUpdateNotification &&

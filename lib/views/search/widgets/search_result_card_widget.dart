@@ -18,42 +18,27 @@ class SearchResultCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      width: 170,
-      decoration: BoxDecoration(
-        color: ColorConstants.onyx,
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
             SizedBox(
-              height: 145,
-              width: 175,
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-                child: NetworkImageWidget(
-                  url: coverUrlPath,
-                ),
+              height: 56,
+              width: 56,
+              child: NetworkImageWidget(
+                url: coverUrlPath,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                bottom: 15,
-                top: 12,
-              ),
+            SizedBox(
+              width: 12,
+            ),
+            Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _title(textTheme, title: title),
-                  height4,
                   _description(
                     textTheme,
                     description: description,
@@ -70,11 +55,10 @@ class SearchResultCardWidget extends StatelessWidget {
   Text _title(TextTheme textTheme, {required String title}) {
     return Text(
       title,
-      maxLines: 3,
+      maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: textTheme.titleMedium?.copyWith(
-        letterSpacing: 0,
-      ),
+      style:
+          textTheme.titleMedium?.copyWith(letterSpacing: 0, fontFamily: DmMono),
     );
   }
 
@@ -83,8 +67,12 @@ class SearchResultCardWidget extends StatelessWidget {
       description,
       maxLines: 3,
       overflow: TextOverflow.ellipsis,
-      style: textTheme.titleMedium
-          ?.copyWith(letterSpacing: 0, color: ColorConstants.walterWhite),
+      style: textTheme.titleMedium?.copyWith(
+        letterSpacing: 0,
+        color: ColorConstants.walterWhite,
+        fontSize: 16,
+        height: 1.28,
+      ),
     );
   }
 }
