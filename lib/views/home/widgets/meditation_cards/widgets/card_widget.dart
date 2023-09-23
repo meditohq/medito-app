@@ -29,8 +29,8 @@ class CardWidget extends ConsumerWidget {
             foregroundDecoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  ColorConstants.almostBlack.withOpacity(0.15),
-                  ColorConstants.almostBlack,
+                  ColorConstants.almostBlack.withOpacity(0),
+                  ColorConstants.almostBlack.withOpacity(0.5),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
