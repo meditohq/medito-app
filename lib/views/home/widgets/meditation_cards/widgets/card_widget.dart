@@ -1,4 +1,5 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/views/home/widgets/meditation_cards/widgets/animated_scale_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,38 +21,40 @@ class CardWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
 
-    return Stack(
-      children: [
-        SizedBox(
-          width: 154,
-          height: 156,
-          child: Container(
-            foregroundDecoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  ColorConstants.almostBlack.withOpacity(0),
-                  ColorConstants.almostBlack.withOpacity(0.5),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+    return AnimatedScaleWidget(
+      child: Stack(
+        children: [
+          SizedBox(
+            width: 154,
+            height: 156,
+            child: Container(
+              foregroundDecoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    ColorConstants.almostBlack.withOpacity(0),
+                    ColorConstants.almostBlack.withOpacity(0.5),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: NetworkImageWidget(
+                url: coverUrlPath,
+                isCache: true,
               ),
             ),
-            child: NetworkImageWidget(
-              url: coverUrlPath,
-              isCache: true,
+          ),
+          InkWell(
+            onTap: onTap,
+            child: Container(
+              width: 154,
+              height: 154,
+              color: ColorConstants.transparent,
+              child: _tagAndTitle(textTheme, tag: tag, title: title),
             ),
           ),
-        ),
-        InkWell(
-          onTap: onTap,
-          child: Container(
-            width: 154,
-            height: 154,
-            color: ColorConstants.transparent,
-            child: _tagAndTitle(textTheme, tag: tag, title: title),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
