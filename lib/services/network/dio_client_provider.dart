@@ -7,8 +7,6 @@ import 'package:Medito/services/shared_preference/shared_preferences_service.dar
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// part 'dio_client_provider.g.dart';
-
 final dioClientProvider = Provider<DioApiService>((ref) {
   var dio = Dio();
   dio.options = BaseOptions(
