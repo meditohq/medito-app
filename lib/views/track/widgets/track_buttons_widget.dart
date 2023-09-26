@@ -48,15 +48,23 @@ class TrackButtonsWidget extends StatelessWidget {
     return SizedBox();
   }
 
-  Wrap _gridList(
+  GridView _gridList(
     int i,
   ) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      alignment: WrapAlignment.spaceBetween,
-      children:
-          trackModel.audio[i].files.map((e) => _getGridItem(e)).toList(),
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        return _getGridItem(trackModel.audio[i].files[index]);
+      },
+      itemCount: trackModel.audio[i].files.length,
     );
   }
 
@@ -68,10 +76,9 @@ class TrackButtonsWidget extends StatelessWidget {
         onTap: () => _handleTap(ref, file),
         borderRadius: BorderRadius.circular(14),
         child: Ink(
-          width: 171,
           height: 56,
           decoration: BoxDecoration(
-            color: ColorConstants.greyIsTheNewGrey,
+            color: ColorConstants.onyx,
             borderRadius: BorderRadius.all(
               Radius.circular(14),
             ),
