@@ -9,7 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'main.dart';
 import 'widgets/widgets.dart';
 import 'views/player/widgets/mini_player_widget.dart';
 
@@ -42,7 +41,8 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   void _checkNotificationPermission() {
     Future.delayed(Duration(seconds: 4), () {
       checkNotificationPermission().then((value) {
-        var checkPermissionStatusInLocalStorage = sharedPreferences
+        var checkPermissionStatusInLocalStorage = ref
+            .read(sharedPreferencesProvider)
             .getBool(SharedPreferenceConstants.notificationPermission);
         if (Platform.isAndroid &&
             checkPermissionStatusInLocalStorage == null &&

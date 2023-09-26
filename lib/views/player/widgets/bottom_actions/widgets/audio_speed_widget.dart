@@ -17,11 +17,10 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
   void initState() {
     super.initState();
     final _provider = ref.read(audioSpeedProvider);
-    _provider.getAudioTrackSpeedFromPref().then((_) {
-      ref
-          .read(audioPlayerNotifierProvider)
-          .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-    });
+    _provider.getAudioTrackSpeedFromPref();
+    ref
+        .read(audioPlayerNotifierProvider)
+        .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
   }
 
   @override

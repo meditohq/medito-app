@@ -1,10 +1,10 @@
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'background_sounds_provider.g.dart';
@@ -20,22 +20,25 @@ Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
 final backgroundSoundsNotifierProvider =
     ChangeNotifierProvider<BackgroundSoundsNotifier>(
   (ref) {
-    return BackgroundSoundsNotifier();
+    return BackgroundSoundsNotifier(ref);
   },
 );
 
 //ignore:prefer-match-file-name
 class BackgroundSoundsNotifier extends ChangeNotifier {
+  final Ref ref;
   double volume = 0;
   BackgroundSoundsModel? selectedBgSound;
+
+  BackgroundSoundsNotifier(this.ref);
 
   void handleOnChangeVolume(double vol) {
     volume = vol;
     unawaited(
-      SharedPreferencesService.addDoubleInSharedPref(
-        SharedPreferenceConstants.bgSoundVolume,
-        vol,
-      ),
+      ref.read(sharedPreferencesProvider).setDouble(
+            SharedPreferenceConstants.bgSoundVolume,
+            vol,
+          ),
     );
     notifyListeners();
   }
@@ -44,48 +47,42 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     selectedBgSound = sound;
     if (sound != null) {
       unawaited(
-        SharedPreferencesService.addStringInSharedPref(
-          SharedPreferenceConstants.bgSound,
-          json.encode(
-            sound.toJson(),
-          ),
-        ),
+        ref.read(sharedPreferencesProvider).setString(
+              SharedPreferenceConstants.bgSound,
+              json.encode(
+                sound.toJson(),
+              ),
+            ),
       );
     } else {
       unawaited(
-        SharedPreferencesService.removeValueFromSharedPref(
-          SharedPreferenceConstants.bgSound,
-        ),
+        ref.read(sharedPreferencesProvider).remove(
+              SharedPreferenceConstants.bgSound,
+            ),
       );
     }
     notifyListeners();
   }
 
-  Future<void> getBackgroundSoundFromPref() async {
-    await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.bgSound,
-    ).then(
-      (value) {
-        if (value != null) {
-          selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
-          notifyListeners();
-        }
-      },
-    );
+  void getBackgroundSoundFromPref() {
+    var value = ref.read(sharedPreferencesProvider).getString(
+          SharedPreferenceConstants.bgSound,
+        );
+    if (value != null) {
+      selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
+      notifyListeners();
+    }
   }
 
-  Future<void> getVolumeFromPref() async {
-    await SharedPreferencesService.getDoubleFromSharedPref(
-      SharedPreferenceConstants.bgSoundVolume,
-    ).then(
-      (value) {
-        if (value != null) {
-          volume = value;
-          notifyListeners();
-        } else {
-          handleOnChangeVolume(50.0);
-        }
-      },
-    );
+  void getVolumeFromPref() {
+    var value = ref.read(sharedPreferencesProvider).getDouble(
+          SharedPreferenceConstants.bgSoundVolume,
+        );
+    if (value != null) {
+      volume = value;
+      notifyListeners();
+    } else {
+      handleOnChangeVolume(50.0);
+    }
   }
 }

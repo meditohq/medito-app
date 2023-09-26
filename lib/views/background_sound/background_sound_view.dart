@@ -35,16 +35,15 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     final _provider = ref.read(backgroundSoundsNotifierProvider);
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
     if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
-      _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.none) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          _audioPlayerNotifier.playBackgroundSound();
-        }
-      });
-      _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-      });
+      _provider.getBackgroundSoundFromPref();
+      if (_provider.selectedBgSound != null &&
+          _provider.selectedBgSound?.title != StringConstants.none) {
+        _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+        _audioPlayerNotifier.playBackgroundSound();
+      }
+
+      _provider.getVolumeFromPref();
+      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
     }
   }
 

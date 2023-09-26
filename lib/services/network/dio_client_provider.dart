@@ -4,7 +4,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -53,11 +52,12 @@ Future<void> onError(
   );
   if (err.response?.statusCode == 401) {
     var router = ref.read(goRouterProvider);
+    var _sharedPreferenceProvider = ref.read(sharedPreferencesProvider);
     unawaited(ref.read(audioPlayerNotifierProvider).pause());
-    await SharedPreferencesService.removeValueFromSharedPref(
+    await _sharedPreferenceProvider.remove(
       SharedPreferenceConstants.userToken,
     );
-    await SharedPreferencesService.removeValueFromSharedPref(
+    await _sharedPreferenceProvider.remove(
       SharedPreferenceConstants.userEmail,
     );
     handler.reject(err);

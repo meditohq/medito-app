@@ -13,9 +13,10 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/main.dart';
 import 'package:Medito/network/cache.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -220,32 +221,13 @@ Future<int> incrementNumTracks() async {
   return current;
 }
 
-void toggleListenedStatus(String id) {
-  var listened = checkListened(id);
-  if (listened) {
-    markAsNotListened(id);
-  } else {
-    markAsListened(id);
-  }
-}
-
-void markAsListened(String id) {
+void markAsListened(WidgetRef ref, String id) {
   print('mark as listened');
-  unawaited(sharedPreferences.setBool('listened' + id, true));
-}
-
-void markAsNotListened(String id) {
-  sharedPreferences.setBool('listened' + id, false);
+  unawaited(ref.read(sharedPreferencesProvider).setBool('listened' + id, true));
 }
 
 Future<void> clearBgStats() {
   return writeJSONToCache('', 'stats');
-}
-
-bool checkListened(String? id) {
-  if (id == null) return false;
-
-  return sharedPreferences.getBool('listened' + id) ?? false;
 }
 
 void setVersionCopySeen(int id) async {
@@ -275,7 +257,7 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
   return now.isAfter(thirtyTwoHoursAfterTime);
 }
 
-Future updateStatsFromBg() async {
+Future updateStatsFromBg(WidgetRef ref) async {
   var read = await readJSONFromCache('stats');
   print('read ->$read');
 
@@ -287,7 +269,7 @@ Future updateStatsFromBg() async {
     if (map != null && map.isNotEmpty) {
       await updateStreak();
       await incrementNumTracks();
-      markAsListened(id);
+      markAsListened(ref, id);
       await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
     print('clearing bg stats');
