@@ -54,6 +54,10 @@ jobs:
       # - name: Run test
       #   run: flutter test
 
+      - name: Decode and place GoogleService-Info.plist
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 -d > ios/Runner/GoogleService-Info.plist
+
       - name: Build ios bundle without code signing
         run: flutter build ios --release --no-codesign --no-tree-shake-icons
 
