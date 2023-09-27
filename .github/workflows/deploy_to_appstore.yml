@@ -55,7 +55,7 @@ jobs:
       #   run: flutter test
 
       - name: Build ios bundle without code signing
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --no-tree-shake-icons
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
