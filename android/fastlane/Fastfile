@@ -1,19 +1,30 @@
 # This file contains the fastlane.tools configuration
 # You can find the documentation at https://docs.fastlane.tools
-#
+
 # For a list of all available actions, check out
-#
 #     https://docs.fastlane.tools/actions
-#
+
 # For a list of all available plugins, check out
-#
 #     https://docs.fastlane.tools/plugins/available-plugins
-#
 
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
 default_platform(:android)
+
+# Method to update .env with the appropriate values based on environment
+def set_environment_values(url, init_token, sentry_dsn)
+  env_file_path = "./.env"
+  content = File.read(env_file_path)
+  
+  # Update the values
+  updated_content = content
+                    .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
+                    .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
+                    .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
+  
+  File.write(env_file_path, updated_content)
+end
 
 platform :android do
   desc "Runs all the tests"
@@ -23,18 +34,16 @@ platform :android do
 
   desc "Submit a new beta build to Google Play"
   lane :beta do
+    set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["STAGING_SENTRY_DSN"])
     sh "flutter build appbundle -v"
     upload_to_play_store(
       track: 'beta',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
       json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
-      # Skip all the metadata and screenshots for now
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: true,
-      # set as "draft" to complete the release at some other time
-      # TODO: remove this after verify fastlane setup works correctly
       release_status: "draft",
     )
   end
@@ -45,31 +54,26 @@ platform :android do
       track: 'beta',
       track_promote_to: 'production',
       json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
-      # Skip all the metadata and screenshots for now
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: true,
-      # set as "draft" to complete the release at some other time
-      # TODO: remove this after verify fastlane setup works correctly
       release_status: "draft",
     )
   end
 
   desc "Submit a new production build to Google Play"
   lane :production do
+    set_environment_values(ENV["PRODUCTION_URL"], ENV["PRODUCTION_INIT_TOKEN"], ENV["PRODUCTION_SENTRY_DSN"])
     sh "flutter build appbundle -v"
     upload_to_play_store(
       track: 'production',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
       json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
-      # Skip all the metadata and screenshots for now
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: true,
-      # set as "draft" to complete the release at some other time
-      # TODO: remove this after verify fastlane setup works correctly
       release_status: "draft",
     )
   end
