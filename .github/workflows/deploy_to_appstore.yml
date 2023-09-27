@@ -1,90 +1,119 @@
-name: Deploy to App Store 
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
 
-on:
-  workflow_dispatch:
-    # Enable manual run
-    inputs:
-      lane:
-        description: 'Currently, only support beta lane'
-        required: true
-        default: 'beta'
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
 
-jobs:
-  deploy_ios:
-    name: Deploy beta build to TestFlight
-    runs-on: macos-latest
-    environment: prod
-    steps:
-      # Set up Flutter.
-      - name: Clone Flutter repository with stable channel
-        uses: subosito/flutter-action@v1.5.0
-        with:
-          channel: stable
-      - run: flutter doctor -v
+default_platform(:ios)
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+# Method to update .env with the appropriate values based on environment
+def set_environment_values(url, init_token, sentry_dsn)
+  env_file_path = "./.env"
+  content = File.read(env_file_path)
+  
+  # Update the values
+  updated_content = content
+                    .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
+                    .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
+                    .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
+  
+  File.write(env_file_path, updated_content)
+end
 
-      # Fixme: https://github.com/meditohq/medito-app/issues/151
-      - name: Create auth.dart
-        run: sh ./.github/scripts/create_auth_dart.sh
-        env:
-          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
-          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
-          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
-
-      - name: Update packages # Needed to upgrade Dart SDK to compatible version
-        run: flutter upgrade
-
-      - name: Get dependencies
-        run: flutter pub get
-        
-      - name: Run Riverpod generator
-        run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        
-      - name: Analyze code
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+platform :ios do
+  
+  # For TestFlight (staging)
+  lane :beta do
+    set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["SENTRY_DSN"])
     
-    # Add this step once test folder has been re-added to project  
-    # - name: Run test
-    #   run: flutter test
+    # Existing beta lane code...
+    keychain_name = ENV["TEMP_KEYCHAIN_USER"]
+    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
+    ensure_temp_keychain(keychain_name, keychain_password)
 
-      - name: Build ios bundle without code signing
-        run: flutter build ios --release --no-codesign
+    # Fetch the signing certificate
+    match(
+      type: 'appstore',
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+      readonly: true,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password
+    )
 
-      # Setup Ruby, Bundler, and Gemfile dependencies
-      - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7.2'
-          bundler-cache: true
-          working-directory: ios
+    # Build and sign the ipa
+    gym(
+      configuration: "Release",
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+            ENV["DEVELOPER_APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        }
+      }
+    )
 
-      - name: Create Apple API Key JSON
-        run: |
-          echo "$APPLE_API_KEY_JSON" > fastlane/apple_api_key.json
-        env:
-          APPLE_API_KEY_JSON: ${{ secrets.APPLE_API_KEY_JSON }}
-        working-directory: ios
+    # Upload to test flight track
+    pilot(
+      apple_id: ENV["DEVELOPER_APP_ID"],
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      skip_submission: true,
+      distribute_external: false,
+      notify_external_testers: false,
+      api_key_path: "fastlane/apple_api_key.json",
+      ipa: "./Runner.ipa"
+    )
 
-        ## TODO: implement other lanes for appstore deployment
-      - run: bundle exec fastlane beta
-        env:
-          APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
-          DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
-          DEVELOPER_APP_IDENTIFIER: '${{ secrets.DEVELOPER_APP_IDENTIFIER }}'
-          DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
-          FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
-          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
-          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
-          PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
-          TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
-          TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
-          MEDITO_APPSTORE_CERTIFICATES_REPO: '${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}'
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
-        working-directory: ios
+    delete_temp_keychain(keychain_name)
+  end
+  
+  # For App Store (production)
+  lane :release do
+    set_environment_values(ENV["PROD_URL"], ENV["PROD_INIT_TOKEN"], ENV["SENTRY_DSN"])
+    
+    # Similar steps as in the beta lane, but tailored for App Store releases
+    keychain_name = ENV["TEMP_KEYCHAIN_USER"]
+    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
+    ensure_temp_keychain(keychain_name, keychain_password)
+
+    match(
+      type: 'appstore',
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+      readonly: true,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password
+    )
+
+    gym(
+      configuration: "Release",
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+            ENV["DEVELOPER_APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        }
+      }
+    )
+
+    deliver(
+      apple_id: ENV["DEVELOPER_APP_ID"],
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      api_key_path: "fastlane/apple_api_key.json",
+      ipa: "./Runner.ipa"
+    )
+
+    delete_temp_keychain(keychain_name)
+  end
+end
