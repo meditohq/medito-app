@@ -33,7 +33,7 @@ platform :ios do
   
   # For TestFlight (staging)
   lane :beta do
-    set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["STAGING_SENTRY_DSN"])
+    set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["SENTRY_DSN"])
     
     # Existing beta lane code...
     keychain_name = ENV["TEMP_KEYCHAIN_USER"]
@@ -79,7 +79,7 @@ platform :ios do
   
   # For App Store (production)
   lane :release do
-    set_environment_values(ENV["PRODUCTION_URL"], ENV["PRODUCTION_INIT_TOKEN"], ENV["PRODUCTION_SENTRY_DSN"])
+    set_environment_values(ENV["PROD_URL"], ENV["PROD_INIT_TOKEN"], ENV["SENTRY_DSN"])
     
     # Similar steps as in the beta lane, but tailored for App Store releases
     keychain_name = ENV["TEMP_KEYCHAIN_USER"]
