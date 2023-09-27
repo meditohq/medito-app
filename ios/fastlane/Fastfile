@@ -15,42 +15,35 @@
 
 default_platform(:ios)
 
-DEVELOPER_APP_ID = ENV["DEVELOPER_APP_ID"]
-DEVELOPER_APP_IDENTIFIER = ENV["DEVELOPER_APP_IDENTIFIER"]
-PROVISIONING_PROFILE_SPECIFIER = ENV["PROVISIONING_PROFILE_SPECIFIER"]
-TEMP_KEYCHAIN_USER = ENV["TEMP_KEYCHAIN_USER"]
-TEMP_KEYCHAIN_PASSWORD = ENV["TEMP_KEYCHAIN_PASSWORD"]
-
-def delete_temp_keychain(name)
-  delete_keychain(
-    name: name
-  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
-end
-
-def create_temp_keychain(name, password)
-  create_keychain(
-    name: name,
-    password: password,
-    unlock: false,
-    timeout: 360000
-  )
-end
-
-def ensure_temp_keychain(name, password)
-  delete_temp_keychain(name)
-  create_temp_keychain(name, password)
+# Method to update .env with the appropriate values based on environment
+def set_environment_values(url, init_token, sentry_dsn)
+  env_file_path = "./.env"
+  content = File.read(env_file_path)
+  
+  # Update the values
+  updated_content = content
+                    .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
+                    .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
+                    .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
+  
+  File.write(env_file_path, updated_content)
 end
 
 platform :ios do
+  
+  # For TestFlight (staging)
   lane :beta do
-    keychain_name = TEMP_KEYCHAIN_USER
-    keychain_password = TEMP_KEYCHAIN_PASSWORD
+    set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["STAGING_SENTRY_DSN"])
+    
+    # Existing beta lane code...
+    keychain_name = ENV["TEMP_KEYCHAIN_USER"]
+    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
     ensure_temp_keychain(keychain_name, keychain_password)
 
     # Fetch the signing certificate
     match(
       type: 'appstore',
-      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
       git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
       readonly: true,
       keychain_name: keychain_name,
@@ -65,18 +58,58 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-            DEVELOPER_APP_ID => PROVISIONING_PROFILE_SPECIFIER
+            ENV["DEVELOPER_APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
 
     # Upload to test flight track
     pilot(
-      apple_id: "#{DEVELOPER_APP_ID}",
-      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      apple_id: ENV["DEVELOPER_APP_ID"],
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
       skip_submission: true,
       distribute_external: false,
       notify_external_testers: false,
+      api_key_path: "fastlane/apple_api_key.json",
+      ipa: "./Runner.ipa"
+    )
+
+    delete_temp_keychain(keychain_name)
+  end
+  
+  # For App Store (production)
+  lane :release do
+    set_environment_values(ENV["PRODUCTION_URL"], ENV["PRODUCTION_INIT_TOKEN"], ENV["PRODUCTION_SENTRY_DSN"])
+    
+    # Similar steps as in the beta lane, but tailored for App Store releases
+    keychain_name = ENV["TEMP_KEYCHAIN_USER"]
+    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
+    ensure_temp_keychain(keychain_name, keychain_password)
+
+    match(
+      type: 'appstore',
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+      readonly: true,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password
+    )
+
+    gym(
+      configuration: "Release",
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+            ENV["DEVELOPER_APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        }
+      }
+    )
+
+    deliver(
+      apple_id: ENV["DEVELOPER_APP_ID"],
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
       api_key_path: "fastlane/apple_api_key.json",
       ipa: "./Runner.ipa"
     )
