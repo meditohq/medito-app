@@ -1,3 +1,4 @@
+import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -30,9 +31,11 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
       auth.setCounter();
       var status = auth.sendOTPRes.status;
       if (status == Status.COMPLETED) {
+        var params =
+            JoinRouteParamsModel(screen: widget.fromScreen, email: email);
         await context.push(
           RouteConstants.joinVerifyOTPPath,
-          extra: {'email': email, 'screen': widget.fromScreen},
+          extra: params,
         );
       } else if (status == Status.ERROR) {
         showSnackBar(context, auth.sendOTPRes.message.toString());
