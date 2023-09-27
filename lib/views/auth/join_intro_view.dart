@@ -1,3 +1,4 @@
+import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -105,9 +106,10 @@ class JoinIntroView extends ConsumerWidget {
         width8,
         LoadingButtonWidget(
           onPressed: () {
+            var params = JoinRouteParamsModel(screen: fromScreen);
             context.push(
               RouteConstants.joinEmailPath,
-              extra: {'screen': fromScreen},
+              extra: params,
             );
           },
           btnText: StringConstants.joinNow,
