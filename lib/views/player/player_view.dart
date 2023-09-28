@@ -23,14 +23,11 @@ class PlayerView extends ConsumerStatefulWidget {
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
 
-class _PlayerViewState extends ConsumerState<PlayerView> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _PlayerViewState extends ConsumerState<PlayerView>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var coverUrl = widget.meditationModel.coverUrl;
     var artist = widget.meditationModel.artist;
 
@@ -96,4 +93,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     return false;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
