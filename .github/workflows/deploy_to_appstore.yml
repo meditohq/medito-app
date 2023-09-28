@@ -10,7 +10,7 @@ on:
         enum: ['beta', 'release']
   push:
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'v*'
 
 jobs:
   deploy_ios:
@@ -18,6 +18,14 @@ jobs:
     runs-on: macos-latest
     environment: prod
     steps:
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+            
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
@@ -39,7 +47,7 @@ jobs:
           echo "URL=${{ secrets.PROD_URL }}" > ios/.env
           echo "INIT_TOKEN=${{ secrets.PROD_INIT_TOKEN }}" >> ios/.env
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> ios/.env
- 
+
       - name: Create auth.dart
         run: sh ./.github/scripts/create_auth_dart.sh
 
@@ -48,13 +56,13 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
-        
+
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        
+
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-      
+
       - name: Decode and place GoogleService-Info.plist
         run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 -d > ios/Runner/GoogleService-Info.plist
 
@@ -75,7 +83,6 @@ jobs:
         env:
           STAGING_URL: ${{ secrets.STAGING_URL }}
           STAGING_INIT_TOKEN: ${{ secrets.STAGING_INIT_TOKEN }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           PROD_URL: ${{ secrets.PROD_URL }}
           PROD_INIT_TOKEN: ${{ secrets.PROD_INIT_TOKEN }}
           APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
