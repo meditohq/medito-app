@@ -3,6 +3,11 @@ require 'base64'
 default_platform(:ios)
 
 platform :ios do
+  
+  before_all do
+    xcode_select "/Applications/Xcode.app" # Set the default path to Xcode
+  end
+
   # For TestFlight (staging)
   lane :beta do
     setup_keychain()
