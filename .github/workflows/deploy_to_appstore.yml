@@ -2,7 +2,6 @@ name: Deploy to App Store
 
 on:
   workflow_dispatch:
-    # Enable manual run
     inputs:
       lane:
         description: 'Choose which lane to run'
@@ -10,7 +9,6 @@ on:
         default: 'beta'
         enum: ['beta', 'release']
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
@@ -20,7 +18,6 @@ jobs:
     runs-on: macos-latest
     environment: prod
     steps:
-      # Set up Flutter.
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
@@ -49,35 +46,24 @@ jobs:
         
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-    
-      # Add this step once test folder has been re-added to project  
-      # - name: Run test
-      #   run: flutter test
-
+      
       - name: Decode and place GoogleService-Info.plist
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 -d > ios/Runner/GoogleService-Info.plist
+        run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 -d > ios/Runner/GoogleService-Info.plist
 
       - name: Build ios bundle without code signing
         run: flutter build ios --release --no-codesign --no-tree-shake-icons
 
-      # Setup Ruby, Bundler, and Gemfile dependencies
-      - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7.2'
-          bundler-cache: true
-          working-directory: ios
+      - name: Install Fastlane
+        run: gem install fastlane
 
       - name: Create Apple API Key JSON
-        run: |
-          echo "$APPLE_API_KEY_JSON" > fastlane/apple_api_key.json
+        run: echo "$APPLE_API_KEY_JSON" > fastlane/apple_api_key.json
         env:
           APPLE_API_KEY_JSON: ${{ secrets.APPLE_API_KEY_JSON }}
         working-directory: ios
 
       - name: Fastlane Action
-        run: bundle exec fastlane ${{ github.event.inputs.lane }}
+        run: fastlane ${{ github.event.inputs.lane }}
         env:
           STAGING_URL: ${{ secrets.STAGING_URL }}
           STAGING_INIT_TOKEN: ${{ secrets.STAGING_INIT_TOKEN }}
