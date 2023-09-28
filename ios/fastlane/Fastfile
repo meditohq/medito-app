@@ -9,7 +9,7 @@ platform :ios do
     match(
       type: 'appstore',
       readonly: true,
-      clone_branch_directly: true
+      clone_branch_directly: true,
       git_url: "https://x-access-token:${ENV['MATCH_GIT_TOKEN']}@github.com/meditohq/fastlane-certificates.git",
     )
 
@@ -36,6 +36,8 @@ platform :ios do
     match(
       type: 'appstore',
       readonly: true,
+      clone_branch_directly: true,
+      git_url: "https://x-access-token:${ENV['MATCH_GIT_TOKEN']}@github.com/meditohq/fastlane-certificates.git",
     )
 
     build_app(
