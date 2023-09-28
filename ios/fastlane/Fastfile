@@ -1,14 +1,5 @@
 # This file contains the fastlane.tools configuration
 # You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
 
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
@@ -16,11 +7,15 @@
 default_platform(:ios)
 
 # Method to update .env with the appropriate values based on environment
-def set_environment_values(url, init_token, sentry_dsn)
+def set_environment_values
   env_file_path = "./.env"
   content = File.read(env_file_path)
   
-  # Update the values
+  url = ENV["URL"]
+  init_token = ENV["INIT_TOKEN"]
+  sentry_dsn = ENV["SENTRY_DSN"]
+  
+  # Update the values in the .env file
   updated_content = content
                     .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
                     .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
@@ -30,17 +25,20 @@ def set_environment_values(url, init_token, sentry_dsn)
 end
 
 platform :ios do
-  
   # For TestFlight (staging)
   lane :beta do
-    set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["SENTRY_DSN"])
+  ENV["URL"] = ENV["STAGING_URL"]
+  ENV["INIT_TOKEN"] = ENV["STAGING_INIT_TOKEN"]
+  ENV["SENTRY_DSN"] = ENV["SENTRY_DSN"]
+  
+  set_environment_values()
     
-    # Existing beta lane code...
+    # Set up temporary keychain for building
     keychain_name = ENV["TEMP_KEYCHAIN_USER"]
     keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
     ensure_temp_keychain(keychain_name, keychain_password)
 
-    # Fetch the signing certificate
+    # Fetch the signing certificate using match
     match(
       type: 'appstore',
       app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
@@ -50,7 +48,7 @@ platform :ios do
       keychain_password: keychain_password
     )
 
-    # Build and sign the ipa
+    # Build and sign the .ipa for App Store
     gym(
       configuration: "Release",
       workspace: "Runner.xcworkspace",
@@ -63,7 +61,7 @@ platform :ios do
       }
     )
 
-    # Upload to test flight track
+    # Upload .ipa to TestFlight
     pilot(
       apple_id: ENV["DEVELOPER_APP_ID"],
       app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
@@ -74,18 +72,24 @@ platform :ios do
       ipa: "./Runner.ipa"
     )
 
+    # Clean up: Delete the temporary keychain
     delete_temp_keychain(keychain_name)
   end
   
   # For App Store (production)
-  lane :release do
-    set_environment_values(ENV["PROD_URL"], ENV["PROD_INIT_TOKEN"], ENV["SENTRY_DSN"])
+lane :release do
+  ENV["URL"] = ENV["PROD_URL"]
+  ENV["INIT_TOKEN"] = ENV["PROD_INIT_TOKEN"]
+  ENV["SENTRY_DSN"] = ENV["SENTRY_DSN"]
+  
+  set_environment_values()
     
-    # Similar steps as in the beta lane, but tailored for App Store releases
+    # Set up temporary keychain for building
     keychain_name = ENV["TEMP_KEYCHAIN_USER"]
     keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
     ensure_temp_keychain(keychain_name, keychain_password)
 
+    # Fetch the signing certificate using match
     match(
       type: 'appstore',
       app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
@@ -95,6 +99,7 @@ platform :ios do
       keychain_password: keychain_password
     )
 
+    # Build and sign the .ipa for App Store
     gym(
       configuration: "Release",
       workspace: "Runner.xcworkspace",
@@ -107,6 +112,7 @@ platform :ios do
       }
     )
 
+    # Submit .ipa for App Store Review
     deliver(
       apple_id: ENV["DEVELOPER_APP_ID"],
       app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
@@ -114,6 +120,7 @@ platform :ios do
       ipa: "./Runner.ipa"
     )
 
+    # Clean up: Delete the temporary keychain
     delete_temp_keychain(keychain_name)
   end
 end
