@@ -1,126 +1,70 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
-
+# Fastfile
 default_platform(:ios)
-
-# Method to update .env with the appropriate values based on environment
-def set_environment_values
-  env_file_path = "./.env"
-  content = File.read(env_file_path)
-  
-  url = ENV["URL"]
-  init_token = ENV["INIT_TOKEN"]
-  sentry_dsn = ENV["SENTRY_DSN"]
-  
-  # Update the values in the .env file
-  updated_content = content
-                    .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
-                    .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
-                    .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
-  
-  File.write(env_file_path, updated_content)
-end
 
 platform :ios do
   # For TestFlight (staging)
   lane :beta do
-  ENV["URL"] = ENV["STAGING_URL"]
-  ENV["INIT_TOKEN"] = ENV["STAGING_INIT_TOKEN"]
-  ENV["SENTRY_DSN"] = ENV["SENTRY_DSN"]
-  
-  set_environment_values()
+    setup_keychain()
     
-    # Set up temporary keychain for building
-    keychain_name = ENV["TEMP_KEYCHAIN_USER"]
-    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
-    ensure_temp_keychain(keychain_name, keychain_password)
-
-    # Fetch the signing certificate using match
     match(
       type: 'appstore',
-      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
-      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
       readonly: true,
-      keychain_name: keychain_name,
-      keychain_password: keychain_password
     )
 
-    # Build and sign the .ipa for App Store
-    gym(
-      configuration: "Release",
+    build_app(
       workspace: "Runner.xcworkspace",
+      configuration: "Release",
       scheme: "Runner",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-            ENV["DEVELOPER_APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
 
-    # Upload .ipa to TestFlight
-    pilot(
-      apple_id: ENV["DEVELOPER_APP_ID"],
-      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
-      skip_submission: true,
-      distribute_external: false,
-      notify_external_testers: false,
-      api_key_path: "fastlane/apple_api_key.json",
-      ipa: "./Runner.ipa"
-    )
-
-    # Clean up: Delete the temporary keychain
-    delete_temp_keychain(keychain_name)
+    upload_to_testflight(skip_submission: true)
+    cleanup_keychain()
   end
   
   # For App Store (production)
-lane :release do
-  ENV["URL"] = ENV["PROD_URL"]
-  ENV["INIT_TOKEN"] = ENV["PROD_INIT_TOKEN"]
-  ENV["SENTRY_DSN"] = ENV["SENTRY_DSN"]
-  
-  set_environment_values()
+  lane :release do
+    setup_keychain()
     
-    # Set up temporary keychain for building
-    keychain_name = ENV["TEMP_KEYCHAIN_USER"]
-    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
-    ensure_temp_keychain(keychain_name, keychain_password)
-
-    # Fetch the signing certificate using match
     match(
       type: 'appstore',
-      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
-      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
       readonly: true,
-      keychain_name: keychain_name,
-      keychain_password: keychain_password
     )
 
-    # Build and sign the .ipa for App Store
-    gym(
-      configuration: "Release",
+    build_app(
       workspace: "Runner.xcworkspace",
+      configuration: "Release",
       scheme: "Runner",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-            ENV["DEVELOPER_APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
 
-    # Submit .ipa for App Store Review
-    deliver(
-      apple_id: ENV["DEVELOPER_APP_ID"],
-      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
-      api_key_path: "fastlane/apple_api_key.json",
-      ipa: "./Runner.ipa"
-    )
-
-    # Clean up: Delete the temporary keychain
-    delete_temp_keychain(keychain_name)
+    upload_to_app_store()
+    cleanup_keychain()
   end
+end
+
+# Helper methods to manage keychain
+def setup_keychain
+  create_keychain(
+    name: ENV["TEMP_KEYCHAIN_USER"],
+    password: ENV["TEMP_KEYCHAIN_PASSWORD"],
+    default_keychain: true,
+    unlock: true,
+    timeout: 3600,
+    lock_when_sleeps: true
+  )
+end
+
+def cleanup_keychain
+  delete_keychain(name: ENV["TEMP_KEYCHAIN_USER"])
 end
