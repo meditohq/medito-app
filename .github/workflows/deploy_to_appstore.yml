@@ -22,18 +22,20 @@ jobs:
         uses: subosito/flutter-action@v1.5.0
         with:
           channel: stable
+
       - run: flutter doctor -v
 
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set environment variables from GitHub Secrets
+        run: |
+          echo "URL=${{ secrets.PROD_URL }}" >> $GITHUB_ENV
+          echo "INIT_TOKEN=${{ secrets.PROD_INIT_TOKEN }}" >> $GITHUB_ENV
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
+
       - name: Create auth.dart
         run: sh ./.github/scripts/create_auth_dart.sh
-        env:
-          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
-          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
-          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
       - name: Update packages
         run: flutter upgrade
