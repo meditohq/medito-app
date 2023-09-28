@@ -81,6 +81,7 @@ jobs:
       - name: Fastlane Action
         run: fastlane ${{ github.event.inputs.lane }}
         env:
+          MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
           STAGING_URL: ${{ secrets.STAGING_URL }}
           STAGING_INIT_TOKEN: ${{ secrets.STAGING_INIT_TOKEN }}
           PROD_URL: ${{ secrets.PROD_URL }}
