@@ -1,8 +1,10 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/views/home/widgets/meditation_cards/widgets/animated_scale_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardWidget extends StatelessWidget {
+class CardWidget extends ConsumerWidget {
   const CardWidget({
     super.key,
     this.tag,
@@ -14,12 +16,12 @@ class CardWidget extends StatelessWidget {
   final String title;
   final String coverUrlPath;
   final void Function()? onTap;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
-      onTap: onTap,
+    return AnimatedScaleWidget(
       child: Stack(
         children: [
           SizedBox(
@@ -29,8 +31,8 @@ class CardWidget extends StatelessWidget {
               foregroundDecoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    ColorConstants.almostBlack.withOpacity(0.15),
-                    ColorConstants.almostBlack,
+                    ColorConstants.almostBlack.withOpacity(0),
+                    ColorConstants.almostBlack.withOpacity(0.5),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -42,14 +44,17 @@ class CardWidget extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            width: 154,
-            height: 154,
-            color: ColorConstants.transparent,
-            child: _tagAndTitle(textTheme, tag: tag, title: title),
+          InkWell(
+            onTap: onTap,
+            child: Container(
+              width: 154,
+              height: 154,
+              color: ColorConstants.transparent,
+              child: _tagAndTitle(textTheme, tag: tag, title: title),
+            ),
           ),
-        ],
-      ),
+        
+      ],),
     );
   }
 
