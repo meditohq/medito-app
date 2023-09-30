@@ -40,8 +40,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   void _handleTrackEvent(WidgetRef ref, String trackId) {
-    var trackViewedModel =
-        TrackViewedModel(trackId: trackId);
+    var trackViewedModel = TrackViewedModel(trackId: trackId);
     var event = EventsModel(
       name: EventTypes.trackViewed,
       payload: trackViewedModel.toJson(),
@@ -58,9 +57,10 @@ class _TrackViewState extends ConsumerState<TrackView>
       var _user =
           ref.read(authProvider.notifier).userRes.body as UserTokenModel;
       if (_user.email == null && next.value != null && next.value!) {
+        var params = JoinRouteParamsModel(screen: Screen.track);
         context.push(
           RouteConstants.joinIntroPath,
-          extra: {'screen': Screen.track},
+          extra: params,
         );
       }
     });
@@ -71,16 +71,15 @@ class _TrackViewState extends ConsumerState<TrackView>
         data: (data) => _buildScaffoldWithData(context, data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () =>
-              ref.refresh(tracksProvider(trackId: widget.id)),
+          onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
         ),
         loading: () => _buildLoadingWidget(),
       ),
     );
   }
 
-  TrackShimmerWidget _buildLoadingWidget() =>
-      const TrackShimmerWidget();
+  TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
+  
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
     TrackModel trackModel,
