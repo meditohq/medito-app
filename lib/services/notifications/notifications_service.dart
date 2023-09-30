@@ -40,7 +40,7 @@ Future<PermissionStatus> requestPermission() async {
 }
 
 Future<void> initializeNotification(WidgetRef ref) async {
-  await initialiazeLocalNotification(ref);
+  await initializeLocalNotification(ref);
 
   // For handling the received notifications
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -52,7 +52,7 @@ Future<void> initializeNotification(WidgetRef ref) async {
   });
 }
 
-Future<void> initialiazeLocalNotification(WidgetRef ref) async {
+Future<void> initializeLocalNotification(WidgetRef ref) async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
   var initializationSettingsIOS = DarwinInitializationSettings(
@@ -112,7 +112,6 @@ void _navigate(WidgetRef ref, NotificationPayloadModel data) {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('myBackgroundMessageHandler message: $message');
   await _showNotification(
     message.notification?.title,
     message.notification?.body,
