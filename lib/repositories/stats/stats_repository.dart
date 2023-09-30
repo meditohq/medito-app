@@ -52,7 +52,7 @@ class StatsRepositoryImpl extends StatsRepository {
         var data = {
           'currentStreak': int.parse(currentStreak),
           'minutesListened': int.parse(minutesListened),
-          'listendedSessionsNum': int.parse(numSessions),
+          'listenedSessionsNum': int.parse(numSessions),
           'longestStreak': int.parse(longestStreak),
           'listenedSessionIds': listenedSessionIds,
         };
