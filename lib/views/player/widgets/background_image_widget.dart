@@ -33,7 +33,7 @@ class BackgroundImageWidget extends ConsumerWidget {
             height: size.height,
             child: NetworkImageWidget(
               url: imageUrl,
-              isCache: false,
+              isCache: true,
             ),
           ),
         ),

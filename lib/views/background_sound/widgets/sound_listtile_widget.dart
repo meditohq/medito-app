@@ -71,9 +71,9 @@ class SoundListTileWidget extends ConsumerWidget {
       audioPlayerNotifier.backgroundSoundAudioPlayer.dispose();
       audioPlayerNotifier.backgroundSoundAudioPlayer = AudioPlayer();
     } else {
-      bgSoundNotifierProvider.handleOnChangeSound(sound);
       audioPlayerNotifier.setBackgroundAudio(sound);
       audioPlayerNotifier.playBackgroundSound();
+      bgSoundNotifierProvider.handleOnChangeSound(sound);
     }
   }
 }

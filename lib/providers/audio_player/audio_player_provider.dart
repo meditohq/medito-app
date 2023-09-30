@@ -7,6 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 final audioPlayerNotifierProvider =
@@ -60,16 +61,24 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   void setBackgroundAudio(BackgroundSoundsModel sound) {
-    unawaited(
-      backgroundSoundAudioPlayer.setAudioSource(
-        AudioSource.uri(
-          Uri.parse(sound.path),
-          headers: {
-            HttpHeaders.authorizationHeader: _contentToken,
-          },
-        ),
-      ),
-    );
+    getApplicationDocumentsDirectory().then((file) async {
+      var savePath = file.path + '/${sound.title}.mp3';
+      var filePath = File(savePath);
+      if (await filePath.exists()) {
+        unawaited(backgroundSoundAudioPlayer.setFilePath(filePath.path));
+      } else {
+        unawaited(
+          backgroundSoundAudioPlayer.setAudioSource(
+            AudioSource.uri(
+              Uri.parse(sound.path),
+              headers: {
+                HttpHeaders.authorizationHeader: _contentToken,
+              },
+            ),
+          ),
+        );
+      }
+    });
   }
 
   void setTrackAudio(
