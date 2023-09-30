@@ -1,3 +1,4 @@
+import 'package:Medito/models/models.dart';
 import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -41,11 +42,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinIntroPath,
       pageBuilder: (context, state) {
-        final screen = state.extra != null ? state.extra as Map : null;
+        final params =
+            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinIntroView(fromScreen: screen?['screen'] ?? Screen.splash),
+          child: JoinIntroView(fromScreen: params?.screen ?? Screen.splash),
         );
       },
     ),
@@ -53,11 +55,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinEmailPath,
       pageBuilder: (context, state) {
-        final screen = state.extra != null ? state.extra as Map : null;
+        final params =
+            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinEmailView(fromScreen: screen?['screen'] ?? Screen.splash),
+          child: JoinEmailView(fromScreen: params?.screen ?? Screen.splash),
         );
       },
     ),
@@ -65,13 +68,14 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinVerifyOTPPath,
       pageBuilder: (context, state) {
-        final data = state.extra != null ? state.extra as Map : null;
+        final params =
+            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
           child: JoinVerifyOTPView(
-            email: data?['email'] ?? '',
-            fromScreen: data?['screen'] ?? Screen.splash,
+            email: params?.email ?? '',
+            fromScreen: params?.screen ?? Screen.splash,
           ),
         );
       },
@@ -80,13 +84,14 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinWelcomePath,
       pageBuilder: (context, state) {
-        final data = state.extra != null ? state.extra as Map : null;
+        final params =
+            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
           child: JoinWelcomeView(
-            email: data?['email'] ?? '',
-            fromScreen: data?['screen'] ?? Screen.splash,
+            email: params?.email ?? '',
+            fromScreen: params?.screen ?? Screen.splash,
           ),
         );
       },
