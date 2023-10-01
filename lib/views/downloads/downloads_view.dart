@@ -29,7 +29,13 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     return Scaffold(
       appBar: MeditoAppBarWidget(
         title: StringConstants.downloads,
-        closePressed: () => context.pop(),
+        closePressed: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RouteConstants.homePath);
+          }
+        },
         isTransparent: true,
         hasCloseButton: true,
       ),
