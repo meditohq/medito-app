@@ -150,7 +150,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
             color: ColorConstants.walterWhite,
           ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 3, vertical: 0.6),
+        padding: EdgeInsets.only(left: 6, right: 8, bottom: 2),
         child: Row(
           children: [
             Icon(
