@@ -58,6 +58,7 @@
 **/ios/**/Icon?
 **/ios/**/Pods/
 **/ios/**/.symlinks/
+**/ios/Podfile.lock
 **/ios/**/profile
 **/ios/**/xcuserdata
 **/ios/.generated/
