@@ -42,9 +42,10 @@ class _TrackViewState extends ConsumerState<TrackView>
       var _user =
           ref.read(authProvider.notifier).userRes.body as UserTokenModel;
       if (_user.email == null && next.value != null && next.value!) {
+        var params = JoinRouteParamsModel(screen: Screen.track);
         context.push(
           RouteConstants.joinIntroPath,
-          extra: {'screen': Screen.track},
+          extra: params,
         );
       }
     });
@@ -63,6 +64,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
+  
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
     TrackModel trackModel,
