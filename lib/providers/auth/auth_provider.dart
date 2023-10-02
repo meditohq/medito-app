@@ -1,13 +1,14 @@
+import 'package:Medito/models/models.dart';
 import 'package:Medito/network/api_response.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final authProvider = ChangeNotifierProvider.autoDispose<AuthNotifier>(
+final authProvider = ChangeNotifierProvider<AuthNotifier>(
   (ref) {
     return AuthNotifier(
       ref,
-      authRepository: ref.watch(authRepositoryProvider),
+      authRepository: ref.read(authRepositoryProvider),
     );
   },
 );
@@ -17,6 +18,7 @@ class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this.ref, {required this.authRepository});
   final AuthRepository authRepository;
   final Ref ref;
+  ApiResponse userRes = ApiResponse.completed(null);
   ApiResponse sendOTPRes = ApiResponse.completed(null);
   ApiResponse verifyOTPRes = ApiResponse.completed(null);
   String? userEmail;
@@ -38,6 +40,28 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> initializeUser() async {
+    var res = await getUserFromSharedPref();
+    if (res == null) {
+      await generateUserToken();
+    } else {
+      userRes = ApiResponse.completed(res);
+      notifyListeners();
+    }
+  }
+
+  Future<void> generateUserToken() async {
+    userRes = ApiResponse.loading();
+    notifyListeners();
+    try {
+      var res = await authRepository.generateUserToken();
+      userRes = ApiResponse.completed(res);
+    } catch (e) {
+      userRes = ApiResponse.error(e.toString());
+    }
+    notifyListeners();
+  }
+
   Future<void> sendOTP(String email) async {
     sendOTPRes = ApiResponse.loading();
     notifyListeners();
@@ -55,6 +79,7 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       var res = await authRepository.verifyOTP(email, OTP);
+      await updateUserInSharedPref(email);
       verifyOTPRes = ApiResponse.completed(res);
     } catch (e) {
       verifyOTPRes = ApiResponse.error(e.toString());
@@ -62,12 +87,18 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setUserEmailInSharedPref(String email) async {
-    await authRepository.addUserEmailInSharedPreference(email);
+  Future<void> saveUserInSharedPref(UserTokenModel user) async {
+    await authRepository.addUserInSharedPreference(user);
   }
 
-  Future<void> getUserEmailFromSharedPref() async {
-    userEmail = await authRepository.getUserEmailFromSharedPreference();
-    notifyListeners();
+  Future<void> updateUserInSharedPref(String email) async {
+    var _userTokenModel = userRes.body as UserTokenModel;
+    var _user = _userTokenModel.copyWith(email: email);
+    userRes = ApiResponse.completed(_user);
+    await saveUserInSharedPref(_user);
+  }
+
+  Future<UserTokenModel?> getUserFromSharedPref() async {
+    return await authRepository.getUserFromSharedPreference();
   }
 }

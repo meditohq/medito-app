@@ -15,10 +15,8 @@ abstract class AuthRepository {
   Future<UserTokenModel> generateUserToken();
   Future<String> sendOTP(String email);
   Future<String> verifyOTP(String email, String OTP);
-  Future<void> addUserTokenInSharedPreference(UserTokenModel user);
-  Future<UserTokenModel?> getUserTokenFromSharedPreference();
-  Future<void> addUserEmailInSharedPreference(String email);
-  Future<String?> getUserEmailFromSharedPreference();
+  Future<void> addUserInSharedPreference(UserTokenModel user);
+  Future<UserTokenModel?> getUserFromSharedPreference();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -69,22 +67,7 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<void> addUserEmailInSharedPreference(String email) async {
-    await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.userEmail,
-      email,
-    );
-  }
-
-  @override
-  Future<String?> getUserEmailFromSharedPreference() async {
-    return await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.userEmail,
-    );
-  }
-
-  @override
-  Future<void> addUserTokenInSharedPreference(UserTokenModel user) async {
+  Future<void> addUserInSharedPreference(UserTokenModel user) async {
     await SharedPreferencesService.addStringInSharedPref(
       SharedPreferenceConstants.userToken,
       json.encode(user.toJson()),
@@ -92,7 +75,7 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<UserTokenModel?> getUserTokenFromSharedPreference() async {
+  Future<UserTokenModel?> getUserFromSharedPreference() async {
     var user = await SharedPreferencesService.getStringFromSharedPref(
       SharedPreferenceConstants.userToken,
     );

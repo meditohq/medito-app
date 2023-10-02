@@ -53,8 +53,8 @@ class CardWidget extends ConsumerWidget {
               child: _tagAndTitle(textTheme, tag: tag, title: title),
             ),
           ),
-        ],
-      ),
+        
+      ],),
     );
   }
 

@@ -1,25 +1,12 @@
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+part 'device_and_app_info_provider.g.dart';
 
-final deviceAndAppInfoProvider = StateNotifierProvider<DeviceAndAppInfoNotifier,
-    AsyncValue<DeviceAndAppInfoModel>>((ref) {
-  return DeviceAndAppInfoNotifier(ref);
-});
+@riverpod
+Future<DeviceAndAppInfoModel> deviceAndAppInfo(ref) {
+  final info = ref.read(deviceAndAppInfoRepositoryProvider);
+  ref.keepAlive();
 
-//ignore: prefer-match-file-name
-class DeviceAndAppInfoNotifier
-    extends StateNotifier<AsyncValue<DeviceAndAppInfoModel>> {
-  Ref ref;
-  DeviceAndAppInfoNotifier(this.ref) : super(const AsyncValue.loading()) {
-    getDeviceAndAppInfo();
-  }
-  Future<void> getDeviceAndAppInfo() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final info = ref.read(deviceAndAppInfoRepositoryProvider);
-
-      return await info.getDeviceAndAppInfo();
-    });
-  }
+  return info.getDeviceAndAppInfo();
 }

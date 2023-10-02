@@ -1,6 +1,4 @@
 export 'auth/auth_provider.dart';
-export 'auth/auth_token_provider.dart';
-export 'auth/auth_init_token_provider.dart';
 export 'me/me_provider.dart';
 export 'home/home_provider.dart';
 export 'audio_player/audio_player_provider.dart';

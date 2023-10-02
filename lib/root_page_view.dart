@@ -24,6 +24,7 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
+    ref.read(audioPlayerNotifierProvider).initAudioHandler();
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(meProvider);

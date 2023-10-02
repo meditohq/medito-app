@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class NetworkImageWidget extends ConsumerWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var userTokenModel = ref.watch(authTokenProvider).asData?.value;
+    var userTokenModel = ref.watch(authProvider).userRes.body as UserTokenModel;
     if (url.contains('.svg')) {
       return SvgPicture.network(
         url,
@@ -36,7 +37,7 @@ class NetworkImageWidget extends ConsumerWidget {
         return CachedNetworkImage(
           imageUrl: url,
           httpHeaders: {
-            HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel?.token}',
+            HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel.token}',
           },
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
@@ -64,7 +65,7 @@ class NetworkImageWidget extends ConsumerWidget {
         cacheHeight: height?.round(),
         cacheWidth: width?.round(),
         headers: {
-          HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel?.token}',
+          HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel.token}',
         },
         loadingBuilder: (context, child, loadingProgress) {
           return loadingProgress == null ? child : _shimmerLoading();

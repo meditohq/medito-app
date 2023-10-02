@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
+import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,7 +30,32 @@ final dioClientProvider = Provider<DioApiService>((ref) {
     requestBody: true,
     error: true,
   ));
+  dio.interceptors.add(
+    InterceptorsWrapper(onError: (e, handler) => onError(e, handler, ref)),
+  );
   var dioApiService = DioApiService(dio: dio);
 
   return dioApiService;
 });
+
+Future<void> onError(
+  DioError err,
+  ErrorInterceptorHandler handler,
+  Ref ref,
+) async {
+  if (err.response?.statusCode == 401) {
+    var router = ref.read(goRouterProvider);
+    ref.read(audioPlayPauseStateProvider.notifier).state =
+        PLAY_PAUSE_AUDIO.PAUSE;
+    await SharedPreferencesService.removeValueFromSharedPref(
+      SharedPreferenceConstants.userToken,
+    );
+    await SharedPreferencesService.removeValueFromSharedPref(
+      SharedPreferenceConstants.userEmail,
+    );
+    handler.reject(err);
+    router.go(RouteConstants.root);
+  } else {
+    handler.reject(err);
+  }
+}

@@ -115,9 +115,8 @@ class MeditationButtonsWidget extends StatelessWidget {
   Future<bool> _checkUser(
     WidgetRef ref,
   ) async {
-    await ref.read(authInitTokenProvider.notifier).initializeUser();
-    var user = ref.read(authInitTokenProvider).value;
+    var _user = ref.read(authProvider.notifier).userRes.body as UserTokenModel;
 
-    return user == AUTH_INIT_STATUS.IS_USER_PRESENT;
+    return _user.email != null;
   }
 }
