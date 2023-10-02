@@ -14,7 +14,6 @@ final dioClientProvider = Provider<DioApiService>((ref) {
     connectTimeout: Duration(milliseconds: 60000),
     baseUrl: HTTPConstants.BASE_URL,
     headers: {
-      HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
       HttpHeaders.accessControlAllowOriginHeader: '*',
       HttpHeaders.accessControlAllowHeadersHeader:
           'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',

@@ -18,10 +18,10 @@ import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 //ignore:prefer-match-file-name
-class PackListItemWidget extends StatelessWidget {
+class DownloadListItemWidget extends StatelessWidget {
   final PackImageListItemData data;
 
-  PackListItemWidget(this.data);
+  DownloadListItemWidget(this.data);
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +68,7 @@ class PackListItemWidget extends StatelessWidget {
           child: SizedBox(
             height: data.coverSize,
             width: data.coverSize,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                _backgroundImageWidget(),
-                _coverImageWidget(),
-
-              ],
-            ),
+            child: _coverImageWidget(),
           ),
         ),
       );
@@ -89,12 +82,6 @@ class PackListItemWidget extends StatelessWidget {
             isCache: true,
           ),
     );
-  }
-
-  Widget _backgroundImageWidget() {
-    return data.backgroundImage.isNotNullAndNotEmpty()
-        ? getNetworkImageWidget(data.backgroundImage)
-        : Container();
   }
 }
 

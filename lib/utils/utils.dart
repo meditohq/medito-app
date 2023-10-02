@@ -16,7 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/network/user/user_utils.dart';
+import 'package:Medito/utils/user_utils.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,23 +25,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 import 'package:image/image.dart' as img;
-
-Widget getNetworkImageWidget(String? url) {
-  if (url.isNullOrEmpty()) return Container();
-  final headers = {
-    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN_OLD,
-  };
-
-  return Image.network(url!, fit: BoxFit.fill, headers: headers);
-}
-
-NetworkImage getNetworkImage(String url) {
-  final headers = {
-    HttpHeaders.authorizationHeader: HTTPConstants.CONTENT_TOKEN,
-  };
-
-  return NetworkImage(url, headers: headers);
-}
 
 Future<bool> checkConnectivity() async {
   var connectivityResult = await Connectivity().checkConnectivity();
@@ -216,11 +199,5 @@ extension SanitisePath on String {
 extension GetIdFromPath on String {
   String getIdFromPath() {
     return split('/').last;
-  }
-}
-
-extension AssetUrl on String {
-  String toAssetUrl() {
-    return '${HTTPConstants.BASE_URL_OLD}assets/$this?download';
   }
 }

@@ -3,7 +3,7 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/network/api_response.dart';
+import 'package:Medito/services/network/api_response.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/validation_utils.dart';
 import 'package:flutter/material.dart';
