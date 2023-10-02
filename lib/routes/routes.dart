@@ -326,28 +326,13 @@ MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
+  var folderId =
+      state.params['f3id'] ?? state.params['f2id'] ?? state.params['fid'];
+
   return MaterialPage(
     key: state.pageKey,
-    child: FolderView(id: state.params['fid'] ?? ''),
+    child: FolderView(id: folderId ?? ''),
   );
-  // if (params.length == 1) {
-  //   return MaterialPage(
-  //     key: state.pageKey, child: FolderView(id: state.params['fid']),
-  //     // child: NewFolderScreen(id: state.params['fid']),
-  //   );
-  // } else {
-  //   if (params.length == 2) {
-  //     return MaterialPage(
-  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
-  //       // child: NewFolderScreen(id: state.params['f2id']),
-  //     );
-  //   } else {
-  //     return MaterialPage(
-  //       key: state.pageKey, child: FolderView(id: state.params['fid']),
-  //       // child: NewFolderScreen(id: state.params['f3id']),
-  //     );
-  //   }
-  // }
 }
 
 String getPathFromString(String? place, List<String?> ids) {
