@@ -67,32 +67,35 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     );
   }
 
-  CollapsibleHeaderWidget _mainContent(
+  RefreshIndicator _mainContent(
     List<BackgroundSoundsModel> data,
   ) {
-    return CollapsibleHeaderWidget(
-      title: StringConstants.backgroundSounds,
-      leadingIconBgColor: ColorConstants.walterWhite,
-      leadingIconColor: ColorConstants.almostBlack,
-      headerHeight: 130,
-      children: [
-        VolumeSliderWidget(),
-        SoundListTileWidget(
-          sound: BackgroundSoundsModel(
-            id: '0',
-            title: StringConstants.none,
-            duration: 0,
-            path: '',
+    return RefreshIndicator(
+      onRefresh: () async => await ref.refresh(backgroundSoundsProvider),
+      child: CollapsibleHeaderWidget(
+        title: StringConstants.backgroundSounds,
+        leadingIconBgColor: ColorConstants.walterWhite,
+        leadingIconColor: ColorConstants.almostBlack,
+        headerHeight: 130,
+        children: [
+          VolumeSliderWidget(),
+          SoundListTileWidget(
+            sound: BackgroundSoundsModel(
+              id: '0',
+              title: StringConstants.none,
+              duration: 0,
+              path: '',
+            ),
           ),
-        ),
-        Column(
-          children: data
-              .map((e) => SoundListTileWidget(
-                    sound: e,
-                  ))
-              .toList(),
-        ),
-      ],
+          Column(
+            children: data
+                .map((e) => SoundListTileWidget(
+                      sound: e,
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 }
