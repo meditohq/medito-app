@@ -35,11 +35,9 @@ void _handleRetry(BuildContext context, Ref ref, String err) {
     Future.delayed(Duration(seconds: 2), () {
       ref.refresh(appInitializationProvider(context));
     });
-    showSnackBar(context, err);
     ref.read(retryCounterProvider.notifier).update((state) => ++state);
   } else {
     context.go(RouteConstants.downloadsPath);
-    showSnackBar(context, StringConstants.timeout);
   }
 }
 
