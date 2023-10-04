@@ -17,10 +17,10 @@ class PackView extends ConsumerStatefulWidget {
   final String id;
 
   @override
-  ConsumerState<PackView> createState() => _FolderViewState();
+  ConsumerState<PackView> createState() => _PackViewState();
 }
 
-class _FolderViewState extends ConsumerState<PackView>
+class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   @override
   void initState() {

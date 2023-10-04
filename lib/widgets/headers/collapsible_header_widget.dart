@@ -1,3 +1,4 @@
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
@@ -67,6 +68,8 @@ class _CollapsibleHeaderWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final currentlyPlayingSession = ref.watch(playerProvider);
+
     return CustomScrollView(
       controller: _scrollController,
       physics: AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
@@ -89,7 +92,10 @@ class _CollapsibleHeaderWidgetState
             centerTitle: false,
             expandedTitleScale: 1.2,
             titlePadding: EdgeInsets.only(
-                bottom: 16, left: _isShrink ? 64 : 16, right: 16),
+              bottom: 16,
+              left: _isShrink ? 64 : 16,
+              right: 16,
+            ),
             title: _title(context),
             background: widget.bgImage != null
                 ? _bgImage(context, widget.bgImage!)
@@ -105,7 +111,7 @@ class _CollapsibleHeaderWidgetState
               _description(widget.description!),
             ...widget.children,
             SizedBox(
-              height: 42,
+              height: currentlyPlayingSession != null ? 0 : 48,
             ),
           ]),
         ),
