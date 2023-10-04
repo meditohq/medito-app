@@ -5,6 +5,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -24,12 +25,14 @@ final dioClientProvider = Provider<DioApiService>((ref) {
       HttpHeaders.acceptHeader: '*/*',
     },
   );
-  dio.interceptors.add(LogInterceptor(
-    request: true,
-    responseBody: true,
-    requestBody: true,
-    error: true,
-  ));
+  if (kDebugMode) {
+    dio.interceptors.add(LogInterceptor(
+      request: true,
+      responseBody: true,
+      requestBody: true,
+      error: true,
+    ));
+  }
   dio.interceptors.add(
     InterceptorsWrapper(onError: (e, handler) => _onError(e, handler, ref)),
   );

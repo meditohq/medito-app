@@ -34,6 +34,21 @@ class TrackView extends ConsumerStatefulWidget {
 class _TrackViewState extends ConsumerState<TrackView>
     with AutomaticKeepAliveClientMixin<TrackView> {
   @override
+  void initState() {
+    _handleTrackEvent(ref, widget.id);
+    super.initState();
+  }
+
+  void _handleTrackEvent(WidgetRef ref, String trackId) {
+    var trackViewedModel = TrackViewedModel(trackId: trackId);
+    var event = EventsModel(
+      name: EventTypes.trackViewed,
+      payload: trackViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     ref.watch(trackOpenedFirstTimeProvider);
@@ -64,7 +79,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
-  
+
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
     TrackModel trackModel,

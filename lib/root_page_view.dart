@@ -71,6 +71,18 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
+    ref.listen(playerProvider, (prev, next) {
+      var prevId = prev?.audio.first.files.first.id;
+      var nextId = next?.audio.first.files.first.id;
+      if (next != null &&
+          (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
+        _handleAudioStartedEvent(
+          ref,
+          next.id,
+          next.audio.first.files.first.id,
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
@@ -167,6 +179,19 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var event = EventsModel(
       name: EventTypes.saveFcmToken,
       payload: fcm.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  void _handleAudioStartedEvent(
+    WidgetRef ref,
+    String trackId,
+    String audioFileId,
+  ) {
+    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
+    var event = EventsModel(
+      name: EventTypes.audioStarted,
+      payload: audio.toJson(),
     );
     ref.read(eventsProvider(event: event.toJson()));
   }

@@ -23,6 +23,21 @@ class PackView extends ConsumerStatefulWidget {
 class _FolderViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   @override
+  void initState() {
+    _handleTrackEvent(ref, widget.id);
+    super.initState();
+  }
+
+  void _handleTrackEvent(WidgetRef ref, String packId) {
+    var packViewedModel = PackViewedModel(packId: packId);
+    var event = EventsModel(
+      name: EventTypes.packViewed,
+      payload: packViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     var packs = ref.watch(PacksProvider(packId: widget.id));
