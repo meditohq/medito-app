@@ -67,15 +67,13 @@ Future<void> _onError(
 Future<void> _captureException(
   DioError err,
 ) async {
-  var exception = {
-    'error': err.toString(),
-    'endpoint': err.requestOptions.path,
-    'data': err.requestOptions.data,
-    'response': err.response ?? '',
-    'serverMessage': err.message ?? '',
-  };
   await Sentry.captureException(
-    exception,
-    stackTrace: exception,
+    {
+      'error': err.toString(),
+      'endpoint': err.requestOptions.path.toString(),
+      'response': err.response.toString(),
+      'serverMessage': err.message.toString(),
+    },
+    stackTrace: err.stackTrace,
   );
 }
