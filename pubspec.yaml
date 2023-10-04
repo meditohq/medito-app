@@ -83,7 +83,8 @@ dev_dependencies:
 
 flutter:
   assets:
-    - .env
+    - .prod.env
+    - .staging.env
     - assets/images/
   fonts:
     - family: Clash Display
