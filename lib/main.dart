@@ -19,6 +19,7 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -31,13 +32,15 @@ import 'services/notifications/notifications_service.dart';
 late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  await dotenv.load(fileName: StringConstants.prodEnv);
   var sharedPreferences = await initializeSharedPreferences();
   await Firebase.initializeApp();
   await registerNotification();
   await SentryFlutter.init(
     (options) {
-      options.environment = HTTPConstants.ENVIRONMENT;
+      options.environment = kDebugMode
+          ? HTTPConstants.ENVIRONMENT_DEBUG
+          : HTTPConstants.ENVIRONMENT;
       options.dsn = HTTPConstants.SENTRY_DSN;
       options.tracesSampleRate = 1.0;
     },
