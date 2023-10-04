@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -214,6 +215,11 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
       });
+      var params = JoinRouteParamsModel(screen: Screen.track);
+      context.push(
+        RouteConstants.joinIntroPath,
+        extra: params,
+      );
     }
   }
 
