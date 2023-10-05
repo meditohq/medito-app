@@ -9,7 +9,6 @@ class PlayPauseButtonWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(audioPlayerNotifierProvider);
-    ref.watch(audioPlayPauseProvider);
 
     return StreamBuilder<bool>(
       stream: provider.playbackState.map((state) => state.playing).distinct(),
@@ -39,12 +38,11 @@ class PlayPauseButtonWidget extends ConsumerWidget {
   }
 
   void _handleTap(WidgetRef ref, bool isPlaying) {
+    final provider = ref.read(audioPlayerNotifierProvider);
     if (isPlaying) {
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PAUSE;
+      provider.pause();
     } else {
-      ref.read(audioPlayPauseStateProvider.notifier).state =
-          PLAY_PAUSE_AUDIO.PLAY;
+      provider.play();
     }
   }
 }

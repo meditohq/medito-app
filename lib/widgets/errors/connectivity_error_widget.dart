@@ -42,7 +42,6 @@ class _ConnectivityErrorComponentState
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(audioPlayPauseProvider);
 
     return WillPopScope(
       onWillPop: () async => false,
