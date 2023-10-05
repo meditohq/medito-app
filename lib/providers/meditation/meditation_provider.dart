@@ -1,9 +1,27 @@
 import 'dart:async';
+import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'download_meditation_provider.dart';
 part 'meditation_provider.g.dart';
+
+final meditationOpenedFirstTimeProvider = FutureProvider<bool>((ref) async {
+  final hasOpened = await SharedPreferencesService.getBoolFromSharedPref(
+    SharedPreferenceConstants.meditationOpenedFirstTime,
+  );
+  final isFirstTime = hasOpened ?? true;
+
+  if (isFirstTime) {
+    await SharedPreferencesService.addBoolInSharedPref(
+      SharedPreferenceConstants.meditationOpenedFirstTime,
+      false,
+    );
+  }
+
+  return isFirstTime;
+});
 
 @riverpod
 Future<MeditationModel> meditations(
@@ -50,8 +68,8 @@ Future<void> addSingleMeditationInPreference(
   _downloadedMeditationList.add(_meditation);
   await ref.read(
     addMeditationListInPreferenceProvider(
-            meditations: _downloadedMeditationList)
-        .future,
+      meditations: _downloadedMeditationList,
+    ).future,
   );
   unawaited(ref.refresh(downloadedMeditationsProvider.future));
 }
