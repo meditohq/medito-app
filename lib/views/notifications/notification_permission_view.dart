@@ -1,3 +1,4 @@
+import 'package:Medito/main.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -5,6 +6,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationPermissionView extends ConsumerWidget {
   const NotificationPermissionView({super.key});
@@ -88,7 +90,13 @@ class NotificationPermissionView extends ConsumerWidget {
   }
 
   void _allowNotification(BuildContext context) async {
-    await requestPermission();
+    var status = await requestPermission();
+    if (status.isPermanentlyDenied) {
+      await sharedPreferences.setBool(
+        SharedPreferenceConstants.notificationPermission,
+        false,
+      );
+    }
     context.pop();
   }
 
