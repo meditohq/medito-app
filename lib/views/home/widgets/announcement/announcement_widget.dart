@@ -142,19 +142,14 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     WidgetRef ref,
     AnnouncementModel element,
   ) {
-    var location = GoRouter.of(context).location;
     _handleTrackEvent(ref, element.id, element.ctaTitle);
-    if (element.ctaType == TypeConstants.LINK) {
-      context.push(
-        location + RouteConstants.webviewPath,
-        extra: {'url': element.ctaPath},
-      );
-    } else {
-      context.push(getPathFromString(
+    context.push(
+      getPathFromString(
         element.ctaType,
         [element.ctaPath.toString().getIdFromPath()],
-      ));
-    }
+      ),
+      extra: {'url': element.ctaPath},
+    );
   }
 
   void _handleTrackEvent(
