@@ -2,79 +2,90 @@ name: Deploy to App Store
 
 on:
   workflow_dispatch:
-    # Enable manual run
     inputs:
       lane:
-        description: 'Currently, only support beta lane'
+        description: 'Choose which lane to run'
         required: true
         default: 'beta'
+        enum: ['beta', 'release']
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'v*'
 
 jobs:
   deploy_ios:
-    name: Deploy beta build to TestFlight
+    name: Deploy to App Store using ${{ github.event.inputs.lane }} lane
     runs-on: macos-latest
     environment: prod
     steps:
-      # Set up Flutter.
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+            
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
           channel: stable
+
       - run: flutter doctor -v
 
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Fixme: https://github.com/meditohq/medito-app/issues/151
+      - name: Set environment variables from GitHub Secrets
+        run: |
+          echo "URL=${{ secrets.PROD_URL }}" >> $GITHUB_ENV
+          echo "INIT_TOKEN=${{ secrets.PROD_INIT_TOKEN }}" >> $GITHUB_ENV
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
+
+      - name: Create .env file
+        run: |
+          echo "URL=${{ secrets.PROD_URL }}" > ios/.env
+          echo "INIT_TOKEN=${{ secrets.PROD_INIT_TOKEN }}" >> ios/.env
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> ios/.env
+
       - name: Create auth.dart
         run: sh ./.github/scripts/create_auth_dart.sh
-        env:
-          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
-          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
-          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
-      - name: Update packages # Needed to upgrade Dart SDK to compatible version
+      - name: Update packages
         run: flutter upgrade
 
       - name: Get dependencies
         run: flutter pub get
-        
+
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        
+
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-    
-    # Add this step once test folder has been re-added to project  
-    # - name: Run test
-    #   run: flutter test
+
+      - name: Decode and place GoogleService-Info.plist
+        run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 -d > ios/Runner/GoogleService-Info.plist
 
       - name: Build ios bundle without code signing
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --no-tree-shake-icons
 
-      # Setup Ruby, Bundler, and Gemfile dependencies
-      - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7.2'
-          bundler-cache: true
-          working-directory: ios
+      - name: Install Fastlane
+        run: gem install fastlane
 
       - name: Create Apple API Key JSON
-        run: |
-          echo "$APPLE_API_KEY_JSON" > fastlane/apple_api_key.json
+        run: echo "$APPLE_API_KEY_JSON" > fastlane/apple_api_key.json
         env:
           APPLE_API_KEY_JSON: ${{ secrets.APPLE_API_KEY_JSON }}
         working-directory: ios
 
-        ## TODO: implement other lanes for appstore deployment
-      - run: bundle exec fastlane beta
+      - name: Fastlane Action
+        run: fastlane ${{ github.event.inputs.lane }}
         env:
+          MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+          STAGING_INIT_TOKEN: ${{ secrets.STAGING_INIT_TOKEN }}
+          PROD_URL: ${{ secrets.PROD_URL }}
+          PROD_INIT_TOKEN: ${{ secrets.PROD_INIT_TOKEN }}
           APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
           DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
           DEVELOPER_APP_IDENTIFIER: '${{ secrets.DEVELOPER_APP_IDENTIFIER }}'
@@ -88,3 +99,6 @@ jobs:
           MEDITO_APPSTORE_CERTIFICATES_REPO: '${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}'
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
         working-directory: ios
+
+      - name: Cleanup .env file
+        run: rm ios/.env
