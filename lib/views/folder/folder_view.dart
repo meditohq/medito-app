@@ -179,13 +179,14 @@ class _FolderViewState extends ConsumerState<FolderView>
               [widget.id, id.toString()],
             ));
           }
-        } else if (type == TypeConstants.LINK) {
-          context.push(
-            location + RouteConstants.webviewPath,
-            extra: {'url': path!},
-          );
         } else {
-          context.push(location + getPathFromString(type, [id.toString()]));
+          context.push(
+            getPathFromString(
+              type,
+              [id.toString()],
+            ),
+            extra: {'url': path ?? ''},
+          );
         }
       } else {
         createSnackBar(StringConstants.checkConnection, context);

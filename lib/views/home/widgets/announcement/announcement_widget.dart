@@ -9,8 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class AnnouncementWidget extends ConsumerStatefulWidget {
-  const AnnouncementWidget({super.key, required this.announcement});
+  const AnnouncementWidget({
+    super.key,
+    required this.announcement,
+    this.onPressedDismiss,
+  });
   final AnnouncementModel announcement;
+  final void Function()? onPressedDismiss;
   @override
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
@@ -95,6 +100,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       children: [
         LoadingButtonWidget(
           onPressed: () {
+            if (widget.onPressedDismiss != null) {
+              widget.onPressedDismiss!();
+            }
             _toggleCollapse();
             _handleTrackEvent(
               ref,
@@ -164,19 +172,14 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     WidgetRef ref,
     AnnouncementModel element,
   ) {
-    var location = GoRouter.of(context).location;
     _handleTrackEvent(ref, element.id, element.ctaTitle);
-    if (element.ctaType == TypeConstants.LINK) {
-      context.push(
-        location + RouteConstants.webviewPath,
-        extra: {'url': element.ctaPath},
-      );
-    } else {
-      context.push(getPathFromString(
+    context.push(
+      getPathFromString(
         element.ctaType,
         [element.ctaPath.toString().getIdFromPath()],
-      ));
-    }
+      ),
+      extra: {'url': element.ctaPath},
+    );
   }
 
   void _handleTrackEvent(

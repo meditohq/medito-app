@@ -367,6 +367,9 @@ String getPathFromString(String? place, List<String?> ids) {
   if (place == 'url') {
     launchUrlMedito(ids.first);
   }
+  if (place == TypeConstants.LINK) {
+    return RouteConstants.webviewPath;
+  }
   if (place == 'app') {
     return RouteConstants.collectionPath;
   }
