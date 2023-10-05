@@ -1,86 +1,80 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
+require 'base64'
 
 default_platform(:ios)
 
-DEVELOPER_APP_ID = ENV["DEVELOPER_APP_ID"]
-DEVELOPER_APP_IDENTIFIER = ENV["DEVELOPER_APP_IDENTIFIER"]
-PROVISIONING_PROFILE_SPECIFIER = ENV["PROVISIONING_PROFILE_SPECIFIER"]
-TEMP_KEYCHAIN_USER = ENV["TEMP_KEYCHAIN_USER"]
-TEMP_KEYCHAIN_PASSWORD = ENV["TEMP_KEYCHAIN_PASSWORD"]
-
-def delete_temp_keychain(name)
-  delete_keychain(
-    name: name
-  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
-end
-
-def create_temp_keychain(name, password)
-  create_keychain(
-    name: name,
-    password: password,
-    unlock: false,
-    timeout: 360000
-  )
-end
-
-def ensure_temp_keychain(name, password)
-  delete_temp_keychain(name)
-  create_temp_keychain(name, password)
-end
-
 platform :ios do
-  lane :beta do
-    keychain_name = TEMP_KEYCHAIN_USER
-    keychain_password = TEMP_KEYCHAIN_PASSWORD
-    ensure_temp_keychain(keychain_name, keychain_password)
+  
+  before_all do
+    xcode_select "/Applications/Xcode.app" # Set the default path to Xcode
+  end
 
-    # Fetch the signing certificate
+  # For TestFlight (staging)
+  lane :beta do
+    setup_keychain()
+    
     match(
       type: 'appstore',
-      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
-      git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
       readonly: true,
-      keychain_name: keychain_name,
-      keychain_password: keychain_password
+      git_url: "https://github.com/meditohq/fastlane-certificates.git",
+      git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}")
     )
 
-    # Build and sign the ipa
-    gym(
-      configuration: "Release",
+    build_app(
       workspace: "Runner.xcworkspace",
+      configuration: "Release",
       scheme: "Runner",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-            DEVELOPER_APP_ID => PROVISIONING_PROFILE_SPECIFIER
+          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
 
-    # Upload to test flight track
-    pilot(
-      apple_id: "#{DEVELOPER_APP_ID}",
-      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
-      skip_submission: true,
-      distribute_external: false,
-      notify_external_testers: false,
-      api_key_path: "fastlane/apple_api_key.json",
-      ipa: "./Runner.ipa"
+    upload_to_testflight(skip_submission: true)
+    cleanup_keychain()
+  end
+  
+  # For App Store (production)
+  lane :release do
+    setup_keychain()
+    
+    match(
+      type: 'appstore',
+      readonly: true,
+      git_url: "https://github.com/meditohq/fastlane-certificates.git",
+      git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}")
     )
 
-    delete_temp_keychain(keychain_name)
+    build_app(
+      workspace: "Runner.xcworkspace",
+      configuration: "Release",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        }
+      }
+    )
+
+    upload_to_app_store()
+    cleanup_keychain()
   end
+end
+
+# Helper methods to manage keychain
+def setup_keychain
+  create_keychain(
+    name: ENV["TEMP_KEYCHAIN_USER"],
+    password: ENV["TEMP_KEYCHAIN_PASSWORD"],
+    default_keychain: true,
+    unlock: true,
+    timeout: 3600,
+    lock_when_sleeps: true
+  )
+end
+
+def cleanup_keychain
+  delete_keychain(name: ENV["TEMP_KEYCHAIN_USER"])
 end
