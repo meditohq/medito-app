@@ -21,22 +21,6 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
 }
 
 class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
-  bool _isCollapsed = true;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _toggleCollapse();
-    });
-    super.initState();
-  }
-
-  void _toggleCollapse() {
-    setState(() {
-      _isCollapsed = !_isCollapsed;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     var bgColor =
@@ -46,39 +30,28 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
 
     return Column(
       children: [
-        AnimatedSize(
-          duration: Duration(milliseconds: 800),
-          curve: Curves.easeInOut,
-          child: Visibility(
-            visible: !_isCollapsed,
-            child: Container(
-              color: bgColor,
-              width: size.width,
-              padding: EdgeInsets.all(16),
-              child: Column(
+        Container(
+          color: bgColor,
+          width: size.width,
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              SizedBox(
+                height: topPadding,
+                width: size.width,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: topPadding,
-                    width: size.width,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _icon(widget.announcement.icon),
-                      _text(context, widget.announcement.text),
-                    ],
-                  ),
-                  height16,
-                  _actionBtn(context, ref, widget.announcement),
+                  _icon(widget.announcement.icon),
+                  _text(context, widget.announcement.text),
                 ],
               ),
-            ),
+              height16,
+              _actionBtn(context, ref, widget.announcement),
+            ],
           ),
         ),
-        if (_isCollapsed)
-          SizedBox(
-            height: topPadding,
-          ),
       ],
     );
   }
@@ -103,16 +76,13 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
             if (widget.onPressedDismiss != null) {
               widget.onPressedDismiss!();
             }
-            _toggleCollapse();
             _handleTrackEvent(
               ref,
               announcement.id,
               StringConstants.dismiss.toLowerCase(),
             );
-            ref.invalidate(remoteStatsProvider);
-            ref.read(remoteStatsProvider);
-            ref.invalidate(homeProvider);
-            ref.read(homeProvider);
+            //ignore: unused_result
+            // ref.refresh(homeProvider);
           },
           btnText: StringConstants.dismiss,
           bgColor: bgColor,
