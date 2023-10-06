@@ -6,7 +6,7 @@ class HTTPConstants {
   static String INIT_TOKEN = dotenv.env['INIT_TOKEN']!;
   static String CONTENT_TOKEN = dotenv.env['CONTENT_TOKEN']!;
   static String CONTENT_TOKEN_OLD = dotenv.env['CONTENT_TOKEN_OLD']!;
-  static String SENTRY_URL = dotenv.env['SENTRY_URL']!;
+  static String SENTRY_DSN = dotenv.env['SENTRY_DSN']!;
 
   //END POINTS
   static const String USERS = 'users';

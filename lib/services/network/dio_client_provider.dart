@@ -7,6 +7,7 @@ import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 final dioClientProvider = Provider<DioApiService>((ref) {
   var dio = Dio();
@@ -44,6 +45,10 @@ Future<void> onError(
   ErrorInterceptorHandler handler,
   Ref ref,
 ) async {
+  await Sentry.captureException(
+    err,
+    stackTrace: err.stackTrace,
+  );
   if (err.response?.statusCode == 401) {
     var router = ref.read(goRouterProvider);
     unawaited(ref.read(audioPlayerNotifierProvider).pause());
