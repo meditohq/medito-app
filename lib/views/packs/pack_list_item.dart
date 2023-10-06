@@ -73,6 +73,7 @@ class PackListItemWidget extends StatelessWidget {
               children: [
                 _backgroundImageWidget(),
                 _coverImageWidget(),
+
               ],
             ),
           ),
@@ -82,7 +83,11 @@ class PackListItemWidget extends StatelessWidget {
   Padding _coverImageWidget() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: data.icon ?? NetworkImageWidget(url: data.cover!),
+      child: data.icon ??
+          NetworkImageWidget(
+            url: data.cover!,
+            isCache: true,
+          ),
     );
   }
 
