@@ -64,7 +64,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
-  
+
   RefreshIndicator _buildScaffoldWithData(
     BuildContext context,
     TrackModel trackModel,

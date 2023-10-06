@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -71,6 +72,19 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
     var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
+    ref.listen(playerProvider, (prev, next) {
+      var prevId = prev?.audio.first.files.first.id;
+      var nextId = next?.audio.first.files.first.id;
+      if (next != null &&
+          (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
+        _handleAudioStartedEvent(
+          ref,
+          next.id,
+          next.audio.first.files.first.id,
+        );
+      }
+    });
+
 
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
@@ -171,6 +185,19 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(eventsProvider(event: event.toJson()));
   }
 
+  void _handleAudioStartedEvent(
+    WidgetRef ref,
+    String trackId,
+    String audioFileId,
+  ) {
+    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
+    var event = EventsModel(
+      name: EventTypes.audioStarted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
   void _handleAudioCompletion(
     WidgetRef ref,
   ) {
@@ -189,6 +216,11 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
       });
+      var params = JoinRouteParamsModel(screen: Screen.track);
+      context.push(
+        RouteConstants.joinIntroPath,
+        extra: params,
+      );
     }
   }
 
