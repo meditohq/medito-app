@@ -85,11 +85,6 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
           border: outlineInputBorder,
         ),
         textInputAction: TextInputAction.search,
-        style: textTheme.bodyMedium?.copyWith(
-          color: ColorConstants.walterWhite,
-          fontFamily: DmSans,
-          fontSize: 16,
-        ),
         autofocus: true,
         onFieldSubmitted: (val) {
           ref.read(searchQueryProvider.notifier).state = val;
