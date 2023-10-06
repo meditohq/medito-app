@@ -31,22 +31,19 @@ final dioClientProvider = Provider<DioApiService>((ref) {
     error: true,
   ));
   dio.interceptors.add(
-    InterceptorsWrapper(onError: (e, handler) => onError(e, handler, ref)),
+    InterceptorsWrapper(onError: (e, handler) => _onError(e, handler, ref)),
   );
   var dioApiService = DioApiService(dio: dio);
 
   return dioApiService;
 });
 
-Future<void> onError(
+Future<void> _onError(
   DioError err,
   ErrorInterceptorHandler handler,
   Ref ref,
 ) async {
-  await Sentry.captureException(
-    err,
-    stackTrace: err.stackTrace,
-  );
+  await _captureException(err);
   if (err.response?.statusCode == 401) {
     var router = ref.read(goRouterProvider);
     var _sharedPreferenceProvider = ref.read(sharedPreferencesProvider);
@@ -62,4 +59,20 @@ Future<void> onError(
   } else {
     handler.reject(err);
   }
+}
+
+Future<void> _captureException(
+  DioError err,
+) async {
+  var exception = {
+    'error': err.toString(),
+    'endpoint': err.requestOptions.path,
+    'data': err.requestOptions.data,
+    'response': err.response ?? '',
+    'serverMessage': err.message ?? '',
+  };
+  await Sentry.captureException(
+    exception,
+    stackTrace: exception,
+  );
 }
