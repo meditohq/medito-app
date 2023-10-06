@@ -173,8 +173,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     String trackId,
     String audioFileId,
   ) {
-    var audio =
-        AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
+    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
     var event = EventsModel(
       name: EventTypes.audioStarted,
       payload: audio.toJson(),
