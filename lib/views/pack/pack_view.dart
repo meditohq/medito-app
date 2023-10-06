@@ -111,8 +111,7 @@ class _PackViewState extends ConsumerState<PackView>
                 bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
               ),
       ),
-      constraints: BoxConstraints(minHeight: 88),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -123,25 +122,23 @@ class _PackViewState extends ConsumerState<PackView>
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (title.isNotNullAndNotEmpty())
-                  Padding(
-                    padding: EdgeInsets.only(top: hasSubtitle ? 8 : 0),
-                    child: Text(
-                      title!,
-                      style: bodyLarge?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: DmSans,
-                        height: 2,
-                      ),
+                  Text(
+                    title!,
+                    style: bodyLarge?.copyWith(
+                      color: ColorConstants.walterWhite,
+                      fontFamily: DmSans,
                     ),
                   ),
                 if (hasSubtitle)
                   Flexible(
-                    child: Text(
-                      subtitle!,
-                      style: bodyLarge?.copyWith(
-                        fontFamily: DmMono,
-                        height: 2,
-                        color: ColorConstants.newGrey,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        subtitle!,
+                        style: bodyLarge?.copyWith(
+                          fontFamily: DmMono,
+                          color: ColorConstants.newGrey,
+                        ),
                       ),
                     ),
                   ),
