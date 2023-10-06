@@ -8,18 +8,18 @@ import 'labels_widget.dart';
 
 class AudioDownloadWidget extends ConsumerWidget {
   const AudioDownloadWidget({
-    required this.meditationModel,
+    required this.trackModel,
     required this.file,
     super.key,
   });
-  final MeditationModel meditationModel;
-  final MeditationFilesModel file;
+  final TrackModel trackModel;
+  final TrackFilesModel file;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
     var downloadFileKey =
-        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}';
+        '${trackModel.id}-${file.id}${getFileExtension(file.path)}';
 
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
@@ -79,12 +79,12 @@ class AudioDownloadWidget extends ConsumerWidget {
     BuildContext context,
   ) async {
     try {
-      await downloadAudioProvider.downloadMeditationAudio(
-        meditationModel,
+      await downloadAudioProvider.downloadTrackAudio(
+        trackModel,
         file,
       );
-      await ref.read(addSingleMeditationInPreferenceProvider(
-        meditationModel: meditationModel,
+      await ref.read(addSingleTrackInPreferenceProvider(
+        trackModel: trackModel,
         file: file,
       ).future);
     } catch (e) {
@@ -98,10 +98,10 @@ class AudioDownloadWidget extends ConsumerWidget {
     BuildContext context,
   ) async {
     try {
-      await downloadAudioProvider.deleteMeditationAudio(
-        '${meditationModel.id}-${file.id}${getFileExtension(file.path)}',
+      await downloadAudioProvider.deleteTrackAudio(
+        '${trackModel.id}-${file.id}${getFileExtension(file.path)}',
       );
-      ref.read(deleteMeditationFromPreferenceProvider(
+      ref.read(deleteTrackFromPreferenceProvider(
         file: file,
       ));
     } catch (e) {

@@ -80,7 +80,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       unawaited(updateStatsFromBg());
     } else if (state == AppLifecycleState.detached) {
       final audioProvider = ref.read(audioPlayerNotifierProvider);
-      audioProvider.meditationAudioPlayer.dispose();
+      audioProvider.trackAudioPlayer.dispose();
       audioProvider.backgroundSoundAudioPlayer.dispose();
       audioProvider.dispose();
     }
@@ -91,7 +91,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    audioProvider.meditationAudioPlayer.dispose();
+    audioProvider.trackAudioPlayer.dispose();
     audioProvider.backgroundSoundAudioPlayer.dispose();
     audioProvider.dispose();
     super.dispose();

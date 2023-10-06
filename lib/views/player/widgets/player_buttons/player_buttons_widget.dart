@@ -7,11 +7,11 @@ import 'play_pause_button_widget.dart';
 class PlayerButtonsWidget extends ConsumerWidget {
   const PlayerButtonsWidget({
     super.key,
-    required this.meditationModel,
+    required this.trackModel,
     required this.file,
   });
-  final MeditationFilesModel file;
-  final MeditationModel meditationModel;
+  final TrackFilesModel file;
+  final TrackModel trackModel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

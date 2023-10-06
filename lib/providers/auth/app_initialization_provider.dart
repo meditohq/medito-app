@@ -22,11 +22,7 @@ final appInitializationProvider =
     var data = _setAppOpenedModelData(deviceInfo);
 
     await ref.read(eventsProvider(event: data.toJson()).future);
-    if (_user.email != null) {
-      context.go(RouteConstants.homePath);
-    } else {
-      context.go(RouteConstants.joinIntroPath);
-    }
+    context.go(RouteConstants.homePath);
   } catch (err) {
     print(err);
     _handleRetry(context, ref, err.toString());

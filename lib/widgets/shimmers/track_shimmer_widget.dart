@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'widgets/box_shimmer_widget.dart';
 
-class MeditationShimmerWidget extends StatelessWidget {
-  const MeditationShimmerWidget({super.key});
+class TrackShimmerWidget extends StatelessWidget {
+  const TrackShimmerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

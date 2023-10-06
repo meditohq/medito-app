@@ -20,11 +20,11 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
-  List<MeditationModel> downloadedMeditations = [];
+  List<TrackModel> downloadedTracks = [];
 
   @override
   Widget build(BuildContext context) {
-    final downloadedMeditations = ref.watch(downloadedMeditationsProvider);
+    final downloadedTracks = ref.watch(downloadedTracksProvider);
 
     return Scaffold(
       appBar: MeditoAppBarWidget(
@@ -34,7 +34,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         hasCloseButton: true,
       ),
       key: scaffoldKey,
-      body: downloadedMeditations.when(
+      body: downloadedTracks.when(
         skipLoadingOnRefresh: false,
         data: (data) {
           if (data.isEmpty) {
@@ -45,14 +45,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         },
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () => ref.refresh(downloadedMeditationsProvider),
+          onTap: () => ref.refresh(downloadedTracksProvider),
         ),
-        loading: () => MeditationShimmerWidget(),
+        loading: () => TrackShimmerWidget(),
       ),
     );
   }
 
-  Widget _getDownloadList(List<MeditationModel> meditations) {
+  Widget _getDownloadList(List<TrackModel> tracks) {
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
     return ReorderableListView(
@@ -62,16 +62,16 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
-          var reorderedItem = meditations.removeAt(oldIndex);
-          meditations.insert(newIndex, reorderedItem);
+          var reorderedItem = tracks.removeAt(oldIndex);
+          tracks.insert(newIndex, reorderedItem);
           // To ensure, that the new list order is saved
           ref.read(
-            addMeditationListInPreferenceProvider(meditations: meditations),
+            addTrackListInPreferenceProvider(tracks: tracks),
           );
         });
       },
       children:
-          meditations.map((item) => _getSlidingItem(item, context)).toList(),
+          tracks.map((item) => _getSlidingItem(item, context)).toList(),
     );
   }
 
@@ -79,7 +79,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         message: StringConstants.emptyDownloadsMessage,
       );
 
-  Widget _getSlidingItem(MeditationModel item, BuildContext context) {
+  Widget _getSlidingItem(TrackModel item, BuildContext context) {
     return InkWell(
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
@@ -92,10 +92,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         background: _getDismissibleBackgroundWidget(),
         onDismissed: (direction) {
           if (mounted) {
-            ref.watch(audioDownloaderProvider).deleteMeditationAudio(
+            ref.watch(audioDownloaderProvider).deleteTrackAudio(
                   '${item.id}-${item.audio.first.files.first.id}${getFileExtension(item.audio.first.files.first.path)}',
                 );
-            ref.read(deleteMeditationFromPreferenceProvider(
+            ref.read(deleteTrackFromPreferenceProvider(
               file: item.audio.first.files.first,
             ).future);
           }
@@ -128,7 +128,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         ),
       );
 
-  PackListItemWidget _getListItemWidget(MeditationModel item) {
+  PackListItemWidget _getListItemWidget(TrackModel item) {
     var audioLength =
         Duration(milliseconds: item.audio.first.files.first.duration)
             .inMinutes
@@ -147,15 +147,15 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  String _getDuration(String? length) => formatMeditationLength(length);
+  String _getDuration(String? length) => formatTrackLength(length);
 
   void _openPlayer(
     WidgetRef ref,
-    MeditationModel meditationModel,
+    TrackModel trackModel,
   ) {
-    ref.read(playerProvider.notifier).addCurrentlyPlayingMeditationInPreference(
-          meditationModel: meditationModel,
-          file: meditationModel.audio.first.files.first,
+    ref.read(playerProvider.notifier).addCurrentlyPlayingTrackInPreference(
+          trackModel: trackModel,
+          file: trackModel.audio.first.files.first,
         );
     ref.read(pageviewNotifierProvider).gotoNextPage();
   }

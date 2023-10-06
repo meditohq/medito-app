@@ -5,22 +5,22 @@ import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MeditationButtonsWidget extends StatelessWidget {
-  final MeditationModel meditationModel;
-  const MeditationButtonsWidget({super.key, required this.meditationModel});
+class TrackButtonsWidget extends StatelessWidget {
+  final TrackModel trackModel;
+  const TrackButtonsWidget({super.key, required this.trackModel});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: EdgeInsets.zero,
       shrinkWrap: true,
-      itemCount: meditationModel.audio.length,
+      itemCount: trackModel.audio.length,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, i) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _guideName(context, meditationModel.audio[i].guideName),
+            _guideName(context, trackModel.audio[i].guideName),
             _gridList(i),
             SizedBox(height: 30),
           ],
@@ -56,12 +56,12 @@ class MeditationButtonsWidget extends StatelessWidget {
       runSpacing: 8,
       alignment: WrapAlignment.spaceBetween,
       children:
-          meditationModel.audio[i].files.map((e) => _getGridItem(e)).toList(),
+          trackModel.audio[i].files.map((e) => _getGridItem(e)).toList(),
     );
   }
 
   Consumer _getGridItem(
-    MeditationFilesModel file,
+    TrackFilesModel file,
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
@@ -92,12 +92,12 @@ class MeditationButtonsWidget extends StatelessWidget {
 
   void _handleTap(
     WidgetRef ref,
-    MeditationFilesModel file,
+    TrackFilesModel file,
   ) async {
     await ref
         .read(playerProvider.notifier)
-        .addCurrentlyPlayingMeditationInPreference(
-          meditationModel: meditationModel,
+        .addCurrentlyPlayingTrackInPreference(
+          trackModel: trackModel,
           file: file,
         );
     ref.read(pageviewNotifierProvider).gotoNextPage();
