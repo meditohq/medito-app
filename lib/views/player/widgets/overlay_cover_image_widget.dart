@@ -6,11 +6,17 @@ class OverlayCoverImageWidget extends StatelessWidget {
   final String imageUrl;
   @override
   Widget build(BuildContext context) {
+    const totalPadding = 32;
+    const horizontalPadding = totalPadding / 2;
+    const verticalPadding = totalPadding / 2;
     var size = MediaQuery.of(context).size;
 
     return Container(
-      height: size.width,
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      height: size.width - totalPadding,
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
       child: NetworkImageWidget(
         url: imageUrl,
         isCache: true,

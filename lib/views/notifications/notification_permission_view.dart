@@ -18,19 +18,19 @@ class NotificationPermissionView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      body: Padding(
-        padding: EdgeInsets.only(bottom: bottom),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(
-              AssetConstants.dalleNotifications,
-              height: size.height * 0.45,
-              width: size.width,
-              fit: BoxFit.cover,
-            ),
-            Expanded(
-              child: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottom),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                AssetConstants.dalleNotifications,
+                height: size.height * 0.45,
+                width: size.width,
+                fit: BoxFit.cover,
+              ),
+              Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
                 child: Column(
@@ -55,8 +55,7 @@ class NotificationPermissionView extends ConsumerWidget {
                         fontSize: 16,
                       ),
                     ),
-                    height8,
-                    Spacer(),
+                    height16,
                     SizedBox(
                       width: size.width,
                       child: LoadingButtonWidget(
@@ -82,8 +81,8 @@ class NotificationPermissionView extends ConsumerWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -92,11 +91,10 @@ class NotificationPermissionView extends ConsumerWidget {
   void _allowNotification(BuildContext context, WidgetRef ref) async {
     var status = await requestPermission();
     if (status.isPermanentlyDenied) {
-      await ref
-            .read(sharedPreferencesProvider).setBool(
-        SharedPreferenceConstants.notificationPermission,
-        false,
-      );
+      await ref.read(sharedPreferencesProvider).setBool(
+            SharedPreferenceConstants.notificationPermission,
+            false,
+          );
     }
     context.pop();
   }

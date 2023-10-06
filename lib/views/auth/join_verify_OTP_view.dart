@@ -125,12 +125,12 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   onChanged: (String _) => setState(() => {}),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.only(top: 8),
                   child: _ResendCodeWidget(
                     email: widget.email,
                   ),
                 ),
-                Spacer(),
+                height16,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -232,17 +232,14 @@ class _ResendCodeWidget extends ConsumerWidget {
         final minutes = value.inMinutes;
         final seconds = value.inSeconds % 60;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: Text(
-            '$minutes:$seconds',
-            textAlign: TextAlign.center,
-            style: textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              height: 1.5,
-              fontSize: 14,
-            ),
+        return Text(
+          '$minutes:$seconds',
+          textAlign: TextAlign.center,
+          style: textTheme.bodyMedium?.copyWith(
+            color: ColorConstants.walterWhite,
+            fontFamily: DmSans,
+            height: 1.5,
+            fontSize: 14,
           ),
         );
       },
