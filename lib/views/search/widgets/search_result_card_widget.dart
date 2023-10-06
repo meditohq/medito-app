@@ -24,10 +24,12 @@ class SearchResultCardWidget extends StatelessWidget {
         onTap: onTap,
         child: Row(
           children: [
-            NetworkImageWidget(
-              url: coverUrlPath,
+            SizedBox(
               height: 56,
               width: 56,
+              child: NetworkImageWidget(
+                url: coverUrlPath,
+              ),
             ),
             SizedBox(
               width: 12,

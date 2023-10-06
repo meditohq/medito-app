@@ -8,3 +8,4 @@ export 'downloader/downloader_repository.dart';
 export 'stats/stats_repository.dart';
 export 'device_and_app_info/device_and_app_info_repository.dart';
 export 'events/events_repository.dart';
+export 'search/search_repository.dart';

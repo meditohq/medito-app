@@ -26,4 +26,5 @@ export 'events/transfer_stats/transfer_stats_model.dart';
 export 'events/save_fcm_token/save_fcm_token_model.dart';
 export 'events/events_model.dart';
 export 'notification/notification_payload_model.dart';
+export 'search/search_model.dart';
 export 'join/join_route_params_model.dart';
