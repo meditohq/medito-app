@@ -1,6 +1,6 @@
 class TypeConstants {
   static const String LINK = 'link';
-  static const String FOLDER = 'folder';
+  static const String PACK = 'pack';
   static const String TRACK = 'track';
   static const String EMAIL = 'email';
 }
@@ -11,11 +11,10 @@ class EventTypes {
   static const String audioStarted = 'audioStarted';
   static const String audioCompleted = 'audioCompleted';
   static const String backgroundSoundSelected = 'backgroundSoundSelected';
-  static const String folderViewed = 'folderViewed';
+  static const String packViewed = 'packViewed';
   static const String trackViewed = 'trackViewed';
   static const String chipTapped = 'chipTapped';
   static const String menuItemTapped = 'menuItemTapped';
   static const String transferStats = 'transferStats';
   static const String announcementCtaTapped = 'announcementCtaTapped';
 }
-

@@ -8,13 +8,13 @@ class RouteConstants {
   static const String downloadsPath = '/downloads';
   static const String playerPath = '/player';
   static const String articlePath = '/article/:aid';
-  static const String folderPath = '/folder/:fid';
-  static const String player1 = '/folder/:fid/meditation/:sid';
-  static const String folder2Path = '/folder/:fid/folder2/:f2id';
-  static const String player2 = '/folder/:fid/folder2/:f2id/meditation/:sid';
-  static const String folder3Path = '/folder/:fid/folder2/:f2id/folder3/:f3id';
+  static const String packPath = '/pack/:pid';
+  static const String player1 = '/pack/:pid/meditation/:sid';
+  static const String pack2Path = '/pack/:pid/pack2/:p2id';
+  static const String player2 = '/pack/:pid/pack2/:p2id/meditation/:sid';
+  static const String pack3Path = '/pack/:pid/pack2/:p2id/pack3/:p3id';
   static const String player3 =
-      '/folder/:fid/folder2/:f2id/folder3/:f3id/meditation/:sid';
+      '/pack/:pid/pack2/:p2id/pack3/:p3id/meditation/:sid';
   static const String urlPath = '/url';
   static const String collectionPath = '/app';
   static const String webviewPath = '/webview';
