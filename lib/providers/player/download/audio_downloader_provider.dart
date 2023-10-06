@@ -19,7 +19,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
     TrackFilesModel file,
   ) async {
     var fileName =
-        '${trackModel.id}-${file.id}${getFileExtension(file.path)}';
+        '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
       audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADIING;

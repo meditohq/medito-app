@@ -19,7 +19,7 @@ class AudioDownloadWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioProvider = ref.watch(audioDownloaderProvider);
     var downloadFileKey =
-        '${trackModel.id}-${file.id}${getFileExtension(file.path)}';
+        '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
@@ -99,7 +99,7 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) async {
     try {
       await downloadAudioProvider.deleteTrackAudio(
-        '${trackModel.id}-${file.id}${getFileExtension(file.path)}',
+        '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
       );
       ref.read(deleteTrackFromPreferenceProvider(
         file: file,

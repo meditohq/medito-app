@@ -475,7 +475,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 20057;
+				CURRENT_PROJECT_VERSION = 20061;
 				DEVELOPMENT_TEAM = JLKV36C38P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -483,7 +483,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.58;
+				MARKETING_VERSION = 2.0.61;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -662,7 +662,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 20057;
+				CURRENT_PROJECT_VERSION = 20061;
 				DEVELOPMENT_TEAM = JLKV36C38P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -670,7 +670,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.58;
+				MARKETING_VERSION = 2.0.61;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -691,7 +691,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 20057;
+				CURRENT_PROJECT_VERSION = 20061;
 				DEVELOPMENT_TEAM = JLKV36C38P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -699,7 +699,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.58;
+				MARKETING_VERSION = 2.0.61;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

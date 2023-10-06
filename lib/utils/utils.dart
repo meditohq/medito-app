@@ -154,8 +154,20 @@ extension EmptyOrNull on String? {
   }
 }
 
-String getFileExtension(String path) {
-  return '.${path.substring(path.lastIndexOf('.') + 1)}';
+String getAudioFileExtension(String path) {
+  var lastIndex = path.lastIndexOf('/');
+  if (lastIndex != -1) {
+    var filenameWithQuery = path.substring(lastIndex + 1);
+    var filename = Uri.decodeFull(filenameWithQuery.split('?').first);
+    var dotIndex = filename.lastIndexOf('.');
+    if (dotIndex != -1) {
+      var fileExtension = filename.substring(dotIndex + 1);
+
+      return '.$fileExtension';
+    }
+  }
+
+  return '.mp3';
 }
 
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
