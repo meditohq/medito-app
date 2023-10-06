@@ -89,6 +89,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         child: PageView(
           controller: ref.read(pageviewNotifierProvider).pageController,
           scrollDirection: Axis.vertical,
+          physics: ClampingScrollPhysics(),
           children: [
             Column(
               children: [
