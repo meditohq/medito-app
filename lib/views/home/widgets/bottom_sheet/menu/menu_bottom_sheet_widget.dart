@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -51,16 +53,28 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     HomeMenuModel element,
-  ) {
+  ) async {
     _handleTrackEvent(ref, element.id, element.title);
     Navigator.pop(context);
-    context.push(
-      getPathFromString(
-        element.type,
-        [element.path.toString().getIdFromPath()],
-      ),
-      extra: {'url': element.path},
-    );
+    if (element.type == TypeConstants.EMAIL) {
+      var deviceAppAndUserInfo =
+          await ref.read(deviceAppAndUserInfoProvider.future);
+      var _info =
+          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+      await launchEmailSubmission(
+        element.path.toString(),
+        body: _info,
+      );
+    } else {
+      unawaited(context.push(
+        getPathFromString(
+          element.type,
+          [element.path.toString().getIdFromPath()],
+        ),
+        extra: {'url': element.path},
+      ));
+    }
   }
 
   void _handleTrackEvent(WidgetRef ref, String itemId, String itemTitle) {

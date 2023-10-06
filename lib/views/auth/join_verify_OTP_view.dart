@@ -38,8 +38,13 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
       if (status == Status.COMPLETED) {
         await removeFirebaseToken();
         await requestGenerateFirebaseToken();
+        // ignore: unused_result
+        ref.invalidate(meProvider);
+        ref.read(meProvider);
         var params = JoinRouteParamsModel(
-            screen: widget.fromScreen, email: widget.email);
+          screen: widget.fromScreen,
+          email: widget.email,
+        );
         unawaited(context.push(
           RouteConstants.joinWelcomePath,
           extra: params,

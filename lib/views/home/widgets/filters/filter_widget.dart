@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -68,15 +70,27 @@ class FilterWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     HomeChipsItemsModel element,
-  ) {
+  ) async {
     _handleTrackEvent(ref, element.id, element.title);
-    context.push(
-      getPathFromString(
-        element.type,
-        [element.path.toString().getIdFromPath()],
-      ),
-      extra: {'url': element.path},
-    );
+    if (element.type == TypeConstants.EMAIL) {
+      var deviceAppAndUserInfo =
+          await ref.read(deviceAppAndUserInfoProvider.future);
+      var _info =
+          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+      await launchEmailSubmission(
+        element.path.toString(),
+        body: _info,
+      );
+    } else {
+      unawaited(context.push(
+        getPathFromString(
+          element.type,
+          [element.path.toString().getIdFromPath()],
+        ),
+        extra: {'url': element.path},
+      ));
+    }
   }
 
   void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {

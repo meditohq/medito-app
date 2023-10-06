@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -164,29 +166,39 @@ class _FolderViewState extends ConsumerState<FolderView>
     String? path,
     BuildContext context,
   ) {
-    checkConnectivity().then((value) {
+    checkConnectivity().then((value) async {
       if (value) {
         var location = GoRouter.of(context).location;
         if (type == TypeConstants.FOLDER) {
           if (location.contains('folder2')) {
-            context.push(getPathFromString(
+            unawaited(context.push(getPathFromString(
               RouteConstants.folder3Path,
               [location.split('/')[2], widget.id, id.toString()],
-            ));
+            )));
           } else {
-            context.push(getPathFromString(
+            unawaited(context.push(getPathFromString(
               RouteConstants.folder2Path,
               [widget.id, id.toString()],
-            ));
+            )));
           }
+        } else if (type == TypeConstants.EMAIL) {
+          var deviceAppAndUserInfo =
+              await ref.read(deviceAppAndUserInfoProvider.future);
+          var _info =
+              '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+          await launchEmailSubmission(
+            path.toString(),
+            body: _info,
+          );
         } else {
-          context.push(
+          unawaited(context.push(
             getPathFromString(
               type,
               [id.toString()],
             ),
             extra: {'url': path ?? ''},
-          );
+          ));
         }
       } else {
         createSnackBar(StringConstants.checkConnection, context);

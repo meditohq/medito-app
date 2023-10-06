@@ -29,7 +29,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.read(audioPlayerNotifierProvider).initAudioHandler();
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
-    ref.read(meProvider);
+    ref.read(deviceAppAndUserInfoProvider);
     ref.read(pageviewNotifierProvider).addListenerToPage();
     _saveFcmTokenEvent(ref);
     ref
