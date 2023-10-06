@@ -17,11 +17,26 @@ class PackView extends ConsumerStatefulWidget {
   final String id;
 
   @override
-  ConsumerState<PackView> createState() => _FolderViewState();
+  ConsumerState<PackView> createState() => _PackViewState();
 }
 
-class _FolderViewState extends ConsumerState<PackView>
+class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
+  @override
+  void initState() {
+    _handleTrackEvent(ref, widget.id);
+    super.initState();
+  }
+
+  void _handleTrackEvent(WidgetRef ref, String packId) {
+    var packViewedModel = PackViewedModel(packId: packId);
+    var event = EventsModel(
+      name: EventTypes.packViewed,
+      payload: packViewedModel.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -96,8 +111,7 @@ class _FolderViewState extends ConsumerState<PackView>
                 bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
               ),
       ),
-      constraints: BoxConstraints(minHeight: 88),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -108,25 +122,23 @@ class _FolderViewState extends ConsumerState<PackView>
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (title.isNotNullAndNotEmpty())
-                  Padding(
-                    padding: EdgeInsets.only(top: hasSubtitle ? 8 : 0),
-                    child: Text(
-                      title!,
-                      style: bodyLarge?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: DmSans,
-                        height: 2,
-                      ),
+                  Text(
+                    title!,
+                    style: bodyLarge?.copyWith(
+                      color: ColorConstants.walterWhite,
+                      fontFamily: DmSans,
                     ),
                   ),
                 if (hasSubtitle)
                   Flexible(
-                    child: Text(
-                      subtitle!,
-                      style: bodyLarge?.copyWith(
-                        fontFamily: DmMono,
-                        height: 2,
-                        color: ColorConstants.newGrey,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        subtitle!,
+                        style: bodyLarge?.copyWith(
+                          fontFamily: DmMono,
+                          color: ColorConstants.newGrey,
+                        ),
                       ),
                     ),
                   ),

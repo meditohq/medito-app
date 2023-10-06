@@ -97,6 +97,8 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
                     ))
                 .toList(),
           ),
+          height16,
+          height16,
         ],
       ),
     );

@@ -85,7 +85,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       }
     });
 
-
     return Scaffold(
       backgroundColor: ColorConstants.almostBlack,
       resizeToAvoidBottomInset: false,
