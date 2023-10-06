@@ -1,3 +1,4 @@
+import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -46,14 +47,24 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   void handleOnChangeSound(BackgroundSoundsModel? sound) {
     selectedBgSound = sound;
     if (sound != null) {
-      unawaited(
-        ref.read(sharedPreferencesProvider).setString(
-              SharedPreferenceConstants.bgSound,
-              json.encode(
-                sound.toJson(),
-              ),
+      final downloadAudio = ref.read(downloaderRepositoryProvider);
+      unawaited(ref.read(sharedPreferencesProvider).setString(
+            SharedPreferenceConstants.bgSound,
+            json.encode(
+              sound.toJson(),
             ),
-      );
+          ));
+      if (sound.title != StringConstants.none) {
+        var name = '${sound.title}.mp3';
+        downloadAudio.getDownloadedFile(name).then((value) {
+          if (value == null) {
+            downloadAudio.downloadFile(
+              sound.path,
+              name: name,
+            );
+          }
+        });
+      }
     } else {
       unawaited(
         ref.read(sharedPreferencesProvider).remove(

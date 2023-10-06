@@ -13,7 +13,7 @@ class OverlayCoverImageWidget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       child: NetworkImageWidget(
         url: imageUrl,
-        isCache: false,
+        isCache: true,
         width: size.width,
       ),
     );

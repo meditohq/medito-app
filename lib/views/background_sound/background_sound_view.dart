@@ -19,7 +19,9 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void initState() {
     super.initState();
-    setInitStateValues();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setInitStateValues();
+    });
   }
 
   @override
@@ -38,7 +40,9 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       _provider.getBackgroundSoundFromPref();
       if (_provider.selectedBgSound != null &&
           _provider.selectedBgSound?.title != StringConstants.none) {
-        _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+        _audioPlayerNotifier.setBackgroundAudio(
+          _provider.selectedBgSound!,
+        );
         _audioPlayerNotifier.playBackgroundSound();
       }
 
