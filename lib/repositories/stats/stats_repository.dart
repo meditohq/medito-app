@@ -258,7 +258,6 @@ class StatsRepositoryImpl extends StatsRepository {
     await sharedPreferences.setInt('currentStreak', 18);
   }
 }
-
 @riverpod
 StatsRepository statsRepository(ref) {
   return StatsRepositoryImpl(client: ref.watch(dioClientProvider));
