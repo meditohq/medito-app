@@ -13,6 +13,7 @@ class StringConstants {
   static const String pickDuration = 'Pick a duration';
   static const String showDownloads = 'Show downloads';
   static const String favourites = 'Favouites';
+  static const String whatAreYouLookingFor = 'What are you looking for?';
   static const String emptyDownloadsMessage =
       'It looks like you haven’t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
   static const String emptyFavoritesMessage = 'Favourites are coming soon.';

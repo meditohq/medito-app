@@ -1,6 +1,7 @@
 import 'package:Medito/models/models.dart';
 import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
+import 'package:Medito/views/search/search_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/root_page_view.dart';
@@ -118,6 +119,7 @@ final router = GoRouter(
         _getWebviewRoute(fromRoot: true),
         _getConnectivityErrorRoute(fromRoot: true),
         _getDownloadsRoute(fromRoot: true),
+        _getSearchRoute(fromRoot: true),
         GoRoute(
           path: RouteConstants.collectionPath,
           routes: [
@@ -253,6 +255,19 @@ GoRoute _getConnectivityErrorRoute({bool fromRoot = false}) {
       return MaterialPage(
         key: state.pageKey,
         child: ConnectivityErrorWidget(),
+      );
+    },
+  );
+}
+
+GoRoute _getSearchRoute({bool fromRoot = false}) {
+  return GoRoute(
+    path:
+        fromRoot ? RouteConstants.search : RouteConstants.search.sanitisePath(),
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: SearchView(),
       );
     },
   );
