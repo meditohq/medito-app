@@ -1,5 +1,5 @@
 import 'package:Medito/models/models.dart';
-import 'package:Medito/network/api_response.dart';
+import 'package:Medito/services/network/api_response.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -37,6 +37,7 @@ Future<void> main() async {
   await registerNotification();
   await SentryFlutter.init(
     (options) {
+      options.environment = 'staging';
       options.dsn = HTTPConstants.SENTRY_DSN;
       options.tracesSampleRate = 1.0;
     },

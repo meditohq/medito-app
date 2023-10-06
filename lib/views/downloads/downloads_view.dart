@@ -6,7 +6,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/empty_widget.dart';
 import 'package:Medito/views/main/app_bar_widget.dart';
-import 'package:Medito/views/packs/pack_list_item.dart';
+import 'package:Medito/views/downloads/widgets/download_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -133,7 +133,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         ),
       );
 
-  PackListItemWidget _getListItemWidget(TrackModel item) {
+  DownloadListItemWidget _getListItemWidget(TrackModel item) {
     var audioLength =
         Duration(milliseconds: item.audio.first.files.first.duration)
             .inMinutes
@@ -142,7 +142,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     var duration = _getDuration(audioLength);
     var subTitle = guideName != null ? '$guideName — $duration' : '$duration';
 
-    return PackListItemWidget(
+    return DownloadListItemWidget(
       PackImageListItemData(
         title: item.title,
         subtitle: subTitle,

@@ -16,7 +16,6 @@ import 'package:Medito/views/pack/pack_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/track/track_view.dart';
 import 'package:Medito/views/splash_view.dart';
-import 'package:Medito/views/text/text_file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -114,7 +113,6 @@ final router = GoRouter(
           ],
         ),
         _getTrackRoute(fromRoot: true),
-        _getArticleRoute(fromRoot: true),
         _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
         _getConnectivityErrorRoute(fromRoot: true),
@@ -131,20 +129,17 @@ final router = GoRouter(
           path: RouteConstants.packPath,
           routes: [
             _getTrackRoute(),
-            _getArticleRoute(),
             _getWebviewRoute(),
             GoRoute(
               path: 'pack2/:p2id',
               routes: [
                 _getTrackRoute(),
-                _getArticleRoute(),
                 _getWebviewRoute(),
                 GoRoute(
                   path: 'pack3/:p3id',
                   pageBuilder: (context, state) => getFolderMaterialPage(state),
                   routes: [
                     _getTrackRoute(),
-                    _getArticleRoute(),
                     _getWebviewRoute(),
                   ],
                 ),
@@ -171,14 +166,6 @@ GoRoute _getDailyRoute({bool fromRoot = false}) {
   );
 }
 
-GoRoute _getArticleRoute({bool fromRoot = false}) {
-  return GoRoute(
-    path: fromRoot
-        ? RouteConstants.articlePath
-        : RouteConstants.articlePath.sanitisePath(),
-    pageBuilder: (context, state) => getArticleMaterialPAge(state),
-  );
-}
 
 GoRoute _getTrackRoute({bool fromRoot = false}) {
   return GoRoute(
@@ -309,12 +296,6 @@ MaterialPage<void> getTrackOptionsMaterialPage(GoRouterState state) {
   );
 }
 
-MaterialPage<void> getArticleMaterialPAge(GoRouterState state) {
-  return MaterialPage(
-    key: state.pageKey,
-    child: TextFileWidget(id: state.params['aid']),
-  );
-}
 
 MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
