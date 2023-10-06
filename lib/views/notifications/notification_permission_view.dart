@@ -1,4 +1,4 @@
-import 'package:Medito/main.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -60,7 +60,7 @@ class NotificationPermissionView extends ConsumerWidget {
                     SizedBox(
                       width: size.width,
                       child: LoadingButtonWidget(
-                        onPressed: () => _allowNotification(context),
+                        onPressed: () => _allowNotification(context, ref),
                         btnText: StringConstants.allowNotifications,
                         bgColor: ColorConstants.walterWhite,
                         fontWeight: FontWeight.w600,
@@ -89,10 +89,11 @@ class NotificationPermissionView extends ConsumerWidget {
     );
   }
 
-  void _allowNotification(BuildContext context) async {
+  void _allowNotification(BuildContext context, WidgetRef ref) async {
     var status = await requestPermission();
     if (status.isPermanentlyDenied) {
-      await sharedPreferences.setBool(
+      await ref
+            .read(sharedPreferencesProvider).setBool(
         SharedPreferenceConstants.notificationPermission,
         false,
       );

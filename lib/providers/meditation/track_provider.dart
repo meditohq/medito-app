@@ -1,23 +1,22 @@
 import 'dart:async';
 import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'download_track_provider.dart';
 part 'track_provider.g.dart';
 
 final trackOpenedFirstTimeProvider = FutureProvider<bool>((ref) async {
-  final hasOpened = await SharedPreferencesService.getBoolFromSharedPref(
-    SharedPreferenceConstants.trackOpenedFirstTime,
-  );
+  final hasOpened = ref.read(sharedPreferencesProvider).getBool(
+        SharedPreferenceConstants.trackOpenedFirstTime,
+      );
   final isFirstTime = hasOpened ?? true;
 
   if (isFirstTime) {
-    await SharedPreferencesService.addBoolInSharedPref(
-      SharedPreferenceConstants.trackOpenedFirstTime,
-      false,
-    );
+    await ref.read(sharedPreferencesProvider).setBool(
+          SharedPreferenceConstants.trackOpenedFirstTime,
+          false,
+        );
   }
 
   return isFirstTime;

@@ -51,7 +51,8 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   void _checkNotificationPermission() {
     Future.delayed(Duration(seconds: 4), () {
       checkNotificationPermission().then((value) {
-        var checkPermissionStatusInLocalStorage = sharedPreferences
+        var checkPermissionStatusInLocalStorage = ref
+            .read(sharedPreferencesProvider)
             .getBool(SharedPreferenceConstants.notificationPermission);
         if (Platform.isAndroid &&
             checkPermissionStatusInLocalStorage == null &&

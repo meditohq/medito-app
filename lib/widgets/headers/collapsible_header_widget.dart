@@ -88,8 +88,8 @@ class _CollapsibleHeaderWidgetState
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: false,
             expandedTitleScale: 1.2,
-            titlePadding:
-                EdgeInsets.only(bottom: 16, left: _isShrink ? 64 : 16),
+            titlePadding: EdgeInsets.only(
+                bottom: 16, left: _isShrink ? 64 : 16, right: 16),
             title: _title(context),
             background: widget.bgImage != null
                 ? _bgImage(context, widget.bgImage!)
@@ -190,7 +190,7 @@ class _CollapsibleHeaderWidgetState
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
 
     return Container(
-      color: ColorConstants.greyIsTheNewGrey,
+      color: ColorConstants.onyx,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: MarkdownWidget(

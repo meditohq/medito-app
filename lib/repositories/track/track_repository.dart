@@ -2,9 +2,10 @@ import 'dart:convert';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'track_repository.g.dart';
 
@@ -20,14 +21,13 @@ abstract class TrackRepository {
 
 class TrackRepositoryImpl extends TrackRepository {
   final DioApiService client;
-
-  TrackRepositoryImpl({required this.client});
+  final Ref ref;
+  TrackRepositoryImpl({required this.ref, required this.client});
 
   @override
   Future<TrackModel> fetchTrack(String trackId) async {
     try {
-      var res =
-          await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
+      var res = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
 
       return TrackModel.fromJson(res);
     } catch (e) {
@@ -39,9 +39,9 @@ class TrackRepositoryImpl extends TrackRepository {
   Future<List<TrackModel>> fetchTrackFromPreference() async {
     var _downloadedTrackList = <TrackModel>[];
     var _downloadedTrackFromPref =
-        await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.downloads,
-    );
+        ref.read(sharedPreferencesProvider).getString(
+              SharedPreferenceConstants.downloads,
+            );
     if (_downloadedTrackFromPref != null) {
       var tempList = [];
       tempList = json.decode(_downloadedTrackFromPref);
@@ -54,30 +54,28 @@ class TrackRepositoryImpl extends TrackRepository {
   }
 
   @override
-  Future<void> addTrackInPreference(
-      List<TrackModel> trackList) async {
-    await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.downloads,
-      json.encode(trackList),
-    );
+  Future<void> addTrackInPreference(List<TrackModel> trackList) async {
+    await ref.read(sharedPreferencesProvider).setString(
+          SharedPreferenceConstants.downloads,
+          json.encode(trackList),
+        );
   }
 
   @override
   Future<void> addCurrentlyPlayingTrackInPreference(
     TrackModel track,
   ) async {
-    await SharedPreferencesService.addStringInSharedPref(
-      SharedPreferenceConstants.currentPlayingTrack,
-      json.encode(track),
-    );
+    await ref.read(sharedPreferencesProvider).setString(
+          SharedPreferenceConstants.currentPlayingTrack,
+          json.encode(track),
+        );
   }
 
   @override
-  Future<TrackModel?>
-      fetchCurrentlyPlayingTrackFromPreference() async {
-    var _track = await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.currentPlayingTrack,
-    );
+  Future<TrackModel?> fetchCurrentlyPlayingTrackFromPreference() async {
+    var _track = ref.read(sharedPreferencesProvider).getString(
+          SharedPreferenceConstants.currentPlayingTrack,
+        );
     if (_track != null) {
       return TrackModel.fromJson(json.decode(_track));
     }
@@ -88,5 +86,5 @@ class TrackRepositoryImpl extends TrackRepository {
 
 @riverpod
 TrackRepository trackRepository(ref) {
-  return TrackRepositoryImpl(client: ref.watch(dioClientProvider));
+  return TrackRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
 }

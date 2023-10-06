@@ -115,18 +115,17 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }) {
     if (hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
-      _provider.getBackgroundSoundFromPref().then((_) {
-        if (_provider.selectedBgSound != null &&
-            _provider.selectedBgSound?.title != StringConstants.none) {
-          _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-          if (isPlayAudio) {
-            _audioPlayerNotifier.playBackgroundSound();
-          }
+      _provider.getBackgroundSoundFromPref();
+      if (_provider.selectedBgSound != null &&
+          _provider.selectedBgSound?.title != StringConstants.none) {
+        _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+        if (isPlayAudio) {
+          _audioPlayerNotifier.playBackgroundSound();
         }
-      });
-      _provider.getVolumeFromPref().then((_) {
-        _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-      });
+      }
+
+      _provider.getVolumeFromPref();
+      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
     } else {
       _audioPlayerNotifier.pauseBackgroundSound();
     }

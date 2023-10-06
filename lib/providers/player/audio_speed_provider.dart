@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/services/shared_preference/shared_preferences_service.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final audioSpeedProvider = ChangeNotifierProvider<AudioSpeedProvider>((ref) {
-  return AudioSpeedProvider();
+  return AudioSpeedProvider(ref);
 });
 
 class AudioSpeedProvider extends ChangeNotifier {
+  final Ref ref;
   final List<String> _speedList = [
     StringConstants.x1,
     StringConstants.x125,
@@ -19,6 +20,8 @@ class AudioSpeedProvider extends ChangeNotifier {
     StringConstants.x06,
   ];
   AudioSpeedModel audioSpeedModel = AudioSpeedModel();
+
+  AudioSpeedProvider(this.ref);
 
   void setAudioTrackSpeed() {
     double speed;
@@ -41,21 +44,20 @@ class AudioSpeedProvider extends ChangeNotifier {
     }
     audioSpeedModel = AudioSpeedModel(label: label, speed: speed);
     unawaited(
-      SharedPreferencesService.addStringInSharedPref(
-        SharedPreferenceConstants.sessionAudioSpeed,
-        json.encode(
-          audioSpeedModel.toJson(),
-        ),
-      ),
+      ref.read(sharedPreferencesProvider).setString(
+            SharedPreferenceConstants.sessionAudioSpeed,
+            json.encode(
+              audioSpeedModel.toJson(),
+            ),
+          ),
     );
     notifyListeners();
   }
 
-  Future<void> getAudioTrackSpeedFromPref() async {
-    var audioSpeedFromPref =
-        await SharedPreferencesService.getStringFromSharedPref(
-      SharedPreferenceConstants.sessionAudioSpeed,
-    );
+  void getAudioTrackSpeedFromPref()  {
+    var audioSpeedFromPref = ref.read(sharedPreferencesProvider).getString(
+          SharedPreferenceConstants.sessionAudioSpeed,
+        );
     if (audioSpeedFromPref != null) {
       audioSpeedModel =
           AudioSpeedModel.fromJson(json.decode(audioSpeedFromPref));

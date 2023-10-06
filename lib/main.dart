@@ -25,16 +25,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Medito/providers/providers.dart';
 import 'services/notifications/notifications_service.dart';
 
-late SharedPreferences sharedPreferences;
 late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  sharedPreferences = await SharedPreferences.getInstance();
+  var sharedPreferences = await initializeSharedPreferences();
   await Firebase.initializeApp();
   await registerNotification();
   await SentryFlutter.init(
@@ -53,14 +51,15 @@ Future<void> main() async {
   );
 
   usePathUrlStrategy();
-  _runApp();
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: ParentWidget(),
+    ),
+  );
 }
-
-void _runApp() => runApp(
-      ProviderScope(
-        child: ParentWidget(),
-      ),
-    );
 
 // This Widget is the main application widget.
 // ignore: prefer-match-file-name
@@ -77,7 +76,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(updateStatsFromBg());
+      unawaited(updateStatsFromBg(ref));
     } else if (state == AppLifecycleState.detached) {
       final audioProvider = ref.read(audioPlayerNotifierProvider);
       audioProvider.trackAudioPlayer.dispose();
