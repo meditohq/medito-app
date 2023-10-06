@@ -9,8 +9,8 @@ class OverlayCoverImageWidget extends StatelessWidget {
     var size = MediaQuery.of(context).size;
 
     return Container(
-      height: size.width,
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      height: size.width - 32,
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: NetworkImageWidget(
         url: imageUrl,
         isCache: true,

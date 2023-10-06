@@ -25,8 +25,7 @@ class JoinIntroView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      body: SizedBox(
-        height: size.height,
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -36,40 +35,36 @@ class JoinIntroView extends ConsumerWidget {
               width: size.width,
               fit: BoxFit.cover,
             ),
-            Expanded(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      StringConstants.joinTheMeditoFamily,
-                      style: textTheme.headlineMedium?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: ClashDisplay,
-                        height: 2,
-                        fontSize: 24,
-                      ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    StringConstants.joinTheMeditoFamily,
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: ColorConstants.walterWhite,
+                      fontFamily: ClashDisplay,
+                      height: 2,
+                      fontSize: 24,
                     ),
-                    _benefitPoints(joinBenefitList, textTheme),
-                    Text(
-                      StringConstants.itsFreeForever,
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: ClashDisplay,
-                        height: 3,
-                        fontSize: 16,
-                      ),
+                  ),
+                  _benefitPoints(joinBenefitList, textTheme),
+                  Text(
+                    StringConstants.itsFreeForever,
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: ColorConstants.walterWhite,
+                      fontFamily: ClashDisplay,
+                      height: 3,
+                      fontSize: 16,
                     ),
-                    height8,
-                    Spacer(),
-                    _bottomButtons(ref, context),
-                    SizedBox(
-                      height: getBottomPadding(context),
-                    ),
-                  ],
-                ),
+                  ),
+                  height8,
+                  _bottomButtons(ref, context),
+                  SizedBox(
+                    height: getBottomPadding(context),
+                  ),
+                ],
               ),
             ),
           ],

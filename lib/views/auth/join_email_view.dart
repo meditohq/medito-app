@@ -84,7 +84,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                   validator: ValidationUtils().validateEmail,
                   onChanged: (val) => setState(() => {}),
                 ),
-                Spacer(),
+                height16,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
