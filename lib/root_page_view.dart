@@ -215,11 +215,15 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
       });
-      var params = JoinRouteParamsModel(screen: Screen.track);
-      context.push(
-        RouteConstants.joinIntroPath,
-        extra: params,
-      );
+      var _user =
+          ref.read(authProvider.notifier).userRes.body as UserTokenModel;
+      if (_user.email == null) {
+        var params = JoinRouteParamsModel(screen: Screen.track);
+        context.push(
+          RouteConstants.joinIntroPath,
+          extra: params,
+        );
+      }
     }
   }
 
