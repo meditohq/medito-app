@@ -32,7 +32,7 @@ class NotificationPermissionView extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -64,7 +64,7 @@ class NotificationPermissionView extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top:16, bottom:32, left:12, right: 12),
+            padding: const EdgeInsets.only(top:16, bottom:24, left:16, right: 16),
             child: Column(
               children: [
                 SizedBox(
