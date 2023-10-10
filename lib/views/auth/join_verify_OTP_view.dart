@@ -81,7 +81,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(
                     StringConstants.verifyYourAccountInstruction
                         .replaceAll('replaceme', widget.email),
