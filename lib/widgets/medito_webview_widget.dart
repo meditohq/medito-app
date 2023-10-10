@@ -3,6 +3,7 @@ import 'package:Medito/views/main/app_bar_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class MeditoWebViewWidget extends StatefulWidget {
@@ -19,18 +20,28 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
 
   @override
   void initState() {
-    controller
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: _handleLoad,
-          onNavigationRequest: (NavigationRequest request) {
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(widget.url));
+    try {
+      controller
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(const Color(0x00000000))
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageFinished: _handleLoad,
+            onNavigationRequest: (NavigationRequest request) {
+              return NavigationDecision.navigate;
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse(widget.url));
+    } catch (e) {
+      Sentry.captureException(
+        {
+          'error': e.toString(),
+          'url': widget.url.toString(),
+        },
+        stackTrace: e,
+      );
+    }
     super.initState();
   }
 
