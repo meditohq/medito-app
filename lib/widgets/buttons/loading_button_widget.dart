@@ -10,7 +10,7 @@ class LoadingButtonWidget extends StatelessWidget {
     this.textColor = ColorConstants.walterWhite,
     this.isLoading = false,
     this.elevation = 2,
-    this.fontWeight = FontWeight.w500,
+    this.fontWeight = FontWeight.w700,
     this.fontSize = 15,
   });
   final void Function()? onPressed;
