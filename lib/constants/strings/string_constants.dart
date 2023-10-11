@@ -52,7 +52,7 @@ class StringConstants {
   static const String joinBenefits2 =
       '- Access features before everybody else.';
   static const String joinBenefits3 =
-      '- Save favorite sessions & packs (coming soon).';
+      '- Save favorite tracks & packs.';
   static const String joinBenefits4 = '- Custom theme and icon (coming soon).';
   static const String joinBenefits5 = '- Receive content updates and news.';
   static const String itsFreeForever = 'It’s free, forever!';
@@ -67,12 +67,10 @@ class StringConstants {
   static const String verify = 'Verify';
   static const String resendCode = 'Resend code';
   static const String resendCodeIn = 'Resend code in ';
-  static const String welcomeToTheMeditoFamily =
-      'Welcome to \nthe Medito Family';
-  static const String welcomeMessage =
-      'You are now logged in. If you ever need to transfer Medito to another phone, use the same email address to log in and your preferences will be restored.';
   static const String thanksForJoining =
       'Thanks for being on this journey with us.';
+  static const String welcomeMessage =
+      'You are now logged in. \nTo transfer Medito to another device, sign in with the same email to restore your preferences.';
   static const String close = 'Close';
   static const String search = 'Search';
   static const String share = 'Share';
