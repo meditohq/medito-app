@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 
 class JoinEmailView extends ConsumerStatefulWidget {
   const JoinEmailView({super.key, required this.fromScreen});
+
   final Screen fromScreen;
 
   @override
@@ -23,6 +24,21 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   final TextEditingController _emailController =
       TextEditingController(text: '');
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode _emailFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emailFocusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    super.dispose();
+  }
 
   void _handleContinue() async {
     if (_formKey.currentState!.validate()) {
@@ -52,39 +68,47 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
+        maintainBottomViewPadding: true,
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+          padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  StringConstants.whatsYourEmail,
-                  style: textTheme.headlineMedium?.copyWith(
-                    color: ColorConstants.walterWhite,
-                    fontFamily: ClashDisplay,
-                    height: 2,
-                    fontSize: 24,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        StringConstants.whatsYourEmail,
+                        style: textTheme.headlineMedium?.copyWith(
+                          color: ColorConstants.walterWhite,
+                          fontFamily: ClashDisplay,
+                          height: 2,
+                          fontSize: 24,
+                        ),
+                      ),
+                      height16,
+                      TextFormField(
+                        controller: _emailController,
+                        cursorColor: ColorConstants.walterWhite,
+                        focusNode: _emailFocusNode,
+                        cursorHeight: 22,
+                        cursorWidth: 1,
+                        keyboardType: TextInputType.emailAddress,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: ColorConstants.walterWhite,
+                          fontFamily: DmSans,
+                          fontSize: 16,
+                        ),
+                        validator: ValidationUtils().validateEmail,
+                        onChanged: (val) => setState(() => {}),
+                      ),
+                      height16,
+                    ],
                   ),
                 ),
-                height8,
-                TextFormField(
-                  controller: _emailController,
-                  cursorColor: ColorConstants.walterWhite,
-                  cursorHeight: 22,
-                  cursorWidth: 1,
-                  keyboardType: TextInputType.emailAddress,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: ColorConstants.walterWhite,
-                    fontFamily: DmSans,
-                    fontSize: 16,
-                  ),
-                  validator: ValidationUtils().validateEmail,
-                  onChanged: (val) => setState(() => {}),
-                ),
-                height16,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
