@@ -218,6 +218,7 @@ class _ResendCodeWidget extends ConsumerWidget {
                 fontFamily: DmSans,
                 height: 1.5,
                 fontSize: 14,
+                fontWeight: FontWeight.w700,
                 decoration: auth.counter
                     ? TextDecoration.none
                     : TextDecoration.underline,
