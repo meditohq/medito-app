@@ -93,7 +93,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                                         context.push(RouteConstants.search),
                                     child: SearchWidget(),
                                   ),
-                                  height8,
+                                  height5,
                                   FilterWidget(
                                     chips: data.chips,
                                   ),
@@ -158,7 +158,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                 curvedAnimation,
               ),
         child: Padding(
-          padding: const EdgeInsets.only(top: 32.0),
+          padding: const EdgeInsets.only(top: 30.0),
           child: AnnouncementWidget(
             announcement: data.announcement!,
             onPressedDismiss: _handleCollapse,
