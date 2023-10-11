@@ -13,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../utils/utils.dart';
+
 class JoinVerifyOTPView extends ConsumerStatefulWidget {
   const JoinVerifyOTPView({
     super.key,
@@ -64,31 +66,36 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
+        maintainBottomViewPadding: true,  // Added maintainBottomViewPadding: true
+        bottom: false,  // Added bottom: false
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),  // Updated padding
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            Expanded(  // Added Expanded
+            child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   StringConstants.verifyYourAccount,
                   style: textTheme.headlineMedium?.copyWith(
                     color: ColorConstants.walterWhite,
                     fontFamily: ClashDisplay,
-                    height: 2,
+                    height: 1.2,
                     fontSize: 24,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.only(top: 16, bottom: 24),
                   child: Text(
                     StringConstants.verifyYourAccountInstruction
                         .replaceAll('replaceme', widget.email),
                     style: textTheme.bodyMedium?.copyWith(
                       color: ColorConstants.walterWhite,
                       fontFamily: DmSans,
-                      height: 1.5,
+                      height: 1.4,
                       fontSize: 16,
                     ),
                   ),
@@ -131,6 +138,9 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   ),
                 ),
                 height16,
+              ],
+            ),
+            ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -150,7 +160,9 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                     ),
                   ],
                 ),
-                height8,
+                SizedBox(
+                  height: getBottomPadding(context),  // Added SizedBox
+                ),
               ],
             ),
           ),
