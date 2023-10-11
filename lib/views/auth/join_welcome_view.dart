@@ -24,84 +24,87 @@ class JoinWelcomeView extends ConsumerWidget {
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: ColorConstants.ebony,
-        body: SizedBox(
-          height: size.height,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset(
-                  AssetConstants.join,
-                  height: size.height * 0.45,
-                  width: size.width,
-                  fit: BoxFit.cover,
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      AssetConstants.join,
+                      height: size.height * 0.45,
+                      width: size.width,
+                      fit: BoxFit.cover,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            StringConstants.thanksForJoining,
+                            style: textTheme.headlineMedium?.copyWith(
+                              color: ColorConstants.walterWhite,
+                              fontFamily: ClashDisplay,
+                              height: 1.2,
+                              fontSize: 24,
+                            ),
+                          ),
+                          height8,
+                          Text(
+                            StringConstants.welcomeMessage,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: ColorConstants.walterWhite,
+                              fontFamily: DmSans,
+                              height: 1.4,
+                              fontSize: 16,
+                            ),
+                          ),
+                          height8,
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        StringConstants.welcomeToTheMeditoFamily,
-                        style: textTheme.headlineMedium?.copyWith(
-                          color: ColorConstants.walterWhite,
-                          fontFamily: ClashDisplay,
-                          height: 1.2,
-                          fontSize: 24,
-                        ),
-                      ),
-                      height8,
-                      Text(
-                        StringConstants.welcomeMessage,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: ColorConstants.walterWhite,
-                          fontFamily: ClashDisplay,
-                          height: 1.6,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        StringConstants.thanksForJoining,
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: ColorConstants.walterWhite,
-                          fontFamily: ClashDisplay,
-                          height: 3,
-                          fontSize: 16,
-                        ),
-                      ),
-                      height8,
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: LoadingButtonWidget(
-                          onPressed: () {
-                            var auth = ref.read(authProvider.notifier);
-                            auth.setUserEmail(email);
-                            if (fromScreen == Screen.splash) {
-                              context.go(RouteConstants.homePath);
-                            } else if (fromScreen == Screen.track) {
-                              context.pop();
-                              context.pop();
-                              context.pop();
-                              context.pop();
-                            }
-                          },
-                          btnText: StringConstants.close,
-                          bgColor: ColorConstants.walterWhite,
-                          textColor: ColorConstants.greyIsTheNewGrey,
-                        ),
-                      ),
-                      SizedBox(
-                        height: getBottomPadding(context),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
+              child: _bottomButtons(ref, context),
+            ),
+            SizedBox(
+              height: getBottomPadding(context),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Row _bottomButtons(WidgetRef ref, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        LoadingButtonWidget(
+          onPressed: () {
+            var auth = ref.read(authProvider.notifier);
+            auth.setUserEmail(email);
+            if (fromScreen == Screen.splash) {
+              context.go(RouteConstants.homePath);
+            } else if (fromScreen == Screen.track) {
+              context.pop();
+              context.pop();
+              context.pop();
+              context.pop();
+            }
+          },
+          btnText: StringConstants.close,
+          bgColor: ColorConstants.walterWhite,
+          textColor: ColorConstants.greyIsTheNewGrey,
+        ),
+      ],
+    );
+  }
 }
+
