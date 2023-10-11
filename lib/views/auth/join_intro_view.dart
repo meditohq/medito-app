@@ -40,7 +40,7 @@ class JoinIntroView extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -49,17 +49,18 @@ class JoinIntroView extends ConsumerWidget {
                           style: textTheme.headlineMedium?.copyWith(
                             color: ColorConstants.walterWhite,
                             fontFamily: ClashDisplay,
-                            height: 2,
+                            height: 1.2,
                             fontSize: 24,
                           ),
                         ),
+                        height8,
                         _benefitPoints(joinBenefitList, textTheme),
+                        height24,
                         Text(
                           StringConstants.itsFreeForever,
                           style: textTheme.headlineSmall?.copyWith(
                             color: ColorConstants.walterWhite,
-                            fontFamily: ClashDisplay,
-                            height: 3,
+                            fontFamily: DmSans,
                             fontSize: 16,
                           ),
                         ),
@@ -91,8 +92,8 @@ class JoinIntroView extends ConsumerWidget {
                 e,
                 style: textTheme.labelMedium?.copyWith(
                   color: ColorConstants.walterWhite,
-                  fontFamily: ClashDisplay,
-                  height: 1.8,
+                  fontFamily: DmSans,
+                  height: 1.6,
                   fontSize: 16,
                 ),
               ))
