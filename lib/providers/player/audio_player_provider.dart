@@ -92,13 +92,13 @@ class AudioPlayerNotifier extends BaseAudioHandler
         setMediaItem(trackModel, file, filePath: filePath);
       } else {
         setMediaItem(trackModel, file);
+        // unawaited(AudioPlayer.clearAssetCache());
+        final audioSource =
+            LockCachingAudioSource(Uri.parse(file.path), headers: {
+          HttpHeaders.authorizationHeader: _contentToken,
+        });
         unawaited(
-          trackAudioPlayer.setAudioSource(AudioSource.uri(
-            Uri.parse(file.path),
-            headers: {
-              HttpHeaders.authorizationHeader: _contentToken,
-            },
-          )),
+          trackAudioPlayer.setAudioSource(audioSource),
         );
       }
     } catch (e) {

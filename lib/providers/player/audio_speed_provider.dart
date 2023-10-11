@@ -54,7 +54,7 @@ class AudioSpeedProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getAudioTrackSpeedFromPref()  {
+  void getAudioTrackSpeedFromPref() {
     var audioSpeedFromPref = ref.read(sharedPreferencesProvider).getString(
           SharedPreferenceConstants.sessionAudioSpeed,
         );

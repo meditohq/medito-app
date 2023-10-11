@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
-import 'main.dart';
 import 'widgets/widgets.dart';
 import 'views/player/widgets/mini_player_widget.dart';
 
@@ -27,7 +26,8 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
-    ref.read(audioPlayerNotifierProvider).initAudioHandler();
+    var audioPlayerProvider = ref.read(audioPlayerNotifierProvider);
+    audioPlayerProvider.initAudioHandler();
     ref.read(remoteStatsProvider);
     ref.read(postLocalStatsProvider);
     ref.read(deviceAppAndUserInfoProvider);
@@ -38,7 +38,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         .getCurrentlyPlayingTrack(isPlayAudio: false);
     _checkNotificationPermission();
     checkInitialMessage(ref);
-    var streamEvent = audioHandler.trackAudioPlayer.playerStateStream
+    var streamEvent = audioPlayerProvider.trackAudioPlayer.playerStateStream
         .map((event) => event.processingState)
         .distinct();
     streamEvent.forEach((element) {
@@ -201,7 +201,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     WidgetRef ref,
   ) {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    var extras = audioHandler.mediaItem.value?.extras;
+    var extras = ref.read(audioPlayerNotifierProvider).mediaItem.value?.extras;
     if (extras != null) {
       _handleAudioCompletionEvent(
         ref,
