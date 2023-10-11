@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 class JoinIntroView extends ConsumerWidget {
   const JoinIntroView({super.key, required this.fromScreen});
   final Screen fromScreen;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
@@ -25,50 +26,60 @@ class JoinIntroView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(
-              AssetConstants.join,
-              height: size.height * 0.44,
-              width: size.width,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    StringConstants.joinTheMeditoFamily,
-                    style: textTheme.headlineMedium?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 2,
-                      fontSize: 24,
-                    ),
+                  Image.asset(
+                    AssetConstants.join,
+                    height: size.height * 0.44,
+                    width: size.width,
+                    fit: BoxFit.cover,
                   ),
-                  _benefitPoints(joinBenefitList, textTheme),
-                  Text(
-                    StringConstants.itsFreeForever,
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: ClashDisplay,
-                      height: 3,
-                      fontSize: 16,
+                  Padding(
+                    padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          StringConstants.joinTheMeditoFamily,
+                          style: textTheme.headlineMedium?.copyWith(
+                            color: ColorConstants.walterWhite,
+                            fontFamily: ClashDisplay,
+                            height: 1.2,
+                            fontSize: 24,
+                          ),
+                        ),
+                        height8,
+                        _benefitPoints(joinBenefitList, textTheme),
+                        height24,
+                        Text(
+                          StringConstants.itsFreeForever,
+                          style: textTheme.headlineSmall?.copyWith(
+                            color: ColorConstants.walterWhite,
+                            fontFamily: DmSans,
+                            fontSize: 16,
+                          ),
+                        ),
+                        height8,
+                      ],
                     ),
-                  ),
-                  height8,
-                  _bottomButtons(ref, context),
-                  SizedBox(
-                    height: getBottomPadding(context),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top:16, bottom:16, left:16, right: 16),
+            child: _bottomButtons(ref, context),
+          ),
+          SizedBox(
+            height: getBottomPadding(context),
+          ),
+        ],
       ),
     );
   }
@@ -81,8 +92,8 @@ class JoinIntroView extends ConsumerWidget {
                 e,
                 style: textTheme.labelMedium?.copyWith(
                   color: ColorConstants.walterWhite,
-                  fontFamily: ClashDisplay,
-                  height: 1.8,
+                  fontFamily: DmSans,
+                  height: 1.6,
                   fontSize: 16,
                 ),
               ))

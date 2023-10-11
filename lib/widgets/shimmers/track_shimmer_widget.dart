@@ -20,7 +20,7 @@ class TrackShimmerWidget extends StatelessWidget {
             height: 380,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

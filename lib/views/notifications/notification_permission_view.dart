@@ -10,80 +10,89 @@ import 'package:permission_handler/permission_handler.dart';
 
 class NotificationPermissionView extends ConsumerWidget {
   const NotificationPermissionView({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
     var size = MediaQuery.of(context).size;
-    var bottom = getBottomPadding(context);
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: bottom),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset(
-                AssetConstants.dalleNotifications,
-                height: size.height * 0.45,
-                width: size.width,
-                fit: BoxFit.cover,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset(
+                    AssetConstants.dalleNotifications,
+                    height: size.height * 0.45,
+                    width: size.width,
+                    fit: BoxFit.cover,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          StringConstants.allowNotificationsTitle,
+                          style: textTheme.headlineMedium?.copyWith(
+                            color: ColorConstants.walterWhite,
+                            fontFamily: ClashDisplay,
+                            height: 1.2,
+                            fontSize: 24,
+                          ),
+                        ),
+                        height8,
+                        Text(
+                          StringConstants.allowNotificationsDesc,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: ColorConstants.walterWhite,
+                            fontFamily: DmSans,
+                            height: 1.4,
+                            fontSize: 16,
+                          ),
+                        ),
+                        height16,
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      StringConstants.allowNotificationsTitle,
-                      style: textTheme.headlineMedium?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: ClashDisplay,
-                        height: 1.2,
-                        fontSize: 24,
-                      ),
-                    ),
-                    height8,
-                    Text(
-                      StringConstants.allowNotificationsDesc,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: ColorConstants.walterWhite,
-                        fontFamily: ClashDisplay,
-                        height: 1.6,
-                        fontSize: 16,
-                      ),
-                    ),
-                    height16,
-                    SizedBox(
-                      width: size.width,
-                      child: LoadingButtonWidget(
-                        onPressed: () => _allowNotification(context, ref),
-                        btnText: StringConstants.allowNotifications,
-                        bgColor: ColorConstants.walterWhite,
-                        fontWeight: FontWeight.w600,
-                        textColor: ColorConstants.greyIsTheNewGrey,
-                      ),
-                    ),
-                    height8,
-                    SizedBox(
-                      width: size.width,
-                      child: LoadingButtonWidget(
-                        onPressed: () => _handleNotNow(context),
-                        btnText: StringConstants.notNow,
-                        bgColor: ColorConstants.onyx,
-                        fontWeight: FontWeight.w600,
-                        textColor: ColorConstants.walterWhite,
-                      ),
-                    ),
-                    height8,
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(top:16, bottom:16, left:16, right: 16),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: size.width,
+                  child: LoadingButtonWidget(
+                    onPressed: () => _allowNotification(context, ref),
+                    btnText: StringConstants.allowNotifications,
+                    bgColor: ColorConstants.walterWhite,
+                    fontWeight: FontWeight.w600,
+                    textColor: ColorConstants.greyIsTheNewGrey,
+                  ),
+                ),
+                height8,
+                SizedBox(
+                  width: size.width,
+                  child: LoadingButtonWidget(
+                    onPressed: () => _handleNotNow(context),
+                    btnText: StringConstants.notNow,
+                    bgColor: ColorConstants.onyx,
+                    fontWeight: FontWeight.w600,
+                    textColor: ColorConstants.walterWhite,
+                  ),
+                ),
+                height8,
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

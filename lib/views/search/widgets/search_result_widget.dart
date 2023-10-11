@@ -26,7 +26,7 @@ class SearchResultWidget extends ConsumerWidget {
       data: (data) {
         if (data.message != null) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Text(
               data.message.toString(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(

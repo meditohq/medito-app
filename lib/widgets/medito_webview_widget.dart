@@ -18,6 +18,7 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
   var controller = WebViewController();
   int _stackToView = 1;
 
+
   @override
   void initState() {
     try {
@@ -46,9 +47,11 @@ class _MeditoWebViewWidgetState extends State<MeditoWebViewWidget> {
   }
 
   void _handleLoad(String _) {
-    setState(() {
-      _stackToView = 0;
-    });
+    if (mounted) {
+      setState(() {
+        _stackToView = 0;
+      });
+    }
   }
 
   @override

@@ -94,9 +94,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
           btnText: announcement.ctaTitle ?? '',
           bgColor: textColor,
           textColor: bgColor,
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-          elevation: 0,
         ),
       ],
     );

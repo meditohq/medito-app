@@ -25,8 +25,6 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       height: 56,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 12, right: 2),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -40,37 +38,40 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
             ),
           ],
         ),
-      ),
     );
   }
 
   Widget _logo(BuildContext context) {
-    return LongPressDetectorWidget(
-      onLongPress: () {
-        showModalBottomSheet<void>(
-          context: context,
-          useRootNavigator: true,
-          backgroundColor: ColorConstants.onyx,
-          builder: (BuildContext context) {
-            return DebugBottomSheetWidget();
-          },
-        );
-      },
-      duration: Duration(milliseconds: 500),
-      child: Material(
-        type: MaterialType.transparency,
-        shape: CircleBorder(),
-        clipBehavior: Clip.hardEdge,
-        child: IconButton(
-          onPressed: () => {},
-          icon: SvgPicture.asset(
-            AssetConstants.icLogo,
-            width: 32,
+    return Padding(
+      padding: EdgeInsets.only(left: 8.0),
+      child: LongPressDetectorWidget(
+        onLongPress: () {
+          showModalBottomSheet<void>(
+            context: context,
+            useRootNavigator: true,
+            backgroundColor: ColorConstants.onyx,
+            builder: (BuildContext context) {
+              return DebugBottomSheetWidget();
+            },
+          );
+        },
+        duration: Duration(milliseconds: 500),
+        child: Material(
+          type: MaterialType.transparency,
+          shape: CircleBorder(),
+          clipBehavior: Clip.hardEdge,
+          child: IconButton(
+            onPressed: () => {},
+            icon: SvgPicture.asset(
+              AssetConstants.icLogo,
+              width: 32,
+            ),
           ),
         ),
       ),
     );
   }
+
 
   Material _menuWidget(BuildContext context) {
     return Material(

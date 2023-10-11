@@ -61,7 +61,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   Flexible _titleAndSubtitle() {
     return Flexible(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,

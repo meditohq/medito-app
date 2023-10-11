@@ -74,7 +74,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     var labelMedium = Theme.of(context).textTheme.labelMedium;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SelectableText(
         '$info',
         style: labelMedium,

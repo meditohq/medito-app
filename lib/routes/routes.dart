@@ -113,7 +113,6 @@ final router = GoRouter(
           ],
         ),
         _getTrackRoute(fromRoot: true),
-        _getDailyRoute(fromRoot: true),
         _getWebviewRoute(fromRoot: true),
         _getConnectivityErrorRoute(fromRoot: true),
         _getDownloadsRoute(fromRoot: true),
@@ -155,17 +154,6 @@ final router = GoRouter(
     _getNotificationPermissionRoute(),
   ],
 );
-
-GoRoute _getDailyRoute({bool fromRoot = false}) {
-  return GoRoute(
-    path: fromRoot
-        ? RouteConstants.dailyPath
-        : RouteConstants.dailyPath.sanitisePath(),
-    routes: [_getPlayerRoute()],
-    pageBuilder: (context, state) => getTrackOptionsDailyPage(state),
-  );
-}
-
 
 GoRoute _getTrackRoute({bool fromRoot = false}) {
   return GoRoute(
