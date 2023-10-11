@@ -28,7 +28,7 @@ class FilterWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 8),
       child: SizedBox(
-        height: 45,
+        height: 49,
         child: ListView.builder(
           itemCount: items.length,
           scrollDirection: Axis.horizontal,
@@ -39,23 +39,20 @@ class FilterWidget extends ConsumerWidget {
 
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: SizedBox(
-                height: 40,
-                child: Theme(
-                  data: Theme.of(context)
-                      .copyWith(canvasColor: ColorConstants.onyx),
-                  child: ActionChip(
-                    onPressed: () => handleChipPress(context, ref, element),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    backgroundColor: ColorConstants.transparent,
-                    labelPadding:
-                        EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                    label: Text(
-                      element.title,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(canvasColor: ColorConstants.onyx),
+                child: ActionChip(
+                  onPressed: () => handleChipPress(context, ref, element),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor: ColorConstants.transparent,
+                  labelPadding:
+                      EdgeInsets.only(left: 12, right: 12, top: 3, bottom: 5),
+                  label: Text(
+                    element.title,
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
               ),
