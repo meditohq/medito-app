@@ -32,7 +32,7 @@ class NotificationPermissionView extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -50,8 +50,8 @@ class NotificationPermissionView extends ConsumerWidget {
                           StringConstants.allowNotificationsDesc,
                           style: textTheme.bodyMedium?.copyWith(
                             color: ColorConstants.walterWhite,
-                            fontFamily: ClashDisplay,
-                            height: 1.6,
+                            fontFamily: DmSans,
+                            height: 1.4,
                             fontSize: 16,
                           ),
                         ),
