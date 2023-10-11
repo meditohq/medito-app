@@ -36,14 +36,14 @@ class FolderShimmerWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               child: BoxShimmerWidget(
                 height: 10,
                 width: 300,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               child: BoxShimmerWidget(
                 height: 10,
                 width: 200,

@@ -11,7 +11,7 @@ class SearchWidget extends StatelessWidget {
     var outlineInputBorder = _outlineInputBorder();
 
     return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: TextFormField(
         enabled: false,
         textAlign: TextAlign.center,
@@ -20,7 +20,7 @@ class SearchWidget extends StatelessWidget {
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(0),
           prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 15.0),
+            padding: const EdgeInsets.only(left: 16.0),
             child: SvgPicture.asset(
               AssetConstants.icSearch,
             ),

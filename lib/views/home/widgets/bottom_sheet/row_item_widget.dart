@@ -44,7 +44,7 @@ class RowItemWidget extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 15,
+          horizontal: 16,
         ),
         child: Container(
           decoration: BoxDecoration(

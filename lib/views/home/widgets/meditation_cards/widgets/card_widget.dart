@@ -75,7 +75,7 @@ class CardWidget extends ConsumerWidget {
 
   Padding _tag(TextTheme textTheme, {String? tag}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Container(
         color: ColorConstants.ashWhite,
         padding: EdgeInsets.symmetric(horizontal: 5),
@@ -94,7 +94,7 @@ class CardWidget extends ConsumerWidget {
 
   Padding _title(TextTheme textTheme, {required String title}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Text(
         title,
         maxLines: 3,

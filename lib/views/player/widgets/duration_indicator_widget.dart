@@ -56,7 +56,7 @@ class _DurationIndicatorWidgetState
     num currentDuration,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           SliderTheme(

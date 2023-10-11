@@ -65,7 +65,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(
