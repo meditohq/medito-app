@@ -60,28 +60,36 @@ class DioApiService {
     var data = error.response?.data;
     var message = data?['error'] ?? data?['message'];
     if (error.type == DioErrorType.receiveTimeout) {
-      throw FetchDataException('Error connection timeout');
+      throw FetchDataException(
+        error.response?.statusCode,
+        'Error connection timeout',
+      );
     }
     switch (error.response?.statusCode) {
       case 400:
         throw BadRequestException(
+          error.response?.statusCode,
           message ?? error.response!.statusMessage ?? 'Bad request',
         );
       case 401:
         throw UnauthorisedException(
+          error.response?.statusCode,
           message ?? 'Unauthorised request: ${error.response!.statusCode}',
         );
       case 403:
         throw UnauthorisedException(
+          error.response?.statusCode,
           message ?? 'Access forbidden: ${error.response!.statusCode}',
         );
       case 404:
         throw FetchDataException(
+          error.response?.statusCode,
           message ?? 'Api not found: ${error.response!.statusCode}',
         );
       case 500:
       default:
         throw FetchDataException(
+          error.response?.statusCode,
           message ?? 'Error occurred while Communication with Server ',
         );
     }
@@ -89,30 +97,34 @@ class DioApiService {
 }
 
 class CustomException implements Exception {
+  final int? statusCode;
   final String? message;
   final String? prefix;
 
-  CustomException([this.message, this.prefix]);
+  CustomException([this.statusCode, this.message, this.prefix]);
 
   @override
   String toString() {
-    return '$message';
+    return '$message,$statusCode';
   }
 }
 
 class FetchDataException extends CustomException {
-  FetchDataException([String? message])
-      : super(message, 'Error During Communication: ');
+  FetchDataException([int? statusCode, String? message])
+      : super(statusCode, message, 'Error During Communication: ');
 }
 
 class BadRequestException extends CustomException {
-  BadRequestException([message]) : super(message, 'Invalid Request: ');
+  BadRequestException([int? statusCode, message])
+      : super(statusCode, message, 'Invalid Request: ');
 }
 
 class UnauthorisedException extends CustomException {
-  UnauthorisedException([message]) : super(message, 'Unauthorised: ');
+  UnauthorisedException([int? statusCode, message])
+      : super(statusCode, message, 'Unauthorised: ');
 }
 
 class InvalidInputException extends CustomException {
-  InvalidInputException([String? message]) : super(message, 'Invalid Input: ');
+  InvalidInputException([int? statusCode, String? message])
+      : super(statusCode, message, 'Invalid Input: ');
 }

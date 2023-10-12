@@ -4,6 +4,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
+import 'package:Medito/widgets/snackbar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,32 +13,58 @@ final retryCounterProvider = StateProvider<int>((ref) => 0);
 
 final appInitializationProvider =
     FutureProvider.family<void, BuildContext>((ref, context) async {
+  var _authProvider = ref.read(authProvider);
   try {
-    var _authProvider = ref.read(authProvider);
     await _authProvider.initializeUser();
-    var _user = _authProvider.userRes.body as UserTokenModel;
-    _assignNewTokenToDioAndAudioPlayer(ref, _user.token);
-    var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-    var data = _setAppOpenedModelData(deviceInfo);
+    var res = _authProvider.userRes;
+    if (res.body != null) {
+      var _user = res.body as UserTokenModel;
+      _assignNewTokenToDioAndAudioPlayer(ref, _user.token);
+      var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+      var data = _setAppOpenedModelData(deviceInfo);
 
-    await ref.read(eventsProvider(event: data.toJson()).future);
-    context.go(RouteConstants.homePath);
+      await ref.read(eventsProvider(event: data.toJson()).future);
+      context.go(RouteConstants.homePath);
+    } else {
+      _checkInternetConnectivity(context, ref);
+      _handleRetry(context, ref, false);
+    }
   } catch (err) {
-    print(err);
-    _handleRetry(context, ref);
+    if (_authProvider.userRes.body != null) {
+      _handleRetry(context, ref, true);
+    } else {
+      _checkInternetConnectivity(context, ref);
+      _handleRetry(context, ref, false);
+    }
   }
 });
 
-void _handleRetry(BuildContext context, Ref ref) {
+void _handleRetry(BuildContext context, Ref ref, bool shouldNavigate) {
   var retryCount = ref.read(retryCounterProvider);
   if (retryCount < 2) {
-    Future.delayed(Duration(seconds: 2), () {
-      ref.refresh(appInitializationProvider(context));
-    });
+    _recallProvider(ref, context);
     ref.read(retryCounterProvider.notifier).update((state) => ++state);
   } else {
     ref.read(retryCounterProvider.notifier).update((state) => 0);
-    context.go(RouteConstants.downloadsPath);
+    if (shouldNavigate) {
+      context.go(RouteConstants.downloadsPath);
+    } else {
+      _recallProvider(ref, context);
+      showSnackBar(context, StringConstants.timeout);
+    }
+  }
+}
+
+void _recallProvider(Ref<Object?> ref, BuildContext context) {
+  Future.delayed(Duration(seconds: 2), () {
+    ref.refresh(appInitializationProvider(context));
+  });
+}
+
+void _checkInternetConnectivity(BuildContext context, Ref ref) {
+  var connectivityStatus = ref.read(connectivityStatusProvider);
+  if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+    showSnackBar(context, StringConstants.connectivityError);
   }
 }
 
