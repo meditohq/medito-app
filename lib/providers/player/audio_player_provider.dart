@@ -41,8 +41,11 @@ class AudioPlayerNotifier extends BaseAudioHandler
       } else {
         pauseBackgroundSound();
       }
-    } catch (e) {
-      print(e.toString());
+    } catch (err) {
+      unawaited(Sentry.captureException(
+        err,
+        stackTrace: err,
+      ));
     }
   }
 
@@ -140,7 +143,10 @@ class AudioPlayerNotifier extends BaseAudioHandler
     try {
       trackAudioPlayer.seek(Duration(milliseconds: duration));
     } catch (err) {
-      print(err);
+      Sentry.captureException(
+        err,
+        stackTrace: err,
+      );
     }
   }
 
