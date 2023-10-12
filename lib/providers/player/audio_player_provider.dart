@@ -33,13 +33,17 @@ class AudioPlayerNotifier extends BaseAudioHandler
 
   @override
   Future<void> play() async {
-    var checkBgAudio = mediaItemHasBGSound();
-    if (checkBgAudio) {
-      playBackgroundSound();
-    } else {
-      pauseBackgroundSound();
+    try {
+      unawaited(trackAudioPlayer.play());
+      var checkBgAudio = mediaItemHasBGSound();
+      if (checkBgAudio) {
+        playBackgroundSound();
+      } else {
+        pauseBackgroundSound();
+      }
+    } catch (e) {
+      print(e.toString());
     }
-    unawaited(trackAudioPlayer.play());
   }
 
   @override
@@ -48,6 +52,11 @@ class AudioPlayerNotifier extends BaseAudioHandler
     if (mediaItemHasBGSound()) {
       stopBackgroundSound();
     }
+  }
+
+  @override
+  Future<void> seek(Duration position) async {
+    seekValueFromSlider(position.inMilliseconds);
   }
 
   void setContentToken(String token) {
@@ -92,7 +101,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
         setMediaItem(trackModel, file, filePath: filePath);
       } else {
         setMediaItem(trackModel, file);
-        // unawaited(AudioPlayer.clearAssetCache());
         final audioSource =
             LockCachingAudioSource(Uri.parse(file.path), headers: {
           HttpHeaders.authorizationHeader: _contentToken,
@@ -108,6 +116,8 @@ class AudioPlayerNotifier extends BaseAudioHandler
       );
     }
   }
+
+  void clearAssetCache() async => unawaited(AudioPlayer.clearAssetCache());
 
   void playBackgroundSound() {
     backgroundSoundAudioPlayer.play();
@@ -127,7 +137,11 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   void seekValueFromSlider(int duration) {
-    trackAudioPlayer.seek(Duration(milliseconds: duration));
+    try {
+      trackAudioPlayer.seek(Duration(milliseconds: duration));
+    } catch (err) {
+      print(err);
+    }
   }
 
   void stopTrack() {

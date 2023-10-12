@@ -101,6 +101,8 @@ class TrackButtonsWidget extends StatelessWidget {
     WidgetRef ref,
     TrackFilesModel file,
   ) async {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    audioProvider.clearAssetCache();
     await ref
         .read(playerProvider.notifier)
         .addCurrentlyPlayingTrackInPreference(
