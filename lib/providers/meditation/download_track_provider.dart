@@ -7,9 +7,7 @@ part 'download_track_provider.g.dart';
 
 @riverpod
 Future<List<TrackModel>> downloadedTracks(ref) {
-  return ref
-      .watch(trackRepositoryProvider)
-      .fetchTrackFromPreference();
+  return ref.watch(trackRepositoryProvider).fetchTrackFromPreference();
 }
 
 @riverpod
@@ -17,8 +15,7 @@ Future<void> deleteTrackFromPreference(
   ref, {
   required TrackFilesModel file,
 }) async {
-  var _downloadedTrackList =
-      await ref.read(downloadedTracksProvider.future);
+  var _downloadedTrackList = await ref.read(downloadedTracksProvider.future);
   _downloadedTrackList.removeWhere((element) =>
       element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
   await ref.read(

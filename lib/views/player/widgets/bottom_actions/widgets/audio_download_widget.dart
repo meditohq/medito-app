@@ -83,6 +83,9 @@ class AudioDownloadWidget extends ConsumerWidget {
         trackModel,
         file,
       );
+    await  ref.read(deleteTrackFromPreferenceProvider(
+        file: file,
+      ).future);
       await ref.read(addSingleTrackInPreferenceProvider(
         trackModel: trackModel,
         file: file,

@@ -33,13 +33,20 @@ class AudioPlayerNotifier extends BaseAudioHandler
 
   @override
   Future<void> play() async {
-    var checkBgAudio = mediaItemHasBGSound();
-    if (checkBgAudio) {
-      playBackgroundSound();
-    } else {
-      pauseBackgroundSound();
+    try {
+      unawaited(trackAudioPlayer.play());
+      var checkBgAudio = mediaItemHasBGSound();
+      if (checkBgAudio) {
+        playBackgroundSound();
+      } else {
+        pauseBackgroundSound();
+      }
+    } catch (err) {
+      unawaited(Sentry.captureException(
+        err,
+        stackTrace: err,
+      ));
     }
-    unawaited(trackAudioPlayer.play());
   }
 
   @override
@@ -48,6 +55,11 @@ class AudioPlayerNotifier extends BaseAudioHandler
     if (mediaItemHasBGSound()) {
       stopBackgroundSound();
     }
+  }
+
+  @override
+  Future<void> seek(Duration position) async {
+    seekValueFromSlider(position.inMilliseconds);
   }
 
   void setContentToken(String token) {
@@ -92,13 +104,12 @@ class AudioPlayerNotifier extends BaseAudioHandler
         setMediaItem(trackModel, file, filePath: filePath);
       } else {
         setMediaItem(trackModel, file);
+        final audioSource =
+            LockCachingAudioSource(Uri.parse(file.path), headers: {
+          HttpHeaders.authorizationHeader: _contentToken,
+        });
         unawaited(
-          trackAudioPlayer.setAudioSource(AudioSource.uri(
-            Uri.parse(file.path),
-            headers: {
-              HttpHeaders.authorizationHeader: _contentToken,
-            },
-          )),
+          trackAudioPlayer.setAudioSource(audioSource),
         );
       }
     } catch (e) {
@@ -108,6 +119,8 @@ class AudioPlayerNotifier extends BaseAudioHandler
       );
     }
   }
+
+  void clearAssetCache() async => unawaited(AudioPlayer.clearAssetCache());
 
   void playBackgroundSound() {
     backgroundSoundAudioPlayer.play();
@@ -127,7 +140,14 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   void seekValueFromSlider(int duration) {
-    trackAudioPlayer.seek(Duration(milliseconds: duration));
+    try {
+      trackAudioPlayer.seek(Duration(milliseconds: duration));
+    } catch (err) {
+      Sentry.captureException(
+        err,
+        stackTrace: err,
+      );
+    }
   }
 
   void stopTrack() {
