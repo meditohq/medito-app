@@ -4,7 +4,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,18 +24,19 @@ final appInitializationProvider =
     context.go(RouteConstants.homePath);
   } catch (err) {
     print(err);
-    _handleRetry(context, ref, err.toString());
+    _handleRetry(context, ref);
   }
 });
 
-void _handleRetry(BuildContext context, Ref ref, String err) {
+void _handleRetry(BuildContext context, Ref ref) {
   var retryCount = ref.read(retryCounterProvider);
-  if (retryCount < 4) {
+  if (retryCount < 2) {
     Future.delayed(Duration(seconds: 2), () {
       ref.refresh(appInitializationProvider(context));
     });
     ref.read(retryCounterProvider.notifier).update((state) => ++state);
   } else {
+    ref.read(retryCounterProvider.notifier).update((state) => 0);
     context.go(RouteConstants.downloadsPath);
   }
 }
