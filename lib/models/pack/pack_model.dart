@@ -25,6 +25,7 @@ abstract class PackItemsModel with _$PackItemsModel {
     required String title,
     required String subtitle,
     required String path,
+    bool? isCompleted,
   }) = _PackItemsModel;
 
   factory PackItemsModel.fromJson(Map<String, Object?> json) =>
