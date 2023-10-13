@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -8,7 +6,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class AnnouncementWidget extends ConsumerStatefulWidget {
   const AnnouncementWidget({
@@ -137,24 +134,12 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     AnnouncementModel element,
   ) async {
     _handleTrackEvent(ref, element.id, element.ctaTitle);
-    if (element.ctaType == TypeConstants.EMAIL) {
-      var deviceAppAndUserInfo =
-          await ref.read(deviceAppAndUserInfoProvider.future);
-      var _info =
-          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
-      await launchEmailSubmission(
-        element.ctaPath.toString(),
-        body: _info,
-      );
-    } else {
-      unawaited(context.push(
-        getPathFromString(
-          element.ctaType,
-          [element.ctaPath.toString().getIdFromPath()],
-        ),
-        extra: {'url': element.ctaPath},
-      ));
-    }
+    await handleNavigation(
+      context: context,
+      element.ctaType,
+      [element.ctaPath.toString().getIdFromPath(), element.ctaPath],
+      ref: ref,
+    );
   }
 
   void _handleTrackEvent(
