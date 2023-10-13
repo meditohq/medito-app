@@ -51,8 +51,7 @@ class StringConstants {
   static const String joinBenefits1 = '- Save and retrieve your stats.';
   static const String joinBenefits2 =
       '- Access features before everybody else.';
-  static const String joinBenefits3 =
-      '- Save favorite tracks & packs.';
+  static const String joinBenefits3 = '- Save favorite tracks & packs.';
   static const String joinBenefits4 = '- Custom theme and icon (coming soon).';
   static const String joinBenefits5 = '- Receive content updates and news.';
   static const String itsFreeForever = 'It’s free, forever!';
@@ -98,10 +97,13 @@ class StringConstants {
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';
+  static const String invalidToken = 'Invalid token';
   static const String loadingError =
       "It looks like you're offline or there was little hiccup from our end.";
   static const String checkConnection =
       'It seems you are offline. Please connect to the internet to continue.';
   static const String timeout =
-      'Oops! It seems like there was an error. If the problem persists, kill the app and try again.';
+      'Oops! It seems like there was an error. If the problem persists, Close the app and try again.';
+  static const String connectivityError =
+      'Make sure you are connected to the internet to use Medito';
 }

@@ -18,6 +18,8 @@ class MeditoErrorWidget extends StatelessWidget {
   final bool showCheckDownloadText;
   @override
   Widget build(BuildContext context) {
+    var isInvalidToken = message == StringConstants.invalidToken;
+
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
           color: ColorConstants.walterWhite,
@@ -36,15 +38,17 @@ class MeditoErrorWidget extends StatelessWidget {
             children: [
               RichText(
                 text: TextSpan(
-                  text: '$message ',
+                  text: isInvalidToken
+                      ? '${StringConstants.someThingWentWrong}. '
+                      : '$message ',
                   style: textStyle,
                   children: <TextSpan>[
-                    if (showCheckDownloadText)
+                    if (showCheckDownloadText || isInvalidToken)
                       TextSpan(
                         text: '${StringConstants.meanWhileCheck} ',
                         style: textStyle,
                       ),
-                    if (showCheckDownloadText)
+                    if (showCheckDownloadText || isInvalidToken)
                       TextSpan(
                         text: '${StringConstants.downloads.toLowerCase()}',
                         style: textStyle?.copyWith(
