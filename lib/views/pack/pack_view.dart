@@ -159,7 +159,7 @@ class _PackViewState extends ConsumerState<PackView>
     } else if (type == TypeConstants.TRACK &&
         isCompletedTrack != null &&
         isCompletedTrack) {
-      return Icon(IconData(formatIcon('f634'), fontFamily: 'MaterialIcons'));
+      return Icon(Icons.check_circle_outline_rounded);
     }
 
     return SizedBox();
