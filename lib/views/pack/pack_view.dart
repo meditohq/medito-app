@@ -84,6 +84,7 @@ class _PackViewState extends ConsumerState<PackView>
                   e.subtitle,
                   e.type,
                   pack.items.last == e,
+                  e.isCompleted,
                 ),
               ),
             )
@@ -98,6 +99,7 @@ class _PackViewState extends ConsumerState<PackView>
     String? subtitle,
     String type,
     bool isLast,
+    bool? isCompletedTrack,
   ) {
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
     var hasSubtitle = subtitle.isNotNullAndNotEmpty();
@@ -145,16 +147,22 @@ class _PackViewState extends ConsumerState<PackView>
               ],
             ),
           ),
-          _getIcon(type),
+          _getIcon(type, isCompletedTrack: isCompletedTrack),
         ],
       ),
     );
   }
 
-  Widget _getIcon(String type) {
-    return type == TypeConstants.LINK
-        ? SvgPicture.asset(AssetConstants.icLink)
-        : SizedBox();
+  Widget _getIcon(String type, {bool? isCompletedTrack}) {
+    if (type == TypeConstants.LINK) {
+      return SvgPicture.asset(AssetConstants.icLink);
+    } else if (type == TypeConstants.TRACK &&
+        isCompletedTrack != null &&
+        isCompletedTrack) {
+      return Icon(Icons.check_circle_outline_rounded);
+    }
+
+    return SizedBox();
   }
 
   void _onListItemTap(

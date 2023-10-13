@@ -210,7 +210,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       );
       audioProvider.seekValueFromSlider(0);
       audioProvider.pause();
-
+      ref.invalidate(packsProvider);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
