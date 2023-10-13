@@ -12,7 +12,9 @@ class SoundListTileWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
     final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
-    var isSelected = bgSoundNotifierProvider.selectedBgSound?.id == sound.id;
+    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id;
+    var id = selectedSoundId ?? '0';
+    var isSelected = id == sound.id;
 
     return InkWell(
       onTap: () => _handleItemTap(
