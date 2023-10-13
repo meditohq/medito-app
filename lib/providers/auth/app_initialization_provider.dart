@@ -15,6 +15,10 @@ final appInitializationProvider =
     FutureProvider.family<void, BuildContext>((ref, context) async {
   var _authProvider = ref.read(authProvider);
   try {
+    var retryCount = ref.read(retryCounterProvider);
+    if (retryCount < 2) {
+      _checkInternetConnectivity(context, ref);
+    }
     await _authProvider.initializeUser();
     var res = _authProvider.userRes;
     if (res.body != null) {
@@ -24,18 +28,13 @@ final appInitializationProvider =
       var data = _setAppOpenedModelData(deviceInfo);
 
       await ref.read(eventsProvider(event: data.toJson()).future);
+      ref.read(retryCounterProvider.notifier).update((state) => 0);
       context.go(RouteConstants.homePath);
     } else {
-      _checkInternetConnectivity(context, ref);
       _handleRetry(context, ref, false);
     }
   } catch (err) {
-    if (_authProvider.userRes.body != null) {
-      _handleRetry(context, ref, true);
-    } else {
-      _checkInternetConnectivity(context, ref);
-      _handleRetry(context, ref, false);
-    }
+    _handleRetry(context, ref, _authProvider.userRes.body != null);
   }
 });
 
@@ -45,12 +44,14 @@ void _handleRetry(BuildContext context, Ref ref, bool shouldNavigate) {
     _recallProvider(ref, context);
     ref.read(retryCounterProvider.notifier).update((state) => ++state);
   } else {
-    ref.read(retryCounterProvider.notifier).update((state) => 0);
     if (shouldNavigate) {
+      ref.read(retryCounterProvider.notifier).update((state) => 0);
       context.go(RouteConstants.downloadsPath);
     } else {
       _recallProvider(ref, context);
-      showSnackBar(context, StringConstants.timeout);
+      if (retryCount < 2) {
+        showSnackBar(context, StringConstants.timeout);
+      }
     }
   }
 }

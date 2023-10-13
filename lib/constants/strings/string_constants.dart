@@ -103,7 +103,7 @@ class StringConstants {
   static const String checkConnection =
       'It seems you are offline. Please connect to the internet to continue.';
   static const String timeout =
-      'Oops! It seems like there was an error. If the problem persists, kill the app and try again.';
+      'Oops! It seems like there was an error. If the problem persists, Close the app and try again.';
   static const String connectivityError =
       'Make sure you are connected to the internet to use Medito';
 }

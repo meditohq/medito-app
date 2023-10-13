@@ -105,7 +105,7 @@ class CustomException implements Exception {
 
   @override
   String toString() {
-    return '$message,$statusCode';
+    return '$message${statusCode != null ? ',$statusCode' : ''}';
   }
 }
 
