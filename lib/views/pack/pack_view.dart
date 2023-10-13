@@ -171,38 +171,29 @@ class _PackViewState extends ConsumerState<PackView>
     String? path,
     BuildContext context,
   ) {
-    checkConnectivity().then((value) async {
+    checkConnectivity().then((value) {
       if (value) {
         var location = GoRouter.of(context).location;
         if (type == TypeConstants.PACK) {
           if (location.contains('pack2')) {
-            unawaited(context.push(getPathFromString(
+            unawaited(handleNavigation(
+              context: context,
               RouteConstants.pack3Path,
               [location.split('/')[2], widget.id, id.toString()],
-            )));
+            ));
           } else {
-            unawaited(context.push(getPathFromString(
+            unawaited(handleNavigation(
+              context: context,
               RouteConstants.pack2Path,
               [widget.id, id.toString()],
-            )));
+            ));
           }
-        } else if (type == TypeConstants.EMAIL) {
-          var deviceAppAndUserInfo =
-              await ref.read(deviceAppAndUserInfoProvider.future);
-          var _info =
-              '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
-
-          await launchEmailSubmission(
-            path.toString(),
-            body: _info,
-          );
         } else {
-          unawaited(context.push(
-            getPathFromString(
-              type,
-              [id.toString()],
-            ),
-            extra: {'url': path ?? ''},
+          unawaited(handleNavigation(
+            context: context,
+            type,
+            [id.toString(), path],
+            ref: ref,
           ));
         }
       } else {

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -7,7 +5,6 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class FilterWidget extends ConsumerWidget {
   const FilterWidget({super.key, required this.chips});
@@ -69,25 +66,12 @@ class FilterWidget extends ConsumerWidget {
     HomeChipsItemsModel element,
   ) async {
     _handleTrackEvent(ref, element.id, element.title);
-    if (element.type == TypeConstants.EMAIL) {
-      var deviceAppAndUserInfo =
-          await ref.read(deviceAppAndUserInfoProvider.future);
-      var _info =
-          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
-
-      await launchEmailSubmission(
-        element.path.toString(),
-        body: _info,
-      );
-    } else {
-      unawaited(context.push(
-        getPathFromString(
-          element.type,
-          [element.path.toString().getIdFromPath()],
-        ),
-        extra: {'url': element.path},
-      ));
-    }
+    await handleNavigation(
+      context: context,
+      element.type,
+      [element.path.toString().getIdFromPath(), element.path],
+      ref: ref,
+    );
   }
 
   void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {

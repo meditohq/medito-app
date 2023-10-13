@@ -4,7 +4,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Medito/providers/providers.dart';
 import 'search_result_card_widget.dart';
 
@@ -72,12 +71,10 @@ class SearchResultWidget extends ConsumerWidget {
   ) {
     checkConnectivity().then((value) {
       if (value) {
-        context.push(
-          getPathFromString(
-            type,
-            [id.toString()],
-          ),
-          extra: {'url': path},
+        handleNavigation(
+          context: context,
+          type,
+          [id.toString(), path],
         );
       } else {
         createSnackBar(StringConstants.checkConnection, context);

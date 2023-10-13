@@ -3,6 +3,8 @@ class TypeConstants {
   static const String PACK = 'pack';
   static const String TRACK = 'track';
   static const String EMAIL = 'email';
+  static const String URL = 'url';
+  static const String FLOW = 'flow';
 }
 
 class EventTypes {

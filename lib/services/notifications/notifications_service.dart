@@ -99,12 +99,10 @@ void onMessageAppOpened(WidgetRef ref) {
 
 void _navigate(WidgetRef ref, NotificationPayloadModel data) {
   var context = ref.read(goRouterProvider);
-  context.push(
-    getPathFromString(
-      data.type,
-      [data.id.toString().getIdFromPath()],
-    ),
-    extra: {'url': data.path},
+  handleNavigation(
+    goRouterContext: context,
+    data.type,
+    [data.id.toString().getIdFromPath(), data.path],
   );
 }
 

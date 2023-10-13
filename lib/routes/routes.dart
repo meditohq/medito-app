@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/search/search_view.dart';
@@ -268,13 +271,9 @@ enum Screen {
   splash,
   pack,
   player,
-  article,
   stats,
   track,
-  daily,
-  donation,
   url,
-  collection
 }
 
 MaterialPage<void> getTrackOptionsMaterialPage(GoRouterState state) {
@@ -283,7 +282,6 @@ MaterialPage<void> getTrackOptionsMaterialPage(GoRouterState state) {
     child: TrackView(id: state.params['sid'] ?? ''),
   );
 }
-
 
 MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
   return MaterialPage(
@@ -319,44 +317,57 @@ MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
   );
 }
 
-String getPathFromString(String? place, List<String?> ids) {
+Future<void> handleNavigation(
+  String? place,
+  List<String?> ids, {
+  BuildContext? context,
+  WidgetRef? ref,
+  GoRouter? goRouterContext,
+}) async {
   ids.removeWhere((element) => element == null);
-
-  if (place == 'track') {
-    return RouteConstants.trackPath.replaceAll(':sid', ids.first!);
-  }
-  if (place == 'daily') {
-    return RouteConstants.dailyPath.replaceAll(':did', ids.first!);
-  }
-  if (place == 'donation') {
-    return RouteConstants.donationPath;
-  }
-  if (place == 'article') {
-    return RouteConstants.articlePath.replaceAll(':aid', ids.first!);
-  }
-  if (place != null && place.contains('pack3')) {
-    return RouteConstants.pack3Path
+  var path;
+  var params;
+  if (place == TypeConstants.TRACK) {
+    path = RouteConstants.trackPath.replaceAll(':sid', ids.first!);
+  } else if (place != null && place.contains('pack3')) {
+    path = RouteConstants.pack3Path
         .replaceAll(':pid', ids.first!)
         .replaceAll(':p2id', ids[1]!)
         .replaceAll(':p3id', ids[2]!);
-  }
-  if (place != null && place.contains('pack2')) {
-    return RouteConstants.pack2Path
+  } else if (place != null && place.contains('pack2')) {
+    path = RouteConstants.pack2Path
         .replaceAll(':pid', ids.first!)
         .replaceAll(':p2id', ids[1]!);
-  }
-  if (place == 'pack') {
-    return RouteConstants.packPath.replaceAll(':pid', ids.first!);
-  }
-  if (place == 'url') {
-    launchUrlMedito(ids.first);
-  }
-  if (place == TypeConstants.LINK) {
-    return RouteConstants.webviewPath;
-  }
-  if (place == 'app') {
-    return RouteConstants.collectionPath;
-  }
+  } else if (place == TypeConstants.PACK) {
+    path = RouteConstants.packPath.replaceAll(':pid', ids.first!);
+  } else if (place == TypeConstants.URL) {
+    await launchUrlMedito(ids.first);
 
-  return '';
+    return;
+  } else if (place == TypeConstants.LINK) {
+    path = RouteConstants.webviewPath;
+    params = {'url': ids.last};
+  } else if (place == TypeConstants.FLOW) {
+    path = ids.first != null ? '/${ids.first}' : RouteConstants.joinIntroPath;
+    params = JoinRouteParamsModel(screen: Screen.track);
+  } else if (place == TypeConstants.EMAIL) {
+    if (ref != null) {
+      var deviceAppAndUserInfo =
+          await ref.read(deviceAppAndUserInfoProvider.future);
+      var _info =
+          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+      await launchEmailSubmission(
+        path.toString(),
+        body: _info,
+      );
+    }
+
+    return;
+  }
+  if (context != null) {
+    unawaited(context.push(path, extra: params));
+  } else if (goRouterContext != null) {
+    unawaited(goRouterContext.push(path, extra: params));
+  }
 }
