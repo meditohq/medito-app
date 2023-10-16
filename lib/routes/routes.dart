@@ -341,7 +341,7 @@ Future<void> handleNavigation(
   } else if (place == TypeConstants.PACK) {
     path = RouteConstants.packPath.replaceAll(':pid', ids.first!);
   } else if (place == TypeConstants.URL) {
-    await launchUrlMedito(ids.first);
+    await launchUrlMedito(ids.first ?? StringConstants.meditoUrl);
 
     return;
   } else if (place == TypeConstants.LINK) {
