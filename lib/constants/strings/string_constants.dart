@@ -1,4 +1,5 @@
 class StringConstants {
+  static const String meditoUrl = 'https://meditofoundation.org/';
   static const String downloads = 'Downloads';
   static const String download = 'Download';
   static const String downloaded = 'Downloaded';
