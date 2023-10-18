@@ -40,8 +40,8 @@ dependencies:
   sentry_flutter: ^7.9.0
   back_button_interceptor: ^6.0.2
   go_router: ^6.5.5
-  flutter_riverpod: ^2.1.3
-  riverpod_annotation: ^2.0.2
+  flutter_riverpod: ^2.4.4
+  riverpod_annotation: ^2.2.1
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
   json_annotation: ^4.7.0

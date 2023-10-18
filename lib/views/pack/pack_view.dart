@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
+import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -8,7 +10,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 class PackView extends ConsumerStatefulWidget {
@@ -40,18 +41,18 @@ class _PackViewState extends ConsumerState<PackView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var packs = ref.watch(PacksProvider(packId: widget.id));
+    var packs = ref.watch(packsProvider(packId: widget.id));
 
     return Scaffold(
       body: packs.when(
         skipLoadingOnRefresh: false,
         skipLoadingOnReload: false,
-        data: (data) => _buildScaffoldWithData(context, data, ref),
+        data: (data) => _buildScaffoldWithData(data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () => ref.refresh(
-            PacksProvider(packId: widget.id),
-          ),
+          onTap: () {
+            ref.refresh(packsProvider(packId: widget.id));
+          },
           isLoading: packs.isLoading,
         ),
         loading: () => const FolderShimmerWidget(),
@@ -60,14 +61,11 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   RefreshIndicator _buildScaffoldWithData(
-    BuildContext context,
     PackModel pack,
     WidgetRef ref,
   ) {
     return RefreshIndicator(
-      onRefresh: () async {
-        return await ref.refresh(PacksProvider(packId: widget.id));
-      },
+      onRefresh: () async => ref.refresh(packsProvider(packId: widget.id)),
       child: CollapsibleHeaderWidget(
         bgImage: pack.coverUrl,
         title: '${pack.title}',
@@ -79,12 +77,8 @@ class _PackViewState extends ConsumerState<PackView>
               (e) => GestureDetector(
                 onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
                 child: _buildListTile(
-                  context,
-                  e.title,
-                  e.subtitle,
-                  e.type,
+                  e,
                   pack.items.last == e,
-                  e.isCompleted,
                 ),
               ),
             )
@@ -93,76 +87,23 @@ class _PackViewState extends ConsumerState<PackView>
     );
   }
 
-  Container _buildListTile(
-    BuildContext context,
-    String? title,
-    String? subtitle,
-    String type,
+  Widget _buildListTile(
+    PackItemsModel item,
     bool isLast,
-    bool? isCompletedTrack,
   ) {
-    var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
-    var hasSubtitle = subtitle.isNotNullAndNotEmpty();
-
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
-              ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (title.isNotNullAndNotEmpty())
-                  Text(
-                    title!,
-                    style: bodyLarge?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: DmSans,
-                    ),
-                  ),
-                if (hasSubtitle)
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        subtitle!,
-                        style: bodyLarge?.copyWith(
-                          fontFamily: DmMono,
-                          color: ColorConstants.newGrey,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          _getIcon(type, isCompletedTrack: isCompletedTrack),
-        ],
-      ),
-    );
-  }
-
-  Widget _getIcon(String type, {bool? isCompletedTrack}) {
-    if (type == TypeConstants.LINK) {
-      return SvgPicture.asset(AssetConstants.icLink);
-    } else if (type == TypeConstants.TRACK &&
-        isCompletedTrack != null &&
-        isCompletedTrack) {
-      return Icon(Icons.check_circle_outline_rounded);
+    //ignore: prefer-conditional-expressions
+    if (item.type == TypeConstants.TRACK &&
+        item.isCompleted != null &&
+        !item.isCompleted!) {
+      return PackDismissibleWidget(
+        child: PackItemWidget(isLast: isLast, item: item),
+        onUpdateCb: () {
+          ref.read(packsProvider(packId: widget.id));
+        },
+      );
+    } else {
+      return PackItemWidget(isLast: isLast, item: item);
     }
-
-    return SizedBox();
   }
 
   void _onListItemTap(
