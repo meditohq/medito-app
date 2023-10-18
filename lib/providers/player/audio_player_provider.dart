@@ -21,7 +21,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   var backgroundSoundAudioPlayer = AudioPlayer();
   TrackFilesModel? currentlyPlayingTrack;
   final hasBgSound = 'hasBgSound';
-  var trackAudioPlayer = AudioPlayer();
+  final trackAudioPlayer = AudioPlayer();
 
   late String _contentToken;
 
