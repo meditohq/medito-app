@@ -21,6 +21,7 @@ class Pack extends _$Pack {
     state = await AsyncValue.guard(
       () async => await packRepository.fetchPacks(packId),
     );
+    ref.keepAlive();
   }
 
   Future<void> markComplete({
