@@ -15,11 +15,9 @@ class PackDismissibleWidget extends StatelessWidget {
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
       background: _getDismissibleBackgroundWidget(),
-      onUpdate: (details) {
-        if (details.reached) {
-          if (onUpdateCb != null) {
-            onUpdateCb!();
-          }
+      onDismissed: (details) {
+        if (onUpdateCb != null) {
+          onUpdateCb!();
         }
       },
       child: child,

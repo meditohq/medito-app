@@ -41,7 +41,7 @@ class _PackViewState extends ConsumerState<PackView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var packs = ref.watch(packsProvider(packId: widget.id));
+    var packs = ref.watch(packProvider(packId: widget.id));
 
     return Scaffold(
       body: packs.when(
@@ -50,9 +50,7 @@ class _PackViewState extends ConsumerState<PackView>
         data: (data) => _buildScaffoldWithData(data, ref),
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
-          onTap: () {
-            ref.refresh(packsProvider(packId: widget.id));
-          },
+          onTap: () => ref.refresh(packProvider(packId: widget.id)),
           isLoading: packs.isLoading,
         ),
         loading: () => const FolderShimmerWidget(),
@@ -65,7 +63,7 @@ class _PackViewState extends ConsumerState<PackView>
     WidgetRef ref,
   ) {
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(packsProvider(packId: widget.id)),
+      onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
       child: CollapsibleHeaderWidget(
         bgImage: pack.coverUrl,
         title: '${pack.title}',
@@ -98,7 +96,10 @@ class _PackViewState extends ConsumerState<PackView>
       return PackDismissibleWidget(
         child: PackItemWidget(isLast: isLast, item: item),
         onUpdateCb: () {
-          ref.read(packsProvider(packId: widget.id));
+          ref.read(packProvider(packId: widget.id).notifier).markComplete(
+                audioFileId: item.path.getIdFromPath(),
+                trackId: item.id,
+              );
         },
       );
     } else {
