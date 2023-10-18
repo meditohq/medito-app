@@ -44,6 +44,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     streamEvent.forEach((element) {
       if (element == ProcessingState.completed) {
         _handleAudioCompletion(ref);
+        _handleUserNotSignedIn(ref);
       }
     });
     super.initState();
@@ -215,15 +216,17 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
       });
-      var _user =
-          ref.read(authProvider.notifier).userRes.body as UserTokenModel;
-      if (_user.email == null) {
-        var params = JoinRouteParamsModel(screen: Screen.track);
-        context.push(
-          RouteConstants.joinIntroPath,
-          extra: params,
-        );
-      }
+    }
+  }
+
+  void _handleUserNotSignedIn(WidgetRef ref) {
+    var _user = ref.read(authProvider.notifier).userRes.body as UserTokenModel;
+    if (_user.email == null) {
+      var params = JoinRouteParamsModel(screen: Screen.track);
+      context.push(
+        RouteConstants.joinIntroPath,
+        extra: params,
+      );
     }
   }
 
