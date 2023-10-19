@@ -35,7 +35,7 @@ class RowItemWidget extends StatelessWidget {
       bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
-              color: ColorConstants.darkMoon,
+              color: ColorConstants.ebony,
             )
           : BorderSide.none,
     );

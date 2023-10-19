@@ -22,7 +22,7 @@ class ShareBtnWidget extends StatelessWidget {
         onPressed: onPressed ?? () => _handleShare(context, globalKey),
         btnText: StringConstants.share,
         bgColor: ColorConstants.walterWhite,
-        textColor: ColorConstants.greyIsTheNewGrey,
+        textColor: ColorConstants.onyx,
       ),
     );
   }

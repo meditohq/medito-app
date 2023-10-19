@@ -53,7 +53,7 @@ class MeditoErrorWidget extends StatelessWidget {
                         text: '${StringConstants.downloads.toLowerCase()}',
                         style: textStyle?.copyWith(
                           decoration: TextDecoration.underline,
-                          color: ColorConstants.purple,
+                          color: ColorConstants.lightPurple,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap =
@@ -69,7 +69,7 @@ class MeditoErrorWidget extends StatelessWidget {
                 onPressed: onTap,
                 isLoading: isLoading,
                 bgColor: ColorConstants.walterWhite,
-                textColor: ColorConstants.greyIsTheNewGrey,
+                textColor: ColorConstants.onyx,
               ),
             ],
           ),

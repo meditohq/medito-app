@@ -51,7 +51,7 @@ class _ConnectivityErrorComponentState
           createSnackBar(
             StringConstants.retrying,
             context,
-            color: ColorConstants.darkBGColor,
+            color: ColorConstants.ebony,
           );
         },
         message: StringConstants.checkConnection,

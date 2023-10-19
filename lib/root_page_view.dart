@@ -87,7 +87,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     });
 
     return Scaffold(
-      backgroundColor: ColorConstants.almostBlack,
+      backgroundColor: ColorConstants.black,
       resizeToAvoidBottomInset: false,
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {

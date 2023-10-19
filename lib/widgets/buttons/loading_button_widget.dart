@@ -6,7 +6,7 @@ class LoadingButtonWidget extends StatelessWidget {
     super.key,
     this.onPressed,
     required this.btnText,
-    this.bgColor = ColorConstants.greyIsTheNewGrey,
+    this.bgColor = ColorConstants.onyx,
     this.textColor = ColorConstants.walterWhite,
     this.isLoading = false,
     this.elevation = 0,

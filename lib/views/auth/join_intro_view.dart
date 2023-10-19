@@ -120,7 +120,7 @@ class JoinIntroView extends ConsumerWidget {
           },
           btnText: StringConstants.joinNow,
           bgColor: ColorConstants.walterWhite,
-          textColor: ColorConstants.greyIsTheNewGrey,
+          textColor: ColorConstants.onyx,
         ),
       ],
     );
