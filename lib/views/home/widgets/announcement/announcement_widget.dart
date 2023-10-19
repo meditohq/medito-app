@@ -13,8 +13,10 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
     required this.announcement,
     this.onPressedDismiss,
   });
+
   final AnnouncementModel announcement;
   final void Function()? onPressedDismiss;
+
   @override
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
@@ -97,16 +99,25 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   }
 
   Flexible _text(BuildContext context, String? title) {
+    var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: ColorConstants.getColorFromString(
+            widget.announcement.colorText,
+          ),
+          fontSize: 14,
+        );
+
     return Flexible(
-      child: SelectableText(
-        title ?? '',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.getColorFromString(
-                widget.announcement.colorText,
-              ),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+      child: MarkdownWidget(
+        body: title ?? '',
+        selectable: true,
+        textAlign: WrapAlignment.start,
+        a: markDownTheme?.copyWith(
+          decoration: TextDecoration.underline,
+          fontWeight: FontWeight.w700,
+        ),
+        p: markDownTheme?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
