@@ -9,36 +9,39 @@ class PackDismissibleWidget extends StatelessWidget {
   });
   final Widget child;
   final void Function()? onUpdateCb;
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
       background: _getDismissibleBackgroundWidget(),
-      onDismissed: (details) {
+      confirmDismiss: (direction) async {
         if (onUpdateCb != null) {
           onUpdateCb!();
         }
+
+        return false;  // Do not remove the item from the list
       },
       child: child,
     );
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-        color: ColorConstants.moonlight,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Spacer(),
-              Icon(
-                Icons.check,
-                color: ColorConstants.walterWhite,
-              ),
-            ],
+    color: ColorConstants.charcoal,
+    child: Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Spacer(),
+          Icon(
+            Icons.check,
+            color: ColorConstants.walterWhite,
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }

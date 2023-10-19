@@ -19,10 +19,10 @@ class PackItemWidget extends StatelessWidget {
         border: isLast
             ? null
             : Border(
-                bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
+                bottom: BorderSide(width: 2, color: ColorConstants.charcoal),
               ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,7 +48,7 @@ class PackItemWidget extends StatelessWidget {
                         item.subtitle,
                         style: bodyLarge?.copyWith(
                           fontFamily: DmMono,
-                          color: ColorConstants.newGrey,
+                          color: ColorConstants.graphite,
                         ),
                       ),
                     ),
@@ -66,7 +66,9 @@ class PackItemWidget extends StatelessWidget {
     if (type == TypeConstants.LINK) {
       return SvgPicture.asset(AssetConstants.icLink);
     } else if (type == TypeConstants.TRACK && isCompletedTrack == true) {
-      return Icon(Icons.check_circle_outline_rounded);
+      return Icon(
+          color: ColorConstants.graphite,
+          Icons.check,);
     }
 
     return SizedBox();
