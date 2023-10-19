@@ -67,7 +67,7 @@ class TrackShimmerWidget extends StatelessWidget {
         width: 171,
         height: 56,
         decoration: BoxDecoration(
-          color: ColorConstants.greyIsTheNewGrey,
+          color: ColorConstants.onyx,
           borderRadius: BorderRadius.all(
             Radius.circular(14),
           ),

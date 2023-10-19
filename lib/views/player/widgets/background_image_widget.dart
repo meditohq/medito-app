@@ -22,7 +22,7 @@ class BackgroundImageWidget extends ConsumerWidget {
           height: size.height,
           color: Color.lerp(
             ColorConstants.black,
-            ColorConstants.onyx,
+            ColorConstants.ebony,
             scrollProportion,
           ),
         ),

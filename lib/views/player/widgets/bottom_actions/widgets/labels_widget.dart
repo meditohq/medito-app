@@ -6,7 +6,7 @@ class LabelsWidget extends StatelessWidget {
     super.key,
     required this.label,
     this.onTap,
-    this.bgColor = ColorConstants.greyIsTheNewGrey,
+    this.bgColor = ColorConstants.onyx,
     this.textColor = ColorConstants.walterWhite,
   });
   final String label;

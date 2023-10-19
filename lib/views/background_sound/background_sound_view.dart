@@ -78,7 +78,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       child: CollapsibleHeaderWidget(
         title: StringConstants.backgroundSounds,
         leadingIconBgColor: ColorConstants.walterWhite,
-        leadingIconColor: ColorConstants.almostBlack,
+        leadingIconColor: ColorConstants.black,
         headerHeight: 130,
         children: [
           VolumeSliderWidget(),

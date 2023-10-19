@@ -73,7 +73,7 @@ class NotificationPermissionView extends ConsumerWidget {
                     btnText: StringConstants.allowNotifications,
                     bgColor: ColorConstants.walterWhite,
                     fontWeight: FontWeight.w600,
-                    textColor: ColorConstants.greyIsTheNewGrey,
+                    textColor: ColorConstants.onyx,
                   ),
                 ),
                 height8,

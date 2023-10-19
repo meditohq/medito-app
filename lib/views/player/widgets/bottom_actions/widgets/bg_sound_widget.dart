@@ -26,9 +26,9 @@ class BgSoundWidget extends ConsumerWidget {
       label: StringConstants.sound.toUpperCase(),
       bgColor: checkIsBgSoundSelected
           ? ColorConstants.walterWhite
-          : ColorConstants.greyIsTheNewGrey,
+          : ColorConstants.onyx,
       textColor: checkIsBgSoundSelected
-          ? ColorConstants.greyIsTheNewGrey
+          ? ColorConstants.onyx
           : ColorConstants.walterWhite,
       onTap: () {
         context.push(

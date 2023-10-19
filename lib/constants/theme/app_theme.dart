@@ -5,7 +5,7 @@ import 'slide_transition_builder.dart';
 
 ThemeData appTheme(BuildContext context) {
   return ThemeData(
-    splashColor: ColorConstants.moonlight,
+    splashColor: ColorConstants.ebony,
     canvasColor: ColorConstants.ebony,
     pageTransitionsTheme: PageTransitionsTheme(builders: {
       TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),

@@ -70,7 +70,7 @@ class _DurationIndicatorWidgetState
             child: Slider(
               min: _minSeconds,
               activeColor: ColorConstants.walterWhite,
-              inactiveColor: ColorConstants.greyIsTheNewGrey,
+              inactiveColor: ColorConstants.onyx,
               max: _maxDuration,
               value: currentDuration.toDouble(),
               onChanged: (val) {

@@ -31,7 +31,7 @@ class StackHeaderWidget extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(boxShadow: [
                     BoxShadow(
-                      color: ColorConstants.almostBlack.withOpacity(0.4),
+                      color: ColorConstants.black.withOpacity(0.4),
                       offset: Offset(0, 10),
                       blurRadius: 10,
                       spreadRadius: 20,

@@ -122,7 +122,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                           _emailController.text != '' ? _handleContinue : null,
                       btnText: StringConstants.continueTxt,
                       bgColor: ColorConstants.walterWhite,
-                      textColor: ColorConstants.greyIsTheNewGrey,
+                      textColor: ColorConstants.onyx,
                       isLoading: isLoading,
                     ),
                   ],

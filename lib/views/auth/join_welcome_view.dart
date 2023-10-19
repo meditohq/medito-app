@@ -101,7 +101,7 @@ class JoinWelcomeView extends ConsumerWidget {
           },
           btnText: StringConstants.close,
           bgColor: ColorConstants.walterWhite,
-          textColor: ColorConstants.greyIsTheNewGrey,
+          textColor: ColorConstants.onyx,
         ),
       ],
     );

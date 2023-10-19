@@ -83,10 +83,10 @@ class NetworkImageWidget extends ConsumerWidget {
   Shimmer _shimmerLoading() {
     return Shimmer.fromColors(
       period: Duration(seconds: 1),
-      baseColor: ColorConstants.almostBlack,
+      baseColor: ColorConstants.black,
       highlightColor: ColorConstants.greyIsTheNewBlack,
       child: Container(
-        color: ColorConstants.almostBlack,
+        color: ColorConstants.black,
         height: height,
         width: width,
       ),

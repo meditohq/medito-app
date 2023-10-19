@@ -86,7 +86,7 @@ class _CollapsibleHeaderWidgetState
           snap: false,
           elevation: 50,
           // toolbarHeight: kToolbarHeight ,
-          backgroundColor: ColorConstants.deepNight,
+          backgroundColor: ColorConstants.onyx,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: false,
@@ -101,7 +101,7 @@ class _CollapsibleHeaderWidgetState
                 ? _bgImage(context, widget.bgImage!)
                 : Container(
                     height: 20,
-                    color: ColorConstants.darkMoon,
+                    color: ColorConstants.ebony,
                   ),
           ),
         ),
@@ -146,7 +146,7 @@ class _CollapsibleHeaderWidgetState
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: ColorConstants.almostBlack.withOpacity(0.6),
+                  color: ColorConstants.black.withOpacity(0.6),
                   offset: Offset(0, 10),
                   blurRadius: 50,
                   spreadRadius: 50,

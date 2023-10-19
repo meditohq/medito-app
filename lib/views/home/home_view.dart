@@ -135,7 +135,7 @@ class _HomeViewState extends ConsumerState<HomeView>
           .map(
             (e) => Padding(
               padding: EdgeInsets.only(
-                bottom: e.title == data.rows.last.title ? 16 : 32,
+                bottom: e.title == data.rows.last.title ? 0 : 32,
               ),
               child: CardListWidget(
                 row: e,
