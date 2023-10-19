@@ -36,7 +36,7 @@ class StatsRepositoryImpl extends StatsRepository {
     try {
       var pref = await SharedPreferences.getInstance();
       var keys = pref.getKeys();
-      List<int> listenedSessionIds = [];
+      var listenedSessionIds = <int>[];
       keys.forEach((element) {
         if (element.startsWith('listened')) {
           listenedSessionIds.add(int.parse(element.replaceAll('listened', '')));
