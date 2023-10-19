@@ -65,9 +65,7 @@ class PackItemWidget extends StatelessWidget {
   Widget _getIcon(String type, {bool? isCompletedTrack}) {
     if (type == TypeConstants.LINK) {
       return SvgPicture.asset(AssetConstants.icLink);
-    } else if (type == TypeConstants.TRACK &&
-        isCompletedTrack != null &&
-        isCompletedTrack) {
+    } else if (type == TypeConstants.TRACK && isCompletedTrack == true) {
       return Icon(Icons.check_circle_outline_rounded);
     }
 

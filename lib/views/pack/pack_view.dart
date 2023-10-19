@@ -90,9 +90,7 @@ class _PackViewState extends ConsumerState<PackView>
     bool isLast,
   ) {
     //ignore: prefer-conditional-expressions
-    if (item.type == TypeConstants.TRACK &&
-        item.isCompleted != null &&
-        !item.isCompleted!) {
+    if (item.type == TypeConstants.TRACK && item.isCompleted == false) {
       return PackDismissibleWidget(
         child: PackItemWidget(isLast: isLast, item: item),
         onUpdateCb: () {
