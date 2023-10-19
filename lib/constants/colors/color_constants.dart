@@ -16,37 +16,21 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:flutter/material.dart';
 
 class ColorConstants {
-  static const walterWhiteLine = Color(0xff595F65);
-  static const walterWhiteTrans = Color(0x30595F65);
-  static const darkBGColor = Color(0xff22282D);
-  static const almostBlack = Color(0xEE000000);
   static const black = Colors.black;
-
   static const greyIsTheNewBlack = Color(0xFF1C1C1E);
   static const greyIsTheNewGrey = Color(0xFF2C2C2E);
 
-  static const newGrey = Color(0xffb6b6b8);
-  static const midnight = Color(0xff111213);
-
-  static const moonlight = Color(0xff282828);
-  static const peacefulBlue = Color(0xffd1f6fe);
-  static const ashWhite = Color(0xffD5D3D1);
-
   // V2
   static const transparent = Color(0x00ffffff);
-  static const darkMoon = Color(0xff121212);
   static const walterWhite = Colors.white;
-  static const meditoTextGrey = Color(0xffa7aab1);
-  static const link = Color(0xff29bfff);
   static const softGrey = Color(0xff424345);
-  static const deepNight = Color(0xff272829);
-  static const intoTheNight = Color(0xff171717);
-  static const easterYellow = Color(0xfffef5c7);
-  static const purple = Color(0xff4F3C9B);
+  static const quiteGrey = Color(0xffD5D3D1);
   static const lightPurple = Color(0xff917DF0);
   static const onyx = Color(0xff2A2A32);
   static const ebony = Color(0xff171718);
   static const graphite = Color(0xffAAAAAA);
+  static const charcoal = Color(0xff303031);
+
   static Color getColorFromString(String name) {
     var color = int.parse(name.replaceAll('#', '0xff'));
 

@@ -32,7 +32,7 @@ Future<bool> checkConnectivity() async {
 }
 
 Color parseColor(String? color) {
-  if (color == null || color.isEmpty) return ColorConstants.midnight;
+  if (color == null || color.isEmpty) return ColorConstants.ebony;
 
   return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }

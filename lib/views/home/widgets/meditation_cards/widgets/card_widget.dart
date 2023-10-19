@@ -25,14 +25,14 @@ class CardWidget extends ConsumerWidget {
       child: Stack(
         children: [
           SizedBox(
-            width: 154,
+            width: 156,
             height: 156,
             child: Container(
               foregroundDecoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    ColorConstants.almostBlack.withOpacity(0),
-                    ColorConstants.almostBlack.withOpacity(0.5),
+                    ColorConstants.black.withOpacity(0),
+                    ColorConstants.black.withOpacity(0.5),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -75,15 +75,15 @@ class CardWidget extends ConsumerWidget {
 
   Padding _tag(TextTheme textTheme, {String? tag}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       child: Container(
-        color: ColorConstants.ashWhite,
+        color: ColorConstants.onyx,
         padding: EdgeInsets.symmetric(horizontal: 6),
         child: Text(
           tag ?? '',
           style: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w500,
-            color: ColorConstants.black,
+            color: ColorConstants.walterWhite,
             fontFamily: DmMono,
             letterSpacing: 0,
           ),
@@ -94,13 +94,13 @@ class CardWidget extends ConsumerWidget {
 
   Padding _title(TextTheme textTheme, {required String title}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Text(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child:Text(
         title,
         maxLines: 4,
         softWrap: true,
         overflow: TextOverflow.ellipsis,
-        style: textTheme.labelMedium?.copyWith(letterSpacing: 0, height: 1.1),
+        style: textTheme.labelMedium?.copyWith(letterSpacing: 0, height: 1.2),
       ),
     );
   }

@@ -20,7 +20,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.5,
-          color: ColorConstants.meditoTextGrey,
+          color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
         displaySmall: TextStyle(
@@ -60,7 +60,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.4,
           fontWeight: FontWeight.w500,
           height: 1.5,
-          color: ColorConstants.meditoTextGrey,
+          color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
         titleSmall: TextStyle(
@@ -78,7 +78,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
           height: 1.5,
-          color: ColorConstants.meditoTextGrey,
+          color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
         bodyMedium: TextStyle(
@@ -87,7 +87,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.normal,
           height: 1.3,
-          color: ColorConstants.meditoTextGrey,
+          color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
         bodyLarge: TextStyle(

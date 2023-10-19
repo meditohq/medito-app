@@ -116,7 +116,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-        color: ColorConstants.moonlight,
+        color: ColorConstants.charcoal,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(

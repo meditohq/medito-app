@@ -34,9 +34,9 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
       label: audioSpeedModel.label,
       bgColor: audioSpeedModel.label != StringConstants.x1
           ? ColorConstants.walterWhite
-          : ColorConstants.greyIsTheNewGrey,
+          : ColorConstants.onyx,
       textColor: audioSpeedModel.label != StringConstants.x1
-          ? ColorConstants.greyIsTheNewGrey
+          ? ColorConstants.onyx
           : ColorConstants.walterWhite,
       onTap: () {
         _provider.setAudioTrackSpeed();

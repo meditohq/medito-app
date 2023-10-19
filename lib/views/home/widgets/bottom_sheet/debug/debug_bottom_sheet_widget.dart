@@ -96,7 +96,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
       createSnackBar(
         e.toString(),
         context,
-        color: ColorConstants.darkBGColor,
+        color: ColorConstants.ebony,
       );
     }
   }

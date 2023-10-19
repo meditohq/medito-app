@@ -28,7 +28,7 @@ class BoxShimmerWidget extends StatelessWidget {
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(
-            color: ColorConstants.almostBlack,
+            color: ColorConstants.black,
             borderRadius: BorderRadius.all(
               Radius.circular(borderRadius),
             ),

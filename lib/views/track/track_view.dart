@@ -131,7 +131,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             style: Theme.of(context)
                 .primaryTextTheme
                 .bodyLarge
-                ?.copyWith(color: ColorConstants.newGrey, fontFamily: DmSans),
+                ?.copyWith(color: ColorConstants.graphite, fontFamily: DmSans),
           ),
         ],
       );

@@ -46,7 +46,7 @@ class MeditoAppBarWidget extends StatelessWidget
       actions: actions,
       elevation: 0,
       backgroundColor:
-          isTransparent ? Colors.transparent : ColorConstants.moonlight,
+          isTransparent ? Colors.transparent : ColorConstants.onyx,
       title: getTitleWidget(context),
     );
   }

@@ -155,7 +155,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                           : null,
                       btnText: StringConstants.verify,
                       bgColor: ColorConstants.walterWhite,
-                      textColor: ColorConstants.greyIsTheNewGrey,
+                      textColor: ColorConstants.onyx,
                       isLoading: isLoading,
                     ),
                   ],
