@@ -61,16 +61,20 @@ bool isDayBefore(DateTime day1, DateTime day2) {
       day1.day == day2.day - 1;
 }
 
-Future<void> launchUrlMedito(String url) async {
+Future<void> launchURLInBrowser(String url) async {
   try {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
     }
-  } catch (e) {
+  } catch (e, stackTrace) {
+    // Capture the exception using Sentry
     await Sentry.captureException(
       e,
-      stackTrace: e,
+      stackTrace: stackTrace,
     );
   }
 }
