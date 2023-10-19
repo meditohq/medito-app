@@ -211,7 +211,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       );
       audioProvider.seekValueFromSlider(0);
       audioProvider.pause();
-      ref.invalidate(packsProvider);
+      ref.invalidate(packProvider);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioPlayPauseStateProvider.notifier).state =
             PLAY_PAUSE_AUDIO.PAUSE;
@@ -238,6 +238,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var audio = AudioCompletedModel(
       audioFileId: audioFileId,
       trackId: trackId,
+      updateStats: true,
     );
     var event = EventsModel(
       name: EventTypes.audioCompleted,

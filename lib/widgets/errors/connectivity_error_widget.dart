@@ -32,17 +32,15 @@ class _ConnectivityErrorComponentState
     var id = location.split('/').last;
     var isFolder = location.contains('folder');
     var isTrack = location.contains('track');
-
     if (isFolder && isTrack) {
       ref.read(tracksProvider(trackId: id));
     } else if (isFolder && !isTrack) {
-      ref.read(PacksProvider(packId: id));
+      ref.read(packProvider(packId: id));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () async => false,
       child: MeditoErrorWidget(
