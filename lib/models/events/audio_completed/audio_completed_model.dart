@@ -7,6 +7,7 @@ abstract class AudioCompletedModel with _$AudioCompletedModel {
   const factory AudioCompletedModel({
     required String audioFileId,
     required String trackId,
+    required bool updateStats,
   }) = _AudioCompletedModel;
 
   factory AudioCompletedModel.fromJson(Map<String, Object?> json) =>
