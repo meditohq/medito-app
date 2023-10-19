@@ -9,4 +9,14 @@ class SharedPreferenceConstants {
   static const String audioForBgEvent = 'audioForBgEvent';
   static const String notificationPermission = 'notificationPermission';
   static const String trackOpenedFirstTime = 'trackOpenedFirstTime';
+  static const String secsListened = 'secsListened';
+  static const String listened = 'listened';
+  static const String stats = 'stats';
+  static const String id = 'id';
+  static const String COPY = 'copy';
+  static const String numSessions = 'numSessions';
+  static const String longestStreak = 'longestStreak';
+  static const String streakCount = 'streakCount';
+  static const String streakList = 'streakList';
+  static const String fakeStreakList = 'fakeStreakList';
 }

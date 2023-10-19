@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/cache.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
@@ -37,7 +38,7 @@ String getUnits(UnitType type, int _) {
 Future<String> getCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('streakCount') ?? 0;
+  var streak = prefs.getInt(SharedPreferenceConstants.streakCount) ?? 0;
   var streakList = await getStreakList();
 
   if (streakList.isNotEmpty) {
@@ -48,7 +49,7 @@ Future<String> getCurrentStreak() async {
 
     if (longerThanOneDayAgo(lastDayInStreak, now)) {
       streak = 0;
-      await prefs.setInt('streakCount', streak);
+      await prefs.setInt(SharedPreferenceConstants.streakCount, streak);
     }
   }
 
@@ -58,19 +59,19 @@ Future<String> getCurrentStreak() async {
 Future<List<String>> getStreakList() async {
   var prefs = await SharedPreferences.getInstance();
 
-  return prefs.getStringList('streakList') ?? [];
+  return prefs.getStringList(SharedPreferenceConstants.streakList) ?? [];
 }
 
 Future<bool> setStreakList(List<String> streakList) async {
   var prefs = await SharedPreferences.getInstance();
 
-  return prefs.setStringList('streakList', streakList);
+  return prefs.setStringList(SharedPreferenceConstants.streakList, streakList);
 }
 
 Future<int> _getCurrentStreakInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('streakCount');
+  var streak = prefs.getInt(SharedPreferenceConstants.streakCount);
 
   return streak ?? 0;
 }
@@ -80,7 +81,7 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
 
   var current = await _getSecondsListened();
   var plusOne = current + (additionalSecs);
-  await prefs.setInt('secsListened', plusOne);
+  await prefs.setInt(SharedPreferenceConstants.secsListened, plusOne);
 
   return true;
 }
@@ -91,7 +92,8 @@ Future<void> updateStreak({String streak = ''}) async {
   var prefs = await SharedPreferences.getInstance();
 
   if (streak.isNotEmpty) {
-    await prefs.setInt('streakCount', int.parse(streak));
+    await prefs.setInt(
+        SharedPreferenceConstants.streakCount, int.parse(streak));
     await _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomTrackToStreakList();
 
@@ -99,7 +101,7 @@ Future<void> updateStreak({String streak = ''}) async {
   }
 
   var streakList = await getStreakList();
-  var streakCount = prefs.getInt('streakCount') ?? 0;
+  var streakCount = prefs.getInt(SharedPreferenceConstants.streakCount) ?? 0;
 
   if (streakList.isNotEmpty) {
     //if you have meditated before, was it on today? if not, increase counter
@@ -125,12 +127,14 @@ Future<void> addPhantomTrackToStreakList() async {
 
   var prefs = await SharedPreferences.getInstance();
   var streakList = await getStreakList();
-  var fakeStreakList = prefs.getStringList('fakeStreakList') ?? [];
+  var fakeStreakList =
+      prefs.getStringList(SharedPreferenceConstants.fakeStreakList) ?? [];
   var streakTime = DateTime.now().millisecondsSinceEpoch.toString();
   streakList.add(streakTime);
   fakeStreakList.add(streakTime);
   await setStreakList(streakList);
-  await prefs.setStringList('fakeStreakList', fakeStreakList);
+  await prefs.setStringList(
+      SharedPreferenceConstants.fakeStreakList, fakeStreakList);
 }
 
 Future<void> incrementStreakCounter(
@@ -139,7 +143,7 @@ Future<void> incrementStreakCounter(
   var prefs = await SharedPreferences.getInstance();
 
   streakCount++;
-  await prefs.setInt('streakCount', streakCount);
+  await prefs.setInt(SharedPreferenceConstants.streakCount, streakCount);
 
   //update longestStreak
   await _updateLongestStreak(streakCount, prefs);
@@ -149,20 +153,20 @@ Future _updateLongestStreak(int streakCount, SharedPreferences prefs) async {
   //update longestStreak
   var longest = await _getLongestStreakInt();
   if (streakCount > longest) {
-    await prefs.setInt('longestStreak', streakCount);
+    await prefs.setInt(SharedPreferenceConstants.longestStreak, streakCount);
   }
 }
 
 void setLongestStreakToCurrentStreak() async {
   var prefs = await SharedPreferences.getInstance();
   var current = await _getCurrentStreakInt();
-  await prefs.setInt('longestStreak', current);
+  await prefs.setInt(SharedPreferenceConstants.longestStreak, current);
 }
 
 Future<String> getMinutesListened() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('secsListened');
+  var streak = prefs.getInt(SharedPreferenceConstants.secsListened);
 
   return streak == null ? '0' : Duration(seconds: streak).inMinutes.toString();
 }
@@ -170,7 +174,7 @@ Future<String> getMinutesListened() async {
 Future<int> _getSecondsListened() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('secsListened');
+  var streak = prefs.getInt(SharedPreferenceConstants.secsListened);
 
   return streak ?? 0;
 }
@@ -182,7 +186,7 @@ Future<String> getLongestStreak() async {
     return getCurrentStreak();
   }
 
-  var streak = prefs.getInt('longestStreak');
+  var streak = prefs.getInt(SharedPreferenceConstants.longestStreak);
 
   return streak == null ? '0' : streak.toString();
 }
@@ -190,7 +194,7 @@ Future<String> getLongestStreak() async {
 Future<int> _getLongestStreakInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('longestStreak');
+  var streak = prefs.getInt(SharedPreferenceConstants.longestStreak);
 
   return streak ?? 0;
 }
@@ -198,7 +202,7 @@ Future<int> _getLongestStreakInt() async {
 Future<String> getNumTracks() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('numSessions');
+  var streak = prefs.getInt(SharedPreferenceConstants.numSessions);
 
   return streak == null ? '0' : streak.toString();
 }
@@ -206,7 +210,7 @@ Future<String> getNumTracks() async {
 Future<int> getNumTracksInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var streak = prefs.getInt('numSessions');
+  var streak = prefs.getInt(SharedPreferenceConstants.numSessions);
 
   return streak ?? 0;
 }
@@ -216,29 +220,31 @@ Future<int> incrementNumTracks() async {
   var prefs = await SharedPreferences.getInstance();
   var current = await getNumTracksInt();
   current++;
-  await prefs.setInt('numSessions', current);
+  await prefs.setInt(SharedPreferenceConstants.numSessions, current);
 
   return current;
 }
 
 void markAsListened(WidgetRef ref, String id) {
   print('mark as listened');
-  unawaited(ref.read(sharedPreferencesProvider).setBool('listened' + id, true));
+  unawaited(ref
+      .read(sharedPreferencesProvider)
+      .setBool(SharedPreferenceConstants.listened + id, true));
 }
 
 Future<void> clearBgStats() {
-  return writeJSONToCache('', 'stats');
+  return writeJSONToCache('', SharedPreferenceConstants.stats);
 }
 
 void setVersionCopySeen(int id) async {
   var prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('copy', id);
+  await prefs.setInt(SharedPreferenceConstants.COPY, id);
 }
 
 Future<int> getVersionCopyInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var version = prefs.getInt('copy');
+  var version = prefs.getInt(SharedPreferenceConstants.COPY);
 
   return version ?? -1;
 }
@@ -258,13 +264,13 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
 }
 
 Future updateStatsFromBg(WidgetRef ref) async {
-  var read = await readJSONFromCache('stats');
+  var read = await readJSONFromCache(SharedPreferenceConstants.stats);
   print('read ->$read');
 
   if (read.isNotNullAndNotEmpty()) {
     var map = decoded(read!);
-    var id = map['id'];
-    var secsListened = map['secsListened'];
+    var id = map[SharedPreferenceConstants.id];
+    var secsListened = map[SharedPreferenceConstants.secsListened];
 
     if (map != null && map.isNotEmpty) {
       await updateStreak();
