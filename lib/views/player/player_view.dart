@@ -86,13 +86,14 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   }
 
   Future<bool> _onWillPop(BuildContext context) async {
-    var currentPage = ref.read(pageviewNotifierProvider).currentPage;
+    var currentPageIndex = ref.read(pageviewNotifierProvider).currentPage;
+    var playerPageIndex = 1;
     var currentLocation = GoRouter.of(context).location;
     if (currentLocation.contains(RouteConstants.backgroundSoundsPath)) {
       context.pop();
 
       return true;
-    } else if (currentPage == 1) {
+    } else if (currentPageIndex == playerPageIndex) {
       ref.read(pageviewNotifierProvider).gotoPreviousPage();
 
       return true;
