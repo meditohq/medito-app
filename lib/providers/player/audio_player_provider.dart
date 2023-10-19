@@ -27,8 +27,16 @@ class AudioPlayerNotifier extends BaseAudioHandler
 
   @override
   Future<void> pause() async {
-    pauseBackgroundSound();
-    unawaited(trackAudioPlayer.pause());
+    try {
+      pauseBackgroundSound();
+      unawaited(trackAudioPlayer.pause());
+      unawaited(super.pause());
+    } catch (err) {
+      unawaited(Sentry.captureException(
+        err,
+        stackTrace: err,
+      ));
+    }
   }
 
   @override
@@ -47,6 +55,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
         stackTrace: err,
       ));
     }
+    unawaited(super.play());
   }
 
   @override
@@ -55,6 +64,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     if (mediaItemHasBGSound()) {
       stopBackgroundSound();
     }
+    unawaited(super.stop());
   }
 
   @override
@@ -152,10 +162,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
     }
   }
 
-  void stopTrack() {
-    trackAudioPlayer.stop();
-  }
-
   void skipForward30Secs() async {
     var seekDuration = trackAudioPlayer.position.inMilliseconds +
         Duration(seconds: 30).inMilliseconds;
@@ -173,10 +179,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
 
   void setBackgroundSoundVolume(double volume) async {
     await backgroundSoundAudioPlayer.setVolume(volume / 100);
-  }
-
-  void disposeTrackAudio() async {
-    await trackAudioPlayer.dispose();
   }
 
   void setMediaItem(
