@@ -40,7 +40,7 @@ class PostLocalStatsNotifier
         var statsModel = TransferStatsModel(
           currentStreak: stats['currentStreak'],
           minutesListened: stats['minutesListened'],
-          listendedSessionsNum: stats['listenedSessionsNum'],
+          listenedSessionsNum: stats['listenedSessionsNum'],
           longestStreak: stats['longestStreak'],
           listenedSessionIds: stats['listenedSessionIds'],
         );
