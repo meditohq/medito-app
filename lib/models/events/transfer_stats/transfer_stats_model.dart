@@ -7,7 +7,7 @@ abstract class TransferStatsModel with _$TransferStatsModel {
   const factory TransferStatsModel({
     required int currentStreak,
     required int minutesListened,
-    required int listendedSessionsNum,
+    required int listenedSessionsNum,
     required int longestStreak,
     required List<int> listenedSessionIds,
   }) = _TransferStatsModel;
