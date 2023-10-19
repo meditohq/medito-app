@@ -47,8 +47,8 @@ class ArtistTitleWidget extends ConsumerWidget {
               fontSize: trackTitleFontSize,
               letterSpacing: 0.2,
             ),
-        blankSpace: 50,
-        velocity: 10,
+        blankSpace: 40,
+        velocity: 20,
       ),
     );
   }
