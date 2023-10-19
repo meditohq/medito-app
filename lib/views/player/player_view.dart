@@ -4,6 +4,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'widgets/artist_title_widget.dart';
 import 'widgets/background_image_widget.dart';
 import 'widgets/bottom_actions/bottom_action_widget.dart';
@@ -32,7 +33,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     var artist = widget.trackModel.artist;
 
     return BackButtonListener(
-      onBackButtonPressed: _onWillPop,
+      onBackButtonPressed: () async => await _onWillPop(context),
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
@@ -84,8 +85,14 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     );
   }
 
-  Future<bool> _onWillPop() async {
-    if (ref.read(pageviewNotifierProvider).currentPage == 1) {
+  Future<bool> _onWillPop(BuildContext context) async {
+    var currentPage = ref.read(pageviewNotifierProvider).currentPage;
+    var currentLocation = GoRouter.of(context).location;
+    if (currentLocation.contains(RouteConstants.backgroundSoundsPath)) {
+      context.pop();
+
+      return true;
+    } else if (currentPage == 1) {
       ref.read(pageviewNotifierProvider).gotoPreviousPage();
 
       return true;
