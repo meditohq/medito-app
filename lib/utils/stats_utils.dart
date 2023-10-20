@@ -238,13 +238,13 @@ Future<void> clearBgStats() {
 
 void setVersionCopySeen(int id) async {
   var prefs = await SharedPreferences.getInstance();
-  await prefs.setInt(SharedPreferenceConstants.COPY, id);
+  await prefs.setInt(SharedPreferenceConstants.copy, id);
 }
 
 Future<int> getVersionCopyInt() async {
   var prefs = await SharedPreferences.getInstance();
 
-  var version = prefs.getInt(SharedPreferenceConstants.COPY);
+  var version = prefs.getInt(SharedPreferenceConstants.copy);
 
   return version ?? -1;
 }

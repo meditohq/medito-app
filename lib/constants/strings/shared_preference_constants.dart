@@ -13,7 +13,7 @@ class SharedPreferenceConstants {
   static const String listened = 'listened';
   static const String stats = 'stats';
   static const String id = 'id';
-  static const String COPY = 'copy';
+  static const String copy = 'copy';
   static const String numSessions = 'numSessions';
   static const String longestStreak = 'longestStreak';
   static const String streakCount = 'streakCount';
