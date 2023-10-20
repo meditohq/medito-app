@@ -39,7 +39,7 @@ class Pack extends _$Pack {
         var audio = AudioCompletedModel(
           audioFileId: audioFileId,
           trackId: trackId,
-          updateStats: true,
+          updateStats: false,
         );
         var event = EventsModel(
           name: EventTypes.audioCompleted,
