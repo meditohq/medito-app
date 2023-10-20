@@ -11,7 +11,7 @@ part 'stats_repository.g.dart';
 
 abstract class StatsRepository {
   Future<StatsModel> fetchStatsFromRemote();
-  Future<Map<String, dynamic>?> fetchStatsFromPreference();
+  Future<TransferStatsModel?> fetchStatsFromPreference();
   Future<void> removeStatsFromPreference();
 }
 
@@ -32,14 +32,16 @@ class StatsRepositoryImpl extends StatsRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> fetchStatsFromPreference() async {
+  Future<TransferStatsModel?> fetchStatsFromPreference() async {
     try {
       var pref = await SharedPreferences.getInstance();
       var keys = pref.getKeys();
       var listenedSessionIds = <int>[];
       keys.forEach((element) {
-        if (element.startsWith('listened')) {
-          listenedSessionIds.add(int.parse(element.replaceAll('listened', '')));
+        if (element.startsWith(SharedPreferenceConstants.listened)) {
+          listenedSessionIds.add(int.parse(
+            element.replaceAll(SharedPreferenceConstants.listened, ''),
+          ));
         }
       });
       if (listenedSessionIds.isNotEmpty) {
@@ -47,16 +49,16 @@ class StatsRepositoryImpl extends StatsRepository {
         String? minutesListened = await getMinutesListened();
         String? numSessions = await getNumTracks();
         String? longestStreak = await getLongestStreak();
-        var data = {
-          'currentStreak': int.parse(currentStreak),
-          'minutesListened': int.parse(minutesListened),
-          'listenedSessionsNum': int.parse(numSessions),
-          'longestStreak': int.parse(longestStreak),
-          'listenedSessionIds': listenedSessionIds,
-        };
-        print(data);
 
-        return data;
+        var statsModel = TransferStatsModel(
+          currentStreak: int.parse(currentStreak),
+          minutesListened: int.parse(minutesListened),
+          listenedSessionsNum: int.parse(numSessions),
+          longestStreak: int.parse(longestStreak),
+          listenedSessionIds: listenedSessionIds,
+        );
+
+        return statsModel;
       }
 
       return null;
@@ -76,17 +78,17 @@ class StatsRepositoryImpl extends StatsRepository {
       var keys = pref.getKeys();
       var listenedSessionIdKeys = [];
       keys.forEach((element) {
-        if (element.startsWith('listened')) {
+        if (element.startsWith(SharedPreferenceConstants.listened)) {
           listenedSessionIdKeys.add(element);
         }
       });
       for (var element in listenedSessionIdKeys) {
         await pref.remove(element);
       }
-      await pref.remove('streakCount');
-      await pref.remove('secsListened');
-      await pref.remove('numSessions');
-      await pref.remove('longestStreak');
+      await pref.remove(SharedPreferenceConstants.streakCount);
+      await pref.remove(SharedPreferenceConstants.secsListened);
+      await pref.remove(SharedPreferenceConstants.numSessions);
+      await pref.remove(SharedPreferenceConstants.longestStreak);
     } catch (err) {
       await Sentry.captureException(
         err,
@@ -96,6 +98,7 @@ class StatsRepositoryImpl extends StatsRepository {
     }
   }
 }
+
 @riverpod
 StatsRepository statsRepository(ref) {
   return StatsRepositoryImpl(client: ref.watch(dioClientProvider));

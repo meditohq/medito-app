@@ -20,13 +20,13 @@ Future<Map<String, dynamic>?> localStats(ref) {
 }
 
 final postLocalStatsProvider = StateNotifierProvider<PostLocalStatsNotifier,
-    AsyncValue<Map<String, dynamic>?>>((ref) {
+    AsyncValue<TransferStatsModel?>>((ref) {
   return PostLocalStatsNotifier(ref);
 });
 
 //ignore: prefer-match-file-name
 class PostLocalStatsNotifier
-    extends StateNotifier<AsyncValue<Map<String, dynamic>?>> {
+    extends StateNotifier<AsyncValue<TransferStatsModel?>> {
   Ref ref;
   PostLocalStatsNotifier(this.ref) : super(const AsyncValue.loading()) {
     postLocalStats();
@@ -37,16 +37,9 @@ class PostLocalStatsNotifier
       final statsProvider = ref.read(statsRepositoryProvider);
       var stats = await statsProvider.fetchStatsFromPreference();
       if (stats != null) {
-        var statsModel = TransferStatsModel(
-          currentStreak: stats['currentStreak'],
-          minutesListened: stats['minutesListened'],
-          listenedSessionsNum: stats['listenedSessionsNum'],
-          longestStreak: stats['longestStreak'],
-          listenedSessionIds: stats['listenedSessionIds'],
-        );
         var event = EventsModel(
           name: EventTypes.transferStats,
-          payload: statsModel.toJson(),
+          payload: stats.toJson(),
         );
         try {
           await ref
