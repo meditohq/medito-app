@@ -144,22 +144,29 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    LoadingButtonWidget(
-                      onPressed: () => context.pop(),
-                      btnText: StringConstants.goBack,
+                    Container(
+                      height: 48,  // Set the height to 48 pixels
+                      child: LoadingButtonWidget(
+                        onPressed: () => context.pop(),
+                        btnText: StringConstants.goBack,
+                      ),
                     ),
                     width8,
-                    LoadingButtonWidget(
-                      onPressed: _otpTextEditingController.text != ''
-                          ? _handleVerify
-                          : null,
-                      btnText: StringConstants.verify,
-                      bgColor: ColorConstants.walterWhite,
-                      textColor: ColorConstants.onyx,
-                      isLoading: isLoading,
+                    Container(
+                      height: 48,  // Set the height to 48 pixels
+                      child: LoadingButtonWidget(
+                        onPressed: _otpTextEditingController.text != ''
+                            ? _handleVerify
+                            : null,
+                        btnText: StringConstants.verify,
+                        bgColor: ColorConstants.walterWhite,
+                        textColor: ColorConstants.onyx,
+                        isLoading: isLoading,
+                      ),
                     ),
                   ],
                 ),
+
                 SizedBox(
                   height: getBottomPadding(context),  // Added SizedBox
                 ),

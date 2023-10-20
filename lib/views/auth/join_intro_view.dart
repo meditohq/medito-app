@@ -105,26 +105,33 @@ class JoinIntroView extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        LoadingButtonWidget(
-          onPressed: () => _handleMaybeLater(ref, context),
-          btnText: StringConstants.maybeLater,
+        Container(
+          height: 48,  // Specify the desired height of the button
+          child: LoadingButtonWidget(
+            onPressed: () => _handleMaybeLater(ref, context),
+            btnText: StringConstants.maybeLater,
+          ),
         ),
         width8,
-        LoadingButtonWidget(
-          onPressed: () {
-            var params = JoinRouteParamsModel(screen: fromScreen);
-            context.push(
-              RouteConstants.joinEmailPath,
-              extra: params,
-            );
-          },
-          btnText: StringConstants.joinNow,
-          bgColor: ColorConstants.walterWhite,
-          textColor: ColorConstants.onyx,
+        Container(
+          height: 48,  // Specify the desired height of the button
+          child: LoadingButtonWidget(
+            onPressed: () {
+              var params = JoinRouteParamsModel(screen: fromScreen);
+              context.push(
+                RouteConstants.joinEmailPath,
+                extra: params,
+              );
+            },
+            btnText: StringConstants.joinNow,
+            bgColor: ColorConstants.walterWhite,
+            textColor: ColorConstants.onyx,
+          ),
         ),
       ],
     );
   }
+
 
   void _handleMaybeLater(WidgetRef ref, BuildContext context) {
     var auth = ref.read(authProvider);

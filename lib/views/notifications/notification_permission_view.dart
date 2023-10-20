@@ -68,6 +68,7 @@ class NotificationPermissionView extends ConsumerWidget {
               children: [
                 SizedBox(
                   width: size.width,
+                  height: 48,
                   child: LoadingButtonWidget(
                     onPressed: () => _allowNotification(context, ref),
                     btnText: StringConstants.allowNotifications,
@@ -79,6 +80,7 @@ class NotificationPermissionView extends ConsumerWidget {
                 height8,
                 SizedBox(
                   width: size.width,
+                  height: 48,
                   child: LoadingButtonWidget(
                     onPressed: () => _handleNotNow(context),
                     btnText: StringConstants.notNow,

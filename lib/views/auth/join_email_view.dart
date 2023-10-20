@@ -112,21 +112,28 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    LoadingButtonWidget(
-                      onPressed: () => context.pop(),
-                      btnText: StringConstants.goBack,
+                    Container(
+                      height: 48,  // Specify the desired height of the button
+                      child: LoadingButtonWidget(
+                        onPressed: () => context.pop(),
+                        btnText: StringConstants.goBack,
+                      ),
                     ),
                     width8,
-                    LoadingButtonWidget(
-                      onPressed:
-                          _emailController.text != '' ? _handleContinue : null,
-                      btnText: StringConstants.continueTxt,
-                      bgColor: ColorConstants.walterWhite,
-                      textColor: ColorConstants.onyx,
-                      isLoading: isLoading,
+                    Container(
+                      height: 48,  // Specify the desired height of the button
+                      child: LoadingButtonWidget(
+                        onPressed:
+                        _emailController.text != '' ? _handleContinue : null,
+                        btnText: StringConstants.continueTxt,
+                        bgColor: ColorConstants.walterWhite,
+                        textColor: ColorConstants.onyx,
+                        isLoading: isLoading,
+                      ),
                     ),
                   ],
                 ),
+
                 SizedBox(
                   height: getBottomPadding(context),
                 ),

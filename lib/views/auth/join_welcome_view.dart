@@ -86,25 +86,29 @@ class JoinWelcomeView extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        LoadingButtonWidget(
-          onPressed: () {
-            var auth = ref.read(authProvider.notifier);
-            auth.setUserEmail(email);
-            if (fromScreen == Screen.splash) {
-              context.go(RouteConstants.homePath);
-            } else if (fromScreen == Screen.track) {
-              context.pop();
-              context.pop();
-              context.pop();
-              context.pop();
-            }
-          },
-          btnText: StringConstants.close,
-          bgColor: ColorConstants.walterWhite,
-          textColor: ColorConstants.onyx,
+        Container(
+          height: 48,  // Set the height to 48 pixels
+          child: LoadingButtonWidget(
+            onPressed: () {
+              var auth = ref.read(authProvider.notifier);
+              auth.setUserEmail(email);
+              if (fromScreen == Screen.splash) {
+                context.go(RouteConstants.homePath);
+              } else if (fromScreen == Screen.track) {
+                context.pop();
+                context.pop();
+                context.pop();
+                context.pop();
+              }
+            },
+            btnText: StringConstants.close,
+            bgColor: ColorConstants.walterWhite,
+            textColor: ColorConstants.onyx,
+          ),
         ),
       ],
     );
+
   }
 }
 
