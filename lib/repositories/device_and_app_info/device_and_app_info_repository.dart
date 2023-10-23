@@ -26,7 +26,8 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
       var packageInfo = await PackageInfo.fromPlatform();
       buildNumber = packageInfo.buildNumber;
       appVersion = packageInfo.version;
-      var languageCode = window.locale.languageCode;
+      var languageCode = PlatformDispatcher.instance.locale.languageCode;
+
       if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
         deviceModel = iosInfo.utsname.machine;
