@@ -24,7 +24,7 @@ class DioApiService {
       );
 
       return response.data;
-    } on DioError catch (err) {
+    } on DioException catch (err) {
       _returnDioErrorResponse(err);
     }
   }
@@ -51,15 +51,15 @@ class DioApiService {
       );
 
       return response.data;
-    } on DioError catch (err) {
+    } on DioException catch (err) {
       _returnDioErrorResponse(err);
     }
   }
 
-  CustomException _returnDioErrorResponse(DioError error) {
+  CustomException _returnDioErrorResponse(DioException error) {
     var data = error.response?.data;
     var message = data?['error'] ?? data?['message'];
-    if (error.type == DioErrorType.receiveTimeout) {
+    if (error.type == DioExceptionType.receiveTimeout) {
       throw FetchDataException(
         error.response?.statusCode,
         'Error connection timeout',
