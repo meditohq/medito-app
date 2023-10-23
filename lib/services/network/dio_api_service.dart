@@ -25,7 +25,7 @@ class DioApiService {
 
       return response.data;
     } on DioException catch (err) {
-      _returnDioExceptionResponse(err);
+      _returnDioErrorResponse(err);
     }
   }
 
@@ -52,11 +52,11 @@ class DioApiService {
 
       return response.data;
     } on DioException catch (err) {
-      _returnDioExceptionResponse(err);
+      _returnDioErrorResponse(err);
     }
   }
 
-  CustomException _returnDioExceptionResponse(DioException error) {
+  CustomException _returnDioErrorResponse(DioException error) {
     var data = error.response?.data;
     var message = data?['error'] ?? data?['message'];
     if (error.type == DioExceptionType.receiveTimeout) {
