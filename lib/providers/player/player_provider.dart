@@ -130,4 +130,32 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       _audioPlayerNotifier.pauseBackgroundSound();
     }
   }
+
+  void handleAudioStartedEvent(
+    String trackId,
+    String audioFileId,
+  ) {
+    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
+    var event = EventsModel(
+      name: EventTypes.audioStarted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
+
+  void handleAudioCompletionEvent(
+    String audioFileId,
+    String trackId,
+  ) {
+    var audio = AudioCompletedModel(
+      audioFileId: audioFileId,
+      trackId: trackId,
+      updateStats: true,
+    );
+    var event = EventsModel(
+      name: EventTypes.audioCompleted,
+      payload: audio.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
+  }
 }

@@ -7,7 +7,7 @@ import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/search/search_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/root_page_view.dart';
+import 'package:Medito/views/root/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/auth/join_email_view.dart';
 import 'package:Medito/views/auth/join_intro_view.dart';
