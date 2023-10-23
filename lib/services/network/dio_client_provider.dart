@@ -40,7 +40,7 @@ final dioClientProvider = Provider<DioApiService>((ref) {
 });
 
 Future<void> _onError(
-  DioError err,
+  DioException err,
   ErrorInterceptorHandler handler,
   Ref _,
 ) async {
@@ -49,7 +49,7 @@ Future<void> _onError(
 }
 
 Future<void> _captureException(
-  DioError err,
+  DioException err,
 ) async {
   await Sentry.captureException(
     {
