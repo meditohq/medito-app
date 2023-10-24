@@ -1,6 +1,9 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/api_response.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -101,5 +104,15 @@ class AuthNotifier extends ChangeNotifier {
 
   Future<UserTokenModel?> getUserFromSharedPref() async {
     return await authRepository.getUserFromSharedPreference();
+  }
+
+  void saveFcmTokenEvent() async {
+    var token = await requestGenerateFirebaseToken();
+    var fcm = SaveFcmTokenModel(fcmToken: token ?? '');
+    var event = EventsModel(
+      name: EventTypes.saveFcmToken,
+      payload: fcm.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()));
   }
 }
