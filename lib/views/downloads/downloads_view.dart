@@ -76,7 +76,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           );
         });
       },
-      children: tracks.map((item) => _getSlidingItem(item, context)).toList(),
+      children: tracks.map((item) => _getSlidingItem(item)).toList(),
     );
   }
 
@@ -84,7 +84,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         message: StringConstants.emptyDownloadsMessage,
       );
 
-  Widget _getSlidingItem(TrackModel item, BuildContext context) {
+  Widget _getSlidingItem(TrackModel item) {
     return InkWell(
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
@@ -95,21 +95,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         key: UniqueKey(),
         direction: DismissDirection.endToStart,
         background: _getDismissibleBackgroundWidget(),
-        onDismissed: (direction) {
-          if (mounted) {
-            ref.watch(audioDownloaderProvider).deleteTrackAudio(
-                  '${item.id}-${item.audio.first.files.first.id}${getAudioFileExtension(item.audio.first.files.first.path)}',
-                );
-            ref.read(deleteTrackFromPreferenceProvider(
-              file: item.audio.first.files.first,
-            ).future);
-          }
-          createSnackBar(
-            '"${item.title}" ${StringConstants.removed.toLowerCase()}',
-            context,
-            color: ColorConstants.walterWhite,
-          );
-        },
+        onDismissed: (direction) => _handleDismissable(direction, item),
         child: _getListItemWidget(item),
       ),
     );
@@ -168,6 +154,23 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   void showSwipeToDeleteTip() {
     createSnackBar(
       StringConstants.swipeToDelete,
+      context,
+      color: ColorConstants.walterWhite,
+    );
+  }
+
+  void _handleDismissable(DismissDirection _, TrackModel item) {
+    if (mounted) {
+      var firstItem = item.audio.first.files.first;
+      ref.watch(audioDownloaderProvider).deleteTrackAudio(
+            '${item.id}-${firstItem.id}${getAudioFileExtension(firstItem.path)}',
+          );
+      ref.read(deleteTrackFromPreferenceProvider(
+        file: firstItem,
+      ).future);
+    }
+    createSnackBar(
+      '"${item.title}" ${StringConstants.removed.toLowerCase()}',
       context,
       color: ColorConstants.walterWhite,
     );
