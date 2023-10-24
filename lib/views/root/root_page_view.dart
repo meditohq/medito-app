@@ -3,6 +3,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/providers/root/root_combine_provider.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/player/widgets/mini_player_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -62,20 +63,19 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         child: PageView(
           controller: ref.read(pageviewNotifierProvider).pageController,
           scrollDirection: Axis.vertical,
-          physics: ClampingScrollPhysics(),
+          // physics: NeverScrollableScrollPhysics(),
           children: [
-            Column(
+            Stack(
+              alignment: Alignment.bottomCenter,
               children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: radius,
-                      bottomRight: radius,
-                    ),
-                    child: _renderChild(
-                      context,
-                      connectivityStatus as ConnectivityStatus,
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: radius,
+                    bottomRight: radius,
+                  ),
+                  child: _renderChild(
+                    context,
+                    connectivityStatus as ConnectivityStatus,
                   ),
                 ),
                 _miniPlayer(radius, currentlyPlayingSession),
@@ -94,27 +94,30 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
 
   Widget _miniPlayer(Radius radius, TrackModel? currentlyPlayingSession) {
     var opacity = ref.watch(pageviewNotifierProvider).scrollProportion;
-
+    var bottom = getBottomPadding(context) + 8;
     if (currentlyPlayingSession != null) {
-      return Column(
-        children: [
-          height8,
-          Consumer(builder: (context, ref, child) {
-            return ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: radius,
-                topRight: radius,
+      return Consumer(
+        builder: (context, ref, child) {
+          return Dismissible(
+            key: UniqueKey(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: bottom,
               ),
-              child: AnimatedOpacity(
-                duration: Duration(milliseconds: 700),
-                opacity: opacity,
-                child: MiniPlayerWidget(
-                  trackModel: currentlyPlayingSession,
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(radius),
+                child: AnimatedOpacity(
+                  duration: Duration(milliseconds: 700),
+                  opacity: opacity,
+                  child: MiniPlayerWidget(
+                    trackModel: currentlyPlayingSession,
+                  ),
                 ),
               ),
-            );
-          }),
-        ],
+            ),
+          );
+        },
       );
     }
 

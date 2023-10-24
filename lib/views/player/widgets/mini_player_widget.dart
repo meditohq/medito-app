@@ -13,16 +13,16 @@ class MiniPlayerWidget extends ConsumerWidget {
   final TrackModel trackModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var bottom = getBottomPadding(context);
+    
 
     return InkWell(
       onTap: () {
         ref.read(pageviewNotifierProvider).gotoNextPage();
       },
       child: Container(
-        height: bottom + 64,
+        height: 64,
         color: ColorConstants.onyx,
-        padding: EdgeInsets.only(bottom: bottom),
+        // padding: EdgeInsets.only(bottom: bottom),
         child: Row(
           children: [
             Expanded(
