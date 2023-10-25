@@ -97,6 +97,7 @@ class _TrackViewState extends ConsumerState<TrackView>
           selectableDescription: true,
           children: [
             _mainContent(context, trackModel),
+            BottomPaddingWidget(),
           ],
         ),
       ),

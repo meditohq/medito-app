@@ -1,4 +1,3 @@
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -13,16 +12,13 @@ class MiniPlayerWidget extends ConsumerWidget {
   final TrackModel trackModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
-
     return InkWell(
       onTap: () {
         ref.read(pageviewNotifierProvider).gotoNextPage();
       },
       child: Container(
-        height: 64,
+        height: miniPlayerHeight,
         color: ColorConstants.onyx,
-        // padding: EdgeInsets.only(bottom: bottom),
         child: Row(
           children: [
             Expanded(

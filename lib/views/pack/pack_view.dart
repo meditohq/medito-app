@@ -70,17 +70,17 @@ class _PackViewState extends ConsumerState<PackView>
         description: pack.description,
         selectableTitle: true,
         selectableDescription: true,
-        children: pack.items
-            .map(
-              (e) => GestureDetector(
-                onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
-                child: _buildListTile(
-                  e,
-                  pack.items.last == e,
-                ),
+        children: [
+          for (var e in pack.items)
+            GestureDetector(
+              onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
+              child: _buildListTile(
+                e,
+                pack.items.last == e,
               ),
-            )
-            .toList(),
+            ),
+          BottomPaddingWidget(),
+        ],
       ),
     );
   }

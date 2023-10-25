@@ -58,25 +58,33 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  Widget _getDownloadList(List<TrackModel> tracks) {
+  Column _getDownloadList(List<TrackModel> tracks) {
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
-    return ReorderableListView(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      onReorder: (int oldIndex, int newIndex) {
-        setState(() {
-          if (oldIndex < newIndex) {
-            newIndex -= 1;
-          }
-          var reorderedItem = tracks.removeAt(oldIndex);
-          tracks.insert(newIndex, reorderedItem);
-          // To ensure, that the new list order is saved
-          ref.read(
-            addTrackListInPreferenceProvider(tracks: tracks),
-          );
-        });
-      },
-      children: tracks.map((item) => _getSlidingItem(item, context)).toList(),
+    return Column(
+      children: [
+        Expanded(
+          child: ReorderableListView(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            onReorder: (int oldIndex, int newIndex) {
+              setState(() {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                var reorderedItem = tracks.removeAt(oldIndex);
+                tracks.insert(newIndex, reorderedItem);
+                // To ensure, that the new list order is saved
+                ref.read(
+                  addTrackListInPreferenceProvider(tracks: tracks),
+                );
+              });
+            },
+            children:
+                tracks.map((item) => _getSlidingItem(item, context)).toList(),
+          ),
+        ),
+        BottomPaddingWidget(),
+      ],
     );
   }
 

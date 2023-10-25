@@ -49,7 +49,6 @@ class _HomeViewState extends ConsumerState<HomeView>
     super.build(context);
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
-    final currentlyPlayingSession = ref.watch(playerProvider);
 
     return Scaffold(
       body: homeRes.when(
@@ -101,11 +100,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                                   height16,
                                   height16,
                                   _cardListWidget(data),
-                                  SizedBox(
-                                    height: currentlyPlayingSession != null
-                                        ? 16
-                                        : 48,
-                                  ),
+                                  BottomPaddingWidget(),
                                 ],
                               ),
                             ],

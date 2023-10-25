@@ -43,6 +43,13 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
   }
 
+  Future<void> removeCurrentlyPlayingTrackInPreference() async {
+    await ref
+        .read(trackRepositoryProvider)
+        .removeCurrentlyPlayingTrackInPreference();
+    state = null;
+  }
+
   Future<void> getCurrentlyPlayingTrack({bool isPlayAudio = true}) async {
     var res = await ref
         .read(trackRepositoryProvider)
