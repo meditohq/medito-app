@@ -14,3 +14,4 @@ export 'snackbar_widget.dart';
 export 'handle_bar_widget.dart';
 export 'long_press_detector_widget.dart';
 export 'shimmers/search_result_shimmer_widget.dart';
+export 'pack_card_widget.dart';

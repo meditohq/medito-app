@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/search_appbar_widget.dart';
+import 'widgets/search_initial_page_widget.dart';
 import 'widgets/search_result_widget.dart';
 
 class SearchView extends StatelessWidget {
@@ -15,6 +16,7 @@ class SearchView extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [
+          SearchInitialPageWidget(),
           Expanded(
             child: SearchResultWidget(),
           ),
