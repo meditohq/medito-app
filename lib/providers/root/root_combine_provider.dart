@@ -43,6 +43,7 @@ void _handleAudioCompletion(
 
     audioProvider.seekValueFromSlider(0);
     audioProvider.pause();
+    audioProvider.setBackgroundSoundVolume(audioProvider.bgVolume);
     ref.invalidate(packProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioPlayPauseStateProvider.notifier).state =

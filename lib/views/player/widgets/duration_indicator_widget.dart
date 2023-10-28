@@ -26,11 +26,12 @@ class _DurationIndicatorWidgetState
   double? _dragSeekbarValue;
   double _maxDuration = 0.0;
   bool _draggingSeekbar = false;
-
   @override
   Widget build(BuildContext context) {
     final audioPositionAndPlayerState =
         ref.watch(audioPositionAndPlayerStateProvider);
+    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
+
     _maxDuration = widget.file.duration.toDouble();
 
     return audioPositionAndPlayerState.when(
@@ -41,6 +42,13 @@ class _DurationIndicatorWidgetState
         );
         if (_dragSeekbarValue != null && !_draggingSeekbar) {
           _dragSeekbarValue = null;
+        }
+        var isEnding = audioPlayerNotifier.audioPositionIsInEndPeriod(
+          data.position,
+          Duration(milliseconds: _maxDuration.round()),
+        );
+        if (isEnding) {
+          audioPlayerNotifier.setBgVolumeFadeAtEnd();
         }
 
         return _durationBar(context, ref, value);
