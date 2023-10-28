@@ -161,13 +161,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   void _handleDismissable(DismissDirection _, TrackModel item) {
     if (mounted) {
-      var firstItem = item.audio.first.files.first;
-      ref.watch(audioDownloaderProvider).deleteTrackAudio(
-            '${item.id}-${firstItem.id}${getAudioFileExtension(firstItem.path)}',
-          );
-      ref.read(deleteTrackFromPreferenceProvider(
-        file: firstItem,
-      ).future);
+      ref.read(removeDownloadedTrackProvider(track: item));
     }
     createSnackBar(
       '"${item.title}" ${StringConstants.removed.toLowerCase()}',
