@@ -17,7 +17,8 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
 
   @override
   void initState() {
-    textEditingController.text = ref.read(searchQueryProvider);
+    textEditingController.text =
+        ref.read(searchQueryProvider.notifier).state.query;
     showCancelIcon = textEditingController.text != '';
     super.initState();
   }
@@ -30,13 +31,14 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
   }
 
   void handleCancelIconVisibility(String val) {
+    ref.read(searchQueryProvider.notifier).state = SearchQueryModel(val);
     if (val.isNotEmpty && !showCancelIcon) {
       setState(() {
         showCancelIcon = true;
       });
     } else if (val.isEmpty && showCancelIcon) {
       setState(() {
-      showCancelIcon = false;
+        showCancelIcon = false;
       });
     }
   }
@@ -67,7 +69,8 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
             child: IconButton(
               splashRadius: 20,
               onPressed: () {
-                ref.read(searchQueryProvider.notifier).state = '';
+                ref.read(searchQueryProvider.notifier).state =
+                    SearchQueryModel('');
                 textEditingController.text = '';
                 openKeyboard();
               },
@@ -92,7 +95,9 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
         ),
         autofocus: true,
         onFieldSubmitted: (val) {
-          ref.read(searchQueryProvider.notifier).state = val;
+          ref.read(searchQueryProvider.notifier).state =
+              SearchQueryModel(val, search: true);
+          ref.invalidate(searchProvider);
         },
         onChanged: (val) => handleCancelIconVisibility(val),
       ),

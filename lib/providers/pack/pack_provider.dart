@@ -6,6 +6,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'pack_provider.g.dart';
 
 @riverpod
+Future<List<PackItemsModel>> fetchAllPacks(ref) {
+  var packRepository = ref.watch(packRepositoryProvider);
+  ref.keepAlive();
+
+  return packRepository.fetchAllPacks();
+}
+
+@riverpod
 //ignore: prefer-match-file-name
 class Pack extends _$Pack {
   @override

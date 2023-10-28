@@ -18,39 +18,36 @@ class PackCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: ColorConstants.onyx,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        padding: EdgeInsets.all(16),
-        child: InkWell(
-          onTap: onTap,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: subTitle != null
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.center,
-                  children: [
-                    _title(textTheme, title: title),
-                    if (subTitle != null) height4,
-                    _description(
-                      textTheme,
-                      description: subTitle,
-                    ),
-                  ],
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorConstants.onyx,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      padding: EdgeInsets.all(16),
+      child: InkWell(
+        onTap: onTap,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: subTitle != null
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
+                children: [
+                  _title(textTheme, title: title),
+                  if (subTitle != null) height4,
+                  _description(
+                    textTheme,
+                    subtitle: subTitle,
+                  ),
+                ],
               ),
-              width12,
-              _getCoverUrl(),
-            ],
-          ),
+            ),
+            width12,
+            _getCoverUrl(),
+          ],
         ),
       ),
     );
@@ -58,9 +55,7 @@ class PackCardWidget extends StatelessWidget {
 
   Text _title(TextTheme textTheme, {required String title}) {
     return Text(
-      title,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
+      '$title',
       style: textTheme.displayLarge?.copyWith(
         fontFamily: ClashDisplay,
         height: 0,
@@ -68,12 +63,10 @@ class PackCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _description(TextTheme textTheme, {String? description}) {
-    if (description != null) {
+  Widget _description(TextTheme textTheme, {String? subtitle}) {
+    if (subtitle != null) {
       return Text(
-        description,
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
+        '$subtitle',
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
           color: ColorConstants.graphite,
@@ -95,6 +88,7 @@ class PackCardWidget extends StatelessWidget {
           width: 80,
           child: NetworkImageWidget(
             url: coverUrlPath ?? '',
+            isCache: true,
           ),
         ),
       );

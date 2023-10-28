@@ -6,12 +6,22 @@ part 'search_provider.g.dart';
 
 @riverpod
 Future<SearchModel> search(ref) async {
-  var query = ref.watch(searchQueryProvider);
   final searchRepository = ref.watch(searchRepositoryProvider);
+  final searchQuery = ref.watch(searchQueryProvider);
 
-  return query != ''
-      ? searchRepository.fetchSearchResult(query)
+  return searchQuery.search
+      ? searchRepository.fetchSearchResult(searchQuery.query)
       : SearchModel();
 }
 
-final searchQueryProvider = StateProvider((ref) => '');
+final searchQueryProvider = StateProvider<SearchQueryModel>(
+  (ref) => SearchQueryModel(''),
+);
+
+//ignore: prefer-match-file-name
+class SearchQueryModel {
+  final String query;
+  final bool search;
+
+  SearchQueryModel(this.query, {this.search = false});
+}
