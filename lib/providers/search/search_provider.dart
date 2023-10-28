@@ -9,7 +9,7 @@ Future<SearchModel> search(ref) async {
   final searchRepository = ref.watch(searchRepositoryProvider);
   final searchQuery = ref.watch(searchQueryProvider);
 
-  return searchQuery.search
+  return searchQuery.hasSearchStarted
       ? searchRepository.fetchSearchResult(searchQuery.query)
       : SearchModel();
 }
