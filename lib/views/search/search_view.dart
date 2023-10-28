@@ -20,14 +20,11 @@ class SearchView extends ConsumerWidget {
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [
-          if (searchQuery.query.isEmpty)
-            Expanded(
-              child: SearchInitialPageWidget(),
-            ),
-          if (searchQuery.query.isNotEmpty)
-            Expanded(
-              child: SearchResultWidget(),
-            ),
+          Expanded(
+            child: searchQuery.query.isEmpty
+                ? SearchInitialPageWidget()
+                : SearchResultWidget(),
+          ),
         ],
       ),
     );

@@ -8,7 +8,11 @@ class SearchInitialPageShimmerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(top: 20, left: 15, right: 15),
+      padding: EdgeInsets.only(
+        top: 20,
+        left: defaultPadding,
+        right: defaultPadding,
+      ),
       child: Column(
         children: List.generate(8, (index) => _shimmerList()),
       ),
@@ -21,8 +25,8 @@ class SearchInitialPageShimmerWidget extends StatelessWidget {
         color: ColorConstants.onyx,
         borderRadius: BorderRadius.circular(14),
       ),
-      padding: EdgeInsets.all(16),
-      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(defaultPadding),
+      margin: EdgeInsets.only(bottom: defaultPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +37,7 @@ class SearchInitialPageShimmerWidget extends StatelessWidget {
               children: [
                 height8,
                 BoxShimmerWidget(
-                  height: 15,
+                  height: 16,
                   width: 150,
                 ),
                 height8,

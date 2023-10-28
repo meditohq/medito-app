@@ -1,3 +1,4 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
@@ -31,7 +32,7 @@ class SearchInitialPageWidget extends ConsumerWidget {
       child: ListView.builder(
         itemCount: packs.length,
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(defaultPadding),
         itemBuilder: (context, index) {
           var element = packs[index];
 

@@ -21,7 +21,7 @@ final searchQueryProvider = StateProvider<SearchQueryModel>(
 //ignore: prefer-match-file-name
 class SearchQueryModel {
   final String query;
-  final bool search;
+  final bool hasSearchStarted;
 
-  SearchQueryModel(this.query, {this.search = false});
+  SearchQueryModel(this.query, {this.hasSearchStarted = false});
 }

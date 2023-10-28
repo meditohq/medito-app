@@ -61,7 +61,7 @@ class SearchResultWidget extends ConsumerWidget {
         isLoading: searchResult.isLoading,
       ),
       loading: () {
-        if (searchQuery.search) {
+        if (searchQuery.hasSearchStarted) {
           return const SearchResultShimmerWidget();
         }
 

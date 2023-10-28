@@ -96,7 +96,7 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
         autofocus: true,
         onFieldSubmitted: (val) {
           ref.read(searchQueryProvider.notifier).state =
-              SearchQueryModel(val, search: true);
+              SearchQueryModel(val, hasSearchStarted: true);
           ref.invalidate(searchProvider);
         },
         onChanged: (val) => handleCancelIconVisibility(val),
