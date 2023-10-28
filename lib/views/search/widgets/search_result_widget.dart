@@ -13,6 +13,7 @@ class SearchResultWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var searchResult = ref.watch(searchProvider);
+    var searchQuery = ref.watch(searchQueryProvider);
     final currentlyPlayingSession = ref.watch(playerProvider);
     var listViewPadding = EdgeInsets.only(
       top: 20,
@@ -59,7 +60,13 @@ class SearchResultWidget extends ConsumerWidget {
         onTap: () => ref.refresh(searchProvider),
         isLoading: searchResult.isLoading,
       ),
-      loading: () => const SearchResultShimmerWidget(),
+      loading: () {
+        if (searchQuery.hasSearchStarted) {
+          return const SearchResultShimmerWidget();
+        }
+
+        return SizedBox();
+      },
     );
   }
 

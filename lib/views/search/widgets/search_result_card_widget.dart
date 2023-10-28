@@ -31,9 +31,7 @@ class SearchResultCardWidget extends StatelessWidget {
                 url: coverUrlPath,
               ),
             ),
-            SizedBox(
-              width: 12,
-            ),
+            width12,
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

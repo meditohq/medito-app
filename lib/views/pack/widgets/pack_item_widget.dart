@@ -45,7 +45,7 @@ class PackItemWidget extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        item.subtitle,
+                        item.subtitle ?? '',
                         style: bodyLarge?.copyWith(
                           fontFamily: DmMono,
                           color: ColorConstants.graphite,
@@ -67,8 +67,9 @@ class PackItemWidget extends StatelessWidget {
       return SvgPicture.asset(AssetConstants.icLink);
     } else if (type == TypeConstants.TRACK && isCompletedTrack == true) {
       return Icon(
-          color: ColorConstants.graphite,
-          Icons.check,);
+        color: ColorConstants.graphite,
+        Icons.check,
+      );
     }
 
     return SizedBox();

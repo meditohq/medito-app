@@ -23,7 +23,8 @@ abstract class PackItemsModel with _$PackItemsModel {
     required String type,
     required String id,
     required String title,
-    required String subtitle,
+    String? subtitle,
+    String? coverUrl,
     required String path,
     bool? isCompleted,
   }) = _PackItemsModel;
