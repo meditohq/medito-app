@@ -22,7 +22,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   TrackFilesModel? currentlyPlayingTrack;
   final hasBgSound = 'hasBgSound';
   final trackAudioPlayer = AudioPlayer();
-  final fade_duration = 5;
+  final fadeDuration = 5;
   var bgVolume;
   late String _contentToken;
 
@@ -187,7 +187,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     bool setToPreviousVolume = false,
   }) {
     var isEnding = maxDuration.inSeconds > 0 &&
-        position.inSeconds > maxDuration.inSeconds - fade_duration;
+        position.inSeconds > maxDuration.inSeconds - fadeDuration;
     if (isEnding) {
       setBgVolumeFadeAtEnd();
     }
