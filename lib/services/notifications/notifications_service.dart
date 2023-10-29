@@ -99,11 +99,15 @@ void onMessageAppOpened(WidgetRef ref) {
 
 void _navigate(WidgetRef ref, NotificationPayloadModel data) {
   var context = ref.read(goRouterProvider);
-  handleNavigation(
-    goRouterContext: context,
-    data.type,
-    [data.id.toString().getIdFromPath(), data.path],
-  );
+  if (data.type.isNotNullAndNotEmpty()) {
+    handleNavigation(
+      goRouterContext: context,
+      data.type,
+      [data.id.toString().getIdFromPath(), data.path],
+    );
+  } else {
+    context.go(RouteConstants.homePath);
+  }
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
