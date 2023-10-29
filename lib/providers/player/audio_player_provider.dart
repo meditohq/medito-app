@@ -107,7 +107,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     TrackModel trackModel,
     TrackFilesModel file, {
     String? filePath,
-  }) {
+  }) async {
     try {
       if (filePath != null) {
         unawaited(trackAudioPlayer.setFilePath(filePath));
@@ -118,15 +118,14 @@ class AudioPlayerNotifier extends BaseAudioHandler
             LockCachingAudioSource(Uri.parse(file.path), headers: {
           HttpHeaders.authorizationHeader: _contentToken,
         });
-        unawaited(
-          trackAudioPlayer.setAudioSource(audioSource),
-        );
+        await trackAudioPlayer.setAudioSource(await audioSource.resolve());
+        ;
       }
     } catch (e) {
-      Sentry.captureException(
+      unawaited(Sentry.captureException(
         e,
         stackTrace: e,
-      );
+      ));
     }
   }
 
