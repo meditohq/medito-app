@@ -48,7 +48,6 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
 
     return AppBar(
       backgroundColor: ColorConstants.onyx,
-      elevation: 0.0,
       titleSpacing: 0,
       leading: IconButton(
         splashRadius: 20,
