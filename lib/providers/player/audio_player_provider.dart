@@ -183,10 +183,21 @@ class AudioPlayerNotifier extends BaseAudioHandler
 
   bool audioPositionIsInEndPeriod(
     Duration position,
-    Duration maxDuration,
-  ) {
-    return maxDuration.inSeconds > 0 &&
+    Duration maxDuration, {
+    bool setToPreviousVolume = false,
+  }) {
+    var isEnding = maxDuration.inSeconds > 0 &&
         position.inSeconds > maxDuration.inSeconds - fade_duration;
+    if (isEnding) {
+      setBgVolumeFadeAtEnd();
+    }
+    if (setToPreviousVolume) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        setBackgroundSoundVolume(bgVolume);
+      });
+    }
+
+    return isEnding;
   }
 
   void setBgVolumeFadeAtEnd() {

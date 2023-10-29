@@ -30,9 +30,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   InkWell _rewindButton(WidgetRef ref) {
     return InkWell(
-      onTap: () => ref.read(
-        skipAudioProvider(skip: SKIP_AUDIO.SKIP_BACKWARD_10),
-      ),
+      onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
       child: Icon(
         Icons.replay_10,
         size: 40,
@@ -42,9 +40,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   InkWell _forwardButton(WidgetRef ref) {
     return InkWell(
-      onTap: () => ref.read(
-        skipAudioProvider(skip: SKIP_AUDIO.SKIP_FORWARD_30),
-      ),
+      onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_30),
       child: Icon(
         Icons.forward_30,
         size: 40,
@@ -54,5 +50,20 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   Widget _playPauseButton() {
     return PlayPauseButtonWidget();
+  }
+
+  void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
+    var audioProvider = ref.read(audioPlayerNotifierProvider);
+    final audioPositionAndPlayerState =
+        ref.read(audioPositionAndPlayerStateProvider);
+    var maxDuration = audioProvider.mediaItem.value?.duration ?? Duration();
+    ref.read(
+      skipAudioProvider(skip: skip),
+    );
+    audioProvider.audioPositionIsInEndPeriod(
+      audioPositionAndPlayerState.value?.position ?? Duration(),
+      maxDuration,
+      setToPreviousVolume: true,
+    );
   }
 }
