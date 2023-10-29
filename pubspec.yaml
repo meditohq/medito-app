@@ -29,7 +29,7 @@ dependencies:
   auto_size_text: ^3.0.0-nullsafety.0
   just_audio:
     git: 
-      url: https://github.com/Colton127/just_audio.git
+      url: https://github.com/meditohq/just_audio.git
       ref: minor
       path: just_audio  
   audio_service: ^0.18.10
