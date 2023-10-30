@@ -6,7 +6,7 @@ part 'notification_payload_model.g.dart';
 abstract class NotificationPayloadModel with _$NotificationPayloadModel {
   const factory NotificationPayloadModel({
     required String id,
-    required String type,
+    required String? type,
     String? path,
     required String action,
   }) = _NotificationPayloadModel;
