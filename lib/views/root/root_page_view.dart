@@ -75,7 +75,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                 StickyMiniPlayerWidget(),
               ],
             ),
-            // BigPlayerWidget(),
           ],
         ),
       ),
