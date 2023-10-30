@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class TrackButtonsWidget extends StatelessWidget {
   final TrackModel trackModel;
@@ -73,7 +76,7 @@ class TrackButtonsWidget extends StatelessWidget {
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
-        onTap: () => _handleTap(ref, file),
+        onTap: () => _handleTap(context, ref, file),
         borderRadius: BorderRadius.circular(14),
         child: Ink(
           height: 56,
@@ -98,6 +101,7 @@ class TrackButtonsWidget extends StatelessWidget {
   }
 
   void _handleTap(
+    BuildContext context,
     WidgetRef ref,
     TrackFilesModel file,
   ) async {
@@ -109,6 +113,6 @@ class TrackButtonsWidget extends StatelessWidget {
           trackModel: trackModel,
           file: file,
         );
-    ref.read(pageviewNotifierProvider).gotoNextPage();
+    unawaited(context.push(RouteConstants.playerPath, extra: trackModel));
   }
 }

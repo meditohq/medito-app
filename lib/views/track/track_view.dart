@@ -106,9 +106,6 @@ class _TrackViewState extends ConsumerState<TrackView>
             MeditoAppBarLarge(
               coverUrl: trackModel.coverUrl,
               title: trackModel.title,
-              // description: trackModel.description,
-              // selectableTitle: true,
-              // selectableDescription: true,
               scrollController: _scrollController,
             ),
             SliverList(

@@ -16,6 +16,7 @@ abstract class TrackRepository {
   Future<void> addCurrentlyPlayingTrackInPreference(
     TrackModel trackModel,
   );
+  Future<void> removeCurrentlyPlayingTrackInPreference();
   Future<TrackModel?> fetchCurrentlyPlayingTrackFromPreference();
 }
 
@@ -68,6 +69,13 @@ class TrackRepositoryImpl extends TrackRepository {
     await ref.read(sharedPreferencesProvider).setString(
           SharedPreferenceConstants.currentPlayingTrack,
           json.encode(track),
+        );
+  }
+
+  @override
+  Future<void> removeCurrentlyPlayingTrackInPreference() async {
+    await ref.read(sharedPreferencesProvider).remove(
+          SharedPreferenceConstants.currentPlayingTrack,
         );
   }
 

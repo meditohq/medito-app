@@ -58,7 +58,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  Widget _getDownloadList(List<TrackModel> tracks) {
+  ReorderableListView _getDownloadList(List<TrackModel> tracks) {
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
     return ReorderableListView(
@@ -148,7 +148,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,
         );
-    ref.read(pageviewNotifierProvider).gotoNextPage();
+    context.push(RouteConstants.playerPath, extra: trackModel);
   }
 
   void showSwipeToDeleteTip() {

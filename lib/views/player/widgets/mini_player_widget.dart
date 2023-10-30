@@ -1,10 +1,10 @@
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'artist_title_widget.dart';
 import 'player_buttons/play_pause_button_widget.dart';
 
@@ -13,16 +13,14 @@ class MiniPlayerWidget extends ConsumerWidget {
   final TrackModel trackModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var bottom = getBottomPadding(context);
-
     return InkWell(
       onTap: () {
-        ref.read(pageviewNotifierProvider).gotoNextPage();
+        final currentlyPlayingSession = ref.read(playerProvider);
+        context.push(RouteConstants.playerPath, extra: currentlyPlayingSession);
       },
       child: Container(
-        height: bottom + 64,
+        height: miniPlayerHeight,
         color: ColorConstants.onyx,
-        padding: EdgeInsets.only(bottom: bottom),
         child: Row(
           children: [
             Expanded(

@@ -1,14 +1,13 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/providers/root/root_combine_provider.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
-import 'package:Medito/views/player/player_view.dart';
-import 'package:Medito/views/player/widgets/mini_player_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import 'widgets/sticky_mini_player_widget.dart';
 
 class RootPageView extends ConsumerStatefulWidget {
   final Widget firstChild;
@@ -31,19 +30,21 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   Widget build(BuildContext context) {
     var connectivityStatus = ref.watch(connectivityStatusProvider);
-    final currentlyPlayingSession = ref.watch(playerProvider);
-    var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
-    ref.listen(playerProvider, (prev, next) {
-      var prevId = prev?.audio.first.files.first.id;
-      var nextId = next?.audio.first.files.first.id;
-      if (next != null &&
-          (prev?.id != next.id || (prev?.id == next.id && prevId != nextId))) {
-        ref.read(playerProvider.notifier).handleAudioStartedEvent(
-              next.id,
-              next.audio.first.files.first.id,
-            );
-      }
-    });
+    ref.listen(
+      playerProvider,
+      (prev, next) {
+        var prevId = prev?.audio.first.files.first.id;
+        var nextId = next?.audio.first.files.first.id;
+        if (next != null &&
+            (prev?.id != next.id ||
+                (prev?.id == next.id && prevId != nextId))) {
+          ref.read(playerProvider.notifier).handleAudioStartedEvent(
+                next.id,
+                next.audio.first.files.first.id,
+              );
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: ColorConstants.black,
@@ -64,61 +65,20 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
           scrollDirection: Axis.vertical,
           physics: ClampingScrollPhysics(),
           children: [
-            Column(
+            Stack(
+              alignment: Alignment.bottomCenter,
               children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: radius,
-                      bottomRight: radius,
-                    ),
-                    child: _renderChild(
-                      context,
-                      connectivityStatus as ConnectivityStatus,
-                    ),
-                  ),
+                _renderChild(
+                  context,
+                  connectivityStatus as ConnectivityStatus,
                 ),
-                _miniPlayer(radius, currentlyPlayingSession),
+                StickyMiniPlayerWidget(),
               ],
             ),
-            if (currentlyPlayingSession != null)
-              PlayerView(
-                trackModel: currentlyPlayingSession,
-                file: currentlyPlayingSession.audio.first.files.first,
-              ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _miniPlayer(Radius radius, TrackModel? currentlyPlayingSession) {
-    var opacity = ref.watch(pageviewNotifierProvider).scrollProportion;
-
-    if (currentlyPlayingSession != null) {
-      return Column(
-        children: [
-          height8,
-          Consumer(builder: (context, ref, child) {
-            return ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: radius,
-                topRight: radius,
-              ),
-              child: AnimatedOpacity(
-                duration: Duration(milliseconds: 700),
-                opacity: opacity,
-                child: MiniPlayerWidget(
-                  trackModel: currentlyPlayingSession,
-                ),
-              ),
-            );
-          }),
-        ],
-      );
-    }
-
-    return SizedBox();
   }
 
   Widget _renderChild(BuildContext context, ConnectivityStatus status) {

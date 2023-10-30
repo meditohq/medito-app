@@ -174,6 +174,14 @@ double getBottomPadding(BuildContext context) {
   return bottom;
 }
 
+double getBottomPaddingWithStickyMiniPlayer(BuildContext context) {
+  var navbarPadding = getBottomPadding(context);
+  var bottomPadding = 8;
+  var totalPadding = navbarPadding + miniPlayerHeight + bottomPadding;
+
+  return totalPadding;
+}
+
 int formatIcon(String icon) {
   return int.parse('0x$icon');
 }
