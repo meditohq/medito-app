@@ -12,6 +12,7 @@ class CardWidget extends ConsumerWidget {
     required this.coverUrlPath,
     this.onTap,
   });
+
   final String? tag;
   final String title;
   final String coverUrlPath;
@@ -19,68 +20,82 @@ class CardWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var textTheme = Theme.of(context).textTheme;
-
     return AnimatedScaleWidget(
-      child: Stack(
-        children: [
-          SizedBox(
-            width: 156,
-            height: 156,
-            child: Container(
-              foregroundDecoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ColorConstants.black.withOpacity(0),
-                    ColorConstants.black.withOpacity(0.5),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: NetworkImageWidget(
-                url: coverUrlPath,
-                isCache: true,
-              ),
-            ),
-          ),
-          InkWell(
-            onTap: onTap,
-            child: Container(
-              width: 154,
-              height: 154,
-              color: ColorConstants.transparent,
-              child: _tagAndTitle(textTheme, tag: tag, title: title),
-            ),
-          ),
-        
-      ],),
+      child: _buildCard(context),
     );
   }
 
-  Column _tagAndTitle(
-    TextTheme textTheme, {
-    String? tag,
-    required String title,
-  }) {
+  Widget _buildCard(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3.5),
+      child: Stack(
+        children: [
+          _buildImage(),
+          _buildGestureDetector(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    return SizedBox(
+      width: 154,
+      height: 154,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3.5),
+        child: Container(
+          foregroundDecoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                ColorConstants.black.withOpacity(0),
+                ColorConstants.black.withOpacity(0.5),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: NetworkImageWidget(
+            url: coverUrlPath,
+            isCache: true,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGestureDetector(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 154,
+        height: 154,
+        color: ColorConstants.transparent,
+        child: _tagAndTitle(context),
+      ),
+    );
+  }
+
+  Widget _tagAndTitle(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        if (tag != null) _tag(textTheme, tag: tag) else SizedBox(),
-        _title(textTheme, title: title),
+        if (tag != null) _tag(context) else const SizedBox(),
+        _title(context),
       ],
     );
   }
 
-  Padding _tag(TextTheme textTheme, {String? tag}) {
+  Widget _tag(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.all(12),
       child: Container(
         color: ColorConstants.onyx,
-        padding: EdgeInsets.symmetric(horizontal: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
         child: Text(
-          tag ?? '',
+          tag!,
           style: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w500,
             color: ColorConstants.walterWhite,
@@ -92,10 +107,11 @@ class CardWidget extends ConsumerWidget {
     );
   }
 
-  Padding _title(TextTheme textTheme, {required String title}) {
+  Widget _title(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child:Text(
+      padding: const EdgeInsets.all(12),
+      child: Text(
         title,
         maxLines: 4,
         softWrap: true,

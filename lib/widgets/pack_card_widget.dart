@@ -59,6 +59,7 @@ class PackCardWidget extends StatelessWidget {
       style: textTheme.displayLarge?.copyWith(
         fontFamily: ClashDisplay,
         height: 0,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
@@ -71,7 +72,7 @@ class PackCardWidget extends StatelessWidget {
           letterSpacing: 0,
           color: ColorConstants.graphite,
           fontSize: 14,
-          height: 1.28,
+          height: 1.4,
         ),
       );
     }

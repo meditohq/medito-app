@@ -6,6 +6,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../widgets/pack_card_widget.dart';
+
 class SearchInitialPageWidget extends ConsumerWidget {
   const SearchInitialPageWidget({
     super.key,
@@ -37,7 +39,7 @@ class SearchInitialPageWidget extends ConsumerWidget {
           var element = packs[index];
 
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: 16),
             child: PackCardWidget(
               title: element.title,
               subTitle: element.subtitle,

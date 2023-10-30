@@ -14,6 +14,9 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/headers/description_widget.dart';
+import 'package:Medito/widgets/headers/medito_app_bar_large.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -27,16 +30,24 @@ class TrackView extends ConsumerStatefulWidget {
   final String id;
 
   TrackView({Key? key, required this.id}) : super(key: key);
+
   @override
   ConsumerState<TrackView> createState() => _TrackViewState();
 }
 
 class _TrackViewState extends ConsumerState<TrackView>
     with AutomaticKeepAliveClientMixin<TrackView> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     _handleTrackEvent(ref, widget.id);
+    _scrollController.addListener(_scrollListener);
     super.initState();
+  }
+
+  void _scrollListener() {
+    setState(() {});
   }
 
   void _handleTrackEvent(WidgetRef ref, String trackId) {
@@ -89,14 +100,29 @@ class _TrackViewState extends ConsumerState<TrackView>
       onRefresh: () async =>
           await ref.refresh(tracksProvider(trackId: widget.id)),
       child: Scaffold(
-        body: CollapsibleHeaderWidget(
-          bgImage: trackModel.coverUrl,
-          title: trackModel.title,
-          description: trackModel.description,
-          selectableTitle: true,
-          selectableDescription: true,
-          children: [
-            _mainContent(context, trackModel),
+        body: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            MeditoAppBarLarge(
+              coverUrl: trackModel.coverUrl,
+              title: trackModel.title,
+              // description: trackModel.description,
+              // selectableTitle: true,
+              // selectableDescription: true,
+              scrollController: _scrollController,
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  if (trackModel.description.isNotNullAndNotEmpty())
+                    DescriptionWidget(description: trackModel.description),
+                  _mainContent(
+                    context,
+                    trackModel,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

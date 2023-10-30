@@ -48,6 +48,12 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         onLongPress: () {
           showModalBottomSheet<void>(
             context: context,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.0),
+                topRight: Radius.circular(14.0),
+              ),
+            ),
             useRootNavigator: true,
             backgroundColor: ColorConstants.onyx,
             builder: (BuildContext context) {
@@ -86,6 +92,12 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         onPressed: () {
           showModalBottomSheet<void>(
             context: context,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.0),
+                topRight: Radius.circular(14.0),
+              ),
+            ),
             useRootNavigator: true,
             backgroundColor: ColorConstants.onyx,
             builder: (BuildContext context) {
@@ -135,6 +147,12 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         ref.read(remoteStatsProvider);
         showModalBottomSheet<void>(
           context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(14.0),
+              topRight: Radius.circular(14.0),
+            ),
+          ),
           isScrollControlled: true,
           useRootNavigator: true,
           backgroundColor: ColorConstants.onyx,

@@ -13,51 +13,56 @@ class PackItemWidget extends StatelessWidget {
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
     var hasSubtitle = item.subtitle.isNotNullAndNotEmpty();
 
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(width: 2, color: ColorConstants.charcoal),
-              ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (item.title.isNotNullAndNotEmpty())
-                  Text(
-                    item.title,
-                    style: bodyLarge?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: DmSans,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          border: isLast
+              ? null
+              : Border(
+                  bottom: BorderSide(width: 2, color: ColorConstants.charcoal),
+                ),
+        ),
+        padding: EdgeInsets.only(top: hasSubtitle ? 24 : 20, bottom:20),
+
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (item.title.isNotNullAndNotEmpty())
+                    Text(
+                      item.title,
+                      style: bodyLarge?.copyWith(
+                        color: ColorConstants.walterWhite,
+                        fontFamily: DmSans,
+                        fontSize: 16
+                      ),
                     ),
-                  ),
-                if (hasSubtitle)
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        item.subtitle ?? '',
-                        style: bodyLarge?.copyWith(
-                          fontFamily: DmMono,
-                          color: ColorConstants.graphite,
+                  if (hasSubtitle)
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          item.subtitle ?? '',
+                          style: bodyLarge?.copyWith(
+                            fontFamily: DmMono,
+                            color: ColorConstants.graphite,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          ),
-          _getIcon(item.type, isCompletedTrack: item.isCompleted),
-        ],
+            _getIcon(item.type, isCompletedTrack: item.isCompleted),
+          ],
+        ),
       ),
     );
   }
