@@ -61,30 +61,22 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   Column _getDownloadList(List<TrackModel> tracks) {
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
-    return Column(
-      children: [
-        Expanded(
-          child: ReorderableListView(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            onReorder: (int oldIndex, int newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                var reorderedItem = tracks.removeAt(oldIndex);
-                tracks.insert(newIndex, reorderedItem);
-                // To ensure, that the new list order is saved
-                ref.read(
-                  addTrackListInPreferenceProvider(tracks: tracks),
-                );
-              });
-            },
-            children:
-                tracks.map((item) => _getSlidingItem(item, context)).toList(),
-          ),
-        ),
-        BottomPaddingWidget(),
-      ],
+    return ReorderableListView(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      onReorder: (int oldIndex, int newIndex) {
+        setState(() {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          var reorderedItem = tracks.removeAt(oldIndex);
+          tracks.insert(newIndex, reorderedItem);
+          // To ensure, that the new list order is saved
+          ref.read(
+            addTrackListInPreferenceProvider(tracks: tracks),
+          );
+        });
+      },
+      children: tracks.map((item) => _getSlidingItem(item)).toList(),
     );
   }
 
@@ -92,7 +84,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         message: StringConstants.emptyDownloadsMessage,
       );
 
-  Widget _getSlidingItem(TrackModel item, BuildContext context) {
+  Widget _getSlidingItem(TrackModel item) {
     return InkWell(
       // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
       key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
@@ -103,21 +95,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         key: UniqueKey(),
         direction: DismissDirection.endToStart,
         background: _getDismissibleBackgroundWidget(),
-        onDismissed: (direction) {
-          if (mounted) {
-            ref.watch(audioDownloaderProvider).deleteTrackAudio(
-                  '${item.id}-${item.audio.first.files.first.id}${getAudioFileExtension(item.audio.first.files.first.path)}',
-                );
-            ref.read(deleteTrackFromPreferenceProvider(
-              file: item.audio.first.files.first,
-            ).future);
-          }
-          createSnackBar(
-            '"${item.title}" ${StringConstants.removed.toLowerCase()}',
-            context,
-            color: ColorConstants.walterWhite,
-          );
-        },
+        onDismissed: (direction) => _handleDismissable(direction, item),
         child: _getListItemWidget(item),
       ),
     );
@@ -176,6 +154,17 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   void showSwipeToDeleteTip() {
     createSnackBar(
       StringConstants.swipeToDelete,
+      context,
+      color: ColorConstants.walterWhite,
+    );
+  }
+
+  void _handleDismissable(DismissDirection _, TrackModel item) {
+    if (mounted) {
+      ref.read(removeDownloadedTrackProvider(track: item));
+    }
+    createSnackBar(
+      '"${item.title}" ${StringConstants.removed.toLowerCase()}',
       context,
       color: ColorConstants.walterWhite,
     );

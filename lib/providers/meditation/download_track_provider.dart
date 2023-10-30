@@ -1,13 +1,27 @@
 import 'dart:async';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'track_provider.dart';
 part 'download_track_provider.g.dart';
 
 @riverpod
 Future<List<TrackModel>> downloadedTracks(ref) {
   return ref.watch(trackRepositoryProvider).fetchTrackFromPreference();
+}
+
+@riverpod
+Future<void> removeDownloadedTrack(ref, {required TrackModel track}) async {
+  var firstItem = track.audio.first.files.first;
+  await ref.watch(audioDownloaderProvider).deleteTrackAudio(
+        '${track.id}-${firstItem.id}${getAudioFileExtension(firstItem.path)}',
+      );
+
+  await ref.read(deleteTrackFromPreferenceProvider(
+    file: firstItem,
+  ).future);
 }
 
 @riverpod

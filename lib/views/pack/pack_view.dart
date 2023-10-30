@@ -1,7 +1,8 @@
 import 'dart:async';
-
+import 'dart:math';
 import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
+import 'package:Medito/widgets/headers/medito_app_bar_large.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -11,6 +12,8 @@ import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../widgets/headers/description_widget.dart';
 
 class PackView extends ConsumerStatefulWidget {
   const PackView({Key? key, required this.id}) : super(key: key);
@@ -23,9 +26,12 @@ class PackView extends ConsumerStatefulWidget {
 
 class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     _handleTrackEvent(ref, widget.id);
+    _scrollController.addListener(_scrollListener);
     super.initState();
   }
 
@@ -58,31 +64,50 @@ class _PackViewState extends ConsumerState<PackView>
     );
   }
 
+  void _scrollListener() {
+    setState(() {});
+  }
+
   RefreshIndicator _buildScaffoldWithData(
     PackModel pack,
     WidgetRef ref,
   ) {
+
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
-      child: CollapsibleHeaderWidget(
-        bgImage: pack.coverUrl,
-        title: '${pack.title}',
-        description: pack.description,
-        selectableTitle: true,
-        selectableDescription: true,
-        children: [
-          for (var e in pack.items)
-            GestureDetector(
-              onTap: () => _onListItemTap(e.id, e.type, e.path, ref.context),
-              child: _buildListTile(
-                e,
-                pack.items.last == e,
-              ),
-            ),
-          BottomPaddingWidget(),
-        ],
-      ),
+      child: CustomScrollView(controller: _scrollController, slivers: [
+        MeditoAppBarLarge(
+          scrollController: _scrollController,
+          title: pack.title,
+          coverUrl: pack.coverUrl,
+        ),
+        SliverList(
+          delegate: SliverChildListDelegate(
+            [DescriptionWidget(description: pack.description)].cast<Widget>() +
+                _listItems(pack, ref),
+          ),
+        ),
+      ]),
     );
+  }
+
+  List<Widget> _listItems(PackModel pack, WidgetRef ref) {
+    return pack.items
+        .map(
+          (packItem) => GestureDetector(
+            onTap: () => _onListItemTap(
+              packItem.id,
+              packItem.type,
+              packItem.path,
+              ref.context,
+            ),
+            child: _buildListTile(
+              packItem,
+              pack.items.last == packItem,
+            ),
+          ),
+        )
+        .toList();
   }
 
   Widget _buildListTile(

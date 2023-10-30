@@ -73,7 +73,8 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                   isTrailingIcon: false,
                   titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontSize: 18,
-                        letterSpacing: 0,
+                        letterSpacing: 1,
+                        wordSpacing: 1.5,
                         fontFamily: ClashDisplay,
                       ),
                 );
