@@ -122,9 +122,6 @@ final router = GoRouter(
         _getSearchRoute(fromRoot: true),
         GoRoute(
           path: RouteConstants.collectionPath,
-          routes: [
-            _getPlayerRoute(),
-          ],
           pageBuilder: (context, state) => getCollectionMaterialPage(state),
         ),
         GoRoute(
@@ -155,6 +152,7 @@ final router = GoRouter(
     ),
     _getBackgroundSoundRoute(),
     _getNotificationPermissionRoute(),
+    _getPlayerRoute(),
   ],
 );
 
@@ -164,7 +162,6 @@ GoRoute _getTrackRoute({bool fromRoot = false}) {
         ? RouteConstants.trackPath
         : RouteConstants.trackPath.sanitisePath(),
     routes: [
-      _getPlayerRoute(),
       _getWebviewRoute(),
     ],
     pageBuilder: (context, state) => getTrackOptionsMaterialPage(state),
@@ -173,11 +170,33 @@ GoRoute _getTrackRoute({bool fromRoot = false}) {
 
 GoRoute _getPlayerRoute() {
   return GoRoute(
-    path: RouteConstants.playerPath.sanitisePath(),
+    parentNavigatorKey: _rootNavigatorKey,
+    path: RouteConstants.playerPath,
     pageBuilder: (context, state) {
-      return getPlayerMaterialPage(state);
+      var track = state.extra as TrackModel;
+      
+      return CustomTransitionPage<void>(
+        key: state.pageKey,
+        opaque: false,
+        child: PlayerView(
+          trackModel: track,
+          file: track.audio.first.files.first,
+        ),
+        transitionDuration: Duration(milliseconds: 500),
+        reverseTransitionDuration: Duration(milliseconds: 500),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          final tween = Tween(begin: begin, end: end);
+          final offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+      );
     },
-    routes: [_getWebviewRoute()],
   );
 }
 
@@ -293,18 +312,6 @@ MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
 //Can be altered to open other pages in the app other than Downloads (eg Faves)
 MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
   return MaterialPage(key: state.pageKey, child: DownloadsView());
-}
-
-MaterialPage<void> getPlayerMaterialPage(GoRouterState state) {
-  var track = state.extra as Map;
-
-  return MaterialPage(
-    key: state.pageKey,
-    child: PlayerView(
-      trackModel: track['trackModel'],
-      file: track['file'],
-    ),
-  );
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {

@@ -44,6 +44,7 @@ void _handleAudioCompletion(
     audioProvider.seekValueFromSlider(0);
     audioProvider.pause();
     ref.invalidate(packProvider);
+    ref.read(playerProvider.notifier).removeCurrentlyPlayingTrackInPreference();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioPlayPauseStateProvider.notifier).state =
           PLAY_PAUSE_AUDIO.PAUSE;

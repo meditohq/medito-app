@@ -4,6 +4,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'artist_title_widget.dart';
 import 'player_buttons/play_pause_button_widget.dart';
 
@@ -14,7 +15,8 @@ class MiniPlayerWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () {
-        ref.read(pageviewNotifierProvider).gotoNextPage();
+        final currentlyPlayingSession = ref.read(playerProvider);
+        context.push(RouteConstants.playerPath, extra: currentlyPlayingSession);
       },
       child: Container(
         height: miniPlayerHeight,

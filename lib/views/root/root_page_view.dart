@@ -2,7 +2,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/providers/root/root_combine_provider.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
-import 'package:Medito/views/root/widgets/big_player_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,7 +75,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
                 StickyMiniPlayerWidget(),
               ],
             ),
-            BigPlayerWidget(),
+            // BigPlayerWidget(),
           ],
         ),
       ),

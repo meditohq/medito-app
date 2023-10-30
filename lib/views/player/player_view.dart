@@ -1,6 +1,5 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,80 +25,113 @@ class PlayerView extends ConsumerStatefulWidget {
 
 class _PlayerViewState extends ConsumerState<PlayerView>
     with AutomaticKeepAliveClientMixin {
+  double _dragStartY = 0.0;
+  double _currentY = 0.0;
+  final _currentX = 0.0;
+  double _opacity = 1.0;
+  String heroTag = 'swipe-down-to-close';
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     var coverUrl = widget.trackModel.coverUrl;
     var artist = widget.trackModel.artist;
 
-    return BackButtonListener(
-      onBackButtonPressed: () async => await _onWillPop(context),
-      child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        body: Stack(
-          children: [
-            BackgroundImageWidget(imageUrl: coverUrl),
-            SafeArea(
-              child: Column(
+    return GestureDetector(
+      onVerticalDragStart: _onVerticalDragStart,
+      onVerticalDragUpdate: _onVerticalDragUpdate,
+      onVerticalDragEnd: _onVerticalDragEnd,
+      child: Hero(
+        tag: heroTag,
+        child: Transform(
+          transform: Matrix4.translationValues(_currentX, _currentY, 0),
+          child: Opacity(
+            opacity: _opacity,
+            child: Scaffold(
+              extendBody: true,
+              extendBodyBehindAppBar: true,
+              body: Stack(
                 children: [
-                  height16,
-                  HandleBarWidget(),
-                  Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 4.0,
+                  BackgroundImageWidget(imageUrl: coverUrl),
+                  SafeArea(
+                    child: Column(
+                      children: [
+                        height16,
+                        HandleBarWidget(),
+                        Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0,
+                            vertical: 4.0,
+                          ),
+                          child: ArtistTitleWidget(
+                            trackTitle: widget.trackModel.title,
+                            artistName: artist?.name,
+                            artistUrlPath: artist?.path,
+                            isPlayerScreen: true,
+                          ),
+                        ),
+                        OverlayCoverImageWidget(imageUrl: coverUrl),
+                        DurationIndicatorWidget(
+                          file: widget.file,
+                          trackId: widget.trackModel.id,
+                        ),
+                        Spacer(),
+                        PlayerButtonsWidget(
+                          file: widget.file,
+                          trackModel: widget.trackModel,
+                        ),
+                        Spacer(
+                          flex: 2,
+                        ),
+                        BottomActionWidget(
+                          trackModel: widget.trackModel,
+                          file: widget.file,
+                        ),
+                        height16,
+                      ],
                     ),
-                    child: ArtistTitleWidget(
-                      trackTitle: widget.trackModel.title,
-                      artistName: artist?.name,
-                      artistUrlPath: artist?.path,
-                      isPlayerScreen: true,
-                    ),
                   ),
-                  OverlayCoverImageWidget(imageUrl: coverUrl),
-                  DurationIndicatorWidget(
-                    file: widget.file,
-                    trackId: widget.trackModel.id,
-                  ),
-                  Spacer(),
-                  PlayerButtonsWidget(
-                    file: widget.file,
-                    trackModel: widget.trackModel,
-                  ),
-                  Spacer(
-                    flex: 2,
-                  ),
-                  BottomActionWidget(
-                    trackModel: widget.trackModel,
-                    file: widget.file,
-                  ),
-                  height16,
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Future<bool> _onWillPop(BuildContext context) async {
-    var currentPageIndex = ref.read(pageviewNotifierProvider).currentPage;
-    var playerPageIndex = 1;
-    var currentLocation = GoRouter.of(context).location;
-    if (currentLocation.contains(RouteConstants.backgroundSoundsPath)) {
-      context.pop();
+  void _onVerticalDragStart(DragStartDetails details) {
+    _dragStartY = details.globalPosition.dy;
+  }
 
-      return true;
-    } else if (currentPageIndex == playerPageIndex) {
-      ref.read(pageviewNotifierProvider).gotoPreviousPage();
+  void _onVerticalDragUpdate(DragUpdateDetails details) {
+    var dragDistance = details.globalPosition.dy - _dragStartY;
+    if (dragDistance > 0) {
+      var calculatedOpacity = 1 - (dragDistance / 400);
+      if (calculatedOpacity < 0) {
+        calculatedOpacity = 0.05;
+      } else if (calculatedOpacity > 1) {
+        calculatedOpacity = 1;
+      }
+      setState(() {
+        _currentY = dragDistance;
+        _opacity = calculatedOpacity.toDouble();
+      });
 
-      return true;
+      print(_opacity);
     }
+  }
 
-    return false;
+  void _onVerticalDragEnd(DragEndDetails _) {
+    if (_currentY > 200) {
+      context.pop();
+    } else {
+      setState(() {
+        _currentY = 0;
+        _opacity = 1.0;
+      });
+    }
   }
 
   @override
