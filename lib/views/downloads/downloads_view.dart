@@ -58,7 +58,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  Column _getDownloadList(List<TrackModel> tracks) {
+  ReorderableListView _getDownloadList(List<TrackModel> tracks) {
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
     return ReorderableListView(
