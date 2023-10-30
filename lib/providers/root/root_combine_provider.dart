@@ -34,7 +34,7 @@ void _handleAudioCompletion(
   Ref ref,
 ) {
   final audioProvider = ref.read(audioPlayerNotifierProvider);
-  var extras = ref.read(audioPlayerNotifierProvider).mediaItem.value?.extras;
+  var extras = audioProvider.mediaItem.value?.extras;
   if (extras != null) {
     ref.read(playerProvider.notifier).handleAudioCompletionEvent(
           extras['fileId'],
@@ -44,6 +44,7 @@ void _handleAudioCompletion(
     audioProvider.seekValueFromSlider(0);
     audioProvider.pause();
     audioProvider.setBackgroundSoundVolume(audioProvider.bgVolume);
+    audioProvider.stop();
     ref.invalidate(packProvider);
     ref.read(playerProvider.notifier).removeCurrentlyPlayingTrackInPreference();
     WidgetsBinding.instance.addPostFrameCallback((_) {

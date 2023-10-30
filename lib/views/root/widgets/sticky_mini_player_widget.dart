@@ -71,5 +71,6 @@ class StickyMiniPlayerWidget extends ConsumerWidget {
 
   void onDismiss(WidgetRef ref) {
     ref.read(playerProvider.notifier).removeCurrentlyPlayingTrackInPreference();
+    ref.read(audioPlayerNotifierProvider).stop();
   }
 }
