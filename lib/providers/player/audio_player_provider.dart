@@ -22,7 +22,8 @@ class AudioPlayerNotifier extends BaseAudioHandler
   TrackFilesModel? currentlyPlayingTrack;
   final hasBgSound = 'hasBgSound';
   final trackAudioPlayer = AudioPlayer();
-
+  final fadeDuration = 5;
+  var bgVolume;
   late String _contentToken;
 
   @override
@@ -175,7 +176,38 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   void setBackgroundSoundVolume(double volume) async {
+    bgVolume = volume;
     await backgroundSoundAudioPlayer.setVolume(volume / 100);
+  }
+
+  bool audioPositionIsInEndPeriod(
+    Duration position,
+    Duration maxDuration, {
+    bool setToPreviousVolume = false,
+  }) {
+    var isEnding = maxDuration.inSeconds > 0 &&
+        position.inSeconds > maxDuration.inSeconds - fadeDuration;
+    if (isEnding) {
+      setBgVolumeFadeAtEnd();
+    }
+    if (setToPreviousVolume) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        setBackgroundSoundVolume(bgVolume);
+      });
+    }
+
+    return isEnding;
+  }
+
+  void setBgVolumeFadeAtEnd() {
+    if (backgroundSoundAudioPlayer.volume > 0) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        var newVolume = backgroundSoundAudioPlayer.volume - 0.05;
+        if (newVolume > 0) {
+          unawaited(backgroundSoundAudioPlayer.setVolume(newVolume));
+        }
+      });
+    }
   }
 
   void setMediaItem(

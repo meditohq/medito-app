@@ -26,11 +26,12 @@ class _DurationIndicatorWidgetState
   double? _dragSeekbarValue;
   double _maxDuration = 0.0;
   bool _draggingSeekbar = false;
-
   @override
   Widget build(BuildContext context) {
     final audioPositionAndPlayerState =
         ref.watch(audioPositionAndPlayerStateProvider);
+    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
+
     _maxDuration = widget.file.duration.toDouble();
 
     return audioPositionAndPlayerState.when(
@@ -42,18 +43,39 @@ class _DurationIndicatorWidgetState
         if (_dragSeekbarValue != null && !_draggingSeekbar) {
           _dragSeekbarValue = null;
         }
+        audioPlayerNotifier.audioPositionIsInEndPeriod(
+          data.position,
+          Duration(milliseconds: _maxDuration.round()),
+        );
 
-        return _durationBar(context, ref, value);
+        return _durationBar(context, ref, value, data);
       },
       error: (error, stackTrace) => SizedBox(),
       loading: () => SizedBox(),
     );
   }
 
+  void onChangeEnd(
+    WidgetRef ref,
+    PositionAndPlayerStateState data,
+    double val,
+  ) {
+    ref.read(slideAudioPositionProvider(
+      duration: val.round(),
+    ));
+    _draggingSeekbar = false;
+    ref.read(audioPlayerNotifierProvider).audioPositionIsInEndPeriod(
+          data.position,
+          Duration(milliseconds: _maxDuration.round()),
+          setToPreviousVolume: true,
+        );
+  }
+
   Padding _durationBar(
     BuildContext context,
     WidgetRef ref,
     num currentDuration,
+    PositionAndPlayerStateState data,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -81,12 +103,7 @@ class _DurationIndicatorWidgetState
                   _dragSeekbarValue = val;
                 });
               },
-              onChangeEnd: (val) {
-                ref.read(slideAudioPositionProvider(
-                  duration: val.round(),
-                ));
-                _draggingSeekbar = false;
-              },
+              onChangeEnd: (val) => onChangeEnd(ref, data, val),
             ),
           ),
           _durationLabels(
