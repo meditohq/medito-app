@@ -84,7 +84,8 @@ class _PackViewState extends ConsumerState<PackView>
         SliverList(
           delegate: SliverChildListDelegate(
             [DescriptionWidget(description: pack.description)].cast<Widget>() +
-                _listItems(pack, ref),
+                _listItems(pack, ref)
+            + BottomPaddingWidget(),
           ),
         ),
       ]),

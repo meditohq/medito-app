@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/headers/description_widget.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_large.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -117,6 +116,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                     context,
                     trackModel,
                   ),
+                  BottomPaddingWidget(),
                 ],
               ),
             ),
