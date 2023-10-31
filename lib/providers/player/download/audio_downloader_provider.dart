@@ -51,6 +51,12 @@ class AudioDownloaderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteDownloadedFileFromPreviousVersion() async {
+    final downloadAudio = ref.read(downloaderRepositoryProvider);
+    await downloadAudio.deleteDownloadedFileFromPreviousVersion();
+    notifyListeners();
+  }
+
   Future<String?> getTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
