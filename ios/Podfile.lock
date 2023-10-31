@@ -216,7 +216,7 @@ SPEC CHECKSUMS:
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
@@ -232,4 +232,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 9be41085f3ebdad4d4aaa1df125b86534775346b
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.12.1
