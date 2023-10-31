@@ -117,6 +117,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                     context,
                     trackModel,
                   ),
+                  BottomPaddingWidget(),
                 ],
               ),
             ),
