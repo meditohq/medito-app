@@ -69,29 +69,34 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   RefreshIndicator _buildScaffoldWithData(
-    PackModel pack,
-    WidgetRef ref,
-  ) {
+      PackModel pack,
+      WidgetRef ref,
+      ) {
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
-      child: CustomScrollView(controller: _scrollController, slivers: [
-        MeditoAppBarLarge(
-          scrollController: _scrollController,
-          title: pack.title,
-          coverUrl: pack.coverUrl,
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate(
-            [DescriptionWidget(description: pack.description)].cast<Widget>() +
-                _listItems(pack, ref) +
-                [
-                  BottomPaddingWidget(),
-                ],
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),  // Added this line
+        slivers: [
+          MeditoAppBarLarge(
+            scrollController: _scrollController,
+            title: pack.title,
+            coverUrl: pack.coverUrl,
           ),
-        ),
-      ]),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [DescriptionWidget(description: pack.description)].cast<Widget>() +
+                  _listItems(pack, ref) +
+                  [
+                    BottomPaddingWidget(),
+                  ],
+            ),
+          ),
+        ],
+      ),
     );
   }
+
 
   List<Widget> _listItems(PackModel pack, WidgetRef ref) {
     return pack.items
