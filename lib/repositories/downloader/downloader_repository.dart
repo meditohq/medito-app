@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'downloader_repository.g.dart';
 
@@ -84,22 +86,22 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
               [];
       if (savedFiles.isNotEmpty) {
         for (var element in savedFiles) {
-          try {
-            var json = jsonDecode(element);
-            var id = json['id'];
-            var filePath = await getFilePathForOldAppDownloadedFiles(id);
-            var file = File(filePath);
+          var json = jsonDecode(element);
+          var id = json['id'];
+          var filePath = await getFilePathForOldAppDownloadedFiles(id);
+          var file = File(filePath);
 
-            if (await file.exists()) {
-              await file.delete();
-            }
-          } catch (exception, stackTrace) {
-            print(stackTrace);
+          if (await file.exists()) {
+            await file.delete();
           }
         }
         await provider.remove(SharedPreferenceConstants.listOfSavedFiles);
       }
-    } catch (e) {
+    } catch (err) {
+      unawaited(Sentry.captureException(
+        err,
+        stackTrace: err,
+      ));
       rethrow;
     }
   }
