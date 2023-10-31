@@ -72,7 +72,6 @@ class _PackViewState extends ConsumerState<PackView>
     PackModel pack,
     WidgetRef ref,
   ) {
-
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
       child: CustomScrollView(controller: _scrollController, slivers: [
@@ -84,8 +83,10 @@ class _PackViewState extends ConsumerState<PackView>
         SliverList(
           delegate: SliverChildListDelegate(
             [DescriptionWidget(description: pack.description)].cast<Widget>() +
-                _listItems(pack, ref)
-            + BottomPaddingWidget(),
+                _listItems(pack, ref) +
+                [
+                  BottomPaddingWidget(),
+                ],
           ),
         ),
       ]),
