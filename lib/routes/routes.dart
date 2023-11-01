@@ -173,16 +173,11 @@ GoRoute _getPlayerRoute() {
     parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.playerPath,
     pageBuilder: (context, state) {
-      var track = state.extra as TrackModel;
-
       return CustomTransitionPage<void>(
         key: state.pageKey,
         opaque: false,
         maintainState: false,
-        child: PlayerView(
-          trackModel: track,
-          file: track.audio.first.files.first,
-        ),
+        child: PlayerView(),
         transitionDuration: Duration(milliseconds: 500),
         reverseTransitionDuration: Duration(milliseconds: 500),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {

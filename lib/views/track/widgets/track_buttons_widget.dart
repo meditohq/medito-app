@@ -113,6 +113,6 @@ class TrackButtonsWidget extends StatelessWidget {
           trackModel: trackModel,
           file: file,
         );
-    unawaited(context.push(RouteConstants.playerPath, extra: trackModel));
+    unawaited(context.push(RouteConstants.playerPath));
   }
 }

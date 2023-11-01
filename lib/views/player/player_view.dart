@@ -1,5 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +14,7 @@ import 'widgets/player_buttons/player_buttons_widget.dart';
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({
     super.key,
-    required this.trackModel,
-    required this.file,
   });
-  final TrackModel trackModel;
-  final TrackFilesModel file;
   @override
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }

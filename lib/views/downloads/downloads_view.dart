@@ -148,7 +148,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,
         );
-    context.push(RouteConstants.playerPath, extra: trackModel);
+    context.push(RouteConstants.playerPath);
   }
 
   void showSwipeToDeleteTip() {
