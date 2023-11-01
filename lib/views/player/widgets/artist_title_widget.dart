@@ -1,4 +1,3 @@
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +30,7 @@ class ArtistTitleWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _title(context),
-        if (artistName != null) _subtitle(context, ref),
+        if (artistName != null) _subtitle(context),
       ],
     );
   }
@@ -53,7 +52,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     );
   }
 
-  Padding _subtitle(BuildContext context, WidgetRef ref) {
+  Padding _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
           fontFamily: DmMono,
           fontSize: artistNameFontSize,
@@ -70,17 +69,15 @@ class ArtistTitleWidget extends ConsumerWidget {
         ),
         onTap: () {
           if (isPlayerScreen && artistUrlPath != null) {
+            context.pop();
             var getCurrentLocation = GoRouter.of(context);
-            if (isPlayerScreen) {
-              ref.read(pageviewNotifierProvider).gotoPreviousPage();
-            }
             var location = getCurrentLocation.location;
             if (location.contains(RouteConstants.webviewPath)) {
               context.pop();
             }
             location = getCurrentLocation.location;
             context.push(
-              location + RouteConstants.webviewPath,
+              RouteConstants.webviewPath,
               extra: {'url': artistUrlPath},
             );
           }
