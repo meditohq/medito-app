@@ -153,6 +153,7 @@ final router = GoRouter(
     _getBackgroundSoundRoute(),
     _getNotificationPermissionRoute(),
     _getPlayerRoute(),
+    _getWebviewRoute(fromRoot: true),
   ],
 );
 
@@ -224,6 +225,7 @@ GoRoute _getNotificationPermissionRoute() {
 
 GoRoute _getWebviewRoute({bool fromRoot = false}) {
   return GoRoute(
+    parentNavigatorKey: _shellNavigatorKey,
     path: fromRoot
         ? RouteConstants.webviewPath
         : RouteConstants.webviewPath.sanitisePath(),
