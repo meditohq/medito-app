@@ -31,11 +31,16 @@ import 'services/notifications/notifications_service.dart';
 
 late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: StringConstants.stagingEnv);
+
+  await dotenv.load(fileName: StringConstants.prodEnv);
+
   var sharedPreferences = await initializeSharedPreferences();
+
   await Firebase.initializeApp();
   await registerNotification();
+
   await SentryFlutter.init(
     (options) {
       options.environment = kDebugMode
@@ -45,6 +50,7 @@ Future<void> main() async {
       options.tracesSampleRate = 1.0;
     },
   );
+
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerNotifier(),
     config: AudioServiceConfig(
@@ -55,6 +61,7 @@ Future<void> main() async {
   );
 
   usePathUrlStrategy();
+
   runApp(
     ProviderScope(
       overrides: [
