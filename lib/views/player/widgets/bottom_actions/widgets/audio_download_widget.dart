@@ -35,7 +35,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     } else {
       return LabelsWidget(
         label: StringConstants.download.toUpperCase(),
-        onTap: () => _handleDownload(downloadAudioProvider, ref, context),
+        onTap: () => _handleDownload(downloadAudioProvider, context),
       );
     }
   }
@@ -75,7 +75,6 @@ class AudioDownloadWidget extends ConsumerWidget {
 
   Future<void> _handleDownload(
     AudioDownloaderProvider downloadAudioProvider,
-    WidgetRef ref,
     BuildContext context,
   ) async {
     try {
@@ -83,13 +82,6 @@ class AudioDownloadWidget extends ConsumerWidget {
         trackModel,
         file,
       );
-    await  ref.read(deleteTrackFromPreferenceProvider(
-        file: file,
-      ).future);
-      await ref.read(addSingleTrackInPreferenceProvider(
-        trackModel: trackModel,
-        file: file,
-      ).future);
     } catch (e) {
       createSnackBar(e.toString(), context);
     }

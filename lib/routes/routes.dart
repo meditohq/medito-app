@@ -174,10 +174,11 @@ GoRoute _getPlayerRoute() {
     path: RouteConstants.playerPath,
     pageBuilder: (context, state) {
       var track = state.extra as TrackModel;
-      
+
       return CustomTransitionPage<void>(
         key: state.pageKey,
         opaque: false,
+        maintainState: false,
         child: PlayerView(
           trackModel: track,
           file: track.audio.first.files.first,
