@@ -4,6 +4,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
+import 'package:Medito/views/player/player_route_params_model.dart';
 import 'package:Medito/views/search/search_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
@@ -173,14 +174,16 @@ GoRoute _getPlayerRoute() {
     parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.playerPath,
     pageBuilder: (context, state) {
-      var track = state.extra as TrackModel;
-      
+      var params = state.extra as PlayerRouteParamsModel;
+      var track = params.trackModel;
+      var index = params.index;
+
       return CustomTransitionPage<void>(
         key: state.pageKey,
         opaque: false,
         child: PlayerView(
           trackModel: track,
-          file: track.audio.first.files.first,
+          file: track.audio.first.files[index],
         ),
         transitionDuration: Duration(milliseconds: 500),
         reverseTransitionDuration: Duration(milliseconds: 500),

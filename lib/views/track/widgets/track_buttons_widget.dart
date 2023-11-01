@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../player/player_route_params_model.dart';
+
 class TrackButtonsWidget extends StatelessWidget {
   final TrackModel trackModel;
+
   const TrackButtonsWidget({super.key, required this.trackModel});
 
   @override
@@ -65,18 +68,19 @@ class TrackButtonsWidget extends StatelessWidget {
         mainAxisSpacing: 8,
       ),
       itemBuilder: (BuildContext context, int index) {
-        return _getGridItem(trackModel.audio[i].files[index]);
+        return _getGridItem(trackModel.audio[i].files[index], index);
       },
       itemCount: trackModel.audio[i].files.length,
     );
   }
 
   Consumer _getGridItem(
-    TrackFilesModel file,
+    TrackFilesModel tracks,
+    int index,
   ) {
     return Consumer(
       builder: (context, ref, child) => InkWell(
-        onTap: () => _handleTap(context, ref, file),
+        onTap: () => _handleTap(context, ref, tracks, index),
         borderRadius: BorderRadius.circular(14),
         child: Ink(
           height: 56,
@@ -88,7 +92,7 @@ class TrackButtonsWidget extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              '${convertDurationToMinutes(milliseconds: file.duration)} mins',
+              '${convertDurationToMinutes(milliseconds: tracks.duration)} mins',
               style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                     color: ColorConstants.walterWhite,
                     fontFamily: DmMono,
@@ -104,6 +108,7 @@ class TrackButtonsWidget extends StatelessWidget {
     BuildContext context,
     WidgetRef ref,
     TrackFilesModel file,
+    int index,
   ) async {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
     audioProvider.clearAssetCache();
@@ -113,6 +118,10 @@ class TrackButtonsWidget extends StatelessWidget {
           trackModel: trackModel,
           file: file,
         );
-    unawaited(context.push(RouteConstants.playerPath, extra: trackModel));
+    var params = PlayerRouteParamsModel(trackModel: trackModel, index: index);
+    unawaited(context.push(
+      RouteConstants.playerPath,
+      extra: params,
+    ));
   }
 }

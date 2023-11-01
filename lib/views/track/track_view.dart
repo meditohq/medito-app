@@ -101,7 +101,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       onRefresh: () async => await ref.refresh(tracksProvider(trackId: widget.id)),
       child: CustomScrollView(
         controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(), // add this line
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           MeditoAppBarLarge(
             coverUrl: trackModel.coverUrl,

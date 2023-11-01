@@ -1,3 +1,4 @@
+import 'package:Medito/views/player/player_route_params_model.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -10,13 +11,23 @@ import 'player_buttons/play_pause_button_widget.dart';
 
 class MiniPlayerWidget extends ConsumerWidget {
   const MiniPlayerWidget({super.key, required this.trackModel});
+
   final TrackModel trackModel;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () {
         final currentlyPlayingSession = ref.read(playerProvider);
-        context.push(RouteConstants.playerPath, extra: currentlyPlayingSession);
+        if (currentlyPlayingSession != null) {
+          context.push(
+            RouteConstants.playerPath,
+            extra: PlayerRouteParamsModel(
+              trackModel: currentlyPlayingSession,
+              index: 0,
+            ),
+          );
+        }
       },
       child: Container(
         height: miniPlayerHeight,
