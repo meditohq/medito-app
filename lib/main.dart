@@ -31,10 +31,9 @@ import 'services/notifications/notifications_service.dart';
 
 late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: StringConstants.prodEnv);
+  await dotenv.load(fileName: StringConstants.stagingEnv);
 
   var sharedPreferences = await initializeSharedPreferences();
 
