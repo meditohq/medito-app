@@ -62,11 +62,11 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                       children: [
                         height16,
                         HandleBarWidget(),
-                        Spacer(),
+                        height8,
+                        OverlayCoverImageWidget(imageUrl: coverUrl),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
-                            vertical: 4.0,
                           ),
                           child: ArtistTitleWidget(
                             trackTitle: currentlyPlayingTrack.title,
@@ -75,24 +75,23 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                             isPlayerScreen: true,
                           ),
                         ),
-                        OverlayCoverImageWidget(imageUrl: coverUrl),
                         DurationIndicatorWidget(
                           file: file,
                           trackId: currentlyPlayingTrack.id,
                         ),
                         Spacer(),
-                        PlayerButtonsWidget(
-                          file: file,
-                          trackModel: currentlyPlayingTrack,
+                        Transform.translate(
+                          offset: Offset(0, -20), // adjust the value as needed
+                          child: PlayerButtonsWidget(
+                            file: file,
+                            trackModel: currentlyPlayingTrack,
+                          ),
                         ),
-                        Spacer(
-                          flex: 2,
-                        ),
+                        Spacer(),
                         BottomActionWidget(
                           trackModel: currentlyPlayingTrack,
                           file: file,
                         ),
-                        height16,
                       ],
                     ),
                   ),

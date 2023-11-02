@@ -11,7 +11,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     this.artistName,
     this.artistUrlPath,
     this.trackTitleFontSize = 24,
-    this.artistNameFontSize = 16,
+    this.artistNameFontSize = 14,
     this.artistUrlPathFontSize = 13,
     this.isPlayerScreen = false,
     this.titleHeight = 35,
@@ -44,6 +44,7 @@ class ArtistTitleWidget extends ConsumerWidget {
               fontFamily: ClashDisplay,
               color: ColorConstants.walterWhite,
               fontSize: trackTitleFontSize,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
         blankSpace: 40,
@@ -57,7 +58,7 @@ class ArtistTitleWidget extends ConsumerWidget {
           fontFamily: DmMono,
           fontSize: artistNameFontSize,
           letterSpacing: 0,
-          color: ColorConstants.walterWhite.withOpacity(0.9),
+          color: ColorConstants.graphite,
         );
 
     return Padding(
