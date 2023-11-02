@@ -14,8 +14,21 @@ part 'background_sounds_provider.g.dart';
 Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
   final backgroundSoundsRepository =
       ref.watch(backgroundSoundsRepositoryProvider);
+  ref.keepAlive();
 
   return backgroundSoundsRepository.fetchBackgroundSounds();
+}
+
+@riverpod
+Future<List<BackgroundSoundsModel>?> fetchLocallySavedBackgroundSounds(
+  FetchLocallySavedBackgroundSoundsRef ref,
+) {
+  final backgroundSoundsRepository =
+      ref.watch(backgroundSoundsRepositoryProvider);
+  ref.watch(backgroundSoundsNotifierProvider);
+  ref.keepAlive();
+
+  return backgroundSoundsRepository.fetchLocallySavedBackgroundSounds();
 }
 
 final backgroundSoundsNotifierProvider =
@@ -35,25 +48,17 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   void handleOnChangeVolume(double vol) {
     volume = vol;
-    unawaited(
-      ref.read(sharedPreferencesProvider).setDouble(
-            SharedPreferenceConstants.bgSoundVolume,
-            vol,
-          ),
-    );
+    ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
     notifyListeners();
   }
 
   void handleOnChangeSound(BackgroundSoundsModel? sound) {
     selectedBgSound = sound;
+    var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
     if (sound != null) {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      unawaited(ref.read(sharedPreferencesProvider).setString(
-            SharedPreferenceConstants.bgSound,
-            json.encode(
-              sound.toJson(),
-            ),
-          ));
+      bgSoundRepoProvider.handleOnChangeSound(sound);
+      updateItemsInSavedBgSoundList(sound);
       if (sound.title != StringConstants.none) {
         var name = '${sound.title}.mp3';
         downloadAudio.getDownloadedFile(name).then((value) {
@@ -66,19 +71,21 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
         });
       }
     } else {
-      unawaited(
-        ref.read(sharedPreferencesProvider).remove(
-              SharedPreferenceConstants.bgSound,
-            ),
-      );
+      bgSoundRepoProvider.removeSelectedBgSound();
     }
     notifyListeners();
   }
 
+  void updateItemsInSavedBgSoundList(BackgroundSoundsModel sound) {
+    final provider = ref.read(backgroundSoundsRepositoryProvider);
+    provider.updateItemsInSavedBgSoundList(sound);
+    notifyListeners();
+  }
+
   void getBackgroundSoundFromPref() {
-    var value = ref.read(sharedPreferencesProvider).getString(
-          SharedPreferenceConstants.bgSound,
-        );
+    var value = ref
+        .read(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.bgSound);
     if (value != null) {
       selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
       notifyListeners();
@@ -86,9 +93,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void getVolumeFromPref() {
-    var value = ref.read(sharedPreferencesProvider).getDouble(
-          SharedPreferenceConstants.bgSoundVolume,
-        );
+    var value = ref.read(backgroundSoundsRepositoryProvider).getBgSoundVolume();
     if (value != null) {
       volume = value;
       notifyListeners();
