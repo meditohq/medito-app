@@ -76,7 +76,6 @@ class CardWidget extends ConsumerWidget {
   }
 
   Widget _tagAndTitle(BuildContext context) {
-    var textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,6 +88,7 @@ class CardWidget extends ConsumerWidget {
 
   Widget _tag(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Container(
@@ -109,6 +109,7 @@ class CardWidget extends ConsumerWidget {
 
   Widget _title(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Text(
