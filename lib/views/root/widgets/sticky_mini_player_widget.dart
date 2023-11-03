@@ -12,8 +12,12 @@ class StickyMiniPlayerWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentlyPlayingSession = ref.watch(playerProvider);
     final audioPlayerProvider = ref.watch(audioPlayerNotifierProvider);
-    var radius = Radius.circular(currentlyPlayingSession != null ? 15 : 0);
-    var opacity = ref.watch(pageviewNotifierProvider).scrollProportion;
+    var radius = BorderRadius.only(
+      topRight: Radius.circular(currentlyPlayingSession != null ? 14 : 0),
+      topLeft: Radius.circular(currentlyPlayingSession != null ? 14 : 0),
+      bottomRight: Radius.circular(currentlyPlayingSession != null ? 20 : 0),
+      bottomLeft: Radius.circular(currentlyPlayingSession != null ? 20 : 0),
+    );    var opacity = ref.watch(pageviewNotifierProvider).scrollProportion;
     var bottom = getBottomPadding(context) + 8;
 
     if (currentlyPlayingSession != null) {
@@ -46,30 +50,37 @@ class StickyMiniPlayerWidget extends ConsumerWidget {
   }
 
   Padding _miniPlayer(
-    double bottom,
-    Radius radius,
-    double opacity,
-    TrackModel currentlyPlayingSession,
-  ) {
+      double bottom,
+      BorderRadius radius,
+      double opacity,
+      TrackModel currentlyPlayingSession,
+      ) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: 8,
+        horizontal: 10,
         vertical: bottom,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(radius),
-        child: AnimatedOpacity(
-          duration: Duration(milliseconds: 700),
-          opacity: opacity,
-          child: MiniPlayerWidget(
-            trackModel: currentlyPlayingSession,
+      child: Material(
+        elevation: 10.0,
+        borderRadius: radius,
+        child: ClipRRect(
+          borderRadius: radius,
+          child: AnimatedOpacity(
+            duration: Duration(milliseconds: 700),
+            opacity: opacity,
+            child: MiniPlayerWidget(
+              trackModel: currentlyPlayingSession,
+            ),
           ),
         ),
       ),
     );
   }
 
+
+
   void onDismiss(WidgetRef ref) {
     ref.read(playerProvider.notifier).removeCurrentlyPlayingTrackInPreference();
+    ref.read(audioPlayerNotifierProvider).stop();
   }
 }

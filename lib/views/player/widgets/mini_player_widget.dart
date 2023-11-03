@@ -1,7 +1,6 @@
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,10 +12,9 @@ class MiniPlayerWidget extends ConsumerWidget {
   final TrackModel trackModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
-        final currentlyPlayingSession = ref.read(playerProvider);
-        context.push(RouteConstants.playerPath, extra: currentlyPlayingSession);
+        context.push(RouteConstants.playerPath);
       },
       child: Container(
         height: miniPlayerHeight,
@@ -41,10 +39,14 @@ class MiniPlayerWidget extends ConsumerWidget {
 
   Padding trackCoverImage(String url) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15),
+      padding: const EdgeInsets.only(left: 8),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
-        child: SizedBox(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(7),
+            topRight: Radius.circular(2),
+            bottomRight: Radius.circular(2),
+            bottomLeft: Radius.circular(12)
+        ),        child: SizedBox(
           height: 40,
           width: 40,
           child: NetworkImageWidget(
@@ -59,7 +61,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   Flexible _titleAndSubtitle() {
     return Flexible(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +73,7 @@ class MiniPlayerWidget extends ConsumerWidget {
               trackTitleFontSize: 16,
               artistNameFontSize: 12,
               artistUrlPathFontSize: 11,
-              titleHeight: 22,
+              titleHeight: 20,
             ),
           ],
         ),
@@ -81,7 +83,7 @@ class MiniPlayerWidget extends ConsumerWidget {
 
   Padding _playPauseButton() {
     return Padding(
-      padding: const EdgeInsets.only(right: 15),
+      padding: const EdgeInsets.only(right: 8),
       child: PlayPauseButtonWidget(
         iconSize: 40,
       ),

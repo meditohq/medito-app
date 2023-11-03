@@ -6,12 +6,15 @@ import '../markdown_widget.dart';
 
 class DescriptionWidget extends StatelessWidget {
   const DescriptionWidget({super.key, required this.description});
+
   final description;
 
   @override
   Widget build(BuildContext context) {
-
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
+    if (description == '') {
+      return Container();
+    }
 
     return Container(
       color: ColorConstants.onyx,

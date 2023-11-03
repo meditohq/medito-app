@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PlayPauseButtonWidget extends ConsumerWidget {
-  const PlayPauseButtonWidget({super.key, this.iconSize = 60});
+  const PlayPauseButtonWidget({super.key, this.iconSize = 72});
   final double iconSize;
   @override
   Widget build(BuildContext context, WidgetRef ref) {

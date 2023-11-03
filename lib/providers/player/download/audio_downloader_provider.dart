@@ -1,3 +1,4 @@
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,13 @@ class AudioDownloaderProvider extends ChangeNotifier {
       );
       downloadingProgress.remove(fileName);
       audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADED;
+      await ref.read(deleteTrackFromPreferenceProvider(
+        file: file,
+      ).future);
+      await ref.read(addSingleTrackInPreferenceProvider(
+        trackModel: trackModel,
+        file: file,
+      ).future);
       notifyListeners();
     } catch (e) {
       audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOAD;
@@ -48,6 +56,12 @@ class AudioDownloaderProvider extends ChangeNotifier {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
     audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOAD;
+    notifyListeners();
+  }
+
+  Future<void> deleteDownloadedFileFromPreviousVersion() async {
+    final downloadAudio = ref.read(downloaderRepositoryProvider);
+    await downloadAudio.deleteDownloadedFileFromPreviousVersion();
     notifyListeners();
   }
 

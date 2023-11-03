@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_large.dart';
@@ -65,29 +64,36 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   void _scrollListener() {
-    setState(() {});
+    setState(() => {});
   }
 
   RefreshIndicator _buildScaffoldWithData(
     PackModel pack,
     WidgetRef ref,
   ) {
-
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
-      child: CustomScrollView(controller: _scrollController, slivers: [
-        MeditoAppBarLarge(
-          scrollController: _scrollController,
-          title: pack.title,
-          coverUrl: pack.coverUrl,
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate(
-            [DescriptionWidget(description: pack.description)].cast<Widget>() +
-                _listItems(pack, ref),
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          MeditoAppBarLarge(
+            scrollController: _scrollController,
+            title: pack.title,
+            coverUrl: pack.coverUrl,
           ),
-        ),
-      ]),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [DescriptionWidget(description: pack.description)]
+                      .cast<Widget>() +
+                  _listItems(pack, ref) +
+                  [
+                    BottomPaddingWidget(),
+                  ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -114,20 +120,23 @@ class _PackViewState extends ConsumerState<PackView>
     PackItemsModel item,
     bool isLast,
   ) {
-    //ignore: prefer-conditional-expressions
-    if (item.type == TypeConstants.TRACK && item.isCompleted == false) {
-      return PackDismissibleWidget(
-        child: PackItemWidget(isLast: isLast, item: item),
-        onUpdateCb: () {
-          ref.read(packProvider(packId: widget.id).notifier).markComplete(
-                audioFileId: item.path.getIdFromPath(),
-                trackId: item.id,
-              );
-        },
-      );
-    } else {
-      return PackItemWidget(isLast: isLast, item: item);
-    }
+    return InkWell(
+      onTap: () {
+        _onListItemTap(item.id, item.type, item.path, context);
+      },
+      splashColor: ColorConstants.charcoal,
+      child: item.type == TypeConstants.TRACK && item.isCompleted == false
+          ? PackDismissibleWidget(
+              child: PackItemWidget(isLast: isLast, item: item),
+              onUpdateCb: () {
+                ref.read(packProvider(packId: widget.id).notifier).markComplete(
+                      audioFileId: item.path.getIdFromPath(),
+                      trackId: item.id,
+                    );
+              },
+            )
+          : PackItemWidget(isLast: isLast, item: item),
+    );
   }
 
   void _onListItemTap(

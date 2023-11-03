@@ -6,8 +6,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../widgets/pack_card_widget.dart';
-
 class SearchInitialPageWidget extends ConsumerWidget {
   const SearchInitialPageWidget({
     super.key,
@@ -19,7 +17,7 @@ class SearchInitialPageWidget extends ConsumerWidget {
 
     return allPacks.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildMain(ref, data),
+      data: (data) => _buildMain(context, ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchAllPacksProvider),
@@ -28,32 +26,47 @@ class SearchInitialPageWidget extends ConsumerWidget {
     );
   }
 
-  RefreshIndicator _buildMain(WidgetRef ref, List<PackItemsModel> packs) {
-    return RefreshIndicator(
-      onRefresh: () async => await ref.refresh(fetchAllPacksProvider),
-      child: ListView.builder(
-        itemCount: packs.length,
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.all(defaultPadding),
-        itemBuilder: (context, index) {
-          var element = packs[index];
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: PackCardWidget(
-              title: element.title,
-              subTitle: element.subtitle,
-              coverUrlPath: element.coverUrl,
-              onTap: () => handleNavigation(
-                context: context,
-                element.type,
-                [element.id.toString(), element.path],
-                ref: ref,
+  Column _buildMain(
+    BuildContext context,
+    WidgetRef ref,
+    List<PackItemsModel> packs,
+  ) {
+    return Column(
+      children: [
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () async => await ref.refresh(fetchAllPacksProvider),
+            child: ListView.builder(
+              itemCount: packs.length,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.only(
+                top: defaultPadding,
+                left: defaultPadding,
+                right: defaultPadding,
+                bottom: ref.watch(bottomPaddingProvider(context)),
               ),
+              itemBuilder: (context, index) {
+                var element = packs[index];
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: PackCardWidget(
+                    title: element.title,
+                    subTitle: element.subtitle,
+                    coverUrlPath: element.coverUrl,
+                    onTap: () => handleNavigation(
+                      context: context,
+                      element.type,
+                      [element.id.toString(), element.path],
+                      ref: ref,
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 

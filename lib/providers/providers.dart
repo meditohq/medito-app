@@ -19,3 +19,4 @@ export 'events/events_provider.dart';
 export 'search/search_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
 export 'notification/notification_provider.dart';
+export 'page_view/bottom_padding_provider.dart';

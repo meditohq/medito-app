@@ -182,6 +182,12 @@ double getBottomPaddingWithStickyMiniPlayer(BuildContext context) {
   return totalPadding;
 }
 
+Future<String> getFilePathForOldAppDownloadedFiles(String mediaItemId) async {
+  var dir = (await getApplicationSupportDirectory()).path;
+
+  return '$dir/${mediaItemId.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
+}
+
 int formatIcon(String icon) {
   return int.parse('0x$icon');
 }

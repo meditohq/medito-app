@@ -1,4 +1,3 @@
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +11,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     this.artistName,
     this.artistUrlPath,
     this.trackTitleFontSize = 24,
-    this.artistNameFontSize = 16,
+    this.artistNameFontSize = 14,
     this.artistUrlPathFontSize = 13,
     this.isPlayerScreen = false,
     this.titleHeight = 35,
@@ -31,7 +30,7 @@ class ArtistTitleWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _title(context),
-        if (artistName != null) _subtitle(context, ref),
+        if (artistName != null) _subtitle(context),
       ],
     );
   }
@@ -45,6 +44,7 @@ class ArtistTitleWidget extends ConsumerWidget {
               fontFamily: ClashDisplay,
               color: ColorConstants.walterWhite,
               fontSize: trackTitleFontSize,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
         blankSpace: 40,
@@ -53,12 +53,12 @@ class ArtistTitleWidget extends ConsumerWidget {
     );
   }
 
-  Padding _subtitle(BuildContext context, WidgetRef ref) {
+  Padding _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
           fontFamily: DmMono,
           fontSize: artistNameFontSize,
           letterSpacing: 0,
-          color: ColorConstants.walterWhite.withOpacity(0.9),
+          color: ColorConstants.graphite,
         );
 
     return Padding(
@@ -70,17 +70,15 @@ class ArtistTitleWidget extends ConsumerWidget {
         ),
         onTap: () {
           if (isPlayerScreen && artistUrlPath != null) {
+            context.pop();
             var getCurrentLocation = GoRouter.of(context);
-            if (isPlayerScreen) {
-              ref.read(pageviewNotifierProvider).gotoPreviousPage();
-            }
             var location = getCurrentLocation.location;
             if (location.contains(RouteConstants.webviewPath)) {
               context.pop();
             }
             location = getCurrentLocation.location;
             context.push(
-              location + RouteConstants.webviewPath,
+              RouteConstants.webviewPath,
               extra: {'url': artistUrlPath},
             );
           }

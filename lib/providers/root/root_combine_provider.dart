@@ -14,6 +14,7 @@ final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
   ref.read(authProvider.notifier).saveFcmTokenEvent();
   ref.read(postLocalStatsProvider);
   ref.read(deviceAppAndUserInfoProvider);
+  ref.read(audioDownloaderProvider).deleteDownloadedFileFromPreviousVersion();
   ref.read(pageviewNotifierProvider).addListenerToPage();
   ref
       .read(playerProvider.notifier)
@@ -24,17 +25,18 @@ final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
       .distinct();
   streamEvent.forEach((element) {
     if (element == ProcessingState.completed) {
-      _handleAudioCompletion(ref);
+      _handleAudioCompletion(context, ref);
       _handleUserNotSignedIn(ref, context);
     }
   });
 });
 
 void _handleAudioCompletion(
+  BuildContext context,
   Ref ref,
 ) {
   final audioProvider = ref.read(audioPlayerNotifierProvider);
-  var extras = ref.read(audioPlayerNotifierProvider).mediaItem.value?.extras;
+  var extras = audioProvider.mediaItem.value?.extras;
   if (extras != null) {
     ref.read(playerProvider.notifier).handleAudioCompletionEvent(
           extras['fileId'],
@@ -44,8 +46,14 @@ void _handleAudioCompletion(
     audioProvider.seekValueFromSlider(0);
     audioProvider.pause();
     audioProvider.setBackgroundSoundVolume(audioProvider.bgVolume);
+    audioProvider.stop();
     ref.invalidate(packProvider);
-    ref.read(playerProvider.notifier).removeCurrentlyPlayingTrackInPreference();
+    var currentLocation = GoRouter.of(context).location;
+    if (!currentLocation.contains(RouteConstants.playerPath)) {
+      ref
+          .read(playerProvider.notifier)
+          .removeCurrentlyPlayingTrackInPreference();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioPlayPauseStateProvider.notifier).state =
           PLAY_PAUSE_AUDIO.PAUSE;

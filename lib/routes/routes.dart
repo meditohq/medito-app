@@ -153,6 +153,7 @@ final router = GoRouter(
     _getBackgroundSoundRoute(),
     _getNotificationPermissionRoute(),
     _getPlayerRoute(),
+    _getWebviewRoute(fromRoot: true),
   ],
 );
 
@@ -173,15 +174,11 @@ GoRoute _getPlayerRoute() {
     parentNavigatorKey: _rootNavigatorKey,
     path: RouteConstants.playerPath,
     pageBuilder: (context, state) {
-      var track = state.extra as TrackModel;
-      
       return CustomTransitionPage<void>(
         key: state.pageKey,
         opaque: false,
-        child: PlayerView(
-          trackModel: track,
-          file: track.audio.first.files.first,
-        ),
+        maintainState: false,
+        child: PlayerView(),
         transitionDuration: Duration(milliseconds: 500),
         reverseTransitionDuration: Duration(milliseconds: 500),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -228,6 +225,7 @@ GoRoute _getNotificationPermissionRoute() {
 
 GoRoute _getWebviewRoute({bool fromRoot = false}) {
   return GoRoute(
+    parentNavigatorKey: _shellNavigatorKey,
     path: fromRoot
         ? RouteConstants.webviewPath
         : RouteConstants.webviewPath.sanitisePath(),
@@ -363,6 +361,8 @@ Future<void> handleNavigation(
           await ref.read(deviceAppAndUserInfoProvider.future);
       var _info =
           '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+
+      path = ids.first;
 
       await launchEmailSubmission(
         path.toString(),

@@ -100,6 +100,8 @@ class StringConstants {
   static const String invalidInput = 'Invalid Input';
   static const String invalidToken = 'Invalid token';
   static const String noBgSoundAvailable = "You don't have any background sound available in offline mode";
+  static const String unableToLoadAudio =
+      'Unable to load audio. Please go back and try again!!';
   static const String loadingError =
       "It looks like you're offline or there was little hiccup from our end.";
   static const String checkConnection =

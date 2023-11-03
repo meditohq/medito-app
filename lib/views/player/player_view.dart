@@ -1,5 +1,5 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,11 +14,7 @@ import 'widgets/player_buttons/player_buttons_widget.dart';
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({
     super.key,
-    required this.trackModel,
-    required this.file,
   });
-  final TrackModel trackModel;
-  final TrackFilesModel file;
   @override
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
@@ -34,8 +30,16 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var coverUrl = widget.trackModel.coverUrl;
-    var artist = widget.trackModel.artist;
+    var currentlyPlayingTrack = ref.watch(playerProvider);
+    if (currentlyPlayingTrack == null) {
+      return MeditoErrorWidget(
+        onTap: () => context.pop(),
+        message: StringConstants.unableToLoadAudio,
+      );
+    }
+    var coverUrl = currentlyPlayingTrack.coverUrl;
+    var artist = currentlyPlayingTrack.artist;
+    var file = currentlyPlayingTrack.audio.first.files.first;
 
     return GestureDetector(
       onVerticalDragStart: _onVerticalDragStart,
@@ -58,37 +62,36 @@ class _PlayerViewState extends ConsumerState<PlayerView>
                       children: [
                         height16,
                         HandleBarWidget(),
-                        Spacer(),
+                        height8,
+                        OverlayCoverImageWidget(imageUrl: coverUrl),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
-                            vertical: 4.0,
                           ),
                           child: ArtistTitleWidget(
-                            trackTitle: widget.trackModel.title,
+                            trackTitle: currentlyPlayingTrack.title,
                             artistName: artist?.name,
                             artistUrlPath: artist?.path,
                             isPlayerScreen: true,
                           ),
                         ),
-                        OverlayCoverImageWidget(imageUrl: coverUrl),
                         DurationIndicatorWidget(
-                          file: widget.file,
-                          trackId: widget.trackModel.id,
+                          file: file,
+                          trackId: currentlyPlayingTrack.id,
                         ),
                         Spacer(),
-                        PlayerButtonsWidget(
-                          file: widget.file,
-                          trackModel: widget.trackModel,
+                        Transform.translate(
+                          offset: Offset(0, -20), // adjust the value as needed
+                          child: PlayerButtonsWidget(
+                            file: file,
+                            trackModel: currentlyPlayingTrack,
+                          ),
                         ),
-                        Spacer(
-                          flex: 2,
-                        ),
+                        Spacer(),
                         BottomActionWidget(
-                          trackModel: widget.trackModel,
-                          file: widget.file,
+                          trackModel: currentlyPlayingTrack,
+                          file: file,
                         ),
-                        height16,
                       ],
                     ),
                   ),
@@ -118,8 +121,6 @@ class _PlayerViewState extends ConsumerState<PlayerView>
         _currentY = dragDistance;
         _opacity = calculatedOpacity.toDouble();
       });
-
-      print(_opacity);
     }
   }
 

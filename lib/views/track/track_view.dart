@@ -87,44 +87,45 @@ class _TrackViewState extends ConsumerState<TrackView>
         loading: () => _buildLoadingWidget(),
       ),
     );
+
   }
 
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
 
   RefreshIndicator _buildScaffoldWithData(
-    BuildContext context,
-    TrackModel trackModel,
-    WidgetRef ref,
-  ) {
+      BuildContext context,
+      TrackModel trackModel,
+      WidgetRef ref,
+      ) {
     return RefreshIndicator(
-      onRefresh: () async =>
-          await ref.refresh(tracksProvider(trackId: widget.id)),
-      child: Scaffold(
-        body: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            MeditoAppBarLarge(
-              coverUrl: trackModel.coverUrl,
-              title: trackModel.title,
-              scrollController: _scrollController,
+      onRefresh: () async => await ref.refresh(tracksProvider(trackId: widget.id)),
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(), // add this line
+        slivers: [
+          MeditoAppBarLarge(
+            coverUrl: trackModel.coverUrl,
+            title: trackModel.title,
+            scrollController: _scrollController,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                if (trackModel.description.isNotNullAndNotEmpty())
+                  DescriptionWidget(description: trackModel.description),
+                _mainContent(
+                  context,
+                  trackModel,
+                ),
+                BottomPaddingWidget(),
+              ],
             ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  if (trackModel.description.isNotNullAndNotEmpty())
-                    DescriptionWidget(description: trackModel.description),
-                  _mainContent(
-                    context,
-                    trackModel,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
 
   Widget _mainContent(BuildContext context, TrackModel trackModel) {
     return Padding(
