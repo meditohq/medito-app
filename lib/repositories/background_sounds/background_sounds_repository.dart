@@ -73,23 +73,27 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
     BackgroundSoundsModel sound,
   ) async {
     try {
-      var pref = ref.read(sharedPreferencesProvider);
-      var soundList = pref.getStringList(
+      if (sound.id == '0') {
+        return;
+      } else {
+        var pref = ref.read(sharedPreferencesProvider);
+        var soundList = pref.getStringList(
+              SharedPreferenceConstants.listBgSound,
+            ) ??
+            [];
+        var _sounds = <BackgroundSoundsModel>[];
+        for (var element in soundList) {
+          _sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
+        }
+        var index = _sounds.indexWhere((element) => element.id == sound.id);
+        if (index == -1) {
+          _sounds.add(sound);
+          var encodeSounds = _sounds.map((e) => json.encode(e)).toList();
+          await pref.setStringList(
             SharedPreferenceConstants.listBgSound,
-          ) ??
-          [];
-      var _sounds = <BackgroundSoundsModel>[];
-      for (var element in soundList) {
-        _sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
-      }
-      var index = _sounds.indexWhere((element) => element.id == sound.id);
-      if (index == -1) {
-        _sounds.add(sound);
-        var encodeSounds = _sounds.map((e) => json.encode(e)).toList();
-        await pref.setStringList(
-          SharedPreferenceConstants.listBgSound,
-          encodeSounds,
-        );
+            encodeSounds,
+          );
+        }
       }
     } catch (err) {
       unawaited(Sentry.captureException(

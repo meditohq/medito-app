@@ -79,7 +79,6 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   void updateItemsInSavedBgSoundList(BackgroundSoundsModel sound) {
     final provider = ref.read(backgroundSoundsRepositoryProvider);
     provider.updateItemsInSavedBgSoundList(sound);
-    notifyListeners();
   }
 
   void getBackgroundSoundFromPref() {
