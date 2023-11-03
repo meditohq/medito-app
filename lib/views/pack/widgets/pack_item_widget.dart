@@ -41,7 +41,7 @@ class PackItemWidget extends StatelessWidget {
                       style: bodyLarge?.copyWith(
                         color: ColorConstants.walterWhite,
                         fontFamily: DmSans,
-                        fontSize: 16
+                        fontSize: 16,
                       ),
                     ),
                   if (hasSubtitle)

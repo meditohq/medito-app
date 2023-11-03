@@ -160,9 +160,9 @@ class AudioPlayerNotifier extends BaseAudioHandler
     }
   }
 
-  void skipForward30Secs() async {
+  void skipForward10Secs() async {
     var seekDuration = trackAudioPlayer.position.inMilliseconds +
-        Duration(seconds: 30).inMilliseconds;
+        Duration(seconds: 10).inMilliseconds;
     await trackAudioPlayer.seek(Duration(milliseconds: seekDuration));
   }
 

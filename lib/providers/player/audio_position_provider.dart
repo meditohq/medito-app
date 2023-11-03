@@ -21,8 +21,8 @@ void skipAudio(
 }) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
   switch (skip) {
-    case SKIP_AUDIO.SKIP_FORWARD_30:
-      audioPlayer.skipForward30Secs();
+    case SKIP_AUDIO.SKIP_FORWARD_10:
+      audioPlayer.skipForward10Secs();
       break;
     case SKIP_AUDIO.SKIP_BACKWARD_10:
       audioPlayer.skipBackward10Secs();
@@ -52,7 +52,7 @@ final audioPlaybackStreamProvider = StreamProvider<ProcessingState>((ref) {
 });
 
 //ignore: prefer-match-file-name
-enum SKIP_AUDIO { SKIP_FORWARD_30, SKIP_BACKWARD_10 }
+enum SKIP_AUDIO { SKIP_FORWARD_10, SKIP_BACKWARD_10 }
 
 class PositionAndPlayerStateState {
   final PlayerState playerState;

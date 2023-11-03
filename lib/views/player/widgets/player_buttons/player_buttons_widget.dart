@@ -20,9 +20,9 @@ class PlayerButtonsWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _rewindButton(ref),
-        SizedBox(width: 35),
+        SizedBox(width: 32),
         _playPauseButton(),
-        SizedBox(width: 35),
+        SizedBox(width: 32),
         _forwardButton(ref),
       ],
     );
@@ -32,7 +32,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     return InkWell(
       onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
       child: Icon(
-        Icons.replay_10,
+        Icons.replay_10_rounded,
         size: 40,
       ),
     );
@@ -40,9 +40,9 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   InkWell _forwardButton(WidgetRef ref) {
     return InkWell(
-      onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_30),
+      onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_10),
       child: Icon(
-        Icons.forward_30,
+        Icons.forward_10_rounded,
         size: 40,
       ),
     );

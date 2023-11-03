@@ -118,24 +118,28 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   Widget _buildListTile(
-    PackItemsModel item,
-    bool isLast,
-  ) {
-    //ignore: prefer-conditional-expressions
-    if (item.type == TypeConstants.TRACK && item.isCompleted == false) {
-      return PackDismissibleWidget(
+      PackItemsModel item,
+      bool isLast,
+      ) {
+    return InkWell(
+      onTap: () {
+        _onListItemTap(item.id, item.type, item.path, context);
+      },
+      splashColor: ColorConstants.charcoal,
+      child: item.type == TypeConstants.TRACK && item.isCompleted == false
+          ? PackDismissibleWidget(
         child: PackItemWidget(isLast: isLast, item: item),
         onUpdateCb: () {
           ref.read(packProvider(packId: widget.id).notifier).markComplete(
-                audioFileId: item.path.getIdFromPath(),
-                trackId: item.id,
-              );
+            audioFileId: item.path.getIdFromPath(),
+            trackId: item.id,
+          );
         },
-      );
-    } else {
-      return PackItemWidget(isLast: isLast, item: item);
-    }
+      )
+          : PackItemWidget(isLast: isLast, item: item),
+    );
   }
+
 
   void _onListItemTap(
     String? id,

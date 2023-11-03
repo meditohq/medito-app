@@ -72,21 +72,21 @@ class _DurationIndicatorWidgetState
   }
 
   Padding _durationBar(
-    BuildContext context,
-    WidgetRef ref,
-    num currentDuration,
-    PositionAndPlayerStateState data,
-  ) {
+      BuildContext context,
+      WidgetRef ref,
+      num currentDuration,
+      PositionAndPlayerStateState data,
+      ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(left:20, right: 20, top:0, bottom:0),
       child: Column(
         children: [
           SliderTheme(
             data: SliderThemeData(
-              trackHeight: 8,
-              trackShape: CustomTrackShape(),
+              trackHeight: 6,
+              trackShape: CustomTrackShape(addTopPadding: false),
               thumbShape: RoundSliderThumbShape(
-                enabledThumbRadius: 5.0,
+                enabledThumbRadius: 6.0,
               ),
             ),
             child: Slider(
@@ -106,15 +106,20 @@ class _DurationIndicatorWidgetState
               onChangeEnd: (val) => onChangeEnd(ref, data, val),
             ),
           ),
-          _durationLabels(
-            context,
-            currentDuration.round(),
-            _maxDuration.round(),
+          // Adjust the position here
+          Transform.translate(
+            offset: Offset(0,-14), // adjust the value to achieve the desired alignment
+            child: _durationLabels(
+              context,
+              currentDuration.round(),
+              _maxDuration.round(),
+            ),
           ),
         ],
       ),
     );
   }
+
 
   Row _durationLabels(
     BuildContext context,
@@ -143,9 +148,9 @@ class _DurationIndicatorWidgetState
     return Text(
       label,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: ColorConstants.walterWhite,
+            color: ColorConstants.graphite,
             fontFamily: DmMono,
-            fontSize: 14,
+            fontSize: 12,
           ),
     );
   }
@@ -169,7 +174,7 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     final trackLeft = offset.dx;
     var trackTop;
     trackTop = addTopPadding
-        ? offset.dy + (boxHeight - trackHeight) / 2 + 12
+        ? offset.dy + (boxHeight - trackHeight) / 2 + 6
         : boxHeight / 2 - 2;
     final trackWidth = parentBox.size.width;
 
