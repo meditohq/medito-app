@@ -362,6 +362,8 @@ Future<void> handleNavigation(
       var _info =
           '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
 
+      path = ids.first;
+
       await launchEmailSubmission(
         path.toString(),
         body: _info,
