@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_large.dart';
@@ -65,18 +64,18 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   void _scrollListener() {
-    setState(() {});
+    setState(() => {});
   }
 
   RefreshIndicator _buildScaffoldWithData(
-      PackModel pack,
-      WidgetRef ref,
-      ) {
+    PackModel pack,
+    WidgetRef ref,
+  ) {
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
       child: CustomScrollView(
         controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),  // Added this line
+        physics: const AlwaysScrollableScrollPhysics(), // Added this line
         slivers: [
           MeditoAppBarLarge(
             scrollController: _scrollController,
@@ -85,7 +84,8 @@ class _PackViewState extends ConsumerState<PackView>
           ),
           SliverList(
             delegate: SliverChildListDelegate(
-              [DescriptionWidget(description: pack.description)].cast<Widget>() +
+              [DescriptionWidget(description: pack.description)]
+                      .cast<Widget>() +
                   _listItems(pack, ref) +
                   [
                     BottomPaddingWidget(),
@@ -96,7 +96,6 @@ class _PackViewState extends ConsumerState<PackView>
       ),
     );
   }
-
 
   List<Widget> _listItems(PackModel pack, WidgetRef ref) {
     return pack.items
@@ -118,9 +117,9 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   Widget _buildListTile(
-      PackItemsModel item,
-      bool isLast,
-      ) {
+    PackItemsModel item,
+    bool isLast,
+  ) {
     return InkWell(
       onTap: () {
         _onListItemTap(item.id, item.type, item.path, context);
@@ -128,18 +127,17 @@ class _PackViewState extends ConsumerState<PackView>
       splashColor: ColorConstants.charcoal,
       child: item.type == TypeConstants.TRACK && item.isCompleted == false
           ? PackDismissibleWidget(
-        child: PackItemWidget(isLast: isLast, item: item),
-        onUpdateCb: () {
-          ref.read(packProvider(packId: widget.id).notifier).markComplete(
-            audioFileId: item.path.getIdFromPath(),
-            trackId: item.id,
-          );
-        },
-      )
+              child: PackItemWidget(isLast: isLast, item: item),
+              onUpdateCb: () {
+                ref.read(packProvider(packId: widget.id).notifier).markComplete(
+                      audioFileId: item.path.getIdFromPath(),
+                      trackId: item.id,
+                    );
+              },
+            )
           : PackItemWidget(isLast: isLast, item: item),
     );
   }
-
 
   void _onListItemTap(
     String? id,
