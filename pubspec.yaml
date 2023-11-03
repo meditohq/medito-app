@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.0.7+30007
+version: 3.0.9+3009
 environment:
   sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
@@ -28,10 +28,10 @@ dependencies:
   shared_preferences: ^2.0.5
   auto_size_text: ^3.0.0-nullsafety.0
   just_audio:
-    git: 
+    git:
       url: https://github.com/meditohq/just_audio.git
       ref: feature/treadmill
-      path: just_audio  
+      path: just_audio
   audio_service: ^0.18.10
   rxdart: ^0.27.1
   share: ^2.0.1
@@ -79,6 +79,7 @@ dev_dependencies:
 
 flutter:
   assets:
+    - assets/
     - .prod.env
     - .staging.env
     - assets/images/
