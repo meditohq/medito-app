@@ -12,7 +12,7 @@ class MiniPlayerWidget extends ConsumerWidget {
   final TrackModel trackModel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         context.push(RouteConstants.playerPath);
       },
@@ -41,8 +41,12 @@ class MiniPlayerWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
-        child: SizedBox(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(7),
+            topRight: Radius.circular(2),
+            bottomRight: Radius.circular(2),
+            bottomLeft: Radius.circular(12)
+        ),        child: SizedBox(
           height: 40,
           width: 40,
           child: NetworkImageWidget(
