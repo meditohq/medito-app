@@ -53,28 +53,80 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
 
   @override
   Widget build(BuildContext context) {
+    var connectivityStatus =
+        ref.watch(connectivityStatusProvider) as ConnectivityStatus;
+
+    ref.listen(connectivityStatusProvider, (prev, next) {
+      var state = next as ConnectivityStatus;
+      if (state == ConnectivityStatus.isDisonnected) {
+        showSnackBar(context, StringConstants.connectivityError);
+      }
+    });
+    var localBackgroundSounds =
+        ref.watch(fetchLocallySavedBackgroundSoundsProvider);
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
+
+    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+      return Scaffold(
+        body: localBackgroundSounds.when(
+          skipLoadingOnRefresh: true,
+          skipLoadingOnReload: true,
+          data: (data) {
+            if (data != null) {
+              return _mainContent(
+                connectivityStatus,
+                data,
+              );
+            }
+
+            return MeditoErrorWidget(
+              message: StringConstants.noBgSoundAvailable,
+              onTap: () => ref.refresh(backgroundSoundsProvider),
+            );
+          },
+          error: (err, stack) {
+            return MeditoErrorWidget(
+              message: err.toString(),
+              onTap: () =>
+                  ref.refresh(fetchLocallySavedBackgroundSoundsProvider),
+            );
+          },
+          loading: () => BackgroundSoundsShimmerWidget(),
+        ),
+      );
+    }
 
     return Scaffold(
       body: backgroundSounds.when(
         skipLoadingOnRefresh: false,
         data: (data) => _mainContent(
+          connectivityStatus,
           data,
         ),
-        error: (err, stack) => MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(backgroundSoundsProvider),
-        ),
+        error: (err, stack) {
+          return MeditoErrorWidget(
+            message: err.toString(),
+            onTap: () => ref.refresh(backgroundSoundsProvider),
+          );
+        },
         loading: () => BackgroundSoundsShimmerWidget(),
       ),
     );
   }
 
   RefreshIndicator _mainContent(
+    ConnectivityStatus status,
     List<BackgroundSoundsModel> data,
   ) {
     return RefreshIndicator(
-      onRefresh: () async => await ref.refresh(backgroundSoundsProvider),
+      onRefresh: () async {
+        if (status == ConnectivityStatus.isDisonnected) {
+          return;
+        } else {
+          ref.invalidate(backgroundSoundsProvider);
+          ref.read(backgroundSoundsProvider);
+        }
+      },
       child: CollapsibleHeaderWidget(
         title: StringConstants.backgroundSounds,
         leadingIconBgColor: ColorConstants.walterWhite,

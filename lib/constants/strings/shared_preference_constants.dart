@@ -3,6 +3,7 @@ class SharedPreferenceConstants {
   static const String userEmail = 'userEmail';
   static const String bgSoundVolume = 'bgSoundVolume';
   static const String bgSound = 'bgSound';
+  static const String listBgSound = 'listBgSound';
   static const String sessionAudioSpeed = 'sessionAudioSpeed';
   static const String downloads = 'downloads';
   static const String currentPlayingTrack = 'currentPlayingTrack';
