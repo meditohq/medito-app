@@ -75,7 +75,7 @@ class _PackViewState extends ConsumerState<PackView>
       onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
       child: CustomScrollView(
         controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(), // Added this line
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           MeditoAppBarLarge(
             scrollController: _scrollController,
