@@ -12,6 +12,8 @@ class DropdownWidget<T> extends StatelessWidget {
     this.topRight = 14,
     this.bottomLeft = 14,
     this.bottomRight = 14,
+    this.disabled = true,
+    this.disabledLabelText = '',
   });
   final List<DropdownMenuItem<T>>? items;
   final void Function(T?)? onChanged;
@@ -21,6 +23,8 @@ class DropdownWidget<T> extends StatelessWidget {
   final double topRight;
   final double bottomLeft;
   final double bottomRight;
+  final bool disabled;
+  final String disabledLabelText;
   @override
   Widget build(BuildContext context) {
     var radius = BorderRadius.only(
@@ -29,6 +33,12 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomLeft: Radius.circular(bottomLeft),
       bottomRight: Radius.circular(bottomRight),
     );
+    var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
+          fontFamily: DmMono,
+          color: ColorConstants.walterWhite,
+          fontWeight: FontWeight.w400,
+          fontSize: 16,
+        );
 
     return Container(
       decoration: BoxDecoration(
@@ -36,34 +46,50 @@ class DropdownWidget<T> extends StatelessWidget {
         color: ColorConstants.onyx,
       ),
       padding: EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          if (iconData != null)
-            Icon(
-              iconData,
-              color: ColorConstants.walterWhite,
-            ),
-          if (iconData != null) width12,
-          Expanded(
-            child: DropdownButton<T>(
-              value: value,
-              icon: const Icon(Icons.keyboard_arrow_down),
-              isExpanded: true,
-              style: Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
-                    fontFamily: DmMono,
-                    color: ColorConstants.walterWhite,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                  ),
-              onChanged: onChanged,
-              dropdownColor: ColorConstants.onyx,
-              focusColor: ColorConstants.onyx,
-              borderRadius: radius,
-              underline: SizedBox(),
-              items: items,
-            ),
+      child: _buildRow(radius, textStyle),
+    );
+  }
+
+  Row _buildRow(
+    BorderRadius radius,
+    TextStyle? textStyle,
+  ) {
+    return Row(
+      children: [
+        if (iconData != null)
+          Icon(
+            iconData,
+            color: ColorConstants.walterWhite,
           ),
-        ],
+        if (iconData != null) width12,
+        disabled
+            ? _dropdown(textStyle, radius)
+            : SizedBox(
+                height: 48,
+                child: Center(
+                  child: Text(
+                    disabledLabelText,
+                    style: textStyle,
+                  ),
+                ),
+              ),
+      ],
+    );
+  }
+
+  Expanded _dropdown(TextStyle? textStyle, BorderRadius radius) {
+    return Expanded(
+      child: DropdownButton<T>(
+        value: value,
+        icon: disabled ? const Icon(Icons.keyboard_arrow_down) : SizedBox(),
+        isExpanded: true,
+        style: textStyle,
+        onChanged: onChanged,
+        dropdownColor: ColorConstants.onyx,
+        focusColor: ColorConstants.onyx,
+        borderRadius: radius,
+        underline: SizedBox(),
+        items: items,
       ),
     );
   }
