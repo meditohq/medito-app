@@ -335,14 +335,13 @@ Future<void> handleNavigation(
   if (place == TypeConstants.TRACK) {
     unawaited(showModalBottomSheet<void>(
       context: context!,
-      constraints: BoxConstraints(maxHeight: 600),
-      isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(24.0),
         ),
       ),
       useRootNavigator: true,
+      isScrollControlled: true,
       backgroundColor: ColorConstants.ebony,
       builder: (BuildContext context) {
         return TrackView(

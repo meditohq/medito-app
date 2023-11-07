@@ -101,17 +101,14 @@ class _TrackViewState extends ConsumerState<TrackView>
       }
     });
 
-    return Scaffold(
-      backgroundColor: ColorConstants.transparent,
-      body: tracks.when(
-        skipLoadingOnRefresh: false,
-        data: (data) => _buildScaffoldWithData(context, data, ref),
-        error: (err, stack) => MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
-        ),
-        loading: () => _buildLoadingWidget(),
+    return tracks.when(
+      skipLoadingOnRefresh: false,
+      data: (data) => _buildScaffoldWithData(context, data, ref),
+      error: (err, stack) => MeditoErrorWidget(
+        message: err.toString(),
+        onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
       ),
+      loading: () => _buildLoadingWidget(),
     );
   }
 
@@ -122,52 +119,58 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     WidgetRef ref,
   ) {
-    return SingleChildScrollView(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: SizedBox(
-                    height: 248,
-                    child: NetworkImageWidget(
-                      url: trackModel.coverUrl,
-                      isCache: true,
+    return Container(
+      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+      child: SingleChildScrollView(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                alignment: Alignment.topCenter,
+                fit: StackFit.passthrough,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: SizedBox(
+                      height: 248,
+                      child: NetworkImageWidget(
+                        url: trackModel.coverUrl,
+                        isCache: true,
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: HandleBarWidget(),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  height32,
-                  _title(context, trackModel.title),
-                  _getSubTitle(context, trackModel.description),
-                  height32,
-                  Row(
-                    children: [
-                      _artist(trackModel),
-                      _duration(trackModel),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: HandleBarWidget(),
                   ),
-                  height12,
-                  _playBtn(context, ref, trackModel),
                 ],
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    height32,
+                    _title(context, trackModel.title),
+                    _getSubTitle(context, trackModel.description),
+                    height32,
+                    Row(
+                      children: [
+                        _artist(trackModel),
+                        _duration(trackModel),
+                      ],
+                    ),
+                    height12,
+                    _playBtn(context, ref, trackModel),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -218,6 +221,9 @@ class _TrackViewState extends ConsumerState<TrackView>
         value: selectedDuration ?? audioFiles.first,
         iconData: Icons.timer_sharp,
         bottomRight: 7,
+        isDisabled: audioFiles.length > 1,
+        disabledLabelText:
+            '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} mins',
         items: files(_selectedFile ?? audioFiles)
             .map<DropdownMenuItem<TrackFilesModel>>(
           (TrackFilesModel value) {
@@ -245,6 +251,8 @@ class _TrackViewState extends ConsumerState<TrackView>
                 value: selectedAudio ?? audio,
                 iconData: Icons.face,
                 bottomLeft: 7,
+                isDisabled: trackModel.audio.length > 1,
+                disabledLabelText: '${audio.guideName}',
                 items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
                   (TrackAudioModel value) {
                     return DropdownMenuItem<TrackAudioModel>(
@@ -285,6 +293,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
 
       return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           height8,
           MarkdownWidget(
@@ -301,6 +310,14 @@ class _TrackViewState extends ConsumerState<TrackView>
               fontFamily: DmSans,
               decoration: TextDecoration.underline,
             ),
+            onTapLink: (text, href, title) {
+              context.pop();
+              var location = GoRouter.of(context).location;
+              context.push(
+                location + RouteConstants.webviewPath,
+                extra: {'url': href},
+              );
+            },
           ),
         ],
       );
