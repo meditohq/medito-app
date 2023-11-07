@@ -5,6 +5,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -40,8 +41,8 @@ Future<PermissionStatus> requestPermission() async {
   return settings;
 }
 
-Future<void> initializeNotification(WidgetRef ref) async {
-  await initializeLocalNotification(ref);
+Future<void> initializeNotification(BuildContext context, WidgetRef ref) async {
+  await initializeLocalNotification(context, ref);
 
   // For handling the received notifications
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -53,7 +54,10 @@ Future<void> initializeNotification(WidgetRef ref) async {
   });
 }
 
-Future<void> initializeLocalNotification(WidgetRef ref) async {
+Future<void> initializeLocalNotification(
+  BuildContext context,
+  WidgetRef ref,
+) async {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('notification_icon_push');
   var initializationSettingsIOS = DarwinInitializationSettings(
@@ -75,38 +79,43 @@ Future<void> initializeLocalNotification(WidgetRef ref) async {
       if (res.payload != null) {
         var payload = json.decode(res.payload!);
         var notificationPaylaod = NotificationPayloadModel.fromJson(payload);
-        _navigate(ref, notificationPaylaod);
+        _navigate(context, ref, notificationPaylaod);
       }
     },
   );
 }
 
-void checkInitialMessage(WidgetRef ref) async {
+void checkInitialMessage(BuildContext context, WidgetRef ref) async {
   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
     var notificationPaylaod =
         NotificationPayloadModel.fromJson(initialMessage.data);
-    _navigate(ref, notificationPaylaod);
+    _navigate(context, ref, notificationPaylaod);
   }
 }
 
-void onMessageAppOpened(WidgetRef ref) {
+void onMessageAppOpened(BuildContext context, WidgetRef ref) {
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     var notificationPaylaod = NotificationPayloadModel.fromJson(message.data);
-    _navigate(ref, notificationPaylaod);
+    _navigate(context, ref, notificationPaylaod);
   });
 }
 
-void _navigate(WidgetRef ref, NotificationPayloadModel data) {
-  var context = ref.read(goRouterProvider);
+void _navigate(
+  BuildContext context,
+  WidgetRef ref,
+  NotificationPayloadModel data,
+) {
+  var goRouterContext = ref.read(goRouterProvider);
   if (data.type.isNotNullAndNotEmpty()) {
     handleNavigation(
-      goRouterContext: context,
+      goRouterContext: goRouterContext,
+      context: context,
       data.type,
       [data.id.toString().getIdFromPath(), data.path],
     );
   } else {
-    context.go(RouteConstants.homePath);
+    goRouterContext.go(RouteConstants.homePath);
   }
 }
 

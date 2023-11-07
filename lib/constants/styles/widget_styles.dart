@@ -9,6 +9,7 @@ const miniPlayerHeight = 56.0;
 const height32 = SizedBox(height:32);
 const height24 = SizedBox(height:24);
 const height16 = SizedBox(height: 16);
+const height12 = SizedBox(height: 12);
 const width16 = SizedBox(width: 16);
 const width12 = SizedBox(width: 12);
 const height8 = SizedBox(height: 8);

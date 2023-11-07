@@ -34,6 +34,7 @@ class StringConstants {
   static const String swipeToDelete = 'Swipe left on a session to delete it';
   static const String narrator = 'Narrator';
   static const String duration = 'Duration';
+  static const String play = 'Play';
   static const String downloadSession = 'Download Session';
 
 //Player

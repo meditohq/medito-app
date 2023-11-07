@@ -8,77 +8,63 @@ class TrackShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var shimmerList = _shimmerList();
-
-    var list = List.generate(3, (index) => shimmerList);
+    var size = MediaQuery.of(context).size;
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           BoxShimmerWidget(
-            height: 380,
+            height: 280,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                height8,
-                height8,
+                height12,
                 BoxShimmerWidget(
                   height: 15,
                   width: 150,
                   borderRadius: 14,
                 ),
-                height8,
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.spaceBetween,
-                  children: list,
-                ),
-                height8,
-                height8,
+                height12,
                 BoxShimmerWidget(
                   height: 15,
-                  width: 150,
+                  width: 200,
                   borderRadius: 14,
                 ),
-                height8,
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.spaceBetween,
-                  children: list,
+                height32,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: BoxShimmerWidget(
+                        height: 48,
+                        width: size.width,
+                        borderRadius: 14,
+                      ),
+                    ),
+                    width12,
+                    Expanded(
+                      child: BoxShimmerWidget(
+                        height: 48,
+                        width: size.width,
+                        borderRadius: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                height32,
+                BoxShimmerWidget(
+                  height: 48,
+                  width: size.width,
+                  borderRadius: 14,
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Padding _shimmerList() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Container(
-        width: 171,
-        height: 56,
-        decoration: BoxDecoration(
-          color: ColorConstants.onyx,
-          borderRadius: BorderRadius.all(
-            Radius.circular(14),
-          ),
-        ),
-        child: Center(
-          child: BoxShimmerWidget(
-            height: 10,
-            width: 100,
-            borderRadius: 14,
-          ),
-        ),
       ),
     );
   }

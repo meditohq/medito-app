@@ -123,8 +123,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         SystemUiOverlay.top,
       ],
     );
-    onMessageAppOpened(ref);
-    initializeNotification(ref);
+    onMessageAppOpened(context,ref);
+    initializeNotification( context, ref);
     WidgetsBinding.instance.addObserver(this);
   }
 
