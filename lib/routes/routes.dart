@@ -333,7 +333,25 @@ Future<void> handleNavigation(
   var path;
   var params;
   if (place == TypeConstants.TRACK) {
-    path = RouteConstants.trackPath.replaceAll(':sid', ids.first!);
+    unawaited(showModalBottomSheet<void>(
+      context: context!,
+      constraints: BoxConstraints(maxHeight: 600),
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24.0),
+        ),
+      ),
+      useRootNavigator: true,
+      backgroundColor: ColorConstants.ebony,
+      builder: (BuildContext context) {
+        return TrackView(
+          id: ids.first!,
+        );
+      },
+    ));
+
+    return;
   } else if (place != null && place.contains('pack3')) {
     path = RouteConstants.pack3Path
         .replaceAll(':pid', ids.first!)

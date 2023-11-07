@@ -71,7 +71,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
             fontFamily: ClashDisplay,
             color: ColorConstants.walterWhite,
             fontWeight: FontWeight.w600,
-            letterSpacing: 0.2
+            letterSpacing: 0.2,
           ),
     );
   }
