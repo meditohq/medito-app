@@ -12,7 +12,7 @@ class DropdownWidget<T> extends StatelessWidget {
     this.topRight = 14,
     this.bottomLeft = 14,
     this.bottomRight = 14,
-    this.disabled = true,
+    this.isDisabled = true,
     this.disabledLabelText = '',
   });
   final List<DropdownMenuItem<T>>? items;
@@ -23,7 +23,7 @@ class DropdownWidget<T> extends StatelessWidget {
   final double topRight;
   final double bottomLeft;
   final double bottomRight;
-  final bool disabled;
+  final bool isDisabled;
   final String disabledLabelText;
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class DropdownWidget<T> extends StatelessWidget {
             color: ColorConstants.walterWhite,
           ),
         if (iconData != null) width12,
-        disabled
+        isDisabled
             ? _dropdown(textStyle, radius)
             : SizedBox(
                 height: 48,
@@ -81,7 +81,7 @@ class DropdownWidget<T> extends StatelessWidget {
     return Expanded(
       child: DropdownButton<T>(
         value: value,
-        icon: disabled ? const Icon(Icons.keyboard_arrow_down) : SizedBox(),
+        icon: isDisabled ? const Icon(Icons.keyboard_arrow_down) : SizedBox(),
         isExpanded: true,
         style: textStyle,
         onChanged: onChanged,

@@ -221,7 +221,7 @@ class _TrackViewState extends ConsumerState<TrackView>
         value: selectedDuration ?? audioFiles.first,
         iconData: Icons.timer_sharp,
         bottomRight: 7,
-        disabled: audioFiles.length > 1,
+        isDisabled: audioFiles.length > 1,
         disabledLabelText:
             '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} mins',
         items: files(_selectedFile ?? audioFiles)
@@ -251,7 +251,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                 value: selectedAudio ?? audio,
                 iconData: Icons.face,
                 bottomLeft: 7,
-                disabled: trackModel.audio.length > 1,
+                isDisabled: trackModel.audio.length > 1,
                 disabledLabelText: '${audio.guideName}',
                 items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
                   (TrackAudioModel value) {
