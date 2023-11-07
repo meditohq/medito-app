@@ -23,7 +23,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   void initState() {
     ref.read(rootCombineProvider(context));
     ref.read(checkNotificationPermissionProvider(context));
-    checkInitialMessage(ref);
+    checkInitialMessage(context, ref);
     super.initState();
   }
 

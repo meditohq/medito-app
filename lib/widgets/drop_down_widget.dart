@@ -25,22 +25,34 @@ class DropdownWidget<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(topLeft),
+          topRight: Radius.circular(topRight),
+          bottomLeft: Radius.circular(bottomLeft),
+          bottomRight: Radius.circular(bottomRight),
+        ),
         color: ColorConstants.onyx,
       ),
       padding: EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          if (iconData != null) Icon(iconData),
+          if (iconData != null)
+            Icon(
+              iconData,
+              color: ColorConstants.walterWhite,
+            ),
           if (iconData != null) width12,
           Expanded(
             child: DropdownButton<T>(
               value: value,
               icon: const Icon(Icons.keyboard_arrow_down),
               isExpanded: true,
-              style: const TextStyle(
-                color: ColorConstants.walterWhite,
-              ),
+              style: Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
+                    fontFamily: DmMono,
+                    color: ColorConstants.walterWhite,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
               onChanged: onChanged,
               dropdownColor: ColorConstants.onyx,
               focusColor: ColorConstants.onyx,

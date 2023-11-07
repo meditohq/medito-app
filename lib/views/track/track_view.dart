@@ -131,11 +131,14 @@ class _TrackViewState extends ConsumerState<TrackView>
             Stack(
               alignment: Alignment.topCenter,
               children: [
-                SizedBox(
-                  height: 248,
-                  child: NetworkImageWidget(
-                    url: trackModel.coverUrl,
-                    isCache: true,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: SizedBox(
+                    height: 248,
+                    child: NetworkImageWidget(
+                      url: trackModel.coverUrl,
+                      isCache: true,
+                    ),
                   ),
                 ),
                 Padding(
@@ -211,7 +214,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Flexible(
       child: DropdownWidget<TrackFilesModel>(
         value: selectedDuration ?? audioFiles.first,
-        iconData: Icons.face,
+        iconData: Icons.timer_sharp,
         bottomRight: 7,
         items: files(_selectedFile ?? audioFiles)
             .map<DropdownMenuItem<TrackFilesModel>>(
@@ -295,7 +298,6 @@ class _TrackViewState extends ConsumerState<TrackView>
               color: ColorConstants.walterWhite,
               fontFamily: DmSans,
               decoration: TextDecoration.underline,
-              height: 1.5,
             ),
           ),
         ],
