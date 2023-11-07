@@ -23,14 +23,16 @@ class DropdownWidget<T> extends StatelessWidget {
   final double bottomRight;
   @override
   Widget build(BuildContext context) {
+    var radius = BorderRadius.only(
+      topLeft: Radius.circular(topLeft),
+      topRight: Radius.circular(topRight),
+      bottomLeft: Radius.circular(bottomLeft),
+      bottomRight: Radius.circular(bottomRight),
+    );
+
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(topLeft),
-          topRight: Radius.circular(topRight),
-          bottomLeft: Radius.circular(bottomLeft),
-          bottomRight: Radius.circular(bottomRight),
-        ),
+        borderRadius: radius,
         color: ColorConstants.onyx,
       ),
       padding: EdgeInsets.symmetric(horizontal: 12),
@@ -56,12 +58,7 @@ class DropdownWidget<T> extends StatelessWidget {
               onChanged: onChanged,
               dropdownColor: ColorConstants.onyx,
               focusColor: ColorConstants.onyx,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(topLeft),
-                topRight: Radius.circular(topRight),
-                bottomLeft: Radius.circular(bottomLeft),
-                bottomRight: Radius.circular(bottomRight),
-              ),
+              borderRadius: radius,
               underline: SizedBox(),
               items: items,
             ),
