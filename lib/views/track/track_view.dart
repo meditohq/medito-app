@@ -174,22 +174,24 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   InkWell _playBtn(BuildContext context, WidgetRef ref, TrackModel trackModel) {
+    var radius = BorderRadius.only(
+      topLeft: Radius.circular(7),
+      topRight: Radius.circular(7),
+      bottomRight: Radius.circular(24),
+      bottomLeft: Radius.circular(24),
+    );
+
     return InkWell(
       onTap: () {
         var _file = selectedDuration ?? trackModel.audio.first.files.first;
         _handlePlay(context, ref, trackModel, _file);
       },
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: radius,
       child: Ink(
         height: 56,
         decoration: BoxDecoration(
           color: ColorConstants.walterWhite,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(7),
-            topRight: Radius.circular(7),
-            bottomRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-          ),
+          borderRadius: radius,
         ),
         child: Center(
           child: Text(
