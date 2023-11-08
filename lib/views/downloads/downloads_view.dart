@@ -144,7 +144,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     WidgetRef ref,
     TrackModel trackModel,
   ) {
-    ref.read(playerProvider.notifier).addCurrentlyPlayingTrackInPreference(
+    ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,
         );

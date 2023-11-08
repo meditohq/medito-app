@@ -108,19 +108,16 @@ class AudioPlayerNotifier extends BaseAudioHandler
     TrackModel trackModel,
     TrackFilesModel file, {
     String? filePath,
-  }) async {
+  }) {
     try {
       if (filePath != null) {
         unawaited(trackAudioPlayer.setFilePath(filePath));
         setMediaItem(trackModel, file, filePath: filePath);
       } else {
         setMediaItem(trackModel, file);
-        final audioSource =
-            LockCachingAudioSource(Uri.parse(file.path), headers: {
+        trackAudioPlayer.setUrl(file.path, headers: {
           HttpHeaders.authorizationHeader: _contentToken,
         });
-        await trackAudioPlayer.setAudioSource(await audioSource.resolve());
-        ;
       }
     } catch (e) {
       unawaited(Sentry.captureException(

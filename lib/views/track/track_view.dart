@@ -74,10 +74,9 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackFilesModel file,
   ) async {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
+    await audioProvider.stop();
     audioProvider.clearAssetCache();
-    await ref
-        .read(playerProvider.notifier)
-        .addCurrentlyPlayingTrackInPreference(
+    await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: file,
         );
