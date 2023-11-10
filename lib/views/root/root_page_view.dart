@@ -48,18 +48,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       backgroundColor: ColorConstants.black,
       resizeToAvoidBottomInset: false,
       body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          if (scrollNotification is ScrollUpdateNotification &&
-              scrollNotification.depth == 0) {
-            ref
-                .read(pageviewNotifierProvider.notifier)
-                .updateScrollProportion(scrollNotification);
-          }
-
-          return true;
-        },
         child: PageView(
-          controller: ref.read(pageviewNotifierProvider).pageController,
           scrollDirection: Axis.vertical,
           physics: ClampingScrollPhysics(),
           children: [
@@ -82,7 +71,9 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     var location = GoRouter.of(context).location;
     if (location == RouteConstants.downloadsPath) {
       return widget.firstChild;
-    } else if (status == ConnectivityStatus.isDisonnected) {
+    } else if ((location != RouteConstants.downloadsPath &&
+            location != RouteConstants.playerPath) &&
+        status == ConnectivityStatus.isDisonnected) {
       return ConnectivityErrorWidget();
     } else {
       return widget.firstChild;

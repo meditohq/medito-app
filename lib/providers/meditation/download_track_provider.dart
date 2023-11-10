@@ -9,6 +9,7 @@ part 'download_track_provider.g.dart';
 
 @riverpod
 Future<List<TrackModel>> downloadedTracks(ref) {
+  ref.keepAlive();
   return ref.watch(trackRepositoryProvider).fetchTrackFromPreference();
 }
 

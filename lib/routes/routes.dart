@@ -113,6 +113,7 @@ final router = GoRouter(
           ),
           routes: [
             _getWebviewRoute(),
+            _getDownloadsRoute(),
           ],
         ),
         _getTrackRoute(fromRoot: true),
@@ -120,10 +121,6 @@ final router = GoRouter(
         _getConnectivityErrorRoute(fromRoot: true),
         _getDownloadsRoute(fromRoot: true),
         _getSearchRoute(fromRoot: true),
-        GoRoute(
-          path: RouteConstants.collectionPath,
-          pageBuilder: (context, state) => getCollectionMaterialPage(state),
-        ),
         GoRoute(
           path: RouteConstants.packPath,
           routes: [
@@ -152,7 +149,7 @@ final router = GoRouter(
     ),
     _getBackgroundSoundRoute(),
     _getNotificationPermissionRoute(),
-    _getPlayerRoute(),
+    _getPlayerRoute(fromRoot: true),
     _getWebviewRoute(fromRoot: true),
   ],
 );
@@ -169,29 +166,16 @@ GoRoute _getTrackRoute({bool fromRoot = false}) {
   );
 }
 
-GoRoute _getPlayerRoute() {
+GoRoute _getPlayerRoute({bool fromRoot = false}) {
   return GoRoute(
     parentNavigatorKey: _rootNavigatorKey,
-    path: RouteConstants.playerPath,
+    path: fromRoot
+        ? RouteConstants.playerPath
+        : RouteConstants.playerPath.sanitisePath(),
     pageBuilder: (context, state) {
-      return CustomTransitionPage<void>(
+      return MaterialPage(
         key: state.pageKey,
-        opaque: false,
-        maintainState: false,
         child: PlayerView(),
-        transitionDuration: Duration(milliseconds: 500),
-        reverseTransitionDuration: Duration(milliseconds: 500),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 1.0);
-          const end = Offset.zero;
-          final tween = Tween(begin: begin, end: end);
-          final offsetAnimation = animation.drive(tween);
-
-          return SlideTransition(
-            position: offsetAnimation,
-            child: child,
-          );
-        },
       );
     },
   );
@@ -270,17 +254,19 @@ GoRoute _getSearchRoute({bool fromRoot = false}) {
 
 GoRoute _getDownloadsRoute({bool fromRoot = false}) {
   return GoRoute(
-    parentNavigatorKey: _shellNavigatorKey,
-    path: fromRoot
-        ? RouteConstants.downloadsPath
-        : RouteConstants.downloadsPath.sanitisePath(),
-    pageBuilder: (context, state) {
-      return MaterialPage(
-        key: state.pageKey,
-        child: DownloadsView(),
-      );
-    },
-  );
+      parentNavigatorKey: _shellNavigatorKey,
+      path: fromRoot
+          ? RouteConstants.downloadsPath
+          : RouteConstants.downloadsPath.sanitisePath(),
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: DownloadsView(),
+        );
+      },
+      routes: [
+        _getPlayerRoute(),
+      ]);
 }
 
 //ignore: prefer-match-file-name
@@ -305,11 +291,6 @@ MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
     key: state.pageKey,
     child: TrackView(id: state.params['did'] ?? ''),
   );
-}
-
-//Can be altered to open other pages in the app other than Downloads (eg Faves)
-MaterialPage<void> getCollectionMaterialPage(GoRouterState state) {
-  return MaterialPage(key: state.pageKey, child: DownloadsView());
 }
 
 MaterialPage<void> getFolderMaterialPage(GoRouterState state) {

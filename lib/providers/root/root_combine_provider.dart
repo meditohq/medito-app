@@ -15,7 +15,6 @@ final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
   ref.read(postLocalStatsProvider);
   ref.read(deviceAppAndUserInfoProvider);
   ref.read(audioDownloaderProvider).deleteDownloadedFileFromPreviousVersion();
-  ref.read(pageviewNotifierProvider).addListenerToPage();
 
   var streamEvent = audioPlayerProvider.trackAudioPlayer.playerStateStream
       .map((event) => event.processingState)

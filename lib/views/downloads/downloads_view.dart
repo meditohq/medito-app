@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/constants/constants.dart';
@@ -17,13 +19,14 @@ class DownloadsView extends ConsumerStatefulWidget {
 }
 
 class _DownloadsViewState extends ConsumerState<DownloadsView>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
   List<TrackModel> downloadedTracks = [];
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final downloadedTracks = ref.watch(downloadedTracksProvider);
 
     return Scaffold(
@@ -143,20 +146,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   void _openPlayer(
     WidgetRef ref,
     TrackModel trackModel,
-  ) {
-    ref.read(playerProvider.notifier).loadSelectedTrack(
+  ) async {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    await audioProvider.stop();
+    await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,
         );
-    context.push(RouteConstants.playerPath);
-  }
-
-  void showSwipeToDeleteTip() {
-    createSnackBar(
-      StringConstants.swipeToDelete,
-      context,
-      color: ColorConstants.walterWhite,
-    );
+    unawaited(context.push(RouteConstants.playerPath));
   }
 
   void _handleDismissable(DismissDirection _, TrackModel item) {
@@ -169,4 +166,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       color: ColorConstants.walterWhite,
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

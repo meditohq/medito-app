@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/artist_title_widget.dart';
-import 'widgets/background_image_widget.dart';
 import 'widgets/bottom_actions/bottom_action_widget.dart';
 import 'widgets/duration_indicator_widget.dart';
 import 'widgets/overlay_cover_image_widget.dart';
@@ -21,12 +20,6 @@ class PlayerView extends ConsumerStatefulWidget {
 
 class _PlayerViewState extends ConsumerState<PlayerView>
     with AutomaticKeepAliveClientMixin {
-  double _dragStartY = 0.0;
-  double _currentY = 0.0;
-  final _currentX = 0.0;
-  double _opacity = 1.0;
-  String heroTag = 'swipe-down-to-close';
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -41,98 +34,74 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     var artist = currentlyPlayingTrack.artist;
     var file = currentlyPlayingTrack.audio.first.files.first;
 
-    return GestureDetector(
-      onVerticalDragStart: _onVerticalDragStart,
-      onVerticalDragUpdate: _onVerticalDragUpdate,
-      onVerticalDragEnd: _onVerticalDragEnd,
-      child: Hero(
-        tag: heroTag,
-        child: Transform(
-          transform: Matrix4.translationValues(_currentX, _currentY, 0),
-          child: Opacity(
-            opacity: _opacity,
-            child: Scaffold(
-              extendBody: true,
-              extendBodyBehindAppBar: true,
-              body: Stack(
-                children: [
-                  BackgroundImageWidget(imageUrl: coverUrl),
-                  SafeArea(
-                    child: Column(
-                      children: [
-                        height16,
-                        HandleBarWidget(),
-                        height8,
-                        OverlayCoverImageWidget(imageUrl: coverUrl),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0,
-                          ),
-                          child: ArtistTitleWidget(
-                            trackTitle: currentlyPlayingTrack.title,
-                            artistName: artist?.name,
-                            artistUrlPath: artist?.path,
-                            isPlayerScreen: true,
-                          ),
-                        ),
-                        DurationIndicatorWidget(
-                          file: file,
-                          trackId: currentlyPlayingTrack.id,
-                        ),
-                        Spacer(),
-                        Transform.translate(
-                          offset: Offset(0, -20), // adjust the value as needed
-                          child: PlayerButtonsWidget(
-                            file: file,
-                            trackModel: currentlyPlayingTrack,
-                          ),
-                        ),
-                        Spacer(),
-                        BottomActionWidget(
-                          trackModel: currentlyPlayingTrack,
-                          file: file,
-                        ),
-                      ],
-                    ),
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        backgroundColor: ColorConstants.ebony,
+        body: SafeArea(
+          child: Column(
+            children: [
+              height20,
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: defaultPadding,
                   ),
-                ],
+                  child: CloseButtonWidget(
+                    icColor: ColorConstants.walterWhite,
+                    onPressed: _handleClose,
+                    isShowCircle: false,
+                  ),
+                ),
               ),
-            ),
+              height20,
+              OverlayCoverImageWidget(imageUrl: coverUrl),
+              height20,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                ),
+                child: ArtistTitleWidget(
+                  trackTitle: currentlyPlayingTrack.title,
+                  artistName: artist?.name,
+                  artistUrlPath: artist?.path,
+                  isPlayerScreen: true,
+                ),
+              ),
+              DurationIndicatorWidget(
+                file: file,
+                trackId: currentlyPlayingTrack.id,
+              ),
+              Spacer(),
+              Transform.translate(
+                offset: Offset(0, -20), // adjust the value as needed
+                child: PlayerButtonsWidget(
+                  file: file,
+                  trackModel: currentlyPlayingTrack,
+                ),
+              ),
+              Spacer(),
+              BottomActionWidget(
+                trackModel: currentlyPlayingTrack,
+                file: file,
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  void _onVerticalDragStart(DragStartDetails details) {
-    _dragStartY = details.globalPosition.dy;
-  }
+  void _handleClose() {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    audioProvider.stop();
 
-  void _onVerticalDragUpdate(DragUpdateDetails details) {
-    var dragDistance = details.globalPosition.dy - _dragStartY;
-    if (dragDistance > 0) {
-      var calculatedOpacity = 1 - (dragDistance / 400);
-      if (calculatedOpacity < 0) {
-        calculatedOpacity = 0.05;
-      } else if (calculatedOpacity > 1) {
-        calculatedOpacity = 1;
-      }
-      setState(() {
-        _currentY = dragDistance;
-        _opacity = calculatedOpacity.toDouble();
-      });
-    }
-  }
-
-  void _onVerticalDragEnd(DragEndDetails _) {
-    if (_currentY > 200) {
-      context.pop();
-    } else {
-      setState(() {
-        _currentY = 0;
-        _opacity = 1.0;
-      });
-    }
+    context.pop();
   }
 
   @override
