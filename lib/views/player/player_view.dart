@@ -79,7 +79,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
               ),
               Spacer(),
               Transform.translate(
-                offset: Offset(0, -20), // adjust the value as needed
+                offset: Offset(0, -20),
                 child: PlayerButtonsWidget(
                   file: file,
                   trackModel: currentlyPlayingTrack,
