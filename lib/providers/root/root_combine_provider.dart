@@ -15,24 +15,19 @@ final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
   ref.read(postLocalStatsProvider);
   ref.read(deviceAppAndUserInfoProvider);
   ref.read(audioDownloaderProvider).deleteDownloadedFileFromPreviousVersion();
-  ref.read(pageviewNotifierProvider).addListenerToPage();
-  ref
-      .read(playerProvider.notifier)
-      .getCurrentlyPlayingTrack(isPlayAudio: false);
 
   var streamEvent = audioPlayerProvider.trackAudioPlayer.playerStateStream
       .map((event) => event.processingState)
       .distinct();
   streamEvent.forEach((element) {
     if (element == ProcessingState.completed) {
-      _handleAudioCompletion(context, ref);
+      _handleAudioCompletion(ref);
       _handleUserNotSignedIn(ref, context);
     }
   });
 });
 
 void _handleAudioCompletion(
-  BuildContext context,
   Ref ref,
 ) {
   final audioProvider = ref.read(audioPlayerNotifierProvider);
@@ -48,12 +43,6 @@ void _handleAudioCompletion(
     audioProvider.setBackgroundSoundVolume(audioProvider.bgVolume);
     audioProvider.stop();
     ref.invalidate(packProvider);
-    var currentLocation = GoRouter.of(context).location;
-    if (!currentLocation.contains(RouteConstants.playerPath)) {
-      ref
-          .read(playerProvider.notifier)
-          .removeCurrentlyPlayingTrackInPreference();
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioPlayPauseStateProvider.notifier).state =
           PLAY_PAUSE_AUDIO.PAUSE;

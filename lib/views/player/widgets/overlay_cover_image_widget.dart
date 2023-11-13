@@ -13,7 +13,6 @@ class OverlayCoverImageWidget extends StatelessWidget {
       height: size.width,
       padding: EdgeInsets.symmetric(
         horizontal: 20,
-        vertical: 20,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),

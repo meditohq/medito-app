@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,7 +14,7 @@ final playerProvider =
 class PlayerProvider extends StateNotifier<TrackModel?> {
   PlayerProvider(this.ref) : super(null);
   Ref ref;
-  Future<void> addCurrentlyPlayingTrackInPreference({
+  Future<void> loadSelectedTrack({
     required TrackModel trackModel,
     required TrackFilesModel file,
   }) async {
@@ -32,37 +31,11 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     }
 
     state = _track;
-    await ref
-        .read(trackRepositoryProvider)
-        .addCurrentlyPlayingTrackInPreference(_track);
-
     await _loadTrackAndBackgroundSound(
       ref,
       _track,
       _track.audio.first.files.first,
     );
-  }
-
-  Future<void> removeCurrentlyPlayingTrackInPreference() async {
-    await ref
-        .read(trackRepositoryProvider)
-        .removeCurrentlyPlayingTrackInPreference();
-    state = null;
-  }
-
-  Future<void> getCurrentlyPlayingTrack({bool isPlayAudio = true}) async {
-    var res = await ref
-        .read(trackRepositoryProvider)
-        .fetchCurrentlyPlayingTrackFromPreference();
-    state = res;
-    if (res != null) {
-      await _loadTrackAndBackgroundSound(
-        ref,
-        res,
-        res.audio.first.files.first,
-        isPlayAudio: isPlayAudio,
-      );
-    }
   }
 
   Future<void> _loadTrackAndBackgroundSound(

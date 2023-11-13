@@ -6,7 +6,6 @@ export 'background_sounds/background_sounds_provider.dart';
 export 'pack/pack_provider.dart';
 export 'meditation/track_provider.dart';
 export 'meditation/download_track_provider.dart';
-export 'page_view/page_view_provider.dart';
 export 'player/audio_play_pause_provider.dart';
 export 'player/audio_position_provider.dart';
 export 'player/audio_speed_provider.dart';
