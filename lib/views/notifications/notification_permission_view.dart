@@ -39,7 +39,7 @@ class NotificationPermissionView extends ConsumerWidget {
                           StringConstants.allowNotificationsTitle,
                           style: textTheme.headlineMedium?.copyWith(
                             color: ColorConstants.walterWhite,
-                            fontFamily: ClashDisplay,
+                            fontFamily: DmSerif,
                             height: 1.2,
                             fontSize: 24,
                           ),
@@ -64,33 +64,32 @@ class NotificationPermissionView extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top:16, bottom:16, left:16, right: 16),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: size.width,
-                  height: 48,
-                  child: LoadingButtonWidget(
-                    onPressed: () => _allowNotification(context, ref),
-                    btnText: StringConstants.allowNotifications,
-                    bgColor: ColorConstants.walterWhite,
-                    fontWeight: FontWeight.w600,
-                    textColor: ColorConstants.onyx,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: size.width,
+                    height: 48,
+                    child: LoadingButtonWidget(
+                      onPressed: () => _allowNotification(context, ref),
+                      btnText: StringConstants.allowNotifications,
+                      bgColor: ColorConstants.walterWhite,
+                      textColor: ColorConstants.onyx,
+                    ),
                   ),
-                ),
-                height8,
-                SizedBox(
-                  width: size.width,
-                  height: 48,
-                  child: LoadingButtonWidget(
-                    onPressed: () => _handleNotNow(context),
-                    btnText: StringConstants.notNow,
-                    bgColor: ColorConstants.onyx,
-                    fontWeight: FontWeight.w600,
-                    textColor: ColorConstants.walterWhite,
+                  height8,
+                  SizedBox(
+                    width: size.width,
+                    height: 48,
+                    child: LoadingButtonWidget(
+                      onPressed: () => _handleNotNow(context),
+                      btnText: StringConstants.notNow,
+                      bgColor: ColorConstants.onyx,
+                      textColor: ColorConstants.walterWhite,
+                    ),
                   ),
-                ),
-                height8,
-              ],
+                ],
+              ),
             ),
           ),
         ],
