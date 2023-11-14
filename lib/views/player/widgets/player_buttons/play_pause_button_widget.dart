@@ -17,6 +17,7 @@ class PlayPauseButtonWidget extends ConsumerWidget {
 
         return InkWell(
           onTap: () => _handleTap(ref, playing),
+          borderRadius: BorderRadius.circular(iconSize / 2),
           child: AnimatedCrossFade(
             firstChild: Icon(
               Icons.play_circle_fill,

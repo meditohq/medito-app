@@ -4,6 +4,7 @@ import 'package:Medito/views/player/widgets/bottom_actions/widgets/audio_speed_w
 import 'package:flutter/material.dart';
 import 'widgets/audio_download_widget.dart';
 import 'widgets/bg_sound_widget.dart';
+import 'widgets/mark_favourite_widget.dart';
 
 class BottomActionWidget extends StatelessWidget {
   const BottomActionWidget({
@@ -22,19 +23,29 @@ class BottomActionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          AudioSpeedWidget(),
-          width8,
-          AudioDownloadWidget(
-            trackModel: trackModel,
-            file: file,
-          ),
-          width8,
-          if (trackModel.hasBackgroundSound)
-            BgSoundWidget(
+          Expanded(
+            child: AudioDownloadWidget(
               trackModel: trackModel,
               file: file,
             ),
+          ),
+          width8,
+          if (trackModel.hasBackgroundSound)
+            Expanded(
+              child: BgSoundWidget(
+                trackModel: trackModel,
+                file: file,
+              ),
+            ),
           if (trackModel.hasBackgroundSound) width8,
+          Expanded(child: AudioSpeedWidget()),
+          width8,
+          Expanded(
+            child: MarkFavouriteWidget(
+              trackModel: trackModel,
+              file: file,
+            ),
+          ),
         ],
       ),
     );

@@ -12,6 +12,7 @@ abstract class TrackModel with _$TrackModel {
     required String description,
     required String coverUrl,
     required bool isPublished,
+    @Default(false) bool isLiked,
     required bool hasBackgroundSound,
     @Default(null) TrackArtistModel? artist,
     @Default(<TrackAudioModel>[]) List<TrackAudioModel> audio,
@@ -27,6 +28,7 @@ abstract class TrackModel with _$TrackModel {
       description: description,
       coverUrl: coverUrl,
       isPublished: isPublished,
+      isLiked: isLiked,
       hasBackgroundSound: hasBackgroundSound,
       artist: artist,
       audio: [

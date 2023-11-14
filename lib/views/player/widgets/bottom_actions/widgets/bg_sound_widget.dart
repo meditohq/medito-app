@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'labels_widget.dart';
-
 class BgSoundWidget extends ConsumerWidget {
   const BgSoundWidget({
     super.key,
@@ -22,20 +20,19 @@ class BgSoundWidget extends ConsumerWidget {
     var checkIsBgSoundSelected = selectedBgSound != null &&
         selectedBgSound.title != StringConstants.none;
 
-    return LabelsWidget(
-      label: StringConstants.sound.toUpperCase(),
-      bgColor: checkIsBgSoundSelected
-          ? ColorConstants.walterWhite
-          : ColorConstants.onyx,
-      textColor: checkIsBgSoundSelected
-          ? ColorConstants.onyx
-          : ColorConstants.walterWhite,
-      onTap: () {
+    return IconButton(
+      onPressed: () {
         context.push(
           RouteConstants.backgroundSoundsPath,
           extra: {'trackModel': trackModel, 'file': file},
         );
       },
+      icon: Icon(
+        Icons.music_note,
+        color: checkIsBgSoundSelected
+            ? ColorConstants.lightPurple
+            : ColorConstants.walterWhite,
+      ),
     );
   }
 }

@@ -99,14 +99,20 @@ class _TrackViewState extends ConsumerState<TrackView>
       }
     });
 
-    return tracks.when(
-      skipLoadingOnRefresh: false,
-      data: (data) => _buildScaffoldWithData(context, data, ref),
-      error: (err, stack) => MeditoErrorWidget(
-        message: err.toString(),
-        onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+    return Container(
+      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+      child: SingleChildScrollView(
+        child: tracks.when(
+          skipLoadingOnRefresh: false,
+          data: (data) => _buildScaffoldWithData(context, data, ref),
+          error: (err, stack) => MeditoErrorWidget(
+            message: err.toString(),
+            onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+            hasScaffold: false,
+          ),
+          loading: () => _buildLoadingWidget(),
+        ),
       ),
-      loading: () => _buildLoadingWidget(),
     );
   }
 

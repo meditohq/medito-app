@@ -11,11 +11,13 @@ class MeditoErrorWidget extends StatelessWidget {
     required this.message,
     this.isLoading = false,
     this.showCheckDownloadText = false,
+    this.hasScaffold = true,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
   final bool isLoading;
   final bool showCheckDownloadText;
+  final bool hasScaffold;
   @override
   Widget build(BuildContext context) {
     var isInvalidToken = message == StringConstants.invalidToken;
@@ -25,54 +27,69 @@ class MeditoErrorWidget extends StatelessWidget {
           color: ColorConstants.walterWhite,
           fontFamily: DmSerif,
         );
+    if (hasScaffold) {
+      return Scaffold(
+        backgroundColor: ColorConstants.ebony,
+        body: _mainBody(context, isInvalidToken, textStyle),
+      );
+    }
 
-    return Scaffold(
-      backgroundColor: ColorConstants.ebony,
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              RichText(
-                text: TextSpan(
-                  text: isInvalidToken
-                      ? '${StringConstants.someThingWentWrong}. '
-                      : '$message ',
-                  style: textStyle,
-                  children: <TextSpan>[
-                    if (showCheckDownloadText || isInvalidToken)
-                      TextSpan(
-                        text: '${StringConstants.meanWhileCheck} ',
-                        style: textStyle,
+    return _mainBody(context, isInvalidToken, textStyle);
+  }
+
+  SizedBox _mainBody(
+    BuildContext context,
+    bool isInvalidToken,
+    TextStyle? textStyle,
+  ) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: defaultPadding,
+          vertical: defaultPadding,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            RichText(
+              text: TextSpan(
+                text: isInvalidToken
+                    ? '${StringConstants.someThingWentWrong}. '
+                    : '$message ',
+                style: textStyle,
+                children: <TextSpan>[
+                  if (showCheckDownloadText || isInvalidToken)
+                    TextSpan(
+                      text: '${StringConstants.meanWhileCheck} ',
+                      style: textStyle,
+                    ),
+                  if (showCheckDownloadText || isInvalidToken)
+                    TextSpan(
+                      text: '${StringConstants.downloads.toLowerCase()}',
+                      style: textStyle?.copyWith(
+                        decoration: TextDecoration.underline,
+                        color: ColorConstants.lightPurple,
                       ),
-                    if (showCheckDownloadText || isInvalidToken)
-                      TextSpan(
-                        text: '${StringConstants.downloads.toLowerCase()}',
-                        style: textStyle?.copyWith(
-                          decoration: TextDecoration.underline,
-                          color: ColorConstants.lightPurple,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap =
-                              () => context.push(RouteConstants.downloadsPath),
-                      ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap =
+                            () => context.push(RouteConstants.downloadsPath),
+                    ),
+                ],
               ),
-              height16,
-              LoadingButtonWidget(
-                btnText: StringConstants.tryAgain,
-                onPressed: onTap,
-                isLoading: isLoading,
-                bgColor: ColorConstants.walterWhite,
-                textColor: ColorConstants.onyx,
-              ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+            height16,
+            LoadingButtonWidget(
+              btnText: StringConstants.tryAgain,
+              onPressed: onTap,
+              isLoading: isLoading,
+              bgColor: ColorConstants.walterWhite,
+              textColor: ColorConstants.onyx,
+            ),
+          ],
         ),
       ),
     );
