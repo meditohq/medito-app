@@ -54,7 +54,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     ref.read(eventsProvider(event: event.toJson()));
   }
 
-  void handleOnArtistChange(TrackAudioModel? value) {
+  void handleOnGuideNameChange(TrackAudioModel? value) {
     setState(() {
       selectedAudio = value;
       selectedDuration = value?.files.first;
@@ -113,61 +113,66 @@ class _TrackViewState extends ConsumerState<TrackView>
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
 
   Widget _buildScaffoldWithData(
-    BuildContext context,
-    TrackModel trackModel,
-    WidgetRef ref,
-  ) {
-    return Container(
-      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
-      child: SingleChildScrollView(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                alignment: Alignment.topCenter,
-                fit: StackFit.passthrough,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: SizedBox(
-                      height: 248,
-                      child: NetworkImageWidget(
-                        url: trackModel.coverUrl,
-                        isCache: true,
+      BuildContext context,
+      TrackModel trackModel,
+      WidgetRef ref,
+      ) {
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+        child: SingleChildScrollView(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.topCenter,
+                  fit: StackFit.passthrough,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: SizedBox(
+                        height: 248,
+                        child: NetworkImageWidget(
+                          url: trackModel.coverUrl,
+                          isCache: true,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: HandleBarWidget(),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    height32,
-                    _title(context, trackModel.title),
-                    _getSubTitle(context, trackModel.description),
-                    height32,
-                    Row(
-                      children: [
-                        _artist(trackModel),
-                        _duration(trackModel),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: HandleBarWidget(),
                     ),
-                    height12,
-                    _playBtn(context, ref, trackModel),
                   ],
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      height32,
+                      _title(context, trackModel.title),
+                      _getSubTitle(context, trackModel.description),
+                      height32,
+                      SizedBox( // Wrap the Row in a SizedBox with a specified height
+                        height: 48,
+                        child: Row(
+                          children: [
+                            _guideNameDropdown(trackModel),
+                            _durationDropdown(trackModel),
+                          ],
+                        ),
+                      ),
+                      height12,
+                      _playBtn(context, ref, trackModel),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -200,8 +205,8 @@ class _TrackViewState extends ConsumerState<TrackView>
             style: Theme.of(context).primaryTextTheme.labelLarge?.copyWith(
                   color: ColorConstants.black,
                   fontFamily: ClashDisplay,
-                  height: 0,
-                  letterSpacing: 0.3,
+                  letterSpacing: 1,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -210,7 +215,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Flexible _duration(TrackModel trackModel) {
+  Flexible _durationDropdown(TrackModel trackModel) {
     var audioFiles = trackModel.audio.first.files;
     var _selectedFile = selectedAudio?.files;
 
@@ -238,10 +243,10 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Widget _artist(TrackModel trackModel) {
+  Widget _guideNameDropdown(TrackModel trackModel) {
     var audio = trackModel.audio.first;
     if (audio.guideName.isNotNullAndNotEmpty()) {
-      return Flexible(
+      return Expanded(
         child: Row(
           children: [
             Flexible(
@@ -252,14 +257,14 @@ class _TrackViewState extends ConsumerState<TrackView>
                 isDisabled: trackModel.audio.length > 1,
                 disabledLabelText: '${audio.guideName}',
                 items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
-                  (TrackAudioModel value) {
+                      (TrackAudioModel value) {
                     return DropdownMenuItem<TrackAudioModel>(
                       value: value,
                       child: Text(value.guideName ?? ''),
                     );
                   },
                 ).toList(),
-                onChanged: handleOnArtistChange,
+                onChanged: handleOnGuideNameChange,
               ),
             ),
             width12,
@@ -270,6 +275,7 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     return SizedBox();
   }
+
 
   List<TrackFilesModel> files(List<TrackFilesModel> files) => files;
 
@@ -307,6 +313,7 @@ class _TrackViewState extends ConsumerState<TrackView>
               color: ColorConstants.walterWhite,
               fontFamily: DmSans,
               decoration: TextDecoration.underline,
+              fontSize: 16
             ),
             onTapLink: (text, href, title) {
               context.pop();
