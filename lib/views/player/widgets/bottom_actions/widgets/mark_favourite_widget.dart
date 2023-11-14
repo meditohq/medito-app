@@ -28,15 +28,12 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 60,
-      child: IconButton(
-        onPressed: handleLike,
-        icon: Icon(
-          Icons.favorite,
-          color:
-              isLiked ? ColorConstants.lightPurple : ColorConstants.walterWhite,
-        ),
+    return IconButton(
+      onPressed: handleLike,
+      icon: Icon(
+        Icons.favorite,
+        color:
+            isLiked ? ColorConstants.lightPurple : ColorConstants.walterWhite,
       ),
     );
   }

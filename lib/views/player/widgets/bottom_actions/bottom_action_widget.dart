@@ -23,8 +23,7 @@ class BottomActionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(
-            width: 60,
+          Expanded(
             child: AudioDownloadWidget(
               trackModel: trackModel,
               file: file,
@@ -32,16 +31,20 @@ class BottomActionWidget extends StatelessWidget {
           ),
           width8,
           if (trackModel.hasBackgroundSound)
-            BgSoundWidget(
+            Expanded(
+              child: BgSoundWidget(
+                trackModel: trackModel,
+                file: file,
+              ),
+            ),
+          if (trackModel.hasBackgroundSound) width8,
+          Expanded(child: AudioSpeedWidget()),
+          width8,
+          Expanded(
+            child: MarkFavouriteWidget(
               trackModel: trackModel,
               file: file,
             ),
-          if (trackModel.hasBackgroundSound) width8,
-          AudioSpeedWidget(),
-          width8,
-          MarkFavouriteWidget(
-            trackModel: trackModel,
-            file: file,
           ),
         ],
       ),

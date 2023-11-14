@@ -31,23 +31,20 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
         ? ColorConstants.lightPurple
         : ColorConstants.walterWhite;
 
-    return SizedBox(
-      width: 60,
-      child: GestureDetector(
-        onTap: () {
-          _provider.setAudioTrackSpeed();
-          ref
-              .read(audioPlayerNotifierProvider)
-              .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-        },
-        child: Text(
-          audioSpeedModel.label,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: textColor, fontFamily: DmMono, fontSize: 18),
-          textAlign: TextAlign.center,
-        ),
+    return GestureDetector(
+      onTap: () {
+        _provider.setAudioTrackSpeed();
+        ref
+            .read(audioPlayerNotifierProvider)
+            .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
+      },
+      child: Text(
+        audioSpeedModel.label,
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(color: textColor, fontFamily: DmMono, fontSize: 18),
+        textAlign: TextAlign.center,
       ),
     );
   }

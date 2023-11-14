@@ -20,21 +20,18 @@ class BgSoundWidget extends ConsumerWidget {
     var checkIsBgSoundSelected = selectedBgSound != null &&
         selectedBgSound.title != StringConstants.none;
 
-    return SizedBox(
-      width: 60,
-      child: IconButton(
-        onPressed: () {
-          context.push(
-            RouteConstants.backgroundSoundsPath,
-            extra: {'trackModel': trackModel, 'file': file},
-          );
-        },
-        icon: Icon(
-          Icons.music_note,
-          color: checkIsBgSoundSelected
-              ? ColorConstants.lightPurple
-              : ColorConstants.walterWhite,
-        ),
+    return IconButton(
+      onPressed: () {
+        context.push(
+          RouteConstants.backgroundSoundsPath,
+          extra: {'trackModel': trackModel, 'file': file},
+        );
+      },
+      icon: Icon(
+        Icons.music_note,
+        color: checkIsBgSoundSelected
+            ? ColorConstants.lightPurple
+            : ColorConstants.walterWhite,
       ),
     );
   }
