@@ -33,7 +33,7 @@ late AudioPlayerNotifier audioHandler;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: StringConstants.stagingEnv);
+  await dotenv.load(fileName: StringConstants.prodEnv);
 
   var sharedPreferences = await initializeSharedPreferences();
 
@@ -123,8 +123,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         SystemUiOverlay.top,
       ],
     );
-    onMessageAppOpened(context,ref);
-    initializeNotification( context, ref);
+    onMessageAppOpened(context, ref);
+    initializeNotification(context, ref);
     WidgetsBinding.instance.addObserver(this);
   }
 

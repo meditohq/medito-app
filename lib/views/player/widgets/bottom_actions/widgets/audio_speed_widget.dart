@@ -3,8 +3,6 @@ import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'labels_widget.dart';
-
 class AudioSpeedWidget extends ConsumerStatefulWidget {
   const AudioSpeedWidget({super.key});
 
@@ -29,21 +27,28 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
   Widget build(BuildContext context) {
     final _provider = ref.watch(audioSpeedProvider);
     var audioSpeedModel = _provider.audioSpeedModel;
+    var textColor = audioSpeedModel.label != StringConstants.x1
+        ? ColorConstants.lightPurple
+        : ColorConstants.walterWhite;
 
-    return LabelsWidget(
-      label: audioSpeedModel.label,
-      bgColor: audioSpeedModel.label != StringConstants.x1
-          ? ColorConstants.walterWhite
-          : ColorConstants.onyx,
-      textColor: audioSpeedModel.label != StringConstants.x1
-          ? ColorConstants.onyx
-          : ColorConstants.walterWhite,
-      onTap: () {
-        _provider.setAudioTrackSpeed();
-        ref
-            .read(audioPlayerNotifierProvider)
-            .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-      },
+    return SizedBox(
+      width: 60,
+      child: GestureDetector(
+        onTap: () {
+          _provider.setAudioTrackSpeed();
+          ref
+              .read(audioPlayerNotifierProvider)
+              .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
+        },
+        child: Text(
+          audioSpeedModel.label,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(color: textColor, fontFamily: DmMono, fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }
