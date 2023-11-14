@@ -102,9 +102,12 @@ class _TrackViewState extends ConsumerState<TrackView>
     return tracks.when(
       skipLoadingOnRefresh: false,
       data: (data) => _buildScaffoldWithData(context, data, ref),
-      error: (err, stack) => MeditoErrorWidget(
-        message: err.toString(),
-        onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+      error: (err, stack) => SizedBox(
+        height: MediaQuery.of(context).size.height / 2,
+        child: MeditoErrorWidget(
+          message: err.toString(),
+          onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+        ),
       ),
       loading: () => _buildLoadingWidget(),
     );

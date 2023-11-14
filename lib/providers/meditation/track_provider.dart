@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:Medito/constants/strings/shared_preference_constants.dart';
+import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/events/mark_favourite_track/mark_favourite_track_model.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
@@ -24,13 +25,33 @@ final trackOpenedFirstTimeProvider = FutureProvider<bool>((ref) async {
 
 @riverpod
 Future<TrackModel> tracks(
-  ref, {
+  TracksRef ref, {
   required String trackId,
 }) {
   var trackRepository = ref.watch(trackRepositoryProvider);
   ref.keepAlive();
 
   return trackRepository.fetchTrack(trackId);
+}
+
+@riverpod
+Future<void> likeDislikeTrack(
+  ref, {
+  required bool isLike,
+  required String trackId,
+  required String audioFileId,
+}) {
+  var audio =
+      MarkFavouriteTrackModel(audioFileId: audioFileId, trackId: trackId);
+  var event = EventsModel(
+    name: EventTypes.likedTrack,
+    payload: audio.toJson(),
+  );
+  var data = event.toJson();
+
+  return isLike
+      ? ref.read(eventsProvider(event: data).future)
+      : ref.read(deleteEventProvider(event: data).future);
 }
 
 @riverpod

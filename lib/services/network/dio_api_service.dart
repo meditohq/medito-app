@@ -56,6 +56,29 @@ class DioApiService {
     }
   }
 
+  // ignore: avoid-dynamic
+  Future<dynamic> deleteRequest(
+    String uri, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      var response = await dio.delete(
+        uri,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return response.data;
+    } on DioException catch (err) {
+      _returnDioErrorResponse(err);
+    }
+  }
+
   CustomException _returnDioErrorResponse(DioException error) {
     var data = error.response?.data;
     var message = data?['error'] ?? data?['message'];
