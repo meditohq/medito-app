@@ -117,27 +117,42 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   Widget _buildListTile(
-    PackItemsModel item,
-    bool isLast,
-  ) {
-    return InkWell(
-      onTap: () {
-        _onListItemTap(item.id, item.type, item.path, context);
-      },
-      splashColor: ColorConstants.charcoal,
-      child: item.type == TypeConstants.TRACK && item.isCompleted == false
-          ? PackDismissibleWidget(
-              child: PackItemWidget(isLast: isLast, item: item),
-              onUpdateCb: () {
-                ref.read(packProvider(packId: widget.id).notifier).markComplete(
-                      audioFileId: item.path.getIdFromPath(),
-                      trackId: item.id,
-                    );
-              },
-            )
-          : PackItemWidget(isLast: isLast, item: item),
+      PackItemsModel item,
+      bool isLast,
+      ) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            _onListItemTap(item.id, item.type, item.path, context);
+          },
+          splashColor: ColorConstants.charcoal,
+          child: item.type == TypeConstants.TRACK && item.isCompleted == false
+              ? PackDismissibleWidget(
+            child: PackItemWidget(isLast: isLast, item: item),
+            onUpdateCb: () {
+              ref.read(packProvider(packId: widget.id).notifier).markComplete(
+                audioFileId: item.path.getIdFromPath(),
+                trackId: item.id,
+              );
+            },
+          )
+              : PackItemWidget(isLast: isLast, item: item),
+        ),
+        // Add a Divider if it's not the last item
+        if (!isLast)
+          Padding(
+            padding: EdgeInsets.only(left: 16, right: 16),
+            child: Divider(
+              color: ColorConstants.charcoal,
+              thickness: 2,
+              height:2,
+            ),
+          ),
+      ],
     );
   }
+
 
   void _onListItemTap(
     String? id,

@@ -8,6 +8,7 @@ class PackItemWidget extends StatelessWidget {
   const PackItemWidget({super.key, required this.item, required this.isLast});
   final PackItemsModel item;
   final bool isLast;
+
   @override
   Widget build(BuildContext context) {
     var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
@@ -15,21 +16,15 @@ class PackItemWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(width: 2, color: ColorConstants.charcoal),
-                ),
-        ),
-        padding: EdgeInsets.only(top: hasSubtitle ? 24 : 20, bottom:20),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
           children: [
+      Container(
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.only(top: hasSubtitle ? 24 : 20, bottom: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,6 +48,8 @@ class PackItemWidget extends StatelessWidget {
                           style: bodyLarge?.copyWith(
                             fontFamily: DmMono,
                             color: ColorConstants.graphite,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -62,10 +59,15 @@ class PackItemWidget extends StatelessWidget {
             ),
             _getIcon(item.type, isCompletedTrack: item.isCompleted),
           ],
-        ),
+
+      ),
+      ),
+
+          ],
       ),
     );
   }
+
 
   Widget _getIcon(String type, {bool? isCompletedTrack}) {
     if (type == TypeConstants.LINK) {
