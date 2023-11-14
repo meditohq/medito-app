@@ -27,12 +27,16 @@ class DescriptionWidget extends StatelessWidget {
           p: bodyLarge?.copyWith(
             color: ColorConstants.walterWhite,
             fontFamily: DmSans,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
             height: 1.5,
           ),
           a: bodyLarge?.copyWith(
             color: ColorConstants.walterWhite,
             fontFamily: DmSans,
             decoration: TextDecoration.underline,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
             height: 1.5,
           ),
         ),
