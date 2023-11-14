@@ -4,7 +4,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Medito/providers/providers.dart';
-import 'labels_widget.dart';
 
 class AudioDownloadWidget extends ConsumerWidget {
   const AudioDownloadWidget({
@@ -23,42 +22,47 @@ class AudioDownloadWidget extends ConsumerWidget {
 
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
-      return LabelsWidget(
-        bgColor: ColorConstants.walterWhite,
-        textColor: ColorConstants.greyIsTheNewGrey,
-        label: StringConstants.downloaded.toUpperCase(),
-        onTap: () => _handleRemoveDownload(downloadAudioProvider, ref, context),
+      return IconButton(
+        onPressed: () =>
+            _handleRemoveDownload(downloadAudioProvider, ref, context),
+        icon: Icon(
+          Icons.downloading_outlined,
+          color: ColorConstants.lightPurple,
+        ),
       );
     } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AUDIO_DOWNLOAD_STATE.DOWNLOADIING) {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
-      return LabelsWidget(
-        label: StringConstants.download.toUpperCase(),
-        onTap: () => _handleDownload(downloadAudioProvider, context),
+      return IconButton(
+        onPressed: () => _handleDownload(downloadAudioProvider, context),
+        icon: Icon(
+          Icons.downloading_outlined,
+        ),
       );
     }
   }
 
-  Expanded showDownloadProgress(
+  Stack showDownloadProgress(
     AudioDownloaderProvider downloadAudioProvider,
     String downloadFileKey,
   ) {
-    return Expanded(
-      child: Container(
-        height: 44,
-        decoration: BoxDecoration(
-          color: ColorConstants.greyIsTheNewGrey,
-          borderRadius: BorderRadius.all(
-            Radius.circular(14),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Icon(
+          Icons.downloading,
+          size: 24,
+        ),
+        SizedBox(
+          height: 18,
+          width: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            value: _getDownloadProgress(downloadAudioProvider, downloadFileKey),
           ),
         ),
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 5),
-        child: LinearProgressIndicator(
-          value: _getDownloadProgress(downloadAudioProvider, downloadFileKey),
-        ),
-      ),
+      ],
     );
   }
 

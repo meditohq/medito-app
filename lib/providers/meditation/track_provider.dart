@@ -1,8 +1,10 @@
 import 'dart:async';
-import 'package:Medito/constants/strings/shared_preference_constants.dart';
+import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/events/mark_favourite_track/mark_favourite_track_model.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'track_provider.g.dart';
 
@@ -24,7 +26,7 @@ final trackOpenedFirstTimeProvider = FutureProvider<bool>((ref) async {
 
 @riverpod
 Future<TrackModel> tracks(
-  ref, {
+  TracksRef ref, {
   required String trackId,
 }) {
   var trackRepository = ref.watch(trackRepositoryProvider);
@@ -32,6 +34,56 @@ Future<TrackModel> tracks(
 
   return trackRepository.fetchTrack(trackId);
 }
+
+@riverpod
+Future<void> likeDislikeTrack(
+  ref, {
+  required bool isLiked,
+  required String trackId,
+  required String audioFileId,
+}) {
+  var audio =
+      MarkFavouriteTrackModel(audioFileId: audioFileId, trackId: trackId);
+  var event = EventsModel(
+    name: EventTypes.likedTrack,
+    payload: audio.toJson(),
+  );
+  var data = event.toJson();
+
+  return isLiked
+      ? ref.read(eventsProvider(event: data).future)
+      : ref.read(deleteEventProvider(event: data).future);
+}
+
+final likeDislikeCombineProvider =
+    FutureProvider.family<void, LikeDislikeModel>((ref, data) async {
+  var trackId = data.trackModel.id;
+  var fileId = data.file.id;
+
+  await ref.read(
+    likeDislikeTrackProvider(
+      isLiked: data.isLiked,
+      trackId: trackId,
+      audioFileId: fileId,
+    ).future,
+  );
+  final downloadAudioProvider = ref.read(audioDownloaderProvider);
+  var downloadFileKey =
+      '$trackId-$fileId${getAudioFileExtension(data.file.path)}';
+  if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
+      AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
+    await ref.read(deleteTrackFromPreferenceProvider(
+      file: data.file,
+    ).future);
+    var trackCopy = data.trackModel.customCopyWith();
+    trackCopy.isLiked = data.isLiked;
+    await ref.read(addSingleTrackInPreferenceProvider(
+      trackModel: trackCopy,
+      file: data.file,
+    ).future);
+  }
+  ref.invalidate(tracksProvider);
+});
 
 @riverpod
 Future<void> addTrackListInPreference(
@@ -90,4 +142,13 @@ void addCurrentlyPlayingTrackInPreference(
     }
   }
   print(_track);
+}
+
+//ignore: prefer-match-file-name
+class LikeDislikeModel {
+  final bool isLiked;
+  final TrackModel trackModel;
+  final TrackFilesModel file;
+
+  LikeDislikeModel(this.isLiked, this.trackModel, this.file);
 }

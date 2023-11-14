@@ -28,20 +28,21 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  InkWell _rewindButton(WidgetRef ref) {
-    return InkWell(
-      onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
-      child: Icon(
+  IconButton _rewindButton(WidgetRef ref) {
+    return IconButton(
+      onPressed: () =>
+          _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
+      icon: Icon(
         Icons.replay_10_rounded,
         size: 40,
       ),
     );
   }
 
-  InkWell _forwardButton(WidgetRef ref) {
-    return InkWell(
-      onTap: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_10),
-      child: Icon(
+  IconButton _forwardButton(WidgetRef ref) {
+    return IconButton(
+      onPressed: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_10),
+      icon: Icon(
         Icons.forward_10_rounded,
         size: 40,
       ),

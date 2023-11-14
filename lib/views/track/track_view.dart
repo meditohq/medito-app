@@ -99,14 +99,20 @@ class _TrackViewState extends ConsumerState<TrackView>
       }
     });
 
-    return tracks.when(
-      skipLoadingOnRefresh: false,
-      data: (data) => _buildScaffoldWithData(context, data, ref),
-      error: (err, stack) => MeditoErrorWidget(
-        message: err.toString(),
-        onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+    return Container(
+      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+      child: SingleChildScrollView(
+        child: tracks.when(
+          skipLoadingOnRefresh: false,
+          data: (data) => _buildScaffoldWithData(context, data, ref),
+          error: (err, stack) => MeditoErrorWidget(
+            message: err.toString(),
+            onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+            hasScaffold: false,
+          ),
+          loading: () => _buildLoadingWidget(),
+        ),
       ),
-      loading: () => _buildLoadingWidget(),
     );
   }
 
@@ -117,59 +123,54 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     WidgetRef ref,
   ) {
-    return Container(
-      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
-      child: SingleChildScrollView(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            alignment: Alignment.topCenter,
+            fit: StackFit.passthrough,
             children: [
-              Stack(
-                alignment: Alignment.topCenter,
-                fit: StackFit.passthrough,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: SizedBox(
-                      height: 248,
-                      child: NetworkImageWidget(
-                        url: trackModel.coverUrl,
-                        isCache: true,
-                      ),
-                    ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: SizedBox(
+                  height: 248,
+                  child: NetworkImageWidget(
+                    url: trackModel.coverUrl,
+                    isCache: true,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: HandleBarWidget(),
-                  ),
-                ],
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    height32,
-                    _title(context, trackModel.title),
-                    _getSubTitle(context, trackModel.description),
-                    height32,
-                    Row(
-                      children: [
-                        _artist(trackModel),
-                        _duration(trackModel),
-                      ],
-                    ),
-                    height12,
-                    _playBtn(context, ref, trackModel),
-                  ],
-                ),
+                padding: const EdgeInsets.all(16.0),
+                child: HandleBarWidget(),
               ),
             ],
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                height32,
+                _title(context, trackModel.title),
+                _getSubTitle(context, trackModel.description),
+                height32,
+                Row(
+                  children: [
+                    _artist(trackModel),
+                    _duration(trackModel),
+                  ],
+                ),
+                height12,
+                _playBtn(context, ref, trackModel),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
