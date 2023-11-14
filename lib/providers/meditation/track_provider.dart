@@ -4,6 +4,7 @@ import 'package:Medito/models/events/mark_favourite_track/mark_favourite_track_m
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'track_provider.g.dart';
 
@@ -56,23 +57,32 @@ Future<void> likeDislikeTrack(
 
 final likeDislikeCombineProvider =
     FutureProvider.family<void, LikeDisLikeModel>((ref, data) async {
+  var trackId = data.trackModel.id;
+  var fileId = data.file.id;
+
   await ref.read(
     likeDislikeTrackProvider(
       isLike: data.isliked,
-      trackId: data.trackModel.id,
-      audioFileId: data.file.id,
+      trackId: trackId,
+      audioFileId: fileId,
     ).future,
   );
-  await ref.read(deleteTrackFromPreferenceProvider(
-    file: data.file,
-  ).future);
-  var trackCopy = data.trackModel.customCopyWith();
-  trackCopy.isLiked = data.isliked;
-  await ref.read(addSingleTrackInPreferenceProvider(
-    trackModel: trackCopy,
-    file: data.file,
-  ).future);
-  ref.invalidate(tracksProvider);
+  final downloadAudioProvider = ref.read(audioDownloaderProvider);
+  var downloadFileKey =
+      '$trackId-$fileId${getAudioFileExtension(data.file.path)}';
+  if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
+      AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
+    await ref.read(deleteTrackFromPreferenceProvider(
+      file: data.file,
+    ).future);
+    var trackCopy = data.trackModel.customCopyWith();
+    trackCopy.isLiked = data.isliked;
+    await ref.read(addSingleTrackInPreferenceProvider(
+      trackModel: trackCopy,
+      file: data.file,
+    ).future);
+    ref.invalidate(tracksProvider);
+  }
 });
 
 @riverpod
