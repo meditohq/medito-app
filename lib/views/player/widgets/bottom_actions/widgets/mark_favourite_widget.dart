@@ -31,7 +31,7 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
     return SizedBox(
       width: 60,
       child: IconButton(
-        onPressed: () => handleLike(ref, widget.trackModel.id, widget.file.id),
+        onPressed: handleLike,
         icon: Icon(
           Icons.favorite,
           color:
@@ -41,23 +41,15 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
     );
   }
 
-  void handleLike(
-    WidgetRef ref,
-    String trackId,
-    String audioFileId,
-  ) async {
+  void handleLike() async {
     try {
       setState(() {
         isLiked = !isLiked;
       });
+      var data = LikeDisLikeModel(isLiked, widget.trackModel, widget.file);
       await ref.read(
-        likeDislikeTrackProvider(
-          isLike: isLiked,
-          trackId: trackId,
-          audioFileId: audioFileId,
-        ).future,
+        likeDislikeCombineProvider(data).future,
       );
-      ref.invalidate(tracksProvider);
     } catch (e) {
       setState(() {
         isLiked = !isLiked;
