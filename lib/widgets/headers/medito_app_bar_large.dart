@@ -70,10 +70,8 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: ClashDisplay,
+            fontFamily: DmSerif,
             color: ColorConstants.walterWhite,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
           ),
     );
   }

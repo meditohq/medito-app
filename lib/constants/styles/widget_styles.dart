@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 final String DmMono = 'DM Mono';
 final String DmSans = 'DM Sans';
-const String ClashDisplay = 'Clash Display';
+const String DmSerif = 'DM Serif';
 const defaultPadding = 16.0;
 const miniPlayerHeight = 56.0;
 const height32 = SizedBox(height: 32);

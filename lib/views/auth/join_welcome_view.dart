@@ -46,7 +46,7 @@ class JoinWelcomeView extends ConsumerWidget {
                             StringConstants.thanksForJoining,
                             style: textTheme.headlineMedium?.copyWith(
                               color: ColorConstants.walterWhite,
-                              fontFamily: ClashDisplay,
+                              fontFamily: DmSerif,
                               height: 1.2,
                               fontSize: 24,
                             ),
@@ -87,7 +87,7 @@ class JoinWelcomeView extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
-          height: 48,  // Set the height to 48 pixels
+          height: 48,
           child: LoadingButtonWidget(
             onPressed: () {
               var auth = ref.read(authProvider.notifier);

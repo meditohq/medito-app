@@ -41,10 +41,9 @@ class ArtistTitleWidget extends ConsumerWidget {
       child: Marquee(
         text: trackTitle,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: ClashDisplay,
+              fontFamily: DmSerif,
               color: ColorConstants.walterWhite,
               fontSize: trackTitleFontSize,
-              fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
         blankSpace: 40,

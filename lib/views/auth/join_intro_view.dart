@@ -48,7 +48,7 @@ class JoinIntroView extends ConsumerWidget {
                           StringConstants.joinTheMeditoFamily,
                           style: textTheme.headlineMedium?.copyWith(
                             color: ColorConstants.walterWhite,
-                            fontFamily: ClashDisplay,
+                            fontFamily: DmSerif,
                             height: 1.2,
                             fontSize: 24,
                           ),

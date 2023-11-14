@@ -13,7 +13,7 @@ class CardTitleWidget extends StatelessWidget {
         style: Theme.of(context)
             .textTheme
             .headlineSmall
-            ?.copyWith(fontSize: 22, fontFamily: ClashDisplay),
+            ?.copyWith(fontSize: 22, fontFamily: DmSerif),
       ),
     );
   }

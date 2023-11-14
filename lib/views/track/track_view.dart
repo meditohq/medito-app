@@ -204,7 +204,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             StringConstants.play,
             style: Theme.of(context).primaryTextTheme.labelLarge?.copyWith(
                   color: ColorConstants.black,
-                  fontFamily: ClashDisplay,
+                  fontFamily: DmSerif,
                   letterSpacing: 1,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -283,9 +283,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: ClashDisplay,
+            fontFamily: DmSerif,
             color: ColorConstants.walterWhite,
-            fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
             fontSize: 24,
           ),
