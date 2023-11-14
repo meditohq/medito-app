@@ -88,7 +88,7 @@ class _PackViewState extends ConsumerState<PackView>
                       .cast<Widget>() +
                   _listItems(pack, ref) +
                   [
-                    BottomPaddingWidget(),
+                    height32,
                   ],
             ),
           ),

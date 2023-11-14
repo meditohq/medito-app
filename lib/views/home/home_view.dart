@@ -105,7 +105,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                                   height16,
                                   height16,
                                   _cardListWidget(data),
-                                  BottomPaddingWidget(),
+                                  height32,
                                 ],
                               ),
                             ],
