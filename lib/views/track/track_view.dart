@@ -205,9 +205,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             style: Theme.of(context).primaryTextTheme.labelLarge?.copyWith(
                   color: ColorConstants.black,
                   fontFamily: DmSerif,
-                  letterSpacing: 1,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
                 ),
           ),
         ),
