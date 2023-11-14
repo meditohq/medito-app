@@ -54,7 +54,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     ref.read(eventsProvider(event: event.toJson()));
   }
 
-  void handleOnArtistChange(TrackAudioModel? value) {
+  void handleOnGuideNameChange(TrackAudioModel? value) {
     setState(() {
       selectedAudio = value;
       selectedDuration = value?.files.first;
@@ -123,54 +123,64 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     WidgetRef ref,
   ) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
-            alignment: Alignment.topCenter,
-            fit: StackFit.passthrough,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: SizedBox(
-                  height: 248,
-                  child: NetworkImageWidget(
-                    url: trackModel.coverUrl,
-                    isCache: true,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: HandleBarWidget(),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+        child: SingleChildScrollView(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                height32,
-                _title(context, trackModel.title),
-                _getSubTitle(context, trackModel.description),
-                height32,
-                Row(
+                Stack(
+                  alignment: Alignment.topCenter,
+                  fit: StackFit.passthrough,
                   children: [
-                    _artist(trackModel),
-                    _duration(trackModel),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: SizedBox(
+                        height: 248,
+                        child: NetworkImageWidget(
+                          url: trackModel.coverUrl,
+                          isCache: true,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: HandleBarWidget(),
+                    ),
                   ],
                 ),
-                height12,
-                _playBtn(context, ref, trackModel),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      height32,
+                      _title(context, trackModel.title),
+                      _getSubTitle(context, trackModel.description),
+                      height32,
+                      SizedBox(
+                        height: 48,
+                        child: Row(
+                          children: [
+                            _guideNameDropdown(trackModel),
+                            _durationDropdown(trackModel),
+                          ],
+                        ),
+                      ),
+                      height12,
+                      _playBtn(context, ref, trackModel),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -200,10 +210,8 @@ class _TrackViewState extends ConsumerState<TrackView>
             StringConstants.play,
             style: Theme.of(context).primaryTextTheme.labelLarge?.copyWith(
                   color: ColorConstants.black,
-                  fontFamily: ClashDisplay,
-                  height: 0,
-                  letterSpacing: 0.3,
-                  fontWeight: FontWeight.w600,
+                  fontFamily: DmSerif,
+                  fontSize: 20,
                 ),
           ),
         ),
@@ -211,7 +219,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Flexible _duration(TrackModel trackModel) {
+  Flexible _durationDropdown(TrackModel trackModel) {
     var audioFiles = trackModel.audio.first.files;
     var _selectedFile = selectedAudio?.files;
 
@@ -239,10 +247,10 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Widget _artist(TrackModel trackModel) {
+  Widget _guideNameDropdown(TrackModel trackModel) {
     var audio = trackModel.audio.first;
     if (audio.guideName.isNotNullAndNotEmpty()) {
-      return Flexible(
+      return Expanded(
         child: Row(
           children: [
             Flexible(
@@ -260,7 +268,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                     );
                   },
                 ).toList(),
-                onChanged: handleOnArtistChange,
+                onChanged: handleOnGuideNameChange,
               ),
             ),
             width12,
@@ -278,9 +286,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: ClashDisplay,
+            fontFamily: DmSerif,
             color: ColorConstants.walterWhite,
-            fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
             fontSize: 24,
           ),
@@ -305,10 +312,10 @@ class _TrackViewState extends ConsumerState<TrackView>
               fontSize: 16,
             ),
             a: bodyLarge?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              decoration: TextDecoration.underline,
-            ),
+                color: ColorConstants.walterWhite,
+                fontFamily: DmSans,
+                decoration: TextDecoration.underline,
+                fontSize: 16),
             onTapLink: (text, href, title) {
               context.pop();
               var location = GoRouter.of(context).location;

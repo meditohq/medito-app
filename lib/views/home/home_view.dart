@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
-import 'widgets/search/search_widget.dart';
 import 'widgets/meditation_cards/card_list_widget.dart';
 import 'package:Medito/providers/providers.dart';
 
@@ -56,6 +55,22 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: ColorConstants.onyx,
+        onPressed: () {
+          context.push(RouteConstants.search);
+        },
+        icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
+        label: Text(
+          'Explore',
+          style: TextStyle(
+            color: ColorConstants.walterWhite,
+            fontFamily: DmSerif,
+            fontSize: 20,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: homeRes.when(
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
@@ -92,20 +107,16 @@ class _HomeViewState extends ConsumerState<HomeView>
                               ),
                               Column(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () =>
-                                        context.push(RouteConstants.search),
-                                    child: SearchWidget(),
-                                  ),
-                                  height5,
+                                  _getAnnouncementBanner(data),
+                                  height24,
                                   FilterWidget(
                                     chips: data.chips,
                                   ),
-                                  _getAnnouncementBanner(data),
-                                  height16,
-                                  height16,
+                                  height32,
                                   _cardListWidget(data),
-                                  BottomPaddingWidget(),
+                                  height32,
+                                  height32,
+                                  height32,
                                 ],
                               ),
                             ],
@@ -158,7 +169,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                 curvedAnimation,
               ),
         child: Padding(
-          padding: const EdgeInsets.only(top: 30.0),
+          padding: const EdgeInsets.only(top: 16.0),
           child: AnnouncementWidget(
             announcement: data.announcement!,
             onPressedDismiss: _handleCollapse,

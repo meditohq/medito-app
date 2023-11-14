@@ -17,9 +17,9 @@ class SearchResultWidget extends ConsumerWidget {
     final currentlyPlayingSession = ref.watch(playerProvider);
     var listViewPadding = EdgeInsets.only(
       top: 20,
-      bottom: currentlyPlayingSession != null ? 0 : 60,
-      left: 15,
-      right: 15,
+      bottom: 32,
+      left: 16,
+      right: 16,
     );
 
     return searchResult.when(

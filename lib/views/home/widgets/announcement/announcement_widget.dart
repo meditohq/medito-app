@@ -83,8 +83,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
           btnText: StringConstants.dismiss,
           bgColor: bgColor,
           textColor: textColor,
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
           elevation: 0,
         ),
         width4,

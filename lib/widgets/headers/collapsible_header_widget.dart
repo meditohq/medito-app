@@ -85,7 +85,6 @@ class _CollapsibleHeaderWidgetState
           pinned: true,
           snap: false,
           elevation: 50,
-          // toolbarHeight: kToolbarHeight ,
           backgroundColor: ColorConstants.onyx,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
@@ -164,7 +163,7 @@ class _CollapsibleHeaderWidgetState
     const textScaleFactor = 1.0;
     const textAlign = TextAlign.left;
     var style = Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-          fontFamily: ClashDisplay,
+          fontFamily: DmSerif,
           color: ColorConstants.walterWhite,
           fontSize: _isShrink ? 20 : 24,
         );

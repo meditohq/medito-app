@@ -84,7 +84,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                         StringConstants.whatsYourEmail,
                         style: textTheme.headlineMedium?.copyWith(
                           color: ColorConstants.walterWhite,
-                          fontFamily: ClashDisplay,
+                          fontFamily: DmSerif,
                           height: 1.2,
                           fontSize: 24,
                         ),
@@ -113,7 +113,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      height: 48,  // Specify the desired height of the button
+                      height: 48,
                       child: LoadingButtonWidget(
                         onPressed: () => context.pop(),
                         btnText: StringConstants.goBack,
@@ -121,7 +121,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     ),
                     width8,
                     Container(
-                      height: 48,  // Specify the desired height of the button
+                      height: 48,
                       child: LoadingButtonWidget(
                         onPressed:
                         _emailController.text != '' ? _handleContinue : null,

@@ -75,7 +75,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                         fontSize: 18,
                         letterSpacing: 1,
                         wordSpacing: 1.5,
-                        fontFamily: ClashDisplay,
+                        fontFamily: DmSerif,
                       ),
                 );
               }).toList(),

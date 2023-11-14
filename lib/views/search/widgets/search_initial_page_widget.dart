@@ -40,10 +40,10 @@ class SearchInitialPageWidget extends ConsumerWidget {
               itemCount: packs.length,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.only(
-                top: defaultPadding,
+                top: 20,
                 left: defaultPadding,
                 right: defaultPadding,
-                bottom: ref.watch(bottomPaddingProvider(context)),
+                bottom: 32,
               ),
               itemBuilder: (context, index) {
                 var element = packs[index];

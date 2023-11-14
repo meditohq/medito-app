@@ -66,15 +66,15 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
-        maintainBottomViewPadding: true,  // Added maintainBottomViewPadding: true
-        bottom: false,  // Added bottom: false
+        maintainBottomViewPadding: true,
+        bottom: false,
         child: Padding(
           padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),  // Updated padding
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-            Expanded(  // Added Expanded
+            Expanded(
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -82,7 +82,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   StringConstants.verifyYourAccount,
                   style: textTheme.headlineMedium?.copyWith(
                     color: ColorConstants.walterWhite,
-                    fontFamily: ClashDisplay,
+                    fontFamily: DmSerif,
                     height: 1.2,
                     fontSize: 24,
                   ),
@@ -120,7 +120,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                   ),
                   textStyle: textTheme.displayMedium?.copyWith(
                     color: ColorConstants.walterWhite,
-                    fontFamily: ClashDisplay,
+                    fontFamily: DmSerif,
                     fontSize: 24,
                   ),
                   enableActiveFill: true,
