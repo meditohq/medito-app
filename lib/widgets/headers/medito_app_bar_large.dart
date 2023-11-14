@@ -37,6 +37,8 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     final titlePadding = (expandedPadding + titlePaddingDelta).toDouble();
 
     return SliverAppBar.large(
+      shadowColor: ColorConstants.ebony,
+      surfaceTintColor: Colors.transparent,
       expandedHeight: topBarHeight,
       backgroundColor: ColorConstants.onyx,
       leading: IconButton(
@@ -58,7 +60,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
   ) {
     return FlexibleSpaceBar(
       centerTitle: false,
-      titlePadding: EdgeInsets.only(left: titlePadding, bottom: 20.0),
+      titlePadding: EdgeInsets.only(left: titlePadding, bottom: 17.0),
       title: _topBarTitle(title),
       background: _topBarBackground(scrollFactor, widget.coverUrl),
     );

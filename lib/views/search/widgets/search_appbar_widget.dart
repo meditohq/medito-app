@@ -49,6 +49,8 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
     var outlineInputBorder = _outlineInputBorder();
 
     return AppBar(
+      shadowColor: ColorConstants.ebony,
+      surfaceTintColor: Colors.transparent,
       backgroundColor: ColorConstants.onyx,
       titleSpacing: 0,
       leading: IconButton(
