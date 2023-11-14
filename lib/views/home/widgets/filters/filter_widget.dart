@@ -25,7 +25,7 @@ class FilterWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 8),
       child: SizedBox(
-        height: 49,
+        height: 51,
         child: ListView.builder(
           itemCount: items.length,
           scrollDirection: Axis.horizontal,
@@ -41,12 +41,13 @@ class FilterWidget extends ConsumerWidget {
                     .copyWith(canvasColor: ColorConstants.onyx),
                 child: ActionChip(
                   onPressed: () => handleChipPress(context, ref, element),
+                  side: BorderSide.none,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  backgroundColor: ColorConstants.transparent,
                   labelPadding:
-                      EdgeInsets.only(left: 12, right: 12, top: 3, bottom: 5),
+                  EdgeInsets.only(left: 6, right: 6, top: 3, bottom: 3),
+
                   label: Text(
                     element.title,
                     style: Theme.of(context).textTheme.titleSmall,
