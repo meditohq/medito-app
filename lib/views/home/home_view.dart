@@ -47,8 +47,13 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    var connectivityStatus =
+        ref.watch(connectivityStatusProvider) as ConnectivityStatus;
     var homeRes = ref.watch(homeProvider);
     var stats = ref.watch(remoteStatsProvider);
+    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+      return ConnectivityErrorWidget();
+    }
 
     return Scaffold(
       body: homeRes.when(
