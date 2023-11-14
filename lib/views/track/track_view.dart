@@ -113,10 +113,10 @@ class _TrackViewState extends ConsumerState<TrackView>
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
 
   Widget _buildScaffoldWithData(
-      BuildContext context,
-      TrackModel trackModel,
-      WidgetRef ref,
-      ) {
+    BuildContext context,
+    TrackModel trackModel,
+    WidgetRef ref,
+  ) {
     return SafeArea(
       child: Container(
         padding: EdgeInsets.only(bottom: getBottomPadding(context)),
@@ -157,7 +157,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                       _title(context, trackModel.title),
                       _getSubTitle(context, trackModel.description),
                       height32,
-                      SizedBox( // Wrap the Row in a SizedBox with a specified height
+                      SizedBox(
                         height: 48,
                         child: Row(
                           children: [
@@ -255,7 +255,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                 isDisabled: trackModel.audio.length > 1,
                 disabledLabelText: '${audio.guideName}',
                 items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
-                      (TrackAudioModel value) {
+                  (TrackAudioModel value) {
                     return DropdownMenuItem<TrackAudioModel>(
                       value: value,
                       child: Text(value.guideName ?? ''),
@@ -273,7 +273,6 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     return SizedBox();
   }
-
 
   List<TrackFilesModel> files(List<TrackFilesModel> files) => files;
 
@@ -307,11 +306,10 @@ class _TrackViewState extends ConsumerState<TrackView>
               fontSize: 16,
             ),
             a: bodyLarge?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              decoration: TextDecoration.underline,
-              fontSize: 16
-            ),
+                color: ColorConstants.walterWhite,
+                fontFamily: DmSans,
+                decoration: TextDecoration.underline,
+                fontSize: 16),
             onTapLink: (text, href, title) {
               context.pop();
               var location = GoRouter.of(context).location;

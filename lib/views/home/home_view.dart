@@ -60,7 +60,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         onPressed: () {
           context.push(RouteConstants.search);
         },
-        icon: Icon(Icons.explore, color: ColorConstants.walterWhite), // Change icon color here
+        icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
         label: Text(
           'Explore',
           style: TextStyle(

@@ -66,15 +66,15 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
-        maintainBottomViewPadding: true,  // Added maintainBottomViewPadding: true
-        bottom: false,  // Added bottom: false
+        maintainBottomViewPadding: true,
+        bottom: false,
         child: Padding(
           padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),  // Updated padding
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-            Expanded(  // Added Expanded
+            Expanded(
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
               children: [

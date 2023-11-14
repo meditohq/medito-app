@@ -25,19 +25,19 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       height: 56,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _logo(context),
-            Row(
-              children: [
-                _statsWidget(context, ref),
-                _downloadWidget(context),
-                _menuWidget(context),
-              ],
-            ),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _logo(context),
+          Row(
+            children: [
+              _statsWidget(context, ref),
+              _downloadWidget(context),
+              _menuWidget(context),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -77,7 +77,6 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
       ),
     );
   }
-
 
   Material _menuWidget(BuildContext context) {
     return Material(
@@ -169,9 +168,8 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
             width: 2,
             color: ColorConstants.walterWhite,
           ),
-
         ),
-        padding: EdgeInsets.only(left: 6, right: 6, top:1, bottom:1),
+        padding: EdgeInsets.only(left: 6, right: 6, top: 1, bottom: 1),
         child: Row(
           children: [
             Icon(
@@ -183,11 +181,11 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
             Text(
               streakCount,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: ColorConstants.walterWhite,
-                height: 0,
-                fontSize: 14,
-                fontFamily: DmMono,
-              ),
+                    color: ColorConstants.walterWhite,
+                    height: 0,
+                    fontSize: 14,
+                    fontFamily: DmMono,
+                  ),
             ),
           ],
         ),

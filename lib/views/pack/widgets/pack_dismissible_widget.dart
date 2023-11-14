@@ -7,6 +7,7 @@ class PackDismissibleWidget extends StatelessWidget {
     required this.child,
     this.onUpdateCb,
   });
+
   final Widget child;
   final void Function()? onUpdateCb;
 
@@ -21,27 +22,27 @@ class PackDismissibleWidget extends StatelessWidget {
           onUpdateCb!();
         }
 
-        return false;  // Do not remove the item from the list
+        return false; // Do not remove the item from the list
       },
       child: child,
     );
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-    color: ColorConstants.charcoal,
-    child: Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Spacer(),
-          Icon(
-            Icons.check,
-            color: ColorConstants.walterWhite,
+        color: ColorConstants.charcoal,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Spacer(),
+              Icon(
+                Icons.check,
+                color: ColorConstants.walterWhite,
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }
