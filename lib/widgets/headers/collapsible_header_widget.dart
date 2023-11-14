@@ -85,7 +85,6 @@ class _CollapsibleHeaderWidgetState
           pinned: true,
           snap: false,
           elevation: 50,
-          // toolbarHeight: kToolbarHeight ,
           backgroundColor: ColorConstants.onyx,
           centerTitle: false,
           flexibleSpace: FlexibleSpaceBar(
