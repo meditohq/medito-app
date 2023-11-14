@@ -38,7 +38,7 @@ Future<TrackModel> tracks(
 @riverpod
 Future<void> likeDislikeTrack(
   ref, {
-  required bool isLike,
+  required bool isLiked,
   required String trackId,
   required String audioFileId,
 }) {
@@ -50,19 +50,19 @@ Future<void> likeDislikeTrack(
   );
   var data = event.toJson();
 
-  return isLike
+  return isLiked
       ? ref.read(eventsProvider(event: data).future)
       : ref.read(deleteEventProvider(event: data).future);
 }
 
 final likeDislikeCombineProvider =
-    FutureProvider.family<void, LikeDisLikeModel>((ref, data) async {
+    FutureProvider.family<void, LikeDislikeModel>((ref, data) async {
   var trackId = data.trackModel.id;
   var fileId = data.file.id;
 
   await ref.read(
     likeDislikeTrackProvider(
-      isLike: data.isliked,
+      isLiked: data.isLiked,
       trackId: trackId,
       audioFileId: fileId,
     ).future,
@@ -76,13 +76,13 @@ final likeDislikeCombineProvider =
       file: data.file,
     ).future);
     var trackCopy = data.trackModel.customCopyWith();
-    trackCopy.isLiked = data.isliked;
+    trackCopy.isLiked = data.isLiked;
     await ref.read(addSingleTrackInPreferenceProvider(
       trackModel: trackCopy,
       file: data.file,
     ).future);
-    ref.invalidate(tracksProvider);
   }
+  ref.invalidate(tracksProvider);
 });
 
 @riverpod
@@ -145,10 +145,10 @@ void addCurrentlyPlayingTrackInPreference(
 }
 
 //ignore: prefer-match-file-name
-class LikeDisLikeModel {
-  final bool isliked;
+class LikeDislikeModel {
+  final bool isLiked;
   final TrackModel trackModel;
   final TrackFilesModel file;
 
-  LikeDisLikeModel(this.isliked, this.trackModel, this.file);
+  LikeDislikeModel(this.isLiked, this.trackModel, this.file);
 }

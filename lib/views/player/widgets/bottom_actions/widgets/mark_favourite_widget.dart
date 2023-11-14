@@ -46,7 +46,7 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
       setState(() {
         isLiked = !isLiked;
       });
-      var data = LikeDisLikeModel(isLiked, widget.trackModel, widget.file);
+      var data = LikeDislikeModel(isLiked, widget.trackModel, widget.file);
       await ref.read(
         likeDislikeCombineProvider(data).future,
       );
