@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
-import 'package:Medito/widgets/headers/medito_app_bar_large.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';

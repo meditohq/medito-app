@@ -16,9 +16,12 @@ class BackgroundSoundView extends ConsumerStatefulWidget {
 }
 
 class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setInitStateValues();
     });
@@ -49,6 +52,10 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       _provider.getVolumeFromPref();
       _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
     }
+  }
+
+  void _scrollListener() {
+    setState(() => {});
   }
 
   @override
@@ -127,30 +134,36 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
           ref.read(backgroundSoundsProvider);
         }
       },
-      child: CollapsibleHeaderWidget(
-        title: StringConstants.backgroundSounds,
-        leadingIconBgColor: ColorConstants.walterWhite,
-        leadingIconColor: ColorConstants.black,
-        headerHeight: 130,
-        children: [
-          VolumeSliderWidget(),
-          SoundListTileWidget(
-            sound: BackgroundSoundsModel(
-              id: '0',
-              title: StringConstants.none,
-              duration: 0,
-              path: '',
-            ),
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          MeditoAppBarLarge(
+            scrollController: _scrollController,
+            title: StringConstants.backgroundSounds,
           ),
-          Column(
-            children: data
-                .map((e) => SoundListTileWidget(
-                      sound: e,
-                    ))
-                .toList(),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              VolumeSliderWidget(),
+              SoundListTileWidget(
+                sound: BackgroundSoundsModel(
+                  id: '0',
+                  title: StringConstants.none,
+                  duration: 0,
+                  path: '',
+                ),
+              ),
+              Column(
+                children: data
+                    .map((e) => SoundListTileWidget(
+                          sound: e,
+                        ))
+                    .toList(),
+              ),
+              height16,
+              height16,
+            ]),
           ),
-          height16,
-          height16,
         ],
       ),
     );
