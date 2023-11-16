@@ -30,7 +30,6 @@ Future<void> clearStorage() async {
     final cacheDir = await getApplicationDocumentsDirectory();
 
     await cacheDir.list(recursive: true).forEach((element) {
-      print(element.path);
       try {
         if (element.path.endsWith('txt') || element.path.endsWith('mp3')) {
           element.deleteSync(recursive: true);
