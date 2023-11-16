@@ -61,11 +61,11 @@ jobs:
 
       - name: Run dart_code_metrics
         run: |
-          flutter pub run dart_code_metrics:metrics --reporter=github --no-fatal-style --no-fatal-warnings  --no-fatal-performance  lib
+          flutter pub run dart_code_metrics:metrics --no-fatal-style --no-fatal-warnings  --no-fatal-performance  lib
 
       - name: Check unused files
         run: |
-          flutter pub run dart_code_metrics:metrics check-unused-files --reporter=github --fatal-unused  lib      
+          flutter pub run dart_code_metrics:metrics check-unused-files --fatal-unused  lib      
 
       #      - name: Create or update PR comment
 #        uses: peter-evans/create-or-update-comment@v1
