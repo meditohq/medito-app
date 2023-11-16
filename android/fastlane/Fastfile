@@ -14,7 +14,7 @@ default_platform(:android)
 
 # Method to update .env with the appropriate values based on environment
 def set_environment_values(url, init_token, sentry_dsn)
-  env_file_path = "./.env"
+  env_file_path = "./.prod.env"
   content = File.read(env_file_path)
   
   # Update the values

@@ -31,12 +31,11 @@ jobs:
         uses: actions/checkout@v2
 
       # Fixme: https://github.com/meditohq/medito-app/issues/151
-      - name: Create auth.dart
+      - name: Create .prod.env
         run: sh ./.github/scripts/create_auth_dart.sh
         env:
           BASE_URL: ${{ secrets.AUTH_BASE_URL }}
           SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
       - name: Get dependencies
