@@ -81,7 +81,7 @@ class StringConstants {
   static const String deviceModel = 'deviceModel';
   static const String deviceOs = 'deviceOs';
   static const String devicePlatform = 'devicePlatform';
-  static const String buidNumber = 'buidNumber';
+  static const String buildNumber = 'buildNumber';
   static const String dismiss = 'Dismiss';
   static const String watch = 'Watch';
   static const String selectGuideOrDuration = 'Select a guide / duration';
