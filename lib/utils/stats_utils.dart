@@ -14,8 +14,8 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/cache.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/utils/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pedantic/pedantic.dart';
@@ -93,7 +93,9 @@ Future<void> updateStreak({String streak = ''}) async {
 
   if (streak.isNotEmpty) {
     await prefs.setInt(
-        SharedPreferenceConstants.streakCount, int.parse(streak));
+      SharedPreferenceConstants.streakCount,
+      int.parse(streak),
+    );
     await _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomTrackToStreakList();
 
@@ -134,7 +136,9 @@ Future<void> addPhantomTrackToStreakList() async {
   fakeStreakList.add(streakTime);
   await setStreakList(streakList);
   await prefs.setStringList(
-      SharedPreferenceConstants.fakeStreakList, fakeStreakList);
+    SharedPreferenceConstants.fakeStreakList,
+    fakeStreakList,
+  );
 }
 
 Future<void> incrementStreakCounter(
