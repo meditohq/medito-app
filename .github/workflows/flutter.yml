@@ -29,9 +29,6 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Check Flutter version
-        run: flutter --version
-
       - name: Flutter Stable
         uses: nick-invision/retry@v2
         with:
