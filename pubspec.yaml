@@ -48,7 +48,7 @@ dependencies:
   riverpod_annotation: ^2.2.1
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
-  json_annotation: ^4.7.0
+  json_annotation: ^4.8.1
   flutter_dotenv: ^5.0.2
   shimmer: ^2.0.0
   webview_flutter: ^4.0.6

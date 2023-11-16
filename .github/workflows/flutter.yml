@@ -25,7 +25,7 @@ jobs:
           java-version: '12.x'
 
       - name: Flutter version
-        uses: subosito/flutter-action@v2.3.0
+        uses: subosito/flutter-action@v2.12.0
         with:
           channel: 'stable'
 
