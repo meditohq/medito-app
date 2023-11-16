@@ -76,7 +76,7 @@ jobs:
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
 
       - name: Create a dummy .staging.env file
-        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
+        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .staging.env
 
       - name: Flutter clean and pub get
         run: flutter clean && flutter pub get
