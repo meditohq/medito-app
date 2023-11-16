@@ -14,7 +14,6 @@ class SearchResultWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var searchResult = ref.watch(searchProvider);
     var searchQuery = ref.watch(searchQueryProvider);
-    final currentlyPlayingSession = ref.watch(playerProvider);
     var listViewPadding = EdgeInsets.only(
       top: 20,
       bottom: 32,

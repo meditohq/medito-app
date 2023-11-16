@@ -8,6 +8,8 @@ class SharedPreferenceConstants {
   static const String downloads = 'downloads';
   static const String currentPlayingTrack = 'currentPlayingTrack';
   static const String audioForBgEvent = 'audioForBgEvent';
+  static const String notificationPermissionCount =
+      'notificationPermissionCount';
   static const String notificationPermission = 'notificationPermission';
   static const String trackOpenedFirstTime = 'trackOpenedFirstTime';
   static const String secsListened = 'secsListened';

@@ -4,6 +4,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,6 +16,35 @@ class MenuBottomSheetWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var status = ref.watch(notificationPermissionStatusProvider);
+
+    return status.when(
+      skipLoadingOnRefresh: false,
+      skipLoadingOnReload: false,
+      data: (data) {
+        var isNotificationMenuVisibility = true;
+
+        if (data == AuthorizationStatus.authorized ||
+            data == AuthorizationStatus.provisional) {
+          isNotificationMenuVisibility = false;
+        }
+
+        return _buildMain(context, isNotificationMenuVisibility, ref);
+      },
+      error: (err, stack) => MeditoErrorWidget(
+        message: err.toString(),
+        onTap: () => ref.refresh(notificationPermissionStatusProvider),
+        isLoading: status.isLoading,
+      ),
+      loading: () => const CircularProgressIndicator(),
+    );
+  }
+
+  Container _buildMain(
+    BuildContext context,
+    bool isNotificationMenuVisibility,
+    WidgetRef ref,
+  ) {
     return Container(
       decoration: bottomSheetBoxDecoration,
       padding: EdgeInsets.only(bottom: getBottomPadding(context)),
@@ -28,17 +58,24 @@ class MenuBottomSheetWidget extends ConsumerWidget {
             height16,
             Column(
               mainAxisSize: MainAxisSize.min,
-              children: homeMenuModel
-                  .map((element) => RowItemWidget(
-                        enableInteractiveSelection: false,
-                        iconCodePoint: element.icon,
-                        title: element.title,
-                        hasUnderline: element.id != homeMenuModel.last.id,
-                        onTap: () {
-                          handleItemPress(context, ref, element);
-                        },
-                      ))
-                  .toList(),
+              children: homeMenuModel.map((element) {
+                var isNotificationPath = element.path ==
+                    RouteConstants.notificationPermissionPath.sanitisePath();
+
+                if (!isNotificationMenuVisibility && isNotificationPath) {
+                  return SizedBox();
+                }
+
+                return RowItemWidget(
+                  enableInteractiveSelection: false,
+                  iconCodePoint: element.icon,
+                  title: element.title,
+                  hasUnderline: element.id != homeMenuModel.last.id,
+                  onTap: () {
+                    handleItemPress(context, ref, element);
+                  },
+                );
+              }).toList(),
             ),
           ],
         ),

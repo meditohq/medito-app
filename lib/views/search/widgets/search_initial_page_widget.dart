@@ -17,7 +17,7 @@ class SearchInitialPageWidget extends ConsumerWidget {
 
     return allPacks.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildMain(context, ref, data),
+      data: (data) => _buildMain(ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchAllPacksProvider),
@@ -27,7 +27,6 @@ class SearchInitialPageWidget extends ConsumerWidget {
   }
 
   Column _buildMain(
-    BuildContext context,
     WidgetRef ref,
     List<PackItemsModel> packs,
   ) {

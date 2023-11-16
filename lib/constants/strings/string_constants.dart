@@ -89,6 +89,9 @@ class StringConstants {
   static const String allowNotificationsDesc =
       'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
   static const String allowNotifications = 'Allow notifications';
+  static const String openSettings = 'Open settings';
+  static const String notificationTurnOnMessage =
+      'Not ready yet? You can always allow notifications via the menu on the home screen.';
   static const String notNow = 'Not now';
   static const String bugReport = 'Bug report';
   static const String debugInfo = '--- Debug info ---';
@@ -100,7 +103,8 @@ class StringConstants {
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';
   static const String invalidToken = 'Invalid token';
-  static const String noBgSoundAvailable = "You don't have any background sound available in offline mode";
+  static const String noBgSoundAvailable =
+      "You don't have any background sound available in offline mode";
   static const String unableToLoadAudio =
       'Unable to load audio. Please go back and try again!!';
   static const String loadingError =
