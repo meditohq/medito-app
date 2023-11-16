@@ -87,8 +87,6 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
 }
 
 Future<void> updateStreak({String streak = ''}) async {
-  print('update streak');
-
   var prefs = await SharedPreferences.getInstance();
 
   if (streak.isNotEmpty) {
@@ -220,7 +218,6 @@ Future<int> getNumTracksInt() async {
 }
 
 Future<int> incrementNumTracks() async {
-  print('increase number of tracks');
   var prefs = await SharedPreferences.getInstance();
   var current = await getNumTracksInt();
   current++;
@@ -230,7 +227,6 @@ Future<int> incrementNumTracks() async {
 }
 
 void markAsListened(WidgetRef ref, String id) {
-  print('mark as listened');
   unawaited(ref
       .read(sharedPreferencesProvider)
       .setBool(SharedPreferenceConstants.listened + id, true));
@@ -269,7 +265,6 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
 
 Future updateStatsFromBg(WidgetRef ref) async {
   var read = await readJSONFromCache(SharedPreferenceConstants.stats);
-  print('read ->$read');
 
   if (read.isNotNullAndNotEmpty()) {
     var map = decoded(read!);
@@ -282,7 +277,6 @@ Future updateStatsFromBg(WidgetRef ref) async {
       markAsListened(ref, id);
       await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
-    print('clearing bg stats');
     await clearBgStats();
   }
 }

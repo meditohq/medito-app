@@ -30,7 +30,6 @@ class AudioDownloaderProvider extends ChangeNotifier {
         onReceiveProgress: (received, total) {
           if (total != -1) {
             downloadingProgress[fileName] = (received / total * 100);
-            print(downloadingProgress);
             notifyListeners();
           }
         },
