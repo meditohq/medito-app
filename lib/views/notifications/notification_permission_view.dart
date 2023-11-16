@@ -198,7 +198,7 @@ class _NotificationPermissionViewState
   void _handleNotNow() async {
     await ref.read(updateNotificationPermissionCountProvider.future);
     var notNowCount = ref.read(getNotificationPermissionCountProvider);
-    if (notNowCount >= 3) {
+    if (notNowCount > 2) {
       showSnackBar(context, StringConstants.notificationTurnOnMessage);
     }
     context.pop();
