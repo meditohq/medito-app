@@ -9,7 +9,7 @@ class MeditoAppBarLarge extends StatefulWidget {
     required this.scrollController,
     required this.title,
     this.coverUrl,
-    this.bgColor = ColorConstants.ebony,
+    this.bgColor = ColorConstants.onyx,
   });
 
   final ScrollController scrollController;
@@ -91,6 +91,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
           ),
           url: coverUrl,
           isCache: true,
+          errorWidget: SizedBox(),
         ),
       );
     }
