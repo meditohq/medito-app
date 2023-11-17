@@ -100,8 +100,6 @@ Future<void> addSingleTrackInPreference(
   required TrackFilesModel file,
 }) async {
   var _track = trackModel.customCopyWith();
-  print(trackModel == _track);
-  print(trackModel.audio == _track.audio);
   for (var i = 0; i < _track.audio.length; i++) {
     var element = _track.audio[i];
     var fileIndex = element.files.indexWhere((e) => e.id == file.id);
@@ -129,8 +127,6 @@ void addCurrentlyPlayingTrackInPreference(
   required TrackFilesModel file,
 }) {
   var _track = trackModel.customCopyWith();
-  print(trackModel == _track);
-  print(trackModel.audio == _track.audio);
   for (var i = 0; i < _track.audio.length; i++) {
     var element = _track.audio[i];
     var fileIndex = element.files.indexWhere((e) => e.id == file.id);
@@ -141,7 +137,6 @@ void addCurrentlyPlayingTrackInPreference(
       break;
     }
   }
-  print(_track);
 }
 
 //ignore: prefer-match-file-name

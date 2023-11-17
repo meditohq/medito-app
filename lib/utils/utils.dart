@@ -103,7 +103,6 @@ Future<void> launchEmailSubmission(
     await launchUrl(params);
   } else {
     var url = params.toString();
-    print('Could not launch $url');
   }
 }
 

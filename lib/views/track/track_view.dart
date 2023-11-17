@@ -15,12 +15,12 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
 
-import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -312,10 +312,11 @@ class _TrackViewState extends ConsumerState<TrackView>
               fontSize: 16,
             ),
             a: bodyLarge?.copyWith(
-                color: ColorConstants.walterWhite,
-                fontFamily: DmSans,
-                decoration: TextDecoration.underline,
-                fontSize: 16),
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              decoration: TextDecoration.underline,
+              fontSize: 16,
+            ),
             onTapLink: (text, href, title) {
               context.pop();
               var location = GoRouter.of(context).location;

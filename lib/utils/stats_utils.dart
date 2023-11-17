@@ -14,8 +14,8 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/utils/cache.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/utils/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pedantic/pedantic.dart';
@@ -87,13 +87,13 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
 }
 
 Future<void> updateStreak({String streak = ''}) async {
-  print('update streak');
-
   var prefs = await SharedPreferences.getInstance();
 
   if (streak.isNotEmpty) {
     await prefs.setInt(
-        SharedPreferenceConstants.streakCount, int.parse(streak));
+      SharedPreferenceConstants.streakCount,
+      int.parse(streak),
+    );
     await _updateLongestStreak(int.parse(streak), prefs);
     await addPhantomTrackToStreakList();
 
@@ -134,7 +134,9 @@ Future<void> addPhantomTrackToStreakList() async {
   fakeStreakList.add(streakTime);
   await setStreakList(streakList);
   await prefs.setStringList(
-      SharedPreferenceConstants.fakeStreakList, fakeStreakList);
+    SharedPreferenceConstants.fakeStreakList,
+    fakeStreakList,
+  );
 }
 
 Future<void> incrementStreakCounter(
@@ -216,7 +218,6 @@ Future<int> getNumTracksInt() async {
 }
 
 Future<int> incrementNumTracks() async {
-  print('increase number of tracks');
   var prefs = await SharedPreferences.getInstance();
   var current = await getNumTracksInt();
   current++;
@@ -226,7 +227,6 @@ Future<int> incrementNumTracks() async {
 }
 
 void markAsListened(WidgetRef ref, String id) {
-  print('mark as listened');
   unawaited(ref
       .read(sharedPreferencesProvider)
       .setBool(SharedPreferenceConstants.listened + id, true));
@@ -265,7 +265,6 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
 
 Future updateStatsFromBg(WidgetRef ref) async {
   var read = await readJSONFromCache(SharedPreferenceConstants.stats);
-  print('read ->$read');
 
   if (read.isNotNullAndNotEmpty()) {
     var map = decoded(read!);
@@ -278,7 +277,6 @@ Future updateStatsFromBg(WidgetRef ref) async {
       markAsListened(ref, id);
       await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
     }
-    print('clearing bg stats');
     await clearBgStats();
   }
 }
