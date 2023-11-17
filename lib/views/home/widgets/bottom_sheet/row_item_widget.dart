@@ -29,6 +29,7 @@ class RowItemWidget extends StatelessWidget {
   final double leadingIconSize;
   final double trailingIconSize;
   final bool enableInteractiveSelection;
+
   @override
   Widget build(BuildContext context) {
     var border = Border(
@@ -51,7 +52,7 @@ class RowItemWidget extends StatelessWidget {
             border: border,
           ),
           padding: EdgeInsets.symmetric(
-            vertical: 15,
+            vertical: 16,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

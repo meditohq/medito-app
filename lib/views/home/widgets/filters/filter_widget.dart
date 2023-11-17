@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FilterWidget extends ConsumerWidget {
   const FilterWidget({super.key, required this.chips});
+
   final List<List<HomeChipsItemsModel>> chips;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
@@ -25,7 +27,7 @@ class FilterWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 8),
       child: SizedBox(
-        height: 51,
+        height: 52,
         child: ListView.builder(
           itemCount: items.length,
           scrollDirection: Axis.horizontal,
@@ -46,11 +48,17 @@ class FilterWidget extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                   labelPadding:
-                  EdgeInsets.only(left: 6, right: 6, top: 3, bottom: 3),
-
+                      EdgeInsets.only(left: 6, right: 6, top: 6, bottom: 6),
                   label: Text(
                     element.title,
-                    style: Theme.of(context).textTheme.titleSmall,
+                    style: (Theme.of(context).textTheme.titleSmall?.copyWith(
+                              height:
+                                  1, // Adjust the line height multiplier here
+                            )) ??
+                        TextStyle(
+                          height:
+                              1, // Provide a default TextStyle if titleSmall is null
+                        ),
                   ),
                 ),
               ),
