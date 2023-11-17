@@ -30,6 +30,7 @@ import 'package:Medito/providers/providers.dart';
 import 'services/notifications/notifications_service.dart';
 
 late AudioPlayerNotifier audioHandler;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -83,6 +84,7 @@ class ParentWidget extends ConsumerStatefulWidget {
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
   AppLifecycleState currentState = AppLifecycleState.resumed;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
