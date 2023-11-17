@@ -145,7 +145,6 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
           SliverList(
             delegate: SliverChildListDelegate([
               VolumeSliderWidget(),
-              _buildNoneItem(),
               Column(
                 children: data
                     .map((e) => SoundListTileWidget(
@@ -158,20 +157,6 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
             ]),
           ),
         ],
-      ),
-    );
-  }
-
-  SoundListTileWidget _buildNoneItem() {
-    const noneId = '0';
-    const noneDuration = 0;
-
-    return SoundListTileWidget(
-      sound: BackgroundSoundsModel(
-        id: noneId,
-        title: StringConstants.none,
-        duration: noneDuration,
-        path: '',
       ),
     );
   }
