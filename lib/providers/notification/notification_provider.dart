@@ -15,11 +15,11 @@ final checkNotificationPermissionProvider =
     var notNowCount = ref.read(getNotificationPermissionCountProvider);
     if (notNowCount < 3) {
       ref.read(notificationPermissionStatusProvider.future).then((value) {
-        var checkPermissionStatusInLocalStorage = ref
+        var isPermissionStatusInLocalStorage = ref
             .read(sharedPreferencesProvider)
             .getBool(SharedPreferenceConstants.notificationPermission);
         if (Platform.isAndroid &&
-            checkPermissionStatusInLocalStorage == null &&
+            isPermissionStatusInLocalStorage == null &&
             value == AuthorizationStatus.denied) {
           context.push(RouteConstants.notificationPermissionPath);
         } else if (Platform.isIOS &&

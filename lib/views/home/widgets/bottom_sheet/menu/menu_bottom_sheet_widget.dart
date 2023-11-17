@@ -22,14 +22,14 @@ class MenuBottomSheetWidget extends ConsumerWidget {
       skipLoadingOnRefresh: false,
       skipLoadingOnReload: false,
       data: (data) {
-        var isNotificationMenuVisibility = true;
+        var isNotificationMenuVisible = true;
 
         if (data == AuthorizationStatus.authorized ||
             data == AuthorizationStatus.provisional) {
-          isNotificationMenuVisibility = false;
+          isNotificationMenuVisible = false;
         }
 
-        return _buildMain(context, isNotificationMenuVisibility, ref);
+        return _buildMain(context, isNotificationMenuVisible, ref);
       },
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
@@ -42,7 +42,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
 
   Container _buildMain(
     BuildContext context,
-    bool isNotificationMenuVisibility,
+    bool isNotificationMenuVisible,
     WidgetRef ref,
   ) {
     return Container(
@@ -62,7 +62,7 @@ class MenuBottomSheetWidget extends ConsumerWidget {
                 var isNotificationPath = element.path ==
                     RouteConstants.notificationPermissionPath.sanitisePath();
 
-                if (!isNotificationMenuVisibility && isNotificationPath) {
+                if (!isNotificationMenuVisible && isNotificationPath) {
                   return SizedBox();
                 }
 
