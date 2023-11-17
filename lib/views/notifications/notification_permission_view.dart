@@ -2,16 +2,50 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:app_settings/app_settings.dart';
 
-class NotificationPermissionView extends ConsumerWidget {
+class NotificationPermissionView extends ConsumerStatefulWidget {
   const NotificationPermissionView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationPermissionView> createState() =>
+      _NotificationPermissionViewState();
+}
+
+class _NotificationPermissionViewState
+    extends ConsumerState<NotificationPermissionView>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      var status =
+          await ref.refresh(notificationPermissionStatusProvider.future);
+      if (status == AuthorizationStatus.authorized) {
+        context.pop();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var status = ref.watch(notificationPermissionStatusProvider);
     var textTheme = Theme.of(context).textTheme;
     var size = MediaQuery.of(context).size;
 
@@ -30,74 +64,127 @@ class NotificationPermissionView extends ConsumerWidget {
                     width: size.width,
                     fit: BoxFit.cover,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          StringConstants.allowNotificationsTitle,
-                          style: textTheme.headlineMedium?.copyWith(
-                            color: ColorConstants.walterWhite,
-                            fontFamily: DmSerif,
-                            height: 1.2,
-                            fontSize: 24,
-                          ),
-                        ),
-                        height8,
-                        Text(
-                          StringConstants.allowNotificationsDesc,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: ColorConstants.walterWhite,
-                            fontFamily: DmSans,
-                            height: 1.4,
-                            fontSize: 16,
-                          ),
-                        ),
-                        height16,
-                      ],
-                    ),
-                  ),
+                  _buildTitleAndDesc(textTheme),
                 ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top:16, bottom:16, left:16, right: 16),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: size.width,
-                    height: 48,
-                    child: LoadingButtonWidget(
-                      onPressed: () => _allowNotification(context, ref),
-                      btnText: StringConstants.allowNotifications,
-                      bgColor: ColorConstants.walterWhite,
-                      textColor: ColorConstants.onyx,
-                    ),
-                  ),
-                  height8,
-                  SizedBox(
-                    width: size.width,
-                    height: 48,
-                    child: LoadingButtonWidget(
-                      onPressed: () => _handleNotNow(context),
-                      btnText: StringConstants.notNow,
-                      bgColor: ColorConstants.onyx,
-                      textColor: ColorConstants.walterWhite,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildBottomActionButttons(status, size),
         ],
       ),
     );
   }
 
-  void _allowNotification(BuildContext context, WidgetRef ref) async {
+  Padding _buildBottomActionButttons(
+    AsyncValue<AuthorizationStatus> status,
+    Size size,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(defaultPadding),
+      child: SafeArea(
+        child: status.when(
+          skipLoadingOnRefresh: false,
+          skipLoadingOnReload: false,
+          data: (data) {
+            return data == AuthorizationStatus.denied
+                ? _buildOpenNotificationSettingsButton(size)
+                : _buildAllowNotificationAndNotNowButtons(size);
+          },
+          error: (err, stack) => MeditoErrorWidget(
+            message: err.toString(),
+            onTap: () => ref.refresh(notificationPermissionStatusProvider),
+            isLoading: status.isLoading,
+          ),
+          loading: () => const CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
+
+  Padding _buildTitleAndDesc(TextTheme textTheme) {
+    const padding = EdgeInsets.only(
+      top: 24,
+      bottom: defaultPadding,
+      left: defaultPadding,
+      right: defaultPadding,
+    );
+
+    return Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            StringConstants.allowNotificationsTitle,
+            style: textTheme.headlineMedium?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSerif,
+              height: 1.2,
+              fontSize: 24,
+            ),
+          ),
+          height8,
+          Text(
+            StringConstants.allowNotificationsDesc,
+            style: textTheme.bodyMedium?.copyWith(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSans,
+              height: 1.4,
+              fontSize: 16,
+            ),
+          ),
+          height16,
+        ],
+      ),
+    );
+  }
+
+  Column _buildAllowNotificationAndNotNowButtons(
+    Size size,
+  ) {
+    return Column(
+      children: [
+        SizedBox(
+          width: size.width,
+          height: 48,
+          child: LoadingButtonWidget(
+            onPressed: () => _allowNotification(),
+            btnText: StringConstants.allowNotifications,
+            bgColor: ColorConstants.walterWhite,
+            textColor: ColorConstants.onyx,
+          ),
+        ),
+        height8,
+        SizedBox(
+          width: size.width,
+          height: 48,
+          child: LoadingButtonWidget(
+            onPressed: () => _handleNotNow(),
+            btnText: StringConstants.notNow,
+            bgColor: ColorConstants.onyx,
+            textColor: ColorConstants.walterWhite,
+          ),
+        ),
+      ],
+    );
+  }
+
+  SizedBox _buildOpenNotificationSettingsButton(
+    Size size,
+  ) {
+    return SizedBox(
+      width: size.width,
+      height: 48,
+      child: LoadingButtonWidget(
+        onPressed: () => _handleOpenSettings(),
+        btnText: StringConstants.openSettings,
+        bgColor: ColorConstants.walterWhite,
+        textColor: ColorConstants.onyx,
+      ),
+    );
+  }
+
+  void _allowNotification() async {
     var status = await requestPermission();
     if (status.isPermanentlyDenied) {
       await ref.read(sharedPreferencesProvider).setBool(
@@ -108,7 +195,19 @@ class NotificationPermissionView extends ConsumerWidget {
     context.pop();
   }
 
-  void _handleNotNow(BuildContext context) {
+  void _handleNotNow() async {
+    await ref.read(updateNotificationPermissionCountProvider.future);
+    var notNowCount = ref.read(getNotificationPermissionCountProvider);
+    if (notNowCount > 2) {
+      showSnackBar(context, StringConstants.notificationTurnOnMessage);
+    }
     context.pop();
+  }
+
+  void _handleOpenSettings() async {
+    await AppSettings.openAppSettings(
+      type: AppSettingsType.notification,
+      asAnotherTask: true,
+    );
   }
 }
