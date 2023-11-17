@@ -4,7 +4,7 @@ export 'shimmers/home_shimmer_widget.dart';
 export 'shimmers/background_sounds_shimmer_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'errors/connectivity_error_widget.dart';
-export 'headers/collapsible_header_widget.dart';
+export 'headers/medito_app_bar_large.dart';
 export 'buttons/close_button_widget.dart';
 export 'buttons/loading_button_widget.dart';
 export 'medito_webview_widget.dart';

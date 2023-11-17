@@ -14,6 +14,8 @@ class NetworkImageWidget extends ConsumerWidget {
   final double? height, width;
   final bool isCache;
   final Gradient? gradient;
+  final Widget? errorWidget;
+
   const NetworkImageWidget({
     Key? key,
     required this.url,
@@ -21,6 +23,7 @@ class NetworkImageWidget extends ConsumerWidget {
     this.width,
     this.isCache = false,
     this.gradient,
+    this.errorWidget,
   }) : super(key: key);
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,6 +55,10 @@ class NetworkImageWidget extends ConsumerWidget {
           ),
           placeholder: (context, url) => _shimmerLoading(),
           errorWidget: (context, url, error) {
+            if (errorWidget != null) {
+              return errorWidget!;
+            }
+
             return const Icon(Icons.error);
           },
         );
@@ -71,6 +78,10 @@ class NetworkImageWidget extends ConsumerWidget {
           return loadingProgress == null ? child : _shimmerLoading();
         },
         errorBuilder: (context, error, stackTrace) {
+          if (errorWidget != null) {
+            return errorWidget!;
+          }
+
           return Image.asset(
             AssetConstants.dalle,
             fit: BoxFit.cover,
