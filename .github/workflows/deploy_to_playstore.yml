@@ -22,7 +22,7 @@ jobs:
     steps:
       # Set up Flutter.
       - name: Clone Flutter repository with stable channel
-        uses: subosito/flutter-action@v2.3.0
+        uses: subosito/flutter-action@v2.12.0
         with:
           channel: stable
       - run: flutter doctor -v
@@ -31,18 +31,22 @@ jobs:
         uses: actions/checkout@v2
 
       # Fixme: https://github.com/meditohq/medito-app/issues/151
-      - name: Create auth.dart
-        run: sh ./.github/scripts/create_auth_dart.sh
+      - name: Create .env files
+        run: sh ./.github/scripts/create_env_files.sh
         env:
           BASE_URL: ${{ secrets.AUTH_BASE_URL }}
           SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
           INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Run Riverpod generator
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
       - name: Analyze code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+
       - name: Run test
         run: flutter test
 

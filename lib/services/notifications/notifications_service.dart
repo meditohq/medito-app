@@ -20,7 +20,6 @@ Future<void> registerNotification() async {
 
 Future<String?> requestGenerateFirebaseToken() async {
   var token = await _messaging.getToken();
-  print(token);
 
   return token;
 }

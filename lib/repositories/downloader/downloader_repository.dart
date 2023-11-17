@@ -22,14 +22,18 @@ abstract class DownloaderRepository {
     required String name,
     void Function(int, int)? onReceiveProgress,
   });
+
   Future<String?> getDownloadedFile(String name);
+
   Future<void> deleteDownloadedFile(String name);
+
   Future<void> deleteDownloadedFileFromPreviousVersion();
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
   DioApiService client;
   Ref ref;
+
   DownloaderRepositoryImpl({required this.client, required this.ref});
 
   @override
@@ -41,7 +45,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
     try {
       var file = await getApplicationDocumentsDirectory();
       var savePath = file.path + '/' + name;
-      print(savePath);
       var isExists = await File(savePath).exists();
       if (!isExists) {
         await client.dio.download(
@@ -124,5 +127,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 @riverpod
 DownloaderRepositoryImpl downloaderRepository(ref) {
   return DownloaderRepositoryImpl(
-      client: ref.watch(dioClientProvider), ref: ref);
+    client: ref.watch(dioClientProvider),
+    ref: ref,
+  );
 }

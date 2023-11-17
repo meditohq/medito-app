@@ -34,11 +34,11 @@ String _formatString(
   var deviceOs = '${StringConstants.deviceOs}: ${deviceInfo?.os ?? ''}';
   var devicePlatform =
       '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
-  var buidNumber =
-      '${StringConstants.buidNumber}: ${deviceInfo?.buildNumber ?? ''}';
+  var buildNumber =
+      '${StringConstants.buildNumber}: ${deviceInfo?.buildNumber ?? ''}';
 
   var formattedString =
-      '$id\n$email\n$appVersion\n$deviceModel\n$deviceOs\n$devicePlatform\n$buidNumber';
+      '$id\n$email\n$appVersion\n$deviceModel\n$deviceOs\n$devicePlatform\n$buildNumber';
 
   return formattedString;
 }

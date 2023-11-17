@@ -50,7 +50,7 @@ class MeditoErrorWidget extends StatelessWidget {
           vertical: defaultPadding,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: hasScaffold ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
