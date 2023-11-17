@@ -126,16 +126,25 @@ class _NotificationPermissionViewState
           height8,
           Text(
             StringConstants.allowNotificationsDesc,
-            style: textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.walterWhite,
-              fontFamily: DmSans,
-              height: 1.4,
-              fontSize: 16,
-            ),
+            style: _textStyle(textTheme),
+          ),
+          height16,
+          Text(
+            StringConstants.notificationTurnOnMessage,
+            style: _textStyle(textTheme),
           ),
           height16,
         ],
       ),
+    );
+  }
+
+  TextStyle? _textStyle(TextTheme textTheme){
+    return textTheme.bodyMedium?.copyWith(
+      color: ColorConstants.walterWhite,
+      fontFamily: DmSans,
+      height: 1.4,
+      fontSize: 16,
     );
   }
 
@@ -198,9 +207,6 @@ class _NotificationPermissionViewState
   void _handleNotNow() async {
     await ref.read(updateNotificationPermissionCountProvider.future);
     var notNowCount = ref.read(getNotificationPermissionCountProvider);
-    if (notNowCount > 2) {
-      showSnackBar(context, StringConstants.notificationTurnOnMessage);
-    }
     context.pop();
   }
 
