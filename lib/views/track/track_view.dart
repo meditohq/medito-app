@@ -143,6 +143,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     WidgetRef ref,
   ) {
+    bool showGuideNameDropdown = trackModel.audio.first.guideName.isNotNullAndNotEmpty();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
@@ -176,8 +178,12 @@ class _TrackViewState extends ConsumerState<TrackView>
               _title(context, trackModel.title),
               _getSubTitle(context, trackModel.description),
               height24,
-              _guideNameDropdown(trackModel),
-              height12,
+              // Guide Name Dropdown
+              if (showGuideNameDropdown) _guideNameDropdown(trackModel),
+
+              // Conditional height (only added if guide name dropdown is shown)
+              if (showGuideNameDropdown) SizedBox(height: 12),
+
               _durationDropdown(trackModel),
               height12,
               _playBtn(context, ref, trackModel),
