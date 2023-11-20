@@ -33,6 +33,7 @@ dependencies:
       ref: feature/treadmill
       path: just_audio
   audio_service: ^0.18.10
+  audio_session: ^0.1.18
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2

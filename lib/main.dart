@@ -28,12 +28,12 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:Medito/providers/providers.dart';
 import 'services/notifications/notifications_service.dart';
+import 'package:audio_session/audio_session.dart';
 
 late AudioPlayerNotifier audioHandler;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: StringConstants.stagingEnv);
 
   var sharedPreferences = await initializeSharedPreferences();
@@ -51,14 +51,7 @@ Future<void> main() async {
     },
   );
 
-  audioHandler = await AudioService.init(
-    builder: () => AudioPlayerNotifier(),
-    config: AudioServiceConfig(
-      androidNotificationChannelId: 'com.medito.app.channel.audio',
-      androidNotificationChannelName: 'Medito Meditation',
-      androidNotificationOngoing: true,
-    ),
-  );
+  audioHandler = await initAudioService();
 
   usePathUrlStrategy();
 
@@ -68,6 +61,35 @@ Future<void> main() async {
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
       child: ParentWidget(),
+    ),
+  );
+}
+
+Future<AudioPlayerNotifier> initAudioService() async {
+  final session = await AudioSession.instance;
+  await session.configure(const AudioSessionConfiguration(
+    avAudioSessionCategory: AVAudioSessionCategory.playback,
+    avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.duckOthers,
+    avAudioSessionMode: AVAudioSessionMode.defaultMode,
+    avAudioSessionRouteSharingPolicy:
+        AVAudioSessionRouteSharingPolicy.defaultPolicy,
+    avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+    androidAudioAttributes: AndroidAudioAttributes(
+      contentType: AndroidAudioContentType.music,
+      flags: AndroidAudioFlags.none,
+      usage: AndroidAudioUsage.media,
+    ),
+    androidAudioFocusGainType: AndroidAudioFocusGainType.gainTransientMayDuck,
+    androidWillPauseWhenDucked: true,
+  ));
+
+  return await AudioService.init(
+    builder: () => AudioPlayerNotifier(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'com.medito.app.channel.audio',
+      androidNotificationChannelName: 'Medito Meditation',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
     ),
   );
 }
