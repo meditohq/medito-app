@@ -62,7 +62,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             if ((await Vibration.hasAmplitudeControl()) ?? false) {
               Vibration.vibrate(amplitude: 20, duration: 30);
             } else {
-              Vibration.vibrate(duration: 50);
+              Vibration.vibrate(duration: 30);
             }
           }
         },
@@ -71,7 +71,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             if ((await Vibration.hasAmplitudeControl()) ?? false) {
               Vibration.vibrate(amplitude: 50, duration: 5);
             } else {
-              Vibration.vibrate(duration: 50);
+              Vibration.vibrate(duration: 5);
             }
           }
         },
