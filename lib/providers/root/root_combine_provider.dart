@@ -21,15 +21,13 @@ final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
       .distinct();
   streamEvent.forEach((element) {
     if (element == ProcessingState.completed) {
-      _handleAudioCompletion(ref);
+      _handleAudioCompletion(ref, context);
       _handleUserNotSignedIn(ref, context);
     }
   });
 });
 
-void _handleAudioCompletion(
-  Ref ref,
-) {
+void _handleAudioCompletion(Ref ref, BuildContext context) {
   final audioProvider = ref.read(audioPlayerNotifierProvider);
   var extras = audioProvider.mediaItem.value?.extras;
   if (extras != null) {
@@ -47,6 +45,11 @@ void _handleAudioCompletion(
       ref.read(audioPlayPauseStateProvider.notifier).state =
           PLAY_PAUSE_AUDIO.PAUSE;
     });
+    var currentlyPlayingTrack = ref.read(playerProvider);
+    var endScreen = currentlyPlayingTrack?.endScreen;
+    if (endScreen != null) {
+      context.push(RouteConstants.feedbackAndDonationPath, extra: endScreen);
+    }
   }
 }
 

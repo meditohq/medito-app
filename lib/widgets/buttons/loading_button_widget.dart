@@ -12,6 +12,7 @@ class LoadingButtonWidget extends StatelessWidget {
     this.elevation = 0,
     this.fontWeight = FontWeight.w700,
     this.fontSize = 14,
+    this.borderRadius = 15,
   });
   final void Function()? onPressed;
   final String btnText;
@@ -21,6 +22,7 @@ class LoadingButtonWidget extends StatelessWidget {
   final double elevation;
   final FontWeight fontWeight;
   final double fontSize;
+  final double borderRadius;
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
@@ -30,8 +32,10 @@ class LoadingButtonWidget extends StatelessWidget {
       disabledColor: bgColor.withOpacity(0.7),
       color: bgColor,
       splashColor: ColorConstants.transparent,
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: defaultPadding),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
       child: Stack(
         alignment: Alignment.center,
         children: [
