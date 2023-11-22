@@ -65,13 +65,19 @@ Future<void> launchURLInBrowser(String url) async {
   try {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(
+      var launched = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
+
+      if (!launched) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.inAppWebView,
+        );
+      }
     }
   } catch (e, stackTrace) {
-    // Capture the exception using Sentry
     await Sentry.captureException(
       e,
       stackTrace: stackTrace,
