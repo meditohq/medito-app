@@ -7,19 +7,22 @@ class OverlayCoverImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    var size = MediaQuery.of(context).size.width;
 
-    return Container(
-      height: size.width,
-      padding: EdgeInsets.symmetric(
-        horizontal: 20,
-      ),
+    print(size);
+
+    double dimension;
+
+    dimension = size <= 400 ? size - 128 : size - 64;
+
+    return SizedBox(
+      width: dimension,
+      height: dimension,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
         child: NetworkImageWidget(
           url: imageUrl,
           isCache: true,
-          width: size.width,
         ),
       ),
     );
