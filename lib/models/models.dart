@@ -24,6 +24,8 @@ export 'events/track_viewed/track_viewed_model.dart';
 export 'events/menuItem_tapped/menuItem_tapped_model.dart';
 export 'events/transfer_stats/transfer_stats_model.dart';
 export 'events/save_fcm_token/save_fcm_token_model.dart';
+export 'events/feedback/feedback_tapped_model.dart';
+export 'events/donation/donation_tapped_model.dart';
 export 'events/events_model.dart';
 export 'notification/notification_payload_model.dart';
 export 'search/search_model.dart';

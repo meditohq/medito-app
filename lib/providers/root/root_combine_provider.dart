@@ -32,8 +32,8 @@ void _handleAudioCompletion(Ref ref, BuildContext context) {
   var extras = audioProvider.mediaItem.value?.extras;
   if (extras != null) {
     ref.read(playerProvider.notifier).handleAudioCompletionEvent(
-          extras['fileId'],
-          extras['trackId'],
+          extras[TypeConstants.fileIdKey],
+          extras[TypeConstants.trackIdKey],
         );
 
     audioProvider.seekValueFromSlider(0);

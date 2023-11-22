@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,39 @@ class FeedbackWidget extends ConsumerStatefulWidget {
 }
 
 class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
+  bool isLoading = false;
+  bool isFeedbackAdded = false;
+
+  void _handleFeedbackPress(String feedback) async {
+    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    var extras = audioProvider.mediaItem.value?.extras;
+
+    setState(() {
+      isLoading = true;
+    });
+    var payload = FeedbackTappedModel(
+      trackId: extras?[TypeConstants.trackIdKey] ?? '',
+      audioFileId: extras?[TypeConstants.fileIdKey] ?? '',
+      emoji: feedback,
+    );
+    var event = EventsModel(
+      name: EventTypes.trackFeedback,
+      payload: payload.toJson(),
+    );
+    try {
+      await ref.read(eventsProvider(event: event.toJson()).future);
+      setState(() {
+        isLoading = false;
+        isFeedbackAdded = true;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        isFeedbackAdded = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var bodyLarge = Theme.of(context).textTheme.bodyLarge;
@@ -41,31 +75,53 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
             textAlign: TextAlign.center,
           ),
           height20,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.feedbackModel.options
-                .map((e) => _buildFeedbackButton(e.value))
-                .toList(),
-          ),
+          _buildFeedbackButton(),
         ],
       ),
     );
   }
 
-  Padding _buildFeedbackButton(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Container(
+  Widget _buildFeedbackButton() {
+    var bodyLarge = Theme.of(context).textTheme.bodyLarge;
+
+    if (isLoading) {
+      return CircularProgressIndicator();
+    } else if (isFeedbackAdded) {
+      return Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
           color: ColorConstants.ebony,
+          borderRadius: BorderRadius.circular(14),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: defaultPadding),
         child: Text(
-          text,
-          style: TextStyle(fontSize: 40),
+          StringConstants.thanksForSharing,
+          style: bodyLarge,
+          textAlign: TextAlign.center,
         ),
-      ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: widget.feedbackModel.options
+          .map((e) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: InkWell(
+                  onTap: () => _handleFeedbackPress(e.value),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: ColorConstants.ebony,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text(
+                      e.value,
+                      style: TextStyle(fontSize: 40),
+                    ),
+                  ),
+                ),
+              ))
+          .toList(),
     );
   }
 }

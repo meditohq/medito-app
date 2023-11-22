@@ -336,7 +336,7 @@ Future<void> handleNavigation(
   ids.removeWhere((element) => element == null);
   var path;
   var params;
-  if (place == TypeConstants.TRACK) {
+  if (place == TypeConstants.track) {
     unawaited(showModalBottomSheet<void>(
       context: context!,
       shape: RoundedRectangleBorder(
@@ -364,19 +364,19 @@ Future<void> handleNavigation(
     path = RouteConstants.pack2Path
         .replaceAll(':pid', ids.first!)
         .replaceAll(':p2id', ids[1]!);
-  } else if (place == TypeConstants.PACK) {
+  } else if (place == TypeConstants.pack) {
     path = RouteConstants.packPath.replaceAll(':pid', ids.first!);
-  } else if (place == TypeConstants.URL) {
+  } else if (place == TypeConstants.url) {
     await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
 
     return;
-  } else if (place == TypeConstants.LINK) {
+  } else if (place == TypeConstants.link) {
     path = RouteConstants.webviewPath;
     params = {'url': ids.last};
-  } else if (place == TypeConstants.FLOW) {
+  } else if (place == TypeConstants.flow) {
     path = ids.first != null ? '/${ids.first}' : RouteConstants.joinIntroPath;
     params = JoinRouteParamsModel(screen: Screen.track);
-  } else if (place == TypeConstants.EMAIL) {
+  } else if (place == TypeConstants.email) {
     if (ref != null) {
       var deviceAppAndUserInfo =
           await ref.read(deviceAppAndUserInfoProvider.future);

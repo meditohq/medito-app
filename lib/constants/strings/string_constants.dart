@@ -97,6 +97,7 @@ class StringConstants {
   static const String debugInfo = '--- Debug info ---';
   static const String writeBelowThisLine = '--- Write below this line ---';
   static const String explore = 'Explore';
+  static const String thanksForSharing = 'Thanks for sharing 💜';
 
   //Error
   static const String someThingWentWrong = 'Something went wrong';

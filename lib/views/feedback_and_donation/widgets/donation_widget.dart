@@ -1,16 +1,18 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DonationWidget extends StatelessWidget {
+class DonationWidget extends ConsumerWidget {
   final DonationModel donationModel;
   const DonationWidget({super.key, required this.donationModel});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var bodyLarge = Theme.of(context).textTheme.bodyLarge;
     var bgColor = parseColor(donationModel.colorBackground);
 
@@ -42,9 +44,7 @@ class DonationWidget extends StatelessWidget {
             height: 48,
             width: MediaQuery.of(context).size.width,
             child: LoadingButtonWidget(
-              onPressed: () => handleNavigation(donationModel.ctaType, [
-                donationModel.ctaPath,
-              ]),
+              onPressed: () => _handleDonatePress(ref),
               btnText: donationModel.ctaTitle,
               bgColor: ColorConstants.walterWhite,
               textColor: bgColor,
@@ -57,5 +57,22 @@ class DonationWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleDonatePress(
+    WidgetRef ref,
+  ) {
+    var payload = DonationTappedModel(
+      donationAskCard: TypeConstants.donationAskCard,
+      originId: donationModel.id.toString(),
+    );
+    var event = EventsModel(
+      name: EventTypes.donationCtaTapped,
+      payload: payload.toJson(),
+    );
+    ref.read(eventsProvider(event: event.toJson()).future);
+    handleNavigation(donationModel.ctaType, [
+      donationModel.ctaPath,
+    ]);
   }
 }
