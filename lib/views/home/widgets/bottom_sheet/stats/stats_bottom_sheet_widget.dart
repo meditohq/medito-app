@@ -72,10 +72,9 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                   hasUnderline: e.title != stats.all.last.title,
                   isTrailingIcon: false,
                   titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontSize: 18,
-                        letterSpacing: 1,
-                        wordSpacing: 1.5,
-                        fontFamily: DmSerif,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: DmSans,
                       ),
                 );
               }).toList(),

@@ -1,21 +1,21 @@
+import 'package:Medito/constants/constants.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../constants/colors/color_constants.dart';
-import '../../constants/styles/widget_styles.dart';
-import '../network_image_widget.dart';
 
 class MeditoAppBarLarge extends StatefulWidget {
   const MeditoAppBarLarge({
     super.key,
     required this.scrollController,
     required this.title,
-    required this.coverUrl,
+    this.coverUrl,
+    this.bgColor = ColorConstants.onyx,
   });
 
   final ScrollController scrollController;
   final String title;
-  final String coverUrl;
+  final String? coverUrl;
+  final Color bgColor;
 
   @override
   State<MeditoAppBarLarge> createState() => _MeditoAppBarLargeState();
@@ -76,20 +76,30 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     );
   }
 
-  Opacity _topBarBackground(double scrollFactor, String coverUrl) {
+  Opacity _topBarBackground(double scrollFactor, String? coverUrl) {
+    if (coverUrl != null) {
+      return Opacity(
+        opacity: 1 - scrollFactor,
+        child: NetworkImageWidget(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomLeft,
+            colors: [
+              ColorConstants.black.withOpacity(0),
+              ColorConstants.black.withOpacity(0.3),
+            ],
+          ),
+          url: coverUrl,
+          isCache: true,
+          errorWidget: SizedBox(),
+        ),
+      );
+    }
+
     return Opacity(
       opacity: 1 - scrollFactor,
-      child: NetworkImageWidget(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomLeft,
-          colors: [
-            ColorConstants.black.withOpacity(0),
-            ColorConstants.black.withOpacity(0.3),
-          ],
-        ),
-        url: coverUrl,
-        isCache: true,
+      child: Container(
+        color: widget.bgColor,
       ),
     );
   }

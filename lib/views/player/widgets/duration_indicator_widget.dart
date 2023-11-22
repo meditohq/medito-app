@@ -72,13 +72,13 @@ class _DurationIndicatorWidgetState
   }
 
   Padding _durationBar(
-      BuildContext context,
-      WidgetRef ref,
-      num currentDuration,
-      PositionAndPlayerStateState data,
-      ) {
+    BuildContext context,
+    WidgetRef ref,
+    num currentDuration,
+    PositionAndPlayerStateState data,
+  ) {
     return Padding(
-      padding: const EdgeInsets.only(left:20, right: 20, top:0, bottom:0),
+      padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
       child: Column(
         children: [
           SliderTheme(
@@ -106,9 +106,8 @@ class _DurationIndicatorWidgetState
               onChangeEnd: (val) => onChangeEnd(ref, data, val),
             ),
           ),
-          // Adjust the position here
           Transform.translate(
-            offset: Offset(0,-14), // adjust the value to achieve the desired alignment
+            offset: Offset(0, -14),
             child: _durationLabels(
               context,
               currentDuration.round(),
@@ -119,7 +118,6 @@ class _DurationIndicatorWidgetState
       ),
     );
   }
-
 
   Row _durationLabels(
     BuildContext context,

@@ -46,7 +46,6 @@ class AuthRepositoryImpl extends AuthRepository {
     try {
       var res = await client
           .postRequest('${HTTPConstants.OTP}', data: {'email': email});
-      print(res);
 
       return res['success'];
     } catch (e) {
@@ -59,7 +58,6 @@ class AuthRepositoryImpl extends AuthRepository {
     try {
       var res = await client
           .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
-      print(res);
 
       return res['success'];
     } catch (e) {

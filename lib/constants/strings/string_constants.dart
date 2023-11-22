@@ -15,7 +15,7 @@ class StringConstants {
   static const String pickNarratorAndDuration = 'Pick a narrator & duration';
   static const String pickDuration = 'Pick a duration';
   static const String showDownloads = 'Show downloads';
-  static const String favourites = 'Favouites';
+  static const String favourites = 'Favourites';
   static const String whatAreYouLookingFor = 'What are you looking for?';
   static const String emptyDownloadsMessage =
       'It looks like you haven’t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
@@ -42,11 +42,13 @@ class StringConstants {
   static const String backgroundSounds = 'Background Sound';
   static const String playerBgErrorMsg =
       'Oops! There was an error getting the background sounds. Please try again later.';
+  static const String x06 = 'X0.6';
+  static const String x07 = 'X0.7';
+  static const String x08 = 'X0.8';
+  static const String x09 = 'X0.9';
   static const String x1 = 'X1';
   static const String x125 = 'X1.25';
   static const String x15 = 'X1.5';
-  static const String x2 = 'X2';
-  static const String x06 = 'X0.6';
 
   //Join
   static const String joinTheMeditoFamily = 'Join the Medito Family';
@@ -81,7 +83,7 @@ class StringConstants {
   static const String deviceModel = 'deviceModel';
   static const String deviceOs = 'deviceOs';
   static const String devicePlatform = 'devicePlatform';
-  static const String buidNumber = 'buidNumber';
+  static const String buildNumber = 'buildNumber';
   static const String dismiss = 'Dismiss';
   static const String watch = 'Watch';
   static const String selectGuideOrDuration = 'Select a guide / duration';
@@ -89,6 +91,9 @@ class StringConstants {
   static const String allowNotificationsDesc =
       'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
   static const String allowNotifications = 'Allow notifications';
+  static const String openSettings = 'Open settings';
+  static const String notificationTurnOnMessage =
+      'Not ready yet? You can always allow notifications via the menu on the home screen.';
   static const String notNow = 'Not now';
   static const String bugReport = 'Bug report';
   static const String debugInfo = '--- Debug info ---';
@@ -100,7 +105,8 @@ class StringConstants {
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';
   static const String invalidToken = 'Invalid token';
-  static const String noBgSoundAvailable = "You don't have any background sound available in offline mode";
+  static const String noBgSoundAvailable =
+      "You don't have any background sounds available in offline mode";
   static const String unableToLoadAudio =
       'Unable to load audio. Please go back and try again!!';
   static const String loadingError =

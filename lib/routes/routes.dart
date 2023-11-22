@@ -1,13 +1,8 @@
 import 'dart:async';
 
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/views/home/home_view.dart';
-import 'package:Medito/views/notifications/notification_permission_view.dart';
-import 'package:Medito/views/search/search_view.dart';
-import 'package:Medito/widgets/widgets.dart';
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/views/root/root_page_view.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/auth/join_email_view.dart';
 import 'package:Medito/views/auth/join_intro_view.dart';
@@ -15,10 +10,15 @@ import 'package:Medito/views/auth/join_verify_OTP_view.dart';
 import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
+import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/pack/pack_view.dart';
 import 'package:Medito/views/player/player_view.dart';
-import 'package:Medito/views/track/track_view.dart';
+import 'package:Medito/views/root/root_page_view.dart';
+import 'package:Medito/views/search/search_view.dart';
 import 'package:Medito/views/splash_view.dart';
+import 'package:Medito/views/track/track_view.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -254,19 +254,20 @@ GoRoute _getSearchRoute({bool fromRoot = false}) {
 
 GoRoute _getDownloadsRoute({bool fromRoot = false}) {
   return GoRoute(
-      parentNavigatorKey: _shellNavigatorKey,
-      path: fromRoot
-          ? RouteConstants.downloadsPath
-          : RouteConstants.downloadsPath.sanitisePath(),
-      pageBuilder: (context, state) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: DownloadsView(),
-        );
-      },
-      routes: [
-        _getPlayerRoute(),
-      ]);
+    parentNavigatorKey: _shellNavigatorKey,
+    path: fromRoot
+        ? RouteConstants.downloadsPath
+        : RouteConstants.downloadsPath.sanitisePath(),
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: DownloadsView(),
+      );
+    },
+    routes: [
+      _getPlayerRoute(),
+    ],
+  );
 }
 
 //ignore: prefer-match-file-name
@@ -325,8 +326,10 @@ Future<void> handleNavigation(
       isScrollControlled: true,
       backgroundColor: ColorConstants.ebony,
       builder: (BuildContext context) {
-        return TrackView(
-          id: ids.first!,
+        return SafeArea(
+          child: TrackView(
+            id: ids.first!,
+          ),
         );
       },
     ));

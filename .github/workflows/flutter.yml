@@ -25,12 +25,9 @@ jobs:
           java-version: '12.x'
 
       - name: Flutter version
-        uses: subosito/flutter-action@v2.3.0
+        uses: subosito/flutter-action@v2.12.0
         with:
           channel: 'stable'
-
-      - name: Check Flutter version
-        run: flutter --version
 
       - name: Flutter Stable
         uses: nick-invision/retry@v2
@@ -53,17 +50,21 @@ jobs:
           max_attempts: 2
           command: flutter pub get
 
-#      - name: Check Flutter and Dart versions
-#        run: |
-#          flutter --version
-#          DART_PATH=$(dirname $(which dart))
-#          echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
-#
-#      - name: Run dart_code_metrics
-#        run: |
-#          flutter pub run dart_code_metrics:metrics analyze --reporter=github --verbose > metrics_report.txt
-#
-#      - name: Create or update PR comment
+      - name: Check Flutter and Dart versions
+        run: |
+          flutter --version
+          DART_PATH=$(dirname $(which dart))
+          echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
+
+      - name: Run dart_code_metrics
+        run: |
+          flutter pub run dart_code_metrics:metrics --no-fatal-style --no-fatal-warnings  --no-fatal-performance  lib
+
+      - name: Check unused files
+        run: |
+          flutter pub run dart_code_metrics:metrics check-unused-files --fatal-unused  lib      
+
+      #      - name: Create or update PR comment
 #        uses: peter-evans/create-or-update-comment@v1
 #        with:
 #          token: ${{ secrets.GITHUB_TOKEN }}
@@ -72,12 +73,11 @@ jobs:
 #          body-file: metrics_report.txt
 #          edit-mode: replace
 
-      - name: Run dart_code_metrics
-        run: |
-          flutter pub run dart_code_metrics:metrics --reporter=github --no-fatal-style --no-fatal-warnings  --no-fatal-performance  lib
+      - name: Create a dummy .prod.env file
+        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
 
-      - name: Create a dummy auth.dart
-        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar CONTENT_TOKEN = '';\nvar INIT_TOKEN = '';" > .env
+      - name: Create a dummy .staging.env file
+        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .staging.env
 
       - name: Flutter clean and pub get
         run: flutter clean && flutter pub get

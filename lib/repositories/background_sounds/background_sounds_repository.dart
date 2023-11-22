@@ -32,10 +32,20 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
     try {
       var res = await client.getRequest(HTTPConstants.BACKGROUND_SOUNDS);
       var tempResponse = res as List;
+      var bgSoundList = <BackgroundSoundsModel>[];
+      const noneBgSound = BackgroundSoundsModel(
+        id: '0',
+        title: StringConstants.none,
+        duration: 0,
+        path: '',
+      );
+      bgSoundList.add(noneBgSound);
+      var parsedResponseList =
+          tempResponse.map((x) => BackgroundSoundsModel.fromJson(x)).toList();
 
-      return tempResponse
-          .map((x) => BackgroundSoundsModel.fromJson(x))
-          .toList();
+      bgSoundList.addAll(parsedResponseList);
+
+      return bgSoundList;
     } catch (e) {
       rethrow;
     }

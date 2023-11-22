@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.0.9+3009
+version: 3.0.11+30011
 environment:
   sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
@@ -33,6 +33,7 @@ dependencies:
       ref: feature/treadmill
       path: just_audio
   audio_service: ^0.18.10
+  audio_session: ^0.1.18
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2
@@ -48,7 +49,7 @@ dependencies:
   riverpod_annotation: ^2.2.1
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
-  json_annotation: ^4.7.0
+  json_annotation: ^4.8.1
   flutter_dotenv: ^5.0.2
   shimmer: ^2.0.0
   webview_flutter: ^4.0.6
@@ -63,6 +64,7 @@ dependencies:
   marquee: ^2.2.3
   image: ^4.0.17
   permission_handler: ^10.4.5
+  app_settings: ^5.1.1
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
