@@ -56,21 +56,38 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: ColorConstants.onyx,
-        onPressed: () async {
+      floatingActionButton: Listener(
+        onPointerDown: (_) async {
           if (await Vibration.hasVibrator() ?? false) {
-            Vibration.vibrate();
+            if ((await Vibration.hasAmplitudeControl()) ?? false) {
+              Vibration.vibrate(amplitude: 20, duration: 30);
+            } else {
+              Vibration.vibrate(duration: 50);
+            }
           }
-          context.push(RouteConstants.search);
         },
-        icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
-        label: Text(
-          'Explore',
-          style: TextStyle(
-            color: ColorConstants.walterWhite,
-            fontFamily: DmSerif,
-            fontSize: 20,
+        onPointerUp: (_) async {
+          if (await Vibration.hasVibrator() ?? false) {
+            if ((await Vibration.hasAmplitudeControl()) ?? false) {
+              Vibration.vibrate(amplitude: 50, duration: 5);
+            } else {
+              Vibration.vibrate(duration: 50);
+            }
+          }
+        },
+        child: FloatingActionButton.extended(
+          backgroundColor: ColorConstants.onyx,
+          onPressed: () {
+            context.push(RouteConstants.search);
+          },
+          icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
+          label: Text(
+            'Explore',
+            style: TextStyle(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSerif,
+              fontSize: 20,
+            ),
           ),
         ),
       ),
