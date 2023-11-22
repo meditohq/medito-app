@@ -13,11 +13,13 @@ final audioSpeedProvider = ChangeNotifierProvider<AudioSpeedProvider>((ref) {
 class AudioSpeedProvider extends ChangeNotifier {
   final Ref ref;
   final List<String> _speedList = [
+    StringConstants.x06,
+    StringConstants.x07,
+    StringConstants.x08,
+    StringConstants.x09,
     StringConstants.x1,
     StringConstants.x125,
     StringConstants.x15,
-    StringConstants.x2,
-    StringConstants.x06,
   ];
   AudioSpeedModel audioSpeedModel = AudioSpeedModel();
 
@@ -29,16 +31,20 @@ class AudioSpeedProvider extends ChangeNotifier {
     var nextIndex = _speedList.indexOf(audioSpeedModel.label) + 1;
     label =
         nextIndex >= _speedList.length ? _speedList[0] : _speedList[nextIndex];
-    if (label == StringConstants.x1) {
+    if (label == StringConstants.x06) {
+      speed = 0.6;
+    } else if (label == StringConstants.x07) {
+      speed = 0.7;
+    } else if (label == StringConstants.x08) {
+      speed = 0.8;
+    } else if (label == StringConstants.x09) {
+      speed = 0.9;
+    } else if (label == StringConstants.x1) {
       speed = 1;
     } else if (label == StringConstants.x125) {
       speed = 1.25;
     } else if (label == StringConstants.x15) {
       speed = 1.5;
-    } else if (label == StringConstants.x2) {
-      speed = 2;
-    } else if (label == StringConstants.x06) {
-      speed = 0.6;
     } else {
       speed = 1;
     }
