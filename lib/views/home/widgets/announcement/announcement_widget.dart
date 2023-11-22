@@ -67,7 +67,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     );
 
     List<Widget> actionWidgets = [
-      // Dismiss Button
       LoadingButtonWidget(
         onPressed: () {
           if (widget.onPressedDismiss != null) {
