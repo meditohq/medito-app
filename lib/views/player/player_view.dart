@@ -34,74 +34,77 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     var artist = currentlyPlayingTrack.artist;
     var file = currentlyPlayingTrack.audio.first.files.first;
 
+    var size = MediaQuery.of(context).size.width;
+    double spacerHeight48 = size <= 400 ? 10 : 56;
+    double spacerHeight20 = size <= 400 ? 0 : 20;
+    double spacerHeight24 = size <= 400 ? 0 : 24;
+
     return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+      onWillPop: _handleClose,
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        backgroundColor: ColorConstants.ebony,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: GestureDetector(
+              onTap: _handleClose,
+              child: Icon(Icons.close, color: ColorConstants.walterWhite),
+            ),
+          ),
+        ),
+        backgroundColor: ColorConstants.transparent,
         body: SafeArea(
-          child: Column(
-            children: [
-              height20,
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: defaultPadding,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: spacerHeight20),
+                OverlayCoverImageWidget(imageUrl: coverUrl),
+                SizedBox(height: spacerHeight48),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: ArtistTitleWidget(
+                    trackTitle: currentlyPlayingTrack.title,
+                    artistName: artist?.name,
+                    artistUrlPath: artist?.path,
+                    isPlayerScreen: true,
                   ),
-                  child: CloseButtonWidget(
-                    icColor: ColorConstants.walterWhite,
-                    onPressed: _handleClose,
-                    isShowCircle: false,
-                  ),
                 ),
-              ),
-              height20,
-              OverlayCoverImageWidget(imageUrl: coverUrl),
-              height20,
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                ),
-                child: ArtistTitleWidget(
-                  trackTitle: currentlyPlayingTrack.title,
-                  artistName: artist?.name,
-                  artistUrlPath: artist?.path,
-                  isPlayerScreen: true,
-                ),
-              ),
-              DurationIndicatorWidget(
-                file: file,
-                trackId: currentlyPlayingTrack.id,
-              ),
-              Spacer(),
-              Transform.translate(
-                offset: Offset(0, -20),
-                child: PlayerButtonsWidget(
+                DurationIndicatorWidget(
                   file: file,
-                  trackModel: currentlyPlayingTrack,
+                  trackId: currentlyPlayingTrack.id,
                 ),
-              ),
-              Spacer(),
-              BottomActionWidget(
-                trackModel: currentlyPlayingTrack,
-                file: file,
-              ),
-            ],
+                SizedBox(height: spacerHeight24),
+                Transform.translate(
+                  offset: Offset(0, -10),
+                  child: PlayerButtonsWidget(
+                    file: file,
+                    trackModel: currentlyPlayingTrack,
+                  ),
+                ),
+                SizedBox(height: spacerHeight24),
+                BottomActionWidget(
+                  trackModel: currentlyPlayingTrack,
+                  file: file,
+                ),
+                SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _handleClose() {
+  Future<bool> _handleClose() async {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    audioProvider.stop();
+    await audioProvider.stop();
 
     context.pop();
+
+    return true;
   }
 
   @override
