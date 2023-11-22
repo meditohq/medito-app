@@ -326,8 +326,10 @@ Future<void> handleNavigation(
       isScrollControlled: true,
       backgroundColor: ColorConstants.ebony,
       builder: (BuildContext context) {
-        return TrackView(
-          id: ids.first!,
+        return SafeArea(
+          child: TrackView(
+            id: ids.first!,
+          ),
         );
       },
     ));

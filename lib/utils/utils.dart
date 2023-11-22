@@ -168,7 +168,7 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
 double getBottomPadding(BuildContext context) {
   var systemGestureInsets = MediaQuery.of(context).systemGestureInsets;
   var bottom =
-      systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 16.0;
+      systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 20.0;
 
   return bottom;
 }
