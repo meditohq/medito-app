@@ -69,9 +69,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     List<Widget> actionWidgets = [
       LoadingButtonWidget(
         onPressed: () {
-          if (widget.onPressedDismiss != null) {
-            widget.onPressedDismiss!();
-          }
+          widget.onPressedDismiss?.call();
           _handleTrackEvent(
             ref,
             announcement.id,
