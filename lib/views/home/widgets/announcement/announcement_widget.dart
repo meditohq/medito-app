@@ -55,10 +55,10 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   }
 
   Row _actionBtn(
-    BuildContext context,
-    WidgetRef ref,
-    AnnouncementModel announcement,
-  ) {
+      BuildContext context,
+      WidgetRef ref,
+      AnnouncementModel announcement,
+      ) {
     var textColor = ColorConstants.getColorFromString(
       announcement.colorText,
     );
@@ -66,33 +66,36 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       announcement.colorBackground,
     );
 
+    List<Widget> actionWidgets = [
+      LoadingButtonWidget(
+        onPressed: () {
+          widget.onPressedDismiss?.call();
+          _handleTrackEvent(
+            ref,
+            announcement.id,
+            StringConstants.dismiss.toLowerCase(),
+          );
+        },
+        btnText: StringConstants.dismiss,
+        bgColor: bgColor,
+        textColor: textColor,
+        elevation: 0,
+      ),
+      width4,
+    ];
+
+    if (announcement.ctaPath != null) {
+      actionWidgets.add(LoadingButtonWidget(
+        onPressed: () => _handleCtaTitlePress(context, ref, announcement),
+        btnText: announcement.ctaTitle ?? '',
+        bgColor: textColor,
+        textColor: bgColor,
+      ));
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        LoadingButtonWidget(
-          onPressed: () {
-            if (widget.onPressedDismiss != null) {
-              widget.onPressedDismiss!();
-            }
-            _handleTrackEvent(
-              ref,
-              announcement.id,
-              StringConstants.dismiss.toLowerCase(),
-            );
-          },
-          btnText: StringConstants.dismiss,
-          bgColor: bgColor,
-          textColor: textColor,
-          elevation: 0,
-        ),
-        width4,
-        LoadingButtonWidget(
-          onPressed: () => _handleCtaTitlePress(context, ref, announcement),
-          btnText: announcement.ctaTitle ?? '',
-          bgColor: textColor,
-          textColor: bgColor,
-        ),
-      ],
+      children: actionWidgets,
     );
   }
 
