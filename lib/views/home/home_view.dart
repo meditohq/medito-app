@@ -4,6 +4,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibration/vibration.dart';
 import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
@@ -57,7 +58,10 @@ class _HomeViewState extends ConsumerState<HomeView>
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: ColorConstants.onyx,
-        onPressed: () {
+        onPressed: () async {
+          if (await Vibration.hasVibrator() ?? false) {
+            Vibration.vibrate();
+          }
           context.push(RouteConstants.search);
         },
         icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
