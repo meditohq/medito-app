@@ -68,9 +68,9 @@ class PackItemWidget extends StatelessWidget {
   }
 
   Widget _getIcon(String type, {bool? isCompletedTrack}) {
-    if (type == TypeConstants.LINK) {
+    if (type == TypeConstants.link) {
       return SvgPicture.asset(AssetConstants.icLink);
-    } else if (type == TypeConstants.TRACK && isCompletedTrack == true) {
+    } else if (type == TypeConstants.track && isCompletedTrack == true) {
       return Icon(
         color: ColorConstants.graphite,
         Icons.check,

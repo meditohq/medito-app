@@ -30,6 +30,7 @@ class ColorConstants {
   static const ebony = Color(0xff171718);
   static const graphite = Color(0xffAAAAAA);
   static const charcoal = Color(0xff303031);
+  static const nearWhite = Color(0xffFEFEFE);
 
   static Color getColorFromString(String name) {
     var color = int.parse(name.replaceAll('#', '0xff'));

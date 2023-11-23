@@ -126,7 +126,7 @@ class _PackViewState extends ConsumerState<PackView>
             _onListItemTap(item.id, item.type, item.path, context);
           },
           splashColor: ColorConstants.charcoal,
-          child: item.type == TypeConstants.TRACK && item.isCompleted == false
+          child: item.type == TypeConstants.track && item.isCompleted == false
               ? PackDismissibleWidget(
                   child: PackItemWidget(isLast: isLast, item: item),
                   onUpdateCb: () {
@@ -162,7 +162,7 @@ class _PackViewState extends ConsumerState<PackView>
     checkConnectivity().then((value) {
       if (value) {
         var location = GoRouter.of(context).location;
-        if (type == TypeConstants.PACK) {
+        if (type == TypeConstants.pack) {
           if (location.contains('pack2')) {
             unawaited(handleNavigation(
               context: context,

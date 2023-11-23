@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/home/home_model.dart';
+import 'package:Medito/models/stats/stats_model.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,7 +79,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         child: FloatingActionButton.extended(
           backgroundColor: ColorConstants.onyx,
           onPressed: () {
-            context.push(RouteConstants.search);
+            context.push(RouteConstants.searchPath);
           },
           icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
           label: Text(
@@ -96,60 +97,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
         data: (data) {
-          return SafeArea(
-            bottom: false,
-            child: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        ref.invalidate(homeProvider);
-                        await ref.read(homeProvider.future);
-                        ref.invalidate(remoteStatsProvider);
-                        await ref.read(remoteStatsProvider.future);
-                        if (_isCollapsed) {
-                          _handleCollapse();
-                        }
-                      },
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        physics: AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
-                        ),
-                        child: Container(
-                          color: ColorConstants.ebony,
-                          child: Column(
-                            children: [
-                              HomeHeaderWidget(
-                                homeMenuModel: data.menu,
-                                miniStatsModel: stats.asData?.value.mini,
-                              ),
-                              Column(
-                                children: [
-                                  _getAnnouncementBanner(data),
-                                  height24,
-                                  FilterWidget(
-                                    chips: data.chips,
-                                  ),
-                                  height32,
-                                  _cardListWidget(data),
-                                  height32,
-                                  height32,
-                                  height32,
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return _buildMain(data, stats);
         },
         error: (err, stack) => MeditoErrorWidget(
           message: err.toString(),
@@ -157,6 +105,81 @@ class _HomeViewState extends ConsumerState<HomeView>
           isLoading: homeRes.isLoading,
         ),
         loading: () => const HomeShimmerWidget(),
+      ),
+    );
+  }
+
+  SafeArea _buildMain(HomeModel data, AsyncValue<StatsModel> stats) {
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  ref.invalidate(homeProvider);
+                  await ref.read(homeProvider.future);
+                  ref.invalidate(remoteStatsProvider);
+                  await ref.read(remoteStatsProvider.future);
+                  if (_isCollapsed) {
+                    _handleCollapse();
+                  }
+                },
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  child: Container(
+                    color: ColorConstants.ebony,
+                    child: Column(
+                      children: [
+                        HomeHeaderWidget(
+                          homeMenuModel: data.menu,
+                          miniStatsModel: stats.asData?.value.mini,
+                        ),
+                        Column(
+                          children: [
+                            _getAnnouncementBanner(data),
+                            height24,
+                            FilterWidget(
+                              chips: data.chips,
+                            ),
+                            height32,
+                            _cardListWidget(data),
+                            height32,
+                            height32,
+                            height32,
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  FloatingActionButton _buildFloatingButton(BuildContext context) {
+    return FloatingActionButton.extended(
+      backgroundColor: ColorConstants.onyx,
+      onPressed: () {
+        context.push(RouteConstants.searchPath);
+      },
+      icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
+      label: Text(
+        StringConstants.explore,
+        style: TextStyle(
+          color: ColorConstants.walterWhite,
+          fontFamily: DmSerif,
+          fontSize: 20,
+        ),
       ),
     );
   }
