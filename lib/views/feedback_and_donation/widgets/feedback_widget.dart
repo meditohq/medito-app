@@ -85,7 +85,10 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
     var bodyLarge = Theme.of(context).textTheme.bodyLarge;
 
     if (isLoading) {
-      return CircularProgressIndicator();
+      return Padding(
+        padding: const EdgeInsets.all(10.5),
+        child: CircularProgressIndicator(),
+      );
     } else if (isFeedbackAdded) {
       return Container(
         decoration: BoxDecoration(
@@ -93,6 +96,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           borderRadius: BorderRadius.circular(14),
         ),
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: defaultPadding),
+        margin: EdgeInsets.only(bottom: 4),
         child: Text(
           StringConstants.thanksForSharing,
           style: bodyLarge,
