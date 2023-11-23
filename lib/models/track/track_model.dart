@@ -1,4 +1,4 @@
-import 'package:Medito/models/feedback_and_donation/end_screen_model.dart';
+import 'package:Medito/models/feedback_and_donation/feedback_and_donation_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'track_model.freezed.dart';
 part 'track_model.g.dart';
@@ -13,7 +13,7 @@ abstract class TrackModel with _$TrackModel {
     required String description,
     required String coverUrl,
     required bool isPublished,
-    EndScreenModel? endScreen,
+    List<FeedbackAndDonationModel>? endScreen,
     @Default(false) bool isLiked,
     required bool hasBackgroundSound,
     @Default(null) TrackArtistModel? artist,

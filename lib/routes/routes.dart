@@ -262,12 +262,12 @@ GoRoute _getFeedbackAndDonationRoute({bool fromRoot = false}) {
         ? RouteConstants.feedbackAndDonationPath
         : RouteConstants.feedbackAndDonationPath.sanitisePath(),
     pageBuilder: (context, state) {
-      final params = state.extra as EndScreenModel;
+      final params = state.extra as List<FeedbackAndDonationModel>;
 
       return MaterialPage(
         key: state.pageKey,
         child: FeedbackAndDonationView(
-          endScreenModel: params,
+          feedbackAndDonationModel: params,
         ),
       );
     },

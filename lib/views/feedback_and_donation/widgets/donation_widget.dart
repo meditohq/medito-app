@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DonationWidget extends ConsumerWidget {
-  final DonationModel donationModel;
+  final FeedbackAndDonationContentModel donationModel;
   const DonationWidget({super.key, required this.donationModel});
 
   @override
@@ -25,13 +25,13 @@ class DonationWidget extends ConsumerWidget {
       child: Column(
         children: [
           Text(
-            donationModel.title,
+            donationModel.title ?? '',
             style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 24),
             textAlign: TextAlign.center,
           ),
           height8,
           Text(
-            donationModel.text,
+            donationModel.text ?? '',
             style: bodyLarge?.copyWith(
               fontFamily: DmSans,
               fontSize: 16,
@@ -45,7 +45,7 @@ class DonationWidget extends ConsumerWidget {
             width: MediaQuery.of(context).size.width,
             child: LoadingButtonWidget(
               onPressed: () => _handleDonatePress(ref),
-              btnText: donationModel.ctaTitle,
+              btnText: donationModel.ctaTitle ?? '',
               bgColor: ColorConstants.walterWhite,
               textColor: bgColor,
               fontSize: 18,
