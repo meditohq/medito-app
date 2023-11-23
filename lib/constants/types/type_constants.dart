@@ -8,6 +8,7 @@ class TypeConstants {
   static const String fileIdKey = 'fileId';
   static const String trackIdKey = 'trackId';
   static const String donationAskCard = 'donationAskCard';
+  static const String feedbackCard = 'feedbackCard';
 }
 
 class EventTypes {

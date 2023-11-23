@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class FeedbackWidget extends ConsumerStatefulWidget {
   const FeedbackWidget({super.key, required this.feedbackModel});
 
-  final FeedbackModel feedbackModel;
+  final FeedbackAndDonationContentModel feedbackModel;
 
   @override
   ConsumerState<FeedbackWidget> createState() => _FeedbackWidgetState();
@@ -60,13 +60,13 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
       child: Column(
         children: [
           Text(
-            widget.feedbackModel.title,
+            widget.feedbackModel.title ?? '',
             style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 24),
             textAlign: TextAlign.center,
           ),
           height8,
           Text(
-            widget.feedbackModel.text,
+            widget.feedbackModel.text ?? '',
             style: bodyLarge?.copyWith(
               fontFamily: DmSans,
               fontSize: 16,
@@ -83,6 +83,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
 
   Widget _buildFeedbackButton() {
     var bodyLarge = Theme.of(context).textTheme.bodyLarge;
+    var options = widget.feedbackModel.options;
 
     if (isLoading) {
       return Padding(
@@ -104,28 +105,31 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
         ),
       );
     }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: widget.feedbackModel.options
-          .map((e) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: InkWell(
-                  onTap: () => _handleFeedbackPress(e.value),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: ColorConstants.ebony,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text(
-                      e.value,
-                      style: TextStyle(fontSize: 40),
+    if (options != null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: options
+            .map((e) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: InkWell(
+                    onTap: () => _handleFeedbackPress(e.value),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: ColorConstants.ebony,
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Text(
+                        e.value,
+                        style: TextStyle(fontSize: 40),
+                      ),
                     ),
                   ),
-                ),
-              ))
-          .toList(),
-    );
+                ))
+            .toList(),
+      );
+    }
+    
+    return SizedBox();
   }
 }
