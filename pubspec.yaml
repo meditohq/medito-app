@@ -65,6 +65,7 @@ dependencies:
   image: ^4.0.17
   permission_handler: ^10.4.5
   app_settings: ^5.1.1
+  vibration: ^1.7.3
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1

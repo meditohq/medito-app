@@ -42,11 +42,13 @@ class StringConstants {
   static const String backgroundSounds = 'Background Sound';
   static const String playerBgErrorMsg =
       'Oops! There was an error getting the background sounds. Please try again later.';
+  static const String x06 = 'X0.6';
+  static const String x07 = 'X0.7';
+  static const String x08 = 'X0.8';
+  static const String x09 = 'X0.9';
   static const String x1 = 'X1';
   static const String x125 = 'X1.25';
   static const String x15 = 'X1.5';
-  static const String x2 = 'X2';
-  static const String x06 = 'X0.6';
 
   //Join
   static const String joinTheMeditoFamily = 'Join the Medito Family';

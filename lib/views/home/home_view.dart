@@ -5,6 +5,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibration/vibration.dart';
 import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/filters/filter_widget.dart';
 import 'widgets/header/home_header_widget.dart';
@@ -56,7 +57,41 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     return Scaffold(
-      floatingActionButton: _buildFloatingButton(context),
+      floatingActionButton: Listener(
+        onPointerDown: (_) async {
+          if (await Vibration.hasVibrator() ?? false) {
+            if ((await Vibration.hasAmplitudeControl()) ?? false) {
+              Vibration.vibrate(amplitude: 20, duration: 30);
+            } else {
+              Vibration.vibrate(duration: 30);
+            }
+          }
+        },
+        onPointerUp: (_) async {
+          if (await Vibration.hasVibrator() ?? false) {
+            if ((await Vibration.hasAmplitudeControl()) ?? false) {
+              Vibration.vibrate(amplitude: 50, duration: 5);
+            } else {
+              Vibration.vibrate(duration: 5);
+            }
+          }
+        },
+        child: FloatingActionButton.extended(
+          backgroundColor: ColorConstants.onyx,
+          onPressed: () {
+            context.push(RouteConstants.searchPath);
+          },
+          icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
+          label: Text(
+            'Explore',
+            style: TextStyle(
+              color: ColorConstants.walterWhite,
+              fontFamily: DmSerif,
+              fontSize: 20,
+            ),
+          ),
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: homeRes.when(
         skipLoadingOnRefresh: true,

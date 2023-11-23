@@ -38,11 +38,27 @@ class _TrackViewState extends ConsumerState<TrackView>
     with AutomaticKeepAliveClientMixin<TrackView> {
   TrackAudioModel? selectedAudio;
   TrackFilesModel? selectedDuration;
+  final ScrollController _scrollController = ScrollController();
+  bool _showCloseButton = false;
+  final GlobalKey childKey = GlobalKey();
 
   @override
   void initState() {
     _handleTrackEvent(ref, widget.id);
+    _scrollController.addListener(() {
+      _optionallyShowOrHideCloseButton();
+    });
     super.initState();
+  }
+
+  void _optionallyShowOrHideCloseButton() {
+    final renderBox = childKey.currentContext?.findRenderObject() as RenderBox;
+    final size = renderBox.size.height;
+    var screenHeight = MediaQuery.of(childKey.currentContext!).size.height;
+
+    setState(() {
+      _showCloseButton = size > screenHeight;
+    });
   }
 
   void _handleTrackEvent(WidgetRef ref, String trackId) {
@@ -85,8 +101,10 @@ class _TrackViewState extends ConsumerState<TrackView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     ref.watch(trackOpenedFirstTimeProvider);
     var tracks = ref.watch(tracksProvider(trackId: widget.id));
+
     ref.listen(trackOpenedFirstTimeProvider, (prev, next) {
       var _user =
           ref.read(authProvider.notifier).userRes.body as UserTokenModel;
@@ -99,9 +117,11 @@ class _TrackViewState extends ConsumerState<TrackView>
       }
     });
 
-    return Container(
-      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Container(
+        key: childKey,
+        padding: EdgeInsets.only(bottom: getBottomPadding(context)),
         child: tracks.when(
           skipLoadingOnRefresh: false,
           data: (data) => _buildScaffoldWithData(context, data, ref),
@@ -123,61 +143,72 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     WidgetRef ref,
   ) {
-    return SafeArea(
+    bool showGuideNameDropdown = trackModel.audio.first.guideName.isNotNullAndNotEmpty();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: SizedBox(
+                height: 248,
+                child: NetworkImageWidget(
+                  url: trackModel.coverUrl,
+                  isCache: true,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: HandleBarWidget(),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              height32,
+              _title(context, trackModel.title),
+              _getSubTitle(context, trackModel.description),
+              height24,
+              if (showGuideNameDropdown) _guideNameDropdown(trackModel),
+
+              if (showGuideNameDropdown) SizedBox(height: 12),
+
+              _durationDropdown(trackModel),
+              height12,
+              _playBtn(context, ref, trackModel),
+              _closeButton(context),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _closeButton(BuildContext context) {
+    return Visibility(
+      visible: _showCloseButton,
       child: Container(
-        padding: EdgeInsets.only(bottom: getBottomPadding(context)),
-        child: SingleChildScrollView(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  alignment: Alignment.topCenter,
-                  fit: StackFit.passthrough,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: SizedBox(
-                        height: 248,
-                        child: NetworkImageWidget(
-                          url: trackModel.coverUrl,
-                          isCache: true,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: HandleBarWidget(),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      height32,
-                      _title(context, trackModel.title),
-                      _getSubTitle(context, trackModel.description),
-                      height32,
-                      SizedBox(
-                        height: 48,
-                        child: Row(
-                          children: [
-                            _guideNameDropdown(trackModel),
-                            _durationDropdown(trackModel),
-                          ],
-                        ),
-                      ),
-                      height12,
-                      _playBtn(context, ref, trackModel),
-                    ],
-                  ),
-                ),
-              ],
+        width: double.infinity,
+        child: SizedBox(
+          height: 48,
+          child: TextButton(
+            onPressed: () => context.pop(context),
+            child: Text(
+              StringConstants.close,
+              style: TextStyle(
+                fontFamily: DmSans,
+                fontSize: 16,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
@@ -206,74 +237,65 @@ class _TrackViewState extends ConsumerState<TrackView>
           borderRadius: radius,
         ),
         child: Center(
-          child: Text(
-            StringConstants.play,
-            style: Theme.of(context).primaryTextTheme.labelLarge?.copyWith(
-                  color: ColorConstants.black,
-                  fontFamily: DmSerif,
-                  fontSize: 20,
-                ),
+          child: Icon(
+            Icons.play_arrow_rounded,
+            color: ColorConstants.black,
+            size: 32,
           ),
+
         ),
       ),
     );
   }
 
-  Flexible _durationDropdown(TrackModel trackModel) {
+  DropdownWidget<TrackFilesModel> _durationDropdown(TrackModel trackModel) {
     var audioFiles = trackModel.audio.first.files;
     var _selectedFile = selectedAudio?.files;
 
-    return Flexible(
-      child: DropdownWidget<TrackFilesModel>(
-        value: selectedDuration ?? audioFiles.first,
-        iconData: Icons.timer_sharp,
-        bottomRight: 7,
-        isDisabled: audioFiles.length > 1,
-        disabledLabelText:
-            '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} mins',
-        items: files(_selectedFile ?? audioFiles)
-            .map<DropdownMenuItem<TrackFilesModel>>(
-          (TrackFilesModel value) {
-            return DropdownMenuItem<TrackFilesModel>(
-              value: value,
-              child: Text(
-                '${convertDurationToMinutes(milliseconds: value.duration)} mins',
-              ),
-            );
-          },
-        ).toList(),
-        onChanged: handleOnDurationChange,
-      ),
+    return DropdownWidget<TrackFilesModel>(
+      value: selectedDuration ?? audioFiles.first,
+      iconData: Icons.timer_sharp,
+      topLeft: 7,
+      topRight: 7,
+      bottomRight: 7,
+      bottomLeft: 7,
+      isDisabled: audioFiles.length > 1,
+      disabledLabelText:
+          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} mins',
+      items: files(_selectedFile ?? audioFiles)
+          .map<DropdownMenuItem<TrackFilesModel>>(
+        (TrackFilesModel value) {
+          return DropdownMenuItem<TrackFilesModel>(
+            value: value,
+            child: Text(
+              '${convertDurationToMinutes(milliseconds: value.duration)} mins',
+            ),
+          );
+        },
+      ).toList(),
+      onChanged: handleOnDurationChange,
     );
   }
 
   Widget _guideNameDropdown(TrackModel trackModel) {
     var audio = trackModel.audio.first;
     if (audio.guideName.isNotNullAndNotEmpty()) {
-      return Expanded(
-        child: Row(
-          children: [
-            Flexible(
-              child: DropdownWidget(
-                value: selectedAudio ?? audio,
-                iconData: Icons.face,
-                bottomLeft: 7,
-                isDisabled: trackModel.audio.length > 1,
-                disabledLabelText: '${audio.guideName}',
-                items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
-                  (TrackAudioModel value) {
-                    return DropdownMenuItem<TrackAudioModel>(
-                      value: value,
-                      child: Text(value.guideName ?? ''),
-                    );
-                  },
-                ).toList(),
-                onChanged: handleOnGuideNameChange,
-              ),
-            ),
-            width12,
-          ],
-        ),
+      return DropdownWidget<TrackAudioModel>(
+        value: selectedAudio ?? audio,
+        iconData: Icons.face,
+        bottomRight: 7,
+        bottomLeft: 7,
+        isDisabled: trackModel.audio.length > 1,
+        disabledLabelText: '${audio.guideName}',
+        items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
+          (TrackAudioModel value) {
+            return DropdownMenuItem<TrackAudioModel>(
+              value: value,
+              child: Text(value.guideName ?? ''),
+            );
+          },
+        ).toList(),
+        onChanged: handleOnGuideNameChange,
       );
     }
 

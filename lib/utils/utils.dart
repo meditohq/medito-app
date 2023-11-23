@@ -65,13 +65,19 @@ Future<void> launchURLInBrowser(String url) async {
   try {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(
+      var launched = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
+
+      if (!launched) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.inAppWebView,
+        );
+      }
     }
   } catch (e, stackTrace) {
-    // Capture the exception using Sentry
     await Sentry.captureException(
       e,
       stackTrace: stackTrace,
@@ -168,7 +174,7 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
 double getBottomPadding(BuildContext context) {
   var systemGestureInsets = MediaQuery.of(context).systemGestureInsets;
   var bottom =
-      systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 16.0;
+      systemGestureInsets.bottom > 32 ? systemGestureInsets.bottom : 20.0;
 
   return bottom;
 }
