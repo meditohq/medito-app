@@ -30,4 +30,4 @@ export 'events/events_model.dart';
 export 'notification/notification_payload_model.dart';
 export 'search/search_model.dart';
 export 'join/join_route_params_model.dart';
-export 'feedback_and_donation/feedback_and_donation_model.dart';
+export 'end_screen/end_screen_model.dart';

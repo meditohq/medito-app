@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class FeedbackWidget extends ConsumerStatefulWidget {
   const FeedbackWidget({super.key, required this.feedbackModel});
 
-  final FeedbackAndDonationContentModel feedbackModel;
+  final EndScreenContentModel feedbackModel;
 
   @override
   ConsumerState<FeedbackWidget> createState() => _FeedbackWidgetState();
@@ -129,7 +129,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
             .toList(),
       );
     }
-    
+
     return SizedBox();
   }
 }

@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/feedback_widget.dart';
 
-class FeedbackAndDonationView extends StatelessWidget {
-  final List<FeedbackAndDonationModel> feedbackAndDonationModel;
-  const FeedbackAndDonationView({
+class EndScreenView extends StatelessWidget {
+  final List<EndScreenModel> endScreenModel;
+  const EndScreenView({
     super.key,
-    required this.feedbackAndDonationModel,
+    required this.endScreenModel,
   });
 
   @override
@@ -32,7 +32,7 @@ class FeedbackAndDonationView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
       child: Column(
-        children: feedbackAndDonationModel.map((e) {
+        children: endScreenModel.map((e) {
           if (e.name == TypeConstants.donationAskCard) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),

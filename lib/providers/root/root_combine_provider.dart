@@ -48,7 +48,7 @@ void _handleAudioCompletion(Ref ref, BuildContext context) {
     var currentlyPlayingTrack = ref.read(playerProvider);
     var endScreen = currentlyPlayingTrack?.endScreen;
     if (endScreen != null) {
-      context.push(RouteConstants.feedbackAndDonationPath, extra: endScreen);
+      context.push(RouteConstants.endScreenPath, extra: endScreen);
     }
   }
 }
