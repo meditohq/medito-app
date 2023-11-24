@@ -25,5 +25,5 @@ class RouteConstants {
   static const String joinVerifyOTPPath = '/joinVerifyOTP';
   static const String joinWelcomePath = '/joinWelcome';
   static const String searchPath = '/search';
-  static const String feedbackAndDonationPath = '/feedbackAndDonation';
+  static const String endScreenPath = '/endScreen';
 }

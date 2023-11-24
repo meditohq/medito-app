@@ -10,7 +10,7 @@ import 'package:Medito/views/auth/join_verify_OTP_view.dart';
 import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
-import 'package:Medito/views/feedback_and_donation/feedback_and_donation_view.dart';
+import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/pack/pack_view.dart';
@@ -152,7 +152,7 @@ final router = GoRouter(
     _getNotificationPermissionRoute(),
     _getPlayerRoute(fromRoot: true),
     _getWebviewRoute(fromRoot: true),
-    _getFeedbackAndDonationRoute(fromRoot: true),
+    _getEndScreenRoute(fromRoot: true),
   ],
 );
 
@@ -255,19 +255,19 @@ GoRoute _getSearchRoute({bool fromRoot = false}) {
   );
 }
 
-GoRoute _getFeedbackAndDonationRoute({bool fromRoot = false}) {
+GoRoute _getEndScreenRoute({bool fromRoot = false}) {
   return GoRoute(
     parentNavigatorKey: _rootNavigatorKey,
     path: fromRoot
-        ? RouteConstants.feedbackAndDonationPath
-        : RouteConstants.feedbackAndDonationPath.sanitisePath(),
+        ? RouteConstants.endScreenPath
+        : RouteConstants.endScreenPath.sanitisePath(),
     pageBuilder: (context, state) {
-      final params = state.extra as List<FeedbackAndDonationModel>;
+      final params = state.extra as List<EndScreenModel>;
 
       return MaterialPage(
         key: state.pageKey,
-        child: FeedbackAndDonationView(
-          feedbackAndDonationModel: params,
+        child: EndScreenView(
+          endScreenModel: params,
         ),
       );
     },
