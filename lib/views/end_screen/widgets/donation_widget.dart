@@ -63,7 +63,7 @@ class DonationWidget extends ConsumerWidget {
     WidgetRef ref,
   ) {
     var payload = DonationTappedModel(
-      donationAskCard: TypeConstants.donationAskCard,
+      origin: TypeConstants.donationAskCard,
       originId: donationModel.id.toString(),
     );
     var event = EventsModel(
