@@ -113,12 +113,10 @@ final router = GoRouter(
             child: HomeView(),
           ),
           routes: [
-            _getWebviewRoute(),
             _getDownloadsRoute(),
           ],
         ),
         _getTrackRoute(fromRoot: true),
-        _getWebviewRoute(fromRoot: true),
         _getConnectivityErrorRoute(fromRoot: true),
         _getDownloadsRoute(fromRoot: true),
         _getSearchRoute(fromRoot: true),
@@ -126,18 +124,15 @@ final router = GoRouter(
           path: RouteConstants.packPath,
           routes: [
             _getTrackRoute(),
-            _getWebviewRoute(),
             GoRoute(
               path: 'pack2/:p2id',
               routes: [
                 _getTrackRoute(),
-                _getWebviewRoute(),
                 GoRoute(
                   path: 'pack3/:p3id',
                   pageBuilder: (context, state) => getFolderMaterialPage(state),
                   routes: [
                     _getTrackRoute(),
-                    _getWebviewRoute(),
                   ],
                 ),
               ],
@@ -151,7 +146,6 @@ final router = GoRouter(
     _getBackgroundSoundRoute(),
     _getNotificationPermissionRoute(),
     _getPlayerRoute(fromRoot: true),
-    _getWebviewRoute(fromRoot: true),
     _getEndScreenRoute(fromRoot: true),
   ],
 );
@@ -161,9 +155,6 @@ GoRoute _getTrackRoute({bool fromRoot = false}) {
     path: fromRoot
         ? RouteConstants.trackPath
         : RouteConstants.trackPath.sanitisePath(),
-    routes: [
-      _getWebviewRoute(),
-    ],
     pageBuilder: (context, state) => getTrackOptionsMaterialPage(state),
   );
 }
@@ -204,23 +195,6 @@ GoRoute _getNotificationPermissionRoute() {
       return MaterialPage(
         key: state.pageKey,
         child: NotificationPermissionView(),
-      );
-    },
-  );
-}
-
-GoRoute _getWebviewRoute({bool fromRoot = false}) {
-  return GoRoute(
-    parentNavigatorKey: _shellNavigatorKey,
-    path: fromRoot
-        ? RouteConstants.webviewPath
-        : RouteConstants.webviewPath.sanitisePath(),
-    pageBuilder: (context, state) {
-      final url = state.extra! as Map;
-
-      return MaterialPage(
-        key: state.pageKey,
-        child: MeditoWebViewWidget(url: url['url']!),
       );
     },
   );
@@ -368,13 +342,10 @@ Future<void> handleNavigation(
         .replaceAll(':p2id', ids[1]!);
   } else if (place == TypeConstants.pack) {
     path = RouteConstants.packPath.replaceAll(':pid', ids.first!);
-  } else if (place == TypeConstants.url) {
+  } else if (place == TypeConstants.url || place == TypeConstants.link) {
     await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
 
     return;
-  } else if (place == TypeConstants.link) {
-    path = RouteConstants.webviewPath;
-    params = {'url': ids.last};
   } else if (place == TypeConstants.flow) {
     path = ids.first != null ? '/${ids.first}' : RouteConstants.joinIntroPath;
     params = JoinRouteParamsModel(screen: Screen.track);

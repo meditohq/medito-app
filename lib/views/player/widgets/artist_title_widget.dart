@@ -1,7 +1,7 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:marquee/marquee.dart';
 
 class ArtistTitleWidget extends ConsumerWidget {
@@ -67,22 +67,18 @@ class ArtistTitleWidget extends ConsumerWidget {
           artistName ?? '',
           style: style,
         ),
-        onTap: () {
-          if (isPlayerScreen && artistUrlPath != null) {
-            context.pop();
-            var getCurrentLocation = GoRouter.of(context);
-            var location = getCurrentLocation.location;
-            if (location.contains(RouteConstants.webviewPath)) {
-              context.pop();
-            }
-            location = getCurrentLocation.location;
-            context.push(
-              RouteConstants.webviewPath,
-              extra: {'url': artistUrlPath},
-            );
-          }
-        },
+        onTap: () => _handleArtistNameTap(context),
       ),
     );
+  }
+
+  void _handleArtistNameTap(BuildContext context) async {
+    if (isPlayerScreen && artistUrlPath != null) {
+      await handleNavigation(
+        context: context,
+        TypeConstants.url,
+        [artistUrlPath],
+      );
+    }
   }
 }
