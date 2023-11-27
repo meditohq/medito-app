@@ -5,7 +5,7 @@ part 'donation_tapped_model.g.dart';
 @freezed
 abstract class DonationTappedModel with _$DonationTappedModel {
   const factory DonationTappedModel({
-    required String donationAskCard,
+    required String origin,
     required String originId,
   }) = _DonationTappedModel;
 
