@@ -37,9 +37,9 @@ class _PlayerViewState extends ConsumerState<PlayerView>
     var file = currentlyPlayingTrack.audio.first.files.first;
 
     var size = MediaQuery.of(context).size.width;
-    double spacerHeight48 = size <= 380 ? 10 : 56;
-    double spacerHeight20 = size <= 380 ? 0 : 20;
-    double spacerHeight24 = size <= 380 ? 0 : 24;
+    var spacerHeight48 = size <= 380.0 ? 10.0 : 56.0;
+    var spacerHeight20 = size <= 380.0 ? 0.0 : 20.0;
+    var spacerHeight24 = size <= 380.0 ? 0.0 : 24.0;
 
     return WillPopScope(
       onWillPop: _handleClose,
