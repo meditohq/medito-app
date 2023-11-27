@@ -14,6 +14,7 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -107,7 +108,10 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     ref.listen(trackOpenedFirstTimeProvider, (prev, next) {
       var _user =
-          ref.read(authProvider.notifier).userRes.body as UserTokenModel;
+      ref
+          .read(authProvider.notifier)
+          .userRes
+          .body as UserTokenModel;
       if (_user.email == null && next.value != null && next.value!) {
         var params = JoinRouteParamsModel(screen: Screen.track);
         context.push(
@@ -117,24 +121,33 @@ class _TrackViewState extends ConsumerState<TrackView>
       }
     });
 
-    return SingleChildScrollView(
-      controller: _scrollController,
-      child: Container(
-        key: childKey,
-        padding: EdgeInsets.only(bottom: getBottomPadding(context)),
-        child: tracks.when(
-          skipLoadingOnRefresh: false,
-          data: (data) => _buildScaffoldWithData(context, data, ref),
-          error: (err, stack) => MeditoErrorWidget(
-            message: err.toString(),
-            onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
-            hasScaffold: false,
+    return Listener(
+      onPointerMove: (PointerMoveEvent event) {
+        if (Platform.isIOS && event.delta.dx > 20) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Container(
+          key: childKey,
+          padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+          child: tracks.when(
+            skipLoadingOnRefresh: false,
+            data: (data) => _buildScaffoldWithData(context, data, ref),
+            error: (err, stack) =>
+                MeditoErrorWidget(
+                  message: err.toString(),
+                  onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+                  hasScaffold: false,
+                ),
+            loading: () => _buildLoadingWidget(),
           ),
-          loading: () => _buildLoadingWidget(),
         ),
       ),
     );
   }
+
 
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
 
@@ -178,6 +191,11 @@ class _TrackViewState extends ConsumerState<TrackView>
               height32,
               _title(context, trackModel.title),
               _getSubTitle(context, trackModel.description),
+              _getSubTitle(context, trackModel.description),
+              _getSubTitle(context, trackModel.description),
+              _getSubTitle(context, trackModel.description),
+              _getSubTitle(context, trackModel.description),
+
               height24,
               if (showGuideNameDropdown) _guideNameDropdown(trackModel),
               if (showGuideNameDropdown) SizedBox(height: 12),
