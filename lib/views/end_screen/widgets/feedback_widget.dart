@@ -56,12 +56,12 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
         borderRadius: BorderRadius.circular(24),
         color: ColorConstants.onyx,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         children: [
           Text(
             widget.feedbackModel.title ?? '',
-            style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 24),
+            style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 22),
             textAlign: TextAlign.center,
           ),
           height8,
@@ -87,7 +87,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
 
     if (isLoading) {
       return Padding(
-        padding: const EdgeInsets.all(10.5),
+        padding: const EdgeInsets.all(8),
         child: CircularProgressIndicator(),
       );
     } else if (isFeedbackAdded) {

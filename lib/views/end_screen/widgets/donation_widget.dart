@@ -21,12 +21,12 @@ class DonationWidget extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         color: parseColor(donationModel.colorBackground),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         children: [
           Text(
             donationModel.title ?? '',
-            style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 24),
+            style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 22),
             textAlign: TextAlign.center,
           ),
           height8,
