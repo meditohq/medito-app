@@ -2,6 +2,7 @@ import UIKit
 import FirebaseCore
 import Flutter
 import flutter_local_notifications
+import just_audio
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -11,7 +12,7 @@ import flutter_local_notifications
   ) -> Bool {
     FirebaseApp.configure()
     FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
-    GeneratedPluginRegistrant.register(with: registry)
+      GeneratedPluginRegistrant.register(with: registry)
     }
     if #available(iOS 10.0, *) {
       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
