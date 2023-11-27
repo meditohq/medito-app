@@ -13,7 +13,7 @@ final checkNotificationPermissionProvider =
     Provider.family<void, BuildContext>((ref, context) {
   Future.delayed(Duration(seconds: 4), () {
     var notNowCount = ref.read(getNotificationPermissionCountProvider);
-    if (notNowCount < 3) {
+    if (notNowCount < 1) {
       ref.read(notificationPermissionStatusProvider.future).then((value) {
         var isPermissionStatusInLocalStorage = ref
             .read(sharedPreferencesProvider)

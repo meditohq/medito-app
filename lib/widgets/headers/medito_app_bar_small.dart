@@ -16,10 +16,9 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-//ignore: prefer-match-file-name
-class MeditoAppBarWidget extends StatelessWidget
+class MeditoAppBarSmall extends StatelessWidget
     implements PreferredSizeWidget {
-  const MeditoAppBarWidget({
+  const MeditoAppBarSmall({
     Key? key,
     this.title,
     this.titleWidget,

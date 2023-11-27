@@ -24,7 +24,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
   final trackAudioPlayer = AudioPlayer();
   final fadeDuration = 5;
   var bgVolume;
-  late String _contentToken;
 
   @override
   Future<void> pause() async {
@@ -73,10 +72,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
     seekValueFromSlider(position.inMilliseconds);
   }
 
-  void setContentToken(String token) {
-    _contentToken = token;
-  }
-
   void initAudioHandler() {
     trackAudioPlayer.playbackEventStream
         .map(_transformEvent)
@@ -94,9 +89,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
           backgroundSoundAudioPlayer.setAudioSource(
             AudioSource.uri(
               Uri.parse(sound.path),
-              headers: {
-                HttpHeaders.authorizationHeader: _contentToken,
-              },
             ),
           ),
         );
@@ -115,9 +107,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
         setMediaItem(trackModel, file, filePath: filePath);
       } else {
         setMediaItem(trackModel, file);
-        trackAudioPlayer.setUrl(file.path, headers: {
-          HttpHeaders.authorizationHeader: _contentToken,
-        });
+        trackAudioPlayer.setUrl(file.path);
       }
     } catch (e) {
       unawaited(Sentry.captureException(
@@ -126,8 +116,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
       ));
     }
   }
-
-  void clearAssetCache() async => unawaited(AudioPlayer.clearAssetCache());
 
   void playBackgroundSound() {
     backgroundSoundAudioPlayer.play();

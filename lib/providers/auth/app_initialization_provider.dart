@@ -23,7 +23,7 @@ final appInitializationProvider =
     var res = _authProvider.userRes;
     if (res.body != null) {
       var _user = res.body as UserTokenModel;
-      _assignNewTokenToDioAndAudioPlayer(ref, _user.token);
+      _assignNewTokenToDio(ref, _user.token);
       var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
       var data = _setAppOpenedModelData(deviceInfo);
 
@@ -69,13 +69,12 @@ void _checkInternetConnectivity(BuildContext context, Ref ref) {
   }
 }
 
-void _assignNewTokenToDioAndAudioPlayer(Ref ref, String token) {
+void _assignNewTokenToDio(Ref ref, String token) {
   ref
       .read(dioClientProvider)
       .dio
       .options
       .headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
-  ref.read(audioPlayerNotifierProvider).setContentToken('Bearer $token');
 }
 
 EventsModel _setAppOpenedModelData(DeviceAndAppInfoModel val) {

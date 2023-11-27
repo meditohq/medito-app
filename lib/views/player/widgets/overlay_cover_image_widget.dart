@@ -13,7 +13,7 @@ class OverlayCoverImageWidget extends StatelessWidget {
 
     double dimension;
 
-    dimension = size <= 400 ? size - 128 : size - 64;
+    dimension = size <= 380 ? size - 128 : size - 64;
 
     return SizedBox(
       width: dimension,
