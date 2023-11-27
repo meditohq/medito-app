@@ -16,7 +16,6 @@ class RouteConstants {
   static const String player3 =
       '/pack/:pid/pack2/:p2id/pack3/:p3id/meditation/:sid';
   static const String urlPath = '/url';
-  static const String webviewPath = '/webview';
   static const String connectivityErrorPath = '/connectivityError';
   static const String backgroundSoundsPath = '/backgroundsounds';
   static const String notificationPermissionPath = '/notificationPermission';

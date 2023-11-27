@@ -143,7 +143,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     WidgetRef ref,
   ) {
-    bool showGuideNameDropdown = trackModel.audio.first.guideName.isNotNullAndNotEmpty();
+    var showGuideNameDropdown =
+        trackModel.audio.first.guideName.isNotNullAndNotEmpty();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,9 +180,7 @@ class _TrackViewState extends ConsumerState<TrackView>
               _getSubTitle(context, trackModel.description),
               height24,
               if (showGuideNameDropdown) _guideNameDropdown(trackModel),
-
               if (showGuideNameDropdown) SizedBox(height: 12),
-
               _durationDropdown(trackModel),
               height12,
               _playBtn(context, ref, trackModel),
@@ -242,7 +241,6 @@ class _TrackViewState extends ConsumerState<TrackView>
             color: ColorConstants.black,
             size: 32,
           ),
-
         ),
       ),
     );
@@ -340,11 +338,10 @@ class _TrackViewState extends ConsumerState<TrackView>
               fontSize: 16,
             ),
             onTapLink: (text, href, title) {
-              context.pop();
-              var location = GoRouter.of(context).location;
-              context.push(
-                location + RouteConstants.webviewPath,
-                extra: {'url': href},
+              handleNavigation(
+                context: context,
+                TypeConstants.url,
+                [href],
               );
             },
           ),
