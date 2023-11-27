@@ -191,11 +191,6 @@ class _TrackViewState extends ConsumerState<TrackView>
               height32,
               _title(context, trackModel.title),
               _getSubTitle(context, trackModel.description),
-              _getSubTitle(context, trackModel.description),
-              _getSubTitle(context, trackModel.description),
-              _getSubTitle(context, trackModel.description),
-              _getSubTitle(context, trackModel.description),
-
               height24,
               if (showGuideNameDropdown) _guideNameDropdown(trackModel),
               if (showGuideNameDropdown) SizedBox(height: 12),
