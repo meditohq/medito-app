@@ -1,6 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/views/main/app_bar_widget.dart';
+import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:flutter/material.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/feedback_widget.dart';
@@ -15,15 +15,16 @@ class EndScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MeditoAppBarWidget(
+      appBar: MeditoAppBarSmall(
         isTransparent: true,
         hasCloseButton: true,
       ),
-      body: Column(
-        children: [
-          height16,
-          _buildCard(),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildCard(),
+          ],
+        ),
       ),
     );
   }
