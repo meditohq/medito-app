@@ -5,7 +5,9 @@ part 'track_model.g.dart';
 
 @unfreezed
 abstract class TrackModel with _$TrackModel {
+
   const TrackModel._();
+
   factory TrackModel({
     required String id,
     required String title,
@@ -22,6 +24,7 @@ abstract class TrackModel with _$TrackModel {
 
   factory TrackModel.fromJson(Map<String, Object?> json) =>
       _$TrackModelFromJson(json);
+
   TrackModel customCopyWith() {
     return TrackModel(
       id: id,

@@ -25,6 +25,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     var currentlyPlayingTrack = ref.watch(playerProvider);
     if (currentlyPlayingTrack == null) {
       return MeditoErrorWidget(
@@ -32,6 +33,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
         message: StringConstants.unableToLoadAudio,
       );
     }
+
     var coverUrl = currentlyPlayingTrack.coverUrl;
     var artist = currentlyPlayingTrack.artist;
     var file = currentlyPlayingTrack.audio.first.files.first;

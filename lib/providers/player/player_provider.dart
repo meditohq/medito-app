@@ -14,100 +14,99 @@ final playerProvider =
 class PlayerProvider extends StateNotifier<TrackModel?> {
   PlayerProvider(this.ref) : super(null);
   Ref ref;
+
   Future<void> loadSelectedTrack({
     required TrackModel trackModel,
     required TrackFilesModel file,
   }) async {
-    var _track = trackModel.customCopyWith();
-    for (var i = 0; i < _track.audio.length; i++) {
-      var element = _track.audio[i];
-      var fileIndex = element.files.indexWhere((e) => e.id == file.id);
-      if (fileIndex != -1) {
-        _track.audio.removeWhere((e) => e.guideName != element.guideName);
-        _track.audio.first.files
-            .removeWhere((e) => e.id != element.files[fileIndex].id);
-        break;
-      }
-    }
+    var track = trackModel.customCopyWith();
 
-    state = _track;
-    await _loadTrackAndBackgroundSound(
+    track.audio.forEach((audioModel) {
+      var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
+      if (fileIndex != -1) {
+        track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
+        track.audio.first.files
+            .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
+
+        return;
+      }
+    });
+
+    final audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+
+    state = track;
+    _optionallyLoadBackgroundSound(
       ref,
-      _track,
-      _track.audio.first.files.first,
+      audioPlayerNotifier,
+      track,
+      track.audio.first.files.first,
+    );
+    await _playTrack(
+      ref,
+      audioPlayerNotifier,
+      track,
+      file,
     );
   }
 
-  Future<void> _loadTrackAndBackgroundSound(
+  void _optionallyLoadBackgroundSound(
     Ref ref,
+    AudioPlayerNotifier audioPlayerNotifier,
     TrackModel trackModel,
-    TrackFilesModel file, {
-    bool isPlayAudio = true,
-  }) async {
-    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    var isPlaying = _audioPlayerNotifier.trackAudioPlayer.playerState.playing;
-    var _currentPlayingFileId = _audioPlayerNotifier.currentlyPlayingTrack?.id;
+    TrackFilesModel file,
+  ) {
+    var isPlaying = audioPlayerNotifier.trackAudioPlayer.playerState.playing;
+    var currentPlayingFileId = audioPlayerNotifier.currentlyPlayingTrack?.id;
 
-    if (!isPlaying || _currentPlayingFileId != file.id) {
-      _setBackgroundSound(
+    if (!isPlaying || currentPlayingFileId != file.id) {
+      _optionallyPlayBackgroundSound(
         ref,
-        _audioPlayerNotifier,
+        audioPlayerNotifier,
         trackModel.hasBackgroundSound,
-        isPlayAudio: isPlayAudio,
-      );
-      await _setTrackAudio(
-        ref,
-        _audioPlayerNotifier,
-        trackModel,
-        file,
-        isPlayAudio: isPlayAudio,
       );
     }
   }
 
-  Future<void> _setTrackAudio(
+  Future<void> _playTrack(
     Ref ref,
-    AudioPlayerNotifier _audioPlayerNotifier,
+    AudioPlayerNotifier audioPlayerNotifier,
     TrackModel trackModel,
-    TrackFilesModel file, {
-    bool isPlayAudio = true,
-  }) async {
+    TrackFilesModel file,
+  ) async {
     var checkDownloadedFile = ref.read(audioDownloaderProvider).getTrackAudio(
-          '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
+          _constructFileName(trackModel, file),
         );
-    var res = await checkDownloadedFile;
-    _audioPlayerNotifier.setTrackAudio(
+    var filePath = await checkDownloadedFile;
+    audioPlayerNotifier.setTrackAudio(
       trackModel,
       file,
-      filePath: res,
+      filePath: filePath,
     );
-    _audioPlayerNotifier.currentlyPlayingTrack = file;
-    if (isPlayAudio) {
-      unawaited(_audioPlayerNotifier.play());
-    }
+    audioPlayerNotifier.currentlyPlayingTrack = file;
+    unawaited(audioPlayerNotifier.play());
   }
 
-  void _setBackgroundSound(
+  String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
+      '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
+
+  void _optionallyPlayBackgroundSound(
     Ref ref,
-    AudioPlayerNotifier _audioPlayerNotifier,
-    bool hasBackgroundSound, {
-    bool isPlayAudio = true,
-  }) {
+    AudioPlayerNotifier audioPlayerNotifier,
+    bool hasBackgroundSound,
+  ) {
     if (hasBackgroundSound) {
       final _provider = ref.read(backgroundSoundsNotifierProvider);
       _provider.getBackgroundSoundFromPref();
       if (_provider.selectedBgSound != null &&
           _provider.selectedBgSound?.title != StringConstants.none) {
-        _audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-        if (isPlayAudio) {
-          _audioPlayerNotifier.playBackgroundSound();
-        }
+        audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
+        audioPlayerNotifier.playBackgroundSound();
       }
 
       _provider.getVolumeFromPref();
-      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+      audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
     } else {
-      _audioPlayerNotifier.pauseBackgroundSound();
+      audioPlayerNotifier.pauseBackgroundSound();
     }
   }
 

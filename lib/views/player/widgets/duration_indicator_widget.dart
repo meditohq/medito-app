@@ -43,7 +43,7 @@ class _DurationIndicatorWidgetState
         if (_dragSeekbarValue != null && !_draggingSeekbar) {
           _dragSeekbarValue = null;
         }
-        audioPlayerNotifier.audioPositionIsInEndPeriod(
+        audioPlayerNotifier.handleFadeAtEnd(
           data.position,
           Duration(milliseconds: _maxDuration.round()),
         );
@@ -64,10 +64,9 @@ class _DurationIndicatorWidgetState
       duration: val.round(),
     ));
     _draggingSeekbar = false;
-    ref.read(audioPlayerNotifierProvider).audioPositionIsInEndPeriod(
+    ref.read(audioPlayerNotifierProvider).handleFadeAtEnd(
           data.position,
           Duration(milliseconds: _maxDuration.round()),
-          setToPreviousVolume: true,
         );
   }
 
