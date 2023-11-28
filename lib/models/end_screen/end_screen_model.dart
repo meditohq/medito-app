@@ -18,7 +18,7 @@ abstract class EndScreenModel with _$EndScreenModel {
 @freezed
 abstract class EndScreenContentModel with _$EndScreenContentModel {
   const factory EndScreenContentModel({
-    int? id,
+    String? id,
     String? title,
     String? text,
     String? ctaPath,
