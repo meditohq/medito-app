@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:audio_service/audio_service.dart';
@@ -19,10 +20,11 @@ final audioPlayerNotifierProvider =
 class AudioPlayerNotifier extends BaseAudioHandler
     with QueueHandler, SeekHandler, ChangeNotifier {
   var backgroundSoundAudioPlayer = AudioPlayer();
-  TrackFilesModel? currentlyPlayingTrack;
-  final hasBgSound = 'hasBgSound';
   final trackAudioPlayer = AudioPlayer();
-  final fadeDuration = 5;
+
+  TrackFilesModel? currentlyPlayingTrack;
+  final hasBgSoundKey = 'hasBgSound';
+  final fadeDurationInSeconds = 5;
   var bgVolume;
 
   @override
@@ -43,8 +45,8 @@ class AudioPlayerNotifier extends BaseAudioHandler
   Future<void> play() async {
     try {
       unawaited(trackAudioPlayer.play());
-      var checkBgAudio = mediaItemHasBGSound();
-      if (checkBgAudio) {
+      var hasBgSound = mediaItemHasBGSound();
+      if (hasBgSound) {
         playBackgroundSound();
       } else {
         pauseBackgroundSound();
@@ -165,17 +167,16 @@ class AudioPlayerNotifier extends BaseAudioHandler
     await backgroundSoundAudioPlayer.setVolume(volume / 100);
   }
 
-  bool audioPositionIsInEndPeriod(
+  bool handleFadeAtEnd(
     Duration position,
-    Duration maxDuration, {
-    bool setToPreviousVolume = false,
-  }) {
+    Duration maxDuration,
+  ) {
     var isEnding = maxDuration.inSeconds > 0 &&
-        position.inSeconds > maxDuration.inSeconds - fadeDuration;
+        position.inSeconds > maxDuration.inSeconds - fadeDurationInSeconds;
+
     if (isEnding) {
-      setBgVolumeFadeAtEnd();
-    }
-    if (setToPreviousVolume) {
+      _setBgVolumeFadeAtEnd();
+    } else {
       Future.delayed(Duration(milliseconds: 500), () {
         setBackgroundSoundVolume(bgVolume);
       });
@@ -184,7 +185,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
     return isEnding;
   }
 
-  void setBgVolumeFadeAtEnd() {
+  void _setBgVolumeFadeAtEnd() {
     if (backgroundSoundAudioPlayer.volume > 0) {
       Future.delayed(Duration(milliseconds: 500), () {
         var newVolume = backgroundSoundAudioPlayer.volume - 0.05;
@@ -209,7 +210,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
         trackModel.coverUrl,
       ),
       extras: {
-        hasBgSound: trackModel.hasBackgroundSound,
+        hasBgSoundKey: trackModel.hasBackgroundSound,
         'trackId': trackModel.id,
         'fileId': file.id,
       },
@@ -218,7 +219,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   bool mediaItemHasBGSound() {
-    return mediaItem.value?.extras?[hasBgSound] ?? false;
+    return mediaItem.value?.extras?[hasBgSoundKey] ?? false;
   }
 
   PlaybackState _transformEvent(PlaybackEvent event) {

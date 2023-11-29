@@ -90,8 +90,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     TrackFilesModel file,
   ) async {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
-    await audioProvider.stop();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: file,
@@ -238,8 +236,8 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     return InkWell(
       onTap: () {
-        var _file = selectedDuration ?? trackModel.audio.first.files.first;
-        _handlePlay(context, ref, trackModel, _file);
+        var file = selectedDuration ?? trackModel.audio.first.files.first;
+        _handlePlay(context, ref, trackModel, file);
       },
       borderRadius: radius,
       child: Ink(

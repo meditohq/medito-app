@@ -21,7 +21,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
       children: [
         _rewindButton(ref),
         SizedBox(width: 32),
-        _playPauseButton(),
+        PlayPauseButtonWidget(),
         SizedBox(width: 32),
         _forwardButton(ref),
       ],
@@ -49,22 +49,21 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  Widget _playPauseButton() {
-    return PlayPauseButtonWidget();
-  }
-
   void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
+
     var audioProvider = ref.read(audioPlayerNotifierProvider);
     final audioPositionAndPlayerState =
         ref.read(audioPositionAndPlayerStateProvider);
+
     var maxDuration = audioProvider.mediaItem.value?.duration ?? Duration();
+
     ref.read(
       skipAudioProvider(skip: skip),
     );
-    audioProvider.audioPositionIsInEndPeriod(
+
+    audioProvider.handleFadeAtEnd(
       audioPositionAndPlayerState.value?.position ?? Duration(),
       maxDuration,
-      setToPreviousVolume: true,
     );
   }
 }
