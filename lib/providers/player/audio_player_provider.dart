@@ -23,7 +23,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   final trackAudioPlayer = AudioPlayer();
 
   TrackFilesModel? currentlyPlayingTrack;
-  final hasBgSoundId = 'hasBgSound';
+  final hasBgSoundKey = 'hasBgSound';
   final fadeDurationInSeconds = 5;
   var bgVolume;
 
@@ -210,7 +210,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
         trackModel.coverUrl,
       ),
       extras: {
-        hasBgSoundId: trackModel.hasBackgroundSound,
+        hasBgSoundKey: trackModel.hasBackgroundSound,
         'trackId': trackModel.id,
         'fileId': file.id,
       },
@@ -219,7 +219,7 @@ class AudioPlayerNotifier extends BaseAudioHandler
   }
 
   bool mediaItemHasBGSound() {
-    return mediaItem.value?.extras?[hasBgSoundId] ?? false;
+    return mediaItem.value?.extras?[hasBgSoundKey] ?? false;
   }
 
   PlaybackState _transformEvent(PlaybackEvent event) {
