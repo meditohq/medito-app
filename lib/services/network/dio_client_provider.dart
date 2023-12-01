@@ -10,7 +10,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 final dioClientProvider = Provider<DioApiService>((ref) {
   var dio = Dio();
   dio.options = BaseOptions(
-    connectTimeout: Duration(milliseconds: 30000),
+    connectTimeout: Duration(milliseconds: 1000),
     baseUrl: HTTPConstants.BASE_URL,
     headers: {
       HttpHeaders.accessControlAllowOriginHeader: '*',
