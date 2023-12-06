@@ -41,7 +41,7 @@ To volunteer, send an email (preferably with your CV) and how many hours you can
 Please note that we are looking for people who are interested in investing at least 2 hours a week regularly. :)
 
 Don't feel like contributing to the code?
-Feature requests, feedback and suggestions are welcome. Reach us via Slack/email, or create a new issue.
+Feature requests, feedback and suggestions are welcome. Reach us via Discord/email, or create a new issue.
 
 ## About the Medito Foundation
 
@@ -63,6 +63,6 @@ RSIN: 860222627
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
 - Our original content is licensed under a Creative Commons licence. For more information please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
 - Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito". Make sure to respect the original copyright. 
-Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on slack or by email.
+Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on Discord or by email.
 
 Medito Foundation https://meditofoundation.org/.
