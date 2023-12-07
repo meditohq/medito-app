@@ -1,3 +1,4 @@
+import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:flutter/material.dart';
 import '../widgets/box_shimmer_widget.dart';
 
@@ -6,37 +7,26 @@ class HeaderAndAnnouncementShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          _header(),
-          _chips(),
-        ],
-      ),
-    );
-  }
-
-  GridView _chips() {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 8.0,
-      mainAxisSpacing: 8.0,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      childAspectRatio: 3,
-      children: List.generate(4, (index) {
-        return BoxShimmerWidget(
-          height: 40,
-          borderRadius: 12,
-        );
-      }),
+    return Column(
+      children: [
+        _header(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: padding20),
+          child: BoxShimmerWidget(
+            height: 200,
+            borderRadius: 12,
+          ),
+        ),
+      ],
     );
   }
 
   Padding _header() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      padding: const EdgeInsets.symmetric(
+        horizontal: padding20,
+        vertical: padding16,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

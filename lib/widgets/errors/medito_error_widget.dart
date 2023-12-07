@@ -46,8 +46,8 @@ class MeditoErrorWidget extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: defaultPadding,
-          vertical: defaultPadding,
+          horizontal: padding16,
+          vertical: padding16,
         ),
         child: Column(
           mainAxisSize: hasScaffold ? MainAxisSize.max : MainAxisSize.min,

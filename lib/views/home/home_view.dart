@@ -9,6 +9,8 @@ import 'package:vibration/vibration.dart';
 import 'package:Medito/providers/providers.dart';
 
 import 'widgets/quote/quote_widget.dart';
+import 'widgets/shortcuts/shortcuts_widget.dart';
+import 'widgets/tiles/tiles_widget.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   HomeView({super.key});
@@ -43,12 +45,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             children: [
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(homeProvider);
-                    await ref.read(homeProvider.future);
-                    ref.invalidate(remoteStatsProvider);
-                    await ref.read(remoteStatsProvider.future);
-                  },
+                  onRefresh: _onRefresh,
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
@@ -58,9 +55,15 @@ class _HomeViewState extends ConsumerState<HomeView>
                       child: Column(
                         children: [
                           HeaderAndAnnouncementWidget(),
+                          height16,
+                          ShortcutsWidget(),
                           height24,
                           QuoteWidget(),
-                          height32,
+                          height24,
+                          TilesWidget(),
+                          SizedBox(
+                            height: 120,
+                          ),
                         ],
                       ),
                     ),
@@ -72,6 +75,19 @@ class _HomeViewState extends ConsumerState<HomeView>
         ),
       ),
     );
+  }
+
+  Future<void> _onRefresh() async {
+    ref.invalidate(homeProvider);
+    await ref.read(homeProvider.future);
+    ref.invalidate(remoteStatsProvider);
+    await ref.read(remoteStatsProvider.future);
+    ref.invalidate(fetchShortcutsProvider);
+    await ref.read(fetchShortcutsProvider.future);
+    ref.invalidate(fetchQuoteProvider);
+    await ref.read(fetchQuoteProvider.future);
+    ref.invalidate(fetchHomeHeaderProvider);
+    await ref.read(fetchHomeHeaderProvider.future);
   }
 
   void onPointerUp(_) async {

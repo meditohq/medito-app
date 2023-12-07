@@ -6,7 +6,7 @@ part 'shortcuts_model.g.dart';
 @freezed
 abstract class ShortcutsModel with _$ShortcutsModel {
   const factory ShortcutsModel({
-    required List<ShortcutsItemsModel> items,
+    required List<ShortcutsItemsModel> shortcuts,
   }) = _ShortcutsModel;
 
   factory ShortcutsModel.fromJson(Map<String, Object?> json) =>

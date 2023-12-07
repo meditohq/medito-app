@@ -48,14 +48,10 @@ class _HeaderAndAnnouncementWidgetState
     return response.when(
       skipLoadingOnRefresh: true,
       skipLoadingOnReload: true,
-      data: (data) {
-        // return const HeaderAndAnnouncementShimmerWidget();
-
-        return _buildMain(data);
-      },
+      data: (data) => _buildMain(data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
-        onTap: () => ref.refresh(homeProvider),
+        onTap: () => ref.refresh(fetchHomeHeaderProvider),
         isLoading: response.isLoading,
       ),
       loading: () => const HeaderAndAnnouncementShimmerWidget(),

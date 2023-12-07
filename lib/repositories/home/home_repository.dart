@@ -10,6 +10,7 @@ abstract class HomeRepository {
   Future<HomeModel> fetchHomeData();
   Future<HomeHeaderModel> fetchHomeHeader();
   Future<QuoteModel> fetchQuote();
+  Future<ShortcutsModel> fetchShortcuts();
 }
 
 class HomeRepositoryImpl extends HomeRepository {
@@ -44,7 +45,18 @@ class HomeRepositoryImpl extends HomeRepository {
     try {
       var response = await client.getRequest(HTTPConstants.QUOTE);
 
-      return QuoteModel.fromJson(response);
+      return QuoteModel.fromJson(response['quote']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ShortcutsModel> fetchShortcuts() async {
+    try {
+      var response = await client.getRequest(HTTPConstants.SHORTCUTS);
+
+      return ShortcutsModel.fromJson(response);
     } catch (e) {
       rethrow;
     }

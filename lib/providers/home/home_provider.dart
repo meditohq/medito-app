@@ -20,6 +20,14 @@ Future<HomeHeaderModel> fetchHomeHeader(FetchHomeHeaderRef ref) {
 }
 
 @riverpod
+Future<ShortcutsModel> fetchShortcuts(FetchShortcutsRef ref) {
+  final homeRepository = ref.watch(homeRepositoryProvider);
+  ref.keepAlive();
+
+  return homeRepository.fetchShortcuts();
+}
+
+@riverpod
 Future<QuoteModel> fetchQuote(FetchQuoteRef ref) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();

@@ -1,3 +1,4 @@
+import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:flutter/material.dart';
 import '../widgets/box_shimmer_widget.dart';
 
@@ -6,24 +7,24 @@ class QuoteShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          _chips(),
-        ],
-      ),
+    var size = MediaQuery.of(context).size;
+
+    return Column(
+      children: [
+        _lines(size.width * 0.9),
+        height8,
+        _lines(size.width * 0.7),
+        height8,
+        _lines(size.width * 0.5),
+      ],
     );
   }
 
-  Column _chips() {
-    return Column(
-      children: List.generate(
-        4,
-        (_) => BoxShimmerWidget(
-          height: 40,
-          borderRadius: 12,
-        ),
-      ),
+  BoxShimmerWidget _lines(double width) {
+    return BoxShimmerWidget(
+      height: 16,
+      width: width,
+      borderRadius: 12,
     );
   }
 }

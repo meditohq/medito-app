@@ -31,7 +31,7 @@ class EndScreenView extends StatelessWidget {
 
   Padding _buildCard() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
       child: Column(
         children: endScreenModel.map((e) {
           if (e.name == TypeConstants.donationAskCard) {

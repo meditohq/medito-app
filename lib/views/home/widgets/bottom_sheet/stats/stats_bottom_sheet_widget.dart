@@ -62,14 +62,14 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           child: Container(
             color: ColorConstants.onyx,
             child: Column(
-              children: stats.all.map((e) {
+              children: stats.allStats.map((e) {
                 return RowItemWidget(
                   iconCodePoint: e.icon,
                   iconColor: e.color,
                   trailingIconSize: 20,
                   title: e.title,
                   subTitle: e.subtitle,
-                  hasUnderline: e.title != stats.all.last.title,
+                  hasUnderline: e.title != stats.allStats.last.title,
                   isTrailingIcon: false,
                   titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontSize: 20,

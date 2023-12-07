@@ -2,6 +2,8 @@ export 'shimmers/folder_shimmer_widget.dart';
 export 'shimmers/track_shimmer_widget.dart';
 export 'shimmers/home/home_shimmer_widget.dart';
 export 'shimmers/home/quote_shimmer_widget.dart';
+export 'shimmers/home/shortcuts_shimmer_widget.dart';
+export 'shimmers/home/tiles_shimmer_widget.dart';
 export 'shimmers/home/header_and_announcement_shimmer_widget.dart';
 export 'shimmers/background_sounds_shimmer_widget.dart';
 export 'errors/medito_error_widget.dart';

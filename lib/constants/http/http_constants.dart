@@ -16,7 +16,8 @@ class HTTPConstants {
   static const String HOME = 'home';
   static const String HEADER = 'main/header';
   static const String QUOTE = 'main/quote';
-  static const String STATS = 'stats';
+  static const String SHORTCUTS = 'main/shortcuts';
+  static const String STATS = 'main/stats';
   static const String ME = 'me';
   static const String EVENTS = 'events';
   static const String SEARCH = 'search';

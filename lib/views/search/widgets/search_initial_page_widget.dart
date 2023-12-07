@@ -40,8 +40,8 @@ class SearchInitialPageWidget extends ConsumerWidget {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.only(
                 top: 20,
-                left: defaultPadding,
-                right: defaultPadding,
+                left: padding16,
+                right: padding16,
                 bottom: 32,
               ),
               itemBuilder: (context, index) {
