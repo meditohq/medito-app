@@ -5,7 +5,6 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import '../bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
@@ -28,11 +27,11 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _logo(context),
+          _welcomeWidget(context),
           Row(
             children: [
-              _statsWidget(context, ref),
-              _downloadWidget(context),
+              // _statsWidget(context, ref),
+              // _downloadWidget(context),
               _menuWidget(context),
             ],
           ),
@@ -41,9 +40,9 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _logo(BuildContext context) {
+  Widget _welcomeWidget(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 8.0),
+      padding: EdgeInsets.only(left: 20.0),
       child: LongPressDetectorWidget(
         onLongPress: () {
           showModalBottomSheet<void>(
@@ -62,17 +61,14 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
           );
         },
         duration: Duration(milliseconds: 500),
-        child: Material(
-          type: MaterialType.transparency,
-          shape: CircleBorder(),
-          clipBehavior: Clip.hardEdge,
-          child: IconButton(
-            onPressed: () => {},
-            icon: SvgPicture.asset(
-              AssetConstants.icLogo,
-              width: 32,
-            ),
-          ),
+        child: Text(
+          StringConstants.welcome,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: ColorConstants.walterWhite,
+                height: 0,
+                fontSize: 28,
+                fontFamily: DmSerif,
+              ),
         ),
       ),
     );

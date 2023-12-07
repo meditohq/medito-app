@@ -1,6 +1,6 @@
 export 'shimmers/folder_shimmer_widget.dart';
 export 'shimmers/track_shimmer_widget.dart';
-export 'shimmers/home_shimmer_widget.dart';
+export 'shimmers/home/home_shimmer_widget.dart';
 export 'shimmers/background_sounds_shimmer_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'errors/connectivity_error_widget.dart';

@@ -8,6 +8,7 @@ part 'home_repository.g.dart';
 
 abstract class HomeRepository {
   Future<HomeModel> fetchHomeData();
+  Future<HomeHeaderModel> fetchHomeHeader();
 }
 
 class HomeRepositoryImpl extends HomeRepository {
@@ -21,6 +22,17 @@ class HomeRepositoryImpl extends HomeRepository {
       var res = await client.getRequest(HTTPConstants.HOME);
 
       return HomeModel.fromJson(res);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<HomeHeaderModel> fetchHomeHeader() async {
+    try {
+      var response = await client.getRequest(HTTPConstants.HEADER);
+
+      return HomeHeaderModel.fromJson(response);
     } catch (e) {
       rethrow;
     }
