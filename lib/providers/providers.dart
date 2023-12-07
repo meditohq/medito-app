@@ -1,7 +1,6 @@
 export 'auth/auth_provider.dart';
 export 'me/me_provider.dart';
 export 'home/home_provider.dart';
-export 'home/header/home_header_provider.dart';
 export 'player/audio_player_provider.dart';
 export 'background_sounds/background_sounds_provider.dart';
 export 'pack/pack_provider.dart';

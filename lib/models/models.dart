@@ -5,6 +5,7 @@ export 'track/track_model.dart';
 export 'background_sounds/background_sounds_model.dart';
 export 'audio_speed/audio_speed_model.dart';
 export 'home/home_model.dart';
+export 'home/quote/quote_model.dart';
 export 'home/chips/home_chips_items_model.dart';
 export 'home/rows/home_rows_model.dart';
 export 'home/menu/home_menu_model.dart';

@@ -10,3 +10,19 @@ Future<HomeModel> home(HomeRef ref) {
 
   return homeRepository.fetchHomeData();
 }
+
+@riverpod
+Future<HomeHeaderModel> fetchHomeHeader(FetchHomeHeaderRef ref) {
+  final homeRepository = ref.watch(homeRepositoryProvider);
+  ref.keepAlive();
+
+  return homeRepository.fetchHomeHeader();
+}
+
+@riverpod
+Future<QuoteModel> fetchQuote(FetchQuoteRef ref) {
+  final homeRepository = ref.watch(homeRepositoryProvider);
+  ref.keepAlive();
+
+  return homeRepository.fetchQuote();
+}

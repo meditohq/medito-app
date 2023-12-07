@@ -49,6 +49,8 @@ class _HeaderAndAnnouncementWidgetState
       skipLoadingOnRefresh: true,
       skipLoadingOnReload: true,
       data: (data) {
+        // return const HeaderAndAnnouncementShimmerWidget();
+
         return _buildMain(data);
       },
       error: (err, stack) => MeditoErrorWidget(
@@ -56,7 +58,7 @@ class _HeaderAndAnnouncementWidgetState
         onTap: () => ref.refresh(homeProvider),
         isLoading: response.isLoading,
       ),
-      loading: () => const HomeShimmerWidget(),
+      loading: () => const HeaderAndAnnouncementShimmerWidget(),
     );
   }
 
@@ -96,5 +98,5 @@ class _HeaderAndAnnouncementWidgetState
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }
