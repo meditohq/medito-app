@@ -11,13 +11,13 @@ class MeditoErrorWidget extends StatelessWidget {
     required this.message,
     this.isLoading = false,
     this.showCheckDownloadText = false,
-    this.hasScaffold = true,
+    this.isScaffold = true,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
   final bool isLoading;
   final bool showCheckDownloadText;
-  final bool hasScaffold;
+  final bool isScaffold;
   @override
   Widget build(BuildContext context) {
     var isInvalidToken = message == StringConstants.invalidToken;
@@ -27,7 +27,7 @@ class MeditoErrorWidget extends StatelessWidget {
           color: ColorConstants.walterWhite,
           fontFamily: DmSerif,
         );
-    if (hasScaffold) {
+    if (isScaffold) {
       return Scaffold(
         backgroundColor: ColorConstants.ebony,
         body: _mainBody(context, isInvalidToken, textStyle),
@@ -50,7 +50,7 @@ class MeditoErrorWidget extends StatelessWidget {
           vertical: padding16,
         ),
         child: Column(
-          mainAxisSize: hasScaffold ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: isScaffold ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

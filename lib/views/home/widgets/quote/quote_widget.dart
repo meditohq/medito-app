@@ -17,7 +17,7 @@ class QuoteWidget extends ConsumerWidget {
         );
 
     return response.when(
-      skipLoadingOnRefresh: true,
+      skipLoadingOnRefresh: false,
       skipLoadingOnReload: true,
       data: (data) {
         return Padding(
@@ -42,6 +42,7 @@ class QuoteWidget extends ConsumerWidget {
         message: err.toString(),
         onTap: () => ref.refresh(fetchQuoteProvider),
         isLoading: response.isLoading,
+        isScaffold: false,
       ),
       loading: () => const QuoteShimmerWidget(),
     );

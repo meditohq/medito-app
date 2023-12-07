@@ -27,13 +27,14 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     var response = ref.watch(fetchShortcutsProvider);
 
     return response.when(
-      skipLoadingOnRefresh: true,
+      skipLoadingOnRefresh: false,
       skipLoadingOnReload: true,
       data: (data) => _buildShortcuts(data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchShortcutsProvider),
         isLoading: response.isLoading,
+        isScaffold: false,
       ),
       loading: () => const ShortcutsShimmerWidget(),
     );

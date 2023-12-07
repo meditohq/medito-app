@@ -6,6 +6,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
+
 class TilesWidget extends ConsumerWidget {
   const TilesWidget({super.key});
 
@@ -15,18 +17,24 @@ class TilesWidget extends ConsumerWidget {
 
     return stats.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildTiles(context, data.tiles),
+      data: (data) => _buildTiles(context, ref, data.tiles),
       error: (err, stack) => Expanded(
         child: MeditoErrorWidget(
           message: err.toString(),
           onTap: () => ref.refresh(remoteStatsProvider),
+          isLoading: stats.isLoading,
+          isScaffold: false,
         ),
       ),
       loading: () => TilesShimmerWidget(),
     );
   }
 
-  Padding _buildTiles(BuildContext context, List<TilesModel> data) {
+  Padding _buildTiles(
+    BuildContext context,
+    WidgetRef ref,
+    List<TilesModel> data,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
@@ -38,37 +46,60 @@ class TilesWidget extends ConsumerWidget {
               );
 
           return Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                color: ColorConstants.onyx,
-              ),
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(padding16),
-              margin: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    IconData(formatIcon(e.icon), fontFamily: materialIcons),
-                    size: 24,
-                  ),
-                  height8,
-                  Text(
-                    e.title,
-                    style: fontStyle,
-                  ),
-                  height4,
-                  Text(
-                    e.subtitle,
-                    style: fontStyle,
-                  ),
-                ],
+            child: InkWell(
+              onTap: () => onTapTile(context, ref),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: ColorConstants.onyx,
+                ),
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(padding16),
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      IconData(formatIcon(e.icon), fontFamily: materialIcons),
+                      size: 24,
+                    ),
+                    height8,
+                    Text(
+                      e.title,
+                      style: fontStyle,
+                    ),
+                    height4,
+                    Text(
+                      e.subtitle,
+                      style: fontStyle,
+                    ),
+                  ],
+                ),
               ),
             ),
           );
         }).toList(),
       ),
+    );
+  }
+
+  void onTapTile(BuildContext context, WidgetRef ref) {
+    ref.invalidate(remoteStatsProvider);
+    ref.read(remoteStatsProvider);
+    showModalBottomSheet<void>(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(14.0),
+          topRight: Radius.circular(14.0),
+        ),
+      ),
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: ColorConstants.onyx,
+      builder: (BuildContext context) {
+        return StatsBottomSheetWidget();
+      },
     );
   }
 }
