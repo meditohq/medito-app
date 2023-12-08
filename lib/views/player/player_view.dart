@@ -50,7 +50,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
         extendBodyBehindAppBar: true,
         appBar: MeditoAppBarSmall(
           hasCloseButton: true,
-          closePressed: _handleClose,
+          closePressed: () => _handleClose(),
           isTransparent: true,
         ),
         body: SafeArea(

@@ -206,7 +206,7 @@ class _NotificationPermissionViewState
 
   void _handleNotNow() async {
     await ref.read(updateNotificationPermissionCountProvider.future);
-    var notNowCount = ref.read(getNotificationPermissionCountProvider);
+    ref.read(getNotificationPermissionCountProvider);
     context.pop();
   }
 
