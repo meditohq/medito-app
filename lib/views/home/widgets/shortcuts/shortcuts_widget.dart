@@ -16,7 +16,7 @@ class ShortcutsWidget extends ConsumerStatefulWidget {
 }
 
 class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
-  var data = <HomeChipsItemsModel>[];
+  late ShortcutsModel data;
   @override
   void initState() {
     super.initState();
@@ -25,11 +25,16 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
   @override
   Widget build(BuildContext context) {
     var response = ref.watch(fetchShortcutsProvider);
+    ref.listen(fetchShortcutsProvider, (previous, next) {
+      if (next.hasValue) {
+        data = next.value!;
+      }
+    });
 
     return response.when(
       skipLoadingOnRefresh: false,
       skipLoadingOnReload: true,
-      data: (data) => _buildShortcuts(data),
+      data: (_) => _buildShortcuts(),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchShortcutsProvider),
@@ -40,7 +45,7 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     );
   }
 
-  Padding _buildShortcuts(ShortcutsModel data) {
+  Padding _buildShortcuts() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Theme(
@@ -83,8 +88,12 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
               .toList(),
           onReorder: (oldIndex, newIndex) {
             setState(() {
-              final element = data.shortcuts.removeAt(oldIndex);
-              data.shortcuts.insert(newIndex, element);
+              var _data = [...data.shortcuts];
+              final element = _data.removeAt(oldIndex);
+              _data.insert(newIndex, element);
+              data = data.copyWith(shortcuts: _data);
+              var ids = _data.map((e) => e.id).toList();
+              ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids));
             });
           },
         ),

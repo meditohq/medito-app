@@ -3,9 +3,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'shortcuts_model.freezed.dart';
 part 'shortcuts_model.g.dart';
 
-@freezed
+@unfreezed
 abstract class ShortcutsModel with _$ShortcutsModel {
-  const factory ShortcutsModel({
+  factory ShortcutsModel({
     required List<ShortcutsItemsModel> shortcuts,
   }) = _ShortcutsModel;
 
@@ -13,9 +13,9 @@ abstract class ShortcutsModel with _$ShortcutsModel {
       _$ShortcutsModelFromJson(json);
 }
 
-@freezed
+@unfreezed
 abstract class ShortcutsItemsModel with _$ShortcutsItemsModel {
-  const factory ShortcutsItemsModel({
+  factory ShortcutsItemsModel({
     required String id,
     required String type,
     required String title,

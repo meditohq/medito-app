@@ -28,6 +28,16 @@ Future<ShortcutsModel> fetchShortcuts(FetchShortcutsRef ref) {
 }
 
 @riverpod
+Future<void> updateShortcutsIdsInPreference(
+  UpdateShortcutsIdsInPreferenceRef ref, {
+  required List<String> ids,
+}) {
+  final homeRepository = ref.watch(homeRepositoryProvider);
+
+  return homeRepository.setShortcutIdsInPreference(ids);
+}
+
+@riverpod
 Future<QuoteModel> fetchQuote(FetchQuoteRef ref) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
