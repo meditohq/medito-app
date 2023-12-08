@@ -42,7 +42,7 @@ class TilesWidget extends ConsumerWidget {
         children: data.map((e) {
           var fontStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontFamily: DmSerif,
-                color: ColorConstants.getColorFromString(e.color),
+                color: ColorConstants.walterWhite,
               );
 
           return Expanded(
@@ -60,8 +60,12 @@ class TilesWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
-                      IconData(formatIcon(e.icon), fontFamily: materialIcons),
+                      IconData(
+                        formatIcon(e.icon),
+                        fontFamily: materialIcons,
+                      ),
                       size: 24,
+                      color: ColorConstants.getColorFromString(e.color),
                     ),
                     height8,
                     Text(
