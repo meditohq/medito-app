@@ -36,7 +36,7 @@ class TilesWidget extends ConsumerWidget {
     List<TilesModel> data,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.only(left: 4, right: padding20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: data.map((e) {
@@ -44,40 +44,45 @@ class TilesWidget extends ConsumerWidget {
                 fontFamily: DmSerif,
                 color: ColorConstants.walterWhite,
               );
+          var isFirstItem = data[0] == e;
 
           return Expanded(
-            child: InkWell(
-              onTap: () => onTapTile(context, ref),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: ColorConstants.onyx,
-                ),
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(padding16),
-                margin: EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      IconData(
-                        formatIcon(e.icon),
-                        fontFamily: materialIcons,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: padding16,
+              ),
+              child: InkWell(
+                onTap: isFirstItem ? () => onTapTile(context, ref) : null,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    color: ColorConstants.onyx,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.all(padding16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        IconData(
+                          formatIcon(e.icon),
+                          fontFamily: materialIcons,
+                        ),
+                        size: 24,
+                        color: ColorConstants.getColorFromString(e.color),
                       ),
-                      size: 24,
-                      color: ColorConstants.getColorFromString(e.color),
-                    ),
-                    height8,
-                    Text(
-                      e.title,
-                      style: fontStyle,
-                    ),
-                    height4,
-                    Text(
-                      e.subtitle,
-                      style: fontStyle,
-                    ),
-                  ],
+                      height8,
+                      Text(
+                        e.title,
+                        style: fontStyle,
+                      ),
+                      height4,
+                      Text(
+                        e.subtitle,
+                        style: fontStyle,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
