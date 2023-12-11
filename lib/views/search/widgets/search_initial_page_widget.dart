@@ -34,7 +34,7 @@ class SearchInitialPageWidget extends ConsumerWidget {
       children: [
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () async => await ref.refresh(fetchAllPacksProvider),
+            onRefresh: () async => ref.refresh(fetchAllPacksProvider),
             child: ListView.builder(
               itemCount: packs.length,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
