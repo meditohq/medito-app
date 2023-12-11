@@ -90,11 +90,15 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     TrackFilesModel file,
   ) async {
-    await ref.read(playerProvider.notifier).loadSelectedTrack(
-          trackModel: trackModel,
-          file: file,
-        );
-    unawaited(context.push(RouteConstants.playerPath));
+    try {
+      await ref.read(playerProvider.notifier).loadSelectedTrack(
+            trackModel: trackModel,
+            file: file,
+          );
+      unawaited(context.push(RouteConstants.playerPath));
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -106,10 +110,7 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     ref.listen(trackOpenedFirstTimeProvider, (prev, next) {
       var _user =
-      ref
-          .read(authProvider.notifier)
-          .userRes
-          .body as UserTokenModel;
+          ref.read(authProvider.notifier).userRes.body as UserTokenModel;
       if (_user.email == null && next.value != null && next.value!) {
         var params = JoinRouteParamsModel(screen: Screen.track);
         context.push(
@@ -133,19 +134,17 @@ class _TrackViewState extends ConsumerState<TrackView>
           child: tracks.when(
             skipLoadingOnRefresh: false,
             data: (data) => _buildScaffoldWithData(context, data, ref),
-            error: (err, stack) =>
-                MeditoErrorWidget(
-                  message: err.toString(),
-                  onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
-                  hasScaffold: false,
-                ),
+            error: (err, stack) => MeditoErrorWidget(
+              message: err.toString(),
+              onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+              hasScaffold: false,
+            ),
             loading: () => _buildLoadingWidget(),
           ),
         ),
       ),
     );
   }
-
 
   TrackShimmerWidget _buildLoadingWidget() => const TrackShimmerWidget();
 
@@ -268,16 +267,16 @@ class _TrackViewState extends ConsumerState<TrackView>
       topRight: 7,
       bottomRight: 7,
       bottomLeft: 7,
-      isDisabled: audioFiles.length > 1,
+      isDisabled: (_selectedFile ?? audioFiles).length > 1,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} mins',
+          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
       items: files(_selectedFile ?? audioFiles)
           .map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,
             child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} mins',
+              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.mins}',
             ),
           );
         },
