@@ -14,7 +14,7 @@ abstract class HomeModel with _$HomeModel {
     AnnouncementModel? announcement,
     @Default(<HomeMenuModel>[]) List<HomeMenuModel> menu,
     @Default(<List<HomeChipsItemsModel>>[])
-    List<List<HomeChipsItemsModel>> chips,
+        List<List<HomeChipsItemsModel>> chips,
     @Default(<HomeRowsModel>[]) List<HomeRowsModel> rows,
   }) = _HomeModel;
 
