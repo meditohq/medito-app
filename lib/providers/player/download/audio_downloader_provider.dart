@@ -1,9 +1,9 @@
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Medito/models/models.dart';
 
 final audioDownloaderProvider =
     ChangeNotifierProvider<AudioDownloaderProvider>((ref) {

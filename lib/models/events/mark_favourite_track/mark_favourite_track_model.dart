@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'mark_favourite_track_model.freezed.dart';
 part 'mark_favourite_track_model.g.dart';
 

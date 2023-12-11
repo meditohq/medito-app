@@ -7,6 +7,7 @@ import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'track_repository.g.dart';
 
 abstract class TrackRepository {

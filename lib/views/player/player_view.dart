@@ -5,6 +5,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import 'widgets/artist_title_widget.dart';
 import 'widgets/bottom_actions/bottom_action_widget.dart';
 import 'widgets/duration_indicator_widget.dart';

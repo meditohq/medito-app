@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'donation_tapped_model.freezed.dart';
 part 'donation_tapped_model.g.dart';
 

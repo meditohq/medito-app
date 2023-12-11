@@ -2,6 +2,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
+
 part 'audio_position_provider.g.dart';
 
 @riverpod

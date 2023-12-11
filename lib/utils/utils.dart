@@ -15,15 +15,16 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:Medito/constants/constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:ui' as ui;
-import 'package:image/image.dart' as img;
 
 Future<bool> checkConnectivity() async {
   var connectivityResult = await Connectivity().checkConnectivity();

@@ -2,6 +2,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'play_pause_button_widget.dart';
 
 class PlayerButtonsWidget extends ConsumerWidget {
