@@ -15,6 +15,7 @@ class MarkdownWidget extends StatelessWidget {
     this.aFontSize = 13,
     this.selectable = false,
   });
+
   final String body;
   final void Function(String, String?, String)? onTapLink;
   final TextStyle? p, a;
@@ -22,6 +23,7 @@ class MarkdownWidget extends StatelessWidget {
   final double pFontSize;
   final double aFontSize;
   final bool selectable;
+
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;

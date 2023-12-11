@@ -12,9 +12,12 @@ final audioDownloaderProvider =
 
 class AudioDownloaderProvider extends ChangeNotifier {
   ChangeNotifierProviderRef<AudioDownloaderProvider> ref;
+
   AudioDownloaderProvider(this.ref);
+
   Map<String, double> downloadingProgress = {};
   Map<String, AUDIO_DOWNLOAD_STATE> audioDownloadState = {};
+
   Future<void> downloadTrackAudio(
     TrackModel trackModel,
     TrackFilesModel file,

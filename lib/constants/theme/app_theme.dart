@@ -13,11 +13,10 @@ ThemeData appTheme(BuildContext context) {
       TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       TargetPlatform.android: SlideTransitionBuilder(),
     }),
-    colorScheme:
-      ColorScheme.dark(
-          background: ColorConstants.ebony,
-          secondary: ColorConstants.walterWhite,
-      ),
+    colorScheme: ColorScheme.dark(
+      background: ColorConstants.ebony,
+      secondary: ColorConstants.walterWhite,
+    ),
     textTheme: meditoTextTheme(context),
     inputDecorationTheme: inputDecorationTheme(),
   );

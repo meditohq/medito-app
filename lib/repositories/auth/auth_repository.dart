@@ -52,10 +52,10 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<String> verifyOTP(String email, String OTP) async {
-      var res = await client
-          .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
+    var res = await client
+        .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
 
-      return res['success'];
+    return res['success'];
   }
 
   @override

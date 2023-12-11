@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 late final FirebaseMessaging _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 Future<void> registerNotification() async {
   _messaging = FirebaseMessaging.instance;
   await requestGenerateFirebaseToken();

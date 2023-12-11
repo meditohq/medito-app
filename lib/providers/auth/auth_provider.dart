@@ -19,6 +19,7 @@ final authProvider = ChangeNotifierProvider<AuthNotifier>(
 //ignore:prefer-match-file-name
 class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this.ref, {required this.authRepository});
+
   final AuthRepository authRepository;
   final Ref ref;
   ApiResponse userRes = ApiResponse.completed(null);

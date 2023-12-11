@@ -18,6 +18,7 @@ class MeditoErrorWidget extends StatelessWidget {
   final bool isLoading;
   final bool showCheckDownloadText;
   final bool isScaffold;
+
   @override
   Widget build(BuildContext context) {
     var isInvalidToken = message == StringConstants.invalidToken;

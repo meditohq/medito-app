@@ -25,6 +25,7 @@ class NetworkImageWidget extends ConsumerWidget {
     this.gradient,
     this.errorWidget,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var userTokenModel = ref.watch(authProvider).userRes.body as UserTokenModel;

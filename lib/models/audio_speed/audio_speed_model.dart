@@ -10,6 +10,7 @@ abstract class AudioSpeedModel with _$AudioSpeedModel {
     @Default(StringConstants.x1) String label,
     @Default(1) double speed,
   }) = _AudioSpeedModel;
+
   factory AudioSpeedModel.fromJson(Map<String, Object?> json) =>
       _$AudioSpeedModelFromJson(json);
 }

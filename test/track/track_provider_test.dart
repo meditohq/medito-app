@@ -6,8 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 //ignore:prefer-match-file-name
-class MockTrackRepository extends Mock
-    implements TrackRepositoryImpl {}
+class MockTrackRepository extends Mock implements TrackRepositoryImpl {}
 
 class Listener<T> extends Mock {
   void call(T? previous, T next);

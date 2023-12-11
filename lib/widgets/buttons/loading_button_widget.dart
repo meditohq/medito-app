@@ -14,6 +14,7 @@ class LoadingButtonWidget extends StatelessWidget {
     this.fontSize = 14,
     this.borderRadius = 15,
   });
+
   final void Function()? onPressed;
   final String btnText;
   final Color bgColor;
@@ -23,6 +24,7 @@ class LoadingButtonWidget extends StatelessWidget {
   final FontWeight fontWeight;
   final double fontSize;
   final double borderRadius;
+
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
