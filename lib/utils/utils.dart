@@ -147,7 +147,6 @@ String getAudioFileExtension(String path) {
 }
 
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
-  try {
     var pixelRatio = MediaQuery.of(context).devicePixelRatio;
     var boundary =
         globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -166,9 +165,6 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
     }
 
     return null;
-  } catch (e) {
-    rethrow;
-  }
 }
 
 double getBottomPadding(BuildContext context) {

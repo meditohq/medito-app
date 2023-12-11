@@ -8,6 +8,7 @@ part 'packs_repository.g.dart';
 
 abstract class PacksRepository {
   Future<List<PackItemsModel>> fetchAllPacks();
+
   Future<PackModel> fetchPacks(String packId);
 }
 
@@ -18,25 +19,17 @@ class PackRepositoryImpl extends PacksRepository {
 
   @override
   Future<List<PackItemsModel>> fetchAllPacks() async {
-    try {
-      var res = await client.getRequest('${HTTPConstants.PACKS}');
-      var tempResponse = res as List;
+    var res = await client.getRequest('${HTTPConstants.PACKS}');
+    var tempResponse = res as List;
 
-      return tempResponse.map((x) => PackItemsModel.fromJson(x)).toList();
-    } catch (e) {
-      rethrow;
-    }
+    return tempResponse.map((x) => PackItemsModel.fromJson(x)).toList();
   }
 
   @override
   Future<PackModel> fetchPacks(String packId) async {
-    try {
-      var res = await client.getRequest('${HTTPConstants.PACKS}/$packId');
+    var res = await client.getRequest('${HTTPConstants.PACKS}/$packId');
 
-      return PackModel.fromJson(res);
-    } catch (e) {
-      rethrow;
-    }
+    return PackModel.fromJson(res);
   }
 }
 
