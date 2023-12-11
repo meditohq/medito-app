@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'stats_provider.g.dart';
 
 @riverpod
-Future<StatsModel> remoteStats(ref) {
+Future<StatsModel> remoteStats(RemoteStatsRef ref) {
   ref.keepAlive();
 
   return ref.watch(statsRepositoryProvider).fetchStatsFromRemote();
