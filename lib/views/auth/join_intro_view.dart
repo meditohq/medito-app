@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 class JoinIntroView extends ConsumerWidget {
   const JoinIntroView({super.key, required this.fromScreen});
+
   final Screen fromScreen;
 
   @override
@@ -40,7 +41,8 @@ class JoinIntroView extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
+                    padding: const EdgeInsets.only(
+                        top: 24, bottom: 16, left: 16, right: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -73,7 +75,8 @@ class JoinIntroView extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top:16, bottom:16, left:16, right: 16),
+            padding:
+                const EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
             child: _bottomButtons(ref, context),
           ),
           SizedBox(
@@ -106,7 +109,7 @@ class JoinIntroView extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
-          height: 48,  // Specify the desired height of the button
+          height: 48, // Specify the desired height of the button
           child: LoadingButtonWidget(
             onPressed: () => _handleMaybeLater(ref, context),
             btnText: StringConstants.maybeLater,
@@ -114,7 +117,7 @@ class JoinIntroView extends ConsumerWidget {
         ),
         width8,
         Container(
-          height: 48,  // Specify the desired height of the button
+          height: 48, // Specify the desired height of the button
           child: LoadingButtonWidget(
             onPressed: () {
               var params = JoinRouteParamsModel(screen: fromScreen);
@@ -131,7 +134,6 @@ class JoinIntroView extends ConsumerWidget {
       ],
     );
   }
-
 
   void _handleMaybeLater(WidgetRef ref, BuildContext context) {
     var auth = ref.read(authProvider);

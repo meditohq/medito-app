@@ -8,6 +8,7 @@ import 'widgets/feedback_widget.dart';
 
 class EndScreenView extends StatelessWidget {
   final List<EndScreenModel> endScreenModel;
+
   const EndScreenView({
     super.key,
     required this.endScreenModel,

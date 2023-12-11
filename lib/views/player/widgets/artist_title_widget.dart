@@ -16,6 +16,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     this.isPlayerScreen = false,
     this.titleHeight = 35,
   });
+
   final String trackTitle;
   final String? artistName, artistUrlPath;
   final double trackTitleFontSize;

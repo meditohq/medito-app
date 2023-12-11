@@ -11,6 +11,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     required this.file,
     super.key,
   });
+
   final TrackModel trackModel;
   final TrackFilesModel file;
 

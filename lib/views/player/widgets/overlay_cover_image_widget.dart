@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class OverlayCoverImageWidget extends StatelessWidget {
   const OverlayCoverImageWidget({super.key, required this.imageUrl});
+
   final String imageUrl;
 
   @override

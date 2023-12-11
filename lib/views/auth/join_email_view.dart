@@ -71,7 +71,8 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
         maintainBottomViewPadding: true,
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),
+          padding:
+              const EdgeInsets.only(top: 16, bottom: 0, left: 16, right: 16),
           child: Form(
             key: _formKey,
             child: Column(
@@ -123,8 +124,9 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     Container(
                       height: 48,
                       child: LoadingButtonWidget(
-                        onPressed:
-                        _emailController.text != '' ? _handleContinue : null,
+                        onPressed: _emailController.text != ''
+                            ? _handleContinue
+                            : null,
                         btnText: StringConstants.continueTxt,
                         bgColor: ColorConstants.walterWhite,
                         textColor: ColorConstants.onyx,
@@ -133,7 +135,6 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     ),
                   ],
                 ),
-
                 SizedBox(
                   height: getBottomPadding(context),
                 ),

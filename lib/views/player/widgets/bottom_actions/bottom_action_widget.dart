@@ -13,6 +13,7 @@ class BottomActionWidget extends StatelessWidget {
     required this.trackModel,
     required this.file,
   });
+
   final TrackModel trackModel;
   final TrackFilesModel file;
 

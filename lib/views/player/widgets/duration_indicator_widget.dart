@@ -13,6 +13,7 @@ class DurationIndicatorWidget extends ConsumerStatefulWidget {
     required this.file,
     required this.trackId,
   });
+
   final TrackFilesModel file;
   final String trackId;
 
@@ -27,6 +28,7 @@ class _DurationIndicatorWidgetState
   double? _dragSeekbarValue;
   double _maxDuration = 0.0;
   bool _draggingSeekbar = false;
+
   @override
   Widget build(BuildContext context) {
     final audioPositionAndPlayerState =

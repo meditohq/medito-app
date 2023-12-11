@@ -11,6 +11,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     required this.trackModel,
     required this.file,
   });
+
   final TrackFilesModel file;
   final TrackModel trackModel;
 
@@ -51,7 +52,6 @@ class PlayerButtonsWidget extends ConsumerWidget {
   }
 
   void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
-
     var audioProvider = ref.read(audioPlayerNotifierProvider);
     final audioPositionAndPlayerState =
         ref.read(audioPositionAndPlayerStateProvider);

@@ -13,8 +13,10 @@ class JoinWelcomeView extends ConsumerWidget {
     required this.email,
     required this.fromScreen,
   });
+
   final Screen fromScreen;
   final String email;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
@@ -38,7 +40,8 @@ class JoinWelcomeView extends ConsumerWidget {
                       fit: BoxFit.cover,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top:24, bottom:16, left:16, right: 16),
+                      padding: const EdgeInsets.only(
+                          top: 24, bottom: 16, left: 16, right: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -70,7 +73,8 @@ class JoinWelcomeView extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
+              padding: const EdgeInsets.only(
+                  top: 16, bottom: 16, left: 16, right: 16),
               child: _bottomButtons(ref, context),
             ),
             SizedBox(
@@ -108,7 +112,5 @@ class JoinWelcomeView extends ConsumerWidget {
         ),
       ],
     );
-
   }
 }
-

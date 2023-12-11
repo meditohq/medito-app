@@ -6,7 +6,6 @@ part 'track_model.g.dart';
 
 @unfreezed
 abstract class TrackModel with _$TrackModel {
-
   const TrackModel._();
 
   factory TrackModel({
