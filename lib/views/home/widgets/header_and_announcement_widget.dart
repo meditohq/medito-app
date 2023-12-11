@@ -18,7 +18,7 @@ class HeaderAndAnnouncementWidget extends ConsumerStatefulWidget {
 class _HeaderAndAnnouncementWidgetState
     extends ConsumerState<HeaderAndAnnouncementWidget>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  bool _isCollapsed = false;
+  bool isCollapsed = false;
   late CurvedAnimation curvedAnimation = CurvedAnimation(
     parent: AnimationController(
       vsync: this,
@@ -29,7 +29,7 @@ class _HeaderAndAnnouncementWidgetState
 
   void _handleCollapse() {
     setState(() {
-      _isCollapsed = !_isCollapsed;
+      isCollapsed = !isCollapsed;
     });
     curvedAnimation = CurvedAnimation(
       parent: AnimationController(
@@ -74,7 +74,7 @@ class _HeaderAndAnnouncementWidgetState
     if (data.announcement != null) {
       return SizeTransition(
         axisAlignment: -1,
-        sizeFactor: _isCollapsed
+        sizeFactor: isCollapsed
             ? Tween<double>(begin: 1.0, end: 0.0).animate(
                 curvedAnimation,
               )

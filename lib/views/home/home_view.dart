@@ -5,7 +5,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vibration/vibration.dart';
 import 'package:Medito/providers/providers.dart';
 
 import 'widgets/quote/quote_widget.dart';
@@ -31,11 +30,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     return Scaffold(
-      floatingActionButton: Listener(
-        onPointerDown: onPointerDown,
-        onPointerUp: onPointerUp,
-        child: _buildFloatingButton(context),
-      ),
+      floatingActionButton: _buildFloatingButton(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
         bottom: false,
@@ -88,26 +83,6 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(fetchQuoteProvider.future);
     ref.invalidate(fetchHomeHeaderProvider);
     await ref.read(fetchHomeHeaderProvider.future);
-  }
-
-  void onPointerUp(_) async {
-    if (await Vibration.hasVibrator() ?? false) {
-      if ((await Vibration.hasAmplitudeControl()) ?? false) {
-        unawaited(Vibration.vibrate(amplitude: 50, duration: 5));
-      } else {
-        unawaited(Vibration.vibrate(duration: 5));
-      }
-    }
-  }
-
-  void onPointerDown(_) async {
-    if (await Vibration.hasVibrator() ?? false) {
-      if ((await Vibration.hasAmplitudeControl()) ?? false) {
-        unawaited(Vibration.vibrate(amplitude: 20, duration: 30));
-      } else {
-        unawaited(Vibration.vibrate(duration: 30));
-      }
-    }
   }
 
   FloatingActionButton _buildFloatingButton(BuildContext context) {
