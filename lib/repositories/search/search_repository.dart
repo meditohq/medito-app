@@ -20,18 +20,18 @@ class SearchRepositoryImpl extends SearchRepository {
     var res = await client
         .postRequest('${HTTPConstants.SEARCH}', data: {'query': '$query'});
     var searchResults = <SearchItemsModel>[];
-    var searhModel = SearchModel();
+    var searchModel = SearchModel();
     if (res is Map) {
-      searhModel = searhModel.copyWith(message: res['message']);
+      searchModel = searchModel.copyWith(message: res['message']);
     } else {
       var list = res as List;
       for (var element in list) {
         searchResults.add(SearchItemsModel.fromJson(element));
       }
-      searhModel = searhModel.copyWith(items: searchResults);
+      searchModel = searchModel.copyWith(items: searchResults);
     }
 
-    return searhModel;
+    return searchModel;
   }
 }
 
