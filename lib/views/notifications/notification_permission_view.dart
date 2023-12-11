@@ -1,13 +1,13 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
-import 'package:Medito/constants/constants.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:app_settings/app_settings.dart';
 
 class NotificationPermissionView extends ConsumerStatefulWidget {
   const NotificationPermissionView({super.key});

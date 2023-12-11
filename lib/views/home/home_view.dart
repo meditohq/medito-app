@@ -1,11 +1,12 @@
 import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Medito/providers/providers.dart';
 
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';

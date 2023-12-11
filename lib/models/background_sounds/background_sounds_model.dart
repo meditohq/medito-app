@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'background_sounds_model.freezed.dart';
 part 'background_sounds_model.g.dart';
 

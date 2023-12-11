@@ -66,7 +66,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       announcement.colorBackground,
     );
 
-    List<Widget> actionWidgets = [
+    var actionWidgets = <Widget>[
       LoadingButtonWidget(
         onPressed: () {
           widget.onPressedDismiss?.call();

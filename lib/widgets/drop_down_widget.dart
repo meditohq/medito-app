@@ -15,6 +15,7 @@ class DropdownWidget<T> extends StatelessWidget {
     this.isDisabled = true,
     this.disabledLabelText = '',
   });
+
   final List<DropdownMenuItem<T>>? items;
   final void Function(T?)? onChanged;
   final T? value;
@@ -25,6 +26,7 @@ class DropdownWidget<T> extends StatelessWidget {
   final double bottomRight;
   final bool isDisabled;
   final String disabledLabelText;
+
   @override
   Widget build(BuildContext context) {
     var radius = BorderRadius.only(

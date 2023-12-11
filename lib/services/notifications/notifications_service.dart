@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
@@ -12,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 late final FirebaseMessaging _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 Future<void> registerNotification() async {
   _messaging = FirebaseMessaging.instance;
   await requestGenerateFirebaseToken();

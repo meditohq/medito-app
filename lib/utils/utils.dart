@@ -15,15 +15,16 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:Medito/constants/constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:ui' as ui;
-import 'package:image/image.dart' as img;
 
 Future<bool> checkConnectivity() async {
   var connectivityResult = await Connectivity().checkConnectivity();
@@ -147,24 +148,24 @@ String getAudioFileExtension(String path) {
 }
 
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
-    var pixelRatio = MediaQuery.of(context).devicePixelRatio;
-    var boundary =
-        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    var image = await boundary.toImage(pixelRatio: pixelRatio);
-    var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    var pngBytes = byteData?.buffer.asUint8List();
+  var pixelRatio = MediaQuery.of(context).devicePixelRatio;
+  var boundary =
+      globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  var image = await boundary.toImage(pixelRatio: pixelRatio);
+  var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  var pngBytes = byteData?.buffer.asUint8List();
 
-    if (pngBytes != null) {
-      var imgImage = img.decodeImage(Uint8List.fromList(pngBytes))!;
-      var exportedPng = img.encodePng(imgImage);
+  if (pngBytes != null) {
+    var imgImage = img.decodeImage(Uint8List.fromList(pngBytes))!;
+    var exportedPng = img.encodePng(imgImage);
 
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/stats.png');
+    final directory = await getTemporaryDirectory();
+    final file = File('${directory.path}/stats.png');
 
-      return await file.writeAsBytes(exportedPng);
-    }
+    return await file.writeAsBytes(exportedPng);
+  }
 
-    return null;
+  return null;
 }
 
 double getBottomPadding(BuildContext context) {

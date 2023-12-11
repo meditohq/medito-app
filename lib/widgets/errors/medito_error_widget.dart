@@ -1,5 +1,5 @@
-import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +18,7 @@ class MeditoErrorWidget extends StatelessWidget {
   final bool isLoading;
   final bool showCheckDownloadText;
   final bool isScaffold;
+
   @override
   Widget build(BuildContext context) {
     var isInvalidToken = message == StringConstants.invalidToken;

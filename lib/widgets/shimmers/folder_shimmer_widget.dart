@@ -1,5 +1,5 @@
-import 'package:Medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:flutter/material.dart';
 
 class FolderShimmerWidget extends StatelessWidget {
@@ -8,7 +8,7 @@ class FolderShimmerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
+
     return SingleChildScrollView(
       child: Column(
         children: [

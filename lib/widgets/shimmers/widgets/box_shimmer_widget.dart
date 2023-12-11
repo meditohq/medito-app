@@ -11,10 +11,12 @@ class BoxShimmerWidget extends StatelessWidget {
     this.child,
     this.borderRadius = 0,
   });
+
   final double? width, height;
   final int delayInMiliSeconds;
   final Widget? child;
   final double borderRadius;
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;

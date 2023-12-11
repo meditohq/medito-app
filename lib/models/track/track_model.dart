@@ -1,11 +1,11 @@
 import 'package:Medito/models/end_screen/end_screen_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'track_model.freezed.dart';
 part 'track_model.g.dart';
 
 @unfreezed
 abstract class TrackModel with _$TrackModel {
-
   const TrackModel._();
 
   factory TrackModel({

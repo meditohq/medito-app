@@ -1,13 +1,15 @@
-import 'package:Medito/constants/strings/string_constants.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:Medito/constants/strings/shared_preference_constants.dart';
+import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'background_sounds_provider.g.dart';
 
 @riverpod

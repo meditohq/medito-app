@@ -11,9 +11,11 @@ class ShareBtnWidget extends StatelessWidget {
     this.shareText,
     this.onPressed,
   });
+
   final GlobalKey globalKey;
   final String? shareText;
   final void Function()? onPressed;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
