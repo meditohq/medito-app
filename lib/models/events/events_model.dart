@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'events_model.freezed.dart';
 part 'events_model.g.dart';
 

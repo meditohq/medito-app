@@ -8,6 +8,7 @@ import 'package:just_audio/just_audio.dart';
 class SoundListTileWidget extends ConsumerWidget {
   const SoundListTileWidget({required this.sound}) : super();
   final BackgroundSoundsModel sound;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);

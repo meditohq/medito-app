@@ -10,13 +10,19 @@ part 'home_repository.g.dart';
 
 abstract class HomeRepository {
   Future<HomeModel> fetchHomeData();
+
   Future<HomeHeaderModel> fetchHomeHeader();
+
   Future<QuoteModel> fetchQuote();
+
   Future<ShortcutsModel> fetchShortcuts();
+
   List<String> getLocalShortcutIds();
+
   ShortcutsModel getSortedShortcuts(
     ShortcutsModel shortcutsModel,
   );
+
   Future<void> setShortcutIdsInPreference(
     List<String> ids,
   );
@@ -25,17 +31,14 @@ abstract class HomeRepository {
 class HomeRepositoryImpl extends HomeRepository {
   final DioApiService client;
   final Ref ref;
+
   HomeRepositoryImpl({required this.ref, required this.client});
 
   @override
   Future<HomeModel> fetchHomeData() async {
-    try {
-      var res = await client.getRequest(HTTPConstants.HOME);
+    var res = await client.getRequest(HTTPConstants.HOME);
 
-      return HomeModel.fromJson(res);
-    } catch (e) {
-      rethrow;
-    }
+    return HomeModel.fromJson(res);
   }
 
   @override

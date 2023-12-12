@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <queries>
         <intent>
@@ -39,10 +39,10 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true"
         android:name="${applicationName}"
-        android:label="Medito">
+        android:icon="@mipmap/ic_launcher"
+        android:label="Medito"
+        android:usesCleartextTraffic="true">
 
         <meta-data
             android:name="ic_audiofileplayer"
@@ -50,13 +50,13 @@
 
         <activity
             android:name="com.ryanheise.audioservice.AudioServiceActivity"
-            android:exported="true"
             android:allowBackup="false"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:exported="true"
+            android:grantUriPermissions="true"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
-            android:grantUriPermissions="true"
             android:windowSoftInputMode="adjustResize">
 
             <meta-data
@@ -64,12 +64,18 @@
                 android:resource="@xml/provider_paths" />
 
             <!-- Deep linking -->
-            <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="true" />
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="medito.app" />
+
+                <data
+                    android:host="medito.app"
+                    android:scheme="http" />
                 <data android:scheme="https" />
             </intent-filter>
 
@@ -105,6 +111,7 @@
             </intent-filter>
 
         </activity>
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/notification_icon_push" />
@@ -112,19 +119,24 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@android:color/transparent" />
 
-        <service android:name="com.ryanheise.audioservice.AudioService"
-            android:exported="true" tools:ignore="Instantiatable">
+        <service
+            android:name="com.ryanheise.audioservice.AudioService"
+            android:exported="true"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
 
-        <receiver android:name="com.ryanheise.audioservice.MediaButtonReceiver"
-            android:exported="true" tools:ignore="Instantiatable">
+        <receiver
+            android:name="com.ryanheise.audioservice.MediaButtonReceiver"
+            android:exported="true"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

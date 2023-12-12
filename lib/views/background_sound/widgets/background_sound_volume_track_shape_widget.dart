@@ -7,6 +7,7 @@ class BackgroundSoundVolumeTrackShapeWidget
     required this.leadingTitle,
     required this.tralingText,
   });
+
   final String tralingText;
   final String leadingTitle;
 

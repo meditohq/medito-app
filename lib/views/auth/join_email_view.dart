@@ -1,11 +1,11 @@
-import 'package:Medito/models/models.dart';
-import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/services/network/api_response.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
+import 'package:Medito/services/network/api_response.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:Medito/utils/validation_utils.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -71,7 +71,8 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
         maintainBottomViewPadding: true,
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),
+          padding:
+              const EdgeInsets.only(top: 16, bottom: 0, left: 16, right: 16),
           child: Form(
             key: _formKey,
             child: Column(
@@ -123,8 +124,9 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     Container(
                       height: 48,
                       child: LoadingButtonWidget(
-                        onPressed:
-                        _emailController.text != '' ? _handleContinue : null,
+                        onPressed: _emailController.text != ''
+                            ? _handleContinue
+                            : null,
                         btnText: StringConstants.continueTxt,
                         bgColor: ColorConstants.walterWhite,
                         textColor: ColorConstants.onyx,
@@ -133,7 +135,6 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                     ),
                   ],
                 ),
-
                 SizedBox(
                   height: getBottomPadding(context),
                 ),

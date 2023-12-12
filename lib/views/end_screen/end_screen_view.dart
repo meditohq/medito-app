@@ -2,11 +2,13 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:flutter/material.dart';
+
 import 'widgets/donation_widget.dart';
 import 'widgets/feedback_widget.dart';
 
 class EndScreenView extends StatelessWidget {
   final List<EndScreenModel> endScreenModel;
+
   const EndScreenView({
     super.key,
     required this.endScreenModel,

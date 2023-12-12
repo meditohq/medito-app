@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'device_and_app_info_model.freezed.dart';
 part 'device_and_app_info_model.g.dart';
 

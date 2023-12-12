@@ -1,5 +1,6 @@
 import 'package:Medito/routes/routes.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'join_route_params_model.freezed.dart';
 part 'join_route_params_model.g.dart';
 

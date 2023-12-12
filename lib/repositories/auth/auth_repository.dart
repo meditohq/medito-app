@@ -14,55 +14,48 @@ part 'auth_repository.g.dart';
 
 abstract class AuthRepository {
   Future<UserTokenModel> generateUserToken();
+
   Future<String> sendOTP(String email);
+
   Future<String> verifyOTP(String email, String OTP);
+
   Future<void> addUserInSharedPreference(UserTokenModel user);
+
   Future<UserTokenModel?> getUserFromSharedPreference();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
   final DioApiService client;
   final Ref ref;
+
   AuthRepositoryImpl({required this.ref, required this.client});
 
   @override
   Future<UserTokenModel> generateUserToken() async {
-    try {
-      var res = await client.postRequest(
-        HTTPConstants.USERS,
-        options: Options(headers: {
-          HttpHeaders.authorizationHeader: HTTPConstants.INIT_TOKEN,
-        }),
-      );
+    var res = await client.postRequest(
+      HTTPConstants.USERS,
+      options: Options(headers: {
+        HttpHeaders.authorizationHeader: HTTPConstants.INIT_TOKEN,
+      }),
+    );
 
-      return UserTokenModel.fromJson(res);
-    } catch (e) {
-      rethrow;
-    }
+    return UserTokenModel.fromJson(res);
   }
 
   @override
   Future<String> sendOTP(String email) async {
-    try {
-      var res = await client
-          .postRequest('${HTTPConstants.OTP}', data: {'email': email});
+    var res = await client
+        .postRequest('${HTTPConstants.OTP}', data: {'email': email});
 
-      return res['success'];
-    } catch (e) {
-      rethrow;
-    }
+    return res['success'];
   }
 
   @override
   Future<String> verifyOTP(String email, String OTP) async {
-    try {
-      var res = await client
-          .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
+    var res = await client
+        .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
 
-      return res['success'];
-    } catch (e) {
-      rethrow;
-    }
+    return res['success'];
   }
 
   @override

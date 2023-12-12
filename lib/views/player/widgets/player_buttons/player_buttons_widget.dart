@@ -2,6 +2,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'play_pause_button_widget.dart';
 
 class PlayerButtonsWidget extends ConsumerWidget {
@@ -10,6 +11,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     required this.trackModel,
     required this.file,
   });
+
   final TrackFilesModel file;
   final TrackModel trackModel;
 
@@ -50,7 +52,6 @@ class PlayerButtonsWidget extends ConsumerWidget {
   }
 
   void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
-
     var audioProvider = ref.read(audioPlayerNotifierProvider);
     final audioPositionAndPlayerState =
         ref.read(audioPositionAndPlayerStateProvider);

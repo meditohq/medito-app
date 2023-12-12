@@ -17,7 +17,7 @@ class ShortcutsWidget extends ConsumerStatefulWidget {
 
 class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
   late ShortcutsModel data;
-  
+
   @override
   void initState() {
     super.initState();

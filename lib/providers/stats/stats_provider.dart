@@ -28,9 +28,11 @@ final postLocalStatsProvider = StateNotifierProvider<PostLocalStatsNotifier,
 class PostLocalStatsNotifier
     extends StateNotifier<AsyncValue<TransferStatsModel?>> {
   Ref ref;
+
   PostLocalStatsNotifier(this.ref) : super(const AsyncValue.loading()) {
     postLocalStats();
   }
+
   Future<void> postLocalStats() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -41,15 +43,12 @@ class PostLocalStatsNotifier
           name: EventTypes.transferStats,
           payload: stats.toJson(),
         );
-        try {
-          await ref
-              .read(eventsProvider(event: event.toJson()).future)
-              .then((_) async {
-            await statsProvider.removeStatsFromPreference();
-          });
-        } catch (e) {
-          rethrow;
-        }
+
+        await ref
+            .read(eventsProvider(event: event.toJson()).future)
+            .then((_) async {
+          await statsProvider.removeStatsFromPreference();
+        });
       }
 
       return stats;

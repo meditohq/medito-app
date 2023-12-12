@@ -2,6 +2,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
 import 'package:flutter/material.dart';
+
 import 'widgets/audio_download_widget.dart';
 import 'widgets/bg_sound_widget.dart';
 import 'widgets/mark_favourite_widget.dart';
@@ -12,6 +13,7 @@ class BottomActionWidget extends StatelessWidget {
     required this.trackModel,
     required this.file,
   });
+
   final TrackModel trackModel;
   final TrackFilesModel file;
 

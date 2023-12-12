@@ -14,41 +14,44 @@ part 'background_sounds_repository.g.dart';
 
 abstract class BackgroundSoundsRepository {
   Future<List<BackgroundSoundsModel>> fetchBackgroundSounds();
+
   Future<List<BackgroundSoundsModel>?> fetchLocallySavedBackgroundSounds();
+
   Future<void> updateItemsInSavedBgSoundList(BackgroundSoundsModel sound);
+
   void handleOnChangeSound(BackgroundSoundsModel sound);
+
   void removeSelectedBgSound();
+
   void handleOnChangeVolume(double vol);
+
   double? getBgSoundVolume();
 }
 
 class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   final DioApiService client;
   final Ref ref;
+
   BackgroundSoundsRepositoryImpl({required this.client, required this.ref});
 
   @override
   Future<List<BackgroundSoundsModel>> fetchBackgroundSounds() async {
-    try {
-      var res = await client.getRequest(HTTPConstants.BACKGROUND_SOUNDS);
-      var tempResponse = res as List;
-      var bgSoundList = <BackgroundSoundsModel>[];
-      const noneBgSound = BackgroundSoundsModel(
-        id: '0',
-        title: StringConstants.none,
-        duration: 0,
-        path: '',
-      );
-      bgSoundList.add(noneBgSound);
-      var parsedResponseList =
-          tempResponse.map((x) => BackgroundSoundsModel.fromJson(x)).toList();
+    var res = await client.getRequest(HTTPConstants.BACKGROUND_SOUNDS);
+    var tempResponse = res as List;
+    var bgSoundList = <BackgroundSoundsModel>[];
+    const noneBgSound = BackgroundSoundsModel(
+      id: '0',
+      title: StringConstants.none,
+      duration: 0,
+      path: '',
+    );
+    bgSoundList.add(noneBgSound);
+    var parsedResponseList =
+        tempResponse.map((x) => BackgroundSoundsModel.fromJson(x)).toList();
 
-      bgSoundList.addAll(parsedResponseList);
+    bgSoundList.addAll(parsedResponseList);
 
-      return bgSoundList;
-    } catch (e) {
-      rethrow;
-    }
+    return bgSoundList;
   }
 
   @override

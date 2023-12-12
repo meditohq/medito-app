@@ -17,25 +17,21 @@ class SearchRepositoryImpl extends SearchRepository {
 
   @override
   Future<SearchModel> fetchSearchResult(String query) async {
-    try {
-      var res = await client
-          .postRequest('${HTTPConstants.SEARCH}', data: {'query': '$query'});
-      var searchResults = <SearchItemsModel>[];
-      var searhModel = SearchModel();
-      if (res is Map) {
-        searhModel = searhModel.copyWith(message: res['message']);
-      } else {
-        var list = res as List;
-        for (var element in list) {
-          searchResults.add(SearchItemsModel.fromJson(element));
-        }
-        searhModel = searhModel.copyWith(items: searchResults);
+    var res = await client
+        .postRequest('${HTTPConstants.SEARCH}', data: {'query': '$query'});
+    var searchResults = <SearchItemsModel>[];
+    var searchModel = SearchModel();
+    if (res is Map) {
+      searchModel = searchModel.copyWith(message: res['message']);
+    } else {
+      var list = res as List;
+      for (var element in list) {
+        searchResults.add(SearchItemsModel.fromJson(element));
       }
-
-      return searhModel;
-    } catch (e) {
-      rethrow;
+      searchModel = searchModel.copyWith(items: searchResults);
     }
+
+    return searchModel;
   }
 }
 
