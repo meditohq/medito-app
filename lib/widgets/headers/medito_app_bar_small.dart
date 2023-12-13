@@ -16,8 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-class MeditoAppBarSmall extends StatelessWidget
-    implements PreferredSizeWidget {
+class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   const MeditoAppBarSmall({
     Key? key,
     this.title,
@@ -44,8 +43,7 @@ class MeditoAppBarSmall extends StatelessWidget
       centerTitle: true,
       actions: actions,
       elevation: 0,
-      backgroundColor:
-          isTransparent ? Colors.transparent : ColorConstants.onyx,
+      backgroundColor: isTransparent ? Colors.transparent : ColorConstants.onyx,
       title: getTitleWidget(context),
     );
   }

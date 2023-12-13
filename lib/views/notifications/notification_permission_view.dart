@@ -1,13 +1,13 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
-import 'package:Medito/constants/constants.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:app_settings/app_settings.dart';
 
 class NotificationPermissionView extends ConsumerStatefulWidget {
   const NotificationPermissionView({super.key});
@@ -80,7 +80,7 @@ class _NotificationPermissionViewState
     Size size,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(defaultPadding),
+      padding: const EdgeInsets.all(padding16),
       child: SafeArea(
         child: status.when(
           skipLoadingOnRefresh: false,
@@ -104,9 +104,9 @@ class _NotificationPermissionViewState
   Padding _buildTitleAndDesc(TextTheme textTheme) {
     const padding = EdgeInsets.only(
       top: 24,
-      bottom: defaultPadding,
-      left: defaultPadding,
-      right: defaultPadding,
+      bottom: padding16,
+      left: padding16,
+      right: padding16,
     );
 
     return Padding(
@@ -139,7 +139,7 @@ class _NotificationPermissionViewState
     );
   }
 
-  TextStyle? _textStyle(TextTheme textTheme){
+  TextStyle? _textStyle(TextTheme textTheme) {
     return textTheme.bodyMedium?.copyWith(
       color: ColorConstants.walterWhite,
       fontFamily: DmSans,
@@ -206,7 +206,7 @@ class _NotificationPermissionViewState
 
   void _handleNotNow() async {
     await ref.read(updateNotificationPermissionCountProvider.future);
-    var notNowCount = ref.read(getNotificationPermissionCountProvider);
+    ref.read(getNotificationPermissionCountProvider);
     context.pop();
   }
 

@@ -11,8 +11,10 @@ class MarkFavouriteWidget extends ConsumerStatefulWidget {
     required this.trackModel,
     required this.file,
   });
+
   final TrackModel trackModel;
   final TrackFilesModel file;
+
   @override
   ConsumerState<MarkFavouriteWidget> createState() =>
       _MarkFavouriteWidgetState();
@@ -20,6 +22,7 @@ class MarkFavouriteWidget extends ConsumerStatefulWidget {
 
 class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
   bool isLiked = false;
+
   @override
   void initState() {
     isLiked = widget.trackModel.isLiked;

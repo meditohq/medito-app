@@ -1,8 +1,9 @@
 import 'dart:math';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/utils/duration_extensions.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/utils/duration_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,6 +13,7 @@ class DurationIndicatorWidget extends ConsumerStatefulWidget {
     required this.file,
     required this.trackId,
   });
+
   final TrackFilesModel file;
   final String trackId;
 
@@ -26,6 +28,7 @@ class _DurationIndicatorWidgetState
   double? _dragSeekbarValue;
   double _maxDuration = 0.0;
   bool _draggingSeekbar = false;
+
   @override
   Widget build(BuildContext context) {
     final audioPositionAndPlayerState =

@@ -29,7 +29,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     var size = MediaQuery.of(context).size;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         width: size.width,
         decoration: BoxDecoration(
@@ -55,10 +55,10 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   }
 
   Row _actionBtn(
-      BuildContext context,
-      WidgetRef ref,
-      AnnouncementModel announcement,
-      ) {
+    BuildContext context,
+    WidgetRef ref,
+    AnnouncementModel announcement,
+  ) {
     var textColor = ColorConstants.getColorFromString(
       announcement.colorText,
     );
@@ -66,7 +66,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       announcement.colorBackground,
     );
 
-    List<Widget> actionWidgets = [
+    var actionWidgets = <Widget>[
       LoadingButtonWidget(
         onPressed: () {
           widget.onPressedDismiss?.call();

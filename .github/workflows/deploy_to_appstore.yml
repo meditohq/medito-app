@@ -1,4 +1,4 @@
-name: Deploy to App Store 
+name: Deploy to App Store
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
         description: 'Choose which lane to run'
         required: true
         default: 'beta'
-        enum: ['beta', 'release']
+        enum: [ 'beta', 'release' ]
   push:
     tags:
       - 'v*'
@@ -25,7 +25,7 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pub-
-            
+
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'save_fcm_token_model.freezed.dart';
 part 'save_fcm_token_model.g.dart';
 

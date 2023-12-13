@@ -1,9 +1,9 @@
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Medito/models/models.dart';
 
 final audioDownloaderProvider =
     ChangeNotifierProvider<AudioDownloaderProvider>((ref) {
@@ -12,9 +12,12 @@ final audioDownloaderProvider =
 
 class AudioDownloaderProvider extends ChangeNotifier {
   ChangeNotifierProviderRef<AudioDownloaderProvider> ref;
+
   AudioDownloaderProvider(this.ref);
+
   Map<String, double> downloadingProgress = {};
   Map<String, AUDIO_DOWNLOAD_STATE> audioDownloadState = {};
+
   Future<void> downloadTrackAudio(
     TrackModel trackModel,
     TrackFilesModel file,

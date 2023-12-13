@@ -7,33 +7,36 @@ import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'track_repository.g.dart';
 
 abstract class TrackRepository {
   Future<TrackModel> fetchTrack(String trackId);
+
   Future<List<TrackModel>> fetchTrackFromPreference();
+
   Future<void> addTrackInPreference(List<TrackModel> trackList);
+
   Future<void> addCurrentlyPlayingTrackInPreference(
     TrackModel trackModel,
   );
+
   Future<void> removeCurrentlyPlayingTrackInPreference();
+
   Future<TrackModel?> fetchCurrentlyPlayingTrackFromPreference();
 }
 
 class TrackRepositoryImpl extends TrackRepository {
   final DioApiService client;
   final Ref ref;
+
   TrackRepositoryImpl({required this.ref, required this.client});
 
   @override
   Future<TrackModel> fetchTrack(String trackId) async {
-    try {
-      var res = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
+    var res = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
 
-      return TrackModel.fromJson(res);
-    } catch (e) {
-      rethrow;
-    }
+    return TrackModel.fromJson(res);
   }
 
   @override

@@ -1,6 +1,6 @@
+import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:Medito/constants/constants.dart';
 
 TextTheme meditoTextTheme(BuildContext context) {
   return Theme.of(context).textTheme.copyWith(

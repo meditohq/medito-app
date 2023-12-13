@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PlayPauseButtonWidget extends ConsumerWidget {
   const PlayPauseButtonWidget({super.key, this.iconSize = 72});
+
   final double iconSize;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(audioPlayerNotifierProvider);

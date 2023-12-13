@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DonationWidget extends ConsumerWidget {
   final EndScreenContentModel donationModel;
+
   const DonationWidget({super.key, required this.donationModel});
 
   @override

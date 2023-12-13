@@ -23,4 +23,5 @@ class SharedPreferenceConstants {
   static const String streakList = 'streakList';
   static const String fakeStreakList = 'fakeStreakList';
   static const String listOfSavedFiles = 'listOfSavedFiles';
+  static const String shortcuts = 'shortcuts';
 }

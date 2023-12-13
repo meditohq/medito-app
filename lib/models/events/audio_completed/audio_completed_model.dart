@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'audio_completed_model.freezed.dart';
 part 'audio_completed_model.g.dart';
 

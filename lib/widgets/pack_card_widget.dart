@@ -10,10 +10,12 @@ class PackCardWidget extends StatelessWidget {
     this.coverUrlPath,
     this.onTap,
   });
+
   final String title;
   final String? subTitle;
   final String? coverUrlPath;
   final void Function()? onTap;
+
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
