@@ -56,7 +56,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
               children: [
                 _renderChild(
                   context,
-                  connectivityStatus as ConnectivityStatus,
+                  connectivityStatus,
                 ),
               ],
             ),

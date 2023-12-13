@@ -1,4 +1,5 @@
 export 'auth/auth_provider.dart';
+export 'auth/initialize_user_provider.dart';
 export 'me/me_provider.dart';
 export 'home/home_provider.dart';
 export 'player/audio_player_provider.dart';
@@ -19,3 +20,4 @@ export 'search/search_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
 export 'notification/notification_provider.dart';
 export 'page_view/bottom_padding_provider.dart';
+export 'events/app_opened_event_provider.dart';

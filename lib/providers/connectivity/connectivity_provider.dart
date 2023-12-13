@@ -1,15 +1,18 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final connectivityStatusProvider = StateNotifierProvider((ref) {
-  return ConnectivityStatusNotifier();
-});
+final connectivityStatusProvider =
+    StateNotifierProvider<ConnectivityStatusNotifier, ConnectivityStatus>(
+  (ref) {
+    return ConnectivityStatusNotifier();
+  },
+);
 
 //ignore: prefer-match-file-name
 enum ConnectivityStatus { NotDetermined, isConnected, isDisonnected }
 
 class ConnectivityStatusNotifier extends StateNotifier<ConnectivityStatus> {
-  ConnectivityStatusNotifier() : super(ConnectivityStatus.isConnected) {
+  ConnectivityStatusNotifier() : super(ConnectivityStatus.NotDetermined) {
     checkConnectivity();
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       _setConnectivityStatus(result);
@@ -22,6 +25,7 @@ class ConnectivityStatusNotifier extends StateNotifier<ConnectivityStatus> {
   }
 
   void _setConnectivityStatus(ConnectivityResult result) {
+    //ignore: missing_enum_constant_in_switch
     switch (result) {
       case ConnectivityResult.mobile:
       case ConnectivityResult.wifi:
