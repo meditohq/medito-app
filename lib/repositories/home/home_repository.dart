@@ -9,8 +9,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'home_repository.g.dart';
 
 abstract class HomeRepository {
-  Future<HomeModel> fetchHomeData();
-
   Future<HomeHeaderModel> fetchHomeHeader();
 
   Future<QuoteModel> fetchQuote();
@@ -33,13 +31,6 @@ class HomeRepositoryImpl extends HomeRepository {
   final Ref ref;
 
   HomeRepositoryImpl({required this.ref, required this.client});
-
-  @override
-  Future<HomeModel> fetchHomeData() async {
-    var res = await client.getRequest(HTTPConstants.HOME);
-
-    return HomeModel.fromJson(res);
-  }
 
   @override
   Future<HomeHeaderModel> fetchHomeHeader() async {

@@ -26,7 +26,12 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   void initializeUser() async {
     try {
-      await ref.read(initializeUserProvider.future);
+      var response = await ref.read(initializeUserProvider.future);
+      if (response) {
+        context.go(RouteConstants.homePath);
+      } else {
+        retryInitializeUser();
+      }
     } catch (e) {
       retryInitializeUser();
     }

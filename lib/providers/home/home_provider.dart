@@ -5,14 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'home_provider.g.dart';
 
 @riverpod
-Future<HomeModel> home(HomeRef ref) {
-  final homeRepository = ref.watch(homeRepositoryProvider);
-  ref.keepAlive();
-
-  return homeRepository.fetchHomeData();
-}
-
-@riverpod
 Future<HomeHeaderModel> fetchHomeHeader(FetchHomeHeaderRef ref) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();

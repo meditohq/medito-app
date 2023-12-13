@@ -25,8 +25,6 @@ class _HomeViewState extends ConsumerState<HomeView>
   Widget build(BuildContext context) {
     super.build(context);
     var connectivityStatus = ref.watch(connectivityStatusProvider);
-    ref.watch(homeProvider);
-    ref.watch(remoteStatsProvider);
     if (connectivityStatus == ConnectivityStatus.isDisonnected) {
       return ConnectivityErrorWidget();
     }
@@ -75,16 +73,14 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
-    ref.invalidate(homeProvider);
-    await ref.read(homeProvider.future);
-    ref.invalidate(remoteStatsProvider);
-    await ref.read(remoteStatsProvider.future);
+    ref.invalidate(fetchHomeHeaderProvider);
+    await ref.read(fetchHomeHeaderProvider.future);
     ref.invalidate(fetchShortcutsProvider);
     await ref.read(fetchShortcutsProvider.future);
     ref.invalidate(fetchQuoteProvider);
     await ref.read(fetchQuoteProvider.future);
-    ref.invalidate(fetchHomeHeaderProvider);
-    await ref.read(fetchHomeHeaderProvider.future);
+    ref.invalidate(remoteStatsProvider);
+    await ref.read(remoteStatsProvider.future);
   }
 
   FloatingActionButton _buildFloatingButton(BuildContext context) {

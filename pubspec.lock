@@ -1089,6 +1089,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
+  reorderable_grid_view:
+    dependency: "direct main"
+    description:
+      name: reorderable_grid_view
+      sha256: e36c6229a97105a10c79e15ab4b9b14ee9f6c488574ff2be9e858c82af47cda6
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.8"
   riverpod:
     dependency: transitive
     description:
