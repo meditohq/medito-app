@@ -15,6 +15,7 @@ class SplashView extends ConsumerStatefulWidget {
 
 class _SplashViewState extends ConsumerState<SplashView> {
   var retryCounter = 0;
+  final maxRetryCount = 2;
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   }
 
   void retryInitializeUser() {
-    if (retryCounter < 2) {
+    if (retryCounter < maxRetryCount) {
       Future.delayed(Duration(seconds: 2), () {
         incrementCounter();
         initializeUser();
