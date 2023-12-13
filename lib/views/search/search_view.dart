@@ -1,6 +1,7 @@
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'widgets/search_appbar_widget.dart';
 import 'widgets/search_initial_page_widget.dart';
 import 'widgets/search_result_widget.dart';

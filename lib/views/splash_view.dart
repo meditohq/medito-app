@@ -1,5 +1,5 @@
-import 'package:Medito/providers/auth/app_initialization_provider.dart';
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/auth/app_initialization_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';

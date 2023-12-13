@@ -42,24 +42,20 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
     required String name,
     void Function(int, int)? onReceiveProgress,
   }) async {
-    try {
-      var file = await getApplicationDocumentsDirectory();
-      var savePath = file.path + '/' + name;
-      var isExists = await File(savePath).exists();
-      if (!isExists) {
-        await client.dio.download(
-          url,
-          savePath,
-          options: Options(headers: {
-            HttpHeaders.acceptEncodingHeader: '*',
-          }),
-          onReceiveProgress: onReceiveProgress,
-        );
-      } else {
-        throw ('File already exists');
-      }
-    } catch (e) {
-      rethrow;
+    var file = await getApplicationDocumentsDirectory();
+    var savePath = file.path + '/' + name;
+    var isExists = await File(savePath).exists();
+    if (!isExists) {
+      await client.dio.download(
+        url,
+        savePath,
+        options: Options(headers: {
+          HttpHeaders.acceptEncodingHeader: '*',
+        }),
+        onReceiveProgress: onReceiveProgress,
+      );
+    } else {
+      throw ('File already exists');
     }
   }
 
@@ -67,16 +63,12 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   Future<void> deleteDownloadedFile(
     String fileName,
   ) async {
-    try {
-      var file = await getApplicationDocumentsDirectory();
-      var savePath = file.path + '/' + fileName;
-      var filePath = File(savePath);
-      var checkIsExists = await filePath.exists();
-      if (checkIsExists) {
-        await filePath.delete();
-      }
-    } catch (e) {
-      rethrow;
+    var file = await getApplicationDocumentsDirectory();
+    var savePath = file.path + '/' + fileName;
+    var filePath = File(savePath);
+    var checkIsExists = await filePath.exists();
+    if (checkIsExists) {
+      await filePath.delete();
     }
   }
 
@@ -112,15 +104,11 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   @override
   Future<String?> getDownloadedFile(String name) async {
     if (kIsWeb) return null;
-    try {
-      var file = await getApplicationDocumentsDirectory();
-      var savePath = file.path + '/' + name;
-      var filePath = File(savePath);
+    var file = await getApplicationDocumentsDirectory();
+    var savePath = file.path + '/' + name;
+    var filePath = File(savePath);
 
-      return await filePath.exists() ? filePath.path : null;
-    } catch (e) {
-      rethrow;
-    }
+    return await filePath.exists() ? filePath.path : null;
   }
 }
 

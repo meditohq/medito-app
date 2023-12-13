@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/events/mark_favourite_track/mark_favourite_track_model.dart';
 import 'package:Medito/models/models.dart';
@@ -6,6 +7,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 part 'track_provider.g.dart';
 
 final trackOpenedFirstTimeProvider = FutureProvider<bool>((ref) async {

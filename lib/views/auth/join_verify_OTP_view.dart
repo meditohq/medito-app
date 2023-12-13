@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:Medito/models/models.dart';
-import 'package:Medito/routes/routes.dart';
-import 'package:Medito/services/notifications/notifications_service.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/services/network/api_response.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
+import 'package:Medito/services/network/api_response.dart';
+import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/utils/validation_utils.dart';
+import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,8 +21,10 @@ class JoinVerifyOTPView extends ConsumerStatefulWidget {
     required this.email,
     required this.fromScreen,
   });
+
   final Screen fromScreen;
   final String email;
+
   @override
   ConsumerState<JoinVerifyOTPView> createState() => _JoinVerifyOTPViewState();
 }
@@ -69,83 +71,84 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
         maintainBottomViewPadding: true,
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.only(top:16, bottom:0, left:16, right: 16),  // Updated padding
+          padding: const EdgeInsets.only(
+              top: 16, bottom: 0, left: 16, right: 16), // Updated padding
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-            Expanded(
-            child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  StringConstants.verifyYourAccount,
-                  style: textTheme.headlineMedium?.copyWith(
-                    color: ColorConstants.walterWhite,
-                    fontFamily: DmSerif,
-                    height: 1.2,
-                    fontSize: 24,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        StringConstants.verifyYourAccount,
+                        style: textTheme.headlineMedium?.copyWith(
+                          color: ColorConstants.walterWhite,
+                          fontFamily: DmSerif,
+                          height: 1.2,
+                          fontSize: 24,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16, bottom: 24),
+                        child: Text(
+                          StringConstants.verifyYourAccountInstruction
+                              .replaceAll('replaceme', widget.email),
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: ColorConstants.walterWhite,
+                            fontFamily: DmSans,
+                            height: 1.4,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      PinCodeTextField(
+                        appContext: context,
+                        controller: _otpTextEditingController,
+                        backgroundColor: Colors.transparent,
+                        keyboardType: TextInputType.number,
+                        pinTheme: PinTheme(
+                          fieldHeight: 56,
+                          fieldWidth: 56,
+                          selectedColor: ColorConstants.onyx,
+                          borderRadius: BorderRadius.circular(5),
+                          borderWidth: 0,
+                          activeFillColor: ColorConstants.onyx,
+                          inactiveFillColor: ColorConstants.onyx,
+                          selectedFillColor: ColorConstants.onyx,
+                          activeColor: ColorConstants.onyx,
+                          inactiveColor: ColorConstants.onyx,
+                          shape: PinCodeFieldShape.box,
+                        ),
+                        textStyle: textTheme.displayMedium?.copyWith(
+                          color: ColorConstants.walterWhite,
+                          fontFamily: DmSerif,
+                          fontSize: 24,
+                        ),
+                        enableActiveFill: true,
+                        autoFocus: true,
+                        animationCurve: Curves.easeIn,
+                        cursorColor: ColorConstants.walterWhite,
+                        length: 6,
+                        validator: ValidationUtils().validateOTP,
+                        onChanged: (String _) => setState(() => {}),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: _ResendCodeWidget(
+                          email: widget.email,
+                        ),
+                      ),
+                      height16,
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 24),
-                  child: Text(
-                    StringConstants.verifyYourAccountInstruction
-                        .replaceAll('replaceme', widget.email),
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: ColorConstants.walterWhite,
-                      fontFamily: DmSans,
-                      height: 1.4,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                PinCodeTextField(
-                  appContext: context,
-                  controller: _otpTextEditingController,
-                  backgroundColor: Colors.transparent,
-                  keyboardType: TextInputType.number,
-                  pinTheme: PinTheme(
-                    fieldHeight: 56,
-                    fieldWidth: 56,
-                    selectedColor: ColorConstants.onyx,
-                    borderRadius: BorderRadius.circular(5),
-                    borderWidth: 0,
-                    activeFillColor: ColorConstants.onyx,
-                    inactiveFillColor: ColorConstants.onyx,
-                    selectedFillColor: ColorConstants.onyx,
-                    activeColor: ColorConstants.onyx,
-                    inactiveColor: ColorConstants.onyx,
-                    shape: PinCodeFieldShape.box,
-                  ),
-                  textStyle: textTheme.displayMedium?.copyWith(
-                    color: ColorConstants.walterWhite,
-                    fontFamily: DmSerif,
-                    fontSize: 24,
-                  ),
-                  enableActiveFill: true,
-                  autoFocus: true,
-                  animationCurve: Curves.easeIn,
-                  cursorColor: ColorConstants.walterWhite,
-                  length: 6,
-                  validator: ValidationUtils().validateOTP,
-                  onChanged: (String _) => setState(() => {}),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: _ResendCodeWidget(
-                    email: widget.email,
-                  ),
-                ),
-                height16,
-              ],
-            ),
-            ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      height: 48,  // Set the height to 48 pixels
+                      height: 48, // Set the height to 48 pixels
                       child: LoadingButtonWidget(
                         onPressed: () => context.pop(),
                         btnText: StringConstants.goBack,
@@ -153,7 +156,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                     ),
                     width8,
                     Container(
-                      height: 48,  // Set the height to 48 pixels
+                      height: 48, // Set the height to 48 pixels
                       child: LoadingButtonWidget(
                         onPressed: _otpTextEditingController.text != ''
                             ? _handleVerify
@@ -166,9 +169,8 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                     ),
                   ],
                 ),
-
                 SizedBox(
-                  height: getBottomPadding(context),  // Added SizedBox
+                  height: getBottomPadding(context), // Added SizedBox
                 ),
               ],
             ),
@@ -181,7 +183,9 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
 
 class _ResendCodeWidget extends ConsumerWidget {
   const _ResendCodeWidget({required this.email});
+
   final String email;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'track_viewed_model.freezed.dart';
 part 'track_viewed_model.g.dart';
 

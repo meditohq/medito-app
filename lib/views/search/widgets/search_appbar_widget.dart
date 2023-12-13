@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 class SearchAppbarWidget extends ConsumerStatefulWidget {
   const SearchAppbarWidget({super.key});
+
   @override
   ConsumerState<SearchAppbarWidget> createState() => _SearchAppbarWidgetState();
 }

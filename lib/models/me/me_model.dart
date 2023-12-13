@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'me_model.freezed.dart';
 part 'me_model.g.dart';
 

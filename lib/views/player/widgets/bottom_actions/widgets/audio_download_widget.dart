@@ -1,9 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Medito/providers/providers.dart';
 
 class AudioDownloadWidget extends ConsumerWidget {
   const AudioDownloadWidget({
@@ -11,6 +11,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     required this.file,
     super.key,
   });
+
   final TrackModel trackModel;
   final TrackFilesModel file;
 

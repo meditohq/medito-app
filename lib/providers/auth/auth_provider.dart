@@ -1,8 +1,8 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/api_response.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:Medito/services/network/api_response.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +19,7 @@ final authProvider = ChangeNotifierProvider<AuthNotifier>(
 //ignore:prefer-match-file-name
 class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this.ref, {required this.authRepository});
+
   final AuthRepository authRepository;
   final Ref ref;
   ApiResponse userRes = ApiResponse.completed(null);

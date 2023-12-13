@@ -11,8 +11,10 @@ class BgSoundWidget extends ConsumerWidget {
     required this.trackModel,
     required this.file,
   });
+
   final TrackModel trackModel;
   final TrackFilesModel file;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedBgSound =

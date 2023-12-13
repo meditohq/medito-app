@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'announcement/announcement_model.dart';
 import 'chips/home_chips_items_model.dart';
 import 'menu/home_menu_model.dart';

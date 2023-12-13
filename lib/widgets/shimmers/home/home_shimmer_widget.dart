@@ -1,7 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/box_shimmer_widget.dart';
+import '../widgets/box_shimmer_widget.dart';
 
 class HomeShimmerWidget extends StatelessWidget {
   const HomeShimmerWidget({super.key});

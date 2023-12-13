@@ -26,10 +26,12 @@ class ApiResponse<T> extends Equatable {
         body = null,
         statusCode = null,
         message = '';
+
   ApiResponse.completed(this.body)
       : status = Status.COMPLETED,
         statusCode = null,
         message = '';
+
   ApiResponse.error(
     String? message,
   )   : status = Status.ERROR,

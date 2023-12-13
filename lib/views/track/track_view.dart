@@ -133,7 +133,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             error: (err, stack) => MeditoErrorWidget(
               message: err.toString(),
               onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
-              hasScaffold: false,
+              isScaffold: false,
             ),
             loading: () => _buildLoadingWidget(),
           ),

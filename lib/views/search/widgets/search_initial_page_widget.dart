@@ -34,21 +34,21 @@ class SearchInitialPageWidget extends ConsumerWidget {
       children: [
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () async => await ref.refresh(fetchAllPacksProvider),
+            onRefresh: () async => ref.refresh(fetchAllPacksProvider),
             child: ListView.builder(
               itemCount: packs.length,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.only(
-                top: 20,
-                left: defaultPadding,
-                right: defaultPadding,
+                top: padding20,
+                left: padding16,
+                right: padding16,
                 bottom: 32,
               ),
               itemBuilder: (context, index) {
                 var element = packs[index];
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: padding16),
                   child: PackCardWidget(
                     title: element.title,
                     subTitle: element.subtitle,

@@ -1,17 +1,19 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Medito/models/models.dart';
 
 part 'stats_repository.g.dart';
 
 abstract class StatsRepository {
   Future<StatsModel> fetchStatsFromRemote();
+
   Future<TransferStatsModel?> fetchStatsFromPreference();
+
   Future<void> removeStatsFromPreference();
 }
 
@@ -22,13 +24,9 @@ class StatsRepositoryImpl extends StatsRepository {
 
   @override
   Future<StatsModel> fetchStatsFromRemote() async {
-    try {
-      var res = await client.getRequest(HTTPConstants.STATS);
+    var res = await client.getRequest(HTTPConstants.STATS);
 
-      return StatsModel.fromJson(res);
-    } catch (e) {
-      rethrow;
-    }
+    return StatsModel.fromJson(res);
   }
 
   @override
