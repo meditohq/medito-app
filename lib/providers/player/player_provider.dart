@@ -20,8 +20,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     required TrackFilesModel file,
   }) async {
     var track = trackModel.customCopyWith();
+    var audios = [...track.audio];
 
-    track.audio.forEach((audioModel) {
+    audios.forEach((audioModel) {
       var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
       if (fileIndex != -1) {
         track.audio.removeWhere((e) => e.guideName != audioModel.guideName);

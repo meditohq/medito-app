@@ -39,14 +39,14 @@ class _TrackViewState extends ConsumerState<TrackView>
     with AutomaticKeepAliveClientMixin<TrackView> {
   TrackAudioModel? selectedAudio;
   TrackFilesModel? selectedDuration;
-  final ScrollController _scrollController = ScrollController();
-  bool _showCloseButton = false;
+  final ScrollController scrollController = ScrollController();
+  bool showCloseButton = false;
   final GlobalKey childKey = GlobalKey();
 
   @override
   void initState() {
     _handleTrackEvent(ref, widget.id);
-    _scrollController.addListener(() {
+    scrollController.addListener(() {
       _optionallyShowOrHideCloseButton();
     });
     super.initState();
@@ -58,7 +58,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     var screenHeight = MediaQuery.of(childKey.currentContext!).size.height;
 
     setState(() {
-      _showCloseButton = size > screenHeight;
+      showCloseButton = size > screenHeight;
     });
   }
 
@@ -123,7 +123,7 @@ class _TrackViewState extends ConsumerState<TrackView>
         }
       },
       child: SingleChildScrollView(
-        controller: _scrollController,
+        controller: scrollController,
         child: Container(
           key: childKey,
           padding: EdgeInsets.only(bottom: getBottomPadding(context)),
@@ -200,7 +200,7 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   Widget _closeButton(BuildContext context) {
     return Visibility(
-      visible: _showCloseButton,
+      visible: showCloseButton,
       child: Container(
         width: double.infinity,
         child: SizedBox(
@@ -254,7 +254,7 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   DropdownWidget<TrackFilesModel> _durationDropdown(TrackModel trackModel) {
     var audioFiles = trackModel.audio.first.files;
-    var _selectedFile = selectedAudio?.files;
+    var selectedFile = selectedAudio?.files;
 
     return DropdownWidget<TrackFilesModel>(
       value: selectedDuration ?? audioFiles.first,
@@ -263,16 +263,16 @@ class _TrackViewState extends ConsumerState<TrackView>
       topRight: 7,
       bottomRight: 7,
       bottomLeft: 7,
-      isDisabled: audioFiles.length > 1,
+      isDisabled: (selectedFile ?? audioFiles).length > 1,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} mins',
-      items: files(_selectedFile ?? audioFiles)
+          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
+      items: files(selectedFile ?? audioFiles)
           .map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,
             child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} mins',
+              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.mins}',
             ),
           );
         },
