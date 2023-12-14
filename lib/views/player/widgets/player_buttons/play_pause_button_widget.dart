@@ -12,40 +12,42 @@ class PlayPauseButtonWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(audioPlayerNotifierProvider);
 
-    return StreamBuilder<bool>(
-      stream: provider.playbackState.map((state) => state.playing).distinct(),
-      builder: (context, snapshot) {
-        final playing = snapshot.data ?? false;
+    // return StreamBuilder<bool>(
+    //   stream: provider.playbackState.map((state) => state.playing).distinct(),
+    //   builder: (context, snapshot) {
+    //     final playing = snapshot.data ?? false;
+    //
+    //     return InkWell(
+    //       // onTap: () => _handleTap(ref, playing),
+    //       borderRadius: BorderRadius.circular(iconSize / 2),
+    //       child: AnimatedCrossFade(
+    //         firstChild: Icon(
+    //           Icons.play_circle_fill,
+    //           size: iconSize,
+    //           color: ColorConstants.walterWhite,
+    //         ),
+    //         secondChild: Icon(
+    //           Icons.pause_circle_outlined,
+    //           size: iconSize,
+    //           color: ColorConstants.walterWhite,
+    //         ),
+    //         crossFadeState:
+    //             playing ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+    //         duration: Duration(milliseconds: 500),
+    //       ),
+    //     );
+    //   },
+    // );
 
-        return InkWell(
-          onTap: () => _handleTap(ref, playing),
-          borderRadius: BorderRadius.circular(iconSize / 2),
-          child: AnimatedCrossFade(
-            firstChild: Icon(
-              Icons.play_circle_fill,
-              size: iconSize,
-              color: ColorConstants.walterWhite,
-            ),
-            secondChild: Icon(
-              Icons.pause_circle_outlined,
-              size: iconSize,
-              color: ColorConstants.walterWhite,
-            ),
-            crossFadeState:
-                playing ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-            duration: Duration(milliseconds: 500),
-          ),
-        );
-      },
-    );
+    return Container();
   }
 
-  void _handleTap(WidgetRef ref, bool isPlaying) {
-    final provider = ref.read(audioPlayerNotifierProvider);
-    if (isPlaying) {
-      provider.pause();
-    } else {
-      provider.play();
-    }
-  }
+  // void _handleTap(WidgetRef ref, bool isPlaying) {
+  //   final provider = ref.read(audioPlayerNotifierProvider);
+  //   if (isPlaying) {
+  //     provider.pause();
+  //   } else {
+  //     provider.play();
+  //   }
+  // }
 }

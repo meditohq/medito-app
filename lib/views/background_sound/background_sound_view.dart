@@ -31,134 +31,140 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void deactivate() {
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.trackAudioPlayer.playerState.playing) {
-      _audioPlayerNotifier.stopBackgroundSound();
-    }
+    // if (!_audioPlayerNotifier.trackAudioPlayer.playerState.playing) {
+    //   _audioPlayerNotifier.stopBackgroundSound();
+    // }
     super.deactivate();
   }
 
   void setInitStateValues() {
     final _provider = ref.read(backgroundSoundsNotifierProvider);
     final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
-      _provider.getBackgroundSoundFromPref();
-      if (_provider.selectedBgSound != null &&
-          _provider.selectedBgSound?.title != StringConstants.none) {
-        _audioPlayerNotifier.setBackgroundAudio(
-          _provider.selectedBgSound!,
-        );
-        _audioPlayerNotifier.playBackgroundSound();
-      }
-
-      _provider.getVolumeFromPref();
-      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
+    // if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
+    //   _provider.getBackgroundSoundFromPref();
+    //   if (_provider.selectedBgSound != null &&
+    //       _provider.selectedBgSound?.title != StringConstants.none) {
+    //     _audioPlayerNotifier.setBackgroundAudio(
+    //       _provider.selectedBgSound!,
+    //     );
+    //     _audioPlayerNotifier.playBackgroundSound();
+    //   }
+    //
+    //   _provider.getVolumeFromPref();
+      // _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
     }
-  }
-
-  void _scrollListener() {
-    setState(() => {});
-  }
 
   @override
   Widget build(BuildContext context) {
-    var connectivityStatus =
-        ref.watch(connectivityStatusProvider) as ConnectivityStatus;
-
-    ref.listen(connectivityStatusProvider, (prev, next) {
-      var state = next as ConnectivityStatus;
-      if (state == ConnectivityStatus.isDisonnected) {
-        showSnackBar(context, StringConstants.connectivityError);
-      }
-    });
-    var localBackgroundSounds =
-        ref.watch(fetchLocallySavedBackgroundSoundsProvider);
-    var backgroundSounds = ref.watch(backgroundSoundsProvider);
-
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
-      return Scaffold(
-        body: localBackgroundSounds.when(
-          skipLoadingOnRefresh: true,
-          skipLoadingOnReload: true,
-          data: (data) {
-            if (data != null) {
-              return _mainContent(
-                connectivityStatus,
-                data,
-              );
-            }
-
-            return MeditoErrorWidget(
-              message: StringConstants.noBgSoundAvailable,
-              onTap: () => ref.refresh(backgroundSoundsProvider),
-            );
-          },
-          error: (err, stack) {
-            return MeditoErrorWidget(
-              message: err.toString(),
-              onTap: () =>
-                  ref.refresh(fetchLocallySavedBackgroundSoundsProvider),
-            );
-          },
-          loading: () => BackgroundSoundsShimmerWidget(),
-        ),
-      );
-    }
-
-    return Scaffold(
-      body: backgroundSounds.when(
-        skipLoadingOnRefresh: false,
-        data: (data) => _mainContent(
-          connectivityStatus,
-          data,
-        ),
-        error: (err, stack) {
-          return MeditoErrorWidget(
-            message: err.toString(),
-            onTap: () => ref.refresh(backgroundSoundsProvider),
-          );
-        },
-        loading: () => BackgroundSoundsShimmerWidget(),
-      ),
-    );
+    // TODO: implement build
+    return Container();
   }
 
-  RefreshIndicator _mainContent(
-    ConnectivityStatus status,
-    List<BackgroundSoundsModel> data,
-  ) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        if (status == ConnectivityStatus.isDisonnected) {
-          return;
-        } else {
-          ref.invalidate(backgroundSoundsProvider);
-          ref.read(backgroundSoundsProvider);
-        }
-      },
-      child: CustomScrollView(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          MeditoAppBarLarge(
-            scrollController: _scrollController,
-            title: StringConstants.backgroundSounds,
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              VolumeSliderWidget(),
-              Column(
-                children: data
-                    .map((e) => SoundListTileWidget(
-                          sound: e,
-                        ))
-                    .toList(),
-              ),
-              height16,
-              height16,
-            ]),
-          ),
-        ],
-      ),
-    );
+  void _scrollListener() {
+    // setState(() => {});
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+    // var connectivityStatus =
+    //     ref.watch(connectivityStatusProvider) as ConnectivityStatus;
+    //
+    // ref.listen(connectivityStatusProvider, (prev, next) {
+    //   var state = next as ConnectivityStatus;
+    //   if (state == ConnectivityStatus.isDisonnected) {
+    //     showSnackBar(context, StringConstants.connectivityError);
+    //   }
+    // });
+    // var localBackgroundSounds =
+    //     ref.watch(fetchLocallySavedBackgroundSoundsProvider);
+    // var backgroundSounds = ref.watch(backgroundSoundsProvider);
+    //
+    // if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+    //   return Scaffold(
+    //     body: localBackgroundSounds.when(
+    //       skipLoadingOnRefresh: true,
+    //       skipLoadingOnReload: true,
+    //       data: (data) {
+    //         if (data != null) {
+    //           return _mainContent(
+    //             connectivityStatus,
+    //             data,
+    //           );
+    //         }
+    //
+    //         return MeditoErrorWidget(
+    //           message: StringConstants.noBgSoundAvailable,
+    //           onTap: () => ref.refresh(backgroundSoundsProvider),
+    //         );
+    //       },
+    //       error: (err, stack) {
+    //         return MeditoErrorWidget(
+    //           message: err.toString(),
+    //           onTap: () =>
+    //               ref.refresh(fetchLocallySavedBackgroundSoundsProvider),
+    //         );
+    //       },
+    //       loading: () => BackgroundSoundsShimmerWidget(),
+    //     ),
+    //   );
+
+    // return Container();
+
+    // return Scaffold(
+    //   body: backgroundSounds.when(
+    //     skipLoadingOnRefresh: false,
+    //     data: (data) => _mainContent(
+    //       connectivityStatus,
+    //       data,
+    //     ),
+    //     error: (err, stack) {
+    //       return MeditoErrorWidget(
+    //         message: err.toString(),
+    //         onTap: () => ref.refresh(backgroundSoundsProvider),
+    //       );
+    //     },
+    //     loading: () => BackgroundSoundsShimmerWidget(),
+    //   ),
+    // );
+  // }
+  //
+  // RefreshIndicator _mainContent(
+  //   ConnectivityStatus status,
+  //   List<BackgroundSoundsModel> data,
+  // ) {
+  //   return RefreshIndicator(
+  //     onRefresh: () async {
+  //       if (status == ConnectivityStatus.isDisonnected) {
+  //         return;
+  //       } else {
+  //         ref.invalidate(backgroundSoundsProvider);
+  //         ref.read(backgroundSoundsProvider);
+  //       }
+  //     },
+  //     child: CustomScrollView(
+  //       controller: _scrollController,
+  //       physics: const AlwaysScrollableScrollPhysics(),
+  //       slivers: [
+  //         MeditoAppBarLarge(
+  //           scrollController: _scrollController,
+  //           title: StringConstants.backgroundSounds,
+  //         ),
+  //         SliverList(
+  //           delegate: SliverChildListDelegate([
+  //             VolumeSliderWidget(),
+  //             Column(
+  //               children: data
+  //                   .map((e) => SoundListTileWidget(
+  //                         sound: e,
+  //                       ))
+  //                   .toList(),
+  //             ),
+  //             height16,
+  //             height16,
+  //           ]),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

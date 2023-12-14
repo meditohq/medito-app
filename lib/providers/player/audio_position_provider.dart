@@ -30,27 +30,24 @@ void skipAudio(
       break;
   }
 }
-
-final audioPositionAndPlayerStateProvider =
-    StreamProvider<PositionAndPlayerStateState>((ref) {
-  final audioPlayer = ref.watch(audioPlayerNotifierProvider);
-
-  return Rx.combineLatest3<Duration, Duration?, PlayerState,
-      PositionAndPlayerStateState>(
-    audioPlayer.trackAudioPlayer.positionStream,
-    audioPlayer.trackAudioPlayer.durationStream,
-    audioPlayer.trackAudioPlayer.playerStateStream,
-    (position, duration, playerState) =>
-        PositionAndPlayerStateState(playerState, duration, position),
-  );
-});
-
-final audioPlaybackStreamProvider = StreamProvider<ProcessingState>((ref) {
-  final audioPlayer = ref.watch(audioPlayerNotifierProvider);
-
-  return audioPlayer.trackAudioPlayer.playbackEventStream
-      .map((event) => event.processingState);
-});
+//
+// final audioPositionAndPlayerStateProvider =
+//     StreamProvider<PositionAndPlayerStateState>((ref) {
+//   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+//
+//   return Rx.combineLatest3<Duration, Duration?, PlayerState,
+//       PositionAndPlayerStateState>(
+//     (position, duration, playerState) =>
+//         PositionAndPlayerStateState(playerState, duration, position),
+//   );
+// });
+//
+// final audioPlaybackStreamProvider = StreamProvider<ProcessingState>((ref) {
+//   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
+//
+//   // return audioPlayer.trackAudioPlayer.playbackEventStream
+//   //     .map((event) => event.processingState);
+// });
 
 //ignore: prefer-match-file-name
 enum SKIP_AUDIO { SKIP_FORWARD_10, SKIP_BACKWARD_10 }

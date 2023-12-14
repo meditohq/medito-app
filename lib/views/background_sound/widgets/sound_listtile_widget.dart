@@ -18,10 +18,10 @@ class SoundListTileWidget extends ConsumerWidget {
     var isSelected = id == sound.id;
 
     return InkWell(
-      onTap: () => _handleItemTap(
-        bgSoundNotifierProvider,
-        audioPlayerNotifier,
-      ),
+      // onTap: () => _handleItemTap(
+      //   bgSoundNotifierProvider
+      //   // audioPlayerNotifier,
+      // ),
       child: Container(
         decoration: BoxDecoration(
           border: Border(

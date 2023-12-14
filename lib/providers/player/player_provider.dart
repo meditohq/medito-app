@@ -4,6 +4,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final playerProvider =
@@ -15,38 +16,47 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   PlayerProvider(this.ref) : super(null);
   Ref ref;
 
+  static const platform = MethodChannel('meditofoundation.medito/audioplayer');
+
   Future<void> loadSelectedTrack({
     required TrackModel trackModel,
     required TrackFilesModel file,
   }) async {
     var track = trackModel.customCopyWith();
 
-    track.audio.forEach((audioModel) {
-      var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
-      if (fileIndex != -1) {
-        track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
-        track.audio.first.files
-            .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
+    try {
+      await platform.invokeMethod('playAudio', {'url': file.path});
+    } on PlatformException catch (e) {
+      print("Failed to play audio: '${e.message}'.");
+    }
 
-        return;
-      }
-    });
 
-    final audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-
-    state = track;
-    _optionallyLoadBackgroundSound(
-      ref,
-      audioPlayerNotifier,
-      track,
-      track.audio.first.files.first,
-    );
-    await _playTrack(
-      ref,
-      audioPlayerNotifier,
-      track,
-      file,
-    );
+    // track.audio.forEach((audioModel) {
+    //   var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
+    //   if (fileIndex != -1) {
+    //     track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
+    //     track.audio.first.files
+    //         .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
+    //
+    //     return;
+    //   }
+    // });
+    //
+    // final audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
+    //
+    // state = track;
+    // _optionallyLoadBackgroundSound(
+    //   ref,
+    //   audioPlayerNotifier,
+    //   track,
+    //   track.audio.first.files.first,
+    // );
+    // await _playTrack(
+    //   ref,
+    //   audioPlayerNotifier,
+    //   track,
+    //   file,
+    // );
   }
 
   void _optionallyLoadBackgroundSound(
@@ -77,13 +87,13 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
           _constructFileName(trackModel, file),
         );
     var filePath = await checkDownloadedFile;
-    audioPlayerNotifier.setTrackAudio(
+    await audioPlayerNotifier.setTrackAudio(
       trackModel,
       file,
       filePath: filePath,
     );
-    audioPlayerNotifier.currentlyPlayingTrack = file;
-    unawaited(audioPlayerNotifier.play());
+    // audioPlayerNotifier.currentlyPlayingTrack = file;
+    // unawaited(audioPlayerNotifier.play());
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>

@@ -14,13 +14,13 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
   @override
   void initState() {
     super.initState();
-    final _provider = ref.read(audioSpeedProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _provider.getAudioTrackSpeedFromPref();
-      ref
-          .read(audioPlayerNotifierProvider)
-          .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-    });
+    // final _provider = ref.read(audioSpeedProvider);
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _provider.getAudioTrackSpeedFromPref();
+    //   ref
+    //       .read(audioPlayerNotifierProvider)
+    //       .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
+    // });
   }
 
   @override
@@ -32,12 +32,12 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
         : ColorConstants.walterWhite;
 
     return GestureDetector(
-      onTap: () {
-        _provider.setAudioTrackSpeed();
-        ref
-            .read(audioPlayerNotifierProvider)
-            .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-      },
+      // onTap: () {
+      //   _provider.setAudioTrackSpeed();
+      //   ref
+      //       .read(audioPlayerNotifierProvider)
+      //       .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
+      // },
       child: Text(
         audioSpeedModel.label,
         style: Theme.of(context)

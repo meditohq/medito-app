@@ -52,19 +52,19 @@ class PlayerButtonsWidget extends ConsumerWidget {
   }
 
   void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
-    var audioProvider = ref.read(audioPlayerNotifierProvider);
-    final audioPositionAndPlayerState =
-        ref.read(audioPositionAndPlayerStateProvider);
+    // var audioProvider = ref.read(audioPlayerNotifierProvider);
+    // final audioPositionAndPlayerState =
+    //     ref.read(audioPositionAndPlayerStateProvider);
 
-    var maxDuration = audioProvider.mediaItem.value?.duration ?? Duration();
-
-    ref.read(
-      skipAudioProvider(skip: skip),
-    );
-
-    audioProvider.handleFadeAtEnd(
-      audioPositionAndPlayerState.value?.position ?? Duration(),
-      maxDuration,
-    );
+    // var maxDuration = audioProvider.mediaItem.value?.duration ?? Duration();
+    //
+    // ref.read(
+    //   skipAudioProvider(skip: skip),
+    // );
+    //
+    // audioProvider.handleFadeAtEnd(
+    //   audioPositionAndPlayerState.value?.position ?? Duration(),
+    //   maxDuration,
+    // );
   }
 }

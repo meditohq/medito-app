@@ -32,7 +32,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'services/notifications/notifications_service.dart';
 
-late AudioPlayerNotifier audioHandler;
+// late AudioPlayerNotifier audioHandler;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +53,7 @@ Future<void> main() async {
     },
   );
 
-  audioHandler = await initAudioService();
+  // audioHandler = await initAudioService();
 
   usePathUrlStrategy();
 
@@ -115,10 +115,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       unawaited(updateStatsFromBg(ref));
     } else if (state == AppLifecycleState.detached) {
       final audioProvider = ref.read(audioPlayerNotifierProvider);
-      audioProvider.stop();
-      audioProvider.trackAudioPlayer.dispose();
-      audioProvider.backgroundSoundAudioPlayer.dispose();
-      audioProvider.dispose();
+      // audioProvider.stop();
+      // audioProvider.trackAudioPlayer.dispose();
+      // audioProvider.backgroundSoundAudioPlayer.dispose();
+      // audioProvider.dispose();
     }
     currentState = state;
   }
@@ -127,9 +127,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    audioProvider.trackAudioPlayer.dispose();
-    audioProvider.backgroundSoundAudioPlayer.dispose();
-    audioProvider.dispose();
+    // audioProvider.trackAudioPlayer.dispose();
+    // audioProvider.backgroundSoundAudioPlayer.dispose();
+    // audioProvider.dispose();
     super.dispose();
   }
 

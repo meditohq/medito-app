@@ -31,31 +31,33 @@ class _DurationIndicatorWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final audioPositionAndPlayerState =
-        ref.watch(audioPositionAndPlayerStateProvider);
+    // final audioPositionAndPlayerState =
+    //     ref.watch(audioPositionAndPlayerStateProvider);
     final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
 
     _maxDuration = widget.file.duration.toDouble();
 
-    return audioPositionAndPlayerState.when(
-      data: (data) {
-        final value = min(
-          _dragSeekbarValue ?? data.position.inMilliseconds,
-          _maxDuration,
-        );
-        if (_dragSeekbarValue != null && !_draggingSeekbar) {
-          _dragSeekbarValue = null;
-        }
-        audioPlayerNotifier.handleFadeAtEnd(
-          data.position,
-          Duration(milliseconds: _maxDuration.round()),
-        );
+    return Container();
 
-        return _durationBar(context, ref, value, data);
-      },
-      error: (error, stackTrace) => SizedBox(),
-      loading: () => SizedBox(),
-    );
+    // return audioPositionAndPlayerState.when(
+    //   data: (data) {
+    //     // final value = min(
+    //     //   _dragSeekbarValue ?? data.position.inMilliseconds,
+    //     //   _maxDuration,
+    //     // );
+    //     if (_dragSeekbarValue != null && !_draggingSeekbar) {
+    //       _dragSeekbarValue = null;
+    //     }
+    //     // audioPlayerNotifier.handleFadeAtEnd(
+    //     //   data.position,
+    //     //   Duration(milliseconds: _maxDuration.round()),
+    //     // );
+    //
+    //     return _durationBar(context, ref, 0, data);
+    //   },
+    //   error: (error, stackTrace) => SizedBox(),
+    //   loading: () => SizedBox(),
+    // );
   }
 
   void onChangeEnd(
@@ -67,10 +69,10 @@ class _DurationIndicatorWidgetState
       duration: val.round(),
     ));
     _draggingSeekbar = false;
-    ref.read(audioPlayerNotifierProvider).handleFadeAtEnd(
-          data.position,
-          Duration(milliseconds: _maxDuration.round()),
-        );
+    // ref.read(audioPlayerNotifierProvider).handleFadeAtEnd(
+    //       data.position,
+    //       Duration(milliseconds: _maxDuration.round()),
+    //     );
   }
 
   Padding _durationBar(

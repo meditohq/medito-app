@@ -148,7 +148,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     TrackModel trackModel,
   ) async {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    await audioProvider.stop();
+    // await audioProvider.stop();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,

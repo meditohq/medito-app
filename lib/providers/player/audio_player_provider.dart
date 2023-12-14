@@ -6,14 +6,15 @@ import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 final audioPlayerNotifierProvider =
-    ChangeNotifierProvider<AudioPlayerNotifier>((ref) {
-  return audioHandler;
+    ChangeNotifierProvider<AudioPlayerNotifier?>((ref) {
+  return null;
 });
 
 //ignore:prefer-match-file-name
@@ -98,25 +99,34 @@ class AudioPlayerNotifier extends BaseAudioHandler
     });
   }
 
-  void setTrackAudio(
+  Future<void> setTrackAudio(
     TrackModel trackModel,
     TrackFilesModel file, {
     String? filePath,
-  }) {
-    try {
-      if (filePath != null) {
-        unawaited(trackAudioPlayer.setFilePath(filePath));
-        setMediaItem(trackModel, file, filePath: filePath);
-      } else {
-        setMediaItem(trackModel, file);
-        trackAudioPlayer.setUrl(file.path);
+  }) async {
+
+    var platform = MethodChannel('meditofoundation.medito/audioplayer');
+
+      try {
+        await platform.invokeMethod('playAudio', {'url': filePath});
+      } on PlatformException catch (e) {
+        print("Failed to play audio: '${e.message}'.");
       }
-    } catch (e) {
-      unawaited(Sentry.captureException(
-        e,
-        stackTrace: e,
-      ));
-    }
+
+    // try {
+    //   if (filePath != null) {
+    //     unawaited(trackAudioPlayer.setFilePath(filePath));
+    //     setMediaItem(trackModel, file, filePath: filePath);
+    //   } else {
+    //     setMediaItem(trackModel, file);
+    //     trackAudioPlayer.setUrl(file.path);
+    //   }
+    // } catch (e) {
+    //   unawaited(Sentry.captureException(
+    //     e,
+    //     stackTrace: e,
+    //   ));
+    // }
   }
 
   void playBackgroundSound() {

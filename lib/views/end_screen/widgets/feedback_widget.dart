@@ -19,32 +19,32 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
 
   void _handleFeedbackPress(String feedback) async {
     final audioProvider = ref.read(audioPlayerNotifierProvider);
-    var extras = audioProvider.mediaItem.value?.extras;
+    // var extras = audioProvider.mediaItem.value?.extras;
 
     setState(() {
       isLoading = true;
     });
-    var payload = FeedbackTappedModel(
-      trackId: extras?[TypeConstants.trackIdKey] ?? '',
-      audioFileId: extras?[TypeConstants.fileIdKey] ?? '',
-      emoji: feedback,
-    );
-    var event = EventsModel(
-      name: EventTypes.trackFeedback,
-      payload: payload.toJson(),
-    );
-    try {
-      await ref.read(eventsProvider(event: event.toJson()).future);
-      setState(() {
-        isLoading = false;
-        isFeedbackAdded = true;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        isFeedbackAdded = false;
-      });
-    }
+    // var payload = FeedbackTappedModel(
+    //   trackId: extras?[TypeConstants.trackIdKey] ?? '',
+    //   audioFileId: extras?[TypeConstants.fileIdKey] ?? '',
+    //   emoji: feedback,
+    // );
+    // var event = EventsModel(
+    //   name: EventTypes.trackFeedback,
+    //   payload: payload.toJson(),
+    // );
+    // try {
+    //   await ref.read(eventsProvider(event: event.toJson()).future);
+    //   setState(() {
+    //     isLoading = false;
+    //     isFeedbackAdded = true;
+    //   });
+    // } catch (e) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isFeedbackAdded = false;
+    //   });
+    // }
   }
 
   @override

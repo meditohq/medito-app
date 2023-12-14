@@ -33,7 +33,7 @@ class VolumeSliderWidget extends ConsumerWidget {
         inactiveColor: ColorConstants.greyIsTheNewGrey,
         onChanged: (double newValue) {
           bgSoundNotifierProvider.handleOnChangeVolume(newValue);
-          audioPlayerNotifier.setBackgroundSoundVolume(newValue);
+          // audioPlayerNotifier.setBackgroundSoundVolume(newValue);
         },
         semanticFormatterCallback: (double newValue) {
           return '${newValue.round()} ';
