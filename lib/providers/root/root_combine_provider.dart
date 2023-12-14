@@ -54,7 +54,8 @@ void _handleAudioCompletion(Ref ref, BuildContext context) {
 }
 
 void _handleUserNotSignedIn(Ref ref, BuildContext context) {
-  var _user = ref.read(authProvider.notifier).userRes.body as UserTokenModel;
+  var _user =
+      ref.read(authProvider.notifier).userResponse.body as UserTokenModel;
   if (_user.email == null) {
     var params = JoinRouteParamsModel(screen: Screen.track);
     context.push(

@@ -9,7 +9,7 @@ final connectivityStatusProvider =
 );
 
 //ignore: prefer-match-file-name
-enum ConnectivityStatus { NotDetermined, isConnected, isDisonnected }
+enum ConnectivityStatus { NotDetermined, isConnected, isDisconnected }
 
 class ConnectivityStatusNotifier extends StateNotifier<ConnectivityStatus> {
   ConnectivityStatusNotifier() : super(ConnectivityStatus.NotDetermined) {
@@ -32,7 +32,7 @@ class ConnectivityStatusNotifier extends StateNotifier<ConnectivityStatus> {
         state = ConnectivityStatus.isConnected;
         break;
       case ConnectivityResult.none:
-        state = ConnectivityStatus.isDisonnected;
+        state = ConnectivityStatus.isDisconnected;
         break;
     }
   }

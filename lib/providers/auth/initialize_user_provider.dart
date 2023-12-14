@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final initializeUserProvider = FutureProvider<bool>((ref) async {
   var auth = ref.read(authProvider);
   await auth.initializeUser();
-  var response = auth.userRes;
+  var response = auth.userResponse;
   if (response.body != null) {
     await ref.read(assignDioHeadersProvider.future);
     await ref.read(appOpenedEventProvider.future);

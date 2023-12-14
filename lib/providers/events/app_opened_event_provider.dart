@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var appOpenedEventProvider = FutureProvider<void>((ref) async {
   var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-  var data = _setAppOpenedModelData(deviceInfo);
+  var data = _createAppOpenedModelData(deviceInfo);
 
   await ref.read(eventsProvider(event: data.toJson()).future);
 });
 
-EventsModel _setAppOpenedModelData(DeviceAndAppInfoModel val) {
+EventsModel _createAppOpenedModelData(DeviceAndAppInfoModel val) {
   var appOpenedModel = AppOpenedModel(
     deviceOs: val.os,
     deviceLanguage: val.languageCode,

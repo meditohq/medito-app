@@ -38,7 +38,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
   void _handleVerify() async {
     if (_formKey.currentState!.validate()) {
       await auth.verifyOTP(widget.email, _otpTextEditingController.text);
-      var status = auth.verifyOTPRes.status;
+      var status = auth.verifyOTPResponse.status;
       if (status == Status.COMPLETED) {
         await removeFirebaseToken();
         await requestGenerateFirebaseToken();
@@ -54,7 +54,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
           extra: params,
         ));
       } else if (status == Status.ERROR) {
-        showSnackBar(context, auth.verifyOTPRes.message.toString());
+        showSnackBar(context, auth.verifyOTPResponse.message.toString());
       }
     }
   }
@@ -63,7 +63,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
   Widget build(BuildContext context) {
     auth = ref.watch(authProvider);
     var textTheme = Theme.of(context).textTheme;
-    var isLoading = auth.verifyOTPRes == ApiResponse.loading();
+    var isLoading = auth.verifyOTPResponse == ApiResponse.loading();
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -194,16 +194,16 @@ class _ResendCodeWidget extends ConsumerWidget {
     void _handleResendOTP() async {
       await auth.sendOTP(email);
       auth.setCounter();
-      var status = auth.sendOTPRes.status;
+      var status = auth.sendOTPResponse.status;
       if (status == Status.COMPLETED) {
-        showSnackBar(context, auth.sendOTPRes.body.toString());
+        showSnackBar(context, auth.sendOTPResponse.body.toString());
       } else if (status == Status.ERROR) {
-        showSnackBar(context, auth.sendOTPRes.message.toString());
+        showSnackBar(context, auth.sendOTPResponse.message.toString());
         auth.setCounter();
       }
     }
 
-    if (auth.sendOTPRes.status == Status.LOADING) {
+    if (auth.sendOTPResponse.status == Status.LOADING) {
       return SizedBox(
         height: 16,
         width: 16,

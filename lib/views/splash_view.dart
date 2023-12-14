@@ -55,7 +55,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   Widget build(BuildContext context) {
     ref.listen(connectivityStatusProvider, (previous, next) {
-      var isDisconnected = next == ConnectivityStatus.isDisonnected;
+      var isDisconnected = next == ConnectivityStatus.isDisconnected;
       if (isDisconnected) {
         showSnackBar(context, StringConstants.connectivityError);
       }

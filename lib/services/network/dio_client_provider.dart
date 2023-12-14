@@ -66,13 +66,13 @@ Future<void> _captureException(
 }
 
 var assignDioHeadersProvider = FutureProvider<void>((ref) async {
-  var _authProvider = ref.read(authProvider);
+  var auth = ref.read(authProvider);
   var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
   var headers = ref.read(dioClientProvider).dio.options.headers;
 
-  var _user = _authProvider.userRes.body as UserTokenModel;
+  var user = auth.userResponse.body as UserTokenModel;
 
-  headers[HttpHeaders.authorizationHeader] = 'Bearer ${_user.token}';
+  headers[HttpHeaders.authorizationHeader] = 'Bearer ${user.token}';
   var customHeaders = _createCustomHeaders(deviceInfo);
   for (var key in customHeaders.keys) {
     headers[key] = customHeaders[key];

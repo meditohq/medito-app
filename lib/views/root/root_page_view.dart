@@ -72,7 +72,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
       return widget.firstChild;
     } else if ((location != RouteConstants.downloadsPath &&
             location != RouteConstants.playerPath) &&
-        status == ConnectivityStatus.isDisonnected) {
+        status == ConnectivityStatus.isDisconnected) {
       return ConnectivityErrorWidget();
     } else {
       return widget.firstChild;

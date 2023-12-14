@@ -25,7 +25,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   Widget build(BuildContext context) {
     super.build(context);
     var connectivityStatus = ref.watch(connectivityStatusProvider);
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
       return ConnectivityErrorWidget();
     }
 
