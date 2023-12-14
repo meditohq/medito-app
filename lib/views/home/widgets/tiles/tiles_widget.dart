@@ -17,7 +17,7 @@ class TilesWidget extends ConsumerWidget {
 
     return stats.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildTiles(context, ref, data.tiles),
+      data: (data) => _buildTiles(ref, data.tiles),
       error: (err, stack) => Expanded(
         child: MeditoErrorWidget(
           message: err.toString(),
@@ -31,7 +31,6 @@ class TilesWidget extends ConsumerWidget {
   }
 
   Padding _buildTiles(
-    BuildContext context,
     WidgetRef ref,
     List<TilesModel> data,
   ) {
@@ -40,10 +39,6 @@ class TilesWidget extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: data.map((e) {
-          var fontStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: DmSerif,
-                color: ColorConstants.walterWhite,
-              );
           var isFirstItem = data[0] == e;
 
           return Expanded(
@@ -51,45 +46,67 @@ class TilesWidget extends ConsumerWidget {
               padding: EdgeInsets.only(
                 left: padding16,
               ),
-              child: InkWell(
-                onTap: isFirstItem ? () => onTapTile(context, ref) : null,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: ColorConstants.onyx,
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(padding16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        IconData(
-                          formatIcon(e.icon),
-                          fontFamily: materialIcons,
-                        ),
-                        size: 24,
-                        color: ColorConstants.getColorFromString(e.color),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  var fontSize = getFontSize(constraints);
+                  var fontStyle =
+                      Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontFamily: DmSerif,
+                            color: ColorConstants.walterWhite,
+                            fontSize: fontSize,
+                          );
+
+                  return InkWell(
+                    onTap: isFirstItem ? () => onTapTile(context, ref) : null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: ColorConstants.onyx,
                       ),
-                      height8,
-                      Text(
-                        e.title,
-                        style: fontStyle,
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(padding16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            IconData(
+                              formatIcon(e.icon),
+                              fontFamily: materialIcons,
+                            ),
+                            size: 24,
+                            color: ColorConstants.getColorFromString(e.color),
+                          ),
+                          height8,
+                          Text(
+                            e.title,
+                            style: fontStyle,
+                          ),
+                          height4,
+                          Text(
+                            e.subtitle,
+                            style: fontStyle,
+                          ),
+                        ],
                       ),
-                      height4,
-                      Text(
-                        e.subtitle,
-                        style: fontStyle,
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           );
         }).toList(),
       ),
     );
+  }
+
+  double getFontSize(BoxConstraints constraints) {
+    final width = constraints.maxWidth;
+    var fontSize = 16.0;
+    if (width <= 480) {
+      fontSize = 14.0;
+    }
+
+    return fontSize;
   }
 
   void onTapTile(BuildContext context, WidgetRef ref) {
