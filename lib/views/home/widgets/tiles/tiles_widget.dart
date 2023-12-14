@@ -17,7 +17,7 @@ class TilesWidget extends ConsumerWidget {
 
     return stats.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildTiles(ref, data.tiles),
+      data: (data) => buildTiles(ref, data.tiles),
       error: (err, stack) => Expanded(
         child: MeditoErrorWidget(
           message: err.toString(),
@@ -30,7 +30,7 @@ class TilesWidget extends ConsumerWidget {
     );
   }
 
-  Padding _buildTiles(
+  Padding buildTiles(
     WidgetRef ref,
     List<TilesModel> data,
   ) {
