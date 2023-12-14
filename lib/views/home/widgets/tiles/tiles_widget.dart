@@ -17,7 +17,7 @@ class TilesWidget extends ConsumerWidget {
 
     return stats.when(
       skipLoadingOnRefresh: false,
-      data: (data) => buildTiles(ref, data.tiles),
+      data: (data) => _buildTiles(ref, data.tiles),
       error: (err, stack) => Expanded(
         child: MeditoErrorWidget(
           message: err.toString(),
@@ -30,7 +30,7 @@ class TilesWidget extends ConsumerWidget {
     );
   }
 
-  Padding buildTiles(
+  Padding _buildTiles(
     WidgetRef ref,
     List<TilesModel> data,
   ) {
@@ -48,7 +48,7 @@ class TilesWidget extends ConsumerWidget {
               ),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  var fontSize = getFontSize(constraints);
+                  var fontSize = _getFontSize(constraints);
                   var fontStyle =
                       Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontFamily: DmSerif,
@@ -57,7 +57,7 @@ class TilesWidget extends ConsumerWidget {
                           );
 
                   return InkWell(
-                    onTap: isFirstItem ? () => onTapTile(context, ref) : null,
+                    onTap: isFirstItem ? () => _onTapTile(context, ref) : null,
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
@@ -99,17 +99,17 @@ class TilesWidget extends ConsumerWidget {
     );
   }
 
-  double getFontSize(BoxConstraints constraints) {
+  double _getFontSize(BoxConstraints constraints) {
     final width = constraints.maxWidth;
-    var fontSize = 16.0;
-    if (width <= 480) {
-      fontSize = 14.0;
+    var fontSize = fontSize16;
+    if (width <= smallScreenWidth) {
+      fontSize = fontSize14;
     }
 
     return fontSize;
   }
 
-  void onTapTile(BuildContext context, WidgetRef ref) {
+  void _onTapTile(BuildContext context, WidgetRef ref) {
     ref.invalidate(remoteStatsProvider);
     ref.read(remoteStatsProvider);
     showModalBottomSheet<void>(

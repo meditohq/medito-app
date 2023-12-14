@@ -23,12 +23,12 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     super.initState();
   }
 
-  void handleChipPress(
+  void _handleChipPress(
     BuildContext context,
     WidgetRef ref,
-    HomeChipsItemsModel element,
+    ShortcutsItemsModel element,
   ) async {
-    handleTrackEvent(ref, element.id, element.title);
+    _handleTrackEvent(ref, element.id, element.title);
     await handleNavigation(
       context: context,
       element.type,
@@ -37,7 +37,7 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     );
   }
 
-  void handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {
+  void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {
     var chipViewedModel = ChipTappedModel(chipId: chipId, chipTitle: chipTitle);
     var event = EventsModel(
       name: EventTypes.chipTapped,
@@ -46,14 +46,14 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     ref.read(eventsProvider(event: event.toJson()));
   }
 
-  void onReorder(int oldIndex, int newIndex) {
+  void _onReorder(int oldIndex, int newIndex) {
     setState(() {
-      handleShortcutWidgetPlacement(newIndex, oldIndex);
-      handleShortcutItemPlacementInPreference(oldIndex, newIndex);
+      _handleShortcutWidgetPlacement(newIndex, oldIndex);
+      _handleShortcutItemPlacementInPreference(oldIndex, newIndex);
     });
   }
 
-  void handleShortcutItemPlacementInPreference(int oldIndex, int newIndex) {
+  void _handleShortcutItemPlacementInPreference(int oldIndex, int newIndex) {
     var _data = [...data.shortcuts];
     final element = _data.removeAt(oldIndex);
     _data.insert(newIndex, element);
@@ -62,7 +62,7 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids));
   }
 
-  void handleShortcutWidgetPlacement(int newIndex, int oldIndex) {
+  void _handleShortcutWidgetPlacement(int newIndex, int oldIndex) {
     shortcutsWidgetList.insert(
       newIndex,
       shortcutsWidgetList.removeAt(oldIndex),
@@ -75,14 +75,14 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     ref.listen(fetchShortcutsProvider, (previous, next) {
       if (next.hasValue) {
         data = next.value!;
-        shortcutsWidgetList = getShortcutsItemWidgetList();
+        shortcutsWidgetList = _getShortcutsItemWidgetList();
       }
     });
 
     return response.when(
       skipLoadingOnRefresh: false,
       skipLoadingOnReload: true,
-      data: (_) => buildShortcuts(),
+      data: (_) => _buildShortcuts(),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchShortcutsProvider),
@@ -93,19 +93,19 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
     );
   }
 
-  ReorderableWrap buildShortcuts() {
+  ReorderableWrap _buildShortcuts() {
     return ReorderableWrap(
       spacing: 8.0,
       runSpacing: 8.0,
       padding: EdgeInsets.zero,
       maxMainAxisCount: 2,
       minMainAxisCount: 2,
-      onReorder: onReorder,
+      onReorder: _onReorder,
       children: shortcutsWidgetList,
     );
   }
 
-  List<Widget> getShortcutsItemWidgetList() {
+  List<Widget> _getShortcutsItemWidgetList() {
     var size = MediaQuery.of(context).size;
     final containerHeight = 48.0;
     final containerWidth = (size.width / 2) - (padding20 + 2);
@@ -114,10 +114,7 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
         .map((e) => IntrinsicWidth(
               child: InkWell(
                 key: ValueKey(e.id),
-                onTap: () => handleNavigation(context: context, e.type, [
-                  e.path.toString().getIdFromPath(),
-                  e.path,
-                ]),
+                onTap: () => _handleChipPress(context, ref, e),
                 child: Container(
                   height: containerHeight,
                   decoration: BoxDecoration(

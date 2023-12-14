@@ -31,7 +31,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     return Scaffold(
-      floatingActionButton: buildFloatingButton(context),
+      floatingActionButton: _buildFloatingButton(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
         bottom: false,
@@ -41,7 +41,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             children: [
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: onRefresh,
+                  onRefresh: _onRefresh,
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
@@ -73,7 +73,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
   }
 
-  Future<void> onRefresh() async {
+  Future<void> _onRefresh() async {
     ref.invalidate(fetchHomeHeaderProvider);
     await ref.read(fetchHomeHeaderProvider.future);
     ref.invalidate(fetchShortcutsProvider);
@@ -84,7 +84,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(remoteStatsProvider.future);
   }
 
-  FloatingActionButton buildFloatingButton(BuildContext context) {
+  FloatingActionButton _buildFloatingButton(BuildContext context) {
     return FloatingActionButton.extended(
       backgroundColor: ColorConstants.onyx,
       onPressed: () {
