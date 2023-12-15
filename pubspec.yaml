@@ -65,7 +65,7 @@ dependencies:
   permission_handler: ^10.4.5
   app_settings: ^5.1.1
   vibration: ^1.7.3
-  reorderable_grid_view: ^2.2.8
+  reorderables: ^0.6.0
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1

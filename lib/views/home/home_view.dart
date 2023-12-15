@@ -66,7 +66,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           height24,
                           TilesWidget(),
                           SizedBox(
-                            height: 120,
+                            height: 140,
                           ),
                         ],
                       ),
