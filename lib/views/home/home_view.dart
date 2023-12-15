@@ -58,7 +58,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           height24,
                           TilesWidget(),
                           SizedBox(
-                            height: 120,
+                            height: 140,
                           ),
                         ],
                       ),
@@ -74,16 +74,14 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
-    ref.invalidate(homeProvider);
-    await ref.read(homeProvider.future);
-    ref.invalidate(remoteStatsProvider);
-    await ref.read(remoteStatsProvider.future);
+    ref.invalidate(fetchHomeHeaderProvider);
+    await ref.read(fetchHomeHeaderProvider.future);
     ref.invalidate(fetchShortcutsProvider);
     await ref.read(fetchShortcutsProvider.future);
     ref.invalidate(fetchQuoteProvider);
     await ref.read(fetchQuoteProvider.future);
-    ref.invalidate(fetchHomeHeaderProvider);
-    await ref.read(fetchHomeHeaderProvider.future);
+    ref.invalidate(remoteStatsProvider);
+    await ref.read(remoteStatsProvider.future);
   }
 
   FloatingActionButton _buildFloatingButton(BuildContext context) {
