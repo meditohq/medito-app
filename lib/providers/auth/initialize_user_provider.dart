@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 var retryCounter = 0;
 final maxRetryCount = 2;
 
-final initializeUserProvider =
+final userInitializationProvider =
     FutureProvider<UserInitializationStatus>((ref) async {
   try {
     var auth = ref.read(authProvider);
