@@ -2,16 +2,37 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final initializeUserProvider = FutureProvider<bool>((ref) async {
-  var auth = ref.read(authProvider);
-  await auth.initializeUser();
-  var response = auth.userResponse;
-  if (response.body != null) {
-    await ref.read(assignDioHeadersProvider.future);
-    await ref.read(appOpenedEventProvider.future);
+var retryCounter = 0;
+final maxRetryCount = 2;
 
-    return true;
+final initializeUserProvider =
+    FutureProvider<UserInitializationStatus>((ref) async {
+  try {
+    var auth = ref.read(authProvider);
+    await auth.initializeUser();
+    var response = auth.userResponse;
+    if (response.body != null) {
+      await ref.read(assignDioHeadersProvider.future);
+      await ref.read(appOpenedEventProvider.future);
+
+      return UserInitializationStatus.successful;
+    }
+
+    return UserInitializationStatus.error;
+  } catch (e) {
+    if (retryCounter < maxRetryCount) {
+      await Future.delayed(Duration(seconds: 2), () {
+        _incrementCounter();
+      });
+
+      return UserInitializationStatus.retry;
+    }
+
+    return UserInitializationStatus.error;
   }
-
-  return false;
 });
+
+void _incrementCounter() => retryCounter += 1;
+
+//ignore: prefer-match-file-name
+enum UserInitializationStatus { retry, error, successful }

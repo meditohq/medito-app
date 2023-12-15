@@ -14,43 +14,24 @@ class SplashView extends ConsumerStatefulWidget {
 }
 
 class _SplashViewState extends ConsumerState<SplashView> {
-  var retryCounter = 0;
-  final maxRetryCount = 2;
-
   @override
   void initState() {
     initializeUser();
-
     super.initState();
   }
 
   void initializeUser() async {
-    try {
-      var response = await ref.read(initializeUserProvider.future);
-      if (response) {
-        context.go(RouteConstants.homePath);
-      } else {
-        retryInitializeUser();
-      }
-    } catch (e) {
-      retryInitializeUser();
-    }
-  }
-
-  void retryInitializeUser() {
-    if (retryCounter < maxRetryCount) {
-      Future.delayed(Duration(seconds: 2), () {
-        incrementCounter();
-        initializeUser();
-      });
-    } else {
+    var response = await ref.read(initializeUserProvider.future);
+    if (response == UserInitializationStatus.successful) {
+      context.go(RouteConstants.homePath);
+    } else if (response == UserInitializationStatus.error) {
       showSnackBar(context, StringConstants.timeout);
       context.go(RouteConstants.downloadsPath);
+    } else if (response == UserInitializationStatus.retry) {
+      ref.invalidate(initializeUserProvider);
+      initializeUser();
     }
   }
-
-  void resetCounter() => retryCounter = 0;
-  void incrementCounter() => retryCounter += 1;
 
   @override
   Widget build(BuildContext context) {
