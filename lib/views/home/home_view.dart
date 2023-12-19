@@ -24,10 +24,18 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var connectivityStatus =
-        ref.watch(connectivityStatusProvider) as ConnectivityStatus;
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+    var homeAPIsResponse = ref.watch(refreshHomeAPIsProvider);
+    var connectivityStatus = ref.watch(connectivityStatusProvider);
+    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
       return ConnectivityErrorWidget();
+    }
+
+    if (homeAPIsResponse.hasError) {
+      return MeditoErrorWidget(
+        message: homeAPIsResponse.error.toString(),
+        onTap: () => _onRefresh(),
+        isLoading: homeAPIsResponse.isLoading,
+      );
     }
 
     return Scaffold(
@@ -74,14 +82,8 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
-    ref.invalidate(fetchHomeHeaderProvider);
-    await ref.read(fetchHomeHeaderProvider.future);
-    ref.invalidate(fetchShortcutsProvider);
-    await ref.read(fetchShortcutsProvider.future);
-    ref.invalidate(fetchQuoteProvider);
-    await ref.read(fetchQuoteProvider.future);
-    ref.invalidate(remoteStatsProvider);
-    await ref.read(remoteStatsProvider.future);
+    ref.invalidate(refreshHomeAPIsProvider);
+    await ref.read(refreshHomeAPIsProvider.future);
   }
 
   FloatingActionButton _buildFloatingButton(BuildContext context) {

@@ -18,13 +18,11 @@ class TilesWidget extends ConsumerWidget {
     return stats.when(
       skipLoadingOnRefresh: false,
       data: (data) => _buildTiles(ref, data.tiles),
-      error: (err, stack) => Expanded(
-        child: MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(remoteStatsProvider),
-          isLoading: stats.isLoading,
-          isScaffold: false,
-        ),
+      error: (err, stack) => MeditoErrorWidget(
+        message: err.toString(),
+        onTap: () => ref.refresh(remoteStatsProvider),
+        isLoading: stats.isLoading,
+        isScaffold: false,
       ),
       loading: () => TilesShimmerWidget(),
     );

@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'device_and_app_info_provider.g.dart';
 
 @riverpod
-Future<DeviceAndAppInfoModel> deviceAndAppInfo(ref) {
+Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) {
   final info = ref.read(deviceAndAppInfoRepositoryProvider);
   ref.keepAlive();
 

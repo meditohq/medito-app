@@ -22,9 +22,9 @@ class AuthNotifier extends ChangeNotifier {
 
   final AuthRepository authRepository;
   final Ref ref;
-  ApiResponse userRes = ApiResponse.completed(null);
-  ApiResponse sendOTPRes = ApiResponse.completed(null);
-  ApiResponse verifyOTPRes = ApiResponse.completed(null);
+  ApiResponse userResponse = ApiResponse.completed(null);
+  ApiResponse sendOTPResponse = ApiResponse.completed(null);
+  ApiResponse verifyOTPResponse = ApiResponse.completed(null);
   String? userEmail;
   bool counter = false;
   bool isAGuest = false;
@@ -49,45 +49,45 @@ class AuthNotifier extends ChangeNotifier {
     if (res == null) {
       await generateUserToken();
     } else {
-      userRes = ApiResponse.completed(res);
+      userResponse = ApiResponse.completed(res);
       notifyListeners();
     }
   }
 
   Future<void> generateUserToken() async {
-    userRes = ApiResponse.loading();
+    userResponse = ApiResponse.loading();
     notifyListeners();
     try {
       var res = await authRepository.generateUserToken();
       await saveUserInSharedPref(res);
-      userRes = ApiResponse.completed(res);
+      userResponse = ApiResponse.completed(res);
     } catch (e) {
-      userRes = ApiResponse.error(e.toString());
+      userResponse = ApiResponse.error(e.toString());
     }
     notifyListeners();
   }
 
   Future<void> sendOTP(String email) async {
-    sendOTPRes = ApiResponse.loading();
+    sendOTPResponse = ApiResponse.loading();
     notifyListeners();
     try {
       var res = await authRepository.sendOTP(email);
-      sendOTPRes = ApiResponse.completed(res);
+      sendOTPResponse = ApiResponse.completed(res);
     } catch (e) {
-      sendOTPRes = ApiResponse.error(e.toString());
+      sendOTPResponse = ApiResponse.error(e.toString());
     }
     notifyListeners();
   }
 
   Future<void> verifyOTP(String email, String OTP) async {
-    verifyOTPRes = ApiResponse.loading();
+    verifyOTPResponse = ApiResponse.loading();
     notifyListeners();
     try {
       var res = await authRepository.verifyOTP(email, OTP);
       await updateUserInSharedPref(email);
-      verifyOTPRes = ApiResponse.completed(res);
+      verifyOTPResponse = ApiResponse.completed(res);
     } catch (e) {
-      verifyOTPRes = ApiResponse.error(e.toString());
+      verifyOTPResponse = ApiResponse.error(e.toString());
     }
     notifyListeners();
   }
@@ -97,9 +97,9 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   Future<void> updateUserInSharedPref(String email) async {
-    var _userTokenModel = userRes.body as UserTokenModel;
+    var _userTokenModel = userResponse.body as UserTokenModel;
     var _user = _userTokenModel.copyWith(email: email);
-    userRes = ApiResponse.completed(_user);
+    userResponse = ApiResponse.completed(_user);
     await saveUserInSharedPref(_user);
   }
 

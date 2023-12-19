@@ -45,7 +45,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
       var email = _emailController.text;
       await auth.sendOTP(email);
       auth.setCounter();
-      var status = auth.sendOTPRes.status;
+      var status = auth.sendOTPResponse.status;
       if (status == Status.COMPLETED) {
         var params =
             JoinRouteParamsModel(screen: widget.fromScreen, email: email);
@@ -54,7 +54,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
           extra: params,
         );
       } else if (status == Status.ERROR) {
-        showSnackBar(context, auth.sendOTPRes.message.toString());
+        showSnackBar(context, auth.sendOTPResponse.message.toString());
       }
     }
   }
@@ -63,7 +63,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     auth = ref.watch(authProvider);
-    var isLoading = auth.sendOTPRes == ApiResponse.loading();
+    var isLoading = auth.sendOTPResponse == ApiResponse.loading();
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,

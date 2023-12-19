@@ -61,12 +61,10 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
 
   @override
   Widget build(BuildContext context) {
-    var connectivityStatus =
-        ref.watch(connectivityStatusProvider) as ConnectivityStatus;
+    var connectivityStatus = ref.watch(connectivityStatusProvider);
 
     ref.listen(connectivityStatusProvider, (prev, next) {
-      var state = next as ConnectivityStatus;
-      if (state == ConnectivityStatus.isDisonnected) {
+      if (next == ConnectivityStatus.isDisconnected) {
         showSnackBar(context, StringConstants.connectivityError);
       }
     });
@@ -74,7 +72,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         ref.watch(fetchLocallySavedBackgroundSoundsProvider);
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
 
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
       return Scaffold(
         body: localBackgroundSounds.when(
           skipLoadingOnRefresh: true,
@@ -128,7 +126,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        if (status == ConnectivityStatus.isDisonnected) {
+        if (status == ConnectivityStatus.isDisconnected) {
           return;
         } else {
           ref.invalidate(backgroundSoundsProvider);
