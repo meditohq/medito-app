@@ -8,12 +8,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_repository.g.dart';
 
+const _quote = 'quote';
+const _editorialKey = 'editorial';
+
 abstract class HomeRepository {
   Future<HomeHeaderModel> fetchHomeHeader();
 
   Future<QuoteModel> fetchQuote();
 
   Future<ShortcutsModel> fetchShortcuts();
+
+  Future<EditorialModel> fetchEditorial();
 
   List<String> getLocalShortcutIds();
 
@@ -48,7 +53,7 @@ class HomeRepositoryImpl extends HomeRepository {
     try {
       var response = await client.getRequest(HTTPConstants.QUOTE);
 
-      return QuoteModel.fromJson(response['quote']);
+      return QuoteModel.fromJson(response[_quote]);
     } catch (e) {
       rethrow;
     }
@@ -62,6 +67,17 @@ class HomeRepositoryImpl extends HomeRepository {
       var parsedShortcuts = ShortcutsModel.fromJson(response);
 
       return getSortedShortcuts(parsedShortcuts);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<EditorialModel> fetchEditorial() async {
+    try {
+      var response = await client.getRequest(HTTPConstants.EDITORIAL);
+
+      return EditorialModel.fromJson(response[_editorialKey]);
     } catch (e) {
       rethrow;
     }

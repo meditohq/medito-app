@@ -20,8 +20,13 @@ class QuoteWidget extends ConsumerWidget {
       skipLoadingOnRefresh: false,
       skipLoadingOnReload: true,
       data: (data) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: padding20),
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: ColorConstants.onyx,
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: padding20),
+          padding: const EdgeInsets.all(padding16),
           child: Column(
             children: [
               Text(
