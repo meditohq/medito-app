@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'widgets/editorial/editorial_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
 import 'widgets/tiles/tiles_widget.dart';
@@ -61,6 +62,8 @@ class _HomeViewState extends ConsumerState<HomeView>
                           HeaderAndAnnouncementWidget(),
                           height16,
                           ShortcutsWidget(),
+                          height24,
+                          EditorialWidget(),
                           height24,
                           QuoteWidget(),
                           height24,

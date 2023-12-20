@@ -22,6 +22,14 @@ Future<ShortcutsModel> fetchShortcuts(FetchShortcutsRef ref) {
 }
 
 @riverpod
+Future<EditorialModel> fetchEditorial(FetchEditorialRef ref) {
+  final homeRepository = ref.watch(homeRepositoryProvider);
+  ref.keepAlive();
+
+  return homeRepository.fetchEditorial();
+}
+
+@riverpod
 Future<void> updateShortcutsIdsInPreference(
   UpdateShortcutsIdsInPreferenceRef ref, {
   required List<String> ids,
@@ -45,6 +53,8 @@ Future<void> refreshHomeAPIs(RefreshHomeAPIsRef ref) async {
   await ref.read(fetchHomeHeaderProvider.future);
   ref.invalidate(fetchShortcutsProvider);
   await ref.read(fetchShortcutsProvider.future);
+  ref.invalidate(fetchEditorialProvider);
+  await ref.read(fetchEditorialProvider.future);
   ref.invalidate(fetchQuoteProvider);
   await ref.read(fetchQuoteProvider.future);
   ref.invalidate(remoteStatsProvider);

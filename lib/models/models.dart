@@ -22,6 +22,7 @@ export 'home/header/home_header_model.dart';
 export 'home/home_model.dart';
 export 'home/menu/home_menu_model.dart';
 export 'home/quote/quote_model.dart';
+export 'home/editorial/editorial_model.dart';
 export 'home/rows/home_rows_model.dart';
 export 'home/shortcuts/shortcuts_model.dart';
 export 'join/join_route_params_model.dart';

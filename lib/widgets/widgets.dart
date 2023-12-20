@@ -15,6 +15,7 @@ export 'shimmers/home/home_shimmer_widget.dart';
 export 'shimmers/home/quote_shimmer_widget.dart';
 export 'shimmers/home/shortcuts_shimmer_widget.dart';
 export 'shimmers/home/tiles_shimmer_widget.dart';
+export 'shimmers/home/editorial_shimmer_widget.dart';
 export 'shimmers/search_initial_page_shimmer_widget.dart';
 export 'shimmers/search_result_shimmer_widget.dart';
 export 'shimmers/track_shimmer_widget.dart';
