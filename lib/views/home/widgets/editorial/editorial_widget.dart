@@ -79,10 +79,14 @@ class EditorialWidget extends ConsumerWidget {
                   Text(
                     data.title,
                     style: titleStyle,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     data.subtitle,
                     style: subtitleStyle,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
