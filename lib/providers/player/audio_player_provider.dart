@@ -173,13 +173,18 @@ class AudioPlayerNotifier extends BaseAudioHandler
   ) {
     var isEnding = maxDuration.inSeconds > 0 &&
         position.inSeconds > maxDuration.inSeconds - fadeDurationInSeconds;
-
-    if (isEnding) {
-      _setBgVolumeFadeAtEnd();
-    } else {
-      Future.delayed(Duration(milliseconds: 500), () {
-        setBackgroundSoundVolume(bgVolume);
-      });
+    try {
+      if (isEnding) {
+        _setBgVolumeFadeAtEnd();
+      } else {
+        if (bgVolume != null) {
+          Future.delayed(Duration(milliseconds: 500), () {
+            setBackgroundSoundVolume(bgVolume);
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
     }
 
     return isEnding;
