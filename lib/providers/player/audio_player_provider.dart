@@ -32,7 +32,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
     try {
       pauseBackgroundSound();
       unawaited(trackAudioPlayer.pause());
-      unawaited(super.pause());
     } catch (err) {
       unawaited(Sentry.captureException(
         err,
@@ -57,7 +56,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
         stackTrace: err,
       ));
     }
-    unawaited(super.play());
   }
 
   @override
@@ -66,7 +64,6 @@ class AudioPlayerNotifier extends BaseAudioHandler
     if (mediaItemHasBGSound()) {
       stopBackgroundSound();
     }
-    unawaited(super.stop());
   }
 
   @override
