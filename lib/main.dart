@@ -152,7 +152,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
     onMessageAppOpened(context, ref);
     initializeNotification(context, ref);
+    initializeAudioPlayer();
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  void initializeAudioPlayer() {
+    var audioPlayerProvider = ref.read(audioPlayerNotifierProvider);
+    audioPlayerProvider.initAudioHandler();
   }
 
   @override
