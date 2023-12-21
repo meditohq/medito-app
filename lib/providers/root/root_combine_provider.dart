@@ -29,6 +29,7 @@ final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
 
 void _handleAudioCompletion(Ref ref, BuildContext context) {
   final audioProvider = ref.read(audioPlayerNotifierProvider);
+  final bgSoundProvider = ref.read(backgroundSoundsNotifierProvider);
   var extras = audioProvider.mediaItem.value?.extras;
   if (extras != null) {
     ref.read(playerProvider.notifier).handleAudioCompletionEvent(
@@ -38,7 +39,7 @@ void _handleAudioCompletion(Ref ref, BuildContext context) {
 
     audioProvider.seekValueFromSlider(0);
     audioProvider.pause();
-    audioProvider.setBackgroundSoundVolume(audioProvider.bgVolume);
+    audioProvider.setBackgroundSoundVolume(bgSoundProvider.volume);
     audioProvider.stop();
     ref.invalidate(packProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
