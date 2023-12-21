@@ -8,13 +8,12 @@ import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
-  var audioPlayerProvider = ref.read(audioPlayerNotifierProvider);
-  audioPlayerProvider.initAudioHandler();
   ref.read(remoteStatsProvider);
   ref.read(authProvider.notifier).saveFcmTokenEvent();
   ref.read(postLocalStatsProvider);
   ref.read(deviceAppAndUserInfoProvider);
   ref.read(audioDownloaderProvider).deleteDownloadedFileFromPreviousVersion();
+  var audioPlayerProvider = ref.read(audioPlayerNotifierProvider);
 
   var streamEvent = audioPlayerProvider.trackAudioPlayer.playerStateStream
       .map((event) => event.processingState)
