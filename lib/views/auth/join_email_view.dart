@@ -85,7 +85,7 @@ class _JoinEmailViewState extends ConsumerState<JoinEmailView> {
                         StringConstants.whatsYourEmail,
                         style: textTheme.headlineMedium?.copyWith(
                           color: ColorConstants.walterWhite,
-                          fontFamily: DmSerif,
+                          fontFamily: SourceSerif,
                           height: 1.2,
                           fontSize: 24,
                         ),
