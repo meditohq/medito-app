@@ -58,11 +58,6 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container();
-  }
-
-  void _scrollListener() {
-    // setState(() => {});
-  }
 
   // @override
   // Widget build(BuildContext context) {
@@ -134,7 +129,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   // ) {
   //   return RefreshIndicator(
   //     onRefresh: () async {
-  //       if (status == ConnectivityStatus.isDisonnected) {
+  //       if (status == ConnectivityStatus.isDisconnected) {
   //         return;
   //       } else {
   //         ref.invalidate(backgroundSoundsProvider);

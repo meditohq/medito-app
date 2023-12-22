@@ -36,6 +36,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           if (context.canPop()) {
             context.pop();
           } else {
+            ref.read(refreshHomeAPIsProvider.future);
             context.go(RouteConstants.homePath);
           }
         },

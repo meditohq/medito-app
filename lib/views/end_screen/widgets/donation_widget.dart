@@ -27,7 +27,7 @@ class DonationWidget extends ConsumerWidget {
         children: [
           Text(
             donationModel.title ?? '',
-            style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 22),
+            style: bodyLarge?.copyWith(fontFamily: SourceSerif, fontSize: 22),
             textAlign: TextAlign.center,
           ),
           height8,

@@ -59,7 +59,7 @@ class PackCardWidget extends StatelessWidget {
     return Text(
       '$title',
       style: textTheme.displayLarge?.copyWith(
-        fontFamily: DmSerif,
+        fontFamily: SourceSerif,
         height: 0,
       ),
     );

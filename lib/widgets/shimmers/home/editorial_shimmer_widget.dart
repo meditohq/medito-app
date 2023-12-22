@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../widgets/box_shimmer_widget.dart';
 
-class QuoteShimmerWidget extends StatelessWidget {
-  const QuoteShimmerWidget({super.key});
+class EditorialShimmerWidget extends StatelessWidget {
+  const EditorialShimmerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class QuoteShimmerWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding20),
       child: BoxShimmerWidget(
-        height: 150,
+        height: 200,
         width: size.width,
         borderRadius: 14,
       ),

@@ -17,33 +17,27 @@ class TilesWidget extends ConsumerWidget {
 
     return stats.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildTiles(context, ref, data.tiles),
-      error: (err, stack) => Expanded(
-        child: MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(remoteStatsProvider),
-          isLoading: stats.isLoading,
-          isScaffold: false,
-        ),
+      data: (data) => _buildTiles(ref, data.tiles),
+      error: (err, stack) => MeditoErrorWidget(
+        message: err.toString(),
+        onTap: () => ref.refresh(remoteStatsProvider),
+        isLoading: stats.isLoading,
+        isScaffold: false,
       ),
       loading: () => TilesShimmerWidget(),
     );
   }
 
   Padding _buildTiles(
-    BuildContext context,
-    WidgetRef ref,
-    List<TilesModel> data,
-  ) {
+      WidgetRef ref,
+      List<TilesModel> data,
+      ) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, right: padding20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: data.map((e) {
-          var fontStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: DmSerif,
-                color: ColorConstants.walterWhite,
-              );
           var isFirstItem = data[0] == e;
 
           return Expanded(
@@ -51,39 +45,60 @@ class TilesWidget extends ConsumerWidget {
               padding: EdgeInsets.only(
                 left: padding16,
               ),
-              child: InkWell(
-                onTap: isFirstItem ? () => onTapTile(context, ref) : null,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: ColorConstants.onyx,
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(padding16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        IconData(
-                          formatIcon(e.icon),
-                          fontFamily: materialIcons,
-                        ),
-                        size: 24,
-                        color: ColorConstants.getColorFromString(e.color),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+
+                  var titleFontStyle =
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontFamily: DmMono,
+                    color: ColorConstants.walterWhite,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  );
+
+                  var subtitleFontStyle =
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontFamily: DmSans,
+                    color: ColorConstants.walterWhite,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  );
+
+                  return InkWell(
+                    onTap: isFirstItem ? () => _onTapTile(context, ref) : null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: ColorConstants.onyx,
                       ),
-                      height8,
-                      Text(
-                        e.title,
-                        style: fontStyle,
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(padding16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            IconData(
+                              formatIcon(e.icon),
+                              fontFamily: materialIcons,
+                            ),
+                            size: 24,
+                            color: ColorConstants.getColorFromString(e.color),
+                          ),
+                          height8,
+                          Text(
+                            e.title,
+                            style: titleFontStyle,
+                          ),
+                          height4,
+                          Text(
+                            e.subtitle,
+                            style: subtitleFontStyle,
+                          ),
+                        ],
                       ),
-                      height4,
-                      Text(
-                        e.subtitle,
-                        style: fontStyle,
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           );
@@ -92,7 +107,7 @@ class TilesWidget extends ConsumerWidget {
     );
   }
 
-  void onTapTile(BuildContext context, WidgetRef ref) {
+  void _onTapTile(BuildContext context, WidgetRef ref) {
     ref.invalidate(remoteStatsProvider);
     ref.read(remoteStatsProvider);
     showModalBottomSheet<void>(

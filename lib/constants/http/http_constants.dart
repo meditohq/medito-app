@@ -13,10 +13,10 @@ class HTTPConstants {
   static const String PACKS = 'packs';
   static const String TRACKS = 'tracks';
   static const String BACKGROUND_SOUNDS = 'backgroundSounds';
-  static const String HOME = 'home';
   static const String HEADER = 'main/header';
   static const String QUOTE = 'main/quote';
   static const String SHORTCUTS = 'main/shortcuts';
+  static const String EDITORIAL = 'main/editorial';
   static const String STATS = 'main/stats';
   static const String ME = 'me';
   static const String EVENTS = 'events';

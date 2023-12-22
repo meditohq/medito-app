@@ -28,7 +28,8 @@ class NetworkImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var userTokenModel = ref.watch(authProvider).userRes.body as UserTokenModel;
+    var userTokenModel =
+        ref.watch(authProvider).userResponse.body as UserTokenModel;
     if (url.contains('.svg')) {
       return SvgPicture.network(
         url,

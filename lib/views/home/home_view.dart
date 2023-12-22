@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'widgets/editorial/editorial_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
 import 'widgets/tiles/tiles_widget.dart';
@@ -24,10 +25,18 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var connectivityStatus =
-        ref.watch(connectivityStatusProvider) as ConnectivityStatus;
-    if (connectivityStatus == ConnectivityStatus.isDisonnected) {
+    var homeAPIsResponse = ref.watch(refreshHomeAPIsProvider);
+    var connectivityStatus = ref.watch(connectivityStatusProvider);
+    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
       return ConnectivityErrorWidget();
+    }
+
+    if (homeAPIsResponse.hasError) {
+      return MeditoErrorWidget(
+        message: homeAPIsResponse.error.toString(),
+        onTap: () => _onRefresh(),
+        isLoading: homeAPIsResponse.isLoading,
+      );
     }
 
     return Scaffold(
@@ -51,14 +60,16 @@ class _HomeViewState extends ConsumerState<HomeView>
                       child: Column(
                         children: [
                           HeaderAndAnnouncementWidget(),
-                          height16,
+                          height20,
                           ShortcutsWidget(),
-                          height24,
+                          height20,
+                          EditorialWidget(),
+                          height20,
                           QuoteWidget(),
-                          height24,
+                          height20,
                           TilesWidget(),
                           SizedBox(
-                            height: 120,
+                            height: 140,
                           ),
                         ],
                       ),
@@ -74,21 +85,13 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
-    ref.invalidate(homeProvider);
-    await ref.read(homeProvider.future);
-    ref.invalidate(remoteStatsProvider);
-    await ref.read(remoteStatsProvider.future);
-    ref.invalidate(fetchShortcutsProvider);
-    await ref.read(fetchShortcutsProvider.future);
-    ref.invalidate(fetchQuoteProvider);
-    await ref.read(fetchQuoteProvider.future);
-    ref.invalidate(fetchHomeHeaderProvider);
-    await ref.read(fetchHomeHeaderProvider.future);
+    ref.invalidate(refreshHomeAPIsProvider);
+    await ref.read(refreshHomeAPIsProvider.future);
   }
 
   FloatingActionButton _buildFloatingButton(BuildContext context) {
     return FloatingActionButton.extended(
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: ColorConstants.lightPurple,
       onPressed: () {
         context.push(RouteConstants.searchPath);
       },
@@ -97,8 +100,10 @@ class _HomeViewState extends ConsumerState<HomeView>
         StringConstants.explore,
         style: TextStyle(
           color: ColorConstants.walterWhite,
-          fontFamily: DmSerif,
+          fontFamily: SourceSerif,
           fontSize: 20,
+          fontWeight: FontWeight.w700,
+
         ),
       ),
     );

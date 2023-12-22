@@ -42,7 +42,7 @@ class ArtistTitleWidget extends ConsumerWidget {
       child: Marquee(
         text: trackTitle,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: DmSerif,
+              fontFamily: SourceSerif,
               color: ColorConstants.walterWhite,
               fontSize: trackTitleFontSize,
               letterSpacing: 0.2,
