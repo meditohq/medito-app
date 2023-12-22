@@ -97,3 +97,4 @@ android/meditokey.jks
 ios/Runner.xcodeproj/project.pbxproj
 ios/Flutter/AppFrameworkInfo.plist
 android/app/src/google-services.json
+android/app/local.properties
