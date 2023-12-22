@@ -12,8 +12,11 @@ class QuoteWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var response = ref.watch(fetchQuoteProvider);
     var fontStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontFamily: DmSerif,
-          color: ColorConstants.walterWhite,
+      fontFamily: SourceSerif,
+      fontWeight: FontWeight.w500,
+      fontSize: fontSize16,
+      height: 1.4,
+      color: ColorConstants.walterWhite,
         );
 
     return response.when(
@@ -21,6 +24,7 @@ class QuoteWidget extends ConsumerWidget {
       skipLoadingOnReload: true,
       data: (data) {
         return Container(
+          width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             color: ColorConstants.onyx,
@@ -34,6 +38,7 @@ class QuoteWidget extends ConsumerWidget {
                 style: fontStyle,
                 textAlign: TextAlign.center,
               ),
+              height4,
               Text(
                 '— ${data.author}',
                 style: fontStyle,

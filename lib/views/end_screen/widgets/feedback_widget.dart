@@ -61,7 +61,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
         children: [
           Text(
             widget.feedbackModel.title ?? '',
-            style: bodyLarge?.copyWith(fontFamily: DmSerif, fontSize: 22),
+            style: bodyLarge?.copyWith(fontFamily: SourceSerif, fontSize: 22),
             textAlign: TextAlign.center,
           ),
           height8,

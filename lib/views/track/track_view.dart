@@ -312,7 +312,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: DmSerif,
+            fontFamily: SourceSerif,
             color: ColorConstants.walterWhite,
             letterSpacing: 0.2,
             fontSize: 24,

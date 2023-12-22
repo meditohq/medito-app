@@ -26,7 +26,7 @@ class MeditoErrorWidget extends StatelessWidget {
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
           color: ColorConstants.walterWhite,
-          fontFamily: DmSerif,
+          fontFamily: SourceSerif,
         );
     if (isScaffold) {
       return Scaffold(

@@ -18,14 +18,18 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
-      height: 56,
+      height: 72,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _welcomeWidget(context),
           Row(
             children: [
-              _menuWidget(context),
+              Padding(
+                padding: EdgeInsets.only(top: 34), // Add top padding
+                child: _menuWidget(context),
+              ),
             ],
           ),
         ],
@@ -60,7 +64,8 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
                 color: ColorConstants.walterWhite,
                 height: 0,
                 fontSize: 28,
-                fontFamily: DmSerif,
+                fontWeight: FontWeight.w700,
+                fontFamily: SourceSerif,
               ),
         ),
       ),
@@ -100,5 +105,5 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(56.0);
+  Size get preferredSize => Size.fromHeight(72.0);
 }

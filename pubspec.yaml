@@ -87,16 +87,16 @@ flutter:
     - .staging.env
     - assets/images/
   fonts:
-
-    - family: DM Serif
+    - family: Source Serif
       fonts:
-        - asset: assets/fonts/dm-serif/DMSerifDisplay-Regular.ttf
-
+        - asset: assets/fonts/source-serif/SourceSerif4-Regular.ttf
+        - asset: assets/fonts/source-serif/SourceSerif4-Medium.ttf
+        - asset: assets/fonts/source-serif/SourceSerif4-SemiBold.ttf
+        - asset: assets/fonts/source-serif/SourceSerif4-Bold.ttf
     - family: DM Mono
       fonts:
         - asset: assets/fonts/dm-mono/DMMono-Medium.ttf
         - asset: assets/fonts/dm-mono/DMMono-Regular.ttf
-
     - family: DM Sans
       fonts:
         - asset: assets/fonts/dm-sans/DMSans-Bold.ttf
