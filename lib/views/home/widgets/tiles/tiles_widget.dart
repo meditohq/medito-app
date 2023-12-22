@@ -29,13 +29,14 @@ class TilesWidget extends ConsumerWidget {
   }
 
   Padding _buildTiles(
-    WidgetRef ref,
-    List<TilesModel> data,
-  ) {
+      WidgetRef ref,
+      List<TilesModel> data,
+      ) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, right: padding20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: data.map((e) {
           var isFirstItem = data[0] == e;
 
@@ -46,13 +47,22 @@ class TilesWidget extends ConsumerWidget {
               ),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  var fontSize = _getFontSize(constraints);
-                  var fontStyle =
-                      Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: DmSerif,
-                            color: ColorConstants.walterWhite,
-                            fontSize: fontSize,
-                          );
+
+                  var titleFontStyle =
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontFamily: DmMono,
+                    color: ColorConstants.walterWhite,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  );
+
+                  var subtitleFontStyle =
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontFamily: DmSans,
+                    color: ColorConstants.walterWhite,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  );
 
                   return InkWell(
                     onTap: isFirstItem ? () => _onTapTile(context, ref) : null,
@@ -77,12 +87,12 @@ class TilesWidget extends ConsumerWidget {
                           height8,
                           Text(
                             e.title,
-                            style: fontStyle,
+                            style: titleFontStyle,
                           ),
                           height4,
                           Text(
                             e.subtitle,
-                            style: fontStyle,
+                            style: subtitleFontStyle,
                           ),
                         ],
                       ),
@@ -95,16 +105,6 @@ class TilesWidget extends ConsumerWidget {
         }).toList(),
       ),
     );
-  }
-
-  double _getFontSize(BoxConstraints constraints) {
-    final width = constraints.maxWidth;
-    var fontSize = fontSize16;
-    if (width <= smallScreenWidth) {
-      fontSize = fontSize14;
-    }
-
-    return fontSize;
   }
 
   void _onTapTile(BuildContext context, WidgetRef ref) {
