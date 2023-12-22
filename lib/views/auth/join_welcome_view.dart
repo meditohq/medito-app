@@ -49,7 +49,7 @@ class JoinWelcomeView extends ConsumerWidget {
                             StringConstants.thanksForJoining,
                             style: textTheme.headlineMedium?.copyWith(
                               color: ColorConstants.walterWhite,
-                              fontFamily: DmSerif,
+                              fontFamily: SourceSerif,
                               height: 1.2,
                               fontSize: 24,
                             ),

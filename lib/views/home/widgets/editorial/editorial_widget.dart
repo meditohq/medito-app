@@ -33,7 +33,7 @@ class EditorialWidget extends ConsumerWidget {
 
   Padding _buildMain(BuildContext context, EditorialModel data) {
     var titleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontFamily: DmSerif,
+          fontFamily: SourceSerif,
           color: ColorConstants.walterWhite,
           fontSize: 24,
         );

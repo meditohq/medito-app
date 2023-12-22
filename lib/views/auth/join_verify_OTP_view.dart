@@ -85,7 +85,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                         StringConstants.verifyYourAccount,
                         style: textTheme.headlineMedium?.copyWith(
                           color: ColorConstants.walterWhite,
-                          fontFamily: DmSerif,
+                          fontFamily: SourceSerif,
                           height: 1.2,
                           fontSize: 24,
                         ),
@@ -123,7 +123,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
                         ),
                         textStyle: textTheme.displayMedium?.copyWith(
                           color: ColorConstants.walterWhite,
-                          fontFamily: DmSerif,
+                          fontFamily: SourceSerif,
                           fontSize: 24,
                         ),
                         enableActiveFill: true,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 final String DmMono = 'DM Mono';
 final String DmSans = 'DM Sans';
-const String DmSerif = 'DM Serif';
+const String SourceSerif = 'Source Serif';
 const String materialIcons = 'MaterialIcons';
 const padding12 = 12.0;
 const padding16 = 16.0;
