@@ -32,8 +32,8 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   IconButton _rewindButton(WidgetRef ref) {
     return IconButton(
-      onPressed: () =>
-          _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
+      onPressed: () => {},
+          // _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
       icon: Icon(
         Icons.replay_10_rounded,
         size: 40,
@@ -43,7 +43,8 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
   IconButton _forwardButton(WidgetRef ref) {
     return IconButton(
-      onPressed: () => _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_10),
+      onPressed: () =>{},
+          // _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_10),
       icon: Icon(
         Icons.forward_10_rounded,
         size: 40,
@@ -51,7 +52,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
+  // void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
     // var audioProvider = ref.read(audioPlayerNotifierProvider);
     // final audioPositionAndPlayerState =
     //     ref.read(audioPositionAndPlayerStateProvider);
@@ -66,5 +67,5 @@ class PlayerButtonsWidget extends ConsumerWidget {
     //   audioPositionAndPlayerState.value?.position ?? Duration(),
     //   maxDuration,
     // );
-  }
+  // }
 }

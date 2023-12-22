@@ -97,7 +97,7 @@ class _PlayerViewState extends ConsumerState<PlayerView>
   }
 
   Future<bool> _handleClose() async {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    // final audioProvider = ref.read(audioPlayerNotifierProvider);
     // await audioProvider.stop();
 
     context.pop();

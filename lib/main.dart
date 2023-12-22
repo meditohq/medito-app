@@ -19,8 +19,6 @@ import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
-import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -67,35 +65,6 @@ Future<void> main() async {
   );
 }
 
-Future<AudioPlayerNotifier> initAudioService() async {
-  final session = await AudioSession.instance;
-  await session.configure(const AudioSessionConfiguration(
-    avAudioSessionCategory: AVAudioSessionCategory.playback,
-    avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.duckOthers,
-    avAudioSessionMode: AVAudioSessionMode.defaultMode,
-    avAudioSessionRouteSharingPolicy:
-        AVAudioSessionRouteSharingPolicy.defaultPolicy,
-    avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-    androidAudioAttributes: AndroidAudioAttributes(
-      contentType: AndroidAudioContentType.music,
-      flags: AndroidAudioFlags.none,
-      usage: AndroidAudioUsage.media,
-    ),
-    androidAudioFocusGainType: AndroidAudioFocusGainType.gainTransientMayDuck,
-    androidWillPauseWhenDucked: true,
-  ));
-
-  return await AudioService.init(
-    builder: () => AudioPlayerNotifier(),
-    config: AudioServiceConfig(
-      androidNotificationChannelId: 'com.medito.app.channel.audio',
-      androidNotificationChannelName: 'Medito Meditation',
-      androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
-    ),
-  );
-}
-
 // This Widget is the main application widget.
 // ignore: prefer-match-file-name
 class ParentWidget extends ConsumerStatefulWidget {
@@ -113,12 +82,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       unawaited(updateStatsFromBg(ref));
-    } else if (state == AppLifecycleState.detached) {
-      final audioProvider = ref.read(audioPlayerNotifierProvider);
-      // audioProvider.stop();
-      // audioProvider.trackAudioPlayer.dispose();
-      // audioProvider.backgroundSoundAudioPlayer.dispose();
-      // audioProvider.dispose();
     }
     currentState = state;
   }
@@ -126,7 +89,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    // final audioProvider = ref.read(audioPlayerNotifierProvider);
     // audioProvider.trackAudioPlayer.dispose();
     // audioProvider.backgroundSoundAudioPlayer.dispose();
     // audioProvider.dispose();

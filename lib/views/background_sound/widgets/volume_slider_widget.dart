@@ -10,29 +10,28 @@ class VolumeSliderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
-    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
-    var currentVolume = bgSoundNotifierProvider.volume;
+    // final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
 
     return SliderTheme(
       data: SliderThemeData(
         trackShape: BackgroundSoundVolumeTrackShapeWidget(
           leadingTitle: StringConstants.volume,
-          tralingText: currentVolume.toString().split('.').first + '%',
+          tralingText:  '', //currentVolume.toString().split('.').first + '%',
         ),
         overlayShape: RoundSliderOverlayShape(overlayRadius: 0.0),
         thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
         trackHeight: 72,
       ),
       child: Slider(
-        value: currentVolume,
+        // value: currentVolume,
+        value: 50,
         min: 0,
         max: 100,
         divisions: 100,
         activeColor: ColorConstants.lightPurple,
         inactiveColor: ColorConstants.greyIsTheNewGrey,
         onChanged: (double newValue) {
-          bgSoundNotifierProvider.handleOnChangeVolume(newValue);
+          // bgSoundNotifierProvider.handleOnChangeVolume(newValue);
           // audioPlayerNotifier.setBackgroundSoundVolume(newValue);
         },
         semanticFormatterCallback: (double newValue) {

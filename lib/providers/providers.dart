@@ -1,5 +1,4 @@
 export 'auth/auth_provider.dart';
-export 'background_sounds/background_sounds_provider.dart';
 export 'connectivity/connectivity_provider.dart';
 export 'device_and_app_info/device_and_app_info_provider.dart';
 export 'events/events_provider.dart';
@@ -10,10 +9,6 @@ export 'meditation/track_provider.dart';
 export 'notification/notification_provider.dart';
 export 'pack/pack_provider.dart';
 export 'page_view/bottom_padding_provider.dart';
-export 'player/audio_play_pause_provider.dart';
-export 'player/audio_player_provider.dart';
-export 'player/audio_position_provider.dart';
-export 'player/audio_speed_provider.dart';
 export 'player/download/audio_downloader_provider.dart';
 export 'player/player_provider.dart';
 export 'search/search_provider.dart';

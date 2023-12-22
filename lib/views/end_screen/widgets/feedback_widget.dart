@@ -18,7 +18,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
   bool isFeedbackAdded = false;
 
   void _handleFeedbackPress(String feedback) async {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
+    // final audioProvider = ref.read(audioPlayerNotifierProvider);
     // var extras = audioProvider.mediaItem.value?.extras;
 
     setState(() {

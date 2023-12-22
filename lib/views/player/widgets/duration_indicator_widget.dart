@@ -33,7 +33,7 @@ class _DurationIndicatorWidgetState
   Widget build(BuildContext context) {
     // final audioPositionAndPlayerState =
     //     ref.watch(audioPositionAndPlayerStateProvider);
-    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
+    // final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
 
     _maxDuration = widget.file.duration.toDouble();
 
@@ -62,12 +62,12 @@ class _DurationIndicatorWidgetState
 
   void onChangeEnd(
     WidgetRef ref,
-    PositionAndPlayerStateState data,
+    // PositionAndPlayerStateState data,
     double val,
   ) {
-    ref.read(slideAudioPositionProvider(
-      duration: val.round(),
-    ));
+    // ref.read(slideAudioPositionProvider(
+    //   duration: val.round(),
+    // ));
     _draggingSeekbar = false;
     // ref.read(audioPlayerNotifierProvider).handleFadeAtEnd(
     //       data.position,
@@ -75,53 +75,53 @@ class _DurationIndicatorWidgetState
     //     );
   }
 
-  Padding _durationBar(
-    BuildContext context,
-    WidgetRef ref,
-    num currentDuration,
-    PositionAndPlayerStateState data,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
-      child: Column(
-        children: [
-          SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 6,
-              trackShape: CustomTrackShape(addTopPadding: false),
-              thumbShape: RoundSliderThumbShape(
-                enabledThumbRadius: 6.0,
-              ),
-            ),
-            child: Slider(
-              min: _minSeconds,
-              activeColor: ColorConstants.walterWhite,
-              inactiveColor: ColorConstants.onyx,
-              max: _maxDuration,
-              value: currentDuration.toDouble(),
-              onChanged: (val) {
-                if (!_draggingSeekbar) {
-                  _draggingSeekbar = true;
-                }
-                setState(() {
-                  _dragSeekbarValue = val;
-                });
-              },
-              onChangeEnd: (val) => onChangeEnd(ref, data, val),
-            ),
-          ),
-          Transform.translate(
-            offset: Offset(0, -14),
-            child: _durationLabels(
-              context,
-              currentDuration.round(),
-              _maxDuration.round(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Padding _durationBar(
+  //   BuildContext context,
+  //   WidgetRef ref,
+  //   num currentDuration,
+  //   PositionAndPlayerStateState data,
+  // ) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
+  //     child: Column(
+  //       children: [
+  //         SliderTheme(
+  //           data: SliderThemeData(
+  //             trackHeight: 6,
+  //             trackShape: CustomTrackShape(addTopPadding: false),
+  //             thumbShape: RoundSliderThumbShape(
+  //               enabledThumbRadius: 6.0,
+  //             ),
+  //           ),
+  //           child: Slider(
+  //             min: _minSeconds,
+  //             activeColor: ColorConstants.walterWhite,
+  //             inactiveColor: ColorConstants.onyx,
+  //             max: _maxDuration,
+  //             value: currentDuration.toDouble(),
+  //             onChanged: (val) {
+  //               if (!_draggingSeekbar) {
+  //                 _draggingSeekbar = true;
+  //               }
+  //               setState(() {
+  //                 _dragSeekbarValue = val;
+  //               });
+  //             },
+  //             onChangeEnd: (val) => onChangeEnd(ref, data, val),
+  //           ),
+  //         ),
+  //         Transform.translate(
+  //           offset: Offset(0, -14),
+  //           child: _durationLabels(
+  //             context,
+  //             currentDuration.round(),
+  //             _maxDuration.round(),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Row _durationLabels(
     BuildContext context,

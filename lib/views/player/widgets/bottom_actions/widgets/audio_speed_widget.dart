@@ -25,11 +25,12 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final _provider = ref.watch(audioSpeedProvider);
-    var audioSpeedModel = _provider.audioSpeedModel;
-    var textColor = audioSpeedModel.label != StringConstants.x1
-        ? ColorConstants.lightPurple
-        : ColorConstants.walterWhite;
+    // final _provider = ref.watch(audioSpeedProvider);
+    // var audioSpeedModel = _provider.audioSpeedModel;
+    var textColor = // audioSpeedModel.label != StringConstants.x1
+        // ? ColorConstants.lightPurple
+        // : ColorConstants.walterWhite;
+         ColorConstants.walterWhite;
 
     return GestureDetector(
       // onTap: () {
@@ -39,7 +40,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
       //       .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
       // },
       child: Text(
-        audioSpeedModel.label,
+      '  audioSpeedModel.label',
         style: Theme.of(context)
             .textTheme
             .bodyMedium

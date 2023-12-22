@@ -10,7 +10,7 @@ class PlayPauseButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(audioPlayerNotifierProvider);
+    // final provider = ref.watch(audioPlayerNotifierProvider);
 
     // return StreamBuilder<bool>(
     //   stream: provider.playbackState.map((state) => state.playing).distinct(),
