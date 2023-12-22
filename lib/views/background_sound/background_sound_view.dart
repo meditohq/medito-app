@@ -22,7 +22,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_scrollListener);
+    // _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setInitStateValues();
     });
@@ -161,5 +161,5 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   //       ],
   //     ),
   //   );
-  // }
+  }
 }
