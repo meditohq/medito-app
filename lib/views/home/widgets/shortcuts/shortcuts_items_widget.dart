@@ -75,8 +75,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   @override
   Widget build(BuildContext context) {
     return ReorderableWrap(
-      spacing: 8.0,
-      runSpacing: 8.0,
+      spacing: 10.0,
+      runSpacing: 10.0,
       padding: EdgeInsets.zero,
       maxMainAxisCount: 2,
       minMainAxisCount: 2,
@@ -87,7 +87,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   List<Widget> _getShortcutsItemWidgetList() {
     var size = MediaQuery.of(context).size;
-    final containerHeight = 48.0;
+    final containerHeight = 56.0;
     final containerWidth = (size.width / 2) - (padding20 + 2);
 
     return data.shortcuts
