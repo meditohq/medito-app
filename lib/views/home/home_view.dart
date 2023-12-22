@@ -60,13 +60,13 @@ class _HomeViewState extends ConsumerState<HomeView>
                       child: Column(
                         children: [
                           HeaderAndAnnouncementWidget(),
-                          height16,
+                          height20,
                           ShortcutsWidget(),
-                          height24,
+                          height20,
                           EditorialWidget(),
-                          height24,
+                          height20,
                           QuoteWidget(),
-                          height24,
+                          height20,
                           TilesWidget(),
                           SizedBox(
                             height: 140,
@@ -91,7 +91,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
   FloatingActionButton _buildFloatingButton(BuildContext context) {
     return FloatingActionButton.extended(
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: ColorConstants.lightPurple,
       onPressed: () {
         context.push(RouteConstants.searchPath);
       },
@@ -100,8 +100,10 @@ class _HomeViewState extends ConsumerState<HomeView>
         StringConstants.explore,
         style: TextStyle(
           color: ColorConstants.walterWhite,
-          fontFamily: DmSerif,
+          fontFamily: SourceSerif,
           fontSize: 20,
+          fontWeight: FontWeight.w700,
+
         ),
       ),
     );
