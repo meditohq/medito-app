@@ -14,7 +14,7 @@ class HTTPConstants {
   static const String TRACKS = 'tracks';
   static const String BACKGROUND_SOUNDS = 'backgroundSounds';
   static const String HEADER = 'main/header';
-  static const String QUOTE = 'main/quote';
+  static const String QUOTE = 'main/quotes';
   static const String SHORTCUTS = 'main/shortcuts';
   static const String EDITORIAL = 'main/editorial';
   static const String STATS = 'main/stats';

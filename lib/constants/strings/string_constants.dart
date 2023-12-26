@@ -23,10 +23,11 @@ class StringConstants {
   static const String wellDoneCopy = 'Well done for meditating today!';
   static const String wellDoneSubtitle =
       'The mind is everything. What you think, you become.';
-  static const String meanWhileCheck = 'Meanwhile, you can check';
+  static const String meanWhileCheck = 'Meanwhile, you can listen to your';
   static const String loading = 'Loading';
   static const String retrying = 'Retrying...';
   static const String tryAgain = 'Try again';
+  static const String retry = 'Retry';
   static const String shareText =
       "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
   static const String shareStatsText =
@@ -109,14 +110,21 @@ class StringConstants {
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';
   static const String invalidToken = 'Invalid token';
+  static const String connectionTimeout = 'Error connection timeout';
+  static const String badRequest = 'Bad request';
+  static const String unauthorizedRequest = 'Unauthorized request';
+  static const String accessForbidden = 'Access forbidden';
+  static const String apiNotFound = 'Api not found';
+  static const String anErrorOccurred =
+      "An error occurred. Sorry for the inconvenience. We're fixing this issue";
   static const String noBgSoundAvailable =
       "You don't have any background sounds available in offline mode";
   static const String unableToLoadAudio =
       'Unable to load audio. Please go back and try again!!';
   static const String loadingError =
-      "It looks like you're offline or there was little hiccup from our end.";
+      "It looks like you're offline or there was little hiccup from our end";
   static const String checkConnection =
-      'It seems you are offline. Please connect to the internet to continue.';
+      'It seems you are offline. Please connect to the internet to continue';
   static const String timeout =
       'Oops! It seems like there was an error. If the problem persists, Close the app and try again.';
   static const String connectivityError =

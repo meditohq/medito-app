@@ -21,26 +21,42 @@ class MeditoErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var isInvalidToken = message == StringConstants.invalidToken;
+    var splittedMessage = message.split(': ');
+    var _showCheckDownloadText = showCheckDownloadText;
 
+    if (splittedMessage.length > 1) {
+      var statusCode = int.parse(splittedMessage[1]);
+      if (statusCode >= 500 && statusCode < 600) {
+        _showCheckDownloadText = true;
+      }
+    }
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
           color: ColorConstants.walterWhite,
           fontFamily: SourceSerif,
         );
+
+    var mainBody = _mainBody(
+      context,
+      splittedMessage[0],
+      _showCheckDownloadText,
+      textStyle,
+    );
+
     if (isScaffold) {
       return Scaffold(
         backgroundColor: ColorConstants.ebony,
-        body: _mainBody(context, isInvalidToken, textStyle),
+        body: mainBody,
       );
     }
 
-    return _mainBody(context, isInvalidToken, textStyle);
+    return mainBody;
   }
 
   SizedBox _mainBody(
     BuildContext context,
-    bool isInvalidToken,
+    String message,
+    bool showCheckDownloadText,
     TextStyle? textStyle,
   ) {
     return SizedBox(
@@ -57,17 +73,15 @@ class MeditoErrorWidget extends StatelessWidget {
           children: [
             RichText(
               text: TextSpan(
-                text: isInvalidToken
-                    ? '${StringConstants.someThingWentWrong}. '
-                    : '$message ',
+                text: '$message. ',
                 style: textStyle,
                 children: <TextSpan>[
-                  if (showCheckDownloadText || isInvalidToken)
+                  if (showCheckDownloadText)
                     TextSpan(
                       text: '${StringConstants.meanWhileCheck} ',
                       style: textStyle,
                     ),
-                  if (showCheckDownloadText || isInvalidToken)
+                  if (showCheckDownloadText)
                     TextSpan(
                       text: '${StringConstants.downloads.toLowerCase()}',
                       style: textStyle?.copyWith(
@@ -84,7 +98,7 @@ class MeditoErrorWidget extends StatelessWidget {
             ),
             height16,
             LoadingButtonWidget(
-              btnText: StringConstants.tryAgain,
+              btnText: StringConstants.retry,
               onPressed: onTap,
               isLoading: isLoading,
               bgColor: ColorConstants.walterWhite,
