@@ -21,6 +21,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_api_availability/google_api_availability.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -192,6 +193,20 @@ Future<String> getFilePathForOldAppDownloadedFiles(String mediaItemId) async {
 
 int formatIcon(String icon) {
   return int.parse('0x$icon');
+}
+
+Future<bool> checkGooglePlayServices() async {
+  if (Platform.isIOS) {
+    return true;
+  } else if (Platform.isAndroid) {
+    var availability = await GoogleApiAvailability.instance
+        .checkGooglePlayServicesAvailability();
+    if (availability == GooglePlayServicesAvailability.success) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 extension SanitisePath on String {
