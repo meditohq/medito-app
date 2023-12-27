@@ -4,18 +4,18 @@ final meditoErrorWidgetProvider =
     Provider.family<MeditoErrorWidgetUIState, MeditoErrorWidgetUIState>(
   (ref, data) {
     try {
-      if (data.shouldShowCheckDownload) {
+      if (data.shouldShowCheckDownloadButton) {
         return MeditoErrorWidgetUIState(true, data.message);
       }
-      var splittedMessage = data.message.split(': ');
-      if (splittedMessage.length > 1) {
-        var statusCode = int.parse(splittedMessage[1]);
+      var splitMessage = data.message.split(': ');
+      if (splitMessage.length > 1) {
+        var statusCode = int.parse(splitMessage[1]);
         if (statusCode >= 500 && statusCode < 600) {
-          return MeditoErrorWidgetUIState(true, splittedMessage[0]);
+          return MeditoErrorWidgetUIState(true, splitMessage[0]);
         }
       }
 
-      return MeditoErrorWidgetUIState(false, splittedMessage[0]);
+      return MeditoErrorWidgetUIState(false, splitMessage[0]);
     } catch (e) {
       return MeditoErrorWidgetUIState(false, data.message);
     }
@@ -24,8 +24,8 @@ final meditoErrorWidgetProvider =
 
 //ignore: prefer-match-file-name
 class MeditoErrorWidgetUIState {
-  final bool shouldShowCheckDownload;
+  final bool shouldShowCheckDownloadButton;
   final String message;
 
-  MeditoErrorWidgetUIState(this.shouldShowCheckDownload, this.message);
+  MeditoErrorWidgetUIState(this.shouldShowCheckDownloadButton, this.message);
 }

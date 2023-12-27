@@ -12,19 +12,19 @@ class MeditoErrorWidget extends ConsumerWidget {
     required this.onTap,
     required this.message,
     this.isLoading = false,
-    this.isShowCheckDownload = false,
+    this.isShowCheckDownloadButton = false,
     this.isScaffold = true,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
   final bool isLoading;
-  final bool isShowCheckDownload;
+  final bool isShowCheckDownloadButton;
   final bool isScaffold;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var provider = ref.watch(meditoErrorWidgetProvider(
-      MeditoErrorWidgetUIState(isShowCheckDownload, message),
+      MeditoErrorWidgetUIState(isShowCheckDownloadButton, message),
     ));
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
@@ -35,7 +35,7 @@ class MeditoErrorWidget extends ConsumerWidget {
     var mainBody = _mainBody(
       context,
       provider.message,
-      provider.shouldShowCheckDownload,
+      provider.shouldShowCheckDownloadButton,
       textStyle,
     );
 
