@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -196,17 +197,26 @@ int formatIcon(String icon) {
 }
 
 Future<bool> checkGooglePlayServices() async {
-  if (Platform.isIOS) {
-    return true;
-  } else if (Platform.isAndroid) {
-    var availability = await GoogleApiAvailability.instance
-        .checkGooglePlayServicesAvailability();
-    if (availability == GooglePlayServicesAvailability.success) {
+  try {
+    if (Platform.isIOS) {
       return true;
+    } else if (Platform.isAndroid) {
+      var availability = await GoogleApiAvailability.instance
+          .checkGooglePlayServicesAvailability();
+      if (availability == GooglePlayServicesAvailability.success) {
+        return true;
+      }
     }
-  }
 
-  return false;
+    return false;
+  } catch (e) {
+    unawaited(Sentry.captureException(
+      e,
+      stackTrace: e,
+    ));
+
+    return false;
+  }
 }
 
 extension SanitisePath on String {
