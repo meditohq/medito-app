@@ -83,7 +83,6 @@ class MainActivity : FlutterActivity() {
             try {
                 mediaController = mediaControllerFuture.get()
                 Log.d("MainActivity", "MediaController initialized")
-                // Now you can use mediaController to control playback
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error initializing MediaController", e)
             }
