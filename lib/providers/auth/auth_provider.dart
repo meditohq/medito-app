@@ -107,7 +107,7 @@ class AuthNotifier extends ChangeNotifier {
     return await authRepository.getUserFromSharedPreference();
   }
 
-  void saveFcmTokenEvent() async {
+  Future<void> saveFcmTokenEvent() async {
     var token = await requestGenerateFirebaseToken();
     var fcm = SaveFcmTokenModel(fcmToken: token ?? '');
     var event = EventsModel(

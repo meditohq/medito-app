@@ -41,7 +41,7 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
       var status = auth.verifyOTPResponse.status;
       if (status == Status.COMPLETED) {
         await removeFirebaseToken();
-        await requestGenerateFirebaseToken();
+        await auth.saveFcmTokenEvent();
         // ignore: unused_result
         ref.invalidate(meProvider);
         ref.read(meProvider);
