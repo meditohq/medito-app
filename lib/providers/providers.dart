@@ -21,3 +21,4 @@ export 'search/search_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
 export 'events/app_opened_event_provider.dart';
 export 'stats/stats_provider.dart';
+export 'error_widget/medito_error_widget_provider.dart';

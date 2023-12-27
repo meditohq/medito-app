@@ -55,7 +55,7 @@ class _ConnectivityErrorComponentState
           );
         },
         message: StringConstants.checkConnection,
-        showCheckDownloadText: true,
+        isShowCheckDownload: true,
       ),
     );
   }
