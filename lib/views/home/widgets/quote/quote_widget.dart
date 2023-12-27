@@ -12,11 +12,11 @@ class QuoteWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var response = ref.watch(fetchQuoteProvider);
     var fontStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      fontFamily: SourceSerif,
-      fontWeight: FontWeight.w500,
-      fontSize: fontSize16,
-      height: 1.4,
-      color: ColorConstants.walterWhite,
+          fontFamily: SourceSerif,
+          fontWeight: FontWeight.w500,
+          fontSize: fontSize16,
+          height: 1.4,
+          color: ColorConstants.walterWhite,
         );
 
     return response.when(
@@ -31,20 +31,22 @@ class QuoteWidget extends ConsumerWidget {
           ),
           margin: const EdgeInsets.symmetric(horizontal: padding20),
           padding: const EdgeInsets.all(padding16),
-          child: Column(
-            children: [
-              Text(
-                data.text,
-                style: fontStyle,
-                textAlign: TextAlign.center,
-              ),
-              height4,
-              Text(
-                '— ${data.author}',
-                style: fontStyle,
-                textAlign: TextAlign.center,
-              ),
-            ],
+          child: SelectionArea(
+            child: Column(
+              children: [
+                Text(
+                  data.text,
+                  style: fontStyle,
+                  textAlign: TextAlign.center,
+                ),
+                height4,
+                Text(
+                  '— ${data.author}',
+                  style: fontStyle,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         );
       },
