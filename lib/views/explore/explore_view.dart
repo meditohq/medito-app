@@ -6,11 +6,18 @@ import 'widgets/explore_appbar_widget.dart';
 import 'widgets/explore_initial_page_widget.dart';
 import 'widgets/explore_result_widget.dart';
 
-class ExploreView extends ConsumerWidget {
-  const ExploreView({super.key});
+class ExploreView extends ConsumerStatefulWidget {
+  ExploreView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ExploreView> createState() => _ExploreViewState();
+}
+
+class _ExploreViewState extends ConsumerState<ExploreView>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     var exploreQuery = ref.watch(exploreQueryProvider);
 
     return Scaffold(
@@ -30,4 +37,7 @@ class ExploreView extends ConsumerWidget {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

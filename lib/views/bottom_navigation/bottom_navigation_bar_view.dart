@@ -10,12 +10,15 @@ class BottomNavigationBarView extends ConsumerStatefulWidget {
   BottomNavigationBarView({super.key});
 
   @override
-  ConsumerState<BottomNavigationBarView> createState() => _HomeViewState();
+  ConsumerState<BottomNavigationBarView> createState() =>
+      _BottomNavigationBarViewState();
 }
 
-class _HomeViewState extends ConsumerState<BottomNavigationBarView>
+class _BottomNavigationBarViewState
+    extends ConsumerState<BottomNavigationBarView>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   int currentPageIndex = 0;
+  late PageController pageController;
   List<NavigationDestination> navigationBarItems = [
     NavigationDestination(
       selectedIcon: Icon(Icons.home),
@@ -28,6 +31,12 @@ class _HomeViewState extends ConsumerState<BottomNavigationBarView>
       label: StringConstants.explore,
     ),
   ];
+
+  @override
+  void initState() {
+    pageController = PageController(initialPage: currentPageIndex);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +55,9 @@ class _HomeViewState extends ConsumerState<BottomNavigationBarView>
         selectedIndex: currentPageIndex,
         destinations: navigationBarItems,
       ),
-      body: IndexedStack(
-        index: currentPageIndex,
+      body: PageView(
+        controller: pageController,
+        onPageChanged: _onDestinationSelected,
         children: <Widget>[HomeView(), ExploreView()],
       ),
     );
@@ -56,6 +66,11 @@ class _HomeViewState extends ConsumerState<BottomNavigationBarView>
   void _onDestinationSelected(int index) {
     setState(() {
       currentPageIndex = index;
+      pageController.animateToPage(
+        index,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
     });
   }
 
