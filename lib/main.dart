@@ -19,6 +19,7 @@ import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,9 +40,11 @@ Future<void> main() async {
   await dotenv.load(fileName: StringConstants.stagingEnv);
 
   var sharedPreferences = await initializeSharedPreferences();
-
-  await Firebase.initializeApp();
-  await registerNotification();
+  var isPlayServices = await checkGooglePlayServices();
+  if (isPlayServices) {
+    await Firebase.initializeApp();
+    await registerNotification();
+  }
 
   await SentryFlutter.init(
     (options) {
