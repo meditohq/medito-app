@@ -2,29 +2,29 @@ import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'widgets/search_appbar_widget.dart';
-import 'widgets/search_initial_page_widget.dart';
-import 'widgets/search_result_widget.dart';
+import 'widgets/explore_appbar_widget.dart';
+import 'widgets/explore_initial_page_widget.dart';
+import 'widgets/explore_result_widget.dart';
 
-class SearchView extends ConsumerWidget {
-  const SearchView({super.key});
+class ExploreView extends ConsumerWidget {
+  const ExploreView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var searchQuery = ref.watch(searchQueryProvider);
+    var exploreQuery = ref.watch(exploreQueryProvider);
 
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: SearchAppbarWidget(),
+        child: ExploreAppbarWidget(),
       ),
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Expanded(
-            child: searchQuery.query.isEmpty
-                ? SearchInitialPageWidget()
-                : SearchResultWidget(),
+            child: exploreQuery.query.isEmpty
+                ? ExploreInitialPageWidget()
+                : ExploreResultWidget(),
           ),
         ],
       ),

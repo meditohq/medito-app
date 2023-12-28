@@ -17,7 +17,7 @@ export 'player/audio_position_provider.dart';
 export 'player/audio_speed_provider.dart';
 export 'player/download/audio_downloader_provider.dart';
 export 'player/player_provider.dart';
-export 'search/search_provider.dart';
+export 'explore/explore_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
 export 'events/app_opened_event_provider.dart';
 export 'stats/stats_provider.dart';

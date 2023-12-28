@@ -6,23 +6,23 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'search_result_card_widget.dart';
+import 'explore_result_card_widget.dart';
 
-class SearchResultWidget extends ConsumerWidget {
-  const SearchResultWidget({super.key});
+class ExploreResultWidget extends ConsumerWidget {
+  const ExploreResultWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var searchResult = ref.watch(searchProvider);
-    var searchQuery = ref.watch(searchQueryProvider);
+    var exploreResult = ref.watch(exploreProvider);
+    var exploreQuery = ref.watch(exploreQueryProvider);
     var listViewPadding = EdgeInsets.only(
-      top: 20,
-      bottom: 32,
-      left: 16,
-      right: 16,
+      top: padding20,
+      bottom: padding16,
+      left: padding16,
+      right: padding16,
     );
 
-    return searchResult.when(
+    return exploreResult.when(
       data: (data) {
         if (data.message != null) {
           return Padding(
@@ -44,7 +44,7 @@ class SearchResultWidget extends ConsumerWidget {
           itemBuilder: (BuildContext context, int index) {
             var element = data.items[index];
 
-            return SearchResultCardWidget(
+            return ExploreResultCardWidget(
               title: element.category,
               description: element.title,
               coverUrlPath: element.coverUrl,
@@ -57,12 +57,12 @@ class SearchResultWidget extends ConsumerWidget {
       },
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
-        onTap: () => ref.refresh(searchProvider),
-        isLoading: searchResult.isLoading,
+        onTap: () => ref.refresh(exploreProvider),
+        isLoading: exploreResult.isLoading,
       ),
       loading: () {
-        if (searchQuery.hasSearchStarted) {
-          return const SearchResultShimmerWidget();
+        if (exploreQuery.hasExploreStarted) {
+          return const ExploreResultShimmerWidget();
         }
 
         return SizedBox();
