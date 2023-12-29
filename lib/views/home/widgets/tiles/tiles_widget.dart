@@ -6,6 +6,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../animated_scale_widget.dart';
 import '../bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 
 class TilesWidget extends ConsumerWidget {
@@ -29,9 +30,9 @@ class TilesWidget extends ConsumerWidget {
   }
 
   Padding _buildTiles(
-      WidgetRef ref,
-      List<TilesModel> data,
-      ) {
+    WidgetRef ref,
+    List<TilesModel> data,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, right: padding20),
       child: Row(
@@ -41,64 +42,66 @@ class TilesWidget extends ConsumerWidget {
           var isFirstItem = data[0] == e;
 
           return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: padding16,
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
+            child: AnimatedScaleWidget(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: padding16,
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    var titleFontStyle =
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontFamily: DmMono,
+                              color: ColorConstants.walterWhite,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            );
 
-                  var titleFontStyle =
-                  Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontFamily: DmMono,
-                    color: ColorConstants.walterWhite,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  );
+                    var subtitleFontStyle =
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontFamily: DmSans,
+                              color: ColorConstants.walterWhite,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            );
 
-                  var subtitleFontStyle =
-                  Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontFamily: DmSans,
-                    color: ColorConstants.walterWhite,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  );
-
-                  return InkWell(
-                    onTap: isFirstItem ? () => _onTapTile(context, ref) : null,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: ColorConstants.onyx,
-                      ),
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.all(padding16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            IconData(
-                              formatIcon(e.icon),
-                              fontFamily: materialIcons,
+                    return InkWell(
+                      onTap:
+                          isFirstItem ? () => _onTapTile(context, ref) : null,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: ColorConstants.onyx,
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.all(padding16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              IconData(
+                                formatIcon(e.icon),
+                                fontFamily: materialIcons,
+                              ),
+                              size: 24,
+                              color: ColorConstants.getColorFromString(e.color),
                             ),
-                            size: 24,
-                            color: ColorConstants.getColorFromString(e.color),
-                          ),
-                          height8,
-                          Text(
-                            e.title,
-                            style: titleFontStyle,
-                          ),
-                          height4,
-                          Text(
-                            e.subtitle,
-                            style: subtitleFontStyle,
-                          ),
-                        ],
+                            height8,
+                            Text(
+                              e.title,
+                              style: titleFontStyle,
+                            ),
+                            height4,
+                            Text(
+                              e.subtitle,
+                              style: subtitleFontStyle,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           );
