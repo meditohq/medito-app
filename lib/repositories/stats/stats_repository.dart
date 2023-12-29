@@ -24,9 +24,9 @@ class StatsRepositoryImpl extends StatsRepository {
 
   @override
   Future<StatsModel> fetchStatsFromRemote() async {
-    var res = await client.getRequest(HTTPConstants.STATS);
+    var response = await client.getRequest(HTTPConstants.STATS);
 
-    return StatsModel.fromJson(res);
+    return StatsModel.fromJson(response);
   }
 
   @override
@@ -98,6 +98,6 @@ class StatsRepositoryImpl extends StatsRepository {
 }
 
 @riverpod
-StatsRepository statsRepository(ref) {
+StatsRepository statsRepository(StatsRepositoryRef ref) {
   return StatsRepositoryImpl(client: ref.watch(dioClientProvider));
 }

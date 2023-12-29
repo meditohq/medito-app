@@ -39,7 +39,7 @@ Future<TrackModel> tracks(
 
 @riverpod
 Future<void> likeDislikeTrack(
-  ref, {
+  LikeDislikeTrackRef ref, {
   required bool isLiked,
   required String trackId,
   required String audioFileId,
@@ -89,7 +89,7 @@ final likeDislikeCombineProvider =
 
 @riverpod
 Future<void> addTrackListInPreference(
-  ref, {
+  AddTrackListInPreferenceRef ref, {
   required List<TrackModel> tracks,
 }) async {
   return await ref.read(trackRepositoryProvider).addTrackInPreference(tracks);
@@ -97,7 +97,7 @@ Future<void> addTrackListInPreference(
 
 @riverpod
 Future<void> addSingleTrackInPreference(
-  ref, {
+  AddSingleTrackInPreferenceRef ref, {
   required TrackModel trackModel,
   required TrackFilesModel file,
 }) async {

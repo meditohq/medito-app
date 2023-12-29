@@ -17,14 +17,14 @@ class SearchRepositoryImpl extends SearchRepository {
 
   @override
   Future<SearchModel> fetchSearchResult(String query) async {
-    var res = await client
+    var response = await client
         .postRequest('${HTTPConstants.SEARCH}', data: {'query': '$query'});
     var searchResults = <SearchItemsModel>[];
     var searchModel = SearchModel();
-    if (res is Map) {
-      searchModel = searchModel.copyWith(message: res['message']);
+    if (response is Map) {
+      searchModel = searchModel.copyWith(message: response['message']);
     } else {
-      var list = res as List;
+      var list = response as List;
       for (var element in list) {
         searchResults.add(SearchItemsModel.fromJson(element));
       }
@@ -36,6 +36,6 @@ class SearchRepositoryImpl extends SearchRepository {
 }
 
 @riverpod
-SearchRepositoryImpl searchRepository(ref) {
+SearchRepositoryImpl searchRepository(SearchRepositoryRef ref) {
   return SearchRepositoryImpl(client: ref.watch(dioClientProvider));
 }

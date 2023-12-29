@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'me_provider.g.dart';
 
 @riverpod
-Future<MeModel> me(ref) {
+Future<MeModel> me(MeRef ref) {
   ref.keepAlive();
 
   return ref.watch(meRepositoryProvider).fetchMe();
