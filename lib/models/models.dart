@@ -29,7 +29,7 @@ export 'join/join_route_params_model.dart';
 export 'me/me_model.dart';
 export 'notification/notification_payload_model.dart';
 export 'pack/pack_model.dart';
-export 'search/search_model.dart';
+export 'explore/explore_model.dart';
 export 'stats/all_stats/all_stats_model.dart';
 export 'stats/stats_model.dart';
 export 'stats/tiles/tiles_model.dart';

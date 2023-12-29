@@ -37,7 +37,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             context.pop();
           } else {
             ref.read(refreshHomeAPIsProvider.future);
-            context.go(RouteConstants.homePath);
+            context.go(RouteConstants.bottomNavbarPath);
           }
         },
         isTransparent: true,

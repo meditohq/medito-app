@@ -1,38 +1,38 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/search/search_provider.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-class SearchAppbarWidget extends ConsumerStatefulWidget {
-  const SearchAppbarWidget({super.key});
+class ExploreAppbarWidget extends ConsumerStatefulWidget {
+  const ExploreAppbarWidget({super.key});
 
   @override
-  ConsumerState<SearchAppbarWidget> createState() => _SearchAppbarWidgetState();
+  ConsumerState<ExploreAppbarWidget> createState() =>
+      _ExploreAppbarWidgetState();
 }
 
-class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
+class _ExploreAppbarWidgetState extends ConsumerState<ExploreAppbarWidget> {
   bool showCancelIcon = false;
-  FocusNode searchInputFocusNode = FocusNode();
+  FocusNode exploreInputFocusNode = FocusNode();
   var textEditingController = TextEditingController();
 
   @override
   void initState() {
     textEditingController.text =
-        ref.read(searchQueryProvider.notifier).state.query;
+        ref.read(exploreQueryProvider.notifier).state.query;
     showCancelIcon = textEditingController.text != '';
     super.initState();
   }
 
   void openKeyboard() {
-    FocusScope.of(context).requestFocus(searchInputFocusNode);
+    FocusScope.of(context).requestFocus(exploreInputFocusNode);
     setState(() {
       showCancelIcon = false;
     });
   }
 
   void handleCancelIconVisibility(String val) {
-    ref.read(searchQueryProvider.notifier).state = SearchQueryModel(val);
+    ref.read(exploreQueryProvider.notifier).state = ExploreQueryModel(val);
     if (val.isNotEmpty && !showCancelIcon) {
       setState(() {
         showCancelIcon = true;
@@ -53,26 +53,20 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
       shadowColor: ColorConstants.ebony,
       surfaceTintColor: Colors.transparent,
       backgroundColor: ColorConstants.onyx,
-      titleSpacing: 0,
-      leading: IconButton(
-        splashRadius: 20,
-        onPressed: () => context.pop(),
-        icon: Icon(Icons.arrow_back),
-      ),
       title: TextFormField(
-        focusNode: searchInputFocusNode,
+        focusNode: exploreInputFocusNode,
         controller: textEditingController,
         cursorColor: ColorConstants.walterWhite,
         cursorWidth: 1,
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.only(top: 11.5),
+          contentPadding: EdgeInsets.only(top: 11.5, left: padding12),
           suffixIcon: Visibility(
             visible: showCancelIcon,
             child: IconButton(
               splashRadius: 20,
               onPressed: () {
-                ref.read(searchQueryProvider.notifier).state =
-                    SearchQueryModel('');
+                ref.read(exploreQueryProvider.notifier).state =
+                    ExploreQueryModel('');
                 textEditingController.text = '';
                 openKeyboard();
               },
@@ -95,11 +89,10 @@ class _SearchAppbarWidgetState extends ConsumerState<SearchAppbarWidget> {
           fontFamily: DmSans,
           fontSize: 16,
         ),
-        autofocus: true,
         onFieldSubmitted: (val) {
-          ref.read(searchQueryProvider.notifier).state =
-              SearchQueryModel(val, hasSearchStarted: true);
-          ref.invalidate(searchProvider);
+          ref.read(exploreQueryProvider.notifier).state =
+              ExploreQueryModel(val, hasExploreStarted: true);
+          ref.invalidate(exploreProvider);
         },
         onChanged: (val) => handleCancelIconVisibility(val),
       ),

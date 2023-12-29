@@ -6,6 +6,7 @@ class StringConstants {
   static const String sounds = 'Sounds';
   static const String sound = 'Sound';
   static const String volume = 'Volume';
+  static const String home = 'Home';
   static const String begin = 'Begin';
   static const String none = 'None';
   static const String removed = 'Removed';

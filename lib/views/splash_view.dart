@@ -23,7 +23,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initializeUser() async {
     var response = await ref.read(userInitializationProvider.future);
     if (response == UserInitializationStatus.successful) {
-      context.go(RouteConstants.homePath);
+      context.go(RouteConstants.bottomNavbarPath);
     } else if (response == UserInitializationStatus.error) {
       showSnackBar(context, StringConstants.timeout);
       context.go(RouteConstants.downloadsPath);

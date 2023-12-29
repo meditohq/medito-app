@@ -2,8 +2,8 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-class SearchResultCardWidget extends StatelessWidget {
-  const SearchResultCardWidget({
+class ExploreResultCardWidget extends StatelessWidget {
+  const ExploreResultCardWidget({
     super.key,
     required this.description,
     required this.title,
