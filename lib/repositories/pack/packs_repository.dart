@@ -19,21 +19,21 @@ class PackRepositoryImpl extends PacksRepository {
 
   @override
   Future<List<PackItemsModel>> fetchAllPacks() async {
-    var res = await client.getRequest('${HTTPConstants.PACKS}');
-    var tempResponse = res as List;
+    var response = await client.getRequest('${HTTPConstants.PACKS}');
+    var tempResponse = response as List;
 
     return tempResponse.map((x) => PackItemsModel.fromJson(x)).toList();
   }
 
   @override
   Future<PackModel> fetchPacks(String packId) async {
-    var res = await client.getRequest('${HTTPConstants.PACKS}/$packId');
+    var response = await client.getRequest('${HTTPConstants.PACKS}/$packId');
 
-    return PackModel.fromJson(res);
+    return PackModel.fromJson(response);
   }
 }
 
 @riverpod
-PackRepositoryImpl packRepository(ref) {
+PackRepositoryImpl packRepository(PackRepositoryRef ref) {
   return PackRepositoryImpl(client: ref.watch(dioClientProvider));
 }

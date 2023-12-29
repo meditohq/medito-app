@@ -7,7 +7,7 @@ part 'audio_position_provider.g.dart';
 
 @riverpod
 void slideAudioPosition(
-  ref, {
+  SlideAudioPositionRef ref, {
   required int duration,
 }) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);
@@ -17,7 +17,7 @@ void slideAudioPosition(
 
 @riverpod
 void skipAudio(
-  ref, {
+  SkipAudioRef ref, {
   required SKIP_AUDIO skip,
 }) {
   final audioPlayer = ref.watch(audioPlayerNotifierProvider);

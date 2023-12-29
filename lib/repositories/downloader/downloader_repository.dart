@@ -113,7 +113,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 }
 
 @riverpod
-DownloaderRepositoryImpl downloaderRepository(ref) {
+DownloaderRepositoryImpl downloaderRepository(DownloaderRepositoryRef ref) {
   return DownloaderRepositoryImpl(
     client: ref.watch(dioClientProvider),
     ref: ref,

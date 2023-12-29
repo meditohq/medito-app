@@ -34,9 +34,9 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<TrackModel> fetchTrack(String trackId) async {
-    var res = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
+    var response = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
 
-    return TrackModel.fromJson(res);
+    return TrackModel.fromJson(response);
   }
 
   @override
@@ -96,6 +96,6 @@ class TrackRepositoryImpl extends TrackRepository {
 }
 
 @riverpod
-TrackRepository trackRepository(ref) {
+TrackRepository trackRepository(TrackRepositoryRef ref) {
   return TrackRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
 }
