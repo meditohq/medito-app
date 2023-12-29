@@ -2,8 +2,8 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:flutter/material.dart';
 
-class SearchInitialPageShimmerWidget extends StatelessWidget {
-  const SearchInitialPageShimmerWidget({super.key});
+class ExploreInitialPageShimmerWidget extends StatelessWidget {
+  const ExploreInitialPageShimmerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

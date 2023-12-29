@@ -9,6 +9,7 @@ import 'package:Medito/views/auth/join_intro_view.dart';
 import 'package:Medito/views/auth/join_verify_OTP_view.dart';
 import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
+import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/home/home_view.dart';
@@ -16,7 +17,7 @@ import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/pack/pack_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/root/root_page_view.dart';
-import 'package:Medito/views/search/search_view.dart';
+import 'package:Medito/views/explore/explore_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/track/track_view.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -106,20 +107,12 @@ final router = GoRouter(
         firstChild: child,
       ),
       routes: [
-        GoRoute(
-          path: RouteConstants.homePath,
-          pageBuilder: (context, state) => MaterialPage(
-            key: state.pageKey,
-            child: HomeView(),
-          ),
-          routes: [
-            _getDownloadsRoute(),
-          ],
-        ),
+        _getBottomNavigationBarRoute(),
+        _getHomeRoute(),
         _getTrackRoute(fromRoot: true),
         _getConnectivityErrorRoute(fromRoot: true),
         _getDownloadsRoute(fromRoot: true),
-        _getSearchRoute(fromRoot: true),
+        _getExploreRoute(fromRoot: true),
         GoRoute(
           path: RouteConstants.packPath,
           routes: [
@@ -149,6 +142,29 @@ final router = GoRouter(
     _getEndScreenRoute(fromRoot: true),
   ],
 );
+
+GoRoute _getHomeRoute() {
+  return GoRoute(
+    path: RouteConstants.homePath,
+    pageBuilder: (context, state) => MaterialPage(
+      key: state.pageKey,
+      child: HomeView(),
+    ),
+    routes: [
+      _getDownloadsRoute(),
+    ],
+  );
+}
+
+GoRoute _getBottomNavigationBarRoute() {
+  return GoRoute(
+    path: RouteConstants.bottomNavbarPath,
+    pageBuilder: (context, state) => MaterialPage(
+      key: state.pageKey,
+      child: BottomNavigationBarView(),
+    ),
+  );
+}
 
 GoRoute _getTrackRoute({bool fromRoot = false}) {
   return GoRoute(
@@ -215,15 +231,15 @@ GoRoute _getConnectivityErrorRoute({bool fromRoot = false}) {
   );
 }
 
-GoRoute _getSearchRoute({bool fromRoot = false}) {
+GoRoute _getExploreRoute({bool fromRoot = false}) {
   return GoRoute(
     path: fromRoot
-        ? RouteConstants.searchPath
-        : RouteConstants.searchPath.sanitisePath(),
+        ? RouteConstants.explorePath
+        : RouteConstants.explorePath.sanitisePath(),
     pageBuilder: (context, state) {
       return MaterialPage(
         key: state.pageKey,
-        child: SearchView(),
+        child: ExploreView(),
       );
     },
   );

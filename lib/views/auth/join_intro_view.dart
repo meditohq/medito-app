@@ -141,7 +141,7 @@ class JoinIntroView extends ConsumerWidget {
     if (fromScreen == Screen.track) {
       context.pop();
     } else {
-      context.go(RouteConstants.homePath);
+      context.go(RouteConstants.bottomNavbarPath);
     }
   }
 }
