@@ -17,9 +17,9 @@ class BottomNavigationBarView extends ConsumerStatefulWidget {
 class _BottomNavigationBarViewState
     extends ConsumerState<BottomNavigationBarView>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  int currentPageIndex = 0;
-  late PageController pageController;
-  List<NavigationDestination> navigationBarItems = [
+  int _currentPageIndex = 0;
+  late PageController _pageController;
+  final List<NavigationDestination> _navigationBarItems = [
     NavigationDestination(
       selectedIcon: Icon(Icons.home),
       icon: Icon(Icons.home_outlined),
@@ -34,7 +34,7 @@ class _BottomNavigationBarViewState
 
   @override
   void initState() {
-    pageController = PageController(initialPage: currentPageIndex);
+    _pageController = PageController(initialPage: _currentPageIndex);
     super.initState();
   }
 
@@ -52,11 +52,11 @@ class _BottomNavigationBarViewState
         onDestinationSelected: _onDestinationSelected,
         indicatorColor: ColorConstants.lightPurple,
         backgroundColor: ColorConstants.ebony,
-        selectedIndex: currentPageIndex,
-        destinations: navigationBarItems,
+        selectedIndex: _currentPageIndex,
+        destinations: _navigationBarItems,
       ),
       body: PageView(
-        controller: pageController,
+        controller: _pageController,
         onPageChanged: _onDestinationSelected,
         children: <Widget>[HomeView(), ExploreView()],
       ),
@@ -65,8 +65,8 @@ class _BottomNavigationBarViewState
 
   void _onDestinationSelected(int index) {
     setState(() {
-      currentPageIndex = index;
-      pageController.animateToPage(
+      _currentPageIndex = index;
+      _pageController.animateToPage(
         index,
         duration: Duration(milliseconds: 500),
         curve: Curves.ease,

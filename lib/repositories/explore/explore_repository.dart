@@ -17,14 +17,14 @@ class ExploreRepositoryImpl extends ExploreRepository {
 
   @override
   Future<ExploreModel> fetchExploreResult(String query) async {
-    var res = await client
+    var response = await client
         .postRequest('${HTTPConstants.SEARCH}', data: {'query': '$query'});
     var exploreResults = <ExploreItemsModel>[];
     var exploreModel = ExploreModel();
-    if (res is Map) {
-      exploreModel = exploreModel.copyWith(message: res['message']);
+    if (response is Map) {
+      exploreModel = exploreModel.copyWith(message: response['message']);
     } else {
-      var list = res as List;
+      var list = response as List;
       for (var element in list) {
         exploreResults.add(ExploreItemsModel.fromJson(element));
       }
