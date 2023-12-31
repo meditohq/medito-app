@@ -105,6 +105,11 @@ class StringConstants {
   static const String mins = 'mins';
 
   //Error
+  static const String unableToLocateTheRoute =
+      'We apologize for the inconvenience, but we were unable to locate the route you were searching for.';
+  static const String pleaseClick = 'Please click the';
+  static const String toReturnToTheMainMenu =
+      'to return to the main menu. Thank you.';
   static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';

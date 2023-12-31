@@ -13,6 +13,7 @@ import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/missing_route/missing_route_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/pack/pack_view.dart';
 import 'package:Medito/views/player/player_view.dart';
@@ -35,6 +36,9 @@ final router = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigatorKey,
   initialLocation: RouteConstants.root,
+  errorBuilder: (context, state) {
+    return MissingRouteView();
+  },
   routes: [
     GoRoute(
       path: RouteConstants.root,
