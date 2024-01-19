@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'pack_provider.g.dart';
 
 @riverpod
-Future<List<PackItemsModel>> fetchAllPacks(ref) {
+Future<List<PackItemsModel>> fetchAllPacks(FetchAllPacksRef ref) {
   var packRepository = ref.watch(packRepositoryProvider);
   ref.keepAlive();
 

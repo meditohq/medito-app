@@ -9,6 +9,8 @@ import 'package:reorderables/reorderables.dart';
 
 import '../../../../providers/home/home_provider.dart';
 
+import '../animated_scale_widget.dart';
+
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
   final ShortcutsModel data;
@@ -93,28 +95,30 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final containerWidth = (size.width / 2) - (padding20 + 2);
 
     return data.shortcuts
-        .map((e) => IntrinsicWidth(
-              child: InkWell(
-                key: ValueKey(e.id),
-                onTap: () => _handleChipPress(context, ref, e),
-                child: Container(
-                  height: containerHeight,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: ColorConstants.onyx,
-                  ),
-                  padding: EdgeInsets.all(12),
-                  constraints: BoxConstraints(
-                    maxWidth: containerWidth,
-                    minWidth: containerWidth,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '${e.title}',
-                      style: Theme.of(context).textTheme.titleSmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+        .map((e) => AnimatedScaleWidget(
+              child: IntrinsicWidth(
+                child: InkWell(
+                  key: ValueKey(e.id),
+                  onTap: () => _handleChipPress(context, ref, e),
+                  child: Container(
+                    height: containerHeight,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: ColorConstants.onyx,
+                    ),
+                    padding: EdgeInsets.all(12),
+                    constraints: BoxConstraints(
+                      maxWidth: containerWidth,
+                      minWidth: containerWidth,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '${e.title}',
+                        style: Theme.of(context).textTheme.titleSmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                 ),

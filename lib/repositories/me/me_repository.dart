@@ -17,13 +17,13 @@ class MeRepositoryImpl extends MeRepository {
 
   @override
   Future<MeModel> fetchMe() async {
-    var res = await client.getRequest(HTTPConstants.ME);
+    var response = await client.getRequest(HTTPConstants.ME);
 
-    return MeModel.fromJson(res);
+    return MeModel.fromJson(response);
   }
 }
 
 @riverpod
-MeRepository meRepository(ref) {
+MeRepository meRepository(MeRepositoryRef ref) {
   return MeRepositoryImpl(client: ref.watch(dioClientProvider));
 }

@@ -32,20 +32,22 @@ class QuoteWidget extends ConsumerWidget {
           ),
           margin: const EdgeInsets.symmetric(horizontal: padding20),
           padding: const EdgeInsets.all(padding16),
-          child: Column(
-            children: [
-              Text(
-                data.text,
-                style: fontStyle,
-                textAlign: TextAlign.center,
-              ),
-              height4,
-              Text(
-                '— ${data.author}',
-                style: fontStyle,
-                textAlign: TextAlign.center,
-              ),
-            ],
+          child: SelectionArea(
+            child: Column(
+              children: [
+                Text(
+                  data.text,
+                  style: fontStyle,
+                  textAlign: TextAlign.center,
+                ),
+                height4,
+                Text(
+                  '— ${data.author}',
+                  style: fontStyle,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         );
       },

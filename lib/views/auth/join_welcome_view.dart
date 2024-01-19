@@ -97,7 +97,7 @@ class JoinWelcomeView extends ConsumerWidget {
               var auth = ref.read(authProvider.notifier);
               auth.setUserEmail(email);
               if (fromScreen == Screen.splash) {
-                context.go(RouteConstants.homePath);
+                context.go(RouteConstants.bottomNavbarPath);
               } else if (fromScreen == Screen.track) {
                 context.pop();
                 context.pop();

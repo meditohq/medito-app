@@ -32,30 +32,30 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<UserTokenModel> generateUserToken() async {
-    var res = await client.postRequest(
+    var response = await client.postRequest(
       HTTPConstants.USERS,
       options: Options(headers: {
         HttpHeaders.authorizationHeader: HTTPConstants.INIT_TOKEN,
       }),
     );
 
-    return UserTokenModel.fromJson(res);
+    return UserTokenModel.fromJson(response);
   }
 
   @override
   Future<String> sendOTP(String email) async {
-    var res = await client
+    var response = await client
         .postRequest('${HTTPConstants.OTP}', data: {'email': email});
 
-    return res['success'];
+    return response['success'];
   }
 
   @override
   Future<String> verifyOTP(String email, String OTP) async {
-    var res = await client
+    var response = await client
         .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
 
-    return res['success'];
+    return response['success'];
   }
 
   @override
@@ -77,6 +77,6 @@ class AuthRepositoryImpl extends AuthRepository {
 }
 
 @riverpod
-AuthRepository authRepository(ref) {
+AuthRepository authRepository(AuthRepositoryRef ref) {
   return AuthRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
 }

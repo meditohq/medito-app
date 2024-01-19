@@ -6,8 +6,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SearchInitialPageWidget extends ConsumerWidget {
-  const SearchInitialPageWidget({
+class ExploreInitialPageWidget extends ConsumerWidget {
+  const ExploreInitialPageWidget({
     super.key,
   });
 
@@ -42,7 +42,7 @@ class SearchInitialPageWidget extends ConsumerWidget {
                 top: padding20,
                 left: padding16,
                 right: padding16,
-                bottom: 32,
+                bottom: padding16,
               ),
               itemBuilder: (context, index) {
                 var element = packs[index];
@@ -69,6 +69,6 @@ class SearchInitialPageWidget extends ConsumerWidget {
     );
   }
 
-  SearchInitialPageShimmerWidget _buildLoadingWidget() =>
-      const SearchInitialPageShimmerWidget();
+  ExploreInitialPageShimmerWidget _buildLoadingWidget() =>
+      const ExploreInitialPageShimmerWidget();
 }

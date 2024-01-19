@@ -6,6 +6,7 @@ class StringConstants {
   static const String sounds = 'Sounds';
   static const String sound = 'Sound';
   static const String volume = 'Volume';
+  static const String home = 'Home';
   static const String begin = 'Begin';
   static const String none = 'None';
   static const String removed = 'Removed';
@@ -102,6 +103,11 @@ class StringConstants {
   static const String mins = 'mins';
 
   //Error
+  static const String unableToLocateTheRoute =
+      'We apologize for the inconvenience, but we were unable to locate the route you were searching for.';
+  static const String pleaseClick = 'Please click the';
+  static const String toReturnToTheMainMenu =
+      'to return to the main menu. Thank you.';
   static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';

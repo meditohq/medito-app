@@ -20,6 +20,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/utils/stats_utils.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -42,9 +43,11 @@ Future<void> main() async {
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 
   var sharedPreferences = await initializeSharedPreferences();
-
-  await Firebase.initializeApp();
-  await registerNotification();
+  var isPlayServices = await checkGooglePlayServices();
+  if (isPlayServices) {
+    await Firebase.initializeApp();
+    await registerNotification();
+  }
 
   await SentryFlutter.init(
     (options) {

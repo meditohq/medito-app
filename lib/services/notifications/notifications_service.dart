@@ -21,9 +21,13 @@ Future<void> registerNotification() async {
 }
 
 Future<String?> requestGenerateFirebaseToken() async {
-  var token = await _messaging.getToken();
+  try {
+    var token = await _messaging.getToken();
 
-  return token;
+    return token;
+  } catch (e) {
+    return null;
+  }
 }
 
 Future removeFirebaseToken() async {
@@ -79,8 +83,8 @@ Future<void> initializeLocalNotification(
     onDidReceiveNotificationResponse: (res) {
       if (res.payload != null) {
         var payload = json.decode(res.payload!);
-        var notificationPaylaod = NotificationPayloadModel.fromJson(payload);
-        _navigate(context, ref, notificationPaylaod);
+        var notificationPayload = NotificationPayloadModel.fromJson(payload);
+        _navigate(context, ref, notificationPayload);
       }
     },
   );
@@ -89,16 +93,16 @@ Future<void> initializeLocalNotification(
 void checkInitialMessage(BuildContext context, WidgetRef ref) async {
   var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
-    var notificationPaylaod =
+    var notificationPayload =
         NotificationPayloadModel.fromJson(initialMessage.data);
-    _navigate(context, ref, notificationPaylaod);
+    _navigate(context, ref, notificationPayload);
   }
 }
 
 void onMessageAppOpened(BuildContext context, WidgetRef ref) {
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    var notificationPaylaod = NotificationPayloadModel.fromJson(message.data);
-    _navigate(context, ref, notificationPaylaod);
+    var notificationPayload = NotificationPayloadModel.fromJson(message.data);
+    _navigate(context, ref, notificationPayload);
   });
 }
 
@@ -116,7 +120,7 @@ void _navigate(
       [data.id.toString().getIdFromPath(), data.path],
     );
   } else {
-    goRouterContext.go(RouteConstants.homePath);
+    goRouterContext.go(RouteConstants.bottomNavbarPath);
   }
 }
 

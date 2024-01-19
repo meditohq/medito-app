@@ -6,9 +6,6 @@ import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-
-import '../../providers/home/home_provider.dart';
 import 'widgets/editorial/editorial_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
@@ -41,8 +38,6 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     return Scaffold(
-      floatingActionButton: _buildFloatingButton(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
         bottom: false,
         child: Container(
@@ -69,9 +64,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           QuoteWidget(),
                           height20,
                           TilesWidget(),
-                          SizedBox(
-                            height: 140,
-                          ),
+                          height20,
                         ],
                       ),
                     ),
@@ -88,26 +81,6 @@ class _HomeViewState extends ConsumerState<HomeView>
   Future<void> _onRefresh() async {
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
-  }
-
-  FloatingActionButton _buildFloatingButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      backgroundColor: ColorConstants.lightPurple,
-      onPressed: () {
-        context.push(RouteConstants.searchPath);
-      },
-      icon: Icon(Icons.explore, color: ColorConstants.walterWhite),
-      label: Text(
-        StringConstants.explore,
-        style: TextStyle(
-          color: ColorConstants.walterWhite,
-          fontFamily: SourceSerif,
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-
-        ),
-      ),
-    );
   }
 
   @override

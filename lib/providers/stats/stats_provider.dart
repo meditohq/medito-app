@@ -15,7 +15,7 @@ Future<StatsModel> remoteStats(RemoteStatsRef ref) {
 }
 
 @riverpod
-Future<Map<String, dynamic>?> localStats(ref) {
+Future<TransferStatsModel?> localStats(LocalStatsRef ref) {
   return ref.watch(statsRepositoryProvider).fetchStatsFromPreference();
 }
 
