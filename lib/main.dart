@@ -94,10 +94,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    // final audioProvider = ref.read(audioPlayerNotifierProvider);
-    // audioProvider.trackAudioPlayer.dispose();
-    // audioProvider.backgroundSoundAudioPlayer.dispose();
-    // audioProvider.dispose();
     super.dispose();
   }
 

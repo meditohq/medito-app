@@ -19,7 +19,7 @@ class RootPageView extends ConsumerStatefulWidget {
 class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
-    // ref.read(rootCombineProvider(context));
+    ref.read(rootCombineProvider(context));
     checkInitialMessage(context, ref);
     super.initState();
   }
