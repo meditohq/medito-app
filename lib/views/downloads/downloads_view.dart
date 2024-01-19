@@ -13,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/background_sounds/background_sounds_notifier.dart';
+import '../../providers/home/home_provider.dart';
+
 class DownloadsView extends ConsumerStatefulWidget {
   @override
   ConsumerState<DownloadsView> createState() => _DownloadsViewState();
@@ -148,6 +151,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     WidgetRef ref,
     TrackModel trackModel,
   ) async {
+    final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+    bgSoundNotifier.getVolumeFromPref();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,

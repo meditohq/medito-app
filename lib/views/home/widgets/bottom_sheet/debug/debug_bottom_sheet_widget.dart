@@ -5,6 +5,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../providers/me/me_provider.dart';
 import '../share_btn/share_btn_widget.dart';
 
 class DebugBottomSheetWidget extends ConsumerWidget {

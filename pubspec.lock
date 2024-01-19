@@ -960,6 +960,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.0"
+  pigeon:
+    dependency: "direct main"
+    description:
+      name: pigeon
+      sha256: "614d9926d887e8486b487de19d0ea082b7e91228f9e7e6ba86837daf5d6e71cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "15.0.2"
   pin_code_fields:
     dependency: "direct main"
     description:

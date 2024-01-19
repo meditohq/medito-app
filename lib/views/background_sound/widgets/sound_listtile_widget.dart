@@ -1,8 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../providers/background_sounds/background_sounds_notifier.dart';
 
 class SoundListTileWidget extends ConsumerWidget {
   const SoundListTileWidget({required this.sound}) : super();
@@ -10,15 +11,15 @@ class SoundListTileWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
-    var selectedSoundId = 'bgSoundNotifierProvider.selectedBgSound?.id';
+    final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
+    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id;
     var id = selectedSoundId ?? '0';
     var isSelected = id == sound.id;
 
     return InkWell(
-      // onTap: () => _handleItemTap(
-      //   audioPlayerNotifier,
-      // ),
+      onTap: () => _handleItemTap(
+        bgSoundNotifierProvider,
+      ),
       child: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -61,4 +62,12 @@ class SoundListTileWidget extends ConsumerWidget {
     );
   }
 
+  void _handleItemTap(
+    BackgroundSoundsNotifier bgSoundNotifierProvider,
+  ) {
+    if (sound.title == StringConstants.none) {
+      bgSoundNotifierProvider.stopBackgroundSound();
+    }
+    bgSoundNotifierProvider.handleOnChangeSound(sound);
+  }
 }

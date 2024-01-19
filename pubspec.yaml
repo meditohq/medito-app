@@ -59,6 +59,7 @@ dependencies:
   app_settings: ^5.1.1
   vibration: ^1.7.3
   reorderables: ^0.6.0
+  pigeon: ^15.0.2
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1

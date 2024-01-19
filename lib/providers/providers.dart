@@ -1,15 +1,16 @@
 export 'auth/auth_provider.dart';
 export 'connectivity/connectivity_provider.dart';
 export 'device_and_app_info/device_and_app_info_provider.dart';
+export 'events/app_opened_event_provider.dart';
 export 'events/events_provider.dart';
 export 'meditation/download_track_provider.dart';
 export 'meditation/track_provider.dart';
 export 'notification/notification_provider.dart';
 export 'pack/pack_provider.dart';
 export 'page_view/bottom_padding_provider.dart';
+export 'player/audio_state_provider.dart';
 export 'player/download/audio_downloader_provider.dart';
 export 'player/player_provider.dart';
 export 'search/search_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
-export 'events/app_opened_event_provider.dart';
 export 'stats/stats_provider.dart';

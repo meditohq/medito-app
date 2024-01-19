@@ -81,7 +81,6 @@ final likeDislikeCombineProvider =
     trackCopy.isLiked = data.isLiked;
     await ref.read(addSingleTrackInPreferenceProvider(
       trackModel: trackCopy,
-      file: data.file,
     ).future);
   }
   ref.invalidate(tracksProvider);
@@ -99,19 +98,8 @@ Future<void> addTrackListInPreference(
 Future<void> addSingleTrackInPreference(
   ref, {
   required TrackModel trackModel,
-  required TrackFilesModel file,
 }) async {
   var _track = trackModel.customCopyWith();
-  for (var i = 0; i < _track.audio.length; i++) {
-    var element = _track.audio[i];
-    var fileIndex = element.files.indexWhere((e) => e.id == file.id);
-    if (fileIndex != -1) {
-      _track.audio.removeWhere((e) => e.guideName != element.guideName);
-      _track.audio.first.files
-          .removeWhere((e) => e.id != element.files[fileIndex].id);
-      break;
-    }
-  }
   var _downloadedTrackList = await ref.read(downloadedTracksProvider.future);
   _downloadedTrackList.add(_track);
   await ref.read(
@@ -120,25 +108,6 @@ Future<void> addSingleTrackInPreference(
     ).future,
   );
   unawaited(ref.refresh(downloadedTracksProvider.future));
-}
-
-@riverpod
-void addCurrentlyPlayingTrackInPreference(
-  _, {
-  required TrackModel trackModel,
-  required TrackFilesModel file,
-}) {
-  var _track = trackModel.customCopyWith();
-  for (var i = 0; i < _track.audio.length; i++) {
-    var element = _track.audio[i];
-    var fileIndex = element.files.indexWhere((e) => e.id == file.id);
-    if (fileIndex != -1) {
-      _track.audio.removeWhere((e) => e.guideName != element.guideName);
-      _track.audio.first.files
-          .removeWhere((e) => e.id != element.files[fileIndex].id);
-      break;
-    }
-  }
 }
 
 //ignore: prefer-match-file-name

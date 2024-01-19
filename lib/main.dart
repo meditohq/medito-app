@@ -18,6 +18,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -28,13 +29,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
-// late AudioPlayerNotifier audioHandler;
+var audioStateNotifier = AudioStateNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: StringConstants.stagingEnv);
+
+  await dotenv.load(fileName: EnvironmentConstants.prodEnv);
+
+  MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 
   var sharedPreferences = await initializeSharedPreferences();
 
@@ -51,8 +56,6 @@ Future<void> main() async {
     },
   );
 
-  // audioHandler = await initAudioService();
-
   usePathUrlStrategy();
 
   runApp(
@@ -65,7 +68,6 @@ Future<void> main() async {
   );
 }
 
-// This Widget is the main application widget.
 // ignore: prefer-match-file-name
 class ParentWidget extends ConsumerStatefulWidget {
   static const String _title = 'Medito';
@@ -115,14 +117,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
     onMessageAppOpened(context, ref);
     initializeNotification(context, ref);
-    // initializeAudioPlayer();
     WidgetsBinding.instance.addObserver(this);
   }
-
-  // void initializeAudioPlayer() {
-  //   var audioPlayerProvider = ref.read(audioPlayerNotifierProvider);
-  //   audioPlayerProvider.initAudioHandler();
-  // }
 
   @override
   Widget build(BuildContext context) {

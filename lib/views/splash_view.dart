@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/auth/initialize_user_provider.dart';
+
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 

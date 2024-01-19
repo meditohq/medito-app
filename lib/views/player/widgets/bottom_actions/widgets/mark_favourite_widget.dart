@@ -1,6 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,12 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MarkFavouriteWidget extends ConsumerStatefulWidget {
   const MarkFavouriteWidget({
     super.key,
-    required this.trackModel,
-    required this.file,
   });
-
-  final TrackModel trackModel;
-  final TrackFilesModel file;
 
   @override
   ConsumerState<MarkFavouriteWidget> createState() =>
@@ -25,7 +18,7 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
 
   @override
   void initState() {
-    isLiked = widget.trackModel.isLiked;
+    isLiked = false; //widget.trackModel.isLiked;
     super.initState();
   }
 
@@ -46,10 +39,10 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
       setState(() {
         isLiked = !isLiked;
       });
-      var data = LikeDislikeModel(isLiked, widget.trackModel, widget.file);
-      await ref.read(
-        likeDislikeCombineProvider(data).future,
-      );
+      // var data = LikeDislikeModel(isLiked, widget.trackModel, widget.file);
+      // await ref.read(
+      //   likeDislikeCombineProvider(data).future,
+      // );
     } catch (e) {
       setState(() {
         isLiked = !isLiked;

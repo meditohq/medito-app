@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/home/home_provider.dart';
 import 'widgets/editorial/editorial_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';

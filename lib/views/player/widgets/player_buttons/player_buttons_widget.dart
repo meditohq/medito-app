@@ -1,5 +1,3 @@
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,13 +5,17 @@ import 'play_pause_button_widget.dart';
 
 class PlayerButtonsWidget extends ConsumerWidget {
   const PlayerButtonsWidget({
+    required this.onSkip10SecondsBackward,
+    required this.onSkip10SecondsForward,
+    required this.isPlaying,
     super.key,
-    required this.trackModel,
-    required this.file,
+    required this.onPlayPause,
   });
 
-  final TrackFilesModel file;
-  final TrackModel trackModel;
+  final Function() onSkip10SecondsBackward;
+  final Function() onSkip10SecondsForward;
+  final bool isPlaying;
+  final Function() onPlayPause;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,19 +23,21 @@ class PlayerButtonsWidget extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _rewindButton(ref),
+        _rewindButton(),
         SizedBox(width: 32),
-        PlayPauseButtonWidget(),
+        PlayPauseButtonWidget(
+          isPlaying: isPlaying,
+          onPlayPause: onPlayPause,
+        ),
         SizedBox(width: 32),
-        _forwardButton(ref),
+        _forwardButton(),
       ],
     );
   }
 
-  IconButton _rewindButton(WidgetRef ref) {
+  IconButton _rewindButton() {
     return IconButton(
-      onPressed: () => {},
-          // _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_BACKWARD_10),
+      onPressed: onSkip10SecondsBackward,
       icon: Icon(
         Icons.replay_10_rounded,
         size: 40,
@@ -41,31 +45,13 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  IconButton _forwardButton(WidgetRef ref) {
+  IconButton _forwardButton() {
     return IconButton(
-      onPressed: () =>{},
-          // _handleForwardAndRewind(ref, SKIP_AUDIO.SKIP_FORWARD_10),
+      onPressed: onSkip10SecondsForward,
       icon: Icon(
         Icons.forward_10_rounded,
         size: 40,
       ),
     );
   }
-
-  // void _handleForwardAndRewind(WidgetRef ref, SKIP_AUDIO skip) {
-    // var audioProvider = ref.read(audioPlayerNotifierProvider);
-    // final audioPositionAndPlayerState =
-    //     ref.read(audioPositionAndPlayerStateProvider);
-
-    // var maxDuration = audioProvider.mediaItem.value?.duration ?? Duration();
-    //
-    // ref.read(
-    //   skipAudioProvider(skip: skip),
-    // );
-    //
-    // audioProvider.handleFadeAtEnd(
-    //   audioPositionAndPlayerState.value?.position ?? Duration(),
-    //   maxDuration,
-    // );
-  // }
 }

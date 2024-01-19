@@ -1,8 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../me/me_provider.dart';
 
 part 'device_and_app_info_provider.g.dart';
 

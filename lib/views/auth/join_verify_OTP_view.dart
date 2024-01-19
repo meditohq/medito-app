@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../providers/me/me_provider.dart';
 import '../../utils/utils.dart';
 
 class JoinVerifyOTPView extends ConsumerStatefulWidget {

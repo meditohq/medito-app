@@ -1,46 +1,48 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AudioSpeedWidget extends ConsumerStatefulWidget {
-  const AudioSpeedWidget({super.key});
+  const AudioSpeedWidget({super.key, required this.onSpeedChanged});
+
+  final Function(double) onSpeedChanged;
 
   @override
   ConsumerState<AudioSpeedWidget> createState() => _AudioSpeedComponentState();
 }
 
 class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
-  @override
-  void initState() {
-    super.initState();
-    // final _provider = ref.read(audioSpeedProvider);
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _provider.getAudioTrackSpeedFromPref();
-    //   ref
-    //       .read(audioPlayerNotifierProvider)
-    //       .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-    // });
-  }
+  String _label = 'x1';
 
   @override
   Widget build(BuildContext context) {
-    // final _provider = ref.watch(audioSpeedProvider);
-    // var audioSpeedModel = _provider.audioSpeedModel;
-    var textColor = // audioSpeedModel.label != StringConstants.x1
-        // ? ColorConstants.lightPurple
-        // : ColorConstants.walterWhite;
-         ColorConstants.walterWhite;
+    var textColor = _label != StringConstants.x1
+        ? ColorConstants.lightPurple
+        : ColorConstants.walterWhite;
+    ColorConstants.walterWhite;
 
     return GestureDetector(
-      // onTap: () {
-      //   _provider.setAudioTrackSpeed();
-      //   ref
-      //       .read(audioPlayerNotifierProvider)
-      //       .setTrackAudioSpeed(_provider.audioSpeedModel.speed);
-      // },
+      onTap: () {
+        if (_label == StringConstants.x06) {
+          _label = StringConstants.x07;
+        } else if (_label == StringConstants.x07) {
+          _label = StringConstants.x08;
+        } else if (_label == StringConstants.x08) {
+          _label = StringConstants.x09;
+        } else if (_label == StringConstants.x09) {
+          _label = StringConstants.x1;
+        } else if (_label == StringConstants.x1) {
+          _label = StringConstants.x125;
+        } else if (_label == StringConstants.x125) {
+          _label = StringConstants.x15;
+        } else {
+          _label = StringConstants.x06;
+        }
+
+        widget.onSpeedChanged(_label.toDouble);
+      },
       child: Text(
-      '  audioSpeedModel.label',
+        _label,
         style: Theme.of(context)
             .textTheme
             .bodyMedium
@@ -49,4 +51,8 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
       ),
     );
   }
+}
+
+extension on String {
+  double get toDouble => double.parse(substring(1));
 }

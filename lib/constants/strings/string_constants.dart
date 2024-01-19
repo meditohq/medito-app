@@ -9,8 +9,6 @@ class StringConstants {
   static const String begin = 'Begin';
   static const String none = 'None';
   static const String removed = 'Removed';
-  static const String stagingEnv = '.staging.env';
-  static const String prodEnv = '.prod.env';
   static const String supportEmail = 'hello@meditofoundation.org';
   static const String pickNarratorAndDuration = 'Pick a narrator & duration';
   static const String pickDuration = 'Pick a duration';

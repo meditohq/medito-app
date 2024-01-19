@@ -5,6 +5,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/background_sounds/background_sounds_notifier.dart';
 import 'widgets/sound_listtile_widget.dart';
 import 'widgets/volume_slider_widget.dart';
 
@@ -22,144 +23,110 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   @override
   void initState() {
     super.initState();
-    // _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setInitStateValues();
-    });
+    _scrollController.addListener(_scrollListener);
   }
 
-  @override
-  void deactivate() {
-    // final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    // if (!_audioPlayerNotifier.trackAudioPlayer.playerState.playing) {
-    //   _audioPlayerNotifier.stopBackgroundSound();
-    // }
-    super.deactivate();
+  void _scrollListener() {
+    setState(() => {});
   }
-
-  void setInitStateValues() {
-    // final _provider = ref.read(backgroundSoundsNotifierProvider);
-    // final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    // if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
-    //   _provider.getBackgroundSoundFromPref();
-    //   if (_provider.selectedBgSound != null &&
-    //       _provider.selectedBgSound?.title != StringConstants.none) {
-    //     _audioPlayerNotifier.setBackgroundAudio(
-    //       _provider.selectedBgSound!,
-    //     );
-    //     _audioPlayerNotifier.playBackgroundSound();
-    //   }
-    //
-    //   _provider.getVolumeFromPref();
-      // _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-    }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Container();
+    var connectivityStatus = ref.watch(connectivityStatusProvider);
 
-  // @override
-  // Widget build(BuildContext context) {
-    // var connectivityStatus =
-    //     ref.watch(connectivityStatusProvider) as ConnectivityStatus;
-    //
-    // ref.listen(connectivityStatusProvider, (prev, next) {
-    //   var state = next as ConnectivityStatus;
-    //   if (state == ConnectivityStatus.isDisonnected) {
-    //     showSnackBar(context, StringConstants.connectivityError);
-    //   }
-    // });
-    // var localBackgroundSounds =
-    //     ref.watch(fetchLocallySavedBackgroundSoundsProvider);
-    // var backgroundSounds = ref.watch(backgroundSoundsProvider);
-    //
-    // if (connectivityStatus == ConnectivityStatus.isDisonnected) {
-    //   return Scaffold(
-    //     body: localBackgroundSounds.when(
-    //       skipLoadingOnRefresh: true,
-    //       skipLoadingOnReload: true,
-    //       data: (data) {
-    //         if (data != null) {
-    //           return _mainContent(
-    //             connectivityStatus,
-    //             data,
-    //           );
-    //         }
-    //
-    //         return MeditoErrorWidget(
-    //           message: StringConstants.noBgSoundAvailable,
-    //           onTap: () => ref.refresh(backgroundSoundsProvider),
-    //         );
-    //       },
-    //       error: (err, stack) {
-    //         return MeditoErrorWidget(
-    //           message: err.toString(),
-    //           onTap: () =>
-    //               ref.refresh(fetchLocallySavedBackgroundSoundsProvider),
-    //         );
-    //       },
-    //       loading: () => BackgroundSoundsShimmerWidget(),
-    //     ),
-    //   );
+    ref.listen(connectivityStatusProvider, (prev, next) {
+      if (next == ConnectivityStatus.isDisconnected) {
+        showSnackBar(context, StringConstants.connectivityError);
+      }
+    });
+    var localBackgroundSounds =
+        ref.watch(fetchLocallySavedBackgroundSoundsProvider);
+    var backgroundSounds = ref.watch(backgroundSoundsProvider);
 
-    // return Container();
+    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
+      return Scaffold(
+        body: localBackgroundSounds.when(
+          skipLoadingOnRefresh: true,
+          skipLoadingOnReload: true,
+          data: (data) {
+            if (data != null) {
+              return _mainContent(
+                connectivityStatus,
+                data,
+              );
+            }
 
-    // return Scaffold(
-    //   body: backgroundSounds.when(
-    //     skipLoadingOnRefresh: false,
-    //     data: (data) => _mainContent(
-    //       connectivityStatus,
-    //       data,
-    //     ),
-    //     error: (err, stack) {
-    //       return MeditoErrorWidget(
-    //         message: err.toString(),
-    //         onTap: () => ref.refresh(backgroundSoundsProvider),
-    //       );
-    //     },
-    //     loading: () => BackgroundSoundsShimmerWidget(),
-    //   ),
-    // );
-  // }
-  //
-  // RefreshIndicator _mainContent(
-  //   ConnectivityStatus status,
-  //   List<BackgroundSoundsModel> data,
-  // ) {
-  //   return RefreshIndicator(
-  //     onRefresh: () async {
-  //       if (status == ConnectivityStatus.isDisconnected) {
-  //         return;
-  //       } else {
-  //         ref.invalidate(backgroundSoundsProvider);
-  //         ref.read(backgroundSoundsProvider);
-  //       }
-  //     },
-  //     child: CustomScrollView(
-  //       controller: _scrollController,
-  //       physics: const AlwaysScrollableScrollPhysics(),
-  //       slivers: [
-  //         MeditoAppBarLarge(
-  //           scrollController: _scrollController,
-  //           title: StringConstants.backgroundSounds,
-  //         ),
-  //         SliverList(
-  //           delegate: SliverChildListDelegate([
-  //             VolumeSliderWidget(),
-  //             Column(
-  //               children: data
-  //                   .map((e) => SoundListTileWidget(
-  //                         sound: e,
-  //                       ))
-  //                   .toList(),
-  //             ),
-  //             height16,
-  //             height16,
-  //           ]),
-  //         ),
-  //       ],
-  //     ),
-  //   );
+            return MeditoErrorWidget(
+              message: StringConstants.noBgSoundAvailable,
+              onTap: () => ref.refresh(backgroundSoundsProvider),
+            );
+          },
+          error: (err, stack) {
+            return MeditoErrorWidget(
+              message: err.toString(),
+              onTap: () =>
+                  ref.refresh(fetchLocallySavedBackgroundSoundsProvider),
+            );
+          },
+          loading: () => BackgroundSoundsShimmerWidget(),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: backgroundSounds.when(
+        skipLoadingOnRefresh: false,
+        data: (data) => _mainContent(
+          connectivityStatus,
+          data,
+        ),
+        error: (err, stack) {
+          return MeditoErrorWidget(
+            message: err.toString(),
+            onTap: () => ref.refresh(backgroundSoundsProvider),
+          );
+        },
+        loading: () => BackgroundSoundsShimmerWidget(),
+      ),
+    );
+  }
+
+  RefreshIndicator _mainContent(
+    ConnectivityStatus status,
+    List<BackgroundSoundsModel> data,
+  ) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        if (status == ConnectivityStatus.isDisconnected) {
+          return;
+        } else {
+          ref.invalidate(backgroundSoundsProvider);
+          ref.read(backgroundSoundsProvider);
+        }
+      },
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          MeditoAppBarLarge(
+            scrollController: _scrollController,
+            title: StringConstants.backgroundSounds,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              VolumeSliderWidget(),
+              Column(
+                children: data
+                    .map((e) => SoundListTileWidget(
+                          sound: e,
+                        ))
+                    .toList(),
+              ),
+              height32,
+            ]),
+          ),
+        ],
+      ),
+    );
   }
 }
