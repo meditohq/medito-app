@@ -44,6 +44,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
       ).future);
       await ref.read(addSingleTrackInPreferenceProvider(
         trackModel: trackModel,
+        file: file,
       ).future);
       notifyListeners();
     } catch (e) {

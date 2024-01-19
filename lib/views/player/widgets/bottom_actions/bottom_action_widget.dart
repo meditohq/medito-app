@@ -48,7 +48,7 @@ class BottomActionWidget extends StatelessWidget {
           Expanded(child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged)),
           width8,
           Expanded(
-            child: MarkFavouriteWidget(),
+            child: MarkFavouriteWidget(trackModel: trackModel, file: file),
           ),
         ],
       ),

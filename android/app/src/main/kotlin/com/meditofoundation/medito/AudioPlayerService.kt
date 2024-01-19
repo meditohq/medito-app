@@ -6,21 +6,31 @@ import MeditoAudioServiceCallbackApi
 import PlaybackState
 import Speed
 import Track
+import android.app.Notification
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.OptIn
+import androidx.core.app.NotificationCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.NotificationUtil
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
+import androidx.media3.session.MediaStyleNotificationHelper
 import io.flutter.embedding.engine.FlutterEngineCache
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi,
     MediaSession.Callback {
@@ -118,7 +128,56 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         handler.post(positionUpdateRunnable)
 
         playBackgroundSound()
+        showNotification()
+
         return true
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun createMediaNotification(
+        session: MediaSession?,
+        artworkBitmap: Bitmap?
+    ): Notification {
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
+            .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
+            .setSmallIcon(R.drawable.notification_icon_push)
+            .setLargeIcon(artworkBitmap)
+            .setStyle(session?.let { MediaStyleNotificationHelper.MediaStyle(it) })
+
+        return builder.build()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun showNotification() {
+        CoroutineScope(Dispatchers.Main).launch {
+            // Move player access to the main thread
+            val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
+            val artworkBitmap = withContext(Dispatchers.IO) {
+                // Download the bitmap in the background thread
+                artworkUri?.let { downloadBitmap(it) }
+            }
+            val notification = createMediaNotification(primaryMediaSession, artworkBitmap)
+            try {
+                NotificationUtil.setNotification(
+                    this@AudioPlayerService,
+                    NOTIFICATION_ID,
+                    notification
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private suspend fun downloadBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+        try {
+            val inputStream = java.net.URL(uri.toString()).openStream()
+            BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     override fun playBackgroundSound() {
@@ -233,5 +292,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             }
         }
     }
-    
+
+    companion object {
+        const val CHANNEL_ID = "medito_media_channel"
+        const val NOTIFICATION_ID = 101011
+    }
+
 }

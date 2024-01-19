@@ -1,6 +1,10 @@
 package meditofoundation.medito
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -20,11 +24,24 @@ class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        createNotificationChannel()
+
         val intent = Intent(this, AudioPlayerService::class.java)
         startService(intent)
     }
 
     companion object {
         const val ENGINE_ID = "medito_flutter_engine"
+    }
+
+    private fun createNotificationChannel() {
+        val channelName = "Meditation audio"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(AudioPlayerService.CHANNEL_ID, channelName, importance).apply {
+            description = "Notification for media control of meditation audio"
+        }
+
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 }
