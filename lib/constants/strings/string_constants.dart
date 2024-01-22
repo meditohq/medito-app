@@ -46,8 +46,6 @@ class StringConstants {
   static const String x08 = 'X0.8';
   static const String x09 = 'X0.9';
   static const String x1 = 'X1';
-  static const String x125 = 'X1.25';
-  static const String x15 = 'X1.5';
 
   //Join
   static const String joinTheMeditoFamily = 'Join the Medito Family';

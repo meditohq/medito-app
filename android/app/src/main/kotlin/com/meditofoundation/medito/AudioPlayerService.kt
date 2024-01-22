@@ -199,8 +199,14 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         this.backgroundSoundUri = uri
     }
 
+    @OptIn(UnstableApi::class)
     override fun stopBackgroundSound() {
         backgroundMusicPlayer.stop()
+        NotificationUtil.setNotification(
+            this,
+            NOTIFICATION_ID,
+            null
+        )
     }
 
     override fun setBackgroundSoundVolume(volume: Double) {
@@ -276,9 +282,12 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 ),
             )
 
-            meditoAudioApi?.updatePlaybackState(state) {}
+            meditoAudioApi?.updatePlaybackState(state) {
+                if (primaryPlayer.playbackState != Player.STATE_ENDED) {
+                    handler.postDelayed(this, 250)
+                }
+            }
 
-            handler.postDelayed(this, 250)
         }
 
         private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {

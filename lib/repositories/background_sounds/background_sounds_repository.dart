@@ -159,7 +159,7 @@ BackgroundSoundsRepositoryImpl backgroundSoundsRepository(
   BackgroundSoundsRepositoryRef ref,
 ) {
   return BackgroundSoundsRepositoryImpl(
-    client: ref.watch(dioClientProvider),
+    client: DioApiService(),
     ref: ref,
   );
 }

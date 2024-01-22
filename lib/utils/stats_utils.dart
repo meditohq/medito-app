@@ -80,7 +80,7 @@ Future<bool> updateMinuteCounter(int additionalSecs) async {
   var prefs = await SharedPreferences.getInstance();
 
   var current = await _getSecondsListened();
-  var plusOne = current + (additionalSecs);
+  var plusOne = current + additionalSecs;
   await prefs.setInt(SharedPreferenceConstants.secsListened, plusOne);
 
   return true;

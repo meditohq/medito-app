@@ -29,7 +29,6 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
         ));
 
   void updatePlaybackState(PlaybackState newState) {
-    print('updatePlaybackState state' + state.toString());
     state = newState;
   }
 }

@@ -32,10 +32,6 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
         } else if (_label == StringConstants.x09) {
           _label = StringConstants.x1;
         } else if (_label == StringConstants.x1) {
-          _label = StringConstants.x125;
-        } else if (_label == StringConstants.x125) {
-          _label = StringConstants.x15;
-        } else {
           _label = StringConstants.x06;
         }
 

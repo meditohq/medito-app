@@ -1,4 +1,5 @@
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
@@ -8,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../constants/strings/route_constants.dart';
 import '../../constants/strings/string_constants.dart';
+import '../../models/join/join_route_params_model.dart';
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
 import '../../widgets/headers/medito_app_bar_small.dart';
@@ -23,11 +26,17 @@ class PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
+  bool _joinScreenOpened = false;
+  bool _endScreenOpened = false;
 
   @override
   Widget build(BuildContext context) {
-    final playbackState = ref.watch(audioStateProvider);
-    final bgSoundNotifier = ref.watch(backgroundSoundsNotifierProvider);
+    var playbackState = ref.watch(audioStateProvider);
+
+    if (playbackState.isCompleted) {
+      _optionallyOpenJoinScreen();
+      _openEndScreen();
+    }
 
     var currentlyPlayingTrack = ref.watch(playerProvider);
     if (currentlyPlayingTrack == null) {
@@ -97,8 +106,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                   file: file,
                   onSpeedChanged: (speed) =>
                       ref.read(playerProvider.notifier).setSpeed(speed),
-                  isBackgroundSoundSelected:
-                      isBackgroundSoundSelected(bgSoundNotifier),
+                  isBackgroundSoundSelected: _isBackgroundSoundSelected(),
                 ),
                 SizedBox(height: 40),
               ],
@@ -109,14 +117,46 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     );
   }
 
-  bool isBackgroundSoundSelected(BackgroundSoundsNotifier bgSoundNotifier) =>
-      bgSoundNotifier.selectedBgSound != null &&
-      bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
+  bool _isBackgroundSoundSelected() {
+    var bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+
+    return bgSoundNotifier.selectedBgSound != null &&
+        bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
+  }
 
   Future<bool> _handleClose() async {
     ref.read(playerProvider.notifier).stop();
     context.pop();
 
     return true;
+  }
+
+  void _openEndScreen() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_endScreenOpened) {
+        var currentlyPlayingTrack = ref.read(playerProvider);
+        var endScreen = currentlyPlayingTrack?.endScreen;
+        if (endScreen != null) {
+          context.push(RouteConstants.endScreenPath, extra: endScreen);
+        }
+        _endScreenOpened = true;
+      }
+    });
+  }
+
+  void _optionallyOpenJoinScreen() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_joinScreenOpened) {
+        var email = ref.read(authProvider).userResponse.body?.email;
+        if (email == null) {
+          var params = JoinRouteParamsModel(screen: Screen.track);
+          context.push(
+            RouteConstants.joinIntroPath,
+            extra: params,
+          );
+          _joinScreenOpened = true;
+        }
+      }
+    });
   }
 }

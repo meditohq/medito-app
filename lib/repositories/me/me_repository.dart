@@ -25,5 +25,5 @@ class MeRepositoryImpl extends MeRepository {
 
 @riverpod
 MeRepository meRepository(MeRepositoryRef ref) {
-  return MeRepositoryImpl(client: ref.watch(dioClientProvider));
+  return MeRepositoryImpl(client: DioApiService());
 }

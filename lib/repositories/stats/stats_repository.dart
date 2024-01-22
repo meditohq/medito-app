@@ -98,6 +98,6 @@ class StatsRepositoryImpl extends StatsRepository {
 }
 
 @riverpod
-StatsRepository statsRepository(StatsRepositoryRef ref) {
-  return StatsRepositoryImpl(client: ref.watch(dioClientProvider));
+StatsRepository statsRepository(StatsRepositoryRef _) {
+  return StatsRepositoryImpl(client: DioApiService());
 }

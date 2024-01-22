@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:Medito/models/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workmanager/workmanager.dart';
 
-import '../../constants/strings/string_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/utils.dart';
-import '../background_sounds/background_sounds_notifier.dart';
+import '../../utils/workmanager.dart';
 import '../events/events_provider.dart';
 import 'download/audio_downloader_provider.dart';
 
@@ -54,6 +54,12 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackModel trackModel,
     TrackFilesModel file,
   ) async {
+    await startBackgroundThreadForAudioCompleteEvent(
+      file.id,
+      trackModel.id,
+      file.duration,
+    );
+
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(trackModel, file),
         );
@@ -71,6 +77,38 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
   }
 
+  Future<void> startBackgroundThreadForAudioCompleteEvent(
+    String fileId,
+    String trackModelId,
+    int duration,
+  ) async {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+
+    await Workmanager().registerOneOffTask(
+      audioCompletedTaskKey,
+      audioCompletedTaskKey,
+      initialDelay: Duration(milliseconds: duration),
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresDeviceIdle: false,
+        requiresStorageNotLow: false,
+      ),
+      inputData: {
+        TypeConstants.fileIdKey: fileId,
+        TypeConstants.trackIdKey: trackModelId,
+      },
+    );
+  }
+
+  void _cancelBackgroundThreadForAudioCompleteEvent() async {
+    await Workmanager().cancelAll();
+  }
+
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
@@ -86,27 +124,12 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     ref.read(eventsProvider(event: event.toJson()));
   }
 
-  void handleAudioCompletionEvent(
-    String audioFileId,
-    String trackId,
-  ) {
-    var audio = AudioCompletedModel(
-      audioFileId: audioFileId,
-      trackId: trackId,
-      updateStats: true,
-    );
-    var event = EventsModel(
-      name: EventTypes.audioCompleted,
-      payload: audio.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
-  }
-
   Future<void> seekToPosition(int position) async {
     await _api.seekToPosition(position);
   }
 
   void stop() {
+    _cancelBackgroundThreadForAudioCompleteEvent();
     _api.stopAudio();
   }
 

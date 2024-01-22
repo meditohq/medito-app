@@ -60,7 +60,7 @@ dependencies:
   vibration: ^1.7.3
   reorderables: ^0.6.0
   google_api_availability: ^5.0.0
-  pigeon: ^15.0.2
+  workmanager: ^0.5.2
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
@@ -68,6 +68,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pigeon: ^15.0.2
   mocktail: ^0.3.0
   build_runner: ^2.3.3
   riverpod_generator: ^2.1.0

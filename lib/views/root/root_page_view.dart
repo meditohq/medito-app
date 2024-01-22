@@ -35,10 +35,10 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
         if (next != null &&
             (prev?.id != next.id ||
                 (prev?.id == next.id && prevId != nextId))) {
-          // ref.read(playerProvider.notifier).handleAudioStartedEvent(
-          //       next.id,
-          //       next.audio.first.files.first.id,
-          //     );
+          ref.read(playerProvider.notifier).handleAudioStartedEvent(
+                next.id,
+                next.audio.first.files.first.id,
+              );
         }
       },
     );

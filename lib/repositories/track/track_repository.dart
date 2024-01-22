@@ -97,5 +97,5 @@ class TrackRepositoryImpl extends TrackRepository {
 
 @riverpod
 TrackRepository trackRepository(TrackRepositoryRef ref) {
-  return TrackRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
+  return TrackRepositoryImpl(ref: ref, client: DioApiService());
 }

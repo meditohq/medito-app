@@ -38,7 +38,7 @@ var audioStateNotifier = AudioStateNotifier();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: EnvironmentConstants.prodEnv);
+  await dotenv.load(fileName: EnvironmentConstants.stagingEnv);
 
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 

@@ -35,5 +35,5 @@ class PackRepositoryImpl extends PacksRepository {
 
 @riverpod
 PackRepositoryImpl packRepository(PackRepositoryRef ref) {
-  return PackRepositoryImpl(client: ref.watch(dioClientProvider));
+  return PackRepositoryImpl(client: DioApiService());
 }

@@ -36,6 +36,6 @@ class ExploreRepositoryImpl extends ExploreRepository {
 }
 
 @riverpod
-ExploreRepositoryImpl exploreRepository(ref) {
-  return ExploreRepositoryImpl(client: ref.watch(dioClientProvider));
+ExploreRepositoryImpl exploreRepository(ExploreRepositoryRef ref) {
+  return ExploreRepositoryImpl(client: DioApiService());
 }

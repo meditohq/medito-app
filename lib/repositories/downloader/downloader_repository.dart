@@ -115,7 +115,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 @riverpod
 DownloaderRepositoryImpl downloaderRepository(DownloaderRepositoryRef ref) {
   return DownloaderRepositoryImpl(
-    client: ref.watch(dioClientProvider),
+    client: DioApiService(),
     ref: ref,
   );
 }

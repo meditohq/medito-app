@@ -35,5 +35,5 @@ class EventsRepositoryImpl extends EventsRepository {
 
 @riverpod
 EventsRepository eventsRepository(EventsRepositoryRef ref) {
-  return EventsRepositoryImpl(client: ref.watch(dioClientProvider));
+  return EventsRepositoryImpl(client: DioApiService());
 }
