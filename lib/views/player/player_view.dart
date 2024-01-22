@@ -1,5 +1,4 @@
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
@@ -11,7 +10,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../constants/strings/route_constants.dart';
 import '../../constants/strings/string_constants.dart';
-import '../../models/join/join_route_params_model.dart';
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
 import '../../widgets/headers/medito_app_bar_small.dart';
@@ -26,15 +24,14 @@ class PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
-  bool _joinScreenOpened = false;
   bool _endScreenOpened = false;
 
   @override
   Widget build(BuildContext context) {
     var playbackState = ref.watch(audioStateProvider);
 
-    if (playbackState.isCompleted) {
-      _optionallyOpenJoinScreen();
+    if (playbackState.isCompleted && playbackState.position > 5000) {
+      _resetState();
       _openEndScreen();
     }
 
@@ -125,10 +122,17 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   Future<bool> _handleClose() async {
-    ref.read(playerProvider.notifier).stop();
+    _resetState();
     context.pop();
 
     return true;
+  }
+
+  void _resetState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(audioStateProvider.notifier).resetState();
+      ref.read(playerProvider.notifier).stop();
+    });
   }
 
   void _openEndScreen() {
@@ -137,25 +141,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         var currentlyPlayingTrack = ref.read(playerProvider);
         var endScreen = currentlyPlayingTrack?.endScreen;
         if (endScreen != null) {
-          context.push(RouteConstants.endScreenPath, extra: endScreen);
+          context.pushReplacement(
+            RouteConstants.endScreenPath,
+            extra: endScreen,
+          );
         }
         _endScreenOpened = true;
-      }
-    });
-  }
-
-  void _optionallyOpenJoinScreen() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_joinScreenOpened) {
-        var email = ref.read(authProvider).userResponse.body?.email;
-        if (email == null) {
-          var params = JoinRouteParamsModel(screen: Screen.track);
-          context.push(
-            RouteConstants.joinIntroPath,
-            extra: params,
-          );
-          _joinScreenOpened = true;
-        }
       }
     });
   }

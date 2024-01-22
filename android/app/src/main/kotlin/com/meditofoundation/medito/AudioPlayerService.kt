@@ -78,8 +78,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryPlayer.removeListener(this)
         backgroundMusicPlayer.removeListener(this)
 
-        handler.removeCallbacks(positionUpdateRunnable)
-
         primaryMediaSession?.run {
             player.release()
             release()
@@ -125,7 +123,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryPlayer.prepare()
         primaryPlayer.play()
 
-        handler.post(positionUpdateRunnable)
+        handler.postDelayed(positionUpdateRunnable, 500)
 
         playBackgroundSound()
         showNotification()

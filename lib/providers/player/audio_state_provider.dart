@@ -31,6 +31,20 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
   void updatePlaybackState(PlaybackState newState) {
     state = newState;
   }
+
+  void resetState() {
+    state = PlaybackState(
+      position: 0,
+      isPlaying: false,
+      isBuffering: false,
+      isSeeking: false,
+      isCompleted: false,
+      duration: 0,
+      speed: Speed(speed: 1),
+      volume: 100,
+      track: Track(title: '', description: '', imageUrl: '', artist: ''),
+    );
+  }
 }
 
 final audioStateProvider =

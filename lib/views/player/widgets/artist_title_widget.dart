@@ -18,7 +18,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     this.titleHeight = 35,
   });
 
-  final String trackTitle;
+  final String? trackTitle;
   final String? artistName, artistUrlPath;
   final double trackTitleFontSize;
   final double artistNameFontSize;
@@ -38,10 +38,14 @@ class ArtistTitleWidget extends ConsumerWidget {
   }
 
   Widget _title(BuildContext context) {
+    if (trackTitle?.isEmpty == true || trackTitle == null) {
+      return SizedBox(height: titleHeight);
+    }
+
     return SizedBox(
       height: titleHeight,
       child: Marquee(
-        text: trackTitle ?? '',
+        text: trackTitle ?? 'Title',
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
               fontFamily: SourceSerif,
               color: ColorConstants.walterWhite,
