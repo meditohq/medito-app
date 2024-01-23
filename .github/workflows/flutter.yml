@@ -65,13 +65,13 @@ jobs:
           flutter pub run dart_code_metrics:metrics check-unused-files --fatal-unused  lib      
 
       #      - name: Create or update PR comment
-#        uses: peter-evans/create-or-update-comment@v1
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          repository: ${{ github.repository }}
-#          issue-number: ${{ github.event.pull_request.number }}
-#          body-file: metrics_report.txt
-#          edit-mode: replace
+      #        uses: peter-evans/create-or-update-comment@v1
+      #        with:
+      #          token: ${{ secrets.GITHUB_TOKEN }}
+      #          repository: ${{ github.repository }}
+      #          issue-number: ${{ github.event.pull_request.number }}
+      #          body-file: metrics_report.txt
+      #          edit-mode: replace
 
       - name: Create a dummy .prod.env file
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
@@ -84,6 +84,9 @@ jobs:
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Run Pigeon generator
+        run: flutter pub run pigeon --input pigeon_conf.dart
 
       - name: Analyze
         run: flutter analyze --no-fatal-warnings --no-fatal-infos .
