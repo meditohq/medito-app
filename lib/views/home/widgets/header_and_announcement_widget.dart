@@ -1,9 +1,9 @@
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../providers/home/home_provider.dart';
 import 'announcement/announcement_widget.dart';
 import 'header/home_header_widget.dart';
 

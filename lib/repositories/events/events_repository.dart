@@ -1,6 +1,5 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'events_repository.g.dart';
@@ -35,5 +34,5 @@ class EventsRepositoryImpl extends EventsRepository {
 
 @riverpod
 EventsRepository eventsRepository(EventsRepositoryRef ref) {
-  return EventsRepositoryImpl(client: ref.watch(dioClientProvider));
+  return EventsRepositoryImpl(client: DioApiService());
 }

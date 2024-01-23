@@ -51,7 +51,7 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   Widget getTitleWidget(BuildContext context) {
     return titleWidget == null
         ? Text(title ?? '', style: Theme.of(context).textTheme.displayLarge)
-        : Row(children: [titleWidget ?? Container()]);
+        : Row(children: [titleWidget!]);
   }
 
   @override

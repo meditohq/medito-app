@@ -1,7 +1,7 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/views/explore/explore_view.dart';
+import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.0.11+30011
+version: 3.1.0+30012
 environment:
   sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
@@ -27,13 +27,6 @@ dependencies:
   flutter_markdown: ^0.6.7
   shared_preferences: ^2.0.5
   auto_size_text: ^3.0.0-nullsafety.0
-  just_audio:
-    git:
-      url: https://github.com/meditohq/just_audio.git
-      ref: feature/treadmill
-      path: just_audio
-  audio_service: ^0.18.10
-  audio_session: ^0.1.18
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2
@@ -67,6 +60,7 @@ dependencies:
   vibration: ^1.7.3
   reorderables: ^0.6.0
   google_api_availability: ^5.0.0
+  workmanager: ^0.5.2
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
@@ -74,6 +68,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pigeon: ^15.0.2
   mocktail: ^0.3.0
   build_runner: ^2.3.3
   riverpod_generator: ^2.1.0

@@ -1,10 +1,17 @@
 import 'dart:async';
 
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workmanager/workmanager.dart';
+
+import '../../constants/types/type_constants.dart';
+import '../../src/audio_pigeon.g.dart';
+import '../../utils/utils.dart';
+import '../../utils/workmanager.dart';
+import '../events/events_provider.dart';
+import 'download/audio_downloader_provider.dart';
+
+final _api = MeditoAudioServiceApi();
 
 final playerProvider =
     StateNotifierProvider<PlayerProvider, TrackModel?>((ref) {
@@ -33,83 +40,77 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       }
     });
 
-    final audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-
-    state = track;
-    _optionallyLoadBackgroundSound(
-      ref,
-      audioPlayerNotifier,
-      track,
-      track.audio.first.files.first,
-    );
     await _playTrack(
       ref,
-      audioPlayerNotifier,
       track,
       file,
     );
-  }
 
-  void _optionallyLoadBackgroundSound(
-    Ref ref,
-    AudioPlayerNotifier audioPlayerNotifier,
-    TrackModel trackModel,
-    TrackFilesModel file,
-  ) {
-    var isPlaying = audioPlayerNotifier.trackAudioPlayer.playerState.playing;
-    var currentPlayingFileId = audioPlayerNotifier.currentlyPlayingTrack?.id;
-
-    if (!isPlaying || currentPlayingFileId != file.id) {
-      _optionallyPlayBackgroundSound(
-        ref,
-        audioPlayerNotifier,
-        trackModel.hasBackgroundSound,
-      );
-    }
+    state = track;
   }
 
   Future<void> _playTrack(
     Ref ref,
-    AudioPlayerNotifier audioPlayerNotifier,
     TrackModel trackModel,
     TrackFilesModel file,
   ) async {
-    var checkDownloadedFile = ref.read(audioDownloaderProvider).getTrackAudio(
+    await startBackgroundThreadForAudioCompleteEvent(
+      file.id,
+      trackModel.id,
+      file.duration,
+    );
+
+    var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(trackModel, file),
         );
-    var filePath = await checkDownloadedFile;
-    audioPlayerNotifier.setTrackAudio(
-      trackModel,
-      file,
-      filePath: filePath,
+    await _api.playAudio(
+      AudioData(
+        url: downloadPath ?? file.path,
+        track: Track(
+          title: trackModel.title,
+          artist: trackModel.artist?.name ?? '',
+          artistUrl: trackModel.artist?.path ?? '',
+          description: trackModel.description,
+          imageUrl: trackModel.coverUrl,
+        ),
+      ),
     );
-    audioPlayerNotifier.currentlyPlayingTrack = file;
-    unawaited(audioPlayerNotifier.play());
+  }
+
+  Future<void> startBackgroundThreadForAudioCompleteEvent(
+    String fileId,
+    String trackModelId,
+    int duration,
+  ) async {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+
+    await Workmanager().registerOneOffTask(
+      audioCompletedTaskKey,
+      audioCompletedTaskKey,
+      initialDelay: Duration(milliseconds: duration),
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresDeviceIdle: false,
+        requiresStorageNotLow: false,
+      ),
+      inputData: {
+        TypeConstants.fileIdKey: fileId,
+        TypeConstants.trackIdKey: trackModelId,
+      },
+    );
+  }
+
+  void _cancelBackgroundThreadForAudioCompleteEvent() async {
+    await Workmanager().cancelAll();
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
-
-  void _optionallyPlayBackgroundSound(
-    Ref ref,
-    AudioPlayerNotifier audioPlayerNotifier,
-    bool hasBackgroundSound,
-  ) {
-    if (hasBackgroundSound) {
-      final _provider = ref.read(backgroundSoundsNotifierProvider);
-      _provider.getBackgroundSoundFromPref();
-      if (_provider.selectedBgSound != null &&
-          _provider.selectedBgSound?.title != StringConstants.none) {
-        audioPlayerNotifier.setBackgroundAudio(_provider.selectedBgSound!);
-        audioPlayerNotifier.playBackgroundSound();
-      }
-
-      _provider.getVolumeFromPref();
-      audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-    } else {
-      audioPlayerNotifier.pauseBackgroundSound();
-    }
-  }
 
   void handleAudioStartedEvent(
     String trackId,
@@ -123,19 +124,28 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     ref.read(eventsProvider(event: event.toJson()));
   }
 
-  void handleAudioCompletionEvent(
-    String audioFileId,
-    String trackId,
-  ) {
-    var audio = AudioCompletedModel(
-      audioFileId: audioFileId,
-      trackId: trackId,
-      updateStats: true,
-    );
-    var event = EventsModel(
-      name: EventTypes.audioCompleted,
-      payload: audio.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
+  Future<void> seekToPosition(int position) async {
+    await _api.seekToPosition(position);
+  }
+
+  void stop() {
+    _cancelBackgroundThreadForAudioCompleteEvent();
+    _api.stopAudio();
+  }
+
+  void setSpeed(double speed) {
+    _api.setSpeed(speed);
+  }
+
+  void skip10SecondsForward() {
+    _api.skip10SecondsForward();
+  }
+
+  void skip10SecondsBackward() {
+    _api.skip10SecondsBackward();
+  }
+
+  void playPause() {
+    _api.playPauseAudio();
   }
 }

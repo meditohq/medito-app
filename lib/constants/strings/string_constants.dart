@@ -10,8 +10,6 @@ class StringConstants {
   static const String begin = 'Begin';
   static const String none = 'None';
   static const String removed = 'Removed';
-  static const String stagingEnv = '.staging.env';
-  static const String prodEnv = '.prod.env';
   static const String supportEmail = 'hello@meditofoundation.org';
   static const String pickNarratorAndDuration = 'Pick a narrator & duration';
   static const String pickDuration = 'Pick a duration';
@@ -48,8 +46,6 @@ class StringConstants {
   static const String x08 = 'X0.8';
   static const String x09 = 'X0.9';
   static const String x1 = 'X1';
-  static const String x125 = 'X1.25';
-  static const String x15 = 'X1.5';
 
   //Join
   static const String joinTheMeditoFamily = 'Join the Medito Family';

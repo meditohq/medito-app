@@ -26,7 +26,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADIING;
+      audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADING;
       await downloadAudio.downloadFile(
         file.path,
         name: fileName,
@@ -67,7 +67,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> getTrackAudio(String fileName) async {
+  Future<String?> getTrackPath(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
     audioDownloadState[fileName] = audioPath != null
@@ -81,6 +81,6 @@ class AudioDownloaderProvider extends ChangeNotifier {
 
 enum AUDIO_DOWNLOAD_STATE {
   DOWNLOAD,
-  DOWNLOADIING,
+  DOWNLOADING,
   DOWNLOADED,
 }

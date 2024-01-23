@@ -5,7 +5,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -78,5 +77,5 @@ class AuthRepositoryImpl extends AuthRepository {
 
 @riverpod
 AuthRepository authRepository(AuthRepositoryRef ref) {
-  return AuthRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
+  return AuthRepositoryImpl(ref: ref, client: DioApiService());
 }

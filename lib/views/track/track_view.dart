@@ -26,6 +26,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/background_sounds/background_sounds_notifier.dart';
+
 class TrackView extends ConsumerStatefulWidget {
   final String id;
 
@@ -90,6 +92,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     TrackFilesModel file,
   ) async {
+    final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+    bgSoundNotifier.getVolumeFromPref();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: file,

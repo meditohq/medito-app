@@ -1,5 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marquee/marquee.dart';
@@ -17,7 +18,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     this.titleHeight = 35,
   });
 
-  final String trackTitle;
+  final String? trackTitle;
   final String? artistName, artistUrlPath;
   final double trackTitleFontSize;
   final double artistNameFontSize;
@@ -31,16 +32,20 @@ class ArtistTitleWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _title(context),
-        if (artistName != null) _subtitle(context),
+        if (artistName.isNotNullAndNotEmpty()) _subtitle(context),
       ],
     );
   }
 
   Widget _title(BuildContext context) {
+    if (trackTitle?.isEmpty == true || trackTitle == null) {
+      return SizedBox(height: titleHeight);
+    }
+
     return SizedBox(
       height: titleHeight,
       child: Marquee(
-        text: trackTitle,
+        text: trackTitle ?? 'Title',
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
               fontFamily: SourceSerif,
               color: ColorConstants.walterWhite,

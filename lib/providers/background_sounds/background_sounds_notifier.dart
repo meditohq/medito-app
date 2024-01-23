@@ -10,7 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'background_sounds_provider.g.dart';
+import '../../src/audio_pigeon.g.dart';
+
+part 'background_sounds_notifier.g.dart';
+
+final _api = MeditoAudioServiceApi();
 
 @riverpod
 Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
@@ -43,7 +47,7 @@ final backgroundSoundsNotifierProvider =
 //ignore:prefer-match-file-name
 class BackgroundSoundsNotifier extends ChangeNotifier {
   final Ref ref;
-  double volume = 0;
+  double volume = 50;
   BackgroundSoundsModel? selectedBgSound;
 
   BackgroundSoundsNotifier(this.ref);
@@ -51,18 +55,21 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   void handleOnChangeVolume(double vol) {
     volume = vol;
     ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
+    _api.setBackgroundSoundVolume(volume);
     notifyListeners();
   }
 
   void handleOnChangeSound(BackgroundSoundsModel? sound) {
     selectedBgSound = sound;
     var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
+
     if (sound != null) {
-      final downloadAudio = ref.read(downloaderRepositoryProvider);
       bgSoundRepoProvider.handleOnChangeSound(sound);
-      updateItemsInSavedBgSoundList(sound);
+      _updateItemsInSavedBgSoundList(sound);
+
       if (sound.title != StringConstants.none) {
         var name = '${sound.title}.mp3';
+        final downloadAudio = ref.read(downloaderRepositoryProvider);
         downloadAudio.getDownloadedFile(name).then((value) {
           if (value == null) {
             downloadAudio.downloadFile(
@@ -70,15 +77,25 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
               name: name,
             );
           }
+          _api.setBackgroundSound(value);
+          _api.playBackgroundSound();
         });
       }
     } else {
-      bgSoundRepoProvider.removeSelectedBgSound();
+      stopBackgroundSound();
     }
     notifyListeners();
   }
 
-  void updateItemsInSavedBgSoundList(BackgroundSoundsModel sound) {
+  void stopBackgroundSound() {
+    var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
+    bgSoundRepoProvider.removeSelectedBgSound();
+    _api.setBackgroundSound(null);
+    _api.stopBackgroundSound();
+    notifyListeners();
+  }
+
+  void _updateItemsInSavedBgSoundList(BackgroundSoundsModel sound) {
     final provider = ref.read(backgroundSoundsRepositoryProvider);
     provider.updateItemsInSavedBgSoundList(sound);
   }
@@ -94,12 +111,9 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void getVolumeFromPref() {
-    var value = ref.read(backgroundSoundsRepositoryProvider).getBgSoundVolume();
-    if (value != null) {
-      volume = value;
-      notifyListeners();
-    } else {
-      handleOnChangeVolume(50.0);
-    }
+    var value =
+        ref.read(backgroundSoundsRepositoryProvider).getBgSoundVolume() ?? 50.0;
+    handleOnChangeVolume(value);
+    volume = value;
   }
 }

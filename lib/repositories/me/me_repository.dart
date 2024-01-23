@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'me_repository.g.dart';
@@ -25,5 +24,5 @@ class MeRepositoryImpl extends MeRepository {
 
 @riverpod
 MeRepository meRepository(MeRepositoryRef ref) {
-  return MeRepositoryImpl(client: ref.watch(dioClientProvider));
+  return MeRepositoryImpl(client: DioApiService());
 }
