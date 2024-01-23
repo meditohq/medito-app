@@ -6,6 +6,7 @@ import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../providers/home/home_provider.dart';
 import 'widgets/editorial/editorial_widget.dart';
 import 'widgets/quote/quote_widget.dart';

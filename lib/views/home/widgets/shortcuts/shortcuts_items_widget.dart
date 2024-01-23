@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../../../providers/home/home_provider.dart';
-
 import '../animated_scale_widget.dart';
 
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {

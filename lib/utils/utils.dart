@@ -110,8 +110,6 @@ Future<void> launchEmailSubmission(
 
   if (await canLaunchUrl(params)) {
     await launchUrl(params);
-  } else {
-    var url = params.toString();
   }
 }
 

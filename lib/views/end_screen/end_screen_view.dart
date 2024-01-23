@@ -3,10 +3,7 @@ import 'package:Medito/models/models.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../providers/auth/auth_provider.dart';
-import '../../routes/routes.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/feedback_widget.dart';
 

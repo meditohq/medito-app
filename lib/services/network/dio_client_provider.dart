@@ -1,14 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 var assignDioHeadersProvider = FutureProvider<void>((ref) async {
   var auth = ref.read(authProvider);
