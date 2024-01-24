@@ -16,6 +16,8 @@ class SplashView extends ConsumerStatefulWidget {
 }
 
 class _SplashViewState extends ConsumerState<SplashView> {
+  bool maintenance = false;
+
   @override
   void initState() {
     initializeUser();

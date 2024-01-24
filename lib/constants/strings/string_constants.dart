@@ -99,6 +99,7 @@ class StringConstants {
   static const String welcome = '👋 Welcome';
   static const String thanksForSharing = 'Thanks for sharing 💜';
   static const String mins = 'mins';
+  static const String hey = '👋 Hey';
 
   //Error
   static const String unableToLocateTheRoute =
