@@ -7,9 +7,9 @@ part 'maintenance_model.g.dart';
 abstract class MaintenanceModel with _$MaintenanceModel {
   const factory MaintenanceModel({
     @Default(0) int? minimumBuildNumber,
-    @Default(null) String? message,
-    @Default(null) String? ctaLabel,
-    @Default(null) String? ctaUrl,
+    String? message,
+    String? ctaLabel,
+    String? ctaUrl,
   }) = _MaintenanceModel;
 
   factory MaintenanceModel.fromJson(Map<String, Object?> json) =>

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -21,8 +19,7 @@ class MaintenanceDioApiService {
       );
   }
 
-  Future<dynamic> getRequest(
-  ) async {
+  Future<dynamic> getRequest() async {
     try {
       var response = await dio.get('');
 
