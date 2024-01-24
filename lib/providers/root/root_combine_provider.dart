@@ -24,7 +24,7 @@ void checkMaintenance(ProviderRef<void> ref, BuildContext context) {
       ref.read(deviceAndAppInfoProvider.future).then(
         (deviceInfo) {
           var buildNumber = int.parse(deviceInfo.buildNumber);
-          if ((maintenanceData.minimumBuildNumber ?? 0) > buildNumber) {
+          if (maintenanceData.isUnderMaintenance || (maintenanceData.minimumBuildNumber ?? 0) > buildNumber) {
             context.push(
               RouteConstants.maintenancePath,
               extra: maintenanceData,

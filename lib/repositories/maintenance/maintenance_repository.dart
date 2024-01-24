@@ -28,6 +28,6 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
   }
 }
 @riverpod
-MaintenanceRepositoryImpl maintenanceRepository(AutoDisposeProviderRef<MaintenanceRepositoryImpl> ref) {
+MaintenanceRepositoryImpl maintenanceRepository(AutoDisposeProviderRef<MaintenanceRepositoryImpl> _) {
   return MaintenanceRepositoryImpl(client: MaintenanceDioApiService());
 }

@@ -10,6 +10,7 @@ abstract class MaintenanceModel with _$MaintenanceModel {
     String? message,
     String? ctaLabel,
     String? ctaUrl,
+    @Default(false) bool isUnderMaintenance,
   }) = _MaintenanceModel;
 
   factory MaintenanceModel.fromJson(Map<String, Object?> json) =>
