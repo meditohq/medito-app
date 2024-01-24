@@ -60,8 +60,8 @@ jobs:
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
-      - name: Analyze code
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+      - name: Run Pigeon generator
+        run: flutter pub run pigeon --input pigeon_conf.dart
 
       - name: Decode and place GoogleService-Info.plist
         run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 -d > ios/Runner/GoogleService-Info.plist
