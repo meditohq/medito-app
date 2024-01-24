@@ -6,6 +6,7 @@ final String DmSans = 'DM Sans';
 const String SourceSerif = 'Source Serif';
 const String materialIcons = 'MaterialIcons';
 const padding12 = 12.0;
+const padding14 = 14.0;
 const padding16 = 16.0;
 const padding20 = 20.0;
 const fontSize16 = 16.0;

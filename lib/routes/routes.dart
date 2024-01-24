@@ -14,6 +14,7 @@ import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/explore/explore_view.dart';
 import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/maintenance/maintenance_view.dart';
 import 'package:Medito/views/missing_route/missing_route_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/pack/pack_view.dart';
@@ -25,6 +26,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../models/maintenance/maintenance_model.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return router;
@@ -111,6 +114,7 @@ final router = GoRouter(
         firstChild: child,
       ),
       routes: [
+        _getMaintenanceRoute(),
         _getBottomNavigationBarRoute(),
         _getHomeRoute(),
         _getTrackRoute(fromRoot: true),
@@ -127,16 +131,16 @@ final router = GoRouter(
                 _getTrackRoute(),
                 GoRoute(
                   path: 'pack3/:p3id',
-                  pageBuilder: (context, state) => getFolderMaterialPage(state),
+                  pageBuilder: (context, state) => _getFolderMaterialPage(state),
                   routes: [
                     _getTrackRoute(),
                   ],
                 ),
               ],
-              pageBuilder: (context, state) => getFolderMaterialPage(state),
+              pageBuilder: (context, state) => _getFolderMaterialPage(state),
             ),
           ],
-          pageBuilder: (context, state) => getFolderMaterialPage(state),
+          pageBuilder: (context, state) => _getFolderMaterialPage(state),
         ),
       ],
     ),
@@ -175,7 +179,7 @@ GoRoute _getTrackRoute({bool fromRoot = false}) {
     path: fromRoot
         ? RouteConstants.trackPath
         : RouteConstants.trackPath.sanitisePath(),
-    pageBuilder: (context, state) => getTrackOptionsMaterialPage(state),
+    pageBuilder: (context, state) => _getTrackOptionsMaterialPage(state),
   );
 }
 
@@ -286,6 +290,20 @@ GoRoute _getDownloadsRoute({bool fromRoot = false}) {
   );
 }
 
+GoRoute _getMaintenanceRoute() {
+  return GoRoute(
+    parentNavigatorKey: _shellNavigatorKey,
+    path:
+         RouteConstants.maintenancePath,
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: MaintenanceView(maintenanceModel: state.extra as MaintenanceModel),
+      );
+    },
+  );
+}
+
 //ignore: prefer-match-file-name
 enum Screen {
   splash,
@@ -296,21 +314,14 @@ enum Screen {
   url,
 }
 
-MaterialPage<void> getTrackOptionsMaterialPage(GoRouterState state) {
+MaterialPage<void> _getTrackOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
     child: TrackView(id: state.params['sid'] ?? ''),
   );
 }
 
-MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
-  return MaterialPage(
-    key: state.pageKey,
-    child: TrackView(id: state.params['did'] ?? ''),
-  );
-}
-
-MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
+MaterialPage<void> _getFolderMaterialPage(GoRouterState state) {
   var packId =
       state.params['p3id'] ?? state.params['p2id'] ?? state.params['pid'];
 
