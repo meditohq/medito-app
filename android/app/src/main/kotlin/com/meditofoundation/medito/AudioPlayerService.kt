@@ -54,7 +54,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         backgroundMusicPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, false)
             .setHandleAudioBecomingNoisy(true)
-            .setWakeMode(C.WAKE_MODE_NETWORK)
+            .setWakeMode(C.WAKE_MODE_LOCAL)
             .build()
 
         primaryPlayer.addListener(this)
@@ -162,6 +162,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                     NOTIFICATION_ID,
                     notification
                 )
+                startForeground(NOTIFICATION_ID, notification)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
