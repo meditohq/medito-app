@@ -12,7 +12,7 @@ class AudioSpeedWidget extends ConsumerStatefulWidget {
 }
 
 class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
-  String _label = 'x1';
+  String _label = StringConstants.x1;
 
   @override
   Widget build(BuildContext context) {

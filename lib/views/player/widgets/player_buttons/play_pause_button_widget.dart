@@ -6,7 +6,8 @@ class PlayPauseButtonWidget extends ConsumerWidget {
   const PlayPauseButtonWidget({
     super.key,
     this.iconSize = 72,
-    required this.isPlaying, required this.onPlayPause,
+    required this.isPlaying,
+    required this.onPlayPause,
   });
 
   final double iconSize;
