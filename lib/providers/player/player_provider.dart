@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Medito/models/models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -84,7 +85,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   ) async {
     await Workmanager().initialize(
       callbackDispatcher,
-      isInDebugMode: true,
+      isInDebugMode: kDebugMode,
     );
 
     await Workmanager().registerOneOffTask(

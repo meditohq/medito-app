@@ -49,26 +49,27 @@ Future<void> main() async {
     await registerNotification();
   }
 
+  usePathUrlStrategy();
+
   await SentryFlutter.init(
     (options) {
+      options.attachScreenshot = true;
       options.environment = kDebugMode
           ? HTTPConstants.ENVIRONMENT_DEBUG
           : HTTPConstants.ENVIRONMENT;
       options.dsn = HTTPConstants.SENTRY_DSN;
       options.tracesSampleRate = 1.0;
     },
-  );
-
-  usePathUrlStrategy();
-
-  runApp(
-    ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-      ],
-      child: ParentWidget(),
+    appRunner: () => runApp(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        ],
+        child: ParentWidget(),
+      ),
     ),
   );
+
 }
 
 // ignore: prefer-match-file-name
