@@ -24,7 +24,7 @@ class DioApiService {
       headers: {
         HttpHeaders.accessControlAllowOriginHeader: '*',
         HttpHeaders.accessControlAllowHeadersHeader:
-        'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
+            'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
         HttpHeaders.accessControlAllowCredentialsHeader: 'true',
         HttpHeaders.accessControlAllowMethodsHeader: 'POST, OPTIONS, HEAD, GET',
         HttpHeaders.contentTypeHeader: ContentType.json.value,
@@ -46,17 +46,16 @@ class DioApiService {
   }
 
   Future<void> _onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) async {
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     await _captureException(err);
     handler.reject(err);
   }
 
-
   Future<void> _captureException(
-      DioException err,
-      ) async {
+    DioException err,
+  ) async {
     await Sentry.captureException(
       {
         'error': err.toString(),

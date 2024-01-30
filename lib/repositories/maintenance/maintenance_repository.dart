@@ -1,9 +1,6 @@
 import 'package:Medito/models/maintenance/maintenance_model.dart';
-import 'package:Medito/providers/maintenance/maintenance_provider.dart';
 import 'package:Medito/services/network/maintenance_dio_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../constants/http/http_constants.dart';
 
 part 'maintenance_repository.g.dart';
 
@@ -27,7 +24,9 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
     }
   }
 }
+
 @riverpod
-MaintenanceRepositoryImpl maintenanceRepository(AutoDisposeProviderRef<MaintenanceRepositoryImpl> _) {
+MaintenanceRepositoryImpl maintenanceRepository(
+    AutoDisposeProviderRef<MaintenanceRepositoryImpl> _) {
   return MaintenanceRepositoryImpl(client: MaintenanceDioApiService());
 }

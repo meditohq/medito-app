@@ -34,7 +34,6 @@ void callbackDispatcher() {
     } catch (err) {
       unawaited(Sentry.captureException(
         err,
-        Hint(),
         stackTrace: err,
       ));
 
