@@ -9,12 +9,7 @@ class OverlayCoverImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
-
-    print(size);
-
-    double dimension;
-
-    dimension = size <= 380 ? size - 128 : size - 64;
+    var dimension = size <= 380 ? size - 128 : size - 64;
 
     return SizedBox(
       width: dimension,
