@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Medito/constants/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -174,7 +175,7 @@ class DioApiService {
       default:
         throw FetchDataException(
           error.response?.statusCode,
-          message ?? 'Error occurred while Communication with Server ',
+          message ?? StringConstants.timeout,
         );
     }
   }

@@ -34,6 +34,9 @@ void callbackDispatcher() {
     } catch (err) {
       unawaited(Sentry.captureException(
         err,
+        hint: Hint()..addAll(
+          {'task': task, 'inputData': inputData?.toString() ?? ''},
+        ),
         stackTrace: err,
       ));
 

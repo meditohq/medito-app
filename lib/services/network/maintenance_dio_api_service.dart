@@ -19,15 +19,16 @@ class MaintenanceDioApiService {
       );
   }
 
-  Future<dynamic> getRequest() async {
+  Future<Map<String, Object>?> getRequest() async {
     try {
       var response = await dio.get('');
 
       return response.data;
     } on DioException catch (err) {
       if (kDebugMode) {
-        print(err);
+        print('maintenance request error: ' + err.toString());
       }
+      rethrow;
     }
   }
 }

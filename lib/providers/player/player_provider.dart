@@ -55,7 +55,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackModel trackModel,
     TrackFilesModel file,
   ) async {
-    await startBackgroundThreadForAudioCompleteEvent(
+    await _startBackgroundThreadForAudioCompleteEvent(
       file.id,
       trackModel.id,
       file.duration,
@@ -78,7 +78,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
   }
 
-  Future<void> startBackgroundThreadForAudioCompleteEvent(
+  Future<void> _startBackgroundThreadForAudioCompleteEvent(
     String fileId,
     String trackModelId,
     int duration,
@@ -91,6 +91,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     await Workmanager().registerOneOffTask(
       audioCompletedTaskKey,
       audioCompletedTaskKey,
+      backoffPolicy: BackoffPolicy.linear,
       initialDelay: Duration(milliseconds: duration),
       constraints: Constraints(
         networkType: NetworkType.connected,

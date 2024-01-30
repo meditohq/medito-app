@@ -18,6 +18,10 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
     try {
       var response = await client.getRequest();
 
+      if (response == null) {
+        return MaintenanceModel();
+      }
+
       return MaintenanceModel.fromJson(response);
     } catch (e) {
       rethrow;
@@ -27,6 +31,7 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
 
 @riverpod
 MaintenanceRepositoryImpl maintenanceRepository(
-    AutoDisposeProviderRef<MaintenanceRepositoryImpl> _) {
+  AutoDisposeProviderRef<MaintenanceRepositoryImpl> _,
+) {
   return MaintenanceRepositoryImpl(client: MaintenanceDioApiService());
 }

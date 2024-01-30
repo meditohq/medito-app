@@ -73,7 +73,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     ref.read(eventsProvider(event: event.toJson()));
   }
 
-  void handleOnGuideNameChange(TrackAudioModel? value) {
+  void _handleOnGuideNameChange(TrackAudioModel? value) {
     setState(() {
       selectedAudio = value;
       selectedDuration = value?.files.first;
@@ -303,7 +303,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             );
           },
         ).toList(),
-        onChanged: handleOnGuideNameChange,
+        onChanged: _handleOnGuideNameChange,
       );
     }
 

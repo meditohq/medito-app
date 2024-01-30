@@ -102,7 +102,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         key: UniqueKey(),
         direction: DismissDirection.endToStart,
         background: _getDismissibleBackgroundWidget(),
-        onDismissed: (direction) => _handleDismissable(direction, item),
+        onDismissed: (direction) => _handleDismissible(direction, item),
         child: _getListItemWidget(item),
       ),
     );
@@ -160,7 +160,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     unawaited(context.push(RouteConstants.playerPath));
   }
 
-  void _handleDismissable(DismissDirection _, TrackModel item) {
+  void _handleDismissible(DismissDirection _, TrackModel item) {
     if (mounted) {
       ref.read(removeDownloadedTrackProvider(track: item));
     }
