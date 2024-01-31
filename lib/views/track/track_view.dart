@@ -87,7 +87,6 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   void _handlePlay(
-    BuildContext context,
     WidgetRef ref,
     TrackModel trackModel,
     TrackFilesModel file,
@@ -193,7 +192,7 @@ class _TrackViewState extends ConsumerState<TrackView>
               if (showGuideNameDropdown) SizedBox(height: 12),
               _durationDropdown(trackModel),
               height12,
-              _playBtn(context, ref, trackModel),
+              _playBtn(ref, trackModel),
               _closeButton(context),
             ],
           ),
@@ -225,7 +224,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  InkWell _playBtn(BuildContext context, WidgetRef ref, TrackModel trackModel) {
+  InkWell _playBtn(WidgetRef ref, TrackModel trackModel) {
     var radius = BorderRadius.only(
       topLeft: Radius.circular(7),
       topRight: Radius.circular(7),
@@ -236,7 +235,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     return InkWell(
       onTap: () {
         var file = selectedDuration ?? trackModel.audio.first.files.first;
-        _handlePlay(context, ref, trackModel, file);
+        _handlePlay(ref, trackModel, file);
       },
       borderRadius: radius,
       child: Ink(
