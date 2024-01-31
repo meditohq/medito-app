@@ -129,10 +129,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   void _resetState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(audioStateProvider.notifier).resetState();
-      ref.read(playerProvider.notifier).stop();
-    });
+    ref.read(audioStateProvider.notifier).resetState();
+    ref.read(playerProvider.notifier).stop();
   }
 
   void _openEndScreen() {
