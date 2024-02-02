@@ -57,7 +57,6 @@ dependencies:
   image: ^4.0.17
   permission_handler: ^10.4.5
   app_settings: ^5.1.1
-  vibration: ^1.7.3
   reorderables: ^0.6.0
   google_api_availability: ^5.0.0
   workmanager: ^0.5.2
@@ -68,11 +67,11 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pigeon: ^15.0.2
+  pigeon: ^16.0.5
   mocktail: ^0.3.0
-  build_runner: ^2.3.3
-  riverpod_generator: ^2.1.0
-  json_serializable: ^6.5.4
+  build_runner: ^2.4.8
+  riverpod_generator: ^2.3.9
+  json_serializable: ^6.7.1
   dart_code_metrics: ^5.7.0
   #USAGE: dart run build_runner watch --delete-conflicting-outputs
 
