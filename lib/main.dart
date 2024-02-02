@@ -34,11 +34,13 @@ import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
 var audioStateNotifier = AudioStateNotifier();
+var currentEnvironment =
+    kDebugMode ? EnvironmentConstants.stagingEnv : EnvironmentConstants.prodEnv;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: EnvironmentConstants.stagingEnv);
+  await dotenv.load(fileName: currentEnvironment);
 
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 
@@ -69,7 +71,6 @@ Future<void> main() async {
       ),
     ),
   );
-
 }
 
 // ignore: prefer-match-file-name

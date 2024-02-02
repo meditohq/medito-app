@@ -16,9 +16,10 @@ class EventsRepositoryImpl extends EventsRepository {
   EventsRepositoryImpl({required this.client});
 
   @override
-  Future<void> trackEvent(Map<String, dynamic> event) async {
+  Future<void> trackEvent(Map<String, dynamic> event, {String? userToken}) async {
     await client.postRequest(
       HTTPConstants.EVENTS,
+      userToken: userToken,
       data: event,
     );
   }

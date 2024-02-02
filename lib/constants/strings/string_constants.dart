@@ -75,6 +75,7 @@ class StringConstants {
   static const String search = 'Search';
   static const String share = 'Share';
   static const String id = 'id';
+  static const String env = 'env';
   static const String email = 'email';
   static const String appVersion = 'appVersion';
   static const String deviceModel = 'deviceModel';

@@ -5,8 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import '../../constants/http/http_constants.dart';
-
 // ignore: avoid_dynamic_calls
 class DioApiService {
   static final DioApiService _instance = DioApiService._internal();
@@ -16,13 +14,24 @@ class DioApiService {
     return _instance;
   }
 
+  // Only pass the userToken if you know the headers have not been set in
+  // assignDioHeadersProvider (for example in workManager)
+  void _setToken(String? userToken) {
+    if (userToken != null && userToken.isNotEmpty) {
+      dio.options.headers[HttpHeaders.authorizationHeader] =
+          'Bearer $userToken';
+    }
+  }
+
   // Private constructor
   DioApiService._internal() {
     dio = Dio();
     dio.options = BaseOptions(
       connectTimeout: Duration(milliseconds: 30000),
       baseUrl: HTTPConstants.BASE_URL,
-      headers: {
+    );
+    dio.options.headers.addAll(
+      {
         HttpHeaders.accessControlAllowOriginHeader: '*',
         HttpHeaders.accessControlAllowHeadersHeader:
             'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
@@ -94,6 +103,7 @@ class DioApiService {
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
     String uri, {
+    String? userToken,
     data,
     Map<String, dynamic>? queryParameters,
     Options? options,
@@ -101,6 +111,7 @@ class DioApiService {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
+    _setToken(userToken);
     try {
       var response = await dio.post(
         uri,

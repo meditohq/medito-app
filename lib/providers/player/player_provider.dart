@@ -1,15 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:Medito/models/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/utils.dart';
 import '../../utils/workmanager.dart';
+import '../../utils/workmanager_constants.dart';
 import '../events/events_provider.dart';
+import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 
 final _api = MeditoAudioServiceApi();
@@ -103,11 +107,25 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       inputData: {
         TypeConstants.fileIdKey: fileId,
         TypeConstants.trackIdKey: trackModelId,
+        WorkManagerConstants.userTokenKey: getUserToken(),
       },
     );
   }
 
-  void _cancelBackgroundThreadForAudioCompleteEvent() async {
+  String? getUserToken() {
+    var user = ref.read(sharedPreferencesProvider).getString(
+          SharedPreferenceConstants.userToken,
+        );
+    var userModel =
+        user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
+    if (userModel != null) {
+      return userModel.token;
+    }
+
+    return null;
+  }
+
+  void cancelBackgroundThreadForAudioCompleteEvent() async {
     await Workmanager().cancelAll();
   }
 
@@ -131,7 +149,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 
   void stop() {
-    _cancelBackgroundThreadForAudioCompleteEvent();
     _api.stopAudio();
   }
 

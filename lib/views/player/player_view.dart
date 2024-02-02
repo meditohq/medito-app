@@ -56,7 +56,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         extendBodyBehindAppBar: true,
         appBar: MeditoAppBarSmall(
           hasCloseButton: true,
-          closePressed: () => _handleClose(),
+          closePressed: () => _handleClose,
           isTransparent: true,
         ),
         body: SafeArea(
@@ -123,14 +123,19 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   Future<bool> _handleClose() async {
     _resetState();
+    ref
+        .read(playerProvider.notifier)
+        .cancelBackgroundThreadForAudioCompleteEvent();
     context.pop();
 
     return true;
   }
 
   void _resetState() {
-    ref.read(audioStateProvider.notifier).resetState();
-    ref.read(playerProvider.notifier).stop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(playerProvider.notifier).stop();
+      ref.read(audioStateProvider.notifier).resetState();
+    });
   }
 
   void _openEndScreen() {
