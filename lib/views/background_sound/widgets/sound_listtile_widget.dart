@@ -12,9 +12,10 @@ class SoundListTileWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
-    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id;
-    var id = selectedSoundId ?? '0';
-    var isSelected = id == sound.id;
+    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id ?? '0';
+    var isDownloading =
+        bgSoundNotifierProvider.downloadingBgSound?.id == sound.id;
+    var isSelected = selectedSoundId == sound.id;
 
     return InkWell(
       onTap: () => _handleItemTap(
@@ -40,10 +41,34 @@ class SoundListTileWidget extends ConsumerWidget {
                     fontSize: 16,
                   ),
             ),
+            isDownloading
+                ? _loadingSpinner()
+                : const SizedBox.shrink(),
           ],
         ),
       ),
     );
+  }
+
+  Expanded _loadingSpinner() {
+    return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: ColorConstants.walterWhite,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
   }
 
   Container _radioButton(bool isSelected) {

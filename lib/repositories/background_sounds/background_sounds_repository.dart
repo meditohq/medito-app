@@ -18,7 +18,7 @@ abstract class BackgroundSoundsRepository {
 
   Future<void> updateItemsInSavedBgSoundList(BackgroundSoundsModel sound);
 
-  void handleOnChangeSound(BackgroundSoundsModel sound);
+  void saveBgSoundToSharedPreferences(BackgroundSoundsModel sound);
 
   void removeSelectedBgSound();
 
@@ -116,7 +116,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   }
 
   @override
-  void handleOnChangeSound(BackgroundSoundsModel sound) {
+  void saveBgSoundToSharedPreferences(BackgroundSoundsModel sound) {
     unawaited(
       ref.read(sharedPreferencesProvider).setString(
             SharedPreferenceConstants.bgSound,

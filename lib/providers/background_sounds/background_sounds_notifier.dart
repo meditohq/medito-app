@@ -49,6 +49,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   final Ref ref;
   double volume = 50;
   BackgroundSoundsModel? selectedBgSound;
+  BackgroundSoundsModel? downloadingBgSound;
 
   BackgroundSoundsNotifier(this.ref);
 
@@ -64,27 +65,38 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
 
     if (sound != null) {
-      bgSoundRepoProvider.handleOnChangeSound(sound);
+      bgSoundRepoProvider.saveBgSoundToSharedPreferences(sound);
       _updateItemsInSavedBgSoundList(sound);
 
       if (sound.title != StringConstants.none) {
         var name = '${sound.title}.mp3';
         final downloadAudio = ref.read(downloaderRepositoryProvider);
-        downloadAudio.getDownloadedFile(name).then((value) {
-          if (value == null) {
-            downloadAudio.downloadFile(
-              sound.path,
-              name: name,
-            );
+        downloadAudio.getDownloadedFile(name).then((url) {
+          if (url == null) {
+            downloadingBgSound = sound;
+            notifyListeners();
+            downloadAudio
+                .downloadFile(
+                  sound.path,
+                  name: name,
+                )
+                .then((_) => downloadingBgSound = null)
+                .then((_) => _play(selectedBgSound?.path))
+                .then((_) => notifyListeners());
+          } else {
+            _play(url);
           }
-          _api.setBackgroundSound(value);
-          _api.playBackgroundSound();
         });
       }
     } else {
       stopBackgroundSound();
     }
     notifyListeners();
+  }
+
+  void _play(String? value) {
+    _api.setBackgroundSound(value);
+    _api.playBackgroundSound();
   }
 
   void stopBackgroundSound() {
