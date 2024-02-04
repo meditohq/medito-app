@@ -28,7 +28,7 @@ String _formatString(
   MeModel? me,
   DeviceAndAppInfoModel? deviceInfo,
 ) {
-  var env = StringConstants.env + ': ${currentEnvironment ?? ''}';
+  var env = StringConstants.env + ': $currentEnvironment';
   var id = StringConstants.id + ': ${me?.id ?? ''}';
   var email = StringConstants.email + ': ${me?.email ?? ''}';
   var appVersion =
