@@ -141,6 +141,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
             .setSmallIcon(R.drawable.notification_icon_push)
             .setLargeIcon(artworkBitmap)
+            .setSilent(true)
             .setStyle(session?.let { MediaStyleNotificationHelper.MediaStyle(it) })
 
         return builder.build()
