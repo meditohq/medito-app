@@ -1,4 +1,5 @@
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/routes/routes.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
@@ -38,7 +39,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     var currentlyPlayingTrack = ref.watch(playerProvider);
     if (currentlyPlayingTrack == null) {
       return MeditoErrorWidget(
-        onTap: () => context.pop(),
+        onTap: () => router.pop(),
         message: StringConstants.unableToLoadAudio,
       );
     }
@@ -49,14 +50,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     var spacerHeight20 = size <= 380.0 ? 0.0 : 20.0;
     var spacerHeight24 = size <= 380.0 ? 0.0 : 24.0;
 
-    return WillPopScope(
-      onWillPop: _handleClose,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _handleClose,
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
         appBar: MeditoAppBarSmall(
           hasCloseButton: true,
-          closePressed: () => _handleClose,
+          closePressed: () => {_handleClose(true)},
           isTransparent: true,
         ),
         body: SafeArea(
@@ -121,14 +123,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
   }
 
-  Future<bool> _handleClose() async {
+  void _handleClose(bool _) {
     _resetState();
     ref
         .read(playerProvider.notifier)
         .cancelBackgroundThreadForAudioCompleteEvent();
-    context.pop();
-
-    return true;
+    router.pop();
   }
 
   void _resetState() {
