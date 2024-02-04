@@ -21,13 +21,9 @@ Future<void> registerNotification() async {
 }
 
 Future<String?> requestGenerateFirebaseToken() async {
-  try {
     var token = await _messaging.getToken();
 
     return token;
-  } catch (e) {
-    return null;
-  }
 }
 
 Future removeFirebaseToken() async {

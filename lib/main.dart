@@ -45,10 +45,16 @@ Future<void> main() async {
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 
   var sharedPreferences = await initializeSharedPreferences();
-  var isPlayServices = await checkGooglePlayServices();
-  if (isPlayServices) {
-    await Firebase.initializeApp();
-    await registerNotification();
+  if (await areGooglePlayServicesAvailable()) {
+    try {
+      await Firebase.initializeApp();
+      await registerNotification();
+    } catch (err) {
+      unawaited(Sentry.captureException(
+        err,
+        stackTrace: err,
+      ));
+    }
   }
 
   usePathUrlStrategy();

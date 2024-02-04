@@ -194,19 +194,15 @@ int formatIcon(String icon) {
   return int.parse('0x$icon');
 }
 
-Future<bool> checkGooglePlayServices() async {
+Future<bool> areGooglePlayServicesAvailable() async {
   try {
     if (Platform.isIOS) {
       return true;
     } else if (Platform.isAndroid) {
-      var availability = await GoogleApiAvailability.instance
-          .checkGooglePlayServicesAvailability();
-      if (availability == GooglePlayServicesAvailability.success) {
-        return true;
-      }
+      return (await GoogleApiAvailability.instance
+              .checkGooglePlayServicesAvailability()) ==
+          GooglePlayServicesAvailability.success;
     }
-
-    return false;
   } catch (e) {
     unawaited(Sentry.captureException(
       e,
@@ -215,6 +211,8 @@ Future<bool> checkGooglePlayServices() async {
 
     return false;
   }
+
+  return false;
 }
 
 extension SanitisePath on String {
