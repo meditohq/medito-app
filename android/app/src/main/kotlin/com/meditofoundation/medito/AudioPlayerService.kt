@@ -45,6 +45,11 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onCreate() {
         super.onCreate()
 
+        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
+            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
+            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
+        }
+
         primaryPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, false)
             .setHandleAudioBecomingNoisy(true)
@@ -62,11 +67,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryMediaSession = MediaSession.Builder(this, primaryPlayer)
             .setCallback(this)
             .build()
-
-        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
-            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
-            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
-        }
 
     }
 
