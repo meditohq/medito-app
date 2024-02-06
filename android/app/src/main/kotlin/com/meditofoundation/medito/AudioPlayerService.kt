@@ -1,4 +1,4 @@
-@UnstableApi package meditofoundation.medito
+package meditofoundation.medito
 
 import AudioData
 import MeditoAudioServiceApi
@@ -82,6 +82,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     }
 
+    @UnstableApi
     @Deprecated("Deprecated in Java")
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         if (playWhenReady && playbackState == Player.STATE_READY) {
