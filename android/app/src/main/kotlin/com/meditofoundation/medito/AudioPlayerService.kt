@@ -1,4 +1,4 @@
-package meditofoundation.medito
+@UnstableApi package meditofoundation.medito
 
 import AudioData
 import MeditoAudioServiceApi
@@ -35,6 +35,7 @@ import kotlinx.coroutines.withContext
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi,
     MediaSession.Callback {
 
+    private lateinit var notification: Notification
     private var backgroundMusicVolume: Float = 0.0F
     private var backgroundSoundUri: String? = null
     private lateinit var primaryPlayer: ExoPlayer
@@ -44,11 +45,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     override fun onCreate() {
         super.onCreate()
-
-        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
-            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
-            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
-        }
 
         primaryPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, false)
@@ -86,6 +82,15 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+        if (playWhenReady && playbackState == Player.STATE_READY) {
+            backgroundMusicPlayer.play()
+        } else if (!playWhenReady) {
+            backgroundMusicPlayer.pause()
+        }
+    }
+
     override fun onTaskRemoved(rootIntent: Intent?) {
         handler.removeCallbacks(positionUpdateRunnable)
 
@@ -118,7 +123,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             )
             .build()
 
-
         primaryPlayer.setMediaItem(primaryMediaItem)
         primaryPlayer.prepare()
         primaryPlayer.play()
@@ -142,21 +146,29 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setSmallIcon(R.drawable.notification_icon_push)
             .setLargeIcon(artworkBitmap)
             .setSilent(true)
+            .setOngoing(true)
             .setStyle(session?.let { MediaStyleNotificationHelper.MediaStyle(it) })
 
         return builder.build()
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
+            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
+            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
+        }
+
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     @OptIn(UnstableApi::class)
     private fun showNotification() {
         CoroutineScope(Dispatchers.Main).launch {
-            // Move player access to the main thread
             val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
             val artworkBitmap = withContext(Dispatchers.IO) {
-                // Download the bitmap in the background thread
                 artworkUri?.let { downloadBitmap(it) }
             }
-            val notification = createMediaNotification(primaryMediaSession, artworkBitmap)
+            notification = createMediaNotification(primaryMediaSession, artworkBitmap)
             try {
                 NotificationUtil.setNotification(
                     this@AudioPlayerService,
