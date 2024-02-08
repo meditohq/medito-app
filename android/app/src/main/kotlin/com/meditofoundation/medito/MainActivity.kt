@@ -36,9 +36,8 @@ class MainActivity : FlutterActivity() {
 
     private fun startAudioService() {
         val intent = Intent(this, AudioPlayerService::class.java)
-        startForegroundService(intent)
+        startService(intent)
     }
-
 
     companion object {
         const val ENGINE_ID = "medito_flutter_engine"
