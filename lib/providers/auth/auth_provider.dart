@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authProvider = ChangeNotifierProvider<AuthNotifier>(
-  (ref) {
+      (ref) {
     return AuthNotifier(
       ref,
       authRepository: ref.read(authRepositoryProvider),
@@ -109,11 +109,13 @@ class AuthNotifier extends ChangeNotifier {
 
   Future<void> saveFcmTokenEvent() async {
     var token = await requestGenerateFirebaseToken();
-    var fcm = SaveFcmTokenModel(fcmToken: token ?? '');
-    var event = EventsModel(
-      name: EventTypes.saveFcmToken,
-      payload: fcm.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
+    if (token != null) {
+      var fcm = SaveFcmTokenModel(fcmToken: token);
+      var event = EventsModel(
+        name: EventTypes.saveFcmToken,
+        payload: fcm.toJson(),
+      );
+      ref.read(eventsProvider(event: event.toJson()));
+    }
   }
 }

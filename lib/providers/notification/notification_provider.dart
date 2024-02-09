@@ -45,7 +45,7 @@ Future<void> updateNotificationPermissionCount(
 }
 
 @riverpod
-Future<AuthorizationStatus> notificationPermissionStatus(
+Future<AuthorizationStatus?> notificationPermissionStatus(
   NotificationPermissionStatusRef _,
 ) async {
   var status = await checkNotificationPermission();

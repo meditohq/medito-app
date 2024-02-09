@@ -11,29 +11,37 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-late final FirebaseMessaging _messaging;
+late final FirebaseMessaging? _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> registerNotification() async {
-  _messaging = FirebaseMessaging.instance;
-  await requestGenerateFirebaseToken();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  try {
+    _messaging = FirebaseMessaging.instance;
+    await requestGenerateFirebaseToken();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  } catch (err) {
+    print('Error: $err');
+  }
 }
 
 Future<String?> requestGenerateFirebaseToken() async {
-    var token = await _messaging.getToken();
+  if (_messaging != null) {
+    var token = await _messaging?.getToken();
 
     return token;
+  }
+
+  return null;
 }
 
 Future removeFirebaseToken() async {
-  return await _messaging.deleteToken();
+  return await _messaging?.deleteToken();
 }
 
-Future<AuthorizationStatus> checkNotificationPermission() async {
-  var settings = await _messaging.getNotificationSettings();
+Future<AuthorizationStatus?> checkNotificationPermission() async {
+  var settings = await _messaging?.getNotificationSettings();
 
-  return settings.authorizationStatus;
+  return settings?.authorizationStatus;
 }
 
 Future<PermissionStatus> requestPermission() async {
@@ -87,11 +95,15 @@ Future<void> initializeLocalNotification(
 }
 
 void checkInitialMessage(BuildContext context, WidgetRef ref) async {
-  var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  if (initialMessage != null) {
-    var notificationPayload =
-        NotificationPayloadModel.fromJson(initialMessage.data);
-    _navigate(context, ref, notificationPayload);
+  try {
+    var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      var notificationPayload =
+          NotificationPayloadModel.fromJson(initialMessage.data);
+      _navigate(context, ref, notificationPayload);
+    }
+  } catch (error) {
+    print('Error: $error');
   }
 }
 
