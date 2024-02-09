@@ -26,7 +26,12 @@ NOTE: If you install Medito app using APK file, please make sure to verify that 
 ## How to use this code
 The best way to start is by opening the project with [Android Studio](https://developer.android.com/studio) or [Visual Studio](https://visualstudio.microsoft.com/).
 
-You will need an API key to build the project. (See "Contributing" below)
+You will need an the 2 .env files to build the project. (See "Contributing" below)
+
+To build the code you also need to run 
+
+```flutter pub run pigeon --input pigeon_conf.dart``` and 
+```dart run build_runner watch --delete-conflicting-outputs```
 
 Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues).
 
