@@ -6,25 +6,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+//todo: fix shouldShowCheckDownloadButton
 class MeditoErrorWidget extends ConsumerWidget {
   const MeditoErrorWidget({
     Key? key,
     required this.onTap,
     required this.message,
     this.isLoading = false,
-    this.isShowCheckDownloadButton = false,
+    this.shouldShowCheckDownloadButton = false,
     this.isScaffold = true,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
   final bool isLoading;
-  final bool isShowCheckDownloadButton;
+  final bool shouldShowCheckDownloadButton;
   final bool isScaffold;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var provider = ref.watch(meditoErrorWidgetProvider(
-      MeditoErrorWidgetUIState(isShowCheckDownloadButton, message),
+    var uiState = ref.watch(meditoErrorWidgetProvider(
+      MeditoErrorWidgetUIState(shouldShowCheckDownloadButton, message),
     ));
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
@@ -34,8 +35,8 @@ class MeditoErrorWidget extends ConsumerWidget {
 
     var mainBody = _mainBody(
       context,
-      provider.message,
-      provider.shouldShowCheckDownloadButton,
+      uiState.message,
+      uiState.shouldShowCheckDownloadButton,
       textStyle,
     );
 
