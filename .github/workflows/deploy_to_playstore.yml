@@ -80,7 +80,7 @@ jobs:
         working-directory: android
       # The aab bundle cannot install easily on device. Build an APK to publish on GH
       - name: Build APK
-        run: flutter build apk --no-tree-shake-icons
+        run: flutter build apk --no-tree-shake-icons --obfuscate
         env:
           FCI_KEYSTORE_PATH: 'meditokey.jks' # The file is created in the previous step
           FCI_KEY_ALIAS: ${{ secrets.FCI_KEY_ALIAS }}
