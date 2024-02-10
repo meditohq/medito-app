@@ -15,9 +15,7 @@ default_platform(:android)
 # Method to update .env with the appropriate values based on environment
 def set_environment_values(url, init_token, sentry_dsn)
     Dir.chdir("..") do
-      puts "Current directory: #{Dir.pwd}"
-      puts "Files in current directory: #{Dir.entries('.')}"
-      env_file_path = ".prod.env"
+      env_file_path = "../.prod.env"
       content = File.read(env_file_path)
 
     # Update the values
