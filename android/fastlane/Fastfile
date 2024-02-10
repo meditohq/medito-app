@@ -37,7 +37,7 @@ platform :android do
   desc "Submit a new beta build to Google Play"
   lane :beta do
     set_environment_values(ENV["STAGING_URL"], ENV["STAGING_INIT_TOKEN"], ENV["SENTRY_DSN"])
-    sh "flutter build appbundle -v"
+    sh "flutter build appbundle --no-tree-shake-icons"
     upload_to_play_store(
       track: 'beta',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
@@ -67,7 +67,7 @@ platform :android do
   desc "Submit a new production build to Google Play"
   lane :production do
     set_environment_values(ENV["PROD_URL"], ENV["PROD_INIT_TOKEN"], ENV["SENTRY_DSN"])
-    sh "flutter build appbundle -v"
+    sh "flutter build appbundle --no-tree-shake-icons"
     upload_to_play_store(
       track: 'production',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
