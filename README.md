@@ -14,7 +14,7 @@ Medito App is a flutter project available on Android and iOS maintained by the M
 - App Store: https://apps.apple.com/us/app/medito/id1500780518
 - APK: <a href="https://github.com/meditohq/medito-app/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/meditohq/medito-app?color=success&label=APK"></a>
 
-NOTE: If you install Medito app using APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
+NOTE: If you istall Medito app using APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
 
 ## Install
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/meditohq/medito-app?label=latest%20version&sort=semver)](https://github.com/meditohq/medito-app/releases)
