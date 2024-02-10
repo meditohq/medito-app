@@ -5,6 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+const _errorKey = 'error';
+const _messageKey = 'message';
+
 // ignore: avoid_dynamic_calls
 class DioApiService {
   static final DioApiService _instance = DioApiService._internal();
@@ -154,39 +157,43 @@ class DioApiService {
 
   CustomException _returnDioErrorResponse(DioException error) {
     var data = error.response?.data;
-    var message = data?['error'] ?? data?['message'];
+    var message;
+    if (!(data is String)) {
+      message = data?[_errorKey] ?? data?[_messageKey];
+    }
+
     if (error.type == DioExceptionType.receiveTimeout) {
       throw FetchDataException(
         error.response?.statusCode,
-        'Error connection timeout',
+        StringConstants.connectionTimeout,
       );
     }
     switch (error.response?.statusCode) {
       case 400:
         throw BadRequestException(
           error.response?.statusCode,
-          message ?? error.response!.statusMessage ?? 'Bad request',
+          message ?? StringConstants.badRequest,
         );
       case 401:
-        throw UnauthorisedException(
+        throw UnauthorizedException(
           error.response?.statusCode,
-          message ?? 'Unauthorised request: ${error.response!.statusCode}',
+          message ?? StringConstants.unauthorizedRequest,
         );
       case 403:
-        throw UnauthorisedException(
+        throw UnauthorizedException(
           error.response?.statusCode,
-          message ?? 'Access forbidden: ${error.response!.statusCode}',
+          message ?? StringConstants.accessForbidden,
         );
       case 404:
         throw FetchDataException(
           error.response?.statusCode,
-          message ?? 'Api not found: ${error.response!.statusCode}',
+          message ?? StringConstants.apiNotFound,
         );
       case 500:
       default:
         throw FetchDataException(
-          error.response?.statusCode,
-          message ?? StringConstants.timeout,
+          error.response?.statusCode ?? 500,
+          message ?? StringConstants.anErrorOccurred,
         );
     }
   }
@@ -195,32 +202,30 @@ class DioApiService {
 class CustomException implements Exception {
   final int? statusCode;
   final String? message;
-  final String? prefix;
 
-  CustomException([this.statusCode, this.message, this.prefix]);
+  CustomException([this.statusCode, this.message]);
 
   @override
   String toString() {
-    return '$message${statusCode != null ? ',$statusCode' : ''}';
+    return '$message${statusCode != null ? ': $statusCode' : ''}';
   }
 }
 
 class FetchDataException extends CustomException {
   FetchDataException([int? statusCode, String? message])
-      : super(statusCode, message, 'Error During Communication: ');
+      : super(statusCode, message);
 }
 
 class BadRequestException extends CustomException {
-  BadRequestException([int? statusCode, message])
-      : super(statusCode, message, 'Invalid Request: ');
+  BadRequestException([int? statusCode, message]) : super(statusCode, message);
 }
 
-class UnauthorisedException extends CustomException {
-  UnauthorisedException([int? statusCode, message])
-      : super(statusCode, message, 'Unauthorised: ');
+class UnauthorizedException extends CustomException {
+  UnauthorizedException([int? statusCode, message])
+      : super(statusCode, message);
 }
 
 class InvalidInputException extends CustomException {
   InvalidInputException([int? statusCode, String? message])
-      : super(statusCode, message, 'Invalid Input: ');
+      : super(statusCode, message);
 }

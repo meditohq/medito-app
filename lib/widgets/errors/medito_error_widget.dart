@@ -1,46 +1,58 @@
 import 'package:Medito/constants/constants.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class MeditoErrorWidget extends StatelessWidget {
+class MeditoErrorWidget extends ConsumerWidget {
   const MeditoErrorWidget({
     Key? key,
     required this.onTap,
     required this.message,
     this.isLoading = false,
-    this.showCheckDownloadText = false,
+    this.shouldShowCheckDownloadButton = false,
     this.isScaffold = true,
   }) : super(key: key);
   final void Function() onTap;
   final String message;
   final bool isLoading;
-  final bool showCheckDownloadText;
+  final bool shouldShowCheckDownloadButton;
   final bool isScaffold;
 
   @override
-  Widget build(BuildContext context) {
-    var isInvalidToken = message == StringConstants.invalidToken;
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    var uiState = ref.watch(meditoErrorWidgetProvider(
+      MeditoErrorWidgetUIState(shouldShowCheckDownloadButton, message),
+    ));
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
           color: ColorConstants.walterWhite,
           fontFamily: SourceSerif,
         );
+
+    var mainBody = _mainBody(
+      context,
+      uiState.message,
+      uiState.shouldShowCheckDownloadButton,
+      textStyle,
+    );
+
     if (isScaffold) {
       return Scaffold(
         backgroundColor: ColorConstants.ebony,
-        body: _mainBody(context, isInvalidToken, textStyle),
+        body: mainBody,
       );
     }
 
-    return _mainBody(context, isInvalidToken, textStyle);
+    return mainBody;
   }
 
   SizedBox _mainBody(
     BuildContext context,
-    bool isInvalidToken,
+    String message,
+    bool isShowCheckDownload,
     TextStyle? textStyle,
   ) {
     return SizedBox(
@@ -57,17 +69,15 @@ class MeditoErrorWidget extends StatelessWidget {
           children: [
             RichText(
               text: TextSpan(
-                text: isInvalidToken
-                    ? '${StringConstants.someThingWentWrong}. '
-                    : '$message ',
+                text: '$message. ',
                 style: textStyle,
                 children: <TextSpan>[
-                  if (showCheckDownloadText || isInvalidToken)
+                  if (isShowCheckDownload)
                     TextSpan(
-                      text: '${StringConstants.meanWhileCheck} ',
+                      text: '${StringConstants.meanWhileListen} ',
                       style: textStyle,
                     ),
-                  if (showCheckDownloadText || isInvalidToken)
+                  if (isShowCheckDownload)
                     TextSpan(
                       text: '${StringConstants.downloads.toLowerCase()}',
                       style: textStyle?.copyWith(
@@ -84,7 +94,7 @@ class MeditoErrorWidget extends StatelessWidget {
             ),
             height16,
             LoadingButtonWidget(
-              btnText: StringConstants.tryAgain,
+              btnText: StringConstants.retry,
               onPressed: onTap,
               isLoading: isLoading,
               bgColor: ColorConstants.walterWhite,
