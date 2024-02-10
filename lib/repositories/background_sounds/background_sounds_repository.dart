@@ -5,7 +5,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -19,7 +18,7 @@ abstract class BackgroundSoundsRepository {
 
   Future<void> updateItemsInSavedBgSoundList(BackgroundSoundsModel sound);
 
-  void handleOnChangeSound(BackgroundSoundsModel sound);
+  void saveBgSoundToSharedPreferences(BackgroundSoundsModel sound);
 
   void removeSelectedBgSound();
 
@@ -36,8 +35,8 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
   @override
   Future<List<BackgroundSoundsModel>> fetchBackgroundSounds() async {
-    var res = await client.getRequest(HTTPConstants.BACKGROUND_SOUNDS);
-    var tempResponse = res as List;
+    var response = await client.getRequest(HTTPConstants.BACKGROUND_SOUNDS);
+    var tempResponse = response as List;
     var bgSoundList = <BackgroundSoundsModel>[];
     const noneBgSound = BackgroundSoundsModel(
       id: '0',
@@ -117,7 +116,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   }
 
   @override
-  void handleOnChangeSound(BackgroundSoundsModel sound) {
+  void saveBgSoundToSharedPreferences(BackgroundSoundsModel sound) {
     unawaited(
       ref.read(sharedPreferencesProvider).setString(
             SharedPreferenceConstants.bgSound,
@@ -159,7 +158,7 @@ BackgroundSoundsRepositoryImpl backgroundSoundsRepository(
   BackgroundSoundsRepositoryRef ref,
 ) {
   return BackgroundSoundsRepositoryImpl(
-    client: ref.watch(dioClientProvider),
+    client: DioApiService(),
     ref: ref,
   );
 }

@@ -13,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/background_sounds/background_sounds_notifier.dart';
+import '../../providers/home/home_provider.dart';
+
 class DownloadsView extends ConsumerStatefulWidget {
   @override
   ConsumerState<DownloadsView> createState() => _DownloadsViewState();
@@ -37,7 +40,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             context.pop();
           } else {
             ref.read(refreshHomeAPIsProvider.future);
-            context.go(RouteConstants.homePath);
+            context.go(RouteConstants.bottomNavbarPath);
           }
         },
         isTransparent: true,
@@ -99,7 +102,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         key: UniqueKey(),
         direction: DismissDirection.endToStart,
         background: _getDismissibleBackgroundWidget(),
-        onDismissed: (direction) => _handleDismissable(direction, item),
+        onDismissed: (direction) => _handleDismissible(direction, item),
         child: _getListItemWidget(item),
       ),
     );
@@ -148,8 +151,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     WidgetRef ref,
     TrackModel trackModel,
   ) async {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
-    await audioProvider.stop();
+    final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+    bgSoundNotifier.getVolumeFromPref();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,
@@ -157,7 +160,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     unawaited(context.push(RouteConstants.playerPath));
   }
 
-  void _handleDismissable(DismissDirection _, TrackModel item) {
+  void _handleDismissible(DismissDirection _, TrackModel item) {
     if (mounted) {
       ref.read(removeDownloadedTrackProvider(track: item));
     }

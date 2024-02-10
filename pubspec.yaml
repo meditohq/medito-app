@@ -11,7 +11,7 @@ description: A meditation learning tool
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.0.11+30011
+version: 3.0.16+30016
 environment:
   sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
@@ -20,20 +20,13 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
-  dio: ^5.0.2
+  dio: ^5.4.0
   flutter_svg: ^1.1.6
   path_provider: ^2.0.1
   url_launcher: ^6.1.14
   flutter_markdown: ^0.6.7
-  shared_preferences: ^2.0.5
+  shared_preferences: ^2.2.2
   auto_size_text: ^3.0.0-nullsafety.0
-  just_audio:
-    git:
-      url: https://github.com/meditohq/just_audio.git
-      ref: feature/treadmill
-      path: just_audio
-  audio_service: ^0.18.10
-  audio_session: ^0.1.18
   rxdart: ^0.27.1
   share: ^2.0.1
   flutter_html: ^3.0.0-alpha.2
@@ -42,11 +35,11 @@ dependencies:
   connectivity: ^3.0.3
   device_info_plus: ^9.0.2
   equatable: ^2.0.0
-  sentry_flutter: ^7.9.0
+  sentry_flutter: ^7.16.0
   back_button_interceptor: ^6.0.2
   go_router: ^6.5.5
-  flutter_riverpod: ^2.4.4
-  riverpod_annotation: ^2.2.1
+  flutter_riverpod: ^2.4.10
+  riverpod_annotation: ^2.3.4
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
   json_annotation: ^4.8.1
@@ -55,17 +48,17 @@ dependencies:
   flutter_downloader: ^1.10.2
   cached_network_image: ^3.2.3
   email_validator: '^2.1.16'
-  pin_code_fields: ^7.4.0
   share_plus: ^7.0.2
   firebase_messaging: ^13.1.0
   firebase_core: ^1.24.0
   flutter_local_notifications: ^15.0.0
   marquee: ^2.2.3
   image: ^4.0.17
-  permission_handler: ^10.4.5
+  permission_handler: ^11.2.0
   app_settings: ^5.1.1
-  vibration: ^1.7.3
   reorderables: ^0.6.0
+  google_api_availability: ^5.0.0
+  workmanager: ^0.5.2
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
@@ -73,10 +66,11 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pigeon: ^16.0.5
   mocktail: ^0.3.0
-  build_runner: ^2.3.3
-  riverpod_generator: ^2.1.0
-  json_serializable: ^6.5.4
+  build_runner: ^2.4.8
+  riverpod_generator: ^2.3.9
+  json_serializable: ^6.7.1
   dart_code_metrics: ^5.7.0
   #USAGE: dart run build_runner watch --delete-conflicting-outputs
 

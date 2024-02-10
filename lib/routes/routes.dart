@@ -6,23 +6,27 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/auth/join_email_view.dart';
 import 'package:Medito/views/auth/join_intro_view.dart';
-import 'package:Medito/views/auth/join_verify_OTP_view.dart';
 import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
+import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
+import 'package:Medito/views/explore/explore_view.dart';
 import 'package:Medito/views/home/home_view.dart';
+import 'package:Medito/views/maintenance/maintenance_view.dart';
+import 'package:Medito/views/missing_route/missing_route_view.dart';
 import 'package:Medito/views/notifications/notification_permission_view.dart';
 import 'package:Medito/views/pack/pack_view.dart';
 import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/root/root_page_view.dart';
-import 'package:Medito/views/search/search_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:Medito/views/track/track_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../models/maintenance/maintenance_model.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return router;
@@ -34,6 +38,9 @@ final router = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigatorKey,
   initialLocation: RouteConstants.root,
+  errorBuilder: (context, state) {
+    return MissingRouteView();
+  },
   routes: [
     GoRoute(
       path: RouteConstants.root,
@@ -70,22 +77,6 @@ final router = GoRouter(
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
-      path: RouteConstants.joinVerifyOTPPath,
-      pageBuilder: (context, state) {
-        final params =
-            state.extra != null ? state.extra as JoinRouteParamsModel : null;
-
-        return MaterialPage(
-          key: state.pageKey,
-          child: JoinVerifyOTPView(
-            email: params?.email ?? '',
-            fromScreen: params?.screen ?? Screen.splash,
-          ),
-        );
-      },
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinWelcomePath,
       pageBuilder: (context, state) {
         final params =
@@ -106,20 +97,13 @@ final router = GoRouter(
         firstChild: child,
       ),
       routes: [
-        GoRoute(
-          path: RouteConstants.homePath,
-          pageBuilder: (context, state) => MaterialPage(
-            key: state.pageKey,
-            child: HomeView(),
-          ),
-          routes: [
-            _getDownloadsRoute(),
-          ],
-        ),
+        _getMaintenanceRoute(),
+        _getBottomNavigationBarRoute(),
+        _getHomeRoute(),
         _getTrackRoute(fromRoot: true),
         _getConnectivityErrorRoute(fromRoot: true),
         _getDownloadsRoute(fromRoot: true),
-        _getSearchRoute(fromRoot: true),
+        _getExploreRoute(fromRoot: true),
         GoRoute(
           path: RouteConstants.packPath,
           routes: [
@@ -130,16 +114,16 @@ final router = GoRouter(
                 _getTrackRoute(),
                 GoRoute(
                   path: 'pack3/:p3id',
-                  pageBuilder: (context, state) => getFolderMaterialPage(state),
+                  pageBuilder: (context, state) => _getFolderMaterialPage(state),
                   routes: [
                     _getTrackRoute(),
                   ],
                 ),
               ],
-              pageBuilder: (context, state) => getFolderMaterialPage(state),
+              pageBuilder: (context, state) => _getFolderMaterialPage(state),
             ),
           ],
-          pageBuilder: (context, state) => getFolderMaterialPage(state),
+          pageBuilder: (context, state) => _getFolderMaterialPage(state),
         ),
       ],
     ),
@@ -150,12 +134,35 @@ final router = GoRouter(
   ],
 );
 
+GoRoute _getHomeRoute() {
+  return GoRoute(
+    path: RouteConstants.homePath,
+    pageBuilder: (context, state) => MaterialPage(
+      key: state.pageKey,
+      child: HomeView(),
+    ),
+    routes: [
+      _getDownloadsRoute(),
+    ],
+  );
+}
+
+GoRoute _getBottomNavigationBarRoute() {
+  return GoRoute(
+    path: RouteConstants.bottomNavbarPath,
+    pageBuilder: (context, state) => MaterialPage(
+      key: state.pageKey,
+      child: BottomNavigationBarView(),
+    ),
+  );
+}
+
 GoRoute _getTrackRoute({bool fromRoot = false}) {
   return GoRoute(
     path: fromRoot
         ? RouteConstants.trackPath
         : RouteConstants.trackPath.sanitisePath(),
-    pageBuilder: (context, state) => getTrackOptionsMaterialPage(state),
+    pageBuilder: (context, state) => _getTrackOptionsMaterialPage(state),
   );
 }
 
@@ -215,15 +222,15 @@ GoRoute _getConnectivityErrorRoute({bool fromRoot = false}) {
   );
 }
 
-GoRoute _getSearchRoute({bool fromRoot = false}) {
+GoRoute _getExploreRoute({bool fromRoot = false}) {
   return GoRoute(
     path: fromRoot
-        ? RouteConstants.searchPath
-        : RouteConstants.searchPath.sanitisePath(),
+        ? RouteConstants.explorePath
+        : RouteConstants.explorePath.sanitisePath(),
     pageBuilder: (context, state) {
       return MaterialPage(
         key: state.pageKey,
-        child: SearchView(),
+        child: ExploreView(),
       );
     },
   );
@@ -266,6 +273,20 @@ GoRoute _getDownloadsRoute({bool fromRoot = false}) {
   );
 }
 
+GoRoute _getMaintenanceRoute() {
+  return GoRoute(
+    parentNavigatorKey: _shellNavigatorKey,
+    path:
+         RouteConstants.maintenancePath,
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: MaintenanceView(maintenanceModel: state.extra as MaintenanceModel),
+      );
+    },
+  );
+}
+
 //ignore: prefer-match-file-name
 enum Screen {
   splash,
@@ -276,21 +297,14 @@ enum Screen {
   url,
 }
 
-MaterialPage<void> getTrackOptionsMaterialPage(GoRouterState state) {
+MaterialPage<void> _getTrackOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
     child: TrackView(id: state.params['sid'] ?? ''),
   );
 }
 
-MaterialPage<void> getTrackOptionsDailyPage(GoRouterState state) {
-  return MaterialPage(
-    key: state.pageKey,
-    child: TrackView(id: state.params['did'] ?? ''),
-  );
-}
-
-MaterialPage<void> getFolderMaterialPage(GoRouterState state) {
+MaterialPage<void> _getFolderMaterialPage(GoRouterState state) {
   var packId =
       state.params['p3id'] ?? state.params['p2id'] ?? state.params['pid'];
 

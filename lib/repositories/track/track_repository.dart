@@ -4,7 +4,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -34,9 +33,9 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<TrackModel> fetchTrack(String trackId) async {
-    var res = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
+    var response = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
 
-    return TrackModel.fromJson(res);
+    return TrackModel.fromJson(response);
   }
 
   @override
@@ -96,6 +95,6 @@ class TrackRepositoryImpl extends TrackRepository {
 }
 
 @riverpod
-TrackRepository trackRepository(ref) {
-  return TrackRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
+TrackRepository trackRepository(TrackRepositoryRef ref) {
+  return TrackRepositoryImpl(ref: ref, client: DioApiService());
 }

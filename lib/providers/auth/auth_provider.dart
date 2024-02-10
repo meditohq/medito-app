@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authProvider = ChangeNotifierProvider<AuthNotifier>(
-  (ref) {
+      (ref) {
     return AuthNotifier(
       ref,
       authRepository: ref.read(authRepositoryProvider),
@@ -45,11 +45,11 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   Future<void> initializeUser() async {
-    var res = await getUserFromSharedPref();
-    if (res == null) {
+    var response = await getUserFromSharedPref();
+    if (response == null) {
       await generateUserToken();
     } else {
-      userResponse = ApiResponse.completed(res);
+      userResponse = ApiResponse.completed(response);
       notifyListeners();
     }
   }
@@ -58,9 +58,9 @@ class AuthNotifier extends ChangeNotifier {
     userResponse = ApiResponse.loading();
     notifyListeners();
     try {
-      var res = await authRepository.generateUserToken();
-      await saveUserInSharedPref(res);
-      userResponse = ApiResponse.completed(res);
+      var response = await authRepository.generateUserToken();
+      await saveUserInSharedPref(response);
+      userResponse = ApiResponse.completed(response);
     } catch (e) {
       userResponse = ApiResponse.error(e.toString());
     }
@@ -71,8 +71,8 @@ class AuthNotifier extends ChangeNotifier {
     sendOTPResponse = ApiResponse.loading();
     notifyListeners();
     try {
-      var res = await authRepository.sendOTP(email);
-      sendOTPResponse = ApiResponse.completed(res);
+      var response = await authRepository.sendOTP(email);
+      sendOTPResponse = ApiResponse.completed(response);
     } catch (e) {
       sendOTPResponse = ApiResponse.error(e.toString());
     }
@@ -83,9 +83,9 @@ class AuthNotifier extends ChangeNotifier {
     verifyOTPResponse = ApiResponse.loading();
     notifyListeners();
     try {
-      var res = await authRepository.verifyOTP(email, OTP);
+      var response = await authRepository.verifyOTP(email, OTP);
       await updateUserInSharedPref(email);
-      verifyOTPResponse = ApiResponse.completed(res);
+      verifyOTPResponse = ApiResponse.completed(response);
     } catch (e) {
       verifyOTPResponse = ApiResponse.error(e.toString());
     }
@@ -107,13 +107,15 @@ class AuthNotifier extends ChangeNotifier {
     return await authRepository.getUserFromSharedPreference();
   }
 
-  void saveFcmTokenEvent() async {
+  Future<void> saveFcmTokenEvent() async {
     var token = await requestGenerateFirebaseToken();
-    var fcm = SaveFcmTokenModel(fcmToken: token ?? '');
-    var event = EventsModel(
-      name: EventTypes.saveFcmToken,
-      payload: fcm.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
+    if (token != null) {
+      var fcm = SaveFcmTokenModel(fcmToken: token);
+      var event = EventsModel(
+        name: EventTypes.saveFcmToken,
+        payload: fcm.toJson(),
+      );
+      ref.read(eventsProvider(event: event.toJson()));
+    }
   }
 }

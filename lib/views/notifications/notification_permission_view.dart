@@ -69,14 +69,14 @@ class _NotificationPermissionViewState
               ),
             ),
           ),
-          _buildBottomActionButttons(status, size),
+          _buildBottomActionButtons(status, size),
         ],
       ),
     );
   }
 
-  Padding _buildBottomActionButttons(
-    AsyncValue<AuthorizationStatus> status,
+  Padding _buildBottomActionButtons(
+    AsyncValue<AuthorizationStatus?> status,
     Size size,
   ) {
     return Padding(

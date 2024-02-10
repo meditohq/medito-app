@@ -5,7 +5,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,30 +31,30 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<UserTokenModel> generateUserToken() async {
-    var res = await client.postRequest(
+    var response = await client.postRequest(
       HTTPConstants.USERS,
       options: Options(headers: {
         HttpHeaders.authorizationHeader: HTTPConstants.INIT_TOKEN,
       }),
     );
 
-    return UserTokenModel.fromJson(res);
+    return UserTokenModel.fromJson(response);
   }
 
   @override
   Future<String> sendOTP(String email) async {
-    var res = await client
+    var response = await client
         .postRequest('${HTTPConstants.OTP}', data: {'email': email});
 
-    return res['success'];
+    return response['success'];
   }
 
   @override
   Future<String> verifyOTP(String email, String OTP) async {
-    var res = await client
+    var response = await client
         .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
 
-    return res['success'];
+    return response['success'];
   }
 
   @override
@@ -77,6 +76,6 @@ class AuthRepositoryImpl extends AuthRepository {
 }
 
 @riverpod
-AuthRepository authRepository(ref) {
-  return AuthRepositoryImpl(ref: ref, client: ref.watch(dioClientProvider));
+AuthRepository authRepository(AuthRepositoryRef ref) {
+  return AuthRepositoryImpl(ref: ref, client: DioApiService());
 }

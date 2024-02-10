@@ -1,8 +1,10 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
+import 'package:Medito/providers/player/player_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../providers/events/events_provider.dart';
 
 class FeedbackWidget extends ConsumerStatefulWidget {
   const FeedbackWidget({super.key, required this.feedbackModel});
@@ -18,15 +20,16 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
   bool isFeedbackAdded = false;
 
   void _handleFeedbackPress(String feedback) async {
-    final audioProvider = ref.read(audioPlayerNotifierProvider);
-    var extras = audioProvider.mediaItem.value?.extras;
+    final audioProvider = ref.read(playerProvider);
+    var trackId = audioProvider?.id ?? '';
+    var audioFileId = audioProvider?.audio.first.files.first.id ?? '';
 
     setState(() {
       isLoading = true;
     });
     var payload = FeedbackTappedModel(
-      trackId: extras?[TypeConstants.trackIdKey] ?? '',
-      audioFileId: extras?[TypeConstants.fileIdKey] ?? '',
+      trackId: trackId,
+      audioFileId: audioFileId,
       emoji: feedback,
     );
     var event = EventsModel(

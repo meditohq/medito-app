@@ -1,9 +1,9 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
+
+import '../../../providers/background_sounds/background_sounds_notifier.dart';
 
 class SoundListTileWidget extends ConsumerWidget {
   const SoundListTileWidget({required this.sound}) : super();
@@ -12,15 +12,14 @@ class SoundListTileWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
-    final audioPlayerNotifier = ref.watch(audioPlayerNotifierProvider);
-    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id;
-    var id = selectedSoundId ?? '0';
-    var isSelected = id == sound.id;
+    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id ?? '0';
+    var isDownloading =
+        bgSoundNotifierProvider.downloadingBgSound?.id == sound.id;
+    var isSelected = selectedSoundId == sound.id;
 
     return InkWell(
       onTap: () => _handleItemTap(
         bgSoundNotifierProvider,
-        audioPlayerNotifier,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -42,10 +41,34 @@ class SoundListTileWidget extends ConsumerWidget {
                     fontSize: 16,
                   ),
             ),
+            isDownloading
+                ? _loadingSpinner()
+                : const SizedBox.shrink(),
           ],
         ),
       ),
     );
+  }
+
+  Expanded _loadingSpinner() {
+    return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: ColorConstants.walterWhite,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
   }
 
   Container _radioButton(bool isSelected) {
@@ -66,17 +89,10 @@ class SoundListTileWidget extends ConsumerWidget {
 
   void _handleItemTap(
     BackgroundSoundsNotifier bgSoundNotifierProvider,
-    AudioPlayerNotifier audioPlayerNotifier,
   ) {
     if (sound.title == StringConstants.none) {
-      bgSoundNotifierProvider.handleOnChangeSound(sound);
-      audioPlayerNotifier.stopBackgroundSound();
-      audioPlayerNotifier.backgroundSoundAudioPlayer.dispose();
-      audioPlayerNotifier.backgroundSoundAudioPlayer = AudioPlayer();
-    } else {
-      audioPlayerNotifier.setBackgroundAudio(sound);
-      audioPlayerNotifier.playBackgroundSound();
-      bgSoundNotifierProvider.handleOnChangeSound(sound);
+      bgSoundNotifierProvider.stopBackgroundSound();
     }
+    bgSoundNotifierProvider.handleOnChangeSound(sound);
   }
 }

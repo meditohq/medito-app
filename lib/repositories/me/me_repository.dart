@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'me_repository.g.dart';
@@ -17,13 +16,13 @@ class MeRepositoryImpl extends MeRepository {
 
   @override
   Future<MeModel> fetchMe() async {
-    var res = await client.getRequest(HTTPConstants.ME);
+    var response = await client.getRequest(HTTPConstants.ME);
 
-    return MeModel.fromJson(res);
+    return MeModel.fromJson(response);
   }
 }
 
 @riverpod
-MeRepository meRepository(ref) {
-  return MeRepositoryImpl(client: ref.watch(dioClientProvider));
+MeRepository meRepository(MeRepositoryRef ref) {
+  return MeRepositoryImpl(client: DioApiService());
 }

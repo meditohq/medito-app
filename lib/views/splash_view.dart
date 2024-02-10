@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/auth/initialize_user_provider.dart';
+
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
@@ -14,6 +16,8 @@ class SplashView extends ConsumerStatefulWidget {
 }
 
 class _SplashViewState extends ConsumerState<SplashView> {
+  bool maintenance = false;
+
   @override
   void initState() {
     initializeUser();
@@ -23,7 +27,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initializeUser() async {
     var response = await ref.read(userInitializationProvider.future);
     if (response == UserInitializationStatus.successful) {
-      context.go(RouteConstants.homePath);
+      context.go(RouteConstants.bottomNavbarPath);
     } else if (response == UserInitializationStatus.error) {
       showSnackBar(context, StringConstants.timeout);
       context.go(RouteConstants.downloadsPath);

@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -113,9 +112,9 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 }
 
 @riverpod
-DownloaderRepositoryImpl downloaderRepository(ref) {
+DownloaderRepositoryImpl downloaderRepository(DownloaderRepositoryRef ref) {
   return DownloaderRepositoryImpl(
-    client: ref.watch(dioClientProvider),
+    client: DioApiService(),
     ref: ref,
   );
 }

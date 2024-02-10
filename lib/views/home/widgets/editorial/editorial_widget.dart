@@ -1,12 +1,14 @@
 import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:Medito/constants/styles/widget_styles.dart';
 import 'package:Medito/models/home/editorial/editorial_model.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../providers/home/home_provider.dart';
+import '../animated_scale_widget.dart';
 
 class EditorialWidget extends ConsumerWidget {
   const EditorialWidget({super.key});
@@ -31,7 +33,7 @@ class EditorialWidget extends ConsumerWidget {
     );
   }
 
-  Padding _buildMain(BuildContext context, EditorialModel data) {
+  AnimatedScaleWidget _buildMain(BuildContext context, EditorialModel data) {
     var titleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontFamily: SourceSerif,
           color: ColorConstants.walterWhite,
@@ -56,42 +58,44 @@ class EditorialWidget extends ConsumerWidget {
       ),
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: padding20),
-      child: InkWell(
-        onTap: () => handleNavigation(
-          context: context,
-          data.type,
-          [data.path.toString().getIdFromPath(), data.path],
-        ),
-        child: Stack(
-          children: [
-            _buildCoverImage(size, data),
-            Container(
-              width: size.width,
-              height: 200,
-              decoration: boxDecoration,
-              padding: EdgeInsets.all(padding16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data.title,
-                    style: titleStyle,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    data.subtitle,
-                    style: subtitleStyle,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+    return AnimatedScaleWidget(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: padding20),
+        child: InkWell(
+          onTap: () => handleNavigation(
+            context: context,
+            data.type,
+            [data.path.toString().getIdFromPath(), data.path],
+          ),
+          child: Stack(
+            children: [
+              _buildCoverImage(size, data),
+              Container(
+                width: size.width,
+                height: 200,
+                decoration: boxDecoration,
+                padding: EdgeInsets.all(padding16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.title,
+                      style: titleStyle,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      data.subtitle,
+                      style: subtitleStyle,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

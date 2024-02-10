@@ -32,7 +32,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         ),
       );
     } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-        AUDIO_DOWNLOAD_STATE.DOWNLOADIING) {
+        AUDIO_DOWNLOAD_STATE.DOWNLOADING) {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
       return IconButton(

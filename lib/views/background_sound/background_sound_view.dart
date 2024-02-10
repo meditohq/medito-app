@@ -5,6 +5,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/background_sounds/background_sounds_notifier.dart';
 import 'widgets/sound_listtile_widget.dart';
 import 'widgets/volume_slider_widget.dart';
 
@@ -23,36 +24,6 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setInitStateValues();
-    });
-  }
-
-  @override
-  void deactivate() {
-    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.trackAudioPlayer.playerState.playing) {
-      _audioPlayerNotifier.stopBackgroundSound();
-    }
-    super.deactivate();
-  }
-
-  void setInitStateValues() {
-    final _provider = ref.read(backgroundSoundsNotifierProvider);
-    final _audioPlayerNotifier = ref.read(audioPlayerNotifierProvider);
-    if (!_audioPlayerNotifier.backgroundSoundAudioPlayer.playerState.playing) {
-      _provider.getBackgroundSoundFromPref();
-      if (_provider.selectedBgSound != null &&
-          _provider.selectedBgSound?.title != StringConstants.none) {
-        _audioPlayerNotifier.setBackgroundAudio(
-          _provider.selectedBgSound!,
-        );
-        _audioPlayerNotifier.playBackgroundSound();
-      }
-
-      _provider.getVolumeFromPref();
-      _audioPlayerNotifier.setBackgroundSoundVolume(_provider.volume);
-    }
   }
 
   void _scrollListener() {
@@ -151,8 +122,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
                         ))
                     .toList(),
               ),
-              height16,
-              height16,
+              height32,
             ]),
           ),
         ],

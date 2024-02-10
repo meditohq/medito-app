@@ -1,8 +1,8 @@
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../providers/home/home_provider.dart';
 import 'shortcuts_items_widget.dart';
 
 class ShortcutsWidget extends ConsumerStatefulWidget {
@@ -36,19 +36,5 @@ class _ShortcutsWidgetState extends ConsumerState<ShortcutsWidget> {
       ),
       loading: () => const ShortcutsShimmerWidget(),
     );
-  }
-}
-
-class MyWidget extends StatefulWidget {
-  const MyWidget({super.key});
-
-  @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }

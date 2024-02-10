@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:Medito/utils/stats_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -24,9 +23,9 @@ class StatsRepositoryImpl extends StatsRepository {
 
   @override
   Future<StatsModel> fetchStatsFromRemote() async {
-    var res = await client.getRequest(HTTPConstants.STATS);
+    var response = await client.getRequest(HTTPConstants.STATS);
 
-    return StatsModel.fromJson(res);
+    return StatsModel.fromJson(response);
   }
 
   @override
@@ -98,6 +97,6 @@ class StatsRepositoryImpl extends StatsRepository {
 }
 
 @riverpod
-StatsRepository statsRepository(ref) {
-  return StatsRepositoryImpl(client: ref.watch(dioClientProvider));
+StatsRepository statsRepository(StatsRepositoryRef _) {
+  return StatsRepositoryImpl(client: DioApiService());
 }

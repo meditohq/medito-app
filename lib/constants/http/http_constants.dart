@@ -21,4 +21,7 @@ class HTTPConstants {
   static const String ME = 'me';
   static const String EVENTS = 'events';
   static const String SEARCH = 'search';
+
+  // MAINTENANCE END POINTS
+  static const String MAINTENANCE = 'https://api.medito.app/v1/maintenance';
 }

@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'packs_repository.g.dart';
@@ -19,21 +18,21 @@ class PackRepositoryImpl extends PacksRepository {
 
   @override
   Future<List<PackItemsModel>> fetchAllPacks() async {
-    var res = await client.getRequest('${HTTPConstants.PACKS}');
-    var tempResponse = res as List;
+    var response = await client.getRequest('${HTTPConstants.PACKS}');
+    var tempResponse = response as List;
 
     return tempResponse.map((x) => PackItemsModel.fromJson(x)).toList();
   }
 
   @override
   Future<PackModel> fetchPacks(String packId) async {
-    var res = await client.getRequest('${HTTPConstants.PACKS}/$packId');
+    var response = await client.getRequest('${HTTPConstants.PACKS}/$packId');
 
-    return PackModel.fromJson(res);
+    return PackModel.fromJson(response);
   }
 }
 
 @riverpod
-PackRepositoryImpl packRepository(ref) {
-  return PackRepositoryImpl(client: ref.watch(dioClientProvider));
+PackRepositoryImpl packRepository(PackRepositoryRef ref) {
+  return PackRepositoryImpl(client: DioApiService());
 }

@@ -1,6 +1,5 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'events_repository.g.dart';
@@ -17,9 +16,10 @@ class EventsRepositoryImpl extends EventsRepository {
   EventsRepositoryImpl({required this.client});
 
   @override
-  Future<void> trackEvent(Map<String, dynamic> event) async {
+  Future<void> trackEvent(Map<String, dynamic> event, {String? userToken}) async {
     await client.postRequest(
       HTTPConstants.EVENTS,
+      userToken: userToken,
       data: event,
     );
   }
@@ -34,6 +34,6 @@ class EventsRepositoryImpl extends EventsRepository {
 }
 
 @riverpod
-EventsRepository eventsRepository(ref) {
-  return EventsRepositoryImpl(client: ref.watch(dioClientProvider));
+EventsRepository eventsRepository(EventsRepositoryRef _) {
+  return EventsRepositoryImpl(client: DioApiService());
 }

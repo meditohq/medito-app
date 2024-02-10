@@ -6,11 +6,10 @@ class StringConstants {
   static const String sounds = 'Sounds';
   static const String sound = 'Sound';
   static const String volume = 'Volume';
+  static const String home = 'Home';
   static const String begin = 'Begin';
   static const String none = 'None';
   static const String removed = 'Removed';
-  static const String stagingEnv = '.staging.env';
-  static const String prodEnv = '.prod.env';
   static const String supportEmail = 'hello@meditofoundation.org';
   static const String pickNarratorAndDuration = 'Pick a narrator & duration';
   static const String pickDuration = 'Pick a duration';
@@ -43,13 +42,11 @@ class StringConstants {
   static const String backgroundSounds = 'Background Sound';
   static const String playerBgErrorMsg =
       'Oops! There was an error getting the background sounds. Please try again later.';
-  static const String x06 = 'X0.6';
-  static const String x07 = 'X0.7';
-  static const String x08 = 'X0.8';
-  static const String x09 = 'X0.9';
-  static const String x1 = 'X1';
-  static const String x125 = 'X1.25';
-  static const String x15 = 'X1.5';
+  static const String x06 = 'x0.6';
+  static const String x07 = 'x0.7';
+  static const String x08 = 'x0.8';
+  static const String x09 = 'x0.9';
+  static const String x1 = 'x1';
 
   //Join
   static const String joinTheMeditoFamily = 'Join the Medito Family';
@@ -79,6 +76,7 @@ class StringConstants {
   static const String search = 'Search';
   static const String share = 'Share';
   static const String id = 'id';
+  static const String env = 'env';
   static const String email = 'email';
   static const String appVersion = 'appVersion';
   static const String deviceModel = 'deviceModel';
@@ -103,8 +101,14 @@ class StringConstants {
   static const String welcome = '👋 Welcome';
   static const String thanksForSharing = 'Thanks for sharing 💜';
   static const String mins = 'mins';
+  static const String hey = '👋 Hey';
 
   //Error
+  static const String unableToLocateTheRoute =
+      'We apologise for the inconvenience, but we were unable to locate this page.';
+  static const String pleaseClick = 'Please click the';
+  static const String toReturnToTheMainMenu =
+      'to return to the main menu. Thank you.';
   static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';

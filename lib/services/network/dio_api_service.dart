@@ -1,14 +1,85 @@
 import 'package:Medito/constants/strings/string_constants.dart';
+import 'dart:io';
+
+import 'package:Medito/constants/constants.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 const _errorKey = 'error';
 const _messageKey = 'message';
 
 // ignore: avoid_dynamic_calls
 class DioApiService {
-  Dio dio;
+  static final DioApiService _instance = DioApiService._internal();
+  late Dio dio;
 
-  DioApiService({required this.dio});
+  factory DioApiService() {
+    return _instance;
+  }
+
+  // Only pass the userToken if you know the headers have not been set in
+  // assignDioHeadersProvider (for example in workManager)
+  void _setToken(String? userToken) {
+    if (userToken != null && userToken.isNotEmpty) {
+      dio.options.headers[HttpHeaders.authorizationHeader] =
+          'Bearer $userToken';
+    }
+  }
+
+  // Private constructor
+  DioApiService._internal() {
+    dio = Dio();
+    dio.options = BaseOptions(
+      connectTimeout: Duration(milliseconds: 30000),
+      baseUrl: HTTPConstants.BASE_URL,
+    );
+    dio.options.headers.addAll(
+      {
+        HttpHeaders.accessControlAllowOriginHeader: '*',
+        HttpHeaders.accessControlAllowHeadersHeader:
+            'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
+        HttpHeaders.accessControlAllowCredentialsHeader: 'true',
+        HttpHeaders.accessControlAllowMethodsHeader: 'POST, OPTIONS, HEAD, GET',
+        HttpHeaders.contentTypeHeader: ContentType.json.value,
+        HttpHeaders.refererHeader: 'no-referrer-when-downgrade',
+        HttpHeaders.acceptHeader: '*/*',
+      },
+    );
+    if (kDebugMode) {
+      dio.interceptors.add(LogInterceptor(
+        request: true,
+        responseBody: true,
+        requestBody: true,
+        error: true,
+      ));
+    }
+    dio.interceptors.add(
+      InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
+    );
+  }
+
+  Future<void> _onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    await _captureException(err);
+    handler.reject(err);
+  }
+
+  Future<void> _captureException(
+    DioException err,
+  ) async {
+    await Sentry.captureException(
+      {
+        'error': err.toString(),
+        'endpoint': err.requestOptions.path.toString(),
+        'response': err.response.toString(),
+        'serverMessage': err.message.toString(),
+      },
+      stackTrace: err.stackTrace,
+    );
+  }
 
   // ignore: avoid-dynamic
   Future<dynamic> getRequest(
@@ -36,6 +107,7 @@ class DioApiService {
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
     String uri, {
+    String? userToken,
     data,
     Map<String, dynamic>? queryParameters,
     Options? options,
@@ -43,6 +115,7 @@ class DioApiService {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
+    _setToken(userToken);
     try {
       var response = await dio.post(
         uri,

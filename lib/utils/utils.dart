@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -21,6 +22,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_api_availability/google_api_availability.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -108,8 +110,6 @@ Future<void> launchEmailSubmission(
 
   if (await canLaunchUrl(params)) {
     await launchUrl(params);
-  } else {
-    var url = params.toString();
   }
 }
 
@@ -192,6 +192,27 @@ Future<String> getFilePathForOldAppDownloadedFiles(String mediaItemId) async {
 
 int formatIcon(String icon) {
   return int.parse('0x$icon');
+}
+
+Future<bool> areGooglePlayServicesAvailable() async {
+  try {
+    if (Platform.isIOS) {
+      return true;
+    } else if (Platform.isAndroid) {
+      return (await GoogleApiAvailability.instance
+              .checkGooglePlayServicesAvailability()) ==
+          GooglePlayServicesAvailability.success;
+    }
+  } catch (e) {
+    unawaited(Sentry.captureException(
+      e,
+      stackTrace: e,
+    ));
+
+    return false;
+  }
+
+  return false;
 }
 
 extension SanitisePath on String {

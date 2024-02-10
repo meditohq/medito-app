@@ -6,6 +6,7 @@ class RouteConstants {
   static const String dailyPath = '/daily/:did';
   static const String donationPath = '/donation';
   static const String downloadsPath = '/downloads';
+  static const String maintenancePath = '/maintenance';
   static const String playerPath = '/player';
   static const String articlePath = '/article/:aid';
   static const String packPath = '/pack/:pid';
@@ -23,6 +24,6 @@ class RouteConstants {
   static const String joinEmailPath = '/joinEmail';
   static const String joinVerifyOTPPath = '/joinVerifyOTP';
   static const String joinWelcomePath = '/joinWelcome';
-  static const String searchPath = '/search';
+  static const String explorePath = '/explore';
   static const String endScreenPath = '/endScreen';
 }
