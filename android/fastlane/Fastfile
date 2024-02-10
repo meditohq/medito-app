@@ -20,6 +20,8 @@ def set_environment_values(url, init_token, sentry_dsn)
 
     # Update the values
     updated_content = content
+                        .gsub("ENVIRONMENT=production")
+                        .gsub("ENVIRONMENT_DEBUG=debug")
                         .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
                         .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
                         .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
