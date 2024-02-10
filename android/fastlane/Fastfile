@@ -7,8 +7,7 @@
 # For a list of all available plugins, check out
 #     https://docs.fastlane.tools/plugins/available-plugins
 
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
+update_fastlane
 
 default_platform(:android)
 
