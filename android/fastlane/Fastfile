@@ -14,16 +14,18 @@ default_platform(:android)
 
 # Method to update .env with the appropriate values based on environment
 def set_environment_values(url, init_token, sentry_dsn)
-  env_file_path = ".prod.env"
-  content = File.read(env_file_path)
-  
-  # Update the values
-  updated_content = content
-                    .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
-                    .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
-                    .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
-  
-  File.write(env_file_path, updated_content)
+  Dir.chdir("..") do
+    env_file_path = ".prod.env"
+    content = File.read(env_file_path)
+
+    # Update the values
+    updated_content = content
+                        .gsub(/^BASE_URL=.*/, "BASE_URL=#{url}")
+                        .gsub(/^INIT_TOKEN=.*/, "INIT_TOKEN=#{init_token}")
+                        .gsub(/^SENTRY_DSN=.*/, "SENTRY_DSN=#{sentry_dsn}")
+
+    File.write(env_file_path, updated_content)
+  end
 end
 
 platform :android do
