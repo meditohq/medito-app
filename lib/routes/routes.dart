@@ -6,6 +6,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/auth/join_email_view.dart';
 import 'package:Medito/views/auth/join_intro_view.dart';
+import 'package:Medito/views/auth/join_verify_OTP_view.dart';
 import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
@@ -72,6 +73,22 @@ final router = GoRouter(
         return MaterialPage(
           key: state.pageKey,
           child: JoinEmailView(fromScreen: params?.screen ?? Screen.splash),
+        );
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RouteConstants.joinVerifyOTPPath,
+      pageBuilder: (context, state) {
+        final params =
+            state.extra != null ? state.extra as JoinRouteParamsModel : null;
+
+        return MaterialPage(
+          key: state.pageKey,
+          child: JoinVerifyOTPView(
+            email: params?.email ?? '',
+            fromScreen: params?.screen ?? Screen.splash,
+          ),
         );
       },
     ),

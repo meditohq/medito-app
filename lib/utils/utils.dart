@@ -199,10 +199,14 @@ Future<bool> areGooglePlayServicesAvailable() async {
     if (Platform.isIOS) {
       return true;
     } else if (Platform.isAndroid) {
-      return (await GoogleApiAvailability.instance
-              .checkGooglePlayServicesAvailability()) ==
-          GooglePlayServicesAvailability.success;
+      var availability = await GoogleApiAvailability.instance
+          .checkGooglePlayServicesAvailability();
+      if (availability == GooglePlayServicesAvailability.success) {
+        return true;
+      }
     }
+
+    return false;
   } catch (e) {
     unawaited(Sentry.captureException(
       e,
@@ -211,8 +215,6 @@ Future<bool> areGooglePlayServicesAvailable() async {
 
     return false;
   }
-
-  return false;
 }
 
 extension SanitisePath on String {
