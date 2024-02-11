@@ -34,8 +34,7 @@ import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
 var audioStateNotifier = AudioStateNotifier();
-var currentEnvironment = EnvironmentConstants.stagingEnv;
-// kDebugMode ? EnvironmentConstants.stagingEnv : EnvironmentConstants.prodEnv;
+var currentEnvironment = kDebugMode ? EnvironmentConstants.stagingEnv : EnvironmentConstants.prodEnv;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
