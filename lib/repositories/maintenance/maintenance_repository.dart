@@ -24,7 +24,7 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
 
       return MaintenanceModel.fromJson(response);
     } catch (e) {
-      rethrow;
+      return MaintenanceModel();
     }
   }
 }
