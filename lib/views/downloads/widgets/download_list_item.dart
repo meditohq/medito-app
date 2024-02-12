@@ -79,7 +79,7 @@ class DownloadListItemWidget extends StatelessWidget {
       child: data.icon ??
           NetworkImageWidget(
             url: data.cover!,
-            isCache: true,
+            shouldCache: true,
           ),
     );
   }

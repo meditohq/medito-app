@@ -13,7 +13,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -90,6 +89,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         } else if (!playWhenReady) {
             backgroundMusicPlayer.pause()
         }
+
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -110,7 +110,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun playAudio(audioData: AudioData): Boolean {
-
         val primaryMediaItem = MediaItem.Builder()
             .setUri(audioData.url)
             .setMediaId(audioData.url)
@@ -212,14 +211,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         this.backgroundSoundUri = uri
     }
 
-    @OptIn(UnstableApi::class)
     override fun stopBackgroundSound() {
         backgroundMusicPlayer.stop()
-        NotificationUtil.setNotification(
-            this,
-            NOTIFICATION_ID,
-            null
-        )
     }
 
     override fun setBackgroundSoundVolume(volume: Double) {
@@ -254,8 +247,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun stopAudio() {
         primaryPlayer.stop()
         backgroundMusicPlayer.stop()
-        handler.removeCallbacks(positionUpdateRunnable)
-
     }
 
     override fun playPauseAudio() {

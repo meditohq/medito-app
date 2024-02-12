@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/widgets/shimmers/background_sounds_shimmer_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,7 @@ import 'package:shimmer/shimmer.dart';
 class NetworkImageWidget extends ConsumerWidget {
   final String url;
   final double? height, width;
-  final bool isCache;
+  final bool shouldCache;
   final Gradient? gradient;
   final Widget? errorWidget;
 
@@ -21,7 +22,7 @@ class NetworkImageWidget extends ConsumerWidget {
     required this.url,
     this.height,
     this.width,
-    this.isCache = false,
+    this.shouldCache = false,
     this.gradient,
     this.errorWidget,
   }) : super(key: key);
@@ -38,7 +39,7 @@ class NetworkImageWidget extends ConsumerWidget {
         width: width,
       );
     } else {
-      if (isCache) {
+      if (shouldCache) {
         return CachedNetworkImage(
           imageUrl: url,
           httpHeaders: {

@@ -18,7 +18,7 @@ class OverlayCoverImageWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: NetworkImageWidget(
           url: imageUrl,
-          isCache: true,
+          shouldCache: true,
         ),
       ),
     );

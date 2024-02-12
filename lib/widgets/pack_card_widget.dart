@@ -90,7 +90,7 @@ class PackCardWidget extends StatelessWidget {
           width: 80,
           child: NetworkImageWidget(
             url: coverUrlPath ?? '',
-            isCache: true,
+            shouldCache: true,
           ),
         ),
       );

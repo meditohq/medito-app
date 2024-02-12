@@ -26,14 +26,14 @@ class PlayerView extends ConsumerStatefulWidget {
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
+  bool _endScreenRecentlyClosed = false;
 
   @override
   Widget build(BuildContext context) {
     var playbackState = ref.watch(audioStateProvider);
-
     if (playbackState.isCompleted && playbackState.position > 5000) {
-      _resetState();
       _openEndScreen();
+      _resetState();
     }
 
     var currentlyPlayingTrack = ref.watch(playerProvider);
@@ -125,15 +125,21 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void _handleClose(bool _) {
     _resetState();
+    _stopAudio();
     ref
         .read(playerProvider.notifier)
         .cancelBackgroundThreadForAudioCompleteEvent();
+    _endScreenOpened = false;
+
     router.pop();
+  }
+
+  void _stopAudio() {
+    ref.read(playerProvider.notifier).stop();
   }
 
   void _resetState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(playerProvider.notifier).stop();
       ref.read(audioStateProvider.notifier).resetState();
     });
   }
@@ -141,6 +147,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void _openEndScreen() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_endScreenOpened) {
+        _resetState();
         var currentlyPlayingTrack = ref.read(playerProvider);
         var endScreen = currentlyPlayingTrack?.endScreen;
         if (endScreen != null) {
@@ -150,6 +157,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           );
         }
         _endScreenOpened = true;
+        _endScreenRecentlyClosed = true;
+
+        Future.delayed(Duration(seconds: 2), () {
+          _endScreenRecentlyClosed = false;
+        });
       }
     });
   }

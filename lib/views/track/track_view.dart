@@ -168,7 +168,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                 height: 248,
                 child: NetworkImageWidget(
                   url: trackModel.coverUrl,
-                  isCache: true,
+                  shouldCache: true,
                 ),
               ),
             ),
