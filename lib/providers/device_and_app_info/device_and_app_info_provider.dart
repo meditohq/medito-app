@@ -2,7 +2,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../me/me_provider.dart';
