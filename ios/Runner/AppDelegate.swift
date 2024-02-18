@@ -24,7 +24,11 @@ import flutter_local_notifications
         FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
             GeneratedPluginRegistrant.register(with: registry)
         }
-        
+    
         GeneratedPluginRegistrant.register(with: self)
+        
+        if let controller = window?.rootViewController as? FlutterViewController {
+            SetUpMeditoAudioServiceApi(controller.binaryMessenger, AudioService())
+        }
     }
 }

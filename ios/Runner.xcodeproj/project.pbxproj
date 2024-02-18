@@ -17,6 +17,11 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		E1B1D84F2B827E720070C62E /* PigeonGenerated.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B1D84E2B827E720070C62E /* PigeonGenerated.m */; };
+		E1B1D8522B82810A0070C62E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B1D8512B82810A0070C62E /* AudioService.swift */; };
+		E1B1D8532B8281B90070C62E /* PigeonGenerated.h in Sources */ = {isa = PBXBuildFile; fileRef = E1B1D84D2B827E720070C62E /* PigeonGenerated.h */; };
+		E1B1D8542B8281D80070C62E /* GeneratedPluginRegistrant.h in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */; };
+		E1B1D8552B8281DD0070C62E /* Runner-Bridging-Header.h in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +71,9 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A5F97F043A989A215B3D9F18 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		E1B1D84D2B827E720070C62E /* PigeonGenerated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigeonGenerated.h; sourceTree = "<group>"; };
+		E1B1D84E2B827E720070C62E /* PigeonGenerated.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PigeonGenerated.m; sourceTree = "<group>"; };
+		E1B1D8512B82810A0070C62E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		E2CDBD095F3357E4C5EEE455 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEA43EB68A2D6F15933D679B /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -146,6 +154,10 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				E1B1D8512B82810A0070C62E /* AudioService.swift */,
+				E1B1D8502B8280FD0070C62E /* Audio */,
+				E1B1D84D2B827E720070C62E /* PigeonGenerated.h */,
+				E1B1D84E2B827E720070C62E /* PigeonGenerated.m */,
 				8B7AADD52A559F5C004A5611 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -158,6 +170,13 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		E1B1D8502B8280FD0070C62E /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Audio;
 			sourceTree = "<group>";
 		};
 		F550C2D5E1AB3751FF3A3906 /* Frameworks */ = {
@@ -220,7 +239,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					331C8080294A63A400263BE5 = {
@@ -311,7 +330,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin\n";
 		};
 		6C92A130C7CD27D2775925B3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -343,7 +362,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
 		E27A51F14F4F1D5C0C55B4FB /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -382,6 +401,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1B1D8552B8281DD0070C62E /* Runner-Bridging-Header.h in Sources */,
+				E1B1D8542B8281D80070C62E /* GeneratedPluginRegistrant.h in Sources */,
+				E1B1D8532B8281B90070C62E /* PigeonGenerated.h in Sources */,
+				E1B1D8522B82810A0070C62E /* AudioService.swift in Sources */,
+				E1B1D84F2B827E720070C62E /* PigeonGenerated.m in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
