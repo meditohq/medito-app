@@ -3,7 +3,15 @@ import 'dart:io';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/network/dio_api_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+
+final dioClientProvider = Provider<DioApiService>((ref) {
+  var dioApiService = DioApiService();
+
+  return dioApiService;
+});
 
 var assignDioHeadersProvider = FutureProvider<void>((ref) async {
   var auth = ref.read(authProvider);

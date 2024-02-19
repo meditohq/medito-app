@@ -12,14 +12,14 @@ import '../animated_scale_widget.dart';
 
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
-  final ShortcutsModel data;
+  final List<ShortcutsModel> data;
   @override
   ConsumerState<ShortcutsItemsWidget> createState() =>
       _ShortcutsItemsWidgetState();
 }
 
 class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
-  late ShortcutsModel data;
+  late List<ShortcutsModel> data;
   late List<Widget> shortcutsWidgetList = [];
 
   @override
@@ -32,7 +32,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   void _handleChipPress(
     BuildContext context,
     WidgetRef ref,
-    ShortcutsItemsModel element,
+    ShortcutsModel element,
   ) async {
     _handleTrackEvent(ref, element.id, element.title);
     await handleNavigation(
@@ -60,10 +60,10 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   }
 
   void _handleShortcutItemPlacementInPreference(int oldIndex, int newIndex) {
-    var _data = [...data.shortcuts];
+    var _data = [...data];
     final element = _data.removeAt(oldIndex);
     _data.insert(newIndex, element);
-    data = data.copyWith(shortcuts: _data);
+    data = _data;
     var ids = _data.map((e) => e.id).toList();
     ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids));
   }
@@ -93,7 +93,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final containerHeight = 56.0;
     final containerWidth = (size.width / 2) - (padding20 + 2);
 
-    return data.shortcuts
+    return data
         .map((e) => AnimatedScaleWidget(
               child: IntrinsicWidth(
                 child: InkWell(

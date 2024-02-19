@@ -15,7 +15,6 @@ final userInitializationProvider =
     var response = auth.userResponse;
     if (response.body != null) {
       await ref.read(assignDioHeadersProvider.future);
-      unawaited(ref.read(appOpenedEventProvider.future));
 
       return UserInitializationStatus.successful;
     }
