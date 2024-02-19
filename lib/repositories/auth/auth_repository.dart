@@ -9,6 +9,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../services/network/dio_auth_client_provider.dart';
+
 part 'auth_repository.g.dart';
 
 abstract class AuthRepository {
@@ -32,7 +34,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<UserTokenModel> generateUserToken() async {
     var response = await client.postRequest(
-      HTTPConstants.USERS,
+      HTTPConstants.TOKENS,
       options: Options(headers: {
         HttpHeaders.authorizationHeader: HTTPConstants.INIT_TOKEN,
       }),
@@ -77,5 +79,5 @@ class AuthRepositoryImpl extends AuthRepository {
 
 @riverpod
 AuthRepository authRepository(AuthRepositoryRef ref) {
-  return AuthRepositoryImpl(ref: ref, client: DioApiService());
+  return AuthRepositoryImpl(ref: ref, client: ref.watch(dioAuthClientProvider));
 }

@@ -11,15 +11,11 @@ const _quote = 'quote';
 const _editorialKey = 'editorial';
 
 abstract class HomeRepository {
-  Future<HomeHeaderModel> fetchHomeHeader();
-
-  Future<QuoteModel> fetchQuote();
-
-  Future<ShortcutsModel> fetchShortcuts();
-
-  Future<EditorialModel> fetchEditorial();
+  Future<HomeModel> fetchHome();
 
   List<String> getLocalShortcutIds();
+
+  Future<AnnouncementModel> fetchLatestAnnouncement();
 
   ShortcutsModel getSortedShortcuts(
     ShortcutsModel shortcutsModel,
@@ -37,52 +33,6 @@ class HomeRepositoryImpl extends HomeRepository {
   HomeRepositoryImpl({required this.ref, required this.client});
 
   @override
-  Future<HomeHeaderModel> fetchHomeHeader() async {
-    try {
-      var response = await client.getRequest(HTTPConstants.HEADER);
-
-      return HomeHeaderModel.fromJson(response);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<QuoteModel> fetchQuote() async {
-    try {
-      var response = await client.getRequest(HTTPConstants.QUOTE);
-
-      return QuoteModel.fromJson(response[_quote]);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<ShortcutsModel> fetchShortcuts() async {
-    try {
-      var response = await client.getRequest(HTTPConstants.SHORTCUTS);
-
-      var parsedShortcuts = ShortcutsModel.fromJson(response);
-
-      return getSortedShortcuts(parsedShortcuts);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<EditorialModel> fetchEditorial() async {
-    try {
-      var response = await client.getRequest(HTTPConstants.EDITORIAL);
-
-      return EditorialModel.fromJson(response[_editorialKey]);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
   List<String> getLocalShortcutIds() {
     return ref
             .read(sharedPreferencesProvider)
@@ -94,13 +44,14 @@ class HomeRepositoryImpl extends HomeRepository {
   ShortcutsModel getSortedShortcuts(
     ShortcutsModel shortcutsModel,
   ) {
-    var shortcutsIds = getLocalShortcutIds();
-    var shortcutsCopy = [...shortcutsModel.shortcuts];
-
-    shortcutsCopy.sort((a, b) =>
-        shortcutsIds.indexOf(a.id).compareTo(shortcutsIds.indexOf(b.id)));
-
-    return shortcutsModel.copyWith(shortcuts: shortcutsCopy);
+    //   var shortcutsIds = getLocalShortcutIds();
+    //   var shortcutsCopy = [...shortcutsModel.shortcuts];
+    //
+    //   shortcutsCopy.sort((a, b) =>
+    //       shortcutsIds.indexOf(a.id).compareTo(shortcutsIds.indexOf(b.id)));
+    //
+    //   return shortcutsModel.copyWith(shortcuts: shortcutsCopy);
+    throw UnimplementedError();
   }
 
   @override
@@ -108,6 +59,20 @@ class HomeRepositoryImpl extends HomeRepository {
     await ref
         .read(sharedPreferencesProvider)
         .setStringList(SharedPreferenceConstants.shortcuts, ids);
+  }
+
+  @override
+  Future<HomeModel> fetchHome() {
+    return client.getRequest(HTTPConstants.HOME).then((response) {
+      return HomeModel.fromJson(response);
+    });
+  }
+
+  @override
+  Future<AnnouncementModel> fetchLatestAnnouncement() {
+    return client.getRequest(HTTPConstants.LATEST_ANNOUNCEMENT).then((response) {
+      return AnnouncementModel.fromJson(response);
+    });
   }
 }
 

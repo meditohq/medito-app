@@ -7,6 +7,8 @@ part 'events_repository.g.dart';
 abstract class EventsRepository {
   Future<void> trackEvent(Map<String, dynamic> event);
 
+  Future<void> trackAnnouncementDismissEvent(String id);
+
   Future<void> deleteEvent(Map<String, dynamic> event);
 }
 
@@ -21,6 +23,13 @@ class EventsRepositoryImpl extends EventsRepository {
       HTTPConstants.EVENTS,
       userToken: userToken,
       data: event,
+    );
+  }
+
+  @override
+  Future<void> trackAnnouncementDismissEvent(String id) async {
+    await client.postRequest(
+      HTTPConstants.ANNOUNCEMENT_EVENT + id,
     );
   }
 

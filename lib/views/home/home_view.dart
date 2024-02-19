@@ -2,16 +2,15 @@ import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/views/home/widgets/editorial/carousel_widget.dart';
 import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/home/home_provider.dart';
-import 'widgets/editorial/editorial_widget.dart';
+import '../../models/home/home_model.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
-import 'widgets/tiles/tiles_widget.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   HomeView({super.key});
@@ -25,58 +24,63 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var homeAPIsResponse = ref.watch(refreshHomeAPIsProvider);
     var connectivityStatus = ref.watch(connectivityStatusProvider);
     if (connectivityStatus == ConnectivityStatus.isDisconnected) {
       return ConnectivityErrorWidget();
     }
 
-    if (homeAPIsResponse.hasError) {
-      return MeditoErrorWidget(
-        message: homeAPIsResponse.error.toString(),
-        onTap: () => _onRefresh(),
-        isLoading: homeAPIsResponse.isLoading,
-      );
-    }
+    final home = ref.watch(fetchHomeProvider);
+    final latestAnnouncement = ref.watch(fetchLatestAnnouncementProvider);
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _onRefresh,
-                  child: SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    child: Container(
-                      color: ColorConstants.ebony,
-                      child: Column(
-                        children: [
-                          HeaderAndAnnouncementWidget(),
-                          height20,
-                          ShortcutsWidget(),
-                          height20,
-                          EditorialWidget(),
-                          height20,
-                          QuoteWidget(),
-                          height20,
-                          TilesWidget(),
-                          height20,
-                        ],
+    return home.when(
+      loading: () => HomeShimmerWidget(),
+      error: (err, stack) => MeditoErrorWidget(
+        message: home.error.toString(),
+        onTap: () => _onRefresh(),
+        isLoading: home.isLoading,
+      ),
+      data: (HomeModel homeData) {
+        return Scaffold(
+          body: SafeArea(
+            bottom: false,
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        child: Container(
+                          color: ColorConstants.ebony,
+                          child: Column(
+                            children: [
+                              HeaderAndAnnouncementWidget(
+                                menuData: homeData.menu,
+                                announcementData: latestAnnouncement.value,
+                              ),
+                              height20,
+                              ShortcutsWidget(data: homeData.shortcuts),
+                              height20,
+                              CarouselWidget(data: homeData.carousel),
+                              height20,
+                              QuoteWidget(data: homeData.todayQuote),
+                              height20,
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

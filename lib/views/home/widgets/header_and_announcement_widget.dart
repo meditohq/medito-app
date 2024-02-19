@@ -1,14 +1,19 @@
 import 'package:Medito/models/models.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../providers/home/home_provider.dart';
 import 'announcement/announcement_widget.dart';
 import 'header/home_header_widget.dart';
 
 class HeaderAndAnnouncementWidget extends ConsumerStatefulWidget {
-  const HeaderAndAnnouncementWidget({super.key});
+  const HeaderAndAnnouncementWidget({
+    super.key,
+    required this.menuData,
+    required this.announcementData,
+  });
+
+  final List<HomeMenuModel> menuData;
+  final AnnouncementModel? announcementData;
 
   @override
   ConsumerState<HeaderAndAnnouncementWidget> createState() =>
@@ -43,55 +48,40 @@ class _HeaderAndAnnouncementWidgetState
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var response = ref.watch(fetchHomeHeaderProvider);
 
-    return response.when(
-      skipLoadingOnRefresh: false,
-      skipLoadingOnReload: true,
-      data: (data) => _buildMain(data),
-      error: (err, stack) => MeditoErrorWidget(
-        message: err.toString(),
-        onTap: () => ref.refresh(fetchHomeHeaderProvider),
-        isLoading: response.isLoading,
-        isScaffold: false,
-      ),
-      loading: () => const HeaderAndAnnouncementShimmerWidget(),
-    );
+    return _buildMain();
   }
 
-  Column _buildMain(HomeHeaderModel data) {
+  Column _buildMain() {
     return Column(
       children: [
         HomeHeaderWidget(
-          homeMenuModel: data.menu,
+          homeMenuModel: widget.menuData,
         ),
-        _getAnnouncementBanner(data),
+        if (widget.announcementData != null)
+          _getAnnouncementBanner(widget.announcementData!),
       ],
     );
   }
 
-  Widget _getAnnouncementBanner(HomeHeaderModel data) {
-    if (data.announcement != null) {
-      return SizeTransition(
-        axisAlignment: -1,
-        sizeFactor: isCollapsed
-            ? Tween<double>(begin: 1.0, end: 0.0).animate(
-                curvedAnimation,
-              )
-            : Tween<double>(begin: 0.0, end: 1.0).animate(
-                curvedAnimation,
-              ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: AnnouncementWidget(
-            announcement: data.announcement!,
-            onPressedDismiss: _handleCollapse,
-          ),
+  Widget _getAnnouncementBanner(AnnouncementModel data) {
+    return SizeTransition(
+      axisAlignment: -1,
+      sizeFactor: isCollapsed
+          ? Tween<double>(begin: 1.0, end: 0.0).animate(
+              curvedAnimation,
+            )
+          : Tween<double>(begin: 0.0, end: 1.0).animate(
+              curvedAnimation,
+            ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: AnnouncementWidget(
+          announcement: data,
+          onPressedDismiss: _handleCollapse,
         ),
-      );
-    }
-
-    return SizedBox();
+      ),
+    );
   }
 
   @override

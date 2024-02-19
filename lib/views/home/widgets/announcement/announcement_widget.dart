@@ -73,7 +73,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
           _handleTrackEvent(
             ref,
             announcement.id,
-            StringConstants.dismiss.toLowerCase(),
           );
         },
         btnText: StringConstants.dismiss,
@@ -124,12 +123,12 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   }
 
   Widget _icon(String? icon) {
-    if (icon != null) {
+    if (icon.isNotNullAndNotEmpty()) {
       return Padding(
         padding: const EdgeInsets.only(top: 0, right: 10),
         child: Icon(
           IconData(
-            formatIcon(widget.announcement.icon!),
+            formatIcon(icon!),
             fontFamily: 'MaterialIcons',
           ),
           size: 24,
@@ -145,7 +144,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     WidgetRef ref,
     AnnouncementModel element,
   ) async {
-    _handleTrackEvent(ref, element.id, element.ctaTitle);
+    _handleTrackEvent(ref, element.id);
     await handleNavigation(
       context: context,
       element.ctaType,
@@ -157,16 +156,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   void _handleTrackEvent(
     WidgetRef ref,
     String announcementId,
-    String? ctaTitle,
   ) {
-    var announcement = AnnouncementCtaTappedModel(
-      announcementId: announcementId,
-      ctaTitle: ctaTitle ?? '',
-    );
-    var event = EventsModel(
-      name: EventTypes.announcementCtaTapped,
-      payload: announcement.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
+    ref.read(announcementDismissEventProvider(
+      id: announcementId,
+    ));
   }
 }

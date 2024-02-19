@@ -14,6 +14,16 @@ Future<void> events(
 }
 
 @riverpod
+Future<void> announcementDismissEvent(
+  AnnouncementDismissEventRef ref, {
+  required String id,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.trackAnnouncementDismissEvent(id);
+}
+
+@riverpod
 Future<void> deleteEvent(
   DeleteEventRef ref, {
   required Map<String, dynamic> event,
