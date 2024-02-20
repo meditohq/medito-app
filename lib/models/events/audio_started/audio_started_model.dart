@@ -6,9 +6,9 @@ part 'audio_started_model.g.dart';
 @freezed
 abstract class AudioStartedModel with _$AudioStartedModel {
   const factory AudioStartedModel({
-    required String audioFileId,
-    required String trackId,
-    required int duration,
+    required String fileId,
+    required String fileGuide,
+    required int fileDuration,
   }) = _AudioStartedModel;
 
   factory AudioStartedModel.fromJson(Map<String, Object?> json) =>

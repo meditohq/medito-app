@@ -7,6 +7,8 @@ part 'events_repository.g.dart';
 abstract class EventsRepository {
   Future<void> trackEvent(Map<String, dynamic> event);
 
+  Future<void> trackAudioStartedEvent(Map<String, dynamic> event);
+
   Future<void> trackAnnouncementDismissEvent(String id);
 
   Future<void> markAsListenedEvent(String id);
@@ -31,6 +33,14 @@ class EventsRepositoryImpl extends EventsRepository {
   }
 
   @override
+  Future<void> trackAudioStartedEvent(Map<String, dynamic> event) async {
+    await client.postRequest(
+      HTTPConstants.AUDIO_STARTED_EVENT,
+      data: event,
+    );
+  }
+
+  @override
   Future<void> trackAnnouncementDismissEvent(String id) async {
     await client.postRequest(
       HTTPConstants.ANNOUNCEMENT_EVENT + id,
@@ -40,14 +50,14 @@ class EventsRepositoryImpl extends EventsRepository {
   @override
   Future<void> markAsListenedEvent(String id) async {
     await client.postRequest(
-      '${HTTPConstants.TRACKS}/$id/${HTTPConstants.MARK_AS_LISTENED_EVENT}',
+      '${HTTPConstants.TRACKS}/$id/${HTTPConstants.COMPLETED_EVENT}',
     );
   }
 
   @override
   Future<void> markAsNotListenedEvent(String id) async {
     await client.deleteRequest(
-        '${HTTPConstants.TRACKS}/$id/${HTTPConstants.MARK_AS_LISTENED_EVENT}',
+        '${HTTPConstants.TRACKS}/$id/${HTTPConstants.COMPLETED_EVENT}',
     );
   }
 

@@ -14,6 +14,16 @@ Future<void> events(
 }
 
 @riverpod
+Future<void> audioStartedEvent(
+  AudioStartedEventRef ref, {
+  required Map<String, dynamic> event,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.trackAudioStartedEvent(event);
+}
+
+@riverpod
 Future<void> announcementDismissEvent(
   AnnouncementDismissEventRef ref, {
   required String id,

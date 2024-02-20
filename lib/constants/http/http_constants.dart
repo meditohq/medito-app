@@ -29,6 +29,7 @@ class HTTPConstants {
   static const String MAINTENANCE = 'https://api.medito.app/v1/maintenance';
 
   // EVENT END POINTS
+  static const String AUDIO_STARTED_EVENT = 'audio/start/';
   static const String ANNOUNCEMENT_EVENT = 'announcements/dismiss/';
-  static const String MARK_AS_LISTENED_EVENT = 'complete/';
+  static const String COMPLETED_EVENT = 'complete/';
 }

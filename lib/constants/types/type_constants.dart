@@ -16,7 +16,6 @@ class EventTypes {
   static const String saveFcmToken = 'saveFcmToken';
   static const String audioStarted = 'audioStarted';
   static const String likedTrack = 'liked';
-  static const String audioCompleted = 'audioCompleted';
   static const String backgroundSoundSelected = 'backgroundSoundSelected';
   static const String packViewed = 'packViewed';
   static const String trackViewed = 'trackViewed';
