@@ -133,20 +133,16 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
   void handleAudioStartedEvent(
-    String trackId,
+    String guide,
     String audioFileId,
     int duration,
   ) {
     var audio = AudioStartedModel(
-      audioFileId: audioFileId,
-      trackId: trackId,
-      duration: duration,
+      fileId: audioFileId,
+      fileDuration: duration,
+      fileGuide: guide,
     );
-    var event = EventsModel(
-      name: EventTypes.audioStarted,
-      payload: audio.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
+    ref.read(audioStartedEventProvider(event: audio.toJson()));
   }
 
   Future<void> seekToPosition(int position) async {
@@ -171,5 +167,11 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
   void playPause() {
     _api.playPauseAudio();
+  }
+
+  void handleAudioCompletionEvent(
+    String trackId,
+  ) {
+    ref.read(markAsListenedEventProvider(id: trackId));
   }
 }
