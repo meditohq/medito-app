@@ -30,4 +30,5 @@ class HTTPConstants {
 
   // EVENT END POINTS
   static const String ANNOUNCEMENT_EVENT = 'announcements/dismiss/';
+  static const String MARK_AS_LISTENED_EVENT = 'complete/';
 }

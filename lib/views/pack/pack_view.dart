@@ -127,19 +127,16 @@ class _PackViewState extends ConsumerState<PackView>
             _onListItemTap(item.id, item.type, item.path, context);
           },
           splashColor: ColorConstants.charcoal,
-          child: item.type == TypeConstants.track && item.isCompleted == false
-              ? PackDismissibleWidget(
-                  child: PackItemWidget(isLast: isLast, item: item),
-                  onUpdateCb: () {
-                    ref
-                        .read(packProvider(packId: widget.id).notifier)
-                        .markComplete(
-                          audioFileId: item.path.getIdFromPath(),
-                          trackId: item.id,
-                        );
-                  },
-                )
-              : PackItemWidget(isLast: isLast, item: item),
+          child: PackDismissibleWidget(
+            child: PackItemWidget(item: item),
+            onDismissed: () {
+              ref.read(packProvider(packId: widget.id).notifier).toggle(
+                    audioFileId: item.path.getIdFromPath(),
+                    trackId: item.id,
+                    isComplete: item.isCompleted == true,
+                  );
+            },
+          ),
         ),
         if (!isLast)
           Padding(

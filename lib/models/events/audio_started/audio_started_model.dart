@@ -8,6 +8,7 @@ abstract class AudioStartedModel with _$AudioStartedModel {
   const factory AudioStartedModel({
     required String audioFileId,
     required String trackId,
+    required int duration,
   }) = _AudioStartedModel;
 
   factory AudioStartedModel.fromJson(Map<String, Object?> json) =>
