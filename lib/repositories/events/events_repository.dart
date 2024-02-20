@@ -9,6 +9,10 @@ abstract class EventsRepository {
 
   Future<void> trackAnnouncementDismissEvent(String id);
 
+  Future<void> markAsListenedEvent(String id);
+
+  Future<void> markAsNotListenedEvent(String id);
+
   Future<void> deleteEvent(Map<String, dynamic> event);
 }
 
@@ -30,6 +34,20 @@ class EventsRepositoryImpl extends EventsRepository {
   Future<void> trackAnnouncementDismissEvent(String id) async {
     await client.postRequest(
       HTTPConstants.ANNOUNCEMENT_EVENT + id,
+    );
+  }
+
+  @override
+  Future<void> markAsListenedEvent(String id) async {
+    await client.postRequest(
+      '${HTTPConstants.TRACKS}/$id/${HTTPConstants.MARK_AS_LISTENED_EVENT}',
+    );
+  }
+
+  @override
+  Future<void> markAsNotListenedEvent(String id) async {
+    await client.deleteRequest(
+        '${HTTPConstants.TRACKS}/$id/${HTTPConstants.MARK_AS_LISTENED_EVENT}',
     );
   }
 

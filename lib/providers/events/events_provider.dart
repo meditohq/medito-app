@@ -24,6 +24,26 @@ Future<void> announcementDismissEvent(
 }
 
 @riverpod
+Future<void> markAsListenedEvent(
+  MarkAsListenedEventRef ref, {
+  required String id,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.markAsListenedEvent(id);
+}
+
+@riverpod
+Future<void> markAsNotListenedEvent(
+  MarkAsNotListenedEventRef ref, {
+  required String id,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.markAsNotListenedEvent(id);
+}
+
+@riverpod
 Future<void> deleteEvent(
   DeleteEventRef ref, {
   required Map<String, dynamic> event,

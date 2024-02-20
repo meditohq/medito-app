@@ -38,6 +38,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
           ref.read(playerProvider.notifier).handleAudioStartedEvent(
                 next.id,
                 next.audio.first.files.first.id,
+                next.audio.first.files.first.duration,
               );
         }
       },

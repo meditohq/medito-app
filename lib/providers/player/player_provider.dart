@@ -135,8 +135,13 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   void handleAudioStartedEvent(
     String trackId,
     String audioFileId,
+    int duration,
   ) {
-    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
+    var audio = AudioStartedModel(
+      audioFileId: audioFileId,
+      trackId: trackId,
+      duration: duration,
+    );
     var event = EventsModel(
       name: EventTypes.audioStarted,
       payload: audio.toJson(),

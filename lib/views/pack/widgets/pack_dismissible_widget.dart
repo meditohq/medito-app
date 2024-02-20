@@ -5,11 +5,11 @@ class PackDismissibleWidget extends StatelessWidget {
   const PackDismissibleWidget({
     super.key,
     required this.child,
-    this.onUpdateCb,
+    required this.onDismissed,
   });
 
   final Widget child;
-  final void Function()? onUpdateCb;
+  final void Function() onDismissed;
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +18,7 @@ class PackDismissibleWidget extends StatelessWidget {
       direction: DismissDirection.endToStart,
       background: _getDismissibleBackgroundWidget(),
       confirmDismiss: (direction) async {
-        if (onUpdateCb != null) {
-          onUpdateCb!();
-        }
+        onDismissed();
 
         return false; // Do not remove the item from the list
       },

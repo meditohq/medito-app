@@ -1,4 +1,3 @@
-import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
@@ -33,9 +32,10 @@ class Pack extends _$Pack {
     ref.keepAlive();
   }
 
-  Future<void> markComplete({
+  Future<void> toggle({
     required String audioFileId,
     required String trackId,
+    required bool isComplete,
   }) async {
     var packs = state.value;
     var prevState = state.value;
@@ -45,18 +45,13 @@ class Pack extends _$Pack {
             packs.items.indexWhere((element) => element.id == audioFileId);
         packs.items[selectedItemIndex] =
             packs.items[selectedItemIndex].copyWith(isCompleted: true);
-        var audio = AudioCompletedModel(
-          audioFileId: audioFileId,
-          trackId: trackId,
-          updateStats: false,
-        );
-        var event = EventsModel(
-          name: EventTypes.audioCompleted,
-          payload: audio.toJson(),
-        );
 
         state = AsyncData(packs);
-        await ref.read(eventsProvider(event: event.toJson()).future);
+        if (isComplete) {
+          await ref.read(markAsListenedEventProvider(id: trackId).future);
+        } else {
+          await ref.read(markAsNotListenedEventProvider(id: trackId).future);
+        }
       }
     } catch (err) {
       if (prevState != null) state = AsyncData(prevState);
