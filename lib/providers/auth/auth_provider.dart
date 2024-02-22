@@ -111,11 +111,8 @@ class AuthNotifier extends ChangeNotifier {
     var token = await requestGenerateFirebaseToken();
     if (token != null) {
       var fcm = SaveFcmTokenModel(fcmToken: token);
-      var event = EventsModel(
-        name: EventTypes.saveFcmToken,
-        payload: fcm.toJson(),
-      );
-      ref.read(eventsProvider(event: event.toJson()));
+      ref.read(fcmSaveEventProvider(event: fcm.toJson()));
     }
   }
+
 }

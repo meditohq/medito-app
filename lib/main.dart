@@ -34,7 +34,7 @@ import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
 var audioStateNotifier = AudioStateNotifier();
-var currentEnvironment = kDebugMode ? EnvironmentConstants.stagingEnv : EnvironmentConstants.prodEnv;
+var currentEnvironment = EnvironmentConstants.stagingEnv;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +52,7 @@ Future<void> main() async {
   usePathUrlStrategy();
 
   await SentryFlutter.init(
-    (options) {
+        (options) {
       options.attachScreenshot = true;
       options.environment = kDebugMode
           ? HTTPConstants.ENVIRONMENT_DEBUG
@@ -60,14 +60,15 @@ Future<void> main() async {
       options.dsn = HTTPConstants.SENTRY_DSN;
       options.tracesSampleRate = 1.0;
     },
-    appRunner: () => runApp(
-      ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-        ],
-        child: ParentWidget(),
-      ),
-    ),
+    appRunner: () =>
+        runApp(
+          ProviderScope(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+            ],
+            child: ParentWidget(),
+          ),
+        ),
   );
 }
 

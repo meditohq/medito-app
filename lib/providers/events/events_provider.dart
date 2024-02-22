@@ -17,10 +17,21 @@ Future<void> events(
 Future<void> audioStartedEvent(
   AudioStartedEventRef ref, {
   required Map<String, dynamic> event,
+  required String trackId,
 }) {
   final events = ref.watch(eventsRepositoryProvider);
 
-  return events.trackAudioStartedEvent(event);
+  return events.trackAudioStartedEvent(event, trackId);
+}
+
+@riverpod
+Future<void> fcmSaveEvent(
+  FcmSaveEventRef ref, {
+  required Map<String, dynamic> event,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.saveFirebaseToken(event);
 }
 
 @riverpod
@@ -40,7 +51,7 @@ Future<void> markAsListenedEvent(
 }) {
   final events = ref.watch(eventsRepositoryProvider);
 
-  return events.markAsListenedEvent(id);
+  return events.markTrackAsListenedEvent(id);
 }
 
 @riverpod
@@ -50,7 +61,7 @@ Future<void> markAsNotListenedEvent(
 }) {
   final events = ref.watch(eventsRepositoryProvider);
 
-  return events.markAsNotListenedEvent(id);
+  return events.markTrackAsNotListenedEvent(id);
 }
 
 @riverpod

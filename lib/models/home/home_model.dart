@@ -51,7 +51,7 @@ class HomeCarouselModel with _$HomeCarouselModel {
 class HomeQuoteModel with _$HomeQuoteModel {
   const factory HomeQuoteModel({
     required String id,
-    required String text,
+    required String quote,
     required String author,
     String? sharedBy,
   }) = _HomeQuoteModel;

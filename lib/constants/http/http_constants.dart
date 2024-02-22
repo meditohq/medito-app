@@ -4,7 +4,8 @@ class HTTPConstants {
   static String ENVIRONMENT = dotenv.env['ENVIRONMENT']!;
   static String ENVIRONMENT_DEBUG = dotenv.env['ENVIRONMENT_DEBUG']!;
   static String CONTENT_BASE_URL = dotenv.env['CONTENT_BASE_URL']!;
-  static String INIT_TOKEN = dotenv.env['INIT_TOKEN']!;
+  static String AUTH_BASE_URL = dotenv.env['AUTH_BASE_URL']!;
+  static String AUTH_TOKEN = dotenv.env['AUTH_TOKEN']!;
   static String SENTRY_DSN = dotenv.env['SENTRY_DSN']!;
 
   //END POINTS
@@ -29,7 +30,10 @@ class HTTPConstants {
   static const String MAINTENANCE = 'https://api.medito.app/v1/maintenance';
 
   // EVENT END POINTS
-  static const String AUDIO_STARTED_EVENT = 'audio/start/';
-  static const String ANNOUNCEMENT_EVENT = 'announcements/dismiss/';
-  static const String COMPLETED_EVENT = 'complete/';
+  static const String AUDIO = '/audio';
+  static const String AUDIO_START_EVENT = '/start';
+  static const String ANNOUNCEMENT_EVENT = '/announcements';
+  static const String ANNOUNCEMENT_DISMISS_EVENT = '/dismiss/';
+  static const String COMPLETE_EVENT = '/complete';
+  static const String FIREBASE_EVENT = '/fcm';
 }

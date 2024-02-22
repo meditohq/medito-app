@@ -12,17 +12,6 @@ class TypeConstants {
 }
 
 class EventTypes {
-  static const String appOpened = 'appOpened';
-  static const String saveFcmToken = 'saveFcmToken';
-  static const String audioStarted = 'audioStarted';
   static const String likedTrack = 'liked';
-  static const String backgroundSoundSelected = 'backgroundSoundSelected';
-  static const String packViewed = 'packViewed';
-  static const String trackViewed = 'trackViewed';
-  static const String chipTapped = 'chipTapped';
-  static const String menuItemTapped = 'menuItemTapped';
-  static const String transferStats = 'transferStats';
-  static const String announcementCtaTapped = 'announcementCtaTapped';
-  static const String donationCtaTapped = 'ctaTapped';
   static const String trackFeedback = 'trackFeedback';
 }

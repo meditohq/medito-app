@@ -56,35 +56,33 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
   Future<void> _playTrack(
     Ref ref,
-    TrackModel trackModel,
+    TrackModel track,
     TrackFilesModel file,
   ) async {
     await _startBackgroundThreadForAudioCompleteEvent(
-      file.id,
-      trackModel.id,
+      track.id,
       file.duration,
     );
 
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
-          _constructFileName(trackModel, file),
+          _constructFileName(track, file),
         );
     await _api.playAudio(
       AudioData(
         url: downloadPath ?? file.path,
         track: Track(
-          title: trackModel.title,
-          artist: trackModel.artist?.name ?? '',
-          artistUrl: trackModel.artist?.path ?? '',
-          description: trackModel.description,
-          imageUrl: trackModel.coverUrl,
+          title: track.title,
+          artist: track.artist?.name ?? '',
+          artistUrl: track.artist?.path ?? '',
+          description: track.description,
+          imageUrl: track.coverUrl,
         ),
       ),
     );
   }
 
   Future<void> _startBackgroundThreadForAudioCompleteEvent(
-    String fileId,
-    String trackModelId,
+    String trackId,
     int duration,
   ) async {
     await Workmanager().initialize(
@@ -105,8 +103,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         requiresStorageNotLow: false,
       ),
       inputData: {
-        TypeConstants.fileIdKey: fileId,
-        TypeConstants.trackIdKey: trackModelId,
+        TypeConstants.trackIdKey: trackId,
         WorkManagerConstants.userTokenKey: getUserToken(),
       },
     );
@@ -134,6 +131,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
   void handleAudioStartedEvent(
     String guide,
+    String trackId,
     String audioFileId,
     int duration,
   ) {
@@ -142,7 +140,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       fileDuration: duration,
       fileGuide: guide,
     );
-    ref.read(audioStartedEventProvider(event: audio.toJson()));
+    ref.read(audioStartedEventProvider(event: audio.toJson(), trackId: trackId));
   }
 
   Future<void> seekToPosition(int position) async {
