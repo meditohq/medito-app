@@ -29,18 +29,8 @@ class _PackViewState extends ConsumerState<PackView>
 
   @override
   void initState() {
-    _handleTrackEvent(ref, widget.id);
     _scrollController.addListener(_scrollListener);
     super.initState();
-  }
-
-  void _handleTrackEvent(WidgetRef ref, String packId) {
-    var packViewedModel = PackViewedModel(packId: packId);
-    var event = EventsModel(
-      name: EventTypes.packViewed,
-      payload: packViewedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
   }
 
   @override

@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
@@ -10,29 +9,19 @@ const _errorKey = 'error';
 const _messageKey = 'message';
 
 // ignore: avoid_dynamic_calls
-class DioApiService {
-  static final DioApiService _instance = DioApiService._internal();
+class DioAuthApiService {
+  static final DioAuthApiService _instance = DioAuthApiService._internal();
   late Dio dio;
 
-  factory DioApiService() {
+  factory DioAuthApiService() {
     return _instance;
   }
 
-  // Only pass the userToken if you know the headers have not been set in
-  // assignDioHeadersProvider (for example in workManager)
-  void _setToken(String? userToken) {
-    if (userToken != null && userToken.isNotEmpty) {
-      dio.options.headers[HttpHeaders.authorizationHeader] =
-      'Bearer $userToken';
-    }
-  }
-
-  // Private constructor
-  DioApiService._internal() {
+  DioAuthApiService._internal() {
     dio = Dio();
     dio.options = BaseOptions(
       connectTimeout: Duration(milliseconds: 30000),
-      baseUrl: HTTPConstants.CONTENT_BASE_URL,
+      baseUrl: HTTPConstants.AUTH_BASE_URL,
     );
     if (kDebugMode) {
       dio.interceptors.add(LogInterceptor(
@@ -42,9 +31,8 @@ class DioApiService {
         error: true,
       ));
     }
-    dio.interceptors.add(
-      InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
-    );
+    dio.options.headers[HttpHeaders.authorizationHeader] =
+    'Bearer ${HTTPConstants.AUTH_TOKEN}';
   }
 
   Future<void> _onError(
@@ -95,7 +83,6 @@ class DioApiService {
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
       String uri, {
-        String? userToken,
         data,
         Map<String, dynamic>? queryParameters,
         Options? options,
@@ -103,7 +90,6 @@ class DioApiService {
         ProgressCallback? onSendProgress,
         ProgressCallback? onReceiveProgress,
       }) async {
-    _setToken(userToken);
     try {
       var response = await dio.post(
         uri,
@@ -113,29 +99,6 @@ class DioApiService {
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
-      );
-
-      return response.data;
-    } on DioException catch (err) {
-      _returnDioErrorResponse(err);
-    }
-  }
-
-  // ignore: avoid-dynamic
-  Future<dynamic> deleteRequest(
-      String uri, {
-        data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
-    try {
-      var response = await dio.delete(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
       );
 
       return response.data;

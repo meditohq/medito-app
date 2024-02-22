@@ -20,7 +20,7 @@ class QuoteWidget extends ConsumerWidget {
           color: ColorConstants.walterWhite,
         );
 
-    var quote = data?.text;
+    var quote = data?.quote;
     var author = data?.author;
 
     return Container(

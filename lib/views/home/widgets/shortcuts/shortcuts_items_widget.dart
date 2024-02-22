@@ -34,22 +34,12 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     WidgetRef ref,
     ShortcutsModel element,
   ) async {
-    _handleTrackEvent(ref, element.id, element.title);
     await handleNavigation(
       context: context,
       element.type,
       [element.path.toString().getIdFromPath(), element.path],
       ref: ref,
     );
-  }
-
-  void _handleTrackEvent(WidgetRef ref, String chipId, String chipTitle) {
-    var chipViewedModel = ChipTappedModel(chipId: chipId, chipTitle: chipTitle);
-    var event = EventsModel(
-      name: EventTypes.chipTapped,
-      payload: chipViewedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
   }
 
   void _onReorder(int oldIndex, int newIndex) {

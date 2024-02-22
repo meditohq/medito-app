@@ -89,7 +89,6 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     WidgetRef ref,
     HomeMenuModel element,
   ) async {
-    _handleTrackEvent(ref, element.id, element.title);
     Navigator.pop(context);
     await handleNavigation(
       context: context,
@@ -99,13 +98,4 @@ class MenuBottomSheetWidget extends ConsumerWidget {
     );
   }
 
-  void _handleTrackEvent(WidgetRef ref, String itemId, String itemTitle) {
-    var menuItemTappedModel =
-        MenuItemTappedModel(itemId: itemId, itemTitle: itemTitle);
-    var event = EventsModel(
-      name: EventTypes.menuItemTapped,
-      payload: menuItemTappedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
-  }
 }

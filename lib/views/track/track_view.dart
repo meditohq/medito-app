@@ -47,7 +47,6 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   @override
   void initState() {
-    _handleTrackEvent(ref, widget.id);
     scrollController.addListener(() {
       _optionallyShowOrHideCloseButton();
     });
@@ -62,15 +61,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     setState(() {
       showCloseButton = size > screenHeight;
     });
-  }
-
-  void _handleTrackEvent(WidgetRef ref, String trackId) {
-    var trackViewedModel = TrackViewedModel(trackId: trackId);
-    var event = EventsModel(
-      name: EventTypes.trackViewed,
-      payload: trackViewedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
   }
 
   void _handleOnGuideNameChange(TrackAudioModel? value) {

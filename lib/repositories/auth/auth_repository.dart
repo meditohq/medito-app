@@ -1,15 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/dio_api_service.dart';
-import 'package:dio/dio.dart';
+import 'package:Medito/services/network/dio_auth_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../services/network/dio_auth_client_provider.dart';
 
 part 'auth_repository.g.dart';
 
@@ -26,7 +22,7 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImpl extends AuthRepository {
-  final DioApiService client;
+  final DioAuthApiService client;
   final Ref ref;
 
   AuthRepositoryImpl({required this.ref, required this.client});
@@ -35,9 +31,6 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<UserTokenModel> generateUserToken() async {
     var response = await client.postRequest(
       HTTPConstants.TOKENS,
-      options: Options(headers: {
-        HttpHeaders.authorizationHeader: HTTPConstants.INIT_TOKEN,
-      }),
     );
 
     return UserTokenModel.fromJson(response);
@@ -79,5 +72,5 @@ class AuthRepositoryImpl extends AuthRepository {
 
 @riverpod
 AuthRepository authRepository(AuthRepositoryRef ref) {
-  return AuthRepositoryImpl(ref: ref, client: ref.watch(dioAuthClientProvider));
+  return AuthRepositoryImpl(ref: ref, client: DioAuthApiService());
 }
