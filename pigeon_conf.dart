@@ -1,6 +1,6 @@
 import 'package:pigeon/pigeon.dart';
 
-// to build the classes: flutter pub run pigeon --input pigeon_conf.dart
+// to build the classes: dart run pigeon --input pigeon_conf.dart
 
 // #docregion config
 @ConfigurePigeon(PigeonOptions(
@@ -9,8 +9,8 @@ import 'package:pigeon/pigeon.dart';
   kotlinOut:
       'android/app/src/main/kotlin/com/meditofoundation/medito/AudioPigeon.g.kt',
   kotlinOptions: KotlinOptions(),
-  // swiftOut: 'ios/Runner/Messages.g.swift',
-  // swiftOptions: SwiftOptions(),
+  swiftOut: 'ios/Runner/Messages.g.swift',
+  swiftOptions: SwiftOptions(),
 ))
 // #enddocregion config
 
