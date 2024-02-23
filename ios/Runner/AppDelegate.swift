@@ -28,7 +28,7 @@ import flutter_local_notifications
         GeneratedPluginRegistrant.register(with: self)
         
         if let controller = window?.rootViewController as? FlutterViewController {
-            MeditoAudioServiceApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: AudioService())
+            SetUpMeditoAudioServiceApi(controller.binaryMessenger, AudioService())
         }
     }
 }

@@ -9,8 +9,11 @@ import 'package:pigeon/pigeon.dart';
   kotlinOut:
       'android/app/src/main/kotlin/com/meditofoundation/medito/AudioPigeon.g.kt',
   kotlinOptions: KotlinOptions(),
-  swiftOut: 'ios/Runner/Messages.g.swift',
-  swiftOptions: SwiftOptions(),
+  objcHeaderOut: 'ios/Runner/PigeonGenerated.g.h',
+  objcSourceOut: 'ios/Runner/PigeonGenerated.g.m',
+  objcOptions: ObjcOptions()
+  // swiftOut: 'ios/Runner/Messages.g.swift',
+  // swiftOptions: SwiftOptions(),
 ))
 // #enddocregion config
 
