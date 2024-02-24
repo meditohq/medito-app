@@ -2,6 +2,7 @@ import UIKit
 import FirebaseCore
 import Flutter
 import flutter_local_notifications
+import workmanager
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -30,5 +31,9 @@ import flutter_local_notifications
         if let controller = window?.rootViewController as? FlutterViewController {
             SetUpMeditoAudioServiceApi(controller.binaryMessenger, AudioService())
         }
+    }
+    
+    private func setupWorkManager() {
+        WorkmanagerPlugin.registerTask(withIdentifier: "medito-task-identifier")
     }
 }
