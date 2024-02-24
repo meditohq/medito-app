@@ -42,9 +42,14 @@ import workmanager
     }
     
     private func setupFlutterWorkManagerPlugin() {
-        WorkmanagerPlugin.registerTask(withIdentifier: "org.meditofoundation-medito-bgtask")
+        WorkmanagerPlugin.registerTask(withIdentifier: "org.meditofoundation")
         WorkmanagerPlugin.setPluginRegistrantCallback { registry in
-            GeneratedPluginRegistrant.register(with: registry)
+            guard let registrar = registry.registrar(forPlugin: "com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin") else { 
+                print("FlutterLocalNotificationsPlugin not found")
+                return
+            }
+            
+            FlutterLocalNotificationsPlugin.register(with: registrar)
         }
     }
 

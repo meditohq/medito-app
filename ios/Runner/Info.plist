@@ -32,8 +32,6 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
-	<key>LSApplicationCategoryType</key>
-	<string>medito-task-identifier</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>sms</string>
