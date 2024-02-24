@@ -4,12 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>be.tramckrijte.workmanagerExample.rescheduledTask</string>
-		<string>be.tramckrijte.workmanagerExample.simpleDelayedTask</string>
-		<string>be.tramckrijte.workmanagerExample.simplePeriodic1HourTask</string>
-		<string>be.tramckrijte.workmanagerExample.simplePeriodicTask</string>
-		<string>be.tramckrijte.workmanagerExample.failedTask</string>
-		<string>be.tramckrijte.workmanagerExample.simpleTask</string>
+		<string>com.AVFoundation.medito.audioCompletedTask</string>
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
