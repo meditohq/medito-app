@@ -10,6 +10,8 @@ import workmanager
         setupFirebase()
         setupNotifications()
         setupFlutterPlugins()
+        setupCustionAudioService()
+        setupBackgroundTasks()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
@@ -21,19 +23,32 @@ import workmanager
         UNUserNotificationCenter.current().delegate = self
     }
     
-    private func setupFlutterPlugins() {
-        FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
-            GeneratedPluginRegistrant.register(with: registry)
-        }
-    
-        GeneratedPluginRegistrant.register(with: self)
-        
+    private func setupCustionAudioService() {
         if let controller = window?.rootViewController as? FlutterViewController {
             SetUpMeditoAudioServiceApi(controller.binaryMessenger, AudioService())
         }
     }
     
-    private func setupWorkManager() {
-        WorkmanagerPlugin.registerTask(withIdentifier: "medito-task-identifier")
+    private func setupFlutterPlugins() {
+        GeneratedPluginRegistrant.register(with: self)
+        setupFlutterLocalNotificationsPlugin()
+        setupFlutterWorkManagerPlugin()
+    }
+    
+    private func setupFlutterLocalNotificationsPlugin() {
+        FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
+            GeneratedPluginRegistrant.register(with: registry)
+        }
+    }
+    
+    private func setupFlutterWorkManagerPlugin() {
+        WorkmanagerPlugin.registerTask(withIdentifier: "org.meditofoundation-medito-bgtask")
+        WorkmanagerPlugin.setPluginRegistrantCallback { registry in
+            GeneratedPluginRegistrant.register(with: registry)
+        }
+    }
+
+    private func setupBackgroundTasks() {
+        UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*15))
     }
 }
