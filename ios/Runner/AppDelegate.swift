@@ -42,7 +42,12 @@ import workmanager
     }
     
     private func setupFlutterWorkManagerPlugin() {
-        WorkmanagerPlugin.registerTask(withIdentifier: "org.meditofoundation")
+        WorkmanagerPlugin.registerTask(withIdentifier: "be.tramckrijte.workmanagerExample.simpleTask")
+        WorkmanagerPlugin.registerTask(withIdentifier: "be.tramckrijte.workmanagerExample.rescheduledTask")
+        WorkmanagerPlugin.registerTask(withIdentifier: "be.tramckrijte.workmanagerExample.failedTask")
+        WorkmanagerPlugin.registerTask(withIdentifier: "be.tramckrijte.workmanagerExample.simpleDelayedTask")
+        WorkmanagerPlugin.registerTask(withIdentifier: "be.tramckrijte.workmanagerExample.simplePeriodicTask")
+        WorkmanagerPlugin.registerTask(withIdentifier: "be.tramckrijte.workmanagerExample.simplePeriodic1HourTask")
         WorkmanagerPlugin.setPluginRegistrantCallback { registry in
             guard let registrar = registry.registrar(forPlugin: "com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin") else { 
                 print("FlutterLocalNotificationsPlugin not found")

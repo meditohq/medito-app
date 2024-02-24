@@ -4,7 +4,12 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>org.meditofoundation-medito-bgtask</string>
+		<string>be.tramckrijte.workmanagerExample.rescheduledTask</string>
+		<string>be.tramckrijte.workmanagerExample.simpleDelayedTask</string>
+		<string>be.tramckrijte.workmanagerExample.simplePeriodic1HourTask</string>
+		<string>be.tramckrijte.workmanagerExample.simplePeriodicTask</string>
+		<string>be.tramckrijte.workmanagerExample.failedTask</string>
+		<string>be.tramckrijte.workmanagerExample.simpleTask</string>
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
