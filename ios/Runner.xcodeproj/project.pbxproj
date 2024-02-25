@@ -17,9 +17,10 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		E126113A2B8B4EB5005E9560 /* Messages.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = E12611392B8B4EB4005E9560 /* Messages.g.swift */; };
+		E126113C2B8B4FE6005E9560 /* FlutterError+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E126113B2B8B4FE6005E9560 /* FlutterError+Ext.swift */; };
 		E1B1D8522B82810A0070C62E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B1D8512B82810A0070C62E /* AudioService.swift */; };
 		E1B1D8542B8281D80070C62E /* GeneratedPluginRegistrant.h in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */; };
-		E1DD85C52B88A27000E94912 /* PigeonGenerated.g.m in Sources */ = {isa = PBXBuildFile; fileRef = E1DD85C32B88A26F00E94912 /* PigeonGenerated.g.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,10 +69,10 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A5F97F043A989A215B3D9F18 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		E12611392B8B4EB4005E9560 /* Messages.g.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Messages.g.swift; sourceTree = "<group>"; };
+		E126113B2B8B4FE6005E9560 /* FlutterError+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlutterError+Ext.swift"; sourceTree = "<group>"; };
 		E1B1D8512B82810A0070C62E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		E1DD85C22B889E0300E94912 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
-		E1DD85C32B88A26F00E94912 /* PigeonGenerated.g.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PigeonGenerated.g.m; sourceTree = "<group>"; };
-		E1DD85C42B88A27000E94912 /* PigeonGenerated.g.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigeonGenerated.g.h; sourceTree = "<group>"; };
 		E2CDBD095F3357E4C5EEE455 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEA43EB68A2D6F15933D679B /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -152,8 +153,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
-				E1DD85C42B88A27000E94912 /* PigeonGenerated.g.h */,
-				E1DD85C32B88A26F00E94912 /* PigeonGenerated.g.m */,
+				E12611392B8B4EB4005E9560 /* Messages.g.swift */,
 				E1DD85C22B889E0300E94912 /* Runner-Bridging-Header.h */,
 				E1B1D8512B82810A0070C62E /* AudioService.swift */,
 				E1B1D8502B8280FD0070C62E /* Audio */,
@@ -166,6 +166,7 @@
 				8BD257942AC4B7C80012213D /* GoogleService-Info.plist */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				E126113B2B8B4FE6005E9560 /* FlutterError+Ext.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -399,11 +400,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E126113A2B8B4EB5005E9560 /* Messages.g.swift in Sources */,
 				E1B1D8542B8281D80070C62E /* GeneratedPluginRegistrant.h in Sources */,
-				E1DD85C52B88A27000E94912 /* PigeonGenerated.g.m in Sources */,
 				E1B1D8522B82810A0070C62E /* AudioService.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				E126113C2B8B4FE6005E9560 /* FlutterError+Ext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,7 +25,7 @@ import workmanager
     
     private func setupCustionAudioService() {
         if let controller = window?.rootViewController as? FlutterViewController {
-            SetUpMeditoAudioServiceApi(controller.binaryMessenger, AudioService())
+            MeditoAudioServiceApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: AudioService())
         }
     }
     
