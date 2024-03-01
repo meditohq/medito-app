@@ -94,7 +94,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       audioCompletedTaskKey,
       audioCompletedTaskKey,
       backoffPolicy: BackoffPolicy.linear,
-      initialDelay: Duration(milliseconds: duration),
+      initialDelay: Duration(milliseconds: duration * audioPercentageListened as int),
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: false,
@@ -173,3 +173,5 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     ref.read(markAsListenedEventProvider(id: trackId));
   }
 }
+
+const audioPercentageListened = 0.8;
