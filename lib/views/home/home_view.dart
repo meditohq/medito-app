@@ -35,6 +35,8 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     final stats = ref.watch(fetchStatsProvider);
 
+    var topPadding = MediaQuery.of(context).padding.top.toDouble();
+
     return home.when(
       loading: () => HomeShimmerWidget(),
       error: (err, stack) => MeditoErrorWidget(
@@ -44,47 +46,48 @@ class _HomeViewState extends ConsumerState<HomeView>
       ),
       data: (HomeModel homeData) {
         return Scaffold(
+          backgroundColor: ColorConstants.amsterdamSpring,
           body: SafeArea(
             bottom: false,
-            child: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: _onRefresh,
-                      child: SingleChildScrollView(
-                        physics: AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
-                        ),
-                        child: Container(
-                          color: ColorConstants.ebony,
-                          child: Column(
-                            children: [
-                              Container(
-                                color: ColorConstants.amsterdamSpring,
-                                child: HeaderAndAnnouncementWidget(
-                                  menuData: homeData.menu,
-                                  announcementData: latestAnnouncement.value,
-                                  statsData: stats.value,
-                                  onStatsButtonTap: () => _onStatsButtonTapped(context, ref),
-                                ),
+            top: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    child: SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      child: Container(
+                        color: ColorConstants.ebony,
+                        child: Column(
+                          children: [
+                            Container(
+                              color: ColorConstants.amsterdamSpring,
+                              child: HeaderAndAnnouncementWidget(
+                                menuData: homeData.menu,
+                                announcementData: latestAnnouncement.value,
+                                statsData: stats.value,
+                                onStatsButtonTap: () =>
+                                    _onStatsButtonTapped(context, ref),
                               ),
-                              height20,
-                              ShortcutsWidget(data: homeData.shortcuts),
-                              height20,
-                              CarouselWidget(data: homeData.carousel),
-                              height20,
-                              QuoteWidget(data: homeData.todayQuote),
-                              height20,
-                            ],
-                          ),
+                            ),
+                            height20,
+                            ShortcutsWidget(data: homeData.shortcuts),
+                            height20,
+                            CarouselWidget(data: homeData.carousel),
+                            height20,
+                            QuoteWidget(data: homeData.todayQuote),
+                            height20,
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -118,7 +121,6 @@ class _HomeViewState extends ConsumerState<HomeView>
       },
     );
   }
-
 
   @override
   bool get wantKeepAlive => true;
