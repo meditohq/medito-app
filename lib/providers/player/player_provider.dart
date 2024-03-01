@@ -174,4 +174,4 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 }
 
-const audioPercentageListened = 0.8;
+const audioPercentageListened = 0.7;
