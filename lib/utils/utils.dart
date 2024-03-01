@@ -191,6 +191,8 @@ Future<String> getFilePathForOldAppDownloadedFiles(String mediaItemId) async {
 }
 
 int formatIcon(String icon) {
+  if (icon.isEmpty) return 0;
+
   return int.parse('0x$icon');
 }
 

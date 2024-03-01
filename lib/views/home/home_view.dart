@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/views/home/widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'package:Medito/views/home/widgets/editorial/carousel_widget.dart';
 import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -32,6 +33,8 @@ class _HomeViewState extends ConsumerState<HomeView>
     final home = ref.watch(fetchHomeProvider);
     final latestAnnouncement = ref.watch(fetchLatestAnnouncementProvider);
 
+    final stats = ref.watch(fetchStatsProvider);
+
     return home.when(
       loading: () => HomeShimmerWidget(),
       error: (err, stack) => MeditoErrorWidget(
@@ -58,9 +61,14 @@ class _HomeViewState extends ConsumerState<HomeView>
                           color: ColorConstants.ebony,
                           child: Column(
                             children: [
-                              HeaderAndAnnouncementWidget(
-                                menuData: homeData.menu,
-                                announcementData: latestAnnouncement.value,
+                              Container(
+                                color: ColorConstants.amsterdamSpring,
+                                child: HeaderAndAnnouncementWidget(
+                                  menuData: homeData.menu,
+                                  announcementData: latestAnnouncement.value,
+                                  statsData: stats.value,
+                                  onStatsButtonTap: () => _onStatsButtonTapped(context, ref),
+                                ),
                               ),
                               height20,
                               ShortcutsWidget(data: homeData.shortcuts),
@@ -87,7 +95,30 @@ class _HomeViewState extends ConsumerState<HomeView>
   Future<void> _onRefresh() async {
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
+    ref.invalidate(refreshStatsProvider);
+    await ref.read(refreshStatsProvider.future);
   }
+
+  void _onStatsButtonTapped(BuildContext context, WidgetRef ref) {
+    ref.invalidate(fetchStatsProvider);
+    ref.read(fetchStatsProvider);
+    showModalBottomSheet<void>(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(14.0),
+          topRight: Radius.circular(14.0),
+        ),
+      ),
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: ColorConstants.onyx,
+      builder: (BuildContext context) {
+        return StatsBottomSheetWidget();
+      },
+    );
+  }
+
 
   @override
   bool get wantKeepAlive => true;

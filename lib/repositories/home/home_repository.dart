@@ -5,6 +5,8 @@ import 'package:Medito/services/network/dio_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../models/stats/stats_model.dart';
+
 part 'home_repository.g.dart';
 
 const _quote = 'quote';
@@ -14,6 +16,8 @@ abstract class HomeRepository {
   Future<HomeModel> fetchHome();
 
   List<String> getLocalShortcutIds();
+
+  Future<StatsModel> fetchStats();
 
   Future<AnnouncementModel> fetchLatestAnnouncement();
 
@@ -69,8 +73,17 @@ class HomeRepositoryImpl extends HomeRepository {
   }
 
   @override
+  Future<StatsModel> fetchStats() {
+    return client.getRequest(HTTPConstants.STATS).then((response) {
+      return StatsModel.fromJson(response);
+    });
+  }
+
+  @override
   Future<AnnouncementModel> fetchLatestAnnouncement() {
-    return client.getRequest(HTTPConstants.LATEST_ANNOUNCEMENT).then((response) {
+    return client
+        .getRequest(HTTPConstants.LATEST_ANNOUNCEMENT)
+        .then((response) {
       return AnnouncementModel.fromJson(response);
     });
   }
