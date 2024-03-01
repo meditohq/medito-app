@@ -89,20 +89,27 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         } else if (!playWhenReady) {
             backgroundMusicPlayer.pause()
         }
-
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         handler.removeCallbacks(positionUpdateRunnable)
 
-        val player = primaryMediaSession?.player!!
-        if (!player.playWhenReady || player.mediaItemCount == 0) {
-            this.primaryPlayer.clearMediaItems()
-            this.backgroundMusicPlayer.clearMediaItems()
-            this.primaryPlayer.stop()
-            this.backgroundMusicPlayer.stop()
-            stopSelf()
-        }
+        clearNotification()
+
+        this.primaryPlayer.stop()
+        this.backgroundMusicPlayer.stop()
+        this.primaryPlayer.clearMediaItems()
+        this.backgroundMusicPlayer.clearMediaItems()
+        stopSelf()
+    }
+
+    @androidx.annotation.OptIn(UnstableApi::class)
+    private fun clearNotification() {
+        NotificationUtil.setNotification(
+            this@AudioPlayerService,
+            NOTIFICATION_ID,
+            null
+        )
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
@@ -247,6 +254,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun stopAudio() {
         primaryPlayer.stop()
         backgroundMusicPlayer.stop()
+        clearNotification()
     }
 
     override fun playPauseAudio() {
