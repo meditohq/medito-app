@@ -8,7 +8,7 @@ import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
-    ref.read(remoteStatsProvider);
+    ref.read(refreshStatsProvider);
     ref.read(authProvider.notifier).saveFcmTokenEvent();
     ref.read(deviceAppAndUserInfoProvider);
     ref.read(audioDownloaderProvider).deleteDownloadedFileFromPreviousVersion();

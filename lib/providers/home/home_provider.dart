@@ -1,7 +1,8 @@
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../models/stats/stats_model.dart';
 
 part 'home_provider.g.dart';
 
@@ -14,11 +15,21 @@ Future<HomeModel> fetchHome(FetchHomeRef ref) {
 }
 
 @riverpod
-Future<AnnouncementModel> fetchLatestAnnouncement(FetchLatestAnnouncementRef ref) {
+Future<AnnouncementModel> fetchLatestAnnouncement(
+  FetchLatestAnnouncementRef ref,
+) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
   return homeRepository.fetchLatestAnnouncement();
+}
+
+@riverpod
+Future<StatsModel> fetchStats(FetchStatsRef ref) {
+  final homeRepository = ref.watch(homeRepositoryProvider);
+  ref.keepAlive();
+
+  return homeRepository.fetchStats();
 }
 
 @riverpod
@@ -35,6 +46,10 @@ Future<void> updateShortcutsIdsInPreference(
 Future<void> refreshHomeAPIs(RefreshHomeAPIsRef ref) async {
   ref.invalidate(fetchHomeProvider);
   await ref.read(fetchHomeProvider.future);
-  ref.invalidate(remoteStatsProvider);
-  await ref.read(remoteStatsProvider.future);
+}
+
+@riverpod
+Future<void> refreshStats(RefreshStatsRef ref) async {
+  ref.invalidate(fetchStatsProvider);
+  await ref.read(fetchStatsProvider.future);
 }

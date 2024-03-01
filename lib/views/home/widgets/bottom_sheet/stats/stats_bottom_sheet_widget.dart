@@ -6,6 +6,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../models/stats/stats_model.dart';
 import '../row_item_widget.dart';
 import '../share_btn/share_btn_widget.dart';
 
@@ -14,7 +15,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var stats = ref.watch(remoteStatsProvider);
+    var stats = ref.watch(fetchStatsProvider);
     var globalKey = GlobalKey();
 
     return Container(
@@ -34,7 +35,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(
                   message: err.toString(),
-                  onTap: () => ref.refresh(remoteStatsProvider),
+                  onTap: () => ref.refresh(refreshStatsProvider),
                 ),
               ),
               loading: () => SizedBox(
@@ -63,14 +64,14 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           child: Container(
             color: ColorConstants.onyx,
             child: Column(
-              children: stats.allStats.map((e) {
+              children: stats.all.map((e) {
                 return RowItemWidget(
                   iconCodePoint: e.icon,
                   iconColor: e.color,
                   trailingIconSize: 20,
                   title: e.title,
                   subTitle: e.subtitle,
-                  hasUnderline: e.title != stats.allStats.last.title,
+                  hasUnderline: e.title != stats.all.last.title,
                   isTrailingIcon: false,
                   titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontSize: 20,
