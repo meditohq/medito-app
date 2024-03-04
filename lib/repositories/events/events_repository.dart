@@ -9,7 +9,8 @@ abstract class EventsRepository {
 
   Future<void> saveFirebaseToken(Map<String, dynamic> event);
 
-  Future<void> trackAudioStartedEvent(Map<String, dynamic> event, String trackId);
+  Future<void> trackAudioStartedEvent(
+      Map<String, dynamic> event, String trackId);
 
   Future<void> trackAnnouncementDismissEvent(String id);
 
@@ -17,7 +18,14 @@ abstract class EventsRepository {
 
   Future<void> markTrackAsNotListenedEvent(String id);
 
-  Future<void> markAudioAsListenedEvent(String id);
+  Future<void> markAudioAsListenedEvent(
+    String trackId,
+    int? timestamp,
+    int? fileId,
+    int? fileDuration,
+    String? fileGuide, {
+    String? userToken,
+  });
 
   Future<void> deleteEvent(Map<String, dynamic> event);
 }
@@ -40,7 +48,8 @@ class EventsRepositoryImpl extends EventsRepository {
   }
 
   @override
-  Future<void> trackAudioStartedEvent(Map<String, dynamic> event, String trackId) async {
+  Future<void> trackAudioStartedEvent(
+      Map<String, dynamic> event, String trackId) async {
     await client.postRequest(
       HTTPConstants.AUDIO + '/' + trackId + HTTPConstants.AUDIO_START_EVENT,
       data: event,
@@ -50,7 +59,10 @@ class EventsRepositoryImpl extends EventsRepository {
   @override
   Future<void> trackAnnouncementDismissEvent(String id) async {
     await client.postRequest(
-      HTTPConstants.ANNOUNCEMENT_EVENT + '/' + id + HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT,
+      HTTPConstants.ANNOUNCEMENT_EVENT +
+          '/' +
+          id +
+          HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT,
     );
   }
 
@@ -63,10 +75,23 @@ class EventsRepositoryImpl extends EventsRepository {
   }
 
   @override
-  Future<void> markAudioAsListenedEvent(String id, {String? userToken}) async {
+  Future<void> markAudioAsListenedEvent(
+    String trackId,
+    int? timestamp,
+    int? fileId,
+    int? fileDuration,
+    String? fileGuide, {
+    String? userToken,
+  }) async {
     await client.postRequest(
-      '${HTTPConstants.AUDIO}/$id${HTTPConstants.COMPLETE_EVENT}',
+      '${HTTPConstants.AUDIO}/$trackId${HTTPConstants.COMPLETE_EVENT}',
       userToken: userToken,
+      data: {
+        'timestamp': timestamp,
+        'fileId': fileId,
+        'fileDuration': fileDuration,
+        'fileGuide': fileGuide,
+      },
     );
   }
 
