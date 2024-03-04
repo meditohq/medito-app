@@ -35,8 +35,6 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     final stats = ref.watch(fetchStatsProvider);
 
-    var topPadding = MediaQuery.of(context).padding.top.toDouble();
-
     return home.when(
       loading: () => HomeShimmerWidget(),
       error: (err, stack) => MeditoErrorWidget(

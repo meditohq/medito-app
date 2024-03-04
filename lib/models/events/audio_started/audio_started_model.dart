@@ -9,6 +9,7 @@ abstract class AudioStartedModel with _$AudioStartedModel {
     required String fileId,
     required String fileGuide,
     required int fileDuration,
+    required int timestamp,
   }) = _AudioStartedModel;
 
   factory AudioStartedModel.fromJson(Map<String, Object?> json) =>
