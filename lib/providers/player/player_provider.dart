@@ -102,8 +102,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       audioCompletedTaskKey,
       audioCompletedTaskKey,
       backoffPolicy: BackoffPolicy.linear,
-      initialDelay:
-          Duration(milliseconds: duration * audioPercentageListened as int),
+      initialDelay: Duration(milliseconds: (duration * audioPercentageListened).round()),
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: false,
