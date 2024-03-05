@@ -7,6 +7,26 @@ part 'events_repository.g.dart';
 abstract class EventsRepository {
   Future<void> trackEvent(Map<String, dynamic> event);
 
+  Future<void> saveFirebaseToken(Map<String, dynamic> event);
+
+  Future<void> trackAudioStartedEvent(
+      Map<String, dynamic> event, String trackId);
+
+  Future<void> trackAnnouncementDismissEvent(String id);
+
+  Future<void> markTrackAsListenedEvent(String id, {String userToken});
+
+  Future<void> markTrackAsNotListenedEvent(String id);
+
+  Future<void> markAudioAsListenedEvent(
+    String trackId,
+    int? timestamp,
+    int? fileId,
+    int? fileDuration,
+    String? fileGuide, {
+    String? userToken,
+  });
+
   Future<void> deleteEvent(Map<String, dynamic> event);
 }
 
@@ -16,7 +36,10 @@ class EventsRepositoryImpl extends EventsRepository {
   EventsRepositoryImpl({required this.client});
 
   @override
-  Future<void> trackEvent(Map<String, dynamic> event, {String? userToken}) async {
+  Future<void> trackEvent(
+    Map<String, dynamic> event, {
+    String? userToken,
+  }) async {
     await client.postRequest(
       HTTPConstants.EVENTS,
       userToken: userToken,
@@ -25,9 +48,72 @@ class EventsRepositoryImpl extends EventsRepository {
   }
 
   @override
+  Future<void> trackAudioStartedEvent(
+      Map<String, dynamic> event, String trackId) async {
+    await client.postRequest(
+      HTTPConstants.AUDIO + '/' + trackId + HTTPConstants.AUDIO_START_EVENT,
+      data: event,
+    );
+  }
+
+  @override
+  Future<void> trackAnnouncementDismissEvent(String id) async {
+    await client.postRequest(
+      HTTPConstants.ANNOUNCEMENT_EVENT +
+          '/' +
+          id +
+          HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT,
+    );
+  }
+
+  @override
+  Future<void> markTrackAsListenedEvent(String id, {String? userToken}) async {
+    await client.postRequest(
+      '${HTTPConstants.TRACKS}/$id${HTTPConstants.COMPLETE_EVENT}',
+      userToken: userToken,
+    );
+  }
+
+  @override
+  Future<void> markAudioAsListenedEvent(
+    String trackId,
+    int? timestamp,
+    int? fileId,
+    int? fileDuration,
+    String? fileGuide, {
+    String? userToken,
+  }) async {
+    await client.postRequest(
+      '${HTTPConstants.AUDIO}/$trackId${HTTPConstants.COMPLETE_EVENT}',
+      userToken: userToken,
+      data: {
+        'timestamp': timestamp,
+        'fileId': fileId,
+        'fileDuration': fileDuration,
+        'fileGuide': fileGuide,
+      },
+    );
+  }
+
+  @override
+  Future<void> markTrackAsNotListenedEvent(String id) async {
+    await client.deleteRequest(
+      '${HTTPConstants.TRACKS}/$id${HTTPConstants.COMPLETE_EVENT}',
+    );
+  }
+
+  @override
   Future<void> deleteEvent(Map<String, dynamic> event) async {
     await client.deleteRequest(
       HTTPConstants.EVENTS,
+      data: event,
+    );
+  }
+
+  @override
+  Future<void> saveFirebaseToken(Map<String, dynamic> event) async {
+    await client.postRequest(
+      HTTPConstants.FIREBASE_EVENT,
       data: event,
     );
   }

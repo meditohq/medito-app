@@ -63,15 +63,6 @@ class DonationWidget extends ConsumerWidget {
   void _handleDonatePress(
     WidgetRef ref,
   ) {
-    var payload = DonationTappedModel(
-      origin: TypeConstants.donationAskCard,
-      originId: donationModel.id.toString(),
-    );
-    var event = EventsModel(
-      name: EventTypes.donationCtaTapped,
-      payload: payload.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()).future);
     handleNavigation(donationModel.ctaType, [
       donationModel.ctaPath,
     ]);

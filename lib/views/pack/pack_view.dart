@@ -29,18 +29,8 @@ class _PackViewState extends ConsumerState<PackView>
 
   @override
   void initState() {
-    _handleTrackEvent(ref, widget.id);
     _scrollController.addListener(_scrollListener);
     super.initState();
-  }
-
-  void _handleTrackEvent(WidgetRef ref, String packId) {
-    var packViewedModel = PackViewedModel(packId: packId);
-    var event = EventsModel(
-      name: EventTypes.packViewed,
-      payload: packViewedModel.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
   }
 
   @override
@@ -127,19 +117,16 @@ class _PackViewState extends ConsumerState<PackView>
             _onListItemTap(item.id, item.type, item.path, context);
           },
           splashColor: ColorConstants.charcoal,
-          child: item.type == TypeConstants.track && item.isCompleted == false
-              ? PackDismissibleWidget(
-                  child: PackItemWidget(isLast: isLast, item: item),
-                  onUpdateCb: () {
-                    ref
-                        .read(packProvider(packId: widget.id).notifier)
-                        .markComplete(
-                          audioFileId: item.path.getIdFromPath(),
-                          trackId: item.id,
-                        );
-                  },
-                )
-              : PackItemWidget(isLast: isLast, item: item),
+          child: PackDismissibleWidget(
+            child: PackItemWidget(item: item),
+            onDismissed: () {
+              ref.read(packProvider(packId: widget.id).notifier).toggle(
+                    audioFileId: item.path.getIdFromPath(),
+                    trackId: item.id,
+                    isComplete: item.isCompleted == true,
+                  );
+            },
+          ),
         ),
         if (!isLast)
           Padding(

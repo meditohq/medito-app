@@ -1,32 +1,35 @@
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../models/stats/stats_model.dart';
 
 part 'home_provider.g.dart';
 
 @riverpod
-Future<HomeHeaderModel> fetchHomeHeader(FetchHomeHeaderRef ref) {
+Future<HomeModel> fetchHome(FetchHomeRef ref) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  return homeRepository.fetchHomeHeader();
+  return homeRepository.fetchHome();
 }
 
 @riverpod
-Future<ShortcutsModel> fetchShortcuts(FetchShortcutsRef ref) {
+Future<AnnouncementModel> fetchLatestAnnouncement(
+  FetchLatestAnnouncementRef ref,
+) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  return homeRepository.fetchShortcuts();
+  return homeRepository.fetchLatestAnnouncement();
 }
 
 @riverpod
-Future<EditorialModel> fetchEditorial(FetchEditorialRef ref) {
+Future<StatsModel> fetchStats(FetchStatsRef ref) {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  return homeRepository.fetchEditorial();
+  return homeRepository.fetchStats();
 }
 
 @riverpod
@@ -40,23 +43,13 @@ Future<void> updateShortcutsIdsInPreference(
 }
 
 @riverpod
-Future<QuoteModel> fetchQuote(FetchQuoteRef ref) {
-  final homeRepository = ref.watch(homeRepositoryProvider);
-  ref.keepAlive();
-
-  return homeRepository.fetchQuote();
+Future<void> refreshHomeAPIs(RefreshHomeAPIsRef ref) async {
+  ref.invalidate(fetchHomeProvider);
+  await ref.read(fetchHomeProvider.future);
 }
 
 @riverpod
-Future<void> refreshHomeAPIs(RefreshHomeAPIsRef ref) async {
-  ref.invalidate(fetchHomeHeaderProvider);
-  await ref.read(fetchHomeHeaderProvider.future);
-  ref.invalidate(fetchShortcutsProvider);
-  await ref.read(fetchShortcutsProvider.future);
-  ref.invalidate(fetchEditorialProvider);
-  await ref.read(fetchEditorialProvider.future);
-  ref.invalidate(fetchQuoteProvider);
-  await ref.read(fetchQuoteProvider.future);
-  ref.invalidate(remoteStatsProvider);
-  await ref.read(remoteStatsProvider.future);
+Future<void> refreshStats(RefreshStatsRef ref) async {
+  ref.invalidate(fetchStatsProvider);
+  await ref.read(fetchStatsProvider.future);
 }

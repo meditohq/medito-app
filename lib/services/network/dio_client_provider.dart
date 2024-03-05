@@ -7,15 +7,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var assignDioHeadersProvider = FutureProvider<void>((ref) async {
   var auth = ref.read(authProvider);
-  var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-  var headers = DioApiService().dio.options.headers;
-
   var user = auth.userResponse.body as UserTokenModel;
 
-  headers[HttpHeaders.authorizationHeader] = 'Bearer ${user.token}';
+  var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
   var customHeaders = _createCustomHeaders(deviceInfo);
+
+  DioApiService().dio.options.headers[HttpHeaders.authorizationHeader] =
+      'Bearer ${user.token}';
   for (var key in customHeaders.keys) {
-    headers[key] = customHeaders[key];
+    DioApiService().dio.options.headers[key] = customHeaders[key];
   }
 });
 

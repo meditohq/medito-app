@@ -30,6 +30,8 @@ class ColorConstants {
   static const ebony = Color(0xff171718);
   static const graphite = Color(0xffAAAAAA);
   static const charcoal = Color(0xff303031);
+  static const amsterdamSummer = Color(0xff211F26);
+  static const amsterdamSpring = Color(0xff2A2A32);
   static const nearWhite = Color(0xffFEFEFE);
 
   static Color getColorFromString(String name) {

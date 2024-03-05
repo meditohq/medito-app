@@ -49,6 +49,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       ref,
       track,
       file,
+      track.audio.first.guideName ?? '',
     );
 
     state = track;
@@ -56,36 +57,41 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
   Future<void> _playTrack(
     Ref ref,
-    TrackModel trackModel,
+    TrackModel track,
     TrackFilesModel file,
+    String guideName,
   ) async {
     await _startBackgroundThreadForAudioCompleteEvent(
-      file.id,
-      trackModel.id,
+      track.id,
       file.duration,
+      file.id,
+      DateTime.now().millisecondsSinceEpoch,
+      guideName,
     );
 
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
-          _constructFileName(trackModel, file),
+          _constructFileName(track, file),
         );
     await _api.playAudio(
       AudioData(
         url: downloadPath ?? file.path,
         track: Track(
-          title: trackModel.title,
-          artist: trackModel.artist?.name ?? '',
-          artistUrl: trackModel.artist?.path ?? '',
-          description: trackModel.description,
-          imageUrl: trackModel.coverUrl,
+          title: track.title,
+          artist: track.artist?.name ?? '',
+          artistUrl: track.artist?.path ?? '',
+          description: track.description,
+          imageUrl: track.coverUrl,
         ),
       ),
     );
   }
 
   Future<void> _startBackgroundThreadForAudioCompleteEvent(
-    String fileId,
-    String trackModelId,
+    String trackId,
     int duration,
+    String fileID,
+    int timestamp,
+    String fileGuide,
   ) async {
     await Workmanager().initialize(
       callbackDispatcher,
@@ -96,7 +102,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       audioCompletedTaskKey,
       audioCompletedTaskKey,
       backoffPolicy: BackoffPolicy.linear,
-      initialDelay: Duration(milliseconds: duration),
+      initialDelay:
+          Duration(milliseconds: duration * audioPercentageListened as int),
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: false,
@@ -105,8 +112,11 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         requiresStorageNotLow: false,
       ),
       inputData: {
-        TypeConstants.fileIdKey: fileId,
-        TypeConstants.trackIdKey: trackModelId,
+        TypeConstants.trackIdKey: trackId,
+        TypeConstants.durationIdKey: duration,
+        TypeConstants.fileIdKey: fileID,
+        TypeConstants.guideIdKey: fileGuide,
+        TypeConstants.timestampIdKey: timestamp,
         WorkManagerConstants.userTokenKey: getUserToken(),
       },
     );
@@ -133,15 +143,19 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
   void handleAudioStartedEvent(
+    String guide,
     String trackId,
     String audioFileId,
+    int duration,
   ) {
-    var audio = AudioStartedModel(audioFileId: audioFileId, trackId: trackId);
-    var event = EventsModel(
-      name: EventTypes.audioStarted,
-      payload: audio.toJson(),
+    var audio = AudioStartedModel(
+      fileId: audioFileId,
+      fileDuration: duration,
+      fileGuide: guide,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
     );
-    ref.read(eventsProvider(event: event.toJson()));
+    ref.read(
+        audioStartedEventProvider(event: audio.toJson(), trackId: trackId));
   }
 
   Future<void> seekToPosition(int position) async {
@@ -167,4 +181,12 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   void playPause() {
     _api.playPauseAudio();
   }
+
+  void handleAudioCompletionEvent(
+    String trackId,
+  ) {
+    ref.read(markAsListenedEventProvider(id: trackId));
+  }
 }
+
+const audioPercentageListened = 0.7;

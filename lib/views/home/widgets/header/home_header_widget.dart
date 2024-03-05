@@ -27,7 +27,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
           Row(
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 34), // Add top padding
+                padding: EdgeInsets.only(top: 34),
                 child: _menuWidget(context),
               ),
             ],

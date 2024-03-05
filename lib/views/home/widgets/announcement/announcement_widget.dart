@@ -26,30 +26,24 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   Widget build(BuildContext context) {
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
-    var size = MediaQuery.of(context).size;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        width: size.width,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 24),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _icon(widget.announcement.icon),
-                _text(context, widget.announcement.text),
-              ],
-            ),
-            height16,
-            _actionBtn(context, ref, widget.announcement),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+      ),
+      padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 24),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _icon(widget.announcement.icon),
+              _text(context, widget.announcement.text),
+            ],
+          ),
+          height16,
+          _actionBtn(context, ref, widget.announcement),
+        ],
       ),
     );
   }
@@ -73,7 +67,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
           _handleTrackEvent(
             ref,
             announcement.id,
-            StringConstants.dismiss.toLowerCase(),
           );
         },
         btnText: StringConstants.dismiss,
@@ -124,12 +117,12 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   }
 
   Widget _icon(String? icon) {
-    if (icon != null) {
+    if (icon.isNotNullAndNotEmpty()) {
       return Padding(
         padding: const EdgeInsets.only(top: 0, right: 10),
         child: Icon(
           IconData(
-            formatIcon(widget.announcement.icon!),
+            formatIcon(icon!),
             fontFamily: 'MaterialIcons',
           ),
           size: 24,
@@ -145,7 +138,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     WidgetRef ref,
     AnnouncementModel element,
   ) async {
-    _handleTrackEvent(ref, element.id, element.ctaTitle);
+    _handleTrackEvent(ref, element.id);
     await handleNavigation(
       context: context,
       element.ctaType,
@@ -157,16 +150,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   void _handleTrackEvent(
     WidgetRef ref,
     String announcementId,
-    String? ctaTitle,
   ) {
-    var announcement = AnnouncementCtaTappedModel(
-      announcementId: announcementId,
-      ctaTitle: ctaTitle ?? '',
-    );
-    var event = EventsModel(
-      name: EventTypes.announcementCtaTapped,
-      payload: announcement.toJson(),
-    );
-    ref.read(eventsProvider(event: event.toJson()));
+    ref.read(announcementDismissEventProvider(
+      id: announcementId,
+    ));
   }
 }

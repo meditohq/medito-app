@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PackItemWidget extends StatelessWidget {
-  const PackItemWidget({super.key, required this.item, required this.isLast});
+  const PackItemWidget({super.key, required this.item});
 
   final PackItemsModel item;
-  final bool isLast;
 
   @override
   Widget build(BuildContext context) {

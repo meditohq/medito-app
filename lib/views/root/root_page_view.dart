@@ -36,8 +36,10 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
             (prev?.id != next.id ||
                 (prev?.id == next.id && prevId != nextId))) {
           ref.read(playerProvider.notifier).handleAudioStartedEvent(
+                next.audio.first.guideName ?? '',
                 next.id,
                 next.audio.first.files.first.id,
+                next.audio.first.files.first.duration,
               );
         }
       },
