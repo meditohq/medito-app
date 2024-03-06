@@ -133,4 +133,9 @@ class StringConstants {
       'Oops! It seems like there was an error. If the problem persists, Close the app and try again.';
   static const String connectivityError =
       'Make sure you are connected to the internet to use Medito';
+  static const String howDoYouFeel = 'How do you feel after this session?';
+  static const String yourFeedbackHelpsUs = 'Your feedback helps us improve our content and allows you to reflect on your experience.';
+  static const String didYouKnow = 'Did you know?';
+  static const String meditoReliesOnYourDonationsToSurvive = 'Medito relies only on your donations to survive. We produce free content to help humanity.';
+  static const String donateNow = 'Donate now';
 }

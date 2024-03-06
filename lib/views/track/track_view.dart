@@ -352,5 +352,11 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   @override
+  Future<void> dispose() async {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   bool get wantKeepAlive => true;
 }

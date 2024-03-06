@@ -16,5 +16,4 @@ class TypeConstants {
 
 class EventTypes {
   static const String likedTrack = 'liked';
-  static const String trackFeedback = 'trackFeedback';
 }

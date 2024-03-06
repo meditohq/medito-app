@@ -98,27 +98,35 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       isInDebugMode: kDebugMode,
     );
 
-    await Workmanager().registerOneOffTask(
-      audioCompletedTaskKey,
-      audioCompletedTaskKey,
-      backoffPolicy: BackoffPolicy.linear,
-      initialDelay: Duration(milliseconds: (duration * audioPercentageListened).round()),
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-        requiresBatteryNotLow: false,
-        requiresCharging: false,
-        requiresDeviceIdle: false,
-        requiresStorageNotLow: false,
-      ),
-      inputData: {
-        TypeConstants.trackIdKey: trackId,
-        TypeConstants.durationIdKey: duration,
-        TypeConstants.fileIdKey: fileID,
-        TypeConstants.guideIdKey: fileGuide,
-        TypeConstants.timestampIdKey: timestamp,
-        WorkManagerConstants.userTokenKey: getUserToken(),
-      },
-    );
+    try {
+      await Workmanager().registerOneOffTask(
+        audioCompletedTaskKey,
+        audioCompletedTaskKey,
+        backoffPolicy: BackoffPolicy.linear,
+        initialDelay: Duration(
+          milliseconds: (duration * audioPercentageListened).round(),
+        ),
+        constraints: Constraints(
+          networkType: NetworkType.connected,
+          requiresBatteryNotLow: false,
+          requiresCharging: false,
+          requiresDeviceIdle: false,
+          requiresStorageNotLow: false,
+        ),
+        inputData: {
+          TypeConstants.trackIdKey: trackId,
+          TypeConstants.durationIdKey: duration,
+          TypeConstants.fileIdKey: fileID,
+          TypeConstants.guideIdKey: fileGuide,
+          TypeConstants.timestampIdKey: timestamp,
+          WorkManagerConstants.userTokenKey: getUserToken(),
+        },
+      );
+    } catch (e, s) {
+      if (kDebugMode) {
+        print(s);
+      }
+    }
   }
 
   String? getUserToken() {
@@ -153,8 +161,10 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       fileGuide: guide,
       timestamp: DateTime.now().millisecondsSinceEpoch,
     );
-    ref.read(
-        audioStartedEventProvider(event: audio.toJson(), trackId: trackId));
+    ref.read(audioStartedEventProvider(
+      event: audio.toJson(),
+      trackId: trackId,
+    ));
   }
 
   Future<void> seekToPosition(int position) async {

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../models/home/home_model.dart';
+import '../../../../providers/home/home_provider.dart';
 import '../animated_scale_widget.dart';
 
 class CarouselWidget extends ConsumerWidget {
@@ -16,7 +17,6 @@ class CarouselWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     var titleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontFamily: SourceSerif,
           color: ColorConstants.walterWhite,

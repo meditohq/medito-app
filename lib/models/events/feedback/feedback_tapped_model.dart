@@ -6,9 +6,10 @@ part 'feedback_tapped_model.g.dart';
 @freezed
 abstract class FeedbackTappedModel with _$FeedbackTappedModel {
   const factory FeedbackTappedModel({
-    required String trackId,
     required String audioFileId,
-    required String emoji,
+    required String audioFileGuide,
+    required String rating,
+    required int audioFileDuration,
   }) = _FeedbackTappedModel;
 
   factory FeedbackTappedModel.fromJson(Map<String, Object?> json) =>
