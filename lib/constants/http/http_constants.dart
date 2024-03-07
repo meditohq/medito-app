@@ -37,4 +37,5 @@ class HTTPConstants {
   static const String COMPLETE_EVENT = '/complete';
   static const String FIREBASE_EVENT = '/fcm';
   static const String RATE = '/rate';
+  static const String DONATE = '/donations/asks?random=true';
 }
