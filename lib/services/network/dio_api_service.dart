@@ -176,7 +176,7 @@ class DioApiService {
       case 404:
         throw FetchDataException(
           error.response?.statusCode,
-          message ?? StringConstants.apiNotFound,
+          message ?? StringConstants.anErrorOccurred,
         );
       case 500:
       default:
