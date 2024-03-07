@@ -44,13 +44,13 @@ class Pack extends _$Pack {
         var selectedItemIndex =
             packs.items.indexWhere((element) => element.id == audioFileId);
         packs.items[selectedItemIndex] =
-            packs.items[selectedItemIndex].copyWith(isCompleted: true);
+            packs.items[selectedItemIndex].copyWith(isCompleted: !isComplete);
 
         state = AsyncData(packs);
         if (isComplete) {
-          await ref.read(markAsListenedEventProvider(id: trackId).future);
-        } else {
           await ref.read(markAsNotListenedEventProvider(id: trackId).future);
+        } else {
+          await ref.read(markAsListenedEventProvider(id: trackId).future);
         }
       }
     } catch (err) {
