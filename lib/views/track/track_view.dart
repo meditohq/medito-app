@@ -97,17 +97,18 @@ class _TrackViewState extends ConsumerState<TrackView>
     ref.watch(trackOpenedFirstTimeProvider);
     var tracks = ref.watch(tracksProvider(trackId: widget.id));
 
-    ref.listen(trackOpenedFirstTimeProvider, (prev, next) {
-      var _user =
-          ref.read(authProvider.notifier).userResponse.body as UserTokenModel;
-      if (_user.email == null && next.value != null && next.value!) {
-        var params = JoinRouteParamsModel(screen: Screen.track);
-        context.push(
-          RouteConstants.joinIntroPath,
-          extra: params,
-        );
-      }
-    });
+    // ref.listen(trackOpenedFirstTimeProvider, (prev, next) {
+      // var _user =
+      //     ref.read(authProvider.notifier).userResponse.body as UserTokenModel;
+      // if (_user.email == null && next.value != null && next.value!) {
+        // todo uncomment this when join intro is ready
+        // var params = JoinRouteParamsModel(screen: Screen.track);
+        // context.push(
+        //   RouteConstants.joinIntroPath,
+        //   extra: params,
+        // );
+      // }
+    // });
 
     return Listener(
       onPointerMove: (PointerMoveEvent event) {
