@@ -33,7 +33,7 @@ class HTTPConstants {
   static const String AUDIO = '/audio';
   static const String AUDIO_START_EVENT = '/start';
   static const String ANNOUNCEMENT_EVENT = '/announcements';
-  static const String ANNOUNCEMENT_DISMISS_EVENT = '/dismiss/';
+  static const String ANNOUNCEMENT_DISMISS_EVENT = '/dismiss';
   static const String COMPLETE_EVENT = '/complete';
   static const String FIREBASE_EVENT = '/fcm';
   static const String RATE = '/rate';
