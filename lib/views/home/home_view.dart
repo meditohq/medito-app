@@ -47,7 +47,6 @@ class _HomeViewState extends ConsumerState<HomeView>
         return Scaffold(
           backgroundColor: ColorConstants.amsterdamSpring,
           body: SafeArea(
-            top: true,
             child: RefreshIndicator(
               onRefresh: _onRefresh,
               child: SingleChildScrollView(
@@ -74,7 +73,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                       CarouselWidget(data: homeData.carousel),
                       height20,
                       QuoteWidget(data: homeData.todayQuote),
-                      height20,
+                      height200,
                     ],
                   ),
                 ),
