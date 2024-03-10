@@ -25,11 +25,11 @@ void callbackDispatcher() {
           );
           if (inputData != null) {
             await eventsRpo.markAudioAsListenedEvent(
-              inputData[TypeConstants.trackIdKey],
-              inputData[TypeConstants.timestampIdKey],
-              inputData[TypeConstants.durationIdKey],
-              inputData[TypeConstants.fileIdKey],
-              inputData[TypeConstants.guideIdKey],
+              trackId: inputData[TypeConstants.trackIdKey],
+              timestamp : inputData[TypeConstants.timestampIdKey],
+              fileDuration: inputData[TypeConstants.durationIdKey],
+              fileId: inputData[TypeConstants.fileIdKey],
+              fileGuide: inputData[TypeConstants.guideIdKey],
               userToken: inputData[WorkManagerConstants.userTokenKey],
             );
           }

@@ -1,15 +1,23 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/player/player_provider.dart';
+import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/events/events_provider.dart';
 
 class FeedbackWidget extends ConsumerStatefulWidget {
-  const FeedbackWidget({super.key, required this.feedbackModel});
+  const FeedbackWidget({
+    super.key,
+    required this.trackId,
+    required this.audioFileId,
+    required this.audioFileDuration,
+    required this.audioFileGuide,
+  });
 
-  final EndScreenContentModel feedbackModel;
+  final String trackId;
+  final String audioFileId;
+  final int audioFileDuration;
+  final String audioFileGuide;
 
   @override
   ConsumerState<FeedbackWidget> createState() => _FeedbackWidgetState();
@@ -20,24 +28,21 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
   bool isFeedbackAdded = false;
 
   void _handleFeedbackPress(String feedback) async {
-    final audioProvider = ref.read(playerProvider);
-    var trackId = audioProvider?.id ?? '';
-    var audioFileId = audioProvider?.audio.first.files.first.id ?? '';
-
     setState(() {
       isLoading = true;
     });
-    var payload = FeedbackTappedModel(
-      trackId: trackId,
-      audioFileId: audioFileId,
-      emoji: feedback,
-    );
-    var event = EventsModel(
-      name: EventTypes.trackFeedback,
-      payload: payload.toJson(),
-    );
     try {
-      await ref.read(eventsProvider(event: event.toJson()).future);
+      await ref.read(
+        feedbackProvider(
+          trackId: widget.trackId,
+          feedbackEvent: {
+            'rating': feedback,
+            'audioFileDuration': widget.audioFileDuration,
+            'audioFileGuide': widget.audioFileGuide,
+            'audioFileId': widget.audioFileId,
+          },
+        ).future,
+      );
       setState(() {
         isLoading = false;
         isFeedbackAdded = true;
@@ -63,13 +68,13 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
       child: Column(
         children: [
           Text(
-            widget.feedbackModel.title ?? '',
+            StringConstants.howDoYouFeel,
             style: bodyLarge?.copyWith(fontFamily: SourceSerif, fontSize: 22),
             textAlign: TextAlign.center,
           ),
           height8,
           Text(
-            widget.feedbackModel.text ?? '',
+            StringConstants.yourFeedbackHelpsUs,
             style: bodyLarge?.copyWith(
               fontFamily: DmSans,
               fontSize: 16,
@@ -86,7 +91,6 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
 
   Widget _buildFeedbackButton() {
     var bodyLarge = Theme.of(context).textTheme.bodyLarge;
-    var options = widget.feedbackModel.options;
 
     if (isLoading) {
       return Padding(
@@ -108,31 +112,62 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
         ),
       );
     }
-    if (options != null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: options
-            .map((e) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: InkWell(
-                    onTap: () => _handleFeedbackPress(e.value),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: ColorConstants.ebony,
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      child: Text(
-                        e.value,
-                        style: TextStyle(fontSize: 40),
-                      ),
-                    ),
-                  ),
-                ))
-            .toList(),
-      );
-    }
 
-    return SizedBox();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: InkWell(
+            onTap: () => _handleFeedbackPress('🙁'),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: ColorConstants.ebony,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                '🙁',
+                style: TextStyle(fontSize: 40),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: InkWell(
+            onTap: () => _handleFeedbackPress('😐'),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: ColorConstants.ebony,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                '😐',
+                style: TextStyle(fontSize: 40),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: InkWell(
+            onTap: () => _handleFeedbackPress('😀'),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: ColorConstants.ebony,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                '😀',
+                style: TextStyle(fontSize: 40),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

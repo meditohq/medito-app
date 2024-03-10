@@ -97,5 +97,4 @@ class MenuBottomSheetWidget extends ConsumerWidget {
       ref: ref,
     );
   }
-
 }

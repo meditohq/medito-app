@@ -14,6 +14,17 @@ Future<void> events(
 }
 
 @riverpod
+Future<void> feedback(
+    FeedbackRef ref, {
+      required Map<String, dynamic> feedbackEvent,
+      required String trackId,
+    }) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.feedbackEvent(trackId, feedbackEvent);
+}
+
+@riverpod
 Future<void> audioStartedEvent(
   AudioStartedEventRef ref, {
   required Map<String, dynamic> event,

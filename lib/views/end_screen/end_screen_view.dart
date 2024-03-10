@@ -8,11 +8,11 @@ import 'widgets/donation_widget.dart';
 import 'widgets/feedback_widget.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
-  final List<EndScreenModel> endScreenModel;
+  final TrackModel trackModel;
 
   const EndScreenView({
     super.key,
-    required this.endScreenModel,
+    required this.trackModel,
   });
 
   @override
@@ -20,7 +20,6 @@ class EndScreenView extends ConsumerStatefulWidget {
 }
 
 class _EndScreenViewState extends ConsumerState<EndScreenView> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,41 +28,34 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         hasCloseButton: true,
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildCard(),
-          ],
-        ),
+        child: _buildCard(),
       ),
     );
   }
 
   Padding _buildCard() {
+    var audio = widget.trackModel.audio.first;
+    var files = audio.files.first;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding16),
       child: Column(
-        children: widget.endScreenModel.map((e) {
-          if (e.name == TypeConstants.donationAskCard) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: DonationWidget(
-                donationModel: e.content,
-              ),
-            );
-          }
-          if (e.name == TypeConstants.feedbackCard) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: FeedbackWidget(
-                feedbackModel: e.content,
-              ),
-            );
-          }
-
-          return SizedBox();
-        }).toList(),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: FeedbackWidget(
+              trackId: widget.trackModel.id,
+              audioFileDuration: files.duration,
+              audioFileGuide: audio.guideName ?? '',
+              audioFileId: files.id,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: DonationWidget(),
+          ),
+        ],
       ),
     );
   }
-
 }

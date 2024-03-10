@@ -149,13 +149,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       if (!_endScreenOpened) {
         _resetState();
         var currentlyPlayingTrack = ref.read(playerProvider);
-        var endScreen = currentlyPlayingTrack?.endScreen;
-        if (endScreen != null) {
           context.pushReplacement(
             RouteConstants.endScreenPath,
-            extra: endScreen,
+            extra: currentlyPlayingTrack,
           );
-        }
+
         _endScreenOpened = true;
         _endScreenRecentlyClosed = true;
 

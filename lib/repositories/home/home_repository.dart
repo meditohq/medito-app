@@ -9,9 +9,6 @@ import '../../models/stats/stats_model.dart';
 
 part 'home_repository.g.dart';
 
-const _quote = 'quote';
-const _editorialKey = 'editorial';
-
 abstract class HomeRepository {
   Future<HomeModel> fetchHome();
 

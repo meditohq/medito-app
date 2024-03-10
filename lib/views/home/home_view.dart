@@ -22,6 +22,7 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -46,46 +47,37 @@ class _HomeViewState extends ConsumerState<HomeView>
         return Scaffold(
           backgroundColor: ColorConstants.amsterdamSpring,
           body: SafeArea(
-            bottom: false,
-            top: true,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    child: SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      child: Container(
-                        color: ColorConstants.ebony,
-                        child: Column(
-                          children: [
-                            Container(
-                              color: ColorConstants.amsterdamSpring,
-                              child: HeaderAndAnnouncementWidget(
-                                menuData: homeData.menu,
-                                announcementData: latestAnnouncement.value,
-                                statsData: stats.value,
-                                onStatsButtonTap: () =>
-                                    _onStatsButtonTapped(context, ref),
-                              ),
-                            ),
-                            height20,
-                            ShortcutsWidget(data: homeData.shortcuts),
-                            height20,
-                            CarouselWidget(data: homeData.carousel),
-                            height20,
-                            QuoteWidget(data: homeData.todayQuote),
-                            height20,
-                          ],
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                child: Container(
+                  color: ColorConstants.ebony,
+                  child: Column(
+                    children: [
+                      Container(
+                        color: ColorConstants.amsterdamSpring,
+                        child: HeaderAndAnnouncementWidget(
+                          menuData: homeData.menu,
+                          announcementData: latestAnnouncement.value,
+                          statsData: stats.value,
+                          onStatsButtonTap: () =>
+                              _onStatsButtonTapped(context, ref),
                         ),
                       ),
-                    ),
+                      height20,
+                      ShortcutsWidget(data: homeData.shortcuts),
+                      height20,
+                      CarouselWidget(data: homeData.carousel),
+                      height20,
+                      QuoteWidget(data: homeData.todayQuote),
+                      height200,
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         );

@@ -15,7 +15,6 @@ abstract class TrackModel with _$TrackModel {
     required String description,
     required String coverUrl,
     required bool isPublished,
-    List<EndScreenModel>? endScreen,
     @Default(false) bool isLiked,
     required bool hasBackgroundSound,
     @Default(null) TrackArtistModel? artist,
@@ -36,7 +35,6 @@ abstract class TrackModel with _$TrackModel {
       isLiked: isLiked,
       hasBackgroundSound: hasBackgroundSound,
       artist: artist,
-      endScreen: endScreen,
       audio: [
         ...audio
             .map(

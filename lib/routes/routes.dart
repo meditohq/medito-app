@@ -131,7 +131,8 @@ final router = GoRouter(
                 _getTrackRoute(),
                 GoRoute(
                   path: 'pack3/:p3id',
-                  pageBuilder: (context, state) => _getFolderMaterialPage(state),
+                  pageBuilder: (context, state) =>
+                      _getFolderMaterialPage(state),
                   routes: [
                     _getTrackRoute(),
                   ],
@@ -260,12 +261,12 @@ GoRoute _getEndScreenRoute({bool fromRoot = false}) {
         ? RouteConstants.endScreenPath
         : RouteConstants.endScreenPath.sanitisePath(),
     pageBuilder: (context, state) {
-      final params = state.extra as List<EndScreenModel>;
+      final params = state.extra as TrackModel;
 
       return MaterialPage(
         key: state.pageKey,
         child: EndScreenView(
-          endScreenModel: params,
+          trackModel: params,
         ),
       );
     },
@@ -293,12 +294,12 @@ GoRoute _getDownloadsRoute({bool fromRoot = false}) {
 GoRoute _getMaintenanceRoute() {
   return GoRoute(
     parentNavigatorKey: _shellNavigatorKey,
-    path:
-         RouteConstants.maintenancePath,
+    path: RouteConstants.maintenancePath,
     pageBuilder: (context, state) {
       return MaterialPage(
         key: state.pageKey,
-        child: MaintenanceView(maintenanceModel: state.extra as MaintenanceModel),
+        child:
+            MaintenanceView(maintenanceModel: state.extra as MaintenanceModel),
       );
     },
   );
@@ -342,24 +343,28 @@ Future<void> handleNavigation(
   var path;
   var params;
   if (place == TypeConstants.track) {
-    unawaited(showModalBottomSheet<void>(
-      context: context!,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24.0),
-        ),
-      ),
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: ColorConstants.ebony,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: TrackView(
-            id: ids.first!,
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context!,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(24.0),
           ),
-        );
-      },
-    ));
+        ),
+        useRootNavigator: true,
+        isScrollControlled: true,
+        backgroundColor: ColorConstants.ebony,
+        builder: (BuildContext context) {
+          return SafeArea(
+            child: TrackView(
+              id: ids.first!,
+            ),
+          );
+        },
+      ).then(
+        (value) => ref?.refresh(fetchStatsProvider),
+      ),
+    );
 
     return;
   } else if (place != null && place.contains('pack3')) {

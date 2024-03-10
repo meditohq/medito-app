@@ -161,28 +161,28 @@ class DioApiService {
       case 400:
         throw BadRequestException(
           error.response?.statusCode,
-          message ?? StringConstants.badRequest,
+          StringConstants.badRequest,
         );
       case 401:
         throw UnauthorizedException(
           error.response?.statusCode,
-          message ?? StringConstants.unauthorizedRequest,
+          StringConstants.unauthorizedRequest,
         );
       case 403:
         throw UnauthorizedException(
           error.response?.statusCode,
-          message ?? StringConstants.accessForbidden,
+          StringConstants.accessForbidden,
         );
       case 404:
         throw FetchDataException(
           error.response?.statusCode,
-          message ?? StringConstants.apiNotFound,
+          message ?? StringConstants.anErrorOccurred,
         );
       case 500:
       default:
         throw FetchDataException(
           error.response?.statusCode ?? 500,
-          message ?? StringConstants.anErrorOccurred,
+          StringConstants.anErrorOccurred,
         );
     }
   }

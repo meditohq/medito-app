@@ -16,7 +16,6 @@ class CarouselWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     var titleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontFamily: SourceSerif,
           color: ColorConstants.walterWhite,

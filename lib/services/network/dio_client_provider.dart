@@ -26,5 +26,6 @@ Map<String, dynamic> _createCustomHeaders(DeviceAndAppInfoModel model) {
     'Device-Model': '${model.model}',
     'App-Version': '${model.appVersion}',
     'Device-Time': '${DateTime.now()}',
+    'Device-Platform': '${model.platform}',
   };
 }
