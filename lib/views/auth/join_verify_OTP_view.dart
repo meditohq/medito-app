@@ -13,7 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../providers/me/me_provider.dart';
 import '../../utils/utils.dart';
 
 class JoinVerifyOTPView extends ConsumerStatefulWidget {
@@ -73,7 +72,11 @@ class _JoinVerifyOTPViewState extends ConsumerState<JoinVerifyOTPView> {
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.only(
-              top: 16, bottom: 0, left: 16, right: 16), // Updated padding
+            top: 16,
+            bottom: 0,
+            left: 16,
+            right: 16,
+          ),
           child: Form(
             key: _formKey,
             child: Column(

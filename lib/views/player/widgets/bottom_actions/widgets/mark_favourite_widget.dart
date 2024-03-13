@@ -57,4 +57,5 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
       showSnackBar(context, e.toString());
     }
   }
+
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/events/mark_favourite_track/mark_favourite_track_model.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
@@ -42,19 +41,10 @@ Future<void> likeDislikeTrack(
   LikeDislikeTrackRef ref, {
   required bool isLiked,
   required String trackId,
-  required String audioFileId,
 }) {
-  var audio =
-      MarkFavouriteTrackModel(audioFileId: audioFileId, trackId: trackId);
-  var event = EventsModel(
-    name: EventTypes.likedTrack,
-    payload: audio.toJson(),
-  );
-  var data = event.toJson();
-
   return isLiked
-      ? ref.read(eventsProvider(event: data).future)
-      : ref.read(deleteEventProvider(event: data).future);
+      ? ref.read(markAsFavouriteEventProvider(trackId: trackId).future)
+      : ref.read(markAsNotFavouriteEventProvider(trackId: trackId).future);
 }
 
 final likeDislikeCombineProvider =
@@ -66,7 +56,6 @@ final likeDislikeCombineProvider =
     likeDislikeTrackProvider(
       isLiked: data.isLiked,
       trackId: trackId,
-      audioFileId: fileId,
     ).future,
   );
   final downloadAudioProvider = ref.read(audioDownloaderProvider);
@@ -102,22 +91,23 @@ Future<void> addSingleTrackInPreference(
   required TrackFilesModel file,
 }) async {
   var _track = trackModel.customCopyWith();
-  for (var i = 0; i < _track.audio.length; i++) {
-    var element = _track.audio[i];
+  _track.audio = _track.audio.where((element) {
     var fileIndex = element.files.indexWhere((e) => e.id == file.id);
     if (fileIndex != -1) {
-      _track.audio.removeWhere((e) => e.guideName != element.guideName);
-      _track.audio.first.files
-          .removeWhere((e) => e.id != element.files[fileIndex].id);
-      break;
+      element.files = [element.files[fileIndex]];
+
+      return true;
     }
-  }
-  var _downloadedTrackList = await ref.read(downloadedTracksProvider.future);
+
+    return false;
+  }).toList();
+
+  var _downloadedTrackList = await ref.read(
+    downloadedTracksProvider.future,
+  );
   _downloadedTrackList.add(_track);
   await ref.read(
-    addTrackListInPreferenceProvider(
-      tracks: _downloadedTrackList,
-    ).future,
+    addTrackListInPreferenceProvider(tracks: _downloadedTrackList).future,
   );
   unawaited(ref.refresh(downloadedTracksProvider.future));
 }

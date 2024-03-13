@@ -13,7 +13,3 @@ class TypeConstants {
   static const String donationAskCard = 'donationAskCard';
   static const String feedbackCard = 'feedbackCard';
 }
-
-class EventTypes {
-  static const String likedTrack = 'liked';
-}
