@@ -73,6 +73,7 @@ final likeDislikeCombineProvider =
       file: data.file,
     ).future);
   }
+
   ref.invalidate(tracksProvider);
 });
 
@@ -119,16 +120,17 @@ void addCurrentlyPlayingTrackInPreference(
   required TrackFilesModel file,
 }) {
   var _track = trackModel.customCopyWith();
-  for (var i = 0; i < _track.audio.length; i++) {
-    var element = _track.audio[i];
-    var fileIndex = element.files.indexWhere((e) => e.id == file.id);
-    if (fileIndex != -1) {
-      _track.audio.removeWhere((e) => e.guideName != element.guideName);
-      _track.audio.first.files
-          .removeWhere((e) => e.id != element.files[fileIndex].id);
-      break;
-    }
-  }
+  _track.audio = _track.audio
+      .map((element) {
+        var fileIndex = element.files.indexWhere((e) => e.id == file.id);
+        if (fileIndex != -1) {
+          element.files = [element.files[fileIndex]];
+        }
+
+        return element;
+      })
+      .where((element) => element.files.isNotEmpty)
+      .toList();
 }
 
 //ignore: prefer-match-file-name
