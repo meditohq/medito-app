@@ -26,7 +26,6 @@ abstract class DownloaderRepository {
 
   Future<void> deleteDownloadedFile(String name);
 
-  Future<void> deleteDownloadedFileFromPreviousVersion();
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
@@ -68,35 +67,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
     var checkIsExists = await filePath.exists();
     if (checkIsExists) {
       await filePath.delete();
-    }
-  }
-
-  @override
-  Future<void> deleteDownloadedFileFromPreviousVersion() async {
-    try {
-      var provider = ref.read(sharedPreferencesProvider);
-      var savedFiles =
-          provider.getStringList(SharedPreferenceConstants.listOfSavedFiles) ??
-              [];
-      if (savedFiles.isNotEmpty) {
-        for (var element in savedFiles) {
-          var json = jsonDecode(element);
-          var id = json['id'];
-          var filePath = await getFilePathForOldAppDownloadedFiles(id);
-          var file = File(filePath);
-
-          if (await file.exists()) {
-            await file.delete();
-          }
-        }
-        await provider.remove(SharedPreferenceConstants.listOfSavedFiles);
-      }
-    } catch (err) {
-      unawaited(Sentry.captureException(
-        err,
-        stackTrace: err,
-      ));
-      rethrow;
     }
   }
 
