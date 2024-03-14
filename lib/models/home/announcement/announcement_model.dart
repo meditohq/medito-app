@@ -6,9 +6,9 @@ part 'announcement_model.g.dart';
 @freezed
 abstract class AnnouncementModel with _$AnnouncementModel {
   const factory AnnouncementModel({
-    required String id,
-    required String text,
-    required String colorBackground,
+    required String? id,
+    required String? text,
+    required String? colorBackground,
     required String? colorText,
     String? icon,
     String? ctaTitle,

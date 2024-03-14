@@ -14,14 +14,18 @@ Future<HomeModel> fetchHome(FetchHomeRef ref) {
   return homeRepository.fetchHome();
 }
 
+const defaultAnnouncementId = 'default';
+
 @riverpod
-Future<AnnouncementModel> fetchLatestAnnouncement(
+Future<AnnouncementModel?> fetchLatestAnnouncement(
   FetchLatestAnnouncementRef ref,
-) {
+) async {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  return homeRepository.fetchLatestAnnouncement();
+  var announcement = await homeRepository.fetchLatestAnnouncement();
+
+  return announcement?.id == defaultAnnouncementId ? null : announcement;
 }
 
 @riverpod

@@ -16,7 +16,7 @@ abstract class HomeRepository {
 
   Future<StatsModel> fetchStats();
 
-  Future<AnnouncementModel> fetchLatestAnnouncement();
+  Future<AnnouncementModel?> fetchLatestAnnouncement();
 
   ShortcutsModel getSortedShortcuts(
     ShortcutsModel shortcutsModel,
@@ -77,7 +77,7 @@ class HomeRepositoryImpl extends HomeRepository {
   }
 
   @override
-  Future<AnnouncementModel> fetchLatestAnnouncement() {
+  Future<AnnouncementModel?> fetchLatestAnnouncement() {
     return client
         .getRequest(HTTPConstants.LATEST_ANNOUNCEMENT)
         .then((response) {

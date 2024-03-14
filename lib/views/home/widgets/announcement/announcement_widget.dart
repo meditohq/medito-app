@@ -97,7 +97,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
 
     return Flexible(
       child: MarkdownWidget(
-        body: widget.announcement.text,
+        body: widget.announcement.text ?? '',
         selectable: true,
         textAlign: WrapAlignment.start,
         a: markDownTheme?.copyWith(
@@ -142,8 +142,13 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
   }
 
   void _handleTrackEvent() {
-    ref.read(announcementDismissEventProvider(
-      id: widget.announcement.id,
-    ));
+    var id = widget.announcement.id;
+    if (id.isNotNullAndNotEmpty()) {
+      ref.read(
+        announcementDismissEventProvider(
+          id: id!,
+        ),
+      );
+    }
   }
 }
