@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
@@ -23,7 +22,7 @@ class DioApiService {
   void _setToken(String? userToken) {
     if (userToken != null && userToken.isNotEmpty) {
       dio.options.headers[HttpHeaders.authorizationHeader] =
-      'Bearer $userToken';
+          'Bearer $userToken';
     }
   }
 
@@ -48,16 +47,16 @@ class DioApiService {
   }
 
   Future<void> _onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) async {
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     await _captureException(err);
     handler.reject(err);
   }
 
   Future<void> _captureException(
-      DioException err,
-      ) async {
+    DioException err,
+  ) async {
     await Sentry.captureException(
       {
         'error': err.toString(),
@@ -71,12 +70,12 @@ class DioApiService {
 
   // ignore: avoid-dynamic
   Future<dynamic> getRequest(
-      String uri, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String uri, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     try {
       var response = await dio.get(
         uri,
@@ -94,15 +93,15 @@ class DioApiService {
 
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
-      String uri, {
-        String? userToken,
-        data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String uri, {
+    String? userToken,
+    data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     _setToken(userToken);
     try {
       var response = await dio.post(
@@ -123,12 +122,12 @@ class DioApiService {
 
   // ignore: avoid-dynamic
   Future<dynamic> deleteRequest(
-      String uri, {
-        data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
+    String uri, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     try {
       var response = await dio.delete(
         uri,
