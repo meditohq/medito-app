@@ -2,7 +2,6 @@ export 'audio_speed/audio_speed_model.dart';
 export 'background_sounds/background_sounds_model.dart';
 export 'device_info/device_and_app_info_model.dart';
 export 'end_screen/end_screen_model.dart';
-export 'events/app_opened/app_opened_model.dart';
 export 'events/audio_started/audio_started_model.dart';
 export 'events/bg_sound_selected/bg_sound_selected_model.dart';
 export 'events/chip_tapped/chip_tapped_model.dart';
