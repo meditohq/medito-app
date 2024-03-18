@@ -11,7 +11,6 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
     ref.read(refreshStatsProvider);
     // ref.read(authProvider.notifier).saveFcmTokenEvent();
     ref.read(deviceAppAndUserInfoProvider);
-    ref.read(audioDownloaderProvider).deleteDownloadedFileFromPreviousVersion();
 
     checkMaintenance(ref, context);
   },

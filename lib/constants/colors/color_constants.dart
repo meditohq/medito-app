@@ -34,7 +34,11 @@ class ColorConstants {
   static const amsterdamSpring = Color(0xff2A2A32);
   static const nearWhite = Color(0xffFEFEFE);
 
-  static Color getColorFromString(String name) {
+  static Color getColorFromString(String? name) {
+    if (name == null) {
+      return ColorConstants.walterWhite;
+    }
+
     var color = int.parse(name.replaceAll('#', '0xff'));
 
     return Color(color);

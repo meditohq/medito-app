@@ -14,7 +14,7 @@ class HTTPConstants {
   static const String OTP = 'otp';
   static const String PACKS = 'packs';
   static const String TRACKS = 'tracks';
-  static const String BACKGROUND_SOUNDS = 'backgroundSounds';
+  static const String BACKGROUND_SOUNDS = 'backgroundsounds';
   static const String HOME = 'home';
   static const String LATEST_ANNOUNCEMENT = 'announcements?latest=true';
   static const String HEADER = 'main/header';
@@ -23,7 +23,6 @@ class HTTPConstants {
   static const String EDITORIAL = 'main/editorial';
   static const String STATS = '/stats';
   static const String ME = 'me';
-  static const String EVENTS = 'events';
   static const String SEARCH = 'search';
 
   // MAINTENANCE END POINTS
@@ -37,5 +36,6 @@ class HTTPConstants {
   static const String COMPLETE_EVENT = '/complete';
   static const String FIREBASE_EVENT = '/fcm';
   static const String RATE = '/rate';
+  static const String LIKE = '/like';
   static const String DONATE = '/donations/asks?random=true';
 }

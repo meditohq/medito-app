@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'events_repository.g.dart';
 
 abstract class EventsRepository {
-  Future<void> trackEvent(Map<String, dynamic> event);
 
   Future<void> saveFirebaseToken(Map<String, dynamic> event);
 
@@ -22,6 +21,10 @@ abstract class EventsRepository {
 
   Future<void> markTrackAsNotListenedEvent(String id);
 
+  Future<void> markTrackAsFavouriteEvent(String trackId);
+
+  Future<void> markTrackAsNotFavouriteEvent(String trackId);
+
   Future<void> markAudioAsListenedEvent({
     String trackId,
     int? timestamp,
@@ -31,21 +34,12 @@ abstract class EventsRepository {
     String? userToken,
   });
 
-  Future<void> deleteEvent(Map<String, dynamic> event);
 }
 
 class EventsRepositoryImpl extends EventsRepository {
   final DioApiService client;
 
   EventsRepositoryImpl({required this.client});
-
-  @override
-  Future<void> trackEvent(Map<String, dynamic> event, {String? userToken}) =>
-      client.postRequest(
-        HTTPConstants.EVENTS,
-        userToken: userToken,
-        data: event,
-      );
 
   @override
   Future<void> trackAudioStartedEvent(
@@ -97,10 +91,6 @@ class EventsRepositoryImpl extends EventsRepository {
       );
 
   @override
-  Future<void> deleteEvent(Map<String, dynamic> event) =>
-      client.deleteRequest(HTTPConstants.EVENTS, data: event);
-
-  @override
   Future<void> saveFirebaseToken(Map<String, dynamic> event) =>
       client.postRequest(HTTPConstants.FIREBASE_EVENT, data: event);
 
@@ -110,6 +100,20 @@ class EventsRepositoryImpl extends EventsRepository {
         HTTPConstants.TRACKS + '/' + trackId + HTTPConstants.RATE,
         data: event,
       );
+
+  @override
+  Future<void> markTrackAsFavouriteEvent(String trackId) {
+    return client.postRequest(
+      HTTPConstants.TRACKS + '/' + trackId + HTTPConstants.LIKE,
+    );
+  }
+
+  @override
+  Future<void> markTrackAsNotFavouriteEvent(String trackId) {
+    return client.deleteRequest(
+      HTTPConstants.TRACKS + '/' + trackId + HTTPConstants.LIKE,
+    );
+  }
 }
 
 @riverpod

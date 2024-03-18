@@ -38,11 +38,11 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _icon(widget.announcement.icon),
-              _text(context, widget.announcement.text),
+              _text(context),
             ],
           ),
           height16,
-          _actionBtn(context, ref, widget.announcement),
+          _actionBtn(context),
         ],
       ),
     );
@@ -50,24 +50,19 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
 
   Row _actionBtn(
     BuildContext context,
-    WidgetRef ref,
-    AnnouncementModel announcement,
   ) {
     var textColor = ColorConstants.getColorFromString(
-      announcement.colorText,
+      widget.announcement.colorText,
     );
     var bgColor = ColorConstants.getColorFromString(
-      announcement.colorBackground,
+      widget.announcement.colorBackground,
     );
 
     var actionWidgets = <Widget>[
       LoadingButtonWidget(
         onPressed: () {
           widget.onPressedDismiss?.call();
-          _handleTrackEvent(
-            ref,
-            announcement.id,
-          );
+          _handleTrackEvent();
         },
         btnText: StringConstants.dismiss,
         bgColor: bgColor,
@@ -77,10 +72,10 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       width4,
     ];
 
-    if (announcement.ctaPath != null) {
+    if (widget.announcement.ctaPath != null) {
       actionWidgets.add(LoadingButtonWidget(
-        onPressed: () => _handleCtaTitlePress(context, ref, announcement),
-        btnText: announcement.ctaTitle ?? '',
+        onPressed: () => _handleCtaTitlePress(context),
+        btnText: widget.announcement.ctaTitle ?? '',
         bgColor: textColor,
         textColor: bgColor,
       ));
@@ -92,7 +87,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     );
   }
 
-  Flexible _text(BuildContext context, String? title) {
+  Flexible _text(BuildContext context) {
     var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: ColorConstants.getColorFromString(
             widget.announcement.colorText,
@@ -102,7 +97,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
 
     return Flexible(
       child: MarkdownWidget(
-        body: title ?? '',
+        body: widget.announcement.text ?? '',
         selectable: true,
         textAlign: WrapAlignment.start,
         a: markDownTheme?.copyWith(
@@ -135,24 +130,25 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
 
   void _handleCtaTitlePress(
     BuildContext context,
-    WidgetRef ref,
-    AnnouncementModel element,
   ) async {
-    _handleTrackEvent(ref, element.id);
+    var path = widget.announcement.ctaPath;
+    _handleTrackEvent();
     await handleNavigation(
       context: context,
-      element.ctaType,
-      [element.ctaPath.toString().getIdFromPath(), element.ctaPath],
+      widget.announcement.ctaType,
+      [path.toString().getIdFromPath(), path],
       ref: ref,
     );
   }
 
-  void _handleTrackEvent(
-    WidgetRef ref,
-    String announcementId,
-  ) {
-    ref.read(announcementDismissEventProvider(
-      id: announcementId,
-    ));
+  void _handleTrackEvent() {
+    var id = widget.announcement.id;
+    if (id.isNotNullAndNotEmpty()) {
+      ref.read(
+        announcementDismissEventProvider(
+          id: id!,
+        ),
+      );
+    }
   }
 }

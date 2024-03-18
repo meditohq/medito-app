@@ -4,16 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'events_provider.g.dart';
 
 @riverpod
-Future<void> events(
-  EventsRef ref, {
-  required Map<String, dynamic> event,
-}) {
-  final events = ref.watch(eventsRepositoryProvider);
-
-  return events.trackEvent(event);
-}
-
-@riverpod
 Future<void> feedback(
     FeedbackRef ref, {
       required Map<String, dynamic> feedbackEvent,
@@ -66,6 +56,26 @@ Future<void> markAsListenedEvent(
 }
 
 @riverpod
+Future<void> markAsFavouriteEvent(
+  MarkAsFavouriteEventRef ref, {
+  required String trackId,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.markTrackAsFavouriteEvent(trackId);
+}
+
+@riverpod
+Future<void> markAsNotFavouriteEvent(
+  MarkAsNotFavouriteEventRef ref, {
+  required String trackId,
+}) {
+  final events = ref.watch(eventsRepositoryProvider);
+
+  return events.markTrackAsNotFavouriteEvent(trackId);
+}
+
+@riverpod
 Future<void> markAsNotListenedEvent(
   MarkAsNotListenedEventRef ref, {
   required String id,
@@ -73,14 +83,4 @@ Future<void> markAsNotListenedEvent(
   final events = ref.watch(eventsRepositoryProvider);
 
   return events.markTrackAsNotListenedEvent(id);
-}
-
-@riverpod
-Future<void> deleteEvent(
-  DeleteEventRef ref, {
-  required Map<String, dynamic> event,
-}) {
-  final events = ref.watch(eventsRepositoryProvider);
-
-  return events.deleteEvent(event);
 }
