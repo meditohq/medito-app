@@ -1,3 +1,4 @@
+@UnstableApi
 package meditofoundation.medito
 
 import AudioData
@@ -68,6 +69,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onDestroy() {
         super.onDestroy()
 
+        primaryPlayer.release()
+        backgroundMusicPlayer.release()
+
         handler.removeCallbacks(positionUpdateRunnable)
 
         primaryPlayer.removeListener(this)
@@ -105,6 +109,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     @androidx.annotation.OptIn(UnstableApi::class)
     private fun clearNotification() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
         NotificationUtil.setNotification(
             this@AudioPlayerService,
             NOTIFICATION_ID,
@@ -142,7 +147,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return true
     }
 
-    @OptIn(UnstableApi::class)
     private fun createMediaNotification(
         session: MediaSession?,
         artworkBitmap: Bitmap?
@@ -168,7 +172,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return super.onStartCommand(intent, flags, startId)
     }
 
-    @OptIn(UnstableApi::class)
     private fun showNotification() {
         CoroutineScope(Dispatchers.Main).launch {
             val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
