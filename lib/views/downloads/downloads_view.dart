@@ -14,7 +14,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
-import '../../providers/home/home_provider.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override

@@ -13,13 +13,13 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
+import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -33,6 +33,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
+final _androidServiceApi = MeditoAndroidAudioServiceManager();
 var audioStateNotifier = AudioStateNotifier();
 var currentEnvironment = EnvironmentConstants.stagingEnv;
 
@@ -82,16 +83,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  AppLifecycleState currentState = AppLifecycleState.resumed;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      unawaited(updateStatsFromBg(ref));
-    }
-    currentState = state;
-  }
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);

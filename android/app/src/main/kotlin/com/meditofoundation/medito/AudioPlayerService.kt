@@ -1,4 +1,5 @@
-@UnstableApi
+@file:UnstableApi
+
 package meditofoundation.medito
 
 import AudioData
@@ -31,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi,
     MediaSession.Callback {
@@ -74,6 +76,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
         handler.removeCallbacks(positionUpdateRunnable)
 
+
         primaryPlayer.removeListener(this)
         backgroundMusicPlayer.removeListener(this)
 
@@ -85,7 +88,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     }
 
-    @UnstableApi
     @Deprecated("Deprecated in Java")
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         if (playWhenReady && playbackState == Player.STATE_READY) {
@@ -107,7 +109,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         stopSelf()
     }
 
-    @androidx.annotation.OptIn(UnstableApi::class)
+    override fun stopService(name: Intent?): Boolean {
+        return super.stopService(name)
+    }
+
     private fun clearNotification() {
         stopForeground(STOP_FOREGROUND_REMOVE)
         NotificationUtil.setNotification(
@@ -157,7 +162,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setSmallIcon(R.drawable.notification_icon_push)
             .setLargeIcon(artworkBitmap)
             .setSilent(true)
-            .setOngoing(true)
             .setStyle(session?.let { MediaStyleNotificationHelper.MediaStyle(it) })
 
         return builder.build()

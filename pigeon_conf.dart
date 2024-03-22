@@ -27,6 +27,11 @@ class AudioData {
 }
 
 @HostApi()
+abstract class MeditoAndroidAudioServiceManager {
+  void startService();
+}
+
+@HostApi()
 abstract class MeditoAudioServiceApi {
   bool playAudio(AudioData audioData);
 

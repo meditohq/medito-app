@@ -41,7 +41,11 @@ class JoinWelcomeView extends ConsumerWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 24, bottom: 16, left: 16, right: 16),
+                        top: 24,
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
