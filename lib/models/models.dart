@@ -3,7 +3,6 @@ export 'background_sounds/background_sounds_model.dart';
 export 'device_info/device_and_app_info_model.dart';
 export 'end_screen/end_screen_model.dart';
 export 'events/audio_started/audio_started_model.dart';
-export 'events/bg_sound_selected/bg_sound_selected_model.dart';
 export 'events/chip_tapped/chip_tapped_model.dart';
 export 'events/events_model.dart';
 export 'events/feedback/feedback_tapped_model.dart';

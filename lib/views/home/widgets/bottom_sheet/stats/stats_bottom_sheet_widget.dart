@@ -1,5 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';

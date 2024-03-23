@@ -13,7 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
-import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
@@ -33,7 +32,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
-final _androidServiceApi = MeditoAndroidAudioServiceManager();
 var audioStateNotifier = AudioStateNotifier();
 var currentEnvironment = EnvironmentConstants.stagingEnv;
 
@@ -53,7 +51,7 @@ Future<void> main() async {
   usePathUrlStrategy();
 
   await SentryFlutter.init(
-        (options) {
+    (options) {
       options.attachScreenshot = true;
       options.environment = kDebugMode
           ? HTTPConstants.ENVIRONMENT_DEBUG
@@ -61,15 +59,14 @@ Future<void> main() async {
       options.dsn = HTTPConstants.SENTRY_DSN;
       options.tracesSampleRate = 1.0;
     },
-    appRunner: () =>
-        runApp(
-          ProviderScope(
-            overrides: [
-              sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-            ],
-            child: ParentWidget(),
-          ),
-        ),
+    appRunner: () => runApp(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        ],
+        child: ParentWidget(),
+      ),
+    ),
   );
 }
 

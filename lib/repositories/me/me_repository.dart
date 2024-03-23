@@ -23,6 +23,6 @@ class MeRepositoryImpl extends MeRepository {
 }
 
 @riverpod
-MeRepository meRepository(MeRepositoryRef ref) {
+MeRepository meRepository(MeRepositoryRef _) {
   return MeRepositoryImpl(client: DioApiService());
 }

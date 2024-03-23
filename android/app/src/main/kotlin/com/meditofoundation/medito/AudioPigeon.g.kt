@@ -186,6 +186,38 @@ data class Track (
     )
   }
 }
+/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+interface MeditoAndroidAudioServiceManager {
+  fun startService()
+
+  companion object {
+    /** The codec used by MeditoAndroidAudioServiceManager. */
+    val codec: MessageCodec<Any?> by lazy {
+      StandardMessageCodec()
+    }
+    /** Sets up an instance of `MeditoAndroidAudioServiceManager` to handle messages through the `binaryMessenger`. */
+    @Suppress("UNCHECKED_CAST")
+    fun setUp(binaryMessenger: BinaryMessenger, api: MeditoAndroidAudioServiceManager?) {
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.Medito.MeditoAndroidAudioServiceManager.startService", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              api.startService()
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+    }
+  }
+}
 @Suppress("UNCHECKED_CAST")
 private object MeditoAudioServiceApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -515,4 +547,3 @@ class MeditoAudioServiceCallbackApi(private val binaryMessenger: BinaryMessenger
     }
   }
 }
-

@@ -1,8 +1,7 @@
-import 'package:Medito/models/stats/all_stats/all_stats_model.dart';
-import 'package:Medito/models/stats/tiles/tiles_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'stats_model.freezed.dart';
+
 part 'stats_model.g.dart';
 
 @freezed
@@ -12,7 +11,8 @@ class StatsModel with _$StatsModel {
     @Default([]) List<TilesModel> mini,
   }) = _StatsModel;
 
-  factory StatsModel.fromJson(Map<String, dynamic> json) => _$StatsModelFromJson(json);
+  factory StatsModel.fromJson(Map<String, dynamic> json) =>
+      _$StatsModelFromJson(json);
 }
 
 @freezed
@@ -24,7 +24,8 @@ class AllStatsModel with _$AllStatsModel {
     required String subtitle,
   }) = _AllStatsModel;
 
-  factory AllStatsModel.fromJson(Map<String, dynamic> json) => _$AllStatsModelFromJson(json);
+  factory AllStatsModel.fromJson(Map<String, dynamic> json) =>
+      _$AllStatsModelFromJson(json);
 }
 
 @freezed
@@ -36,5 +37,6 @@ class TilesModel with _$TilesModel {
     required String subtitle,
   }) = _TilesModel;
 
-  factory TilesModel.fromJson(Map<String, dynamic> json) => _$TilesModelFromJson(json);
+  factory TilesModel.fromJson(Map<String, dynamic> json) =>
+      _$TilesModelFromJson(json);
 }
