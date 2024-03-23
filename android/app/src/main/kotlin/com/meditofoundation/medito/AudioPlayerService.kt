@@ -304,6 +304,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             meditoAudioApi?.updatePlaybackState(state) {
                 if (primaryPlayer.playbackState != Player.STATE_ENDED) {
                     handler.postDelayed(this, 250)
+                } else {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
                 }
             }
 
