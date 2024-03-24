@@ -14,18 +14,19 @@ public class AudioService: MeditoAudioServiceApi {
         return flutterEngine
     }()
     
-    private var backgroundMusicVolume: Float?
-    private var backgroundSoundURI: String?
-    private var audioTrack: Track?
     private let notificationCenter = NotificationCenter.default
-    private var primaryPlayer: AVPlayer?
-    private var backgroundPlayer: AVPlayer?
-    private var isPrimaryPlayerPlaying: Bool { primaryPlayer?.rate != 0 && primaryPlayer?.error == nil }
-    private var isBackgroundPlayerPlaying: Bool { backgroundPlayer?.rate != 0 && backgroundPlayer?.error == nil }
-    private var currentPositionInSeconds: Int64 { Int64(primaryPlayer?.currentTime().seconds ?? -1) }
-    private var currentDurationInSeconds: Double { primaryPlayer?.currentItem?.duration.seconds ?? -1 }
-    
     private var playbackStateTimer: Timer?
+    
+    //Primary track
+    private var primaryPlayer: AVPlayer?
+    private var audioTrack: Track?
+    private var isPrimaryPlayerPlaying: Bool { primaryPlayer?.rate != 0 && primaryPlayer?.error == nil }
+    private var audioTrackDuration: Int64 { convertCMTimeIntoInt64(primaryPlayer?.currentItem?.duration) }
+    
+    //Background Sound
+    private var backgroundPlayer: AVPlayer?
+    private var backgroundSoundURI: String?
+    private var isBackgroundPlayerPlaying: Bool { backgroundPlayer?.rate != 0 && backgroundPlayer?.error == nil }
     
     lazy var audioServiceCallback: MeditoAudioServiceCallbackApi? = {
         guard let binaryMessenger = flutterEngine?.binaryMessenger
@@ -37,26 +38,14 @@ public class AudioService: MeditoAudioServiceApi {
          return MeditoAudioServiceCallbackApi(binaryMessenger: binaryMessenger)
     }()
     
-    private var trackDuration: Int64 {
-        if let duration = primaryPlayer?.currentItem?.duration {
-            let durationSeconds = CMTimeGetSeconds(duration) * 1000 //TODO: check unit (Flutter uses Int in miliseconds)
-            if durationSeconds.isFinite {
-                return Int64(durationSeconds)
-            } else {
-                print("Duration is infinite or NaN")
-            }
-        }
-        
-        return -1
-    }
-    
-    private var currentVolume: Int64 {
+    private var deviceVolume: Int64 {
         let audioSession = AVAudioSession.sharedInstance()
 
         do {
             try audioSession.setActive(true)
             let outputVolume = audioSession.outputVolume
-            return Int64(outputVolume * 100)
+            let result = Int64(outputVolume * 100)
+            return result
             
         } catch let error {
             print("Error: \(error.localizedDescription)")
@@ -125,46 +114,58 @@ public class AudioService: MeditoAudioServiceApi {
         primaryPlayer?.play()
         
         startPlaybackStateTimer()
-        
-        guard let callback = audioServiceCallback else {
-            print("yo FlutterEngine is not running.")
-            return true
-        }
-        
         updatePlaybackState()
+        
+        print("DEBUG: playAudio \(audioData)")
         
         return true
     }
 
-    func playPauseAudio() throws {
+    func playPauseAudio() {
         guard let player = primaryPlayer else { return }
         
         if isPrimaryPlayerPlaying {
             player.pause()
             updatePlaybackState()
+            print("DEBUG: PAUSE")
         } else {
             player.play()
             updatePlaybackState()
+            print("DEBUG: PLAY")
         }
     }
     
     func stopAudio() throws {
         primaryPlayer?.pause()
+        backgroundPlayer?.pause()
         
+        print("DEBUG: stopAudio")
         updatePlaybackState()
+        invalidatePlaybackStateTimer()
     }
     
     func setSpeed(speed: Double) throws {
+        print("DEBUG: setSpeed \(speed)")
         guard let player = primaryPlayer else { return }
-        player.rate = Float(speed)
-        
-        updatePlaybackState(speed: speed)
+        player.rate = Float(speed) //TODO: check this speed is in the correct format
+        updatePlaybackState()
     }
     
+    //Position comes in percentage seems like //TODO: check unit
     func seekToPosition(position: Int64) throws {
+        print("DEBUG: seekToPosition \(position)") //TODO: finish this
         guard let player = primaryPlayer else { return }
-
-        updatePlaybackState(position: position)
+        
+        let targetPositionInMilis = ( position * audioTrackDuration / 100 )
+        let targetPositionInSec = Double(targetPositionInMilis / 1000)
+        
+        let targetPosition = CMTime(seconds: targetPositionInSec, preferredTimescale: 1)
+        player.seek(to: targetPosition)
+        
+        print("DEBUG: seekToPosition target position in sec: \(targetPosition)")
+        print("DEBUG: seekToPosition target position in milis: \(targetPositionInMilis)")
+        
+        updatePlaybackState()
     }
     
     func skip10SecondsForward() throws {
@@ -172,9 +173,11 @@ public class AudioService: MeditoAudioServiceApi {
         
         let currentTime = player.currentTime()
         let targetTime = CMTimeAdd(currentTime, CMTime(seconds: 10, preferredTimescale: 1))
+        let targetInMilis = convertCMTimeIntoInt64(targetTime)
         player.seek(to: targetTime)
         
-        updatePlaybackState(position: Int64(targetTime.seconds))
+        print("DEBUG: skip10SecondsForward target time: \(targetInMilis)")
+        updatePlaybackState()
     }
     
     func skip10SecondsBackward() throws {
@@ -182,9 +185,11 @@ public class AudioService: MeditoAudioServiceApi {
         
         let currentTime = player.currentTime()
         let targetTime = CMTimeSubtract(currentTime, CMTime(seconds: 10, preferredTimescale: 1))
+        let targetInMilis = convertCMTimeIntoInt64(targetTime)
         player.seek(to: targetTime)
-        
-        updatePlaybackState(position: Int64(targetTime.seconds))
+    
+        print("DEBUG: skip10SecondsBackward target time: \(targetInMilis)")
+        updatePlaybackState()
     }
     
     func setBackgroundSound(uri: String?) throws {
@@ -192,10 +197,13 @@ public class AudioService: MeditoAudioServiceApi {
             throw AudioServiceError.invalidURI
         }
         
+        backgroundSoundURI = uri
+        
         let backgroundPlayerItem = AVPlayerItem(url: url)
         backgroundPlayer = AVPlayer(playerItem: backgroundPlayerItem)
         backgroundPlayer?.play()
         
+        print("DEBUG: setBackgroundSound uri: \(uri)")
         startObservingBackgroundPlayer()
     }
     
@@ -204,7 +212,10 @@ public class AudioService: MeditoAudioServiceApi {
             throw AudioServiceError.backgroundSoundNotSet
         }
         
-        player.volume = Float(volume)
+        let result = Float(volume / 100)
+        print("DEBUG: setBackgroundSoundVolume \(result)")
+        player.volume = result
+        //playPauseBackgroundAudio()
     }
     
     func stopBackgroundSound() throws {
@@ -214,6 +225,7 @@ public class AudioService: MeditoAudioServiceApi {
         
         player.pause()
         backgroundPlayer = nil
+        print("DEBUG: stopBackgroundSound")
     }
     
     func playBackgroundSound() throws {
@@ -222,17 +234,20 @@ public class AudioService: MeditoAudioServiceApi {
         }
         
         player.play()
+        print("DEBUG: playBackgroundSound")
     }
     
     
     @objc
     func primaryPlayerDidFinishPlaying(_ notification: Notification) {
         updatePlaybackState(isCompleted: true)
+        print("DEBUG: primaryPlayerDidFinishPlaying")
     }
     
     @objc
     func backgroundPlayerDidFinishPlaying(_ notification: Notification) {
         updatePlaybackState(isCompleted: true)
+        print("DEBUG: backgroundPlayerDidFinishPlaying")
     }
 }
 
@@ -240,48 +255,68 @@ public class AudioService: MeditoAudioServiceApi {
 
 extension AudioService {
     @objc 
-    private func updatePlaybackState(
-        isCompleted: Bool = false,
-        position: Int64 = -1,
-        speed: Double = 1
-    ) {
+    private func updatePlaybackState(isCompleted: Bool = false) {
         guard let track = audioTrack else {
             preconditionFailure("The audio track should exist by now, nil found instead.")
         }
         
-//        let position = position == -1 ? currentPositionInSeconds : 0
+        let isPlaying = self.isPrimaryPlayerPlaying
+        let duration = audioTrackDuration
+        let position = convertCMTimeIntoInt64(primaryPlayer?.currentTime())
+        let speed = Speed(speed: Double(primaryPlayer?.rate ?? -1))
+        let volume = self.deviceVolume
+        let backgroundSound = BackgroundSound(uri: backgroundSoundURI, title: "title")
         
         audioServiceCallback?.updatePlaybackState(state: PlaybackState(
-            isPlaying: isPrimaryPlayerPlaying,
+            isPlaying: isPlaying,
             isBuffering: false,
             isSeeking: false,
             isCompleted: isCompleted,
-            position: 3000,
-            duration: trackDuration,
-            speed: Speed(speed: speed),
-            volume: currentVolume,
+            position: position,
+            duration: duration,
+            speed: speed,
+            volume: volume,
             track: track,
-            backgroundSound: nil
+            backgroundSound: backgroundSound
         )) { result in
             print("******************")
             print(result)
-            print("isPlaying: \(self.isPrimaryPlayerPlaying)")
-            print("isCompleted: \(isCompleted)")
-            print("position: \(position)")
-            print("duration: \(self.trackDuration)")
-            print("speed: \(speed)")
-            print("volume: \(self.currentVolume)")
-            print("track: \(track)")
+            print("DEBUG: isPlaying: \(isPlaying)")
+            print("DEBUG: isCompleted: \(isCompleted)")
+            print("DEBUG: position: \(position)")
+            print("DEBUG: duration: \(duration)")
+            print("DEBUG: speed: \(speed)")
+            print("DEBUG: volume: \(volume)")
+            print("DEBUG: track: \(track)")
+            print("DEBUG: backgroundSound: \(backgroundSound)")
             print("******************")
         }
     }
     
     private func startPlaybackStateTimer() {
+        print("DEBUG: startPlaybackStateTimer")
         playbackStateTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updatePlaybackState), userInfo: nil, repeats: true)
     }
     
     private func invalidatePlaybackStateTimer() {
+        print("DEBUG: invalidatePlaybackStateTimer")
         playbackStateTimer?.invalidate()
         playbackStateTimer = nil
+    }
+}
+
+// MARK: Helpers
+
+extension AudioService {
+    func convertCMTimeIntoInt64(_ cmTime: CMTime?) -> Int64 {
+        guard let cmTime = cmTime else {
+            print("DEBUG: cmTimeIsNil")
+            return -1
+        }
+        
+        let seconds = Double(cmTime.seconds)
+        let duration = CMTimeMakeWithSeconds(seconds, preferredTimescale: Int32(NSEC_PER_SEC))
+        let miliseconds = Int64(CMTimeGetSeconds(duration) * 1000) // Convert seconds back to milliseconds
+        return miliseconds
     }
 }
