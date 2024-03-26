@@ -4,10 +4,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/views/auth/join_email_view.dart';
-import 'package:Medito/views/auth/join_intro_view.dart';
-import 'package:Medito/views/auth/join_verify_OTP_view.dart';
-import 'package:Medito/views/auth/join_welcome_view.dart';
 import 'package:Medito/views/background_sound/background_sound_view.dart';
 import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:Medito/views/downloads/downloads_view.dart';
@@ -54,12 +50,10 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinIntroPath,
       pageBuilder: (context, state) {
-        final params =
-            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinIntroView(fromScreen: params?.screen ?? Screen.splash),
+          child: Container(),
         );
       },
     ),
@@ -67,12 +61,10 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinEmailPath,
       pageBuilder: (context, state) {
-        final params =
-            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinEmailView(fromScreen: params?.screen ?? Screen.splash),
+          child: Container(),
         );
       },
     ),
@@ -80,15 +72,10 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinVerifyOTPPath,
       pageBuilder: (context, state) {
-        final params =
-            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinVerifyOTPView(
-            email: params?.email ?? '',
-            fromScreen: params?.screen ?? Screen.splash,
-          ),
+          child: Container(),
         );
       },
     ),
@@ -96,15 +83,10 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RouteConstants.joinWelcomePath,
       pageBuilder: (context, state) {
-        final params =
-            state.extra != null ? state.extra as JoinRouteParamsModel : null;
 
         return MaterialPage(
           key: state.pageKey,
-          child: JoinWelcomeView(
-            email: params?.email ?? '',
-            fromScreen: params?.screen ?? Screen.splash,
-          ),
+          child: Container()
         );
       },
     ),
@@ -382,9 +364,6 @@ Future<void> handleNavigation(
     await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
 
     return;
-  } else if (place == TypeConstants.flow) {
-    path = ids.first != null ? '/${ids.first}' : RouteConstants.joinIntroPath;
-    params = JoinRouteParamsModel(screen: Screen.track);
   } else if (place == TypeConstants.email) {
     if (ref != null) {
       var deviceAppAndUserInfo =
