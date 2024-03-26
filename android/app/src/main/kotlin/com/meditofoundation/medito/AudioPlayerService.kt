@@ -147,49 +147,60 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         handler.postDelayed(positionUpdateRunnable, 500)
 
         playBackgroundSound()
-        showNotification()
+        updateNotification()
 
         return true
     }
 
     private fun createMediaNotification(
-        session: MediaSession?,
         artworkBitmap: Bitmap?
     ): Notification {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
-            .setSmallIcon(R.drawable.notification_icon_push)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setLargeIcon(artworkBitmap)
             .setSilent(true)
-            .setStyle(session?.let { MediaStyleNotificationHelper.MediaStyle(it) })
+            .setStyle(primaryMediaSession?.let { MediaStyleNotificationHelper.MediaStyle(it) })
 
         return builder.build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
             MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
             meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
         }
 
-        return super.onStartCommand(intent, flags, startId)
+        notification = createPlaceholderNotification()
+        startForeground(NOTIFICATION_ID, notification)
+        return START_STICKY
     }
 
-    private fun showNotification() {
+    private fun createPlaceholderNotification(): Notification {
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Medito audio starting")
+            .setContentText("Preparing...")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSilent(true)
+            .setStyle(primaryMediaSession?.let { MediaStyleNotificationHelper.MediaStyle(it) })
+        return notificationBuilder.build()
+    }
+
+    private fun updateNotification() {
         CoroutineScope(Dispatchers.Main).launch {
             val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
             val artworkBitmap = withContext(Dispatchers.IO) {
                 artworkUri?.let { downloadBitmap(it) }
             }
-            notification = createMediaNotification(primaryMediaSession, artworkBitmap)
+            notification = createMediaNotification(artworkBitmap)
             try {
                 NotificationUtil.setNotification(
                     this@AudioPlayerService,
                     NOTIFICATION_ID,
                     notification
                 )
-                startForeground(NOTIFICATION_ID, notification)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
