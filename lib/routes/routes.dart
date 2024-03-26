@@ -243,16 +243,6 @@ GoRoute _getMaintenanceRoute() {
   );
 }
 
-//ignore: prefer-match-file-name
-enum Screen {
-  splash,
-  pack,
-  player,
-  stats,
-  track,
-  url,
-}
-
 MaterialPage<void> _getTrackOptionsMaterialPage(GoRouterState state) {
   return MaterialPage(
     key: state.pageKey,
