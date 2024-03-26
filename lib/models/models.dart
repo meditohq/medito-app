@@ -15,7 +15,6 @@ export 'explore/explore_model.dart';
 export 'home/announcement/announcement_model.dart';
 export 'home/home_model.dart';
 export 'home/shortcuts/shortcuts_model.dart';
-export 'join/join_route_params_model.dart';
 export 'me/me_model.dart';
 export 'notification/notification_payload_model.dart';
 export 'pack/pack_model.dart';
