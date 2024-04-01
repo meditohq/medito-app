@@ -12,8 +12,12 @@ import 'package:pigeon/pigeon.dart';
   // objcHeaderOut: 'ios/Runner/PigeonGenerated.g.h',
   // objcSourceOut: 'ios/Runner/PigeonGenerated.g.m',
   // objcOptions: ObjcOptions()
+  cppHeaderOut: 'windows/runner/messages.g.h',
+  cppSourceOut: 'windows/runner/messages.g.cpp',
   swiftOut: 'ios/Runner/Messages.g.swift',
   swiftOptions: SwiftOptions(),
+  objcHeaderOut: 'macos/Runner/messages.g.h',
+  objcSourceOut: 'macos/Runner/messages.g.m'
 ))
 // #enddocregion config
 

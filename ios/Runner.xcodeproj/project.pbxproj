@@ -18,6 +18,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		E16F85E62B97AB1F00813B0C /* AudioServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16F85E52B97AB1F00813B0C /* AudioServiceError.swift */; };
+		E18635DA2BB5B56300976D25 /* FlutterEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18635D92BB5B56300976D25 /* FlutterEngine.swift */; };
 		E197544E2B977F910048B29B /* Messages.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = E197544C2B977F910048B29B /* Messages.g.swift */; };
 		E197544F2B977F910048B29B /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E197544D2B977F910048B29B /* AudioService.swift */; };
 		E19754512B977FC80048B29B /* FlutterError+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19754502B977FC80048B29B /* FlutterError+Ext.swift */; };
@@ -71,6 +72,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A5F97F043A989A215B3D9F18 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		E16F85E52B97AB1F00813B0C /* AudioServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServiceError.swift; sourceTree = "<group>"; };
+		E18635D92BB5B56300976D25 /* FlutterEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterEngine.swift; sourceTree = "<group>"; };
 		E197544C2B977F910048B29B /* Messages.g.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Messages.g.swift; sourceTree = "<group>"; };
 		E197544D2B977F910048B29B /* AudioService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		E19754502B977FC80048B29B /* FlutterError+Ext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FlutterError+Ext.swift"; sourceTree = "<group>"; };
@@ -154,8 +156,8 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				E14336FC2BB1DB3800700E7D /* FlutterSetup */,
 				E16F85E42B97AB0700813B0C /* Audio */,
-				E19754502B977FC80048B29B /* FlutterError+Ext.swift */,
 				E197544C2B977F910048B29B /* Messages.g.swift */,
 				8B7AADD52A559F5C004A5611 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
@@ -169,6 +171,15 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		E14336FC2BB1DB3800700E7D /* FlutterSetup */ = {
+			isa = PBXGroup;
+			children = (
+				E19754502B977FC80048B29B /* FlutterError+Ext.swift */,
+				E18635D92BB5B56300976D25 /* FlutterEngine.swift */,
+			);
+			path = FlutterSetup;
 			sourceTree = "<group>";
 		};
 		E16F85E42B97AB0700813B0C /* Audio */ = {
@@ -404,6 +415,7 @@
 			files = (
 				E197544F2B977F910048B29B /* AudioService.swift in Sources */,
 				E16F85E62B97AB1F00813B0C /* AudioServiceError.swift in Sources */,
+				E18635DA2BB5B56300976D25 /* FlutterEngine.swift in Sources */,
 				E197544E2B977F910048B29B /* Messages.g.swift in Sources */,
 				E19754512B977FC80048B29B /* FlutterError+Ext.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,

@@ -3,17 +3,6 @@ import AVFoundation
 import Flutter
 
 public class AudioService: NSObject, MeditoAudioServiceApi {
-    lazy var flutterEngine: FlutterEngine? = {
-        var flutterEngine: FlutterEngine? = FlutterEngine(
-            name: "medito_flutter_engine",
-            project: nil,
-            allowHeadlessExecution: true
-        )
-        
-        flutterEngine?.run()
-        return flutterEngine
-    }()
-    
     private let notificationCenter = NotificationCenter.default
     private var playbackStateTimer: Timer?
     
@@ -28,7 +17,7 @@ public class AudioService: NSObject, MeditoAudioServiceApi {
     private var backgroundSoundURI: String?
     
     lazy var audioServiceCallback: MeditoAudioServiceCallbackApi? = {
-        guard let binaryMessenger = flutterEngine?.binaryMessenger
+        guard let binaryMessenger = MeditoFlutterEngine.shared?.binaryMessenger
          else {
             print("FlutterEngine is not running.")
             return nil
@@ -396,3 +385,4 @@ extension AudioService: AVAudioPlayerDelegate {
         print("DEBUG: audioPlayerEndInterruption")
     }
 }
+
