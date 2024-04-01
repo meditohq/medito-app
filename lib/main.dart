@@ -19,7 +19,6 @@ import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
-import 'package:Medito/utils/stats_utils.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -34,7 +33,7 @@ import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
 var audioStateNotifier = AudioStateNotifier();
-var currentEnvironment = EnvironmentConstants.stagingEnv;
+var currentEnvironment = kReleaseMode ? EnvironmentConstants.prodEnv : EnvironmentConstants.stagingEnv;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +51,7 @@ Future<void> main() async {
   usePathUrlStrategy();
 
   await SentryFlutter.init(
-        (options) {
+    (options) {
       options.attachScreenshot = true;
       options.environment = kDebugMode
           ? HTTPConstants.ENVIRONMENT_DEBUG
@@ -60,15 +59,14 @@ Future<void> main() async {
       options.dsn = HTTPConstants.SENTRY_DSN;
       options.tracesSampleRate = 1.0;
     },
-    appRunner: () =>
-        runApp(
-          ProviderScope(
-            overrides: [
-              sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-            ],
-            child: ParentWidget(),
-          ),
-        ),
+    appRunner: () => runApp(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        ],
+        child: ParentWidget(),
+      ),
+    ),
   );
 }
 
@@ -82,16 +80,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  AppLifecycleState currentState = AppLifecycleState.resumed;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      unawaited(updateStatsFromBg(ref));
-    }
-    currentState = state;
-  }
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);

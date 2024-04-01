@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:Medito/models/models.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +18,7 @@ import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 
 final _api = MeditoAudioServiceApi();
+final _androidServiceApi = MeditoAndroidAudioServiceManager();
 
 final playerProvider =
     StateNotifierProvider<PlayerProvider, TrackModel?>((ref) {
@@ -72,6 +74,11 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(track, file),
         );
+    if (Platform.isAndroid) {
+      await _androidServiceApi.startService();
+      // wait half a sec for the service to start
+      await Future.delayed(Duration(milliseconds: 500));
+    }
     await _api.playAudio(
       AudioData(
         url: downloadPath ?? file.path,
@@ -104,7 +111,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         audioCompletedTaskKey,
         backoffPolicy: BackoffPolicy.linear,
         initialDelay: Duration(
-            milliseconds: (duration * audioPercentageListened).round()),
+          milliseconds: (duration * audioPercentageListened).round(),
+        ),
         constraints: Constraints(
           networkType: NetworkType.connected,
           requiresBatteryNotLow: false,
@@ -121,8 +129,10 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
           WorkManagerConstants.userTokenKey: getUserToken(),
         },
       );
-    } catch (e) {
-      print(e);
+    } catch (e, s) {
+      if (kDebugMode) {
+        print(s);
+      }
     }
   }
 
@@ -159,7 +169,11 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       timestamp: DateTime.now().millisecondsSinceEpoch,
     );
     ref.read(
-        audioStartedEventProvider(event: audio.toJson(), trackId: trackId));
+      audioStartedEventProvider(
+        event: audio.toJson(),
+        trackId: trackId,
+      ),
+    );
   }
 
   Future<void> seekToPosition(int position) async {

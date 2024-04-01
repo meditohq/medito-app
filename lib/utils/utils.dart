@@ -58,12 +58,6 @@ void createSnackBar(
   }
 }
 
-bool isDayBefore(DateTime day1, DateTime day2) {
-  return day1.year == day2.year &&
-      day1.month == day2.month &&
-      day1.day == day2.day - 1;
-}
-
 Future<void> launchURLInBrowser(String url) async {
   try {
     final uri = Uri.parse(url);
@@ -182,12 +176,6 @@ double getBottomPaddingWithStickyMiniPlayer(BuildContext context) {
   var totalPadding = navbarPadding + miniPlayerHeight + bottomPadding;
 
   return totalPadding;
-}
-
-Future<String> getFilePathForOldAppDownloadedFiles(String mediaItemId) async {
-  var dir = (await getApplicationSupportDirectory()).path;
-
-  return '$dir/${mediaItemId.replaceAll('/', '_').replaceAll(' ', '_')}.mp3';
 }
 
 int formatIcon(String icon) {

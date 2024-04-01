@@ -1,3 +1,5 @@
+@file:UnstableApi
+
 package meditofoundation.medito
 
 import AudioData
@@ -30,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi,
     MediaSession.Callback {
@@ -68,7 +71,11 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onDestroy() {
         super.onDestroy()
 
+        primaryPlayer.release()
+        backgroundMusicPlayer.release()
+
         handler.removeCallbacks(positionUpdateRunnable)
+
 
         primaryPlayer.removeListener(this)
         backgroundMusicPlayer.removeListener(this)
@@ -81,7 +88,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     }
 
-    @UnstableApi
     @Deprecated("Deprecated in Java")
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         if (playWhenReady && playbackState == Player.STATE_READY) {
@@ -103,8 +109,12 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         stopSelf()
     }
 
-    @androidx.annotation.OptIn(UnstableApi::class)
+    override fun stopService(name: Intent?): Boolean {
+        return super.stopService(name)
+    }
+
     private fun clearNotification() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
         NotificationUtil.setNotification(
             this@AudioPlayerService,
             NOTIFICATION_ID,
@@ -137,52 +147,60 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         handler.postDelayed(positionUpdateRunnable, 500)
 
         playBackgroundSound()
-        showNotification()
+        updateNotification()
 
         return true
     }
 
-    @OptIn(UnstableApi::class)
     private fun createMediaNotification(
-        session: MediaSession?,
         artworkBitmap: Bitmap?
     ): Notification {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
-            .setSmallIcon(R.drawable.notification_icon_push)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setLargeIcon(artworkBitmap)
             .setSilent(true)
-            .setOngoing(true)
-            .setStyle(session?.let { MediaStyleNotificationHelper.MediaStyle(it) })
+            .setStyle(primaryMediaSession?.let { MediaStyleNotificationHelper.MediaStyle(it) })
 
         return builder.build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
             MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
             meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
         }
 
-        return super.onStartCommand(intent, flags, startId)
+        notification = createPlaceholderNotification()
+        startForeground(NOTIFICATION_ID, notification)
+        return START_STICKY
     }
 
-    @OptIn(UnstableApi::class)
-    private fun showNotification() {
+    private fun createPlaceholderNotification(): Notification {
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Medito audio starting")
+            .setContentText("Preparing...")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSilent(true)
+            .setStyle(primaryMediaSession?.let { MediaStyleNotificationHelper.MediaStyle(it) })
+        return notificationBuilder.build()
+    }
+
+    private fun updateNotification() {
         CoroutineScope(Dispatchers.Main).launch {
             val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
             val artworkBitmap = withContext(Dispatchers.IO) {
                 artworkUri?.let { downloadBitmap(it) }
             }
-            notification = createMediaNotification(primaryMediaSession, artworkBitmap)
+            notification = createMediaNotification(artworkBitmap)
             try {
                 NotificationUtil.setNotification(
                     this@AudioPlayerService,
                     NOTIFICATION_ID,
                     notification
                 )
-                startForeground(NOTIFICATION_ID, notification)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -297,6 +315,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             meditoAudioApi?.updatePlaybackState(state) {
                 if (primaryPlayer.playbackState != Player.STATE_ENDED) {
                     handler.postDelayed(this, 250)
+                } else {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
                 }
             }
 

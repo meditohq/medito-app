@@ -26,7 +26,6 @@ class PlayerView extends ConsumerStatefulWidget {
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
-  bool _endScreenRecentlyClosed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -155,11 +154,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           );
 
         _endScreenOpened = true;
-        _endScreenRecentlyClosed = true;
-
-        Future.delayed(Duration(seconds: 2), () {
-          _endScreenRecentlyClosed = false;
-        });
       }
     });
   }
