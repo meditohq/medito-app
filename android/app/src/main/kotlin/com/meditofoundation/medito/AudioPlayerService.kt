@@ -232,6 +232,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         backgroundMusicPlayer.play()
     }
 
+    override fun pauseBackgroundSound() {
+        backgroundMusicPlayer.pause()
+    }
+
     override fun setBackgroundSound(uri: String?) {
         this.backgroundSoundUri = uri
     }

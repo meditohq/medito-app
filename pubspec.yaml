@@ -20,6 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   app_settings: ^5.1.1
+  audio_session: ^0.1.19
   auto_size_text: ^3.0.0-nullsafety.0
   back_button_interceptor: ^6.0.2
   cached_network_image: ^3.2.3
@@ -44,12 +45,12 @@ dependencies:
   http: ^0.13.3
   image: ^4.0.17
   json_annotation: ^4.8.1
+  just_audio: ^0.9.37
   marquee: ^2.2.3
   package_info_plus: ^4.0.2
   path_provider: ^2.0.1
   pedantic: ^1.11.0
   permission_handler: ^11.2.0
-  pin_code_fields: ^7.4.0
   reorderables: ^0.6.0
   riverpod_annotation: ^2.3.4
   rxdart: ^0.27.1

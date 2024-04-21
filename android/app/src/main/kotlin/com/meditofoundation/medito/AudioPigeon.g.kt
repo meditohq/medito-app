@@ -263,6 +263,7 @@ interface MeditoAudioServiceApi {
   fun setBackgroundSoundVolume(volume: Double)
   fun stopBackgroundSound()
   fun playBackgroundSound()
+  fun pauseBackgroundSound()
 
   companion object {
     /** The codec used by MeditoAudioServiceApi. */
@@ -458,6 +459,23 @@ interface MeditoAudioServiceApi {
             var wrapped: List<Any?>
             try {
               api.playBackgroundSound()
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.Medito.MeditoAudioServiceApi.pauseBackgroundSound", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              api.pauseBackgroundSound()
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

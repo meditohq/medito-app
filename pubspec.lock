@@ -73,6 +73,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  audio_session:
+    dependency: "direct main"
+    description:
+      name: audio_session
+      sha256: a49af9981eec5d7cd73b37bacb6ee73f8143a6a9f9bd5b6021e6c346b9b6cf4e
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.19"
   auto_size_text:
     dependency: "direct main"
     description:
@@ -744,6 +752,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.7.1"
+  just_audio:
+    dependency: "direct main"
+    description:
+      name: just_audio
+      sha256: b7cb6bbf3750caa924d03f432ba401ec300fd90936b3f73a9b33d58b1e96286b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.37"
+  just_audio_platform_interface:
+    dependency: transitive
+    description:
+      name: just_audio_platform_interface
+      sha256: c3dee0014248c97c91fe6299edb73dc4d6c6930a2f4f713579cd692d9e47f4a1
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.2"
+  just_audio_web:
+    dependency: transitive
+    description:
+      name: just_audio_web
+      sha256: "134356b0fe3d898293102b33b5fd618831ffdc72bb7a1b726140abdf22772b70"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.9"
   leak_tracker:
     dependency: transitive
     description:
@@ -1024,14 +1056,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "16.0.5"
-  pin_code_fields:
-    dependency: "direct main"
-    description:
-      name: pin_code_fields
-      sha256: c8652519d14688f3fe2a8288d86910a46aa0b9046d728f292d3bf6067c31b4c7
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.4.0"
   platform:
     dependency: transitive
     description:

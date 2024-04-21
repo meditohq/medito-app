@@ -150,8 +150,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     WidgetRef ref,
     TrackModel trackModel,
   ) async {
-    final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
-    bgSoundNotifier.getVolumeFromPref();
+    // final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+    // bgSoundNotifier.getVolumeFromPref();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,

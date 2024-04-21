@@ -88,8 +88,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                   offset: Offset(0, -10),
                   child: PlayerButtonsWidget(
                     isPlaying: playbackState.isPlaying,
-                    onPlayPause: () =>
-                        ref.read(playerProvider.notifier).playPause(),
+                    onPlayPause: onPlayPausePressed,
                     onSkip10SecondsBackward: () => ref
                         .read(playerProvider.notifier)
                         .skip10SecondsBackward(),
@@ -115,6 +114,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     );
   }
 
+  void onPlayPausePressed() {
+    var isPlaying = ref.read(audioStateProvider).isPlaying;
+    ref.read(playerProvider.notifier).playPause();
+    ref.read(backgroundSoundsNotifierProvider.notifier).togglePlayPause(isPlaying);
+  }
+
   bool _isBackgroundSoundSelected() {
     var bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
 
@@ -135,6 +140,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void _stopAudio() {
     ref.read(playerProvider.notifier).stop();
+    ref.read(backgroundSoundsNotifierProvider.notifier).stopBackgroundSound();
   }
 
   void _resetState() {
@@ -148,10 +154,10 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       if (!_endScreenOpened) {
         _resetState();
         var currentlyPlayingTrack = ref.read(playerProvider);
-          context.pushReplacement(
-            RouteConstants.endScreenPath,
-            extra: currentlyPlayingTrack,
-          );
+        context.pushReplacement(
+          RouteConstants.endScreenPath,
+          extra: currentlyPlayingTrack,
+        );
 
         _endScreenOpened = true;
       }

@@ -55,6 +55,8 @@ abstract class MeditoAudioServiceApi {
 
   void playBackgroundSound();
 
+  void pauseBackgroundSound();
+
 }
 
 // #enddocregion host-definitions

@@ -18,7 +18,9 @@ abstract class BackgroundSoundsRepository {
 
   Future<void> updateItemsInSavedBgSoundList(BackgroundSoundsModel sound);
 
-  void saveBgSoundToSharedPreferences(BackgroundSoundsModel sound);
+  void saveSelectedBgSoundToSharedPreferences(BackgroundSoundsModel sound);
+
+  BackgroundSoundsModel? getSelectedBgSoundFromSharedPreferences();
 
   void removeSelectedBgSound();
 
@@ -116,24 +118,32 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   }
 
   @override
-  void saveBgSoundToSharedPreferences(BackgroundSoundsModel sound) {
+  void saveSelectedBgSoundToSharedPreferences(BackgroundSoundsModel sound) {
+    var bgSoundJson = json.encode(sound.toJson());
     unawaited(
       ref.read(sharedPreferencesProvider).setString(
             SharedPreferenceConstants.bgSound,
-            json.encode(
-              sound.toJson(),
-            ),
+            bgSoundJson,
           ),
     );
   }
 
   @override
+  BackgroundSoundsModel? getSelectedBgSoundFromSharedPreferences() {
+    var bgSoundJson = ref.read(sharedPreferencesProvider).getString(
+          SharedPreferenceConstants.bgSound,
+        );
+
+    return bgSoundJson != null
+        ? BackgroundSoundsModel.fromJson(json.decode(bgSoundJson))
+        : null;
+  }
+
+  @override
   void removeSelectedBgSound() {
-    unawaited(
-      ref
-          .read(sharedPreferencesProvider)
-          .remove(SharedPreferenceConstants.bgSound),
-    );
+    unawaited(ref
+        .read(sharedPreferencesProvider)
+        .remove(SharedPreferenceConstants.bgSound));
   }
 
   @override

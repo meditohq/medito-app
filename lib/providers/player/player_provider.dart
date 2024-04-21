@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/player/audio_state_provider.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
@@ -19,6 +22,7 @@ import 'download/audio_downloader_provider.dart';
 
 final _api = MeditoAudioServiceApi();
 final _androidServiceApi = MeditoAndroidAudioServiceManager();
+final iosPlayer = AudioPlayer();
 
 final playerProvider =
     StateNotifierProvider<PlayerProvider, TrackModel?>((ref) {
@@ -63,34 +67,64 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackFilesModel file,
     String guideName,
   ) async {
-    await _startBackgroundThreadForAudioCompleteEvent(
-      track.id,
-      file.duration,
-      file.id,
-      DateTime.now().millisecondsSinceEpoch,
-      guideName,
-    );
+    // await _startBackgroundThreadForAudioCompleteEvent(
+    //   track.id,
+    //   file.duration,
+    //   file.id,
+    //   DateTime
+    //       .now()
+    //       .millisecondsSinceEpoch,
+    //   guideName,
+    // );
 
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(track, file),
         );
+
+    var trackData = Track(
+      title: track.title,
+      artist: track.artist?.name ?? '',
+      artistUrl: track.artist?.path ?? '',
+      description: track.description,
+      imageUrl: track.coverUrl,
+    );
+
     if (Platform.isAndroid) {
       await _androidServiceApi.startService();
       // wait half a sec for the service to start
       await Future.delayed(Duration(milliseconds: 500));
-    }
-    await _api.playAudio(
-      AudioData(
-        url: downloadPath ?? file.path,
-        track: Track(
-          title: track.title,
-          artist: track.artist?.name ?? '',
-          artistUrl: track.artist?.path ?? '',
-          description: track.description,
-          imageUrl: track.coverUrl,
+
+      await _api.playAudio(
+        AudioData(
+          url: downloadPath ?? file.path,
+          track: trackData,
         ),
-      ),
-    );
+      );
+    } else {
+      try {
+        final session = await AudioSession.instance;
+        await session.configure(AudioSessionConfiguration.speech());
+
+        if (downloadPath == null) {
+          await iosPlayer.setAudioSource(
+            AudioSource.uri(
+              Uri.parse(
+                file.path,
+              ),
+            ),
+          );
+        } else {
+          await iosPlayer.setAsset(
+            downloadPath,
+          );
+        }
+
+        trackStateSubject.add(trackData);
+        unawaited(iosPlayer.play());
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   Future<void> _startBackgroundThreadForAudioCompleteEvent(
@@ -177,27 +211,55 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 
   Future<void> seekToPosition(int position) async {
-    await _api.seekToPosition(position);
+    if (Platform.isAndroid) {
+      await _api.seekToPosition(position);
+    } else {
+      await iosPlayer.seek(Duration(milliseconds: position));
+    }
   }
 
   void stop() {
-    _api.stopAudio();
+    if (Platform.isAndroid) {
+      _api.stopAudio();
+    } else {
+      iosPlayer.stop();
+    }
   }
 
   void setSpeed(double speed) {
-    _api.setSpeed(speed);
+    if (Platform.isAndroid) {
+      _api.setSpeed(speed);
+    } else {
+      iosPlayer.setSpeed(speed);
+    }
   }
 
   void skip10SecondsForward() {
-    _api.skip10SecondsForward();
+    if (Platform.isAndroid) {
+      _api.skip10SecondsForward();
+    } else {
+      iosPlayer.seek(iosPlayer.position + Duration(seconds: 10));
+    }
   }
 
   void skip10SecondsBackward() {
-    _api.skip10SecondsBackward();
+    if (Platform.isAndroid) {
+      _api.skip10SecondsBackward();
+    } else {
+      iosPlayer.seek(iosPlayer.position - Duration(seconds: 10));
+    }
   }
 
   void playPause() {
-    _api.playPauseAudio();
+    if (Platform.isAndroid) {
+      _api.playPauseAudio();
+    } else {
+      if (iosPlayer.playing) {
+        iosPlayer.pause();
+      } else {
+        iosPlayer.play();
+      }
+    }
   }
 
   void handleAudioCompletionEvent(

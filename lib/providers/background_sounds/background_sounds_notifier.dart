@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:io';
 
-import 'package:Medito/constants/strings/shared_preference_constants.dart';
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../src/audio_pigeon.g.dart';
@@ -15,6 +14,7 @@ import '../../src/audio_pigeon.g.dart';
 part 'background_sounds_notifier.g.dart';
 
 final _api = MeditoAudioServiceApi();
+final iosBackgroundPlayer = AudioPlayer();
 
 @riverpod
 Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
@@ -56,7 +56,11 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   void handleOnChangeVolume(double vol) {
     volume = vol;
     ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
-    _api.setBackgroundSoundVolume(volume);
+    if (Platform.isAndroid) {
+      _api.setBackgroundSoundVolume(volume);
+    } else {
+      iosBackgroundPlayer.setVolume(volume);
+    }
     notifyListeners();
   }
 
@@ -65,7 +69,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
 
     if (sound != null) {
-      bgSoundRepoProvider.saveBgSoundToSharedPreferences(sound);
+      bgSoundRepoProvider.saveSelectedBgSoundToSharedPreferences(sound);
       _updateItemsInSavedBgSoundList(sound);
 
       if (sound.title != StringConstants.none) {
@@ -94,16 +98,61 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _play(String? value) {
-    _api.setBackgroundSound(value);
-    _api.playBackgroundSound();
+  Future<void> _play(String? uri) async {
+    if (uri == null) {
+      if (Platform.isAndroid) {
+        unawaited(_api.stopBackgroundSound());
+      } else {
+        unawaited(iosBackgroundPlayer.stop());
+      }
+
+      return;
+    }
+
+    var parsedUri = Uri.parse(uri);
+    var isUrl = ['http', 'https'].contains(parsedUri.scheme);
+
+    if (Platform.isAndroid) {
+      await _api.setBackgroundSound(uri);
+      unawaited(_api.playBackgroundSound());
+    } else {
+      try {
+        if (isUrl) {
+          await iosBackgroundPlayer.setUrl(uri);
+        } else {
+          await iosBackgroundPlayer.setFilePath(uri);
+        }
+      } catch (e, s) {
+        print(s);
+      }
+      unawaited(iosBackgroundPlayer.play());
+    }
+  }
+
+  void togglePlayPause(isPlaying) {
+    if (Platform.isAndroid) {
+      if (isPlaying) {
+        _api.pauseBackgroundSound();
+      } else {
+        _api.playBackgroundSound();
+      }
+    } else {
+      if (isPlaying) {
+        iosBackgroundPlayer.pause();
+      } else {
+        iosBackgroundPlayer.play();
+      }
+    }
+    notifyListeners();
   }
 
   void stopBackgroundSound() {
-    var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
-    bgSoundRepoProvider.removeSelectedBgSound();
-    _api.setBackgroundSound(null);
-    _api.stopBackgroundSound();
+    if (Platform.isAndroid) {
+      _api.setBackgroundSound(null);
+      _api.stopBackgroundSound();
+    } else {
+      iosBackgroundPlayer.stop();
+    }
     notifyListeners();
   }
 
@@ -112,14 +161,12 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     provider.updateItemsInSavedBgSoundList(sound);
   }
 
-  void getBackgroundSoundFromPref() {
-    var value = ref
-        .read(sharedPreferencesProvider)
-        .getString(SharedPreferenceConstants.bgSound);
-    if (value != null) {
-      selectedBgSound = BackgroundSoundsModel.fromJson(json.decode(value));
-      notifyListeners();
-    }
+  void playBackgroundSoundFromPref() {
+    var selectedBgSound = ref
+        .read(backgroundSoundsRepositoryProvider)
+        .getSelectedBgSoundFromSharedPreferences();
+    handleOnChangeSound(selectedBgSound);
+    notifyListeners();
   }
 
   void getVolumeFromPref() {
