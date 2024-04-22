@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:Medito/models/models.dart';
+import 'package:Medito/providers/player/player_provider.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -126,6 +127,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
         print(s);
       }
       unawaited(iosBackgroundPlayer.play());
+      _handleFadeAtEndForIos();
     }
   }
 
@@ -174,5 +176,28 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
         ref.read(backgroundSoundsRepositoryProvider).getBgSoundVolume() ?? 50.0;
     handleOnChangeVolume(value);
     volume = value;
+  }
+
+  void _handleFadeAtEndForIos() {
+    var durationFromEnd = Duration(seconds: 10).inMilliseconds;
+
+    iosPlayer.positionStream.listen(
+          (currentPosition) {
+        var duration = iosPlayer.duration?.inMilliseconds ?? 0;
+        var remainingTime = duration - currentPosition.inMilliseconds;
+
+        print('Current Position: ${currentPosition.inMilliseconds} ms, Duration: $duration ms, Remaining Time: $remainingTime ms');
+
+        if (remainingTime <= durationFromEnd) {
+          print('In last 10 seconds');
+          var newVolume = volume * remainingTime / durationFromEnd;
+          iosBackgroundPlayer.setVolume(newVolume);
+          print('New Volume: $newVolume');
+        } else {
+          print('Not in last 10 seconds');
+          iosBackgroundPlayer.setVolume(volume);
+        }
+      },
+    );
   }
 }
