@@ -186,15 +186,10 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
         var duration = iosPlayer.duration?.inMilliseconds ?? 0;
         var remainingTime = duration - currentPosition.inMilliseconds;
 
-        print('Current Position: ${currentPosition.inMilliseconds} ms, Duration: $duration ms, Remaining Time: $remainingTime ms');
-
         if (remainingTime <= durationFromEnd) {
-          print('In last 10 seconds');
           var newVolume = volume * remainingTime / durationFromEnd;
           iosBackgroundPlayer.setVolume(newVolume);
-          print('New Volume: $newVolume');
         } else {
-          print('Not in last 10 seconds');
           iosBackgroundPlayer.setVolume(volume);
         }
       },
