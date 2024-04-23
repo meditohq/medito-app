@@ -267,10 +267,10 @@ Future<void> handleNavigation(
   WidgetRef? ref,
   GoRouter? goRouterContext,
 }) async {
-  ids.removeWhere((element) => element == null);
   var path;
   var params;
-  if (place == 'tracks') {
+  ids.removeWhere((element) => element == null);
+  if (place != null && 'tracks'.contains(place)) {
     try {
       unawaited(
         showModalBottomSheet<void>(
