@@ -117,7 +117,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void onPlayPausePressed() {
     var isPlaying = ref.read(audioStateProvider).isPlaying;
     ref.read(playerProvider.notifier).playPause();
-    ref.read(backgroundSoundsNotifierProvider.notifier).togglePlayPause(isPlaying);
+    ref
+        .read(backgroundSoundsNotifierProvider.notifier)
+        .togglePlayPause(isPlaying);
   }
 
   bool _isBackgroundSoundSelected() {

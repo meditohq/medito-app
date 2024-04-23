@@ -61,6 +61,7 @@ dependencies:
   shared_preferences: ^2.2.2
   url_launcher: ^6.1.14
   workmanager: ^0.5.2
+  uni_links: ^0.5.1
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1

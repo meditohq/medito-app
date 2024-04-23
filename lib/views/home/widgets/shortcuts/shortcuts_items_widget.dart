@@ -35,9 +35,9 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     ShortcutsModel element,
   ) async {
     await handleNavigation(
-      context: context,
       element.type,
       [element.path.toString().getIdFromPath(), element.path],
+      context,
       ref: ref,
     );
   }

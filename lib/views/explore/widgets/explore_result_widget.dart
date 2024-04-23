@@ -79,9 +79,9 @@ class ExploreResultWidget extends ConsumerWidget {
     checkConnectivity().then((value) {
       if (value) {
         handleNavigation(
-          context: context,
           type,
           [id.toString(), path],
+          context,
         );
       } else {
         createSnackBar(StringConstants.checkConnection, context);

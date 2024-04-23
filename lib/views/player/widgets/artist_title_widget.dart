@@ -81,9 +81,9 @@ class ArtistTitleWidget extends ConsumerWidget {
   void _handleArtistNameTap(BuildContext context) async {
     if (isPlayerScreen && artistUrlPath != null) {
       await handleNavigation(
-        context: context,
         TypeConstants.url,
         [artistUrlPath],
+        context,
       );
     }
   }

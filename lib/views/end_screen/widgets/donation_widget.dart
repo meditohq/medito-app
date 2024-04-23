@@ -72,7 +72,11 @@ class DonationWidget extends ConsumerWidget {
             height: 48,
             width: MediaQuery.of(context).size.width,
             child: LoadingButtonWidget(
-              onPressed: () => handleNavigation(donationPageModel.ctaType, [donationPageModel.ctaPath]),
+              onPressed: () => handleNavigation(
+                donationPageModel.ctaType,
+                [donationPageModel.ctaPath],
+                context,
+              ),
               btnText: donationPageModel.ctaTitle ?? StringConstants.donateNow,
               bgColor: ColorConstants.walterWhite,
               textColor: parseColor(donationPageModel.colorBackground),

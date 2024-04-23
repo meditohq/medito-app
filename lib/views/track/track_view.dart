@@ -86,9 +86,9 @@ class _TrackViewState extends ConsumerState<TrackView>
       bgSoundNotifier.getVolumeFromPref();
       bgSoundNotifier.playBackgroundSoundFromPref();
       await ref.read(playerProvider.notifier).loadSelectedTrack(
-        trackModel: trackModel,
-        file: file,
-      );
+            trackModel: trackModel,
+            file: file,
+          );
       unawaited(context.push(RouteConstants.playerPath));
     } catch (e) {
       print(e);
@@ -331,9 +331,9 @@ class _TrackViewState extends ConsumerState<TrackView>
             ),
             onTapLink: (text, href, title) {
               handleNavigation(
-                context: context,
                 TypeConstants.url,
                 [href],
+                context,
               );
             },
           ),

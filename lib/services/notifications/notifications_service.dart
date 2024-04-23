@@ -9,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 late final FirebaseMessaging? _messaging;
@@ -127,10 +128,10 @@ void _navigate(
   var goRouterContext = ref.read(goRouterProvider);
   if (data.type.isNotNullAndNotEmpty()) {
     handleNavigation(
-      goRouterContext: goRouterContext,
-      context: context,
       data.type,
       [data.id.toString().getIdFromPath(), data.path],
+      context,
+      goRouterContext: goRouterContext,
     );
   } else {
     goRouterContext.go(RouteConstants.bottomNavbarPath);

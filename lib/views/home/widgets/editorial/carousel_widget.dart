@@ -47,9 +47,9 @@ class CarouselWidget extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: padding20),
         child: InkWell(
           onTap: () => handleNavigation(
-            context: context,
             first.type,
             [first.path.toString().getIdFromPath(), first.path],
+            context,
           ),
           child: Stack(
             children: [

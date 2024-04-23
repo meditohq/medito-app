@@ -8,8 +8,11 @@ import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:uni_links/uni_links.dart';
 
 import '../../models/home/home_model.dart';
+import '../../routes/routes.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
 
@@ -22,6 +25,18 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  void initState() {
+    super.initState();
+    navigateToDeepLink();
+  }
+
+  void navigateToDeepLink() {
+    Future.delayed(Duration(seconds: 1), () async {
+      handleDeepLink(await getInitialUri(), context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);

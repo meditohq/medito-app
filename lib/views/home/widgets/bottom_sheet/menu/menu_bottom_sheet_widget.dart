@@ -91,9 +91,9 @@ class MenuBottomSheetWidget extends ConsumerWidget {
   ) async {
     Navigator.pop(context);
     await handleNavigation(
-      context: context,
       element.type,
       [element.path.toString().getIdFromPath(), element.path],
+      context,
       ref: ref,
     );
   }

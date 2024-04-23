@@ -54,9 +54,9 @@ class ExploreInitialPageWidget extends ConsumerWidget {
                     subTitle: element.subtitle,
                     coverUrlPath: element.coverUrl,
                     onTap: () => handleNavigation(
-                      context: context,
                       element.type,
                       [element.id.toString(), element.path],
+                      context,
                       ref: ref,
                     ),
                   ),

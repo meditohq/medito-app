@@ -155,22 +155,22 @@ class _PackViewState extends ConsumerState<PackView>
         if (type == TypeConstants.pack) {
           if (location.contains('pack2')) {
             unawaited(handleNavigation(
-              context: context,
               RouteConstants.pack3Path,
               [location.split('/')[2], widget.id, id.toString()],
+              context,
             ));
           } else {
             unawaited(handleNavigation(
-              context: context,
               RouteConstants.pack2Path,
               [widget.id, id.toString()],
+              context,
             ));
           }
         } else {
           unawaited(handleNavigation(
-            context: context,
             type,
             [id.toString(), path],
+            context,
             ref: ref,
           ));
         }

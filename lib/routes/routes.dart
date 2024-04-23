@@ -262,37 +262,41 @@ MaterialPage<void> _getFolderMaterialPage(GoRouterState state) {
 
 Future<void> handleNavigation(
   String? place,
-  List<String?> ids, {
-  BuildContext? context,
+  List<String?> ids,
+  BuildContext context, {
   WidgetRef? ref,
   GoRouter? goRouterContext,
 }) async {
   ids.removeWhere((element) => element == null);
   var path;
   var params;
-  if (place == TypeConstants.track) {
-    unawaited(
-      showModalBottomSheet<void>(
-        context: context!,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(24.0),
-          ),
-        ),
-        useRootNavigator: true,
-        isScrollControlled: true,
-        backgroundColor: ColorConstants.ebony,
-        builder: (BuildContext context) {
-          return SafeArea(
-            child: TrackView(
-              id: ids.first!,
+  if (place == 'tracks') {
+    try {
+      unawaited(
+        showModalBottomSheet<void>(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(24.0),
             ),
-          );
-        },
-      ).then(
-        (value) => ref?.refresh(fetchStatsProvider),
-      ),
-    );
+          ),
+          useRootNavigator: true,
+          isScrollControlled: true,
+          backgroundColor: ColorConstants.ebony,
+          builder: (BuildContext context) {
+            return SafeArea(
+              child: TrackView(
+                id: ids.first!,
+              ),
+            );
+          },
+        ).then(
+          (value) => ref?.refresh(fetchStatsProvider),
+        ),
+      );
+    } catch (e, s) {
+      print(s);
+    }
 
     return;
   } else if (place != null && place.contains('pack3')) {
@@ -333,5 +337,20 @@ Future<void> handleNavigation(
     unawaited(context.push(path, extra: params));
   } else if (goRouterContext != null) {
     unawaited(goRouterContext.push(path, extra: params));
+  }
+}
+
+void handleDeepLink(Uri? uri, BuildContext context) {
+  var path = uri?.path;
+  if (path != null) {
+    if (path.contains('tracks')) {
+      handleNavigation(
+        'tracks',
+        [uri?.pathSegments.last ?? ''],
+        context,
+      );
+    } else {
+      unawaited(context.push(path));
+    }
   }
 }

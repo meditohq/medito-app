@@ -58,9 +58,9 @@ class MarkdownWidget extends StatelessWidget {
 
   void _linkTap(BuildContext context, String? href) {
     handleNavigation(
-      context: context,
       TypeConstants.url,
       [href],
+      context,
     );
   }
 }
