@@ -6,12 +6,6 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../src/audio_pigeon.g.dart';
 
-final trackStateSubject = BehaviorSubject<Track>();
-
-Track get _trackState => trackStateSubject.value;
-
-Stream<Track> get _trackStateStream => trackStateSubject.stream;
-
 class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   final AudioStateNotifier notifier;
 
@@ -24,21 +18,6 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
 }
 
 class AudioStateNotifier extends StateNotifier<PlaybackState> {
-  Stream<IosStateData> get _iosStateStream => Rx.combineLatest5<PlayerState,
-          Track, Duration, Duration, Duration?, IosStateData>(
-        iosPlayer.playerStateStream,
-        _trackStateStream,
-        iosPlayer.positionStream,
-        iosPlayer.bufferedPositionStream,
-        iosPlayer.durationStream,
-        (state, track, position, bufferedPosition, duration) => IosStateData(
-          state,
-          track,
-          position,
-          bufferedPosition,
-          duration ?? Duration.zero,
-        ),
-      );
 
   AudioStateNotifier()
       : super(
@@ -59,11 +38,12 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
             ),
           ),
         ) {
-    _iosStateStream.listen(
+    iosAudioHandler.iosStateStream.listen(
       (event) {
         var playerState = event.playerState;
         state = state.copyWith(
-          track: _trackState,
+          speed: Speed(speed: event.speed),
+          track: iosAudioHandler.trackState,
           isPlaying: event.playerState.playing,
           isBuffering: playerState.processingState == ProcessingState.buffering,
           isSeeking: false,
@@ -73,9 +53,6 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
         );
       },
     );
-    iosPlayer.speedStream.listen((event) {
-      state = state.copyWith(speed: Speed(speed: event));
-    });
   }
 
   void updatePlaybackState(PlaybackState newState) {
@@ -95,22 +72,6 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
       track: Track(title: '', description: '', imageUrl: '', artist: ''),
     );
   }
-}
-
-class IosStateData {
-  final PlayerState playerState;
-  final Track track;
-  final Duration position;
-  final Duration bufferedPosition;
-  final Duration duration;
-
-  IosStateData(
-    this.playerState,
-    this.track,
-    this.position,
-    this.bufferedPosition,
-    this.duration,
-  );
 }
 
 final audioStateProvider =

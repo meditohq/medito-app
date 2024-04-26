@@ -13,6 +13,7 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
+import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
@@ -20,6 +21,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +35,9 @@ import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
 var audioStateNotifier = AudioStateNotifier();
-var currentEnvironment = kReleaseMode ? EnvironmentConstants.prodEnv : EnvironmentConstants.stagingEnv;
+var currentEnvironment = kReleaseMode
+    ? EnvironmentConstants.prodEnv
+    : EnvironmentConstants.stagingEnv;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +50,13 @@ Future<void> main() async {
   if (await areGooglePlayServicesAvailable()) {
     await Firebase.initializeApp();
     await registerNotification();
+  }
+
+  if (Platform.isIOS) {
+    await AudioService.init(
+      builder: () => iosAudioHandler,
+      config: AudioServiceConfig(),
+    );
   }
 
   usePathUrlStrategy();

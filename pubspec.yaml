@@ -21,6 +21,7 @@ dependencies:
     sdk: flutter
   app_settings: ^5.1.1
   audio_session: ^0.1.19
+  audio_service: ^0.18.13
   auto_size_text: ^3.0.0-nullsafety.0
   back_button_interceptor: ^6.0.2
   cached_network_image: ^3.2.3
@@ -60,8 +61,8 @@ dependencies:
   shimmer: ^2.0.0
   shared_preferences: ^2.2.2
   url_launcher: ^6.1.14
-  workmanager: ^0.5.2
   uni_links: ^0.5.1
+  workmanager: ^0.5.2
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1
