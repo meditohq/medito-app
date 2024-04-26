@@ -245,7 +245,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun setBackgroundSoundVolume(volume: Double) {
-        this.backgroundMusicVolume = volume.toFloat() / 100
+        this.backgroundMusicVolume = volume.toFloat()
         backgroundMusicPlayer.volume = this.backgroundMusicVolume
     }
 
@@ -302,7 +302,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             val state = PlaybackState(
                 isPlaying = primaryPlayer.isPlaying,
                 position = primaryPlayer.currentPosition,
-                volume = (primaryPlayer.volume * 100).toLong(),
+                volume = (primaryPlayer.volume).toLong(),
                 speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
                 isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
                 duration = primaryPlayer.duration,

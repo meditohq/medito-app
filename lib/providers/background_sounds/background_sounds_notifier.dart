@@ -45,10 +45,9 @@ final backgroundSoundsNotifierProvider =
   },
 );
 
-//ignore:prefer-match-file-name
 class BackgroundSoundsNotifier extends ChangeNotifier {
   final Ref ref;
-  double volume = 50;
+  double volume = 0.5;
   BackgroundSoundsModel? selectedBgSound;
   BackgroundSoundsModel? downloadingBgSound;
 
@@ -181,9 +180,9 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   void _handleFadeAtEndForIos() {
     var durationFromEnd = Duration(seconds: 10).inMilliseconds;
 
-    iosPlayer.positionStream.listen(
-          (currentPosition) {
-        var duration = iosPlayer.duration?.inMilliseconds ?? 0;
+    iosAudioHandler.positionStream.listen(
+      (currentPosition) {
+        var duration = iosAudioHandler.duration?.inMilliseconds ?? 0;
         var remainingTime = duration - currentPosition.inMilliseconds;
 
         if (remainingTime <= durationFromEnd) {

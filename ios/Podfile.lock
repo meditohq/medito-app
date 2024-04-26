@@ -1,6 +1,8 @@
 PODS:
   - app_settings (5.1.1):
     - Flutter
+  - audio_service (0.0.1):
+    - Flutter
   - audio_session (0.0.1):
     - Flutter
   - connectivity (0.0.1):
@@ -125,6 +127,7 @@ PODS:
 
 DEPENDENCIES:
   - app_settings (from `.symlinks/plugins/app_settings/ios`)
+  - audio_service (from `.symlinks/plugins/audio_service/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
@@ -166,6 +169,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   app_settings:
     :path: ".symlinks/plugins/app_settings/ios"
+  audio_service:
+    :path: ".symlinks/plugins/audio_service/ios"
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
   connectivity:
@@ -209,6 +214,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   app_settings: 017320c6a680cdc94c799949d95b84cb69389ebc
+  audio_service: f509d65da41b9521a61f1c404dd58651f265a567
   audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
   device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
