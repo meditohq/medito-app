@@ -265,10 +265,8 @@ Future<void> handleNavigation(
   List<String?> ids,
   BuildContext context, {
   WidgetRef? ref,
-  GoRouter? goRouterContext,
 }) async {
   var path;
-  var params;
   ids.removeWhere((element) => element == null);
   if (place != null && 'tracks'.contains(place)) {
     try {
@@ -333,11 +331,7 @@ Future<void> handleNavigation(
 
     return;
   }
-  if (context != null) {
-    unawaited(context.push(path, extra: params));
-  } else if (goRouterContext != null) {
-    unawaited(goRouterContext.push(path, extra: params));
-  }
+  unawaited(context.push(path));
 }
 
 void handleDeepLink(Uri? uri, BuildContext context) {

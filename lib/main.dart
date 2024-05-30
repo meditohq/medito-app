@@ -34,6 +34,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'constants/environments/environment_constants.dart';
 import 'services/notifications/notifications_service.dart';
 
+final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 var currentEnvironment = kReleaseMode
     ? EnvironmentConstants.prodEnv
@@ -114,8 +115,24 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         SystemUiOverlay.top,
       ],
     );
-    onMessageAppOpened(context, ref);
-    initializeNotification(context, ref);
+    onFirebaseMessageAppOpened(context, ref);
+    initializeNotification(context, ref).then(
+      (value) {
+        Future.delayed(Duration(seconds: 3)).then(
+          (_) {
+            handleOpeningStatsNotificationsFromBackground(context, ref).then(
+              (wasOpened) {
+                if (wasOpened) {
+                  ref.invalidate(refreshStatsProvider);
+                  ref.read(refreshStatsProvider);
+                }
+              },
+            );
+          },
+        );
+      },
+    );
+
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -125,6 +142,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     return MaterialApp.router(
       routerConfig: goRouter,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       theme: appTheme(context),
       title: ParentWidget._title,
     );
