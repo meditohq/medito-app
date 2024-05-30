@@ -122,13 +122,13 @@ void _parseNotificationPayload(payload, BuildContext context, WidgetRef ref) {
 
   try {
     StatsNotificationPayload.fromJson(payload);
-    handleStats(payload, context);
+    handleStats(payload, context: context);
   } catch (error) {
     print('Error: $error');
   }
 }
 
-void handleStats(payload, BuildContext? context) {
+void handleStats(payload, {BuildContext? context}) {
   try {
     callUpdateStats(payload);
     showSnackBar(context, StringConstants.statsSuccess);
@@ -241,7 +241,7 @@ Future<void> _showNotification(
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
-  handleStats(notificationResponse.payload, null);
+  handleStats(notificationResponse.payload);
 }
 
 const threadIdentifier = 'medito_stats_thread_identifier';
