@@ -20,6 +20,8 @@ class IosAudioHandler extends BaseAudioHandler {
 
   bool get playing => _player.playerState.playing;
 
+  bool get isComplete => _player.playerState.processingState == ProcessingState.completed;
+
   final _trackStateSubject = BehaviorSubject<Track>();
 
   Track get trackState => _trackStateSubject.value;

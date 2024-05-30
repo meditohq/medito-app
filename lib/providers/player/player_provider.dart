@@ -66,21 +66,24 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackFilesModel file,
     String guideName,
   ) async {
-    await _startNotificationForAudioCompleteEvent(
-      track.id,
-      file.duration,
-      file.id,
-      DateTime.now().millisecondsSinceEpoch,
-      guideName,
-    );
+    if (Platform.isAndroid) {
+      await _startNotificationForAudioCompleteEvent(
+        track.id,
+        file.duration,
+        file.id,
+        DateTime.now().millisecondsSinceEpoch,
+        guideName,
+      );
+    }
 
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(track, file),
         );
 
     var trackData = Track(
+      id: track.id,
       title: track.title,
-      artist: track.artist?.name ?? '',
+      artist: track.audio.first.guideName,
       artistUrl: track.artist?.path ?? '',
       description: track.description,
       imageUrl: track.coverUrl,
@@ -149,9 +152,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 
   String? getUserToken() {
-    var user = ref.read(sharedPreferencesProvider).getString(
-          SharedPreferenceConstants.userToken,
-        );
+    var user = ref
+        .read(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.userToken);
     var userModel =
         user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
     if (userModel != null) {

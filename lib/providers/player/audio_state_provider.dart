@@ -31,6 +31,7 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
             speed: Speed(speed: 1),
             volume: 100,
             track: Track(
+              id: '',
               title: '',
               description: '',
               imageUrl: '',
@@ -69,7 +70,7 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
       duration: 0,
       speed: Speed(speed: 1),
       volume: 100,
-      track: Track(title: '', description: '', imageUrl: '', artist: ''),
+      track: Track(id: '', title: '', description: '', imageUrl: '', artist: ''),
     );
   }
 }
