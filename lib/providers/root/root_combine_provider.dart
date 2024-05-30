@@ -37,7 +37,7 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
             TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
             UpdateStatsConstants.userTokenKey: getUserToken(ref),
           };
-          handleStats(payload, context);
+          handleStats(payload);
         }
       });
     }

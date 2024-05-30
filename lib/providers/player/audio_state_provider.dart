@@ -2,7 +2,6 @@ import 'package:Medito/main.dart';
 import 'package:Medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../../src/audio_pigeon.g.dart';
 
@@ -18,7 +17,6 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
 }
 
 class AudioStateNotifier extends StateNotifier<PlaybackState> {
-
   AudioStateNotifier()
       : super(
           PlaybackState(
@@ -70,7 +68,8 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
       duration: 0,
       speed: Speed(speed: 1),
       volume: 100,
-      track: Track(id: '', title: '', description: '', imageUrl: '', artist: ''),
+      track:
+          Track(id: '', title: '', description: '', imageUrl: '', artist: ''),
     );
   }
 }

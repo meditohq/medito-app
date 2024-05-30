@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'events_repository.g.dart';
 
 abstract class EventsRepository {
-
   Future<void> saveFirebaseToken(Map<String, dynamic> event);
 
   Future<void> trackAudioStartedEvent(
@@ -33,7 +32,6 @@ abstract class EventsRepository {
     String? fileGuide,
     String? userToken,
   });
-
 }
 
 class EventsRepositoryImpl extends EventsRepository {
