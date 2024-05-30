@@ -158,6 +158,7 @@ data class Speed (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class Track (
+  val id: String,
   val title: String,
   val description: String,
   val imageUrl: String,
@@ -168,16 +169,18 @@ data class Track (
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): Track {
-      val title = list[0] as String
-      val description = list[1] as String
-      val imageUrl = list[2] as String
-      val artist = list[3] as String?
-      val artistUrl = list[4] as String?
-      return Track(title, description, imageUrl, artist, artistUrl)
+      val id = list[0] as String
+      val title = list[1] as String
+      val description = list[2] as String
+      val imageUrl = list[3] as String
+      val artist = list[4] as String?
+      val artistUrl = list[5] as String?
+      return Track(id, title, description, imageUrl, artist, artistUrl)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
+      id,
       title,
       description,
       imageUrl,

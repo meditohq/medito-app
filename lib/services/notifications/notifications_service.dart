@@ -122,19 +122,18 @@ void _parseNotificationPayload(payload, BuildContext context, WidgetRef ref) {
 
   try {
     StatsNotificationPayload.fromJson(payload);
-    _handleStats(payload, context);
+    handleStats(payload, context);
   } catch (error) {
     print('Error: $error');
   }
 }
 
-void _handleStats(payload, BuildContext? context) {
+void handleStats(payload, BuildContext? context) {
   try {
     callUpdateStats(payload);
+    showSnackBar(context, StringConstants.statsSuccess);
   } catch (e, _) {
     showSnackBar(context, StringConstants.statsError);
-  } finally {
-    showSnackBar(context, StringConstants.statsSuccess);
   }
 }
 
@@ -228,18 +227,21 @@ Future<void> _showNotification(
     android: androidPlatformChannelSpecifics,
     iOS: iOSPlatformChannelSpecifics,
   );
-  await flutterLocalNotificationsPlugin.show(
-    Random().nextInt(2147483647),
-    title,
-    body,
-    platformChannelSpecifics,
-    payload: payload,
-  );
+
+  if (Platform.isAndroid) {
+    await flutterLocalNotificationsPlugin.show(
+      Random().nextInt(2147483647),
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: payload,
+    );
+  }
 }
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
-  _handleStats(notificationResponse.payload, null);
+  handleStats(notificationResponse.payload, null);
 }
 
 const threadIdentifier = 'medito_stats_thread_identifier';
