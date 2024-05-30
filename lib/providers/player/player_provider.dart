@@ -3,16 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/models/models.dart';
-import 'package:flutter/foundation.dart';
+import 'package:Medito/utils/permission_handler.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
+import '../../services/notifications/notifications_service.dart';
 import '../../src/audio_pigeon.g.dart';
+import '../../utils/call_update_stats.dart';
 import '../../utils/utils.dart';
-import '../../utils/workmanager.dart';
-import '../../utils/workmanager_constants.dart';
 import '../events/events_provider.dart';
 import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
@@ -65,13 +66,11 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackFilesModel file,
     String guideName,
   ) async {
-    await _startBackgroundThreadForAudioCompleteEvent(
+    await _startNotificationForAudioCompleteEvent(
       track.id,
       file.duration,
       file.id,
-      DateTime
-          .now()
-          .millisecondsSinceEpoch,
+      DateTime.now().millisecondsSinceEpoch,
       guideName,
     );
 
@@ -104,46 +103,48 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     }
   }
 
-  Future<void> _startBackgroundThreadForAudioCompleteEvent(
+  Future<void> _startNotificationForAudioCompleteEvent(
     String trackId,
     int duration,
     String fileID,
     int timestamp,
     String fileGuide,
   ) async {
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: kDebugMode,
-    );
+    await requestNotificationPermissions();
 
+    var payload = {
+      TypeConstants.trackIdKey: trackId,
+      TypeConstants.durationIdKey: duration,
+      TypeConstants.fileIdKey: fileID,
+      TypeConstants.guideIdKey: fileGuide,
+      TypeConstants.timestampIdKey: timestamp,
+      UpdateStatsConstants.userTokenKey: getUserToken(),
+    };
+    var notificationDelay = (duration * audioPercentageListened).round();
     try {
-      await Workmanager().registerOneOffTask(
-        audioCompletedTaskKey,
-        audioCompletedTaskKey,
-        backoffPolicy: BackoffPolicy.linear,
-        initialDelay: Duration(
-          milliseconds: (duration * audioPercentageListened).round(),
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId,
+        notificationTitle,
+        notificationBody,
+        payload: json.encode(payload),
+        tz.TZDateTime.now(tz.local)
+            .add(Duration(milliseconds: notificationDelay)),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            androidNotificationChannelId,
+            androidNotificationChannelName,
+            playSound: false,
+            icon: androidNotificationIcon,
+            enableVibration: false,
+            channelDescription: androidNotificationChannelDescription,
+          ),
         ),
-        constraints: Constraints(
-          networkType: NetworkType.connected,
-          requiresBatteryNotLow: false,
-          requiresCharging: false,
-          requiresDeviceIdle: false,
-          requiresStorageNotLow: false,
-        ),
-        inputData: {
-          TypeConstants.trackIdKey: trackId,
-          TypeConstants.durationIdKey: duration,
-          TypeConstants.fileIdKey: fileID,
-          TypeConstants.guideIdKey: fileGuide,
-          TypeConstants.timestampIdKey: timestamp,
-          WorkManagerConstants.userTokenKey: getUserToken(),
-        },
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e, s) {
-      if (kDebugMode) {
-        print(s);
-      }
+      print(s);
     }
   }
 
@@ -161,7 +162,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 
   void cancelBackgroundThreadForAudioCompleteEvent() async {
-    await Workmanager().cancelAll();
+    var activeNotifications =
+        await flutterLocalNotificationsPlugin.getActiveNotifications();
+    var containsNotification = activeNotifications
+        .any((notification) => notification.id == notificationId);
+
+    if (!containsNotification) {
+      await flutterLocalNotificationsPlugin.cancel(notificationId);
+    }
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
@@ -246,4 +254,5 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 }
 
-const audioPercentageListened = 0.7;
+const audioPercentageListened = 0.8;
+const androidNotificationIcon = 'logo';

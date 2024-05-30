@@ -1,16 +1,24 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/widgets/snackbar_widget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import '../../models/notification/stats_notification_payload.dart';
+import '../../utils/call_update_stats.dart';
 
 late final FirebaseMessaging? _messaging;
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -27,17 +35,16 @@ Future<void> registerNotification() async {
 
 Future<String?> requestGenerateFirebaseToken() async {
   try {
-  if (_messaging != null) {
-    var token = await _messaging?.getToken();
+    if (_messaging != null) {
+      var token = await _messaging?.getToken();
 
-    return token;
-  }
+      return token;
+    }
   } catch (e) {
-
     return null;
   }
 
-    return null;
+  return null;
 }
 
 Future removeFirebaseToken() async {
@@ -73,16 +80,20 @@ Future<void> initializeLocalNotification(
   BuildContext context,
   WidgetRef ref,
 ) async {
-  var initializationSettingsAndroid =
-      const AndroidInitializationSettings('notification_icon_push');
+  var initializationSettingsAndroid = const AndroidInitializationSettings(
+    'logo',
+  );
   var initializationSettingsIOS = DarwinInitializationSettings(
     requestAlertPermission: false,
     requestBadgePermission: false,
     requestSoundPermission: false,
-    requestCriticalPermission: false,
     onDidReceiveLocalNotification: (id, title, body, payload) =>
         _showNotification(title, body, payload),
   );
+
+  tz.initializeTimeZones();
+  final String? timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName!));
 
   var initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -90,14 +101,41 @@ Future<void> initializeLocalNotification(
   );
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
+    onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     onDidReceiveNotificationResponse: (res) {
       if (res.payload != null) {
         var payload = json.decode(res.payload!);
-        var notificationPayload = NotificationPayloadModel.fromJson(payload);
-        _navigate(context, ref, notificationPayload);
+
+        _parseNotificationPayload(payload, context, ref);
       }
     },
   );
+}
+
+void _parseNotificationPayload(payload, BuildContext context, WidgetRef ref) {
+  try {
+    var notificationPayload = NotificationPayloadModel.fromJson(payload);
+    _navigate(context, ref, notificationPayload);
+  } catch (error) {
+    print('Error: $error');
+  }
+
+  try {
+    StatsNotificationPayload.fromJson(payload);
+    _handleStats(payload, context);
+  } catch (error) {
+    print('Error: $error');
+  }
+}
+
+void _handleStats(payload, BuildContext? context) {
+  try {
+    callUpdateStats(payload);
+  } catch (e, _) {
+    showSnackBar(context, StringConstants.statsError);
+  } finally {
+    showSnackBar(context, StringConstants.statsSuccess);
+  }
 }
 
 void checkInitialMessage(BuildContext context, WidgetRef ref) async {
@@ -113,7 +151,32 @@ void checkInitialMessage(BuildContext context, WidgetRef ref) async {
   }
 }
 
-void onMessageAppOpened(BuildContext context, WidgetRef ref) {
+Future<bool> handleOpeningStatsNotificationsFromBackground(
+  context,
+  WidgetRef ref,
+) async {
+  String? selectedNotificationPayload;
+
+  final notificationAppLaunchDetails = !kIsWeb && Platform.isLinux
+      ? null
+      : await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  if (selectedNotificationPayload.isNotNullAndNotEmpty() &&
+      notificationAppLaunchDetails?.didNotificationLaunchApp == true) {
+    selectedNotificationPayload =
+        notificationAppLaunchDetails!.notificationResponse?.payload;
+    _parseNotificationPayload(
+      jsonDecode(selectedNotificationPayload!),
+      context,
+      ref,
+    );
+
+    return true;
+  }
+
+  return false;
+}
+
+void onFirebaseMessageAppOpened(BuildContext context, WidgetRef ref) {
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     var notificationPayload = NotificationPayloadModel.fromJson(message.data);
     _navigate(context, ref, notificationPayload);
@@ -131,7 +194,7 @@ void _navigate(
       data.type,
       [data.id.toString().getIdFromPath(), data.path],
       context,
-      goRouterContext: goRouterContext,
+      ref: ref,
     );
   } else {
     goRouterContext.go(RouteConstants.bottomNavbarPath);
@@ -159,7 +222,8 @@ Future<void> _showNotification(
     priority: Priority.high,
     ticker: 'ticker',
   );
-  var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
+  var iOSPlatformChannelSpecifics =
+      const DarwinNotificationDetails(threadIdentifier: threadIdentifier);
   var platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
     iOS: iOSPlatformChannelSpecifics,
@@ -172,3 +236,10 @@ Future<void> _showNotification(
     payload: payload,
   );
 }
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  _handleStats(notificationResponse.payload, null);
+}
+
+const threadIdentifier = 'medito_stats_thread_identifier';

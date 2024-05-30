@@ -53,9 +53,8 @@ PODS:
     - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
-  - FMDB (2.7.10):
-    - FMDB/standard (= 2.7.10)
-  - FMDB/standard (2.7.10)
+  - flutter_timezone (0.0.1):
+    - Flutter
   - GoogleDataTransport (9.4.1):
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30911.0, >= 2.30908.0)
@@ -97,17 +96,15 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.1.1):
+  - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
   - Reachability (3.7.5)
-  - Sentry/HybridSDK (8.19.0):
-    - SentryPrivate (= 8.19.0)
-  - sentry_flutter (0.0.1):
+  - Sentry/HybridSDK (8.25.2)
+  - sentry_flutter (8.2.0):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.19.0)
-  - SentryPrivate (8.19.0)
+    - Sentry/HybridSDK (= 8.25.2)
   - share (0.0.1):
     - Flutter
   - share_plus (0.0.1):
@@ -117,12 +114,10 @@ PODS:
     - FlutterMacOS
   - sqflite (0.0.3):
     - Flutter
-    - FMDB (>= 2.7.5)
+    - FlutterMacOS
   - uni_links (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
-    - Flutter
-  - workmanager (0.0.1):
     - Flutter
 
 DEPENDENCIES:
@@ -136,6 +131,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -144,10 +140,9 @@ DEPENDENCIES:
   - share (from `.symlinks/plugins/share/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - sqflite (from `.symlinks/plugins/sqflite/ios`)
+  - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-  - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
 SPEC REPOS:
   trunk:
@@ -157,14 +152,12 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseInstallations
     - FirebaseMessaging
-    - FMDB
     - GoogleDataTransport
     - GoogleUtilities
     - nanopb
     - PromisesObjC
     - Reachability
     - Sentry
-    - SentryPrivate
 
 EXTERNAL SOURCES:
   app_settings:
@@ -187,6 +180,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_downloader/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_timezone:
+    :path: ".symlinks/plugins/flutter_timezone/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
   package_info_plus:
@@ -204,13 +199,11 @@ EXTERNAL SOURCES:
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite:
-    :path: ".symlinks/plugins/sqflite/ios"
+    :path: ".symlinks/plugins/sqflite/darwin"
   uni_links:
     :path: ".symlinks/plugins/uni_links/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
-  workmanager:
-    :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
   app_settings: 017320c6a680cdc94c799949d95b84cb69389ebc
@@ -228,28 +221,26 @@ SPEC CHECKSUMS:
   FirebaseMessaging: a4d7910e4af663c9cbfc1071c5bef34651690949
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_downloader: b7301ae057deadd4b1650dc7c05375f10ff12c39
-  flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
-  FMDB: eae540775bf7d0c87a5af926ae37af69effe5a19
+  flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
+  flutter_timezone: ffb07bdad3c6276af8dada0f11978d8a1f8a20bb
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleUtilities: d053d902a8edaa9904e1bd00c37535385b8ed152
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   package_info_plus: 115f4ad11e0698c8c1c5d8a689390df880f47e85
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   Reachability: 44d15955cdaee6cef699877e1f6647dd6f6698cc
-  Sentry: 1ebcaef678a27c8ac515f974cb5425dd1bbdec2f
-  sentry_flutter: ecdfbedee55337205561cfa782ee02d31ec83e1f
-  SentryPrivate: 765c9b4ebe9ac1a5fcdc067c5a1cfbf3f10e1677
+  Sentry: 51b056d96914a741f63eca774d118678b1eb05a1
+  sentry_flutter: e8397d13e297a5d4b6be8a752e33140b21c5cc97
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
-  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
-  sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
-  url_launcher_ios: bf5ce03e0e2088bad9cc378ea97fa0ed5b49673b
-  workmanager: 0afdcf5628bbde6924c21af7836fed07b42e30e6
+  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: e02d150e307466fe01a4335b382fd16ee407a495
+PODFILE CHECKSUM: 84beeb4ee6d6739002d296bc13f526b3d44fa4a6
 
 COCOAPODS: 1.15.2

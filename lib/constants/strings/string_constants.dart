@@ -29,6 +29,8 @@ class StringConstants {
   static const String retry = 'Retry';
   static const String shareText =
       "I just meditated with Medito. Try it out, it's like Headspace and Calm but it's 100% free and not-for-profit! https://medito.app";
+  static const String statsSuccess = 'Stats updated';
+  static const String statsError = 'Error updating stats';
   static const String shareStatsText =
       '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
   static const String swipeToDelete = 'Swipe left on a session to delete it';
