@@ -132,7 +132,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     BuildContext context,
   ) async {
     var path = widget.announcement.ctaPath;
-    _handleTrackEvent();
     await handleNavigation(
       widget.announcement.ctaType,
       [path.toString().getIdFromPath(), path],
