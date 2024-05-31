@@ -59,7 +59,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     if (Platform.isAndroid) {
       _api.setBackgroundSoundVolume(volume);
     } else {
-      iosBackgroundPlayer.setVolume(volume);
+      iosBackgroundPlayer.setVolume(volume / 10);
     }
     notifyListeners();
   }
@@ -187,9 +187,9 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
         if (remainingTime <= durationFromEnd) {
           var newVolume = volume * remainingTime / durationFromEnd;
-          iosBackgroundPlayer.setVolume(newVolume);
+          iosBackgroundPlayer.setVolume(newVolume / 10);
         } else {
-          iosBackgroundPlayer.setVolume(volume);
+          iosBackgroundPlayer.setVolume(volume / 10);
         }
       },
     );
