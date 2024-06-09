@@ -15,7 +15,7 @@ import '../../src/audio_pigeon.g.dart';
 part 'background_sounds_notifier.g.dart';
 
 final _api = MeditoAudioServiceApi();
-final iosBackgroundPlayer = AudioPlayer();
+final iosBackgroundPlayer = AudioPlayer()..setLoopMode(LoopMode.all);
 
 @riverpod
 Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
