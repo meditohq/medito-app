@@ -43,25 +43,32 @@ class ArtistTitleWidget extends ConsumerWidget {
 
     return SizedBox(
       height: titleHeight,
-      child: Text(
-        trackTitle ?? '',
-        style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: SourceSerif,
-              color: ColorConstants.walterWhite,
-              fontSize: trackTitleFontSize,
-              letterSpacing: 0.2,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              trackTitle ?? '',
+              style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+                fontFamily: SourceSerif,
+                color: ColorConstants.walterWhite,
+                fontSize: trackTitleFontSize,
+                letterSpacing: 0.2,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
+          ),
+        ],
       ),
     );
   }
 
   Padding _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontFamily: DmMono,
-          fontSize: artistNameFontSize,
-          letterSpacing: 0,
-          color: ColorConstants.graphite,
-        );
+      fontFamily: DmMono,
+      fontSize: artistNameFontSize,
+      letterSpacing: 0,
+      color: ColorConstants.graphite,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
