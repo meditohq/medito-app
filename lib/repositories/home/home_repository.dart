@@ -18,10 +18,6 @@ abstract class HomeRepository {
 
   Future<AnnouncementModel?> fetchLatestAnnouncement();
 
-  ShortcutsModel getSortedShortcuts(
-    ShortcutsModel shortcutsModel,
-  );
-
   Future<void> setShortcutIdsInPreference(
     List<String> ids,
   );
@@ -39,20 +35,6 @@ class HomeRepositoryImpl extends HomeRepository {
             .read(sharedPreferencesProvider)
             .getStringList(SharedPreferenceConstants.shortcuts) ??
         [];
-  }
-
-  @override
-  ShortcutsModel getSortedShortcuts(
-    ShortcutsModel shortcutsModel,
-  ) {
-    //   var shortcutsIds = getLocalShortcutIds();
-    //   var shortcutsCopy = [...shortcutsModel.shortcuts];
-    //
-    //   shortcutsCopy.sort((a, b) =>
-    //       shortcutsIds.indexOf(a.id).compareTo(shortcutsIds.indexOf(b.id)));
-    //
-    //   return shortcutsModel.copyWith(shortcuts: shortcutsCopy);
-    throw UnimplementedError();
   }
 
   @override

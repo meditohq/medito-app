@@ -38,36 +38,33 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   }
 
   Widget _welcomeWidget(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20.0),
-      child: LongPressDetectorWidget(
-        onLongPress: () {
-          showModalBottomSheet<void>(
-            context: context,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(14.0),
-                topRight: Radius.circular(14.0),
-              ),
+    return LongPressDetectorWidget(
+      onLongPress: () {
+        showModalBottomSheet<void>(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(14.0),
+              topRight: Radius.circular(14.0),
             ),
-            useRootNavigator: true,
-            backgroundColor: ColorConstants.onyx,
-            builder: (BuildContext context) {
-              return DebugBottomSheetWidget();
-            },
-          );
-        },
-        duration: Duration(milliseconds: 500),
-        child: Text(
-          StringConstants.welcome,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: ColorConstants.walterWhite,
-                height: 0,
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                fontFamily: SourceSerif,
-              ),
-        ),
+          ),
+          useRootNavigator: true,
+          backgroundColor: ColorConstants.onyx,
+          builder: (BuildContext context) {
+            return DebugBottomSheetWidget();
+          },
+        );
+      },
+      duration: Duration(milliseconds: 500),
+      child: Text(
+        StringConstants.welcome,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: ColorConstants.walterWhite,
+              height: 0,
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              fontFamily: SourceSerif,
+            ),
       ),
     );
   }
