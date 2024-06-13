@@ -59,37 +59,42 @@ class _HomeViewState extends ConsumerState<HomeView>
       ),
       data: (HomeModel homeData) {
         return Scaffold(
-          backgroundColor: ColorConstants.amsterdamSpring,
-          body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                child: Container(
-                  color: ColorConstants.ebony,
-                  child: Column(
-                    children: [
-                      Container(
-                        color: ColorConstants.amsterdamSpring,
-                        child: HeaderAndAnnouncementWidget(
-                          menuData: homeData.menu,
-                          announcementData: latestAnnouncement.value,
-                          statsData: stats.value,
-                          onStatsButtonTap: () =>
-                              _onStatsButtonTapped(context, ref),
-                        ),
-                      ),
-                      height20,
-                      ShortcutsWidget(data: homeData.shortcuts),
-                      height20,
-                      CarouselWidget(data: homeData.carousel),
-                      height20,
-                      QuoteWidget(data: homeData.todayQuote),
-                      height200,
-                    ],
-                  ),
+          backgroundColor: ColorConstants.ebony,
+          appBar: AppBar(
+            shadowColor: ColorConstants.ebony,
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: ColorConstants.onyx,
+            toolbarHeight: 150.0,
+            title: Container(
+              color: ColorConstants.amsterdamSpring,
+              child: HeaderAndAnnouncementWidget(
+                menuData: homeData.menu,
+                announcementData: latestAnnouncement.value,
+                statsData: stats.value,
+                onStatsButtonTap: () =>
+                    _onStatsButtonTapped(context, ref),
+              ),
+            ),
+            elevation: 0.0,
+          ),
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              child: Container(
+                color: ColorConstants.ebony,
+                child: Column(
+                  children: [
+                    height20,
+                    ShortcutsWidget(data: homeData.shortcuts),
+                    height20,
+                    CarouselWidget(data: homeData.carousel),
+                    height20,
+                    QuoteWidget(data: homeData.todayQuote),
+                    height20,
+                  ],
                 ),
               ),
             ),
@@ -100,6 +105,8 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
+    ref.invalidate(fetchLatestAnnouncementProvider);
+    await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
     ref.invalidate(refreshStatsProvider);

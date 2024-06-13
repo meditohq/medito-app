@@ -43,11 +43,10 @@ class StatsRow extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          SizedBox(width: 16),
           Expanded(
             flex: 1,
             child: TextButton(
@@ -97,7 +96,6 @@ class StatsRow extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 16),
         ],
       ),
     );
