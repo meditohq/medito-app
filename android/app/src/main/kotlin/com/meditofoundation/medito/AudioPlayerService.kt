@@ -309,6 +309,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
                 isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
                 track = Track(
+                    id = primaryPlayer.currentMediaItem?.mediaId.toString(),
                     title = primaryPlayer.currentMediaItem?.mediaMetadata?.title.toString(),
                     description = primaryPlayer.currentMediaItem?.mediaMetadata?.description.toString(),
                     imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri.toString(),

@@ -11,8 +11,10 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   const HomeHeaderWidget({
     super.key,
     required this.homeMenuModel,
+    required this.greeting,
   });
 
+  final String greeting;
   final List<HomeMenuModel> homeMenuModel;
 
   @override
@@ -49,7 +51,6 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
             ),
           ),
           useRootNavigator: true,
-          backgroundColor: ColorConstants.onyx,
           builder: (BuildContext context) {
             return DebugBottomSheetWidget();
           },
@@ -57,7 +58,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
       },
       duration: Duration(milliseconds: 500),
       child: Text(
-        StringConstants.welcome,
+        greeting,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: ColorConstants.walterWhite,
               height: 0,
@@ -89,7 +90,6 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
               ),
             ),
             useRootNavigator: true,
-            backgroundColor: ColorConstants.onyx,
             builder: (BuildContext context) {
               return MenuBottomSheetWidget(
                 homeMenuModel: homeMenuModel,

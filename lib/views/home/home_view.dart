@@ -2,15 +2,16 @@ import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/views/home/widgets/announcement/announcement_widget.dart';
 import 'package:Medito/views/home/widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'package:Medito/views/home/widgets/editorial/carousel_widget.dart';
-import 'package:Medito/views/home/widgets/header_and_announcement_widget.dart';
+import 'package:Medito/views/home/widgets/header_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:uni_links/uni_links.dart';
 
+import '../../models/home/announcement/announcement_model.dart';
 import '../../models/home/home_model.dart';
 import '../../routes/routes.dart';
 import 'widgets/quote/quote_widget.dart';
@@ -31,6 +32,29 @@ class _HomeViewState extends ConsumerState<HomeView>
     navigateToDeepLink();
   }
 
+  bool isCollapsed = false;
+
+  late CurvedAnimation curvedAnimation = CurvedAnimation(
+    parent: AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1000),
+    )..forward(),
+    curve: Curves.easeInOut,
+  );
+
+  void _handleCollapse() {
+    setState(() {
+      isCollapsed = !isCollapsed;
+    });
+    curvedAnimation = CurvedAnimation(
+      parent: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 1000),
+      )..forward(),
+      curve: Curves.easeInOut,
+    );
+  }
+
   void navigateToDeepLink() {
     Future.delayed(Duration(seconds: 1), () async {
       handleDeepLink(await getInitialUri(), context);
@@ -46,7 +70,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
 
     final home = ref.watch(fetchHomeProvider);
-    final latestAnnouncement = ref.watch(fetchLatestAnnouncementProvider);
+    final announcementData = ref.watch(fetchLatestAnnouncementProvider);
 
     final stats = ref.watch(fetchStatsProvider);
 
@@ -61,19 +85,13 @@ class _HomeViewState extends ConsumerState<HomeView>
         return Scaffold(
           backgroundColor: ColorConstants.ebony,
           appBar: AppBar(
-            shadowColor: ColorConstants.ebony,
-            surfaceTintColor: Colors.transparent,
             backgroundColor: ColorConstants.onyx,
             toolbarHeight: 150.0,
-            title: Container(
-              color: ColorConstants.amsterdamSpring,
-              child: HeaderAndAnnouncementWidget(
-                menuData: homeData.menu,
-                announcementData: latestAnnouncement.value,
-                statsData: stats.value,
-                onStatsButtonTap: () =>
-                    _onStatsButtonTapped(context, ref),
-              ),
+            title: HeaderWidget(
+              greeting: homeData.greeting ?? StringConstants.welcome,
+              menuData: homeData.menu,
+              statsData: stats.value,
+              onStatsButtonTap: () => _onStatsButtonTapped(context, ref),
             ),
             elevation: 0.0,
           ),
@@ -83,24 +101,46 @@ class _HomeViewState extends ConsumerState<HomeView>
               physics: AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              child: Container(
-                color: ColorConstants.ebony,
-                child: Column(
-                  children: [
-                    height20,
-                    ShortcutsWidget(data: homeData.shortcuts),
-                    height20,
-                    CarouselWidget(data: homeData.carousel),
-                    height20,
-                    QuoteWidget(data: homeData.todayQuote),
-                    height20,
-                  ],
-                ),
+              child: Column(
+                children: [
+                  _getAnnouncementBanner(announcementData.value),
+                  height20,
+                  ShortcutsWidget(data: homeData.shortcuts),
+                  height20,
+                  CarouselWidget(data: homeData.carousel),
+                  height20,
+                  QuoteWidget(data: homeData.todayQuote),
+                  height20,
+                ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _getAnnouncementBanner(AnnouncementModel? data) {
+    if (data == null) {
+      return Container();
+    }
+
+    return SizeTransition(
+      axisAlignment: -1,
+      sizeFactor: isCollapsed
+          ? Tween<double>(begin: 1.0, end: 0.0).animate(
+              curvedAnimation,
+            )
+          : Tween<double>(begin: 0.0, end: 1.0).animate(
+              curvedAnimation,
+            ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: AnnouncementWidget(
+          announcement: data,
+          onPressedDismiss: _handleCollapse,
+        ),
+      ),
     );
   }
 
