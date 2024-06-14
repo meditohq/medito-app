@@ -57,7 +57,8 @@ class _BottomNavigationBarViewState
       ),
       body: PageView(
         controller: _pageController,
-        onPageChanged: _onDestinationSelected,
+        onPageChanged: _onPageChanged,
+        physics: NeverScrollableScrollPhysics(),
         children: <Widget>[HomeView(), ExploreView()],
       ),
     );
@@ -66,11 +67,13 @@ class _BottomNavigationBarViewState
   void _onDestinationSelected(int index) {
     setState(() {
       _currentPageIndex = index;
-      _pageController.animateToPage(
-        index,
-        duration: Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
+      _pageController.jumpToPage(index);
+    });
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentPageIndex = index;
     });
   }
 

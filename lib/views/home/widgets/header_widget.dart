@@ -10,50 +10,29 @@ import '../../../utils/utils.dart';
 import 'announcement/announcement_widget.dart';
 import 'header/home_header_widget.dart';
 
-class HeaderAndAnnouncementWidget extends ConsumerStatefulWidget {
-  const HeaderAndAnnouncementWidget({
+class HeaderWidget extends ConsumerStatefulWidget {
+
+  const HeaderWidget({
     super.key,
     required this.menuData,
-    required this.announcementData,
     required this.statsData,
     required this.onStatsButtonTap,
+    required this.greeting,
   });
 
+  final String greeting;
   final List<HomeMenuModel> menuData;
-  final AnnouncementModel? announcementData;
   final StatsModel? statsData;
   final VoidCallback onStatsButtonTap;
 
   @override
-  ConsumerState<HeaderAndAnnouncementWidget> createState() =>
+  ConsumerState<HeaderWidget> createState() =>
       _HeaderAndAnnouncementWidgetState();
 }
 
 class _HeaderAndAnnouncementWidgetState
-    extends ConsumerState<HeaderAndAnnouncementWidget>
+    extends ConsumerState<HeaderWidget>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  bool isCollapsed = false;
-
-  late CurvedAnimation curvedAnimation = CurvedAnimation(
-    parent: AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 1000),
-    )..forward(),
-    curve: Curves.easeInOut,
-  );
-
-  void _handleCollapse() {
-    setState(() {
-      isCollapsed = !isCollapsed;
-    });
-    curvedAnimation = CurvedAnimation(
-      parent: AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: 1000),
-      )..forward(),
-      curve: Curves.easeInOut,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +49,7 @@ class _HeaderAndAnnouncementWidgetState
     return Column(
       children: [
         HomeHeaderWidget(
+          greeting: widget.greeting,
           homeMenuModel: widget.menuData,
         ),
         height8,
@@ -93,29 +73,7 @@ class _HeaderAndAnnouncementWidgetState
             widget.onStatsButtonTap();
           },
         ),
-        if (widget.announcementData != null)
-          _getAnnouncementBanner(widget.announcementData!),
       ],
-    );
-  }
-
-  Widget _getAnnouncementBanner(AnnouncementModel data) {
-    return SizeTransition(
-      axisAlignment: -1,
-      sizeFactor: isCollapsed
-          ? Tween<double>(begin: 1.0, end: 0.0).animate(
-              curvedAnimation,
-            )
-          : Tween<double>(begin: 0.0, end: 1.0).animate(
-              curvedAnimation,
-            ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: AnnouncementWidget(
-          announcement: data,
-          onPressedDismiss: _handleCollapse,
-        ),
-      ),
     );
   }
 
