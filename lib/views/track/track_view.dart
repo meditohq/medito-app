@@ -14,7 +14,6 @@ You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
@@ -41,27 +40,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     with AutomaticKeepAliveClientMixin<TrackView> {
   TrackAudioModel? selectedAudio;
   TrackFilesModel? selectedDuration;
-  final ScrollController scrollController = ScrollController();
-  bool showCloseButton = false;
   final GlobalKey childKey = GlobalKey();
-
-  @override
-  void initState() {
-    scrollController.addListener(() {
-      _optionallyShowOrHideCloseButton();
-    });
-    super.initState();
-  }
-
-  void _optionallyShowOrHideCloseButton() {
-    final renderBox = childKey.currentContext?.findRenderObject() as RenderBox;
-    final size = renderBox.size.height;
-    var screenHeight = MediaQuery.of(childKey.currentContext!).size.height;
-
-    setState(() {
-      showCloseButton = size > screenHeight;
-    });
-  }
 
   void _handleOnGuideNameChange(TrackAudioModel? value) {
     setState(() {
@@ -102,28 +81,55 @@ class _TrackViewState extends ConsumerState<TrackView>
     ref.watch(trackOpenedFirstTimeProvider);
     var tracks = ref.watch(tracksProvider(trackId: widget.id));
 
-    return Listener(
-      onPointerMove: (PointerMoveEvent event) {
-        if (Platform.isIOS && event.delta.dx > 20) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: SingleChildScrollView(
-        controller: scrollController,
-        child: Container(
-          key: childKey,
-          padding: EdgeInsets.only(bottom: getBottomPadding(context)),
-          child: tracks.when(
-            skipLoadingOnRefresh: false,
-            data: (data) => _buildScaffoldWithData(context, data, ref),
-            error: (err, stack) => MeditoErrorWidget(
-              message: err.toString(),
-              onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
-              isScaffold: false,
-            ),
-            loading: () => _buildLoadingWidget(),
+    return Scaffold(
+      body: Column(
+        children: [
+          AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
-        ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.25,
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            child: tracks.when(
+              data: (data) => ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: NetworkImageWidget(
+                  url: data.coverUrl,
+                  shouldCache: true,
+                ),
+              ),
+              loading: () => ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(color: Colors.black.withOpacity(0.6)),
+              ),
+              error: (err, stack) => ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(color: Colors.black.withOpacity(0.6)),
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                key: childKey,
+                padding:
+                    EdgeInsets.only(bottom: getBottomPadding(context), top: 24),
+                child: tracks.when(
+                  skipLoadingOnRefresh: false,
+                  data: (data) => _buildScaffoldWithData(context, data, ref),
+                  error: (err, stack) => MeditoErrorWidget(
+                    message: err.toString(),
+                    onTap: () =>
+                        ref.refresh(tracksProvider(trackId: widget.id)),
+                    isScaffold: false,
+                  ),
+                  loading: () => _buildLoadingWidget(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -142,41 +148,20 @@ class _TrackViewState extends ConsumerState<TrackView>
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Stack(
-          alignment: Alignment.topCenter,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: SizedBox(
-                height: 248,
-                child: NetworkImageWidget(
-                  url: trackModel.coverUrl,
-                  shouldCache: true,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: HandleBarWidget(),
-            ),
-          ],
-        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              height32,
               _title(context, trackModel.title),
               _getSubTitle(context, trackModel.description),
-              height24,
+              SizedBox(height: 24),
               if (showGuideNameDropdown) _guideNameDropdown(trackModel),
               if (showGuideNameDropdown) SizedBox(height: 12),
               _durationDropdown(trackModel),
-              height12,
+              SizedBox(height: 12),
               _playBtn(ref, trackModel),
-              _closeButton(context),
             ],
           ),
         ),
@@ -184,36 +169,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Widget _closeButton(BuildContext context) {
-    return Visibility(
-      visible: showCloseButton,
-      child: Container(
-        width: double.infinity,
-        child: SizedBox(
-          height: 48,
-          child: TextButton(
-            onPressed: () => context.pop(context),
-            child: Text(
-              StringConstants.close,
-              style: TextStyle(
-                fontFamily: DmSans,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   InkWell _playBtn(WidgetRef ref, TrackModel trackModel) {
-    var radius = BorderRadius.only(
-      topLeft: Radius.circular(7),
-      topRight: Radius.circular(7),
-      bottomRight: Radius.circular(24),
-      bottomLeft: Radius.circular(24),
-    );
+    var radius = BorderRadius.all(Radius.circular(7));
 
     return InkWell(
       onTap: () {
@@ -274,6 +231,8 @@ class _TrackViewState extends ConsumerState<TrackView>
         value: selectedAudio ?? audio,
         iconData: Icons.face,
         bottomRight: 7,
+        topLeft: 7,
+        topRight: 7,
         bottomLeft: 7,
         isDisabled: trackModel.audio.length > 1,
         disabledLabelText: '${audio.guideName}',
@@ -313,7 +272,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          height8,
+          SizedBox(height: 8),
           MarkdownWidget(
             body: subTitle,
             selectable: true,
@@ -342,12 +301,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     }
 
     return SizedBox();
-  }
-
-  @override
-  Future<void> dispose() async {
-    scrollController.dispose();
-    super.dispose();
   }
 
   @override

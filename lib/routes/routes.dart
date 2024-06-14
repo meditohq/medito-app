@@ -270,28 +270,8 @@ Future<void> handleNavigation(
   ids.removeWhere((element) => element == null);
   if (place != null && 'tracks'.contains(place)) {
     try {
-      unawaited(
-        showModalBottomSheet<void>(
-          context: context,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(24.0),
-            ),
-          ),
-          useRootNavigator: true,
-          isScrollControlled: true,
-          backgroundColor: ColorConstants.ebony,
-          builder: (BuildContext context) {
-            return SafeArea(
-              child: TrackView(
-                id: ids.first!,
-              ),
-            );
-          },
-        ).then(
-          (value) => ref?.refresh(fetchStatsProvider),
-        ),
-      );
+      path = RouteConstants.trackPath.replaceAll(':sid', ids.first!);
+      unawaited(context.push(path));
     } catch (e, s) {
       print(s);
     }
@@ -320,9 +300,7 @@ Future<void> handleNavigation(
           await ref.read(deviceAppAndUserInfoProvider.future);
       var _info =
           '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
-
       path = ids.first;
-
       await launchEmailSubmission(
         path.toString(),
         body: _info,
