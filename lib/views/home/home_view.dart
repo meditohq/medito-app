@@ -1,19 +1,19 @@
 import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/views/home/widgets/announcement/announcement_widget.dart';
-import 'package:Medito/views/home/widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
-import 'package:Medito/views/home/widgets/editorial/carousel_widget.dart';
-import 'package:Medito/views/home/widgets/header_widget.dart';
+import 'package:Medito/models/models.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uni_links/uni_links.dart';
 
-import '../../models/home/announcement/announcement_model.dart';
-import '../../models/home/home_model.dart';
+import '../../providers/home/home_provider.dart';
 import '../../routes/routes.dart';
+import 'widgets/announcement/announcement_widget.dart';
+import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
+import 'widgets/editorial/carousel_widget.dart';
+import 'widgets/header_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
 
@@ -26,10 +26,26 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  var _isConnected = true;
+  late final StreamSubscription _subscription;
+
   @override
   void initState() {
     super.initState();
     navigateToDeepLink();
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      setState(() {
+        _isConnected = !result.contains(ConnectivityResult.none);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   bool isCollapsed = false;
@@ -64,8 +80,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var connectivityStatus = ref.watch(connectivityStatusProvider);
-    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
+    if (!_isConnected) {
       return ConnectivityErrorWidget();
     }
 

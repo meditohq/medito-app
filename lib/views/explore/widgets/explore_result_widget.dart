@@ -1,18 +1,43 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'explore_result_card_widget.dart';
 
-class ExploreResultWidget extends ConsumerWidget {
+class ExploreResultWidget extends ConsumerStatefulWidget {
   const ExploreResultWidget({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _ExploreResultWidgetState createState() => _ExploreResultWidgetState();
+}
+
+class _ExploreResultWidgetState extends ConsumerState<ExploreResultWidget> {
+  var isConnected = true;
+  late final StreamSubscription _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> event) {
+      isConnected = !event.contains(ConnectivityResult.none);
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var exploreResult = ref.watch(exploreProvider);
     var exploreQuery = ref.watch(exploreQueryProvider);
     var listViewPadding = EdgeInsets.only(
@@ -30,10 +55,10 @@ class ExploreResultWidget extends ConsumerWidget {
             child: Text(
               data.message.toString(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    letterSpacing: 0,
-                    color: ColorConstants.walterWhite,
-                    fontSize: 14,
-                  ),
+                letterSpacing: 0,
+                color: ColorConstants.walterWhite,
+                fontSize: 14,
+              ),
             ),
           );
         }
@@ -71,21 +96,19 @@ class ExploreResultWidget extends ConsumerWidget {
   }
 
   void _handleTap(
-    BuildContext context,
-    String id,
-    String type,
-    String path,
-  ) {
-    checkConnectivity().then((value) {
-      if (value) {
-        handleNavigation(
-          type,
-          [id.toString(), path],
-          context,
-        );
-      } else {
-        createSnackBar(StringConstants.checkConnection, context);
-      }
-    });
+      BuildContext context,
+      String id,
+      String type,
+      String path,
+      ) {
+    if (isConnected) {
+      handleNavigation(
+        type,
+        [id.toString(), path],
+        context,
+      );
+    } else {
+      createSnackBar(StringConstants.checkConnection, context);
+    }
   }
 }

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,9 +19,23 @@ class ConnectivityErrorWidget extends ConsumerStatefulWidget {
 
 class _ConnectivityErrorComponentState
     extends ConsumerState<ConnectivityErrorWidget> {
+  var _isConnected = true;
+  late final StreamSubscription _subscription;
+
   @override
   void initState() {
     super.initState();
+    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
+      setState(() {
+        _isConnected = !result.contains(ConnectivityResult.none);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -41,18 +58,24 @@ class _ConnectivityErrorComponentState
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: MeditoErrorWidget(
         onTap: () {
-          var connectivityStatus =
-              ref.read(connectivityStatusProvider.notifier);
-          connectivityStatus.checkConnectivity();
-          createSnackBar(
-            StringConstants.retrying,
-            context,
-            color: ColorConstants.ebony,
-          );
+          if (_isConnected) {
+            _refreshAPI();
+            createSnackBar(
+              StringConstants.retrying,
+              context,
+              color: ColorConstants.ebony,
+            );
+          } else {
+            createSnackBar(
+              StringConstants.connectivityError,
+              context,
+              color: ColorConstants.ebony,
+            );
+          }
         },
         message: StringConstants.checkConnection,
         shouldShowCheckDownloadButton: true,
