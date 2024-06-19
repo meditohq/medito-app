@@ -149,12 +149,9 @@ class _HomeViewState extends ConsumerState<HomeView>
           : Tween<double>(begin: 0.0, end: 1.0).animate(
               curvedAnimation,
             ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: AnnouncementWidget(
-          announcement: data,
-          onPressedDismiss: _handleCollapse,
-        ),
+      child: AnnouncementWidget(
+        announcement: data,
+        onPressedDismiss: _handleCollapse,
       ),
     );
   }
