@@ -15,7 +15,6 @@ dependencies:
   auto_size_text: ^3.0.0-nullsafety.0
   back_button_interceptor: ^6.0.2
   cached_network_image: ^3.2.3
-  connectivity: ^3.0.3
   device_info_plus: ^9.0.2
   dio: ^5.4.0
   email_validator: '^2.1.16'
@@ -53,6 +52,7 @@ dependencies:
   url_launcher: ^6.1.14
   uni_links: ^0.5.1
   flutter_timezone: ^1.0.8
+  connectivity_plus: ^6.0.3
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1

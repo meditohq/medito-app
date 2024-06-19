@@ -19,7 +19,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:Medito/constants/constants.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_api_availability/google_api_availability.dart';
@@ -27,12 +27,6 @@ import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-Future<bool> checkConnectivity() async {
-  var connectivityResult = await Connectivity().checkConnectivity();
-
-  return connectivityResult != ConnectivityResult.none;
-}
 
 Color parseColor(String? color) {
   if (color == null || color.isEmpty) return ColorConstants.ebony;

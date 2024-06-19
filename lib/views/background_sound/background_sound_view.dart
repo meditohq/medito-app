@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,11 +21,23 @@ class BackgroundSoundView extends ConsumerStatefulWidget {
 
 class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   final ScrollController _scrollController = ScrollController();
+  var _isConnected = true;
+  late final StreamSubscription _subscription;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
+    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
+        _isConnected = !result.contains(ConnectivityResult.none);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _subscription.cancel();
+    super.dispose();
   }
 
   void _scrollListener() {
@@ -32,18 +46,11 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
 
   @override
   Widget build(BuildContext context) {
-    var connectivityStatus = ref.watch(connectivityStatusProvider);
-
-    ref.listen(connectivityStatusProvider, (prev, next) {
-      if (next == ConnectivityStatus.isDisconnected) {
-        showSnackBar(context, StringConstants.connectivityError);
-      }
-    });
     var localBackgroundSounds =
-        ref.watch(fetchLocallySavedBackgroundSoundsProvider);
+    ref.watch(fetchLocallySavedBackgroundSoundsProvider);
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
 
-    if (connectivityStatus == ConnectivityStatus.isDisconnected) {
+    if (!_isConnected) {
       return Scaffold(
         body: localBackgroundSounds.when(
           skipLoadingOnRefresh: true,
@@ -51,7 +58,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
           data: (data) {
             if (data != null) {
               return _mainContent(
-                connectivityStatus,
+                _isConnected,
                 data,
               );
             }
@@ -77,7 +84,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       body: backgroundSounds.when(
         skipLoadingOnRefresh: false,
         data: (data) => _mainContent(
-          connectivityStatus,
+          _isConnected,
           data,
         ),
         error: (err, stack) {
@@ -92,12 +99,14 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
   }
 
   RefreshIndicator _mainContent(
-    ConnectivityStatus status,
-    List<BackgroundSoundsModel> data,
-  ) {
+      bool isConnected,
+      List<BackgroundSoundsModel> data,
+      ) {
     return RefreshIndicator(
       onRefresh: () async {
-        if (status == ConnectivityStatus.isDisconnected) {
+        if (!isConnected) {
+          showSnackBar(context, StringConstants.connectivityError);
+
           return;
         } else {
           ref.invalidate(backgroundSoundsProvider);
@@ -118,8 +127,8 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
               Column(
                 children: data
                     .map((e) => SoundListTileWidget(
-                          sound: e,
-                        ))
+                  sound: e,
+                ))
                     .toList(),
               ),
               height32,

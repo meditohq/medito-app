@@ -8,6 +8,7 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,11 +27,24 @@ class PackView extends ConsumerStatefulWidget {
 class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   final ScrollController _scrollController = ScrollController();
+  var isConnected = true;
+  late final StreamSubscription _subscription;
 
   @override
   void initState() {
-    _scrollController.addListener(_scrollListener);
     super.initState();
+    _scrollController.addListener(_scrollListener);
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> event) {
+      isConnected = !event.contains(ConnectivityResult.none);
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -149,35 +163,33 @@ class _PackViewState extends ConsumerState<PackView>
     String? path,
     BuildContext context,
   ) {
-    checkConnectivity().then((value) {
-      if (value) {
-        var location = GoRouter.of(context).location;
-        if (type == TypeConstants.pack) {
-          if (location.contains('pack2')) {
-            unawaited(handleNavigation(
-              RouteConstants.pack3Path,
-              [location.split('/')[2], widget.id, id.toString()],
-              context,
-            ));
-          } else {
-            unawaited(handleNavigation(
-              RouteConstants.pack2Path,
-              [widget.id, id.toString()],
-              context,
-            ));
-          }
+    if (isConnected) {
+      var location = GoRouter.of(context).location;
+      if (type == TypeConstants.pack) {
+        if (location.contains('pack2')) {
+          unawaited(handleNavigation(
+            RouteConstants.pack3Path,
+            [location.split('/')[2], widget.id, id.toString()],
+            context,
+          ));
         } else {
           unawaited(handleNavigation(
-            type,
-            [id.toString(), path],
+            RouteConstants.pack2Path,
+            [widget.id, id.toString()],
             context,
-            ref: ref,
           ));
         }
       } else {
-        createSnackBar(StringConstants.checkConnection, context);
+        unawaited(handleNavigation(
+          type,
+          [id.toString(), path],
+          context,
+          ref: ref,
+        ));
       }
-    });
+    } else {
+      createSnackBar(StringConstants.checkConnection, context);
+    }
   }
 
   @override

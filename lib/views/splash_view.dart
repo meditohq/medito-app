@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/widgets/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,12 +17,29 @@ class SplashView extends ConsumerStatefulWidget {
 }
 
 class _SplashViewState extends ConsumerState<SplashView> {
-  bool maintenance = false;
+  var _isConnected = true;
+  late final StreamSubscription _subscription;
 
   @override
   void initState() {
-    initializeUser();
     super.initState();
+    initializeUser();
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      setState(() {
+        _isConnected = !result.contains(ConnectivityResult.none);
+        if (!_isConnected) {
+          showSnackBar(context, StringConstants.connectivityError);
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   void initializeUser() async {
@@ -37,13 +57,6 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(connectivityStatusProvider, (previous, next) {
-      var isDisconnected = next == ConnectivityStatus.isDisconnected;
-      if (isDisconnected) {
-        showSnackBar(context, StringConstants.connectivityError);
-      }
-    });
-
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: Center(
