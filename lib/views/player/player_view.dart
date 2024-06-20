@@ -1,5 +1,5 @@
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/routes/routes.dart';
+import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
@@ -7,9 +7,7 @@ import 'package:Medito/views/player/widgets/overlay_cover_image_widget.dart';
 import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../constants/strings/route_constants.dart';
 import '../../constants/strings/string_constants.dart';
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
@@ -38,7 +36,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     var currentlyPlayingTrack = ref.watch(playerProvider);
     if (currentlyPlayingTrack == null) {
       return MeditoErrorWidget(
-        onTap: () => router.pop(),
+        onTap: () => Navigator.pop(context),
         message: StringConstants.unableToLoadAudio,
       );
     }
@@ -129,15 +127,41 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
   }
 
-  void _handleClose(bool _) {
-    _resetState();
-    _stopAudio();
-    ref
-        .read(playerProvider.notifier)
-        .cancelBackgroundThreadForAudioCompleteEvent();
-    _endScreenOpened = false;
+  bool _isClosing = false;
 
-    router.pop();
+  void _handleClose(bool _) {
+    if (_isClosing) {
+      print('Close operation already in progress, skipping.');
+      return;
+    }
+    _isClosing = true;
+
+    print(
+        '!!! Attempting to close. Current Navigator state: canPop=${Navigator.canPop(context)}');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print(
+          '!!! Current navigator observers: ${Navigator.of(context).widget.observers}');
+      print(
+          '!!! Current navigator pages: ${Navigator.of(context).widget.pages}');
+
+      if (Navigator.canPop(context)) {
+        print('!!! Navigator can pop, proceeding with pop operation.');
+        _resetState();
+        _stopAudio();
+        ref
+            .read(playerProvider.notifier)
+            .cancelBackgroundThreadForAudioCompleteEvent();
+        _endScreenOpened = false;
+
+        Future.delayed(Duration(milliseconds: 50), () {
+          Navigator.pop(context);
+          _isClosing = false;
+        });
+      } else {
+        print('!!! Navigator cannot pop. Skipping pop operation.');
+        _isClosing = false;
+      }
+    });
   }
 
   void _stopAudio() {
@@ -156,12 +180,17 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       if (!_endScreenOpened) {
         _resetState();
         var currentlyPlayingTrack = ref.read(playerProvider);
-        context.pushReplacement(
-          RouteConstants.endScreenPath,
-          extra: currentlyPlayingTrack,
-        );
+        if (currentlyPlayingTrack != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  EndScreenView(trackModel: currentlyPlayingTrack),
+            ),
+          );
 
-        _endScreenOpened = true;
+          _endScreenOpened = true;
+        }
       }
     });
   }

@@ -6,7 +6,6 @@ import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NotificationPermissionView extends ConsumerStatefulWidget {
@@ -32,7 +31,7 @@ class _NotificationPermissionViewState
       var status =
           await ref.refresh(notificationPermissionStatusProvider.future);
       if (status == AuthorizationStatus.authorized) {
-        context.pop();
+        Navigator.pop(context);
       }
     }
   }
@@ -201,13 +200,13 @@ class _NotificationPermissionViewState
             false,
           );
     }
-    context.pop();
+    Navigator.pop(context);
   }
 
   void _handleNotNow() async {
     await ref.read(updateNotificationPermissionCountProvider.future);
     ref.read(getNotificationPermissionCountProvider);
-    context.pop();
+    Navigator.pop(context);
   }
 
   void _handleOpenSettings() async {

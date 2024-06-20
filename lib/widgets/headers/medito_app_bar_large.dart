@@ -1,7 +1,6 @@
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class MeditoAppBarLarge extends StatefulWidget {
   const MeditoAppBarLarge({
@@ -43,7 +42,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
       backgroundColor: ColorConstants.onyx,
       leading: IconButton(
         icon: Icon(Icons.close_rounded),
-        onPressed: () => context.pop(),
+        onPressed: () => Navigator.pop(context),
       ),
       flexibleSpace: _flexibleSpaceBar(
         titlePadding,

@@ -61,7 +61,7 @@ class NetworkImageWidget extends ConsumerWidget {
               return errorWidget!;
             }
 
-            return const Icon(Icons.error);
+            return _shimmerLoading();
           },
         );
       }

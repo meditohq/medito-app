@@ -4,7 +4,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../views/downloads/downloads_view.dart';
 
 class MeditoErrorWidget extends ConsumerWidget {
   const MeditoErrorWidget({
@@ -85,8 +86,11 @@ class MeditoErrorWidget extends ConsumerWidget {
                         color: ColorConstants.lightPurple,
                       ),
                       recognizer: TapGestureRecognizer()
-                        ..onTap =
-                            () => context.push(RouteConstants.downloadsPath),
+                        ..onTap = () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => DownloadsView(),
+                              ),
+                            ),
                     ),
                 ],
               ),

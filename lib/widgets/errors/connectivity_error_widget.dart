@@ -7,7 +7,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class ConnectivityErrorWidget extends ConsumerStatefulWidget {
   const ConnectivityErrorWidget({super.key});
@@ -45,15 +44,16 @@ class _ConnectivityErrorComponentState
   }
 
   void _refreshAPI() {
-    var location = GoRouter.of(context).location;
-    var id = location.split('/').last;
-    var isFolder = location.contains('folder');
-    var isTrack = location.contains('track');
-    if (isFolder && isTrack) {
-      ref.read(tracksProvider(trackId: id));
-    } else if (isFolder && !isTrack) {
-      ref.read(packProvider(packId: id));
-    }
+    // var location = GoRouter.of(context).location;
+    // var isFolder = location.contains('folder');
+    // var isTrack = location.contains('track');
+    // var currentlyPlayingTrack = ref.watch(playerProvider);
+    // var id = currentlyPlayingTrack?.id ?? '';
+    // if (isFolder && isTrack) {
+    //   ref.read(tracksProvider(trackId: id));
+    // } else if (isFolder && !isTrack) {
+    //   ref.read(packProvider(packId: id));
+    // }
   }
 
   @override

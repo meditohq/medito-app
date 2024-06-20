@@ -18,9 +18,10 @@ import 'dart:io';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:Medito/views/splash_view.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -138,13 +139,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    final goRouter = ref.watch(goRouterProvider);
-
-    return MaterialApp.router(
-      routerConfig: goRouter,
+    return MaterialApp(
       scaffoldMessengerKey: scaffoldMessengerKey,
       theme: appTheme(context),
       title: ParentWidget._title,
+      home: SplashView(),
     );
   }
 }

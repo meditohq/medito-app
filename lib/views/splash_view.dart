@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:Medito/views/downloads/downloads_view.dart';
+import 'package:Medito/views/root/root_page_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
+
+import 'home/home_view.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
@@ -45,10 +49,16 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initializeUser() async {
     var response = await ref.read(userInitializationProvider.future);
     if (response == UserInitializationStatus.successful) {
-      context.go(RouteConstants.bottomNavbarPath);
+      await Navigator.of(context).pushReplacement(MaterialPageRoute(builder:
+        (context) => RootPageView(
+          firstChild: BottomNavigationBarView(),
+        ),
+      ));
     } else if (response == UserInitializationStatus.error) {
       showSnackBar(context, StringConstants.timeout);
-      context.go(RouteConstants.downloadsPath);
+      await Navigator.of(context).pushReplacement(MaterialPageRoute(builder:
+        (context) => DownloadsView(),
+      ));
     } else if (response == UserInitializationStatus.retry) {
       ref.invalidate(userInitializationProvider);
       initializeUser();
