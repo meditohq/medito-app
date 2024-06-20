@@ -6,6 +6,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:Medito/widgets/snackbar_widget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -187,7 +188,6 @@ void _navigate(
   WidgetRef ref,
   NotificationPayloadModel data,
 ) {
-  var goRouterContext = ref.read(goRouterProvider);
   if (data.type.isNotNullAndNotEmpty()) {
     handleNavigation(
       data.type,
@@ -196,7 +196,11 @@ void _navigate(
       ref: ref,
     );
   } else {
-    goRouterContext.go(RouteConstants.bottomNavbarPath);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BottomNavigationBarView(),
+      ),
+    );
   }
 }
 

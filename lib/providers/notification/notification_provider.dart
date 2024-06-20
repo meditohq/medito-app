@@ -5,8 +5,9 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../views/notifications/notification_permission_view.dart';
 
 part 'notification_provider.g.dart';
 
@@ -22,10 +23,20 @@ final checkNotificationPermissionProvider =
         if (Platform.isAndroid &&
             isPermissionStatusInLocalStorage == null &&
             value == AuthorizationStatus.denied) {
-          context.push(RouteConstants.notificationPermissionPath);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NotificationPermissionView(),
+            ),
+          );
         } else if (Platform.isIOS &&
             value == AuthorizationStatus.notDetermined) {
-          context.push(RouteConstants.notificationPermissionPath);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NotificationPermissionView(),
+            ),
+          );
         }
       });
     }

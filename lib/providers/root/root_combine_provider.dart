@@ -4,15 +4,14 @@ import 'dart:io';
 import 'package:Medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../constants/strings/route_constants.dart';
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../models/user/user_token_model.dart';
 import '../../services/notifications/notifications_service.dart';
 import '../../utils/call_update_stats.dart';
+import '../../views/maintenance/maintenance_view.dart';
 import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
@@ -65,9 +64,13 @@ void checkMaintenance(ProviderRef<void> ref, BuildContext context) {
           var buildNumber = int.parse(deviceInfo.buildNumber);
           if (maintenanceData.isUnderMaintenance ||
               (maintenanceData.minimumBuildNumber ?? 0) > buildNumber) {
-            context.push(
-              RouteConstants.maintenancePath,
-              extra: maintenanceData,
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MaintenanceView(
+                  maintenanceModel: maintenanceData,
+                ),
+              ),
             );
           }
         },

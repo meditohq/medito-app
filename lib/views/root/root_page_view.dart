@@ -8,7 +8,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class RootPageView extends ConsumerStatefulWidget {
   final Widget firstChild;
@@ -21,17 +20,24 @@ class RootPageView extends ConsumerStatefulWidget {
 
 class _RootPageViewState extends ConsumerState<RootPageView> {
   var _isConnected = true;
-  late final StreamSubscription _subscription;
+  late final StreamSubscription<List<ConnectivityResult>> _subscription;
 
   @override
   void initState() {
     super.initState();
     ref.read(rootCombineProvider(context));
     checkInitialMessage(context, ref);
-    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
-      setState(() {
-        _isConnected = !result.contains(ConnectivityResult.none);
-      });
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      _isConnected = !result.contains(ConnectivityResult.none);
+
+      if (!_isConnected) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ConnectivityErrorWidget()),
+        );
+      }
     });
   }
 
@@ -45,18 +51,18 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   Widget build(BuildContext context) {
     ref.listen(
       playerProvider,
-          (prev, next) {
+      (prev, next) {
         var prevId = prev?.audio.first.files.first.id;
         var nextId = next?.audio.first.files.first.id;
         if (next != null &&
             (prev?.id != next.id ||
                 (prev?.id == next.id && prevId != nextId))) {
           ref.read(playerProvider.notifier).handleAudioStartedEvent(
-            next.audio.first.guideName ?? '',
-            next.id,
-            next.audio.first.files.first.id,
-            next.audio.first.files.first.duration,
-          );
+                next.audio.first.guideName ?? '',
+                next.id,
+                next.audio.first.files.first.id,
+                next.audio.first.files.first.duration,
+              );
         }
       },
     );
@@ -72,28 +78,12 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
             Stack(
               alignment: Alignment.bottomCenter,
               children: [
-                _renderChild(
-                  context,
-                  _isConnected,
-                ),
+                widget.firstChild,
               ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _renderChild(BuildContext context, bool isConnected) {
-    var location = GoRouter.of(context).location;
-    if (location == RouteConstants.downloadsPath) {
-      return widget.firstChild;
-    } else if ((location != RouteConstants.downloadsPath &&
-        location != RouteConstants.playerPath) &&
-        !isConnected) {
-      return ConnectivityErrorWidget();
-    } else {
-      return widget.firstChild;
-    }
   }
 }

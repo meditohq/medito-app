@@ -201,12 +201,6 @@ Future<bool> areGooglePlayServicesAvailable() async {
   }
 }
 
-extension SanitisePath on String {
-  String sanitisePath() {
-    return replaceFirst('/', '');
-  }
-}
-
 extension GetIdFromPath on String {
   String getIdFromPath() {
     return split('/').last;

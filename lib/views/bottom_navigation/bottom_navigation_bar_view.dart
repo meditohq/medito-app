@@ -6,23 +6,22 @@ import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BottomNavigationBarView extends ConsumerStatefulWidget {
-  BottomNavigationBarView({super.key});
-
+class BottomNavigationBarView extends StatefulWidget {
   @override
-  ConsumerState<BottomNavigationBarView> createState() =>
-      _BottomNavigationBarViewState();
+  _BottomNavigationBarViewState createState() => _BottomNavigationBarViewState();
 }
 
-class _BottomNavigationBarViewState
-    extends ConsumerState<BottomNavigationBarView>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
   int _currentPageIndex = 0;
   late PageController _pageController;
   late final StreamSubscription _subscription;
   var _isConnected = true;
+
+  final List<Widget> _pages = [
+    HomeView(),
+    ExploreView(),
+  ];
 
   final List<NavigationDestination> _navigationBarItems = [
     NavigationDestination(
@@ -40,9 +39,7 @@ class _BottomNavigationBarViewState
   @override
   void initState() {
     _pageController = PageController(initialPage: _currentPageIndex);
-    _subscription = Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
+    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
       setState(() {
         _isConnected = !result.contains(ConnectivityResult.none);
       });
@@ -59,11 +56,6 @@ class _BottomNavigationBarViewState
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    if (!_isConnected) {
-      return ConnectivityErrorWidget();
-    }
-
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: NavigationBar(
@@ -73,12 +65,12 @@ class _BottomNavigationBarViewState
         selectedIndex: _currentPageIndex,
         destinations: _navigationBarItems,
       ),
-      body: PageView(
+      body: _isConnected ? PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
         physics: NeverScrollableScrollPhysics(),
-        children: <Widget>[HomeView(), ExploreView()],
-      ),
+        children: _pages,
+      ) : ConnectivityErrorWidget(),
     );
   }
 
@@ -94,7 +86,4 @@ class _BottomNavigationBarViewState
       _currentPageIndex = index;
     });
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

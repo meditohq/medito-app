@@ -11,7 +11,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../widgets/headers/description_widget.dart';
 
@@ -108,7 +107,6 @@ class _PackViewState extends ConsumerState<PackView>
             onTap: () => _onListItemTap(
               packItem.id,
               packItem.type,
-              packItem.path,
               ref.context,
             ),
             child: _buildListTile(
@@ -128,7 +126,7 @@ class _PackViewState extends ConsumerState<PackView>
       children: [
         InkWell(
           onTap: () {
-            _onListItemTap(item.id, item.type, item.path, context);
+            _onListItemTap(item.id, item.type, context);
           },
           splashColor: ColorConstants.charcoal,
           child: item.type == TypeConstants.pack
@@ -158,35 +156,12 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   void _onListItemTap(
-    String? id,
-    String? type,
-    String? path,
+    String id,
+    String type,
     BuildContext context,
   ) {
     if (isConnected) {
-      var location = GoRouter.of(context).location;
-      if (type == TypeConstants.pack) {
-        if (location.contains('pack2')) {
-          unawaited(handleNavigation(
-            RouteConstants.pack3Path,
-            [location.split('/')[2], widget.id, id.toString()],
-            context,
-          ));
-        } else {
-          unawaited(handleNavigation(
-            RouteConstants.pack2Path,
-            [widget.id, id.toString()],
-            context,
-          ));
-        }
-      } else {
-        unawaited(handleNavigation(
-          type,
-          [id.toString(), path],
-          context,
-          ref: ref,
-        ));
-      }
+      handleNavigation(type, [id], context);
     } else {
       createSnackBar(StringConstants.checkConnection, context);
     }

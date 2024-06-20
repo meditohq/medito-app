@@ -11,9 +11,9 @@ import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../providers/background_sounds/background_sounds_notifier.dart';
+import '../bottom_navigation/bottom_navigation_bar_view.dart';
+import '../player/player_view.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
   @override
@@ -35,11 +35,15 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       appBar: MeditoAppBarSmall(
         title: StringConstants.downloads,
         closePressed: () {
-          if (context.canPop()) {
-            context.pop();
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
           } else {
             ref.read(refreshHomeAPIsProvider.future);
-            context.go(RouteConstants.bottomNavbarPath);
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => BottomNavigationBarView(),
+              ),
+            );
           }
         },
         isTransparent: true,
@@ -150,13 +154,16 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     WidgetRef ref,
     TrackModel trackModel,
   ) async {
-    // final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
-    // bgSoundNotifier.getVolumeFromPref();
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,
         );
-    unawaited(context.push(RouteConstants.playerPath));
+    unawaited(Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlayerView(),
+      ),
+    ));
   }
 
   void _handleDismissible(DismissDirection _, TrackModel item) {

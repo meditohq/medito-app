@@ -13,8 +13,6 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'dart:async';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
@@ -23,9 +21,9 @@ import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
+import '../player/player_view.dart';
 
 class TrackView extends ConsumerStatefulWidget {
   final String id;
@@ -61,14 +59,19 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackFilesModel file,
   ) async {
     try {
-      final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
-      bgSoundNotifier.getVolumeFromPref();
-      bgSoundNotifier.playBackgroundSoundFromPref();
+      // final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+      // bgSoundNotifier.getVolumeFromPref();
+      // bgSoundNotifier.playBackgroundSoundFromPref();
       await ref.read(playerProvider.notifier).loadSelectedTrack(
             trackModel: trackModel,
             file: file,
           );
-      unawaited(context.push(RouteConstants.playerPath));
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PlayerView(),
+        ),
+      );
     } catch (e) {
       print(e);
     }
