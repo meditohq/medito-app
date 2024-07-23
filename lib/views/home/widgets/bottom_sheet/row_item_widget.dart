@@ -2,15 +2,27 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
+class IconType {
+  final IconData? iconData;
+  final String? iconString;
+
+  IconType.fromIconData(this.iconData) : iconString = null;
+
+  IconType.fromString(this.iconString) : iconData = null;
+}
+
 class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
     super.key,
     required this.title,
     this.subTitle,
-    required this.iconCodePoint,
+    required this.icon,
     this.hasUnderline = true,
     this.onTap,
     this.isTrailingIcon = true,
+    this.isSwitch = false,
+    this.switchValue,
+    this.onSwitchChanged,
     this.titleStyle,
     this.trailingIconSize = 24,
     this.leadingIconSize = 24,
@@ -20,11 +32,14 @@ class RowItemWidget extends StatelessWidget {
 
   final String title;
   final String? subTitle;
-  final String iconCodePoint;
+  final IconType icon;
   final String? iconColor;
   final bool hasUnderline;
   final void Function()? onTap;
   final bool isTrailingIcon;
+  final bool isSwitch;
+  final bool? switchValue;
+  final ValueChanged<bool>? onSwitchChanged;
   final TextStyle? titleStyle;
   final double leadingIconSize;
   final double trailingIconSize;
@@ -35,9 +50,9 @@ class RowItemWidget extends StatelessWidget {
     var border = Border(
       bottom: hasUnderline
           ? BorderSide(
-              width: 0.7,
-              color: ColorConstants.ebony,
-            )
+        width: 0.7,
+        color: ColorConstants.ebony,
+      )
           : BorderSide.none,
     );
 
@@ -59,16 +74,7 @@ class RowItemWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    IconData(
-                      formatIcon(iconCodePoint),
-                      fontFamily: 'MaterialIcons',
-                    ),
-                    color: iconColor != null
-                        ? ColorConstants.getColorFromString(iconColor!)
-                        : null,
-                    size: leadingIconSize,
-                  ),
+                  _buildIcon(),
                   width16,
                   SelectableText.rich(
                     enableInteractiveSelection: enableInteractiveSelection,
@@ -88,13 +94,16 @@ class RowItemWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              Visibility(
-                visible: isTrailingIcon,
-                child: Icon(
+              if (isTrailingIcon && !isSwitch)
+                Icon(
                   Icons.chevron_right,
                   size: trailingIconSize,
                 ),
-              ),
+              if (isSwitch)
+                Switch(
+                  value: switchValue ?? false,
+                  onChanged: onSwitchChanged,
+                ),
             ],
           ),
         ),
@@ -102,14 +111,36 @@ class RowItemWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildIcon() {
+    IconData iconData;
+    if (icon.iconData != null) {
+      iconData = icon.iconData!;
+    } else if (icon.iconString != null) {
+      iconData = IconData(
+        formatIcon(icon.iconString!),
+        fontFamily: 'MaterialIcons',
+      );
+    } else {
+      iconData = Icons.error;
+    }
+
+    return Icon(
+      iconData,
+      color: iconColor != null
+          ? ColorConstants.getColorFromString(iconColor!)
+          : null,
+      size: leadingIconSize,
+    );
+  }
+
   TextSpan _subtitle(BuildContext context) {
     return TextSpan(
       text: '${subTitle != null ? '\n$subTitle' : ''}',
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: ColorConstants.graphite,
-            letterSpacing: 0,
-            height: 1.7,
-          ),
+        color: ColorConstants.graphite,
+        letterSpacing: 0,
+        height: 1.7,
+      ),
     );
   }
 }

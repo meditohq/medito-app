@@ -51,10 +51,10 @@ class StatsBottomSheetWidget extends ConsumerWidget {
   }
 
   Column _statsList(
-    BuildContext context,
-    GlobalKey key,
-    StatsModel stats,
-  ) {
+      BuildContext context,
+      GlobalKey key,
+      StatsModel stats,
+      ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -65,7 +65,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             child: Column(
               children: stats.all.map((e) {
                 return RowItemWidget(
-                  iconCodePoint: e.icon,
+                  icon: IconType.fromString(e.icon),
                   iconColor: e.color,
                   trailingIconSize: 20,
                   title: e.title,
@@ -73,10 +73,10 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                   hasUnderline: e.title != stats.all.last.title,
                   isTrailingIcon: false,
                   titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: DmSans,
-                      ),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: DmSans,
+                  ),
                 );
               }).toList(),
             ),
