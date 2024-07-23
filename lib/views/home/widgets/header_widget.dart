@@ -14,14 +14,12 @@ class HeaderWidget extends ConsumerStatefulWidget {
 
   const HeaderWidget({
     super.key,
-    required this.menuData,
     required this.statsData,
     required this.onStatsButtonTap,
     required this.greeting,
   });
 
   final String greeting;
-  final List<HomeMenuModel> menuData;
   final StatsModel? statsData;
   final VoidCallback onStatsButtonTap;
 
@@ -50,7 +48,6 @@ class _HeaderAndAnnouncementWidgetState
       children: [
         HomeHeaderWidget(
           greeting: widget.greeting,
-          homeMenuModel: widget.menuData,
         ),
         height8,
         StatsRow(

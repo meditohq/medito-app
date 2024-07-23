@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/pack/pack_view.dart';
+import 'package:Medito/views/settings/settings_screen.dart';
 import 'package:Medito/views/track/track_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,6 +66,13 @@ Future<void> handleNavigation(
     await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
 
     return;
+  } else if (place != null && place.contains('settings')) {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SettingsScreen(),
+      ),
+    );
   } else if (place == TypeConstants.email) {
     if (ref != null) {
       var deviceAppAndUserInfo =
