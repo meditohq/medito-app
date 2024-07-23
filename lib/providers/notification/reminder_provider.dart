@@ -1,4 +1,5 @@
 import 'package:Medito/constants/strings/string_constants.dart';
+import 'package:Medito/utils/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,10 +19,17 @@ class ReminderProvider {
   }
 
   Future<void> _initializeNotifications() async {
+    await requestNotificationPermissions();
     tz.initializeTimeZones();
     const initializationSettingsAndroid = AndroidInitializationSettings('logo');
+    const initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
     );
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
