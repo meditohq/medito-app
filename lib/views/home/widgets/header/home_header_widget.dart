@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../providers/notification/reminder_provider.dart';
+import '../../../../providers/shared_preference/shared_preference_provider.dart';
 import '../bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../bottom_sheet/menu/menu_bottom_sheet_widget.dart';
 
@@ -26,13 +31,14 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _welcomeWidget(context),
-          Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 34),
-                child: _menuWidget(context),
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.only(top: 34),
+            child: Row(
+              children: [
+                _notificationWidget(context, ref),
+                _menuWidget(context),
+              ],
+            ),
           ),
         ],
       ),
@@ -98,6 +104,91 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _notificationWidget(BuildContext context, WidgetRef ref) {
+    return Material(
+      type: MaterialType.transparency,
+      shape: CircleBorder(),
+      clipBehavior: Clip.hardEdge,
+      child: IconButton(
+        icon: const Icon(
+          Icons.notifications,
+          size: 24,
+        ),
+        onPressed: () {
+          _selectTime(context, ref);
+        },
+      ),
+    );
+  }
+
+  Future<void> _selectTime(BuildContext context, WidgetRef ref) async {
+    var prefs = ref.read(sharedPreferencesProvider);
+
+    final initialTime = _getInitialTime(prefs);
+
+    //REMOVE
+    await ref.read(reminderProvider).cancelAllNotifications();
+
+    final pickedTime = await _showTimePicker(context, initialTime);
+
+    if (pickedTime != null) {
+      await _scheduleNotification(context, ref, pickedTime);
+      await _savePickedTime(prefs, pickedTime);
+      _showSnackBar(context, pickedTime);
+    }
+  }
+
+  TimeOfDay _getInitialTime(SharedPreferences prefs) {
+    var savedHour = prefs.getInt(SharedPreferenceConstants.savedHours) ??
+        TimeOfDay.now().hour;
+    var savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes) ??
+        (TimeOfDay.now().minute + 1);
+
+    return TimeOfDay(hour: savedHour, minute: savedMinute);
+  }
+
+  Future<TimeOfDay?> _showTimePicker(
+    BuildContext context,
+    TimeOfDay initialTime,
+  ) {
+    return showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      helpText: StringConstants.pickTimeHelpText,
+    );
+  }
+
+  Future<void> _scheduleNotification(
+    BuildContext context,
+    WidgetRef ref,
+    TimeOfDay pickedTime,
+  ) async {
+    await ref.read(reminderProvider).scheduleDailyNotification(pickedTime);
+    var pendingNotifications =
+        await ref.read(reminderProvider).getPendingNotifications();
+    showSnackBar(context, pendingNotifications.map((e) => e.title).join(', '));
+  }
+
+  Future<void> _savePickedTime(
+    SharedPreferences prefs,
+    TimeOfDay pickedTime,
+  ) async {
+    await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
+    await prefs.setInt(
+      SharedPreferenceConstants.savedMinutes,
+      pickedTime.minute,
+    );
+  }
+
+  void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
+    showSnackBar(
+      context,
+      StringConstants.reminderNotificationScheduled +
+          ' ' +
+          pickedTime.format(context),
     );
   }
 

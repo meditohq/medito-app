@@ -20,7 +20,6 @@ import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/utils/utils.dart';
-import 'package:Medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';

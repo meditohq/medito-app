@@ -24,6 +24,7 @@ Future<bool> requestNotificationPermissions() async {
 
     final grantedNotificationPermission =
     await androidImplementation?.requestNotificationsPermission();
+    await androidImplementation?.requestExactAlarmsPermission();
 
     return grantedNotificationPermission ?? false;
   } else {
