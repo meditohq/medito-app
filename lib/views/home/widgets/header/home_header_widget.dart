@@ -8,12 +8,10 @@ import '../../../settings/settings_screen.dart';
 class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   const HomeHeaderWidget({
     Key? key,
-    required this.homeMenuModel,
     required this.greeting,
   }) : super(key: key);
 
   final String greeting;
-  final List<HomeMenuModel> homeMenuModel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -64,7 +62,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) =>
-                  SettingsScreen(homeMenuModel: homeMenuModel),
+                  SettingsScreen(),
             ),
           );
         },

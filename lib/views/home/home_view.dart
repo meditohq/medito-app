@@ -104,7 +104,6 @@ class _HomeViewState extends ConsumerState<HomeView>
             toolbarHeight: 150.0,
             title: HeaderWidget(
               greeting: homeData.greeting ?? StringConstants.welcome,
-              menuData: homeData.menu,
               statsData: stats.value,
               onStatsButtonTap: () => _onStatsButtonTapped(context, ref),
             ),

@@ -30,10 +30,7 @@ TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
 }
 
 class SettingsScreen extends ConsumerWidget {
-  final List<HomeMenuModel> homeMenuModel;
-
-  const SettingsScreen({Key? key, required this.homeMenuModel})
-      : super(key: key);
+  const SettingsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -72,32 +69,44 @@ class SettingsScreen extends ConsumerWidget {
     bool isNotificationMenuVisible,
     WidgetRef ref,
   ) {
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDailyNotificationTile(context, ref),
-          ...homeMenuModel.map((element) {
-            var isNotificationPath = element.path ==
-                RouteConstants.notificationPermissionPath.sanitisePath();
+    final home = ref.watch(fetchHomeProvider);
 
-            if (!isNotificationMenuVisible && isNotificationPath) {
-              return SizedBox();
-            }
-
-            return RowItemWidget(
-              enableInteractiveSelection: false,
-              icon: IconType.fromString(element.icon),
-              title: element.title,
-              hasUnderline: element.id != homeMenuModel.last.id,
-              onTap: () {
-                handleItemPress(context, ref, element);
-              },
-            );
-          }).toList(),
-        ],
+    return home.when(
+      loading: () => HomeShimmerWidget(),
+      error: (err, stack) => MeditoErrorWidget(
+        message: home.error.toString(),
+        onTap: () => _onRefresh(ref),
+        isLoading: home.isLoading,
       ),
+      data: (HomeModel homeData) {
+        return SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDailyNotificationTile(context, ref),
+              ...homeData.menu.map((element) {
+                var isNotificationPath = element.path ==
+                    RouteConstants.notificationPermissionPath.sanitisePath();
+
+                if (!isNotificationMenuVisible && isNotificationPath) {
+                  return SizedBox();
+                }
+
+                return RowItemWidget(
+                  enableInteractiveSelection: false,
+                  icon: IconType.fromString(element.icon),
+                  title: element.title,
+                  hasUnderline: element.id != homeData.menu.last.id,
+                  onTap: () {
+                    handleItemPress(context, ref, element);
+                  },
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -113,6 +122,9 @@ class SettingsScreen extends ConsumerWidget {
           : null,
       hasUnderline: true,
       isSwitch: true,
+      onTap: () {
+          _selectTime(context, ref);
+      },
       switchValue: reminderTime != null,
       onSwitchChanged: (value) {
         if (value) {
@@ -122,6 +134,11 @@ class SettingsScreen extends ConsumerWidget {
         }
       },
     );
+  }
+
+  Future<void> _onRefresh(WidgetRef ref) async {
+    ref.invalidate(refreshHomeAPIsProvider);
+    await ref.read(refreshHomeAPIsProvider.future);
   }
 
   void _clearReminder(BuildContext context, WidgetRef ref) async {
@@ -177,7 +194,9 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _savePickedTime(
-      SharedPreferences prefs, TimeOfDay pickedTime) async {
+    SharedPreferences prefs,
+    TimeOfDay pickedTime,
+  ) async {
     await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
     await prefs.setInt(
         SharedPreferenceConstants.savedMinutes, pickedTime.minute);
