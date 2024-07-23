@@ -146,4 +146,10 @@ class StringConstants {
   static const String noTimeSelected = 'No time selected';
   static const String pickTimeHelpText = 'Pick a time for your reminder';
   static const String reminderNotificationScheduled = 'Reminder notification scheduled at';
+  static var dailyReminderTitle  = 'Daily Reminder';
+  static var setFor = 'Set for';
+
+  static var settings = 'Settings';
+  static var reminderNotificationCleared = 'Reminder cancelled';
+  static var clearReminder = 'Cancel Reminder';
 }
