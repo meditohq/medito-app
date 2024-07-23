@@ -129,13 +129,10 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
 
     final initialTime = _getInitialTime(prefs);
 
-    //REMOVE
-    await ref.read(reminderProvider).cancelAllNotifications();
-
     final pickedTime = await _showTimePicker(context, initialTime);
 
     if (pickedTime != null) {
-      await _scheduleNotification(context, ref, pickedTime);
+      await _scheduleNotification(ref, pickedTime);
       await _savePickedTime(prefs, pickedTime);
       _showSnackBar(context, pickedTime);
     }
@@ -162,14 +159,10 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   }
 
   Future<void> _scheduleNotification(
-    BuildContext context,
     WidgetRef ref,
     TimeOfDay pickedTime,
   ) async {
     await ref.read(reminderProvider).scheduleDailyNotification(pickedTime);
-    var pendingNotifications =
-        await ref.read(reminderProvider).getPendingNotifications();
-    showSnackBar(context, pendingNotifications.map((e) => e.title).join(', '));
   }
 
   Future<void> _savePickedTime(

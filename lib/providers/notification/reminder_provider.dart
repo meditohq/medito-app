@@ -2,8 +2,8 @@ import 'package:Medito/constants/strings/string_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final reminderProvider = Provider<ReminderProvider>((ref) {
   return ReminderProvider();
@@ -11,7 +11,7 @@ final reminderProvider = Provider<ReminderProvider>((ref) {
 
 class ReminderProvider {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   ReminderProvider() {
     _initializeNotifications();
@@ -29,14 +29,8 @@ class ReminderProvider {
   Future<void> scheduleDailyNotification(TimeOfDay pickedTime) async {
     try {
       final now = DateTime.now();
-      final localTimezone = tz.getLocation(tz.local.name);
-      print('Current time (now): $now');
-      print('Local timezone: ${localTimezone.name}');
 
-      print('Picked time: ${pickedTime.hour}:${pickedTime.minute}');
-
-      var scheduledDate = tz.TZDateTime(
-        localTimezone,
+      var scheduledDate = DateTime(
         now.year,
         now.month,
         now.day,
@@ -44,17 +38,17 @@ class ReminderProvider {
         pickedTime.minute,
       );
 
-      if (scheduledDate.isBefore(tz.TZDateTime.now(localTimezone))) {
+      if (scheduledDate.isBefore(now)) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
 
-      print('Adjusted scheduledDate: $scheduledDate');
+      final scheduledDateTz = tz.TZDateTime.from(scheduledDate, tz.local);
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         dailyNotificationId,
         StringConstants.reminderNotificationTitle,
         StringConstants.reminderNotificationBody,
-        scheduledDate,
+        scheduledDateTz,
         const NotificationDetails(
           android: AndroidNotificationDetails(
             androidNotificationChannelId,
@@ -66,10 +60,10 @@ class ReminderProvider {
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-      print('Notification scheduled for $scheduledDate');
     } catch (e, s) {
       print('Error scheduling notification: $e');
       print('Stack trace: $s');
@@ -78,18 +72,12 @@ class ReminderProvider {
 
   Future<void> cancelDailyNotification() async {
     await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
-    print('Daily notification cancelled');
   }
-
-  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
-    return await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
-  }
-
-  Future<void> cancelAllNotifications() => _flutterLocalNotificationsPlugin.cancelAll();
 }
 
 const androidNotificationChannelId = 'medito_reminder_channel';
 const androidNotificationChannelName = 'Reminders';
 const androidNotificationIcon = 'logo';
-const androidNotificationChannelDescription = 'Notification for meditation reminders';
+const androidNotificationChannelDescription =
+    'Notification for meditation reminders';
 const dailyNotificationId = 10101024;
