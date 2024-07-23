@@ -140,4 +140,10 @@ class StringConstants {
   static const String didYouKnow = 'Did you know?';
   static const String meditoReliesOnYourDonationsToSurvive = 'Medito relies only on your donations to survive. We produce free content to help humanity.';
   static const String donateNow = 'Donate now';
+  static const String reminderNotificationBody = 'It\'s time for your daily meditation. Take a moment to relax and focus.';
+  static const String reminderNotificationTitle = 'Daily Meditation Reminder';
+  static const String selectTime = 'Select Time:';
+  static const String noTimeSelected = 'No time selected';
+  static const String pickTimeHelpText = 'Pick a time for your reminder';
+  static const String reminderNotificationScheduled = 'Reminder notification scheduled at';
 }

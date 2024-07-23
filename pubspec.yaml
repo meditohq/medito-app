@@ -15,6 +15,7 @@ dependencies:
   auto_size_text: ^3.0.0-nullsafety.0
   back_button_interceptor: ^6.0.2
   cached_network_image: ^3.2.3
+  connectivity_plus: ^6.0.3
   device_info_plus: ^9.0.2
   dio: ^5.4.0
   email_validator: '^2.1.16'
@@ -28,11 +29,13 @@ dependencies:
   flutter_markdown: ^0.6.7
   flutter_riverpod: ^2.4.10
   flutter_svg: ^1.1.6
+  flutter_timezone: ^1.0.8
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
   google_api_availability: ^5.0.0
   http: ^0.13.3
   image: ^4.0.17
+  intl: ^0.19.0
   json_annotation: ^4.8.1
   just_audio: ^0.9.37
   package_info_plus: ^4.0.2
@@ -50,8 +53,6 @@ dependencies:
   timezone: ^0.9.3
   url_launcher: ^6.1.14
   uni_links: ^0.5.1
-  flutter_timezone: ^1.0.8
-  connectivity_plus: ^6.0.3
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.1

@@ -28,6 +28,7 @@ class MainActivity : FlutterActivity(), MeditoAndroidAudioServiceManager {
         super.onCreate(savedInstanceState)
 
         createNotificationChannel()
+        createReminderNotificationChannel()
     }
 
     private fun createNotificationChannel() {
@@ -43,6 +44,19 @@ class MainActivity : FlutterActivity(), MeditoAndroidAudioServiceManager {
         notificationManager.createNotificationChannel(channel)
     }
 
+    private fun createReminderNotificationChannel() {
+        val channelName = "Reminders"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel =
+            NotificationChannel(REMINDER_CHANNEL_ID, channelName, importance).apply {
+                description = "Notification for meditation reminders"
+            }
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
     override fun startService() {
         val intent = Intent(this, AudioPlayerService::class.java)
         startForegroundService(intent)
@@ -50,5 +64,6 @@ class MainActivity : FlutterActivity(), MeditoAndroidAudioServiceManager {
 
     companion object {
         const val ENGINE_ID = "medito_flutter_engine"
+        const val REMINDER_CHANNEL_ID = "medito_reminder_channel"
     }
 }
