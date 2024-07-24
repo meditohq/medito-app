@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/notification/reminder_provider.dart';
+import '../home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../home/widgets/bottom_sheet/row_item_widget.dart';
 
 final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
@@ -79,30 +80,52 @@ class SettingsScreen extends ConsumerWidget {
         isLoading: home.isLoading,
       ),
       data: (HomeModel homeData) {
+        var menuItems = homeData.menu.map((element) {
+          var isNotificationPath = element.path ==
+              RouteConstants.notificationPermissionPath.sanitisePath();
+
+          if (!isNotificationMenuVisible && isNotificationPath) {
+            return SizedBox();
+          }
+
+          return RowItemWidget(
+            enableInteractiveSelection: false,
+            icon: IconType.fromString(element.icon),
+            title: element.title,
+            hasUnderline: element.id != homeData.menu.last.id,
+            onTap: () {
+              handleItemPress(context, ref, element);
+            },
+          );
+        }).toList();
+
+        var debugItem = HomeMenuModel(
+          id: 'debug',
+          title: 'Debug Info',
+          icon: 'bug_report',
+          path: 'debug',
+          type: 'action',
+        );
+
+        menuItems.add(
+          RowItemWidget(
+            enableInteractiveSelection: false,
+            icon: IconType.fromIconData(Icons.bug_report),
+            title: debugItem.title,
+            hasUnderline: true,
+            onTap: () {
+              _showDebugBottomSheet(context);
+            },
+          ),
+        );
+
         return SingleChildScrollView(
           physics: BouncingScrollPhysics(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildDailyNotificationTile(context, ref),
-              ...homeData.menu.map((element) {
-                var isNotificationPath = element.path ==
-                    RouteConstants.notificationPermissionPath.sanitisePath();
-
-                if (!isNotificationMenuVisible && isNotificationPath) {
-                  return SizedBox();
-                }
-
-                return RowItemWidget(
-                  enableInteractiveSelection: false,
-                  icon: IconType.fromString(element.icon),
-                  title: element.title,
-                  hasUnderline: element.id != homeData.menu.last.id,
-                  onTap: () {
-                    handleItemPress(context, ref, element);
-                  },
-                );
-              }).toList(),
+              ...menuItems,
             ],
           ),
         );
@@ -123,7 +146,7 @@ class SettingsScreen extends ConsumerWidget {
       hasUnderline: true,
       isSwitch: true,
       onTap: () {
-          _selectTime(context, ref);
+        _selectTime(context, ref);
       },
       switchValue: reminderTime != null,
       onSwitchChanged: (value) {
@@ -199,7 +222,9 @@ class SettingsScreen extends ConsumerWidget {
   ) async {
     await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
     await prefs.setInt(
-        SharedPreferenceConstants.savedMinutes, pickedTime.minute);
+      SharedPreferenceConstants.savedMinutes,
+      pickedTime.minute,
+    );
   }
 
   void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
@@ -209,6 +234,13 @@ class SettingsScreen extends ConsumerWidget {
             ' ' +
             pickedTime.format(context)),
       ),
+    );
+  }
+
+  void _showDebugBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => DebugBottomSheetWidget(),
     );
   }
 }
