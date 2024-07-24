@@ -2,14 +2,14 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
-class IconType {
-  final IconData? iconData;
-  final String? iconString;
+  class IconType {
+    final IconData? iconData;
+    final String? iconString;
 
-  IconType.fromIconData(this.iconData) : iconString = null;
+    IconType.fromIconData(this.iconData) : iconString = null;
 
-  IconType.fromString(this.iconString) : iconData = null;
-}
+    IconType.fromString(this.iconString) : iconData = null;
+  }
 
 class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
