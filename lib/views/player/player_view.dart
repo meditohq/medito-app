@@ -26,6 +26,14 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(backgroundSoundsNotifierProvider.notifier).playBackgroundSoundFromPref();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     var playbackState = ref.watch(audioStateProvider);
     if (playbackState.isCompleted && playbackState.position > 5000) {
@@ -131,21 +139,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void _handleClose(bool _) {
     if (_isClosing) {
-      print('Close operation already in progress, skipping.');
       return;
     }
     _isClosing = true;
 
-    print(
-        '!!! Attempting to close. Current Navigator state: canPop=${Navigator.canPop(context)}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print(
-          '!!! Current navigator observers: ${Navigator.of(context).widget.observers}');
-      print(
-          '!!! Current navigator pages: ${Navigator.of(context).widget.pages}');
 
       if (Navigator.canPop(context)) {
-        print('!!! Navigator can pop, proceeding with pop operation.');
         _resetState();
         _stopAudio();
         ref
@@ -158,7 +158,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           _isClosing = false;
         });
       } else {
-        print('!!! Navigator cannot pop. Skipping pop operation.');
         _isClosing = false;
       }
     });

@@ -47,7 +47,7 @@ final backgroundSoundsNotifierProvider =
 
 class BackgroundSoundsNotifier extends ChangeNotifier {
   final Ref ref;
-  double volume = 0.5;
+  double volume = 50;
   BackgroundSoundsModel? selectedBgSound;
   BackgroundSoundsModel? downloadingBgSound;
 
@@ -109,11 +109,17 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
       return;
     }
 
+    getVolumeFromPref();
+
     var parsedUri = Uri.parse(uri);
     var isUrl = ['http', 'https'].contains(parsedUri.scheme);
 
     if (Platform.isAndroid) {
-      await _api.setBackgroundSound(uri);
+      if (isUrl) {
+        await _api.setBackgroundSound(uri);
+      } else {
+        await _api.setBackgroundSound('file://$uri');
+      }
       unawaited(_api.playBackgroundSound());
     } else {
       try {
