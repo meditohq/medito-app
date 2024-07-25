@@ -1,7 +1,7 @@
 name: Medito
 description: A meditation learning tool
 
-version: 3.0.34+30034
+version: 3.1.0+30035
 environment:
   sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
