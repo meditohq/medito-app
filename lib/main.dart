@@ -22,6 +22,7 @@ import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'constants/environments/environment_constants.dart';
+import 'firebase_options.dart';
 import 'services/notifications/notifications_service.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -49,8 +51,12 @@ Future<void> main() async {
 
   var sharedPreferences = await initializeSharedPreferences();
   if (await areGooglePlayServicesAvailable()) {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await registerNotification();
+
   }
 
   if (Platform.isIOS) {
@@ -142,6 +148,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       scaffoldMessengerKey: scaffoldMessengerKey,
       theme: appTheme(context),
       title: ParentWidget._title,
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       home: SplashView(),
     );
   }

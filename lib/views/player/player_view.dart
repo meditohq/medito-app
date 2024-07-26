@@ -5,6 +5,7 @@ import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
 import 'package:Medito/views/player/widgets/overlay_cover_image_widget.dart';
 import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

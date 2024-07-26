@@ -98,3 +98,5 @@ ios/Runner.xcodeproj/project.pbxproj
 ios/Flutter/AppFrameworkInfo.plist
 android/app/src/google-services.json
 android/app/local.properties
+firebase.json
+lib/firebase_options.dart
