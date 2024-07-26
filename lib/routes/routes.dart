@@ -8,6 +8,7 @@ import 'package:Medito/views/track/track_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import '../views/downloads/downloads_view.dart';
 
@@ -17,17 +18,28 @@ extension SanitisePath on String {
   }
 }
 
+Future<void> logScreenView(String screenName, {Map<String, dynamic>? parameters}) async {
+  await FirebaseAnalytics.instance.logEvent(
+    name: 'screen_view',
+    parameters: {
+      'screen_name': screenName,
+      ...?parameters,
+    },
+  );
+}
+
 Future<void> handleNavigation(
-  String? place,
-  List<String?> ids,
-  BuildContext context, {
-  WidgetRef? ref,
-}) async {
+    String? place,
+    List<String?> ids,
+    BuildContext context, {
+      WidgetRef? ref,
+    }) async {
   ids.removeWhere((element) => element == null);
 
   if (place != null && (place.contains('tracks') || place.contains('track'))) {
     try {
       var trackId = ids.first!;
+      await logScreenView('Track View', parameters: {'track_id': trackId});
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -40,6 +52,7 @@ Future<void> handleNavigation(
     return;
   } else if (place != null && place.contains('pack3')) {
     var p3id = ids[2]!;
+    await logScreenView('Pack View', parameters: {'pack_id': p3id, 'pack_level': '3'});
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -48,6 +61,7 @@ Future<void> handleNavigation(
     );
   } else if (place != null && place.contains('pack2')) {
     var p2id = ids[1]!;
+    await logScreenView('Pack View', parameters: {'pack_id': p2id, 'pack_level': '2'});
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -56,6 +70,7 @@ Future<void> handleNavigation(
     );
   } else if (place == TypeConstants.pack) {
     var pid = ids.first!;
+    await logScreenView('Pack View', parameters: {'pack_id': pid});
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -63,10 +78,12 @@ Future<void> handleNavigation(
       ),
     );
   } else if (place == TypeConstants.url || place == TypeConstants.link) {
-    await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
-
+    var url = ids.last ?? StringConstants.meditoUrl;
+    await logScreenView('External URL', parameters: {'url': url});
+    await launchURLInBrowser(url);
     return;
   } else if (place != null && place.contains('settings')) {
+    await logScreenView('Settings Screen');
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -76,18 +93,20 @@ Future<void> handleNavigation(
   } else if (place == TypeConstants.email) {
     if (ref != null) {
       var deviceAppAndUserInfo =
-          await ref.read(deviceAppAndUserInfoProvider.future);
-      var _info =
+      await ref.read(deviceAppAndUserInfoProvider.future);
+      var info =
           '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
       var emailAddress = ids.first!;
+      await logScreenView('Email Submission', parameters: {'email': emailAddress});
       await launchEmailSubmission(
         emailAddress,
-        body: _info,
+        body: info,
       );
     }
     return;
   } else if (place == TypeConstants.flow) {
     if (ids.contains('downloads')) {
+      await logScreenView('Downloads View');
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => DownloadsView()),
@@ -135,5 +154,6 @@ void handleDeepLink(Uri? uri, BuildContext context) {
         ),
       );
     }
+    logScreenView('Deep Link', parameters: {'path': path});
   }
 }

@@ -6,6 +6,7 @@ import 'package:Medito/providers/root/root_combine_provider.dart';
 import 'package:Medito/services/notifications/notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -52,6 +53,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
     ref.listen(
       playerProvider,
       (prev, next) {
+
         var prevId = prev?.audio.first.files.first.id;
         var nextId = next?.audio.first.files.first.id;
         if (next != null &&
