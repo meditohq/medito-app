@@ -19,7 +19,6 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
-import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/splash_view.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -31,6 +30,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/environments/environment_constants.dart';
 import 'firebase_options.dart';
@@ -43,32 +43,51 @@ var currentEnvironment = kReleaseMode
     : EnvironmentConstants.stagingEnv;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await dotenv.load(fileName: currentEnvironment);
-
-  MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
-
+  await initializeApp();
   var sharedPreferences = await initializeSharedPreferences();
-  if (await areGooglePlayServicesAvailable()) {
+  runAppWithSentry(sharedPreferences);
+}
+
+Future<void> initializeApp() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await loadEnvironment();
+  setupAudioCallback();
+  await initializeFirebase();
+  await initializeAudioService();
+  usePathUrlStrategy();
+}
+
+Future<void> loadEnvironment() async {
+  await dotenv.load(fileName: currentEnvironment);
+}
+
+void setupAudioCallback() {
+  MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
+}
+
+Future<void> initializeFirebase() async {
+  try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await registerNotification();
-
+  } catch (e) {
+    unawaited(Sentry.captureException(e));
   }
+}
 
+Future<void> initializeAudioService() async {
   if (Platform.isIOS) {
     await AudioService.init(
       builder: () => iosAudioHandler,
       config: AudioServiceConfig(),
     );
   }
+}
 
-  usePathUrlStrategy();
-
-  await SentryFlutter.init(
+void runAppWithSentry(SharedPreferences sharedPreferences) {
+  SentryFlutter.init(
     (options) {
       options.attachScreenshot = true;
       options.environment = kDebugMode
@@ -107,20 +126,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: ColorConstants.transparent,
-        statusBarColor: ColorConstants.transparent,
-      ),
-    );
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge,
-      overlays: [
-        SystemUiOverlay.top,
-      ],
-    );
+    _setUpSystemUi();
     onFirebaseMessageAppOpened(context, ref);
     initializeNotification(context, ref).then(
       (value) {
@@ -140,6 +146,23 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
 
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  void _setUpSystemUi() {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: ColorConstants.transparent,
+        statusBarColor: ColorConstants.transparent,
+      ),
+    );
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: [
+        SystemUiOverlay.top,
+      ],
+    );
   }
 
   @override

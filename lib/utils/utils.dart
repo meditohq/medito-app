@@ -19,11 +19,8 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:Medito/constants/constants.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_api_availability/google_api_availability.dart';
-import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -136,24 +133,29 @@ String getAudioFileExtension(String path) {
 }
 
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
-  var pixelRatio = MediaQuery.of(context).devicePixelRatio;
-  var boundary =
-      globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-  var image = await boundary.toImage(pixelRatio: pixelRatio);
-  var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-  var pngBytes = byteData?.buffer.asUint8List();
+  try {
+    RenderRepaintBoundary boundary =
+        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-  if (pngBytes != null) {
-    var imgImage = img.decodeImage(Uint8List.fromList(pngBytes))!;
-    var exportedPng = img.encodePng(imgImage);
+    final directory = await getApplicationDocumentsDirectory();
+    final sharePlusDir = Directory('${directory.path}/share_plus');
+    if (!await sharePlusDir.exists()) {
+      await sharePlusDir.create(recursive: true);
+    }
+    final file = File('${sharePlusDir.path}/stats.png');
 
-    final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/stats.png');
+    await file.writeAsBytes(pngBytes);
+    print('File saved at: ${file.path}');
 
-    return await file.writeAsBytes(exportedPng);
+    return file;
+  } catch (e) {
+    print('Error in capturePng: $e');
+
+    return null;
   }
-
-  return null;
 }
 
 double getBottomPadding(BuildContext context) {
@@ -164,41 +166,10 @@ double getBottomPadding(BuildContext context) {
   return bottom;
 }
 
-double getBottomPaddingWithStickyMiniPlayer(BuildContext context) {
-  var navbarPadding = getBottomPadding(context);
-  var bottomPadding = 8;
-  var totalPadding = navbarPadding + miniPlayerHeight + bottomPadding;
-
-  return totalPadding;
-}
-
 int formatIcon(String icon) {
   if (icon.isEmpty) return 0;
 
   return int.parse('0x$icon');
-}
-
-Future<bool> areGooglePlayServicesAvailable() async {
-  try {
-    if (Platform.isIOS) {
-      return true;
-    } else if (Platform.isAndroid) {
-      var availability = await GoogleApiAvailability.instance
-          .checkGooglePlayServicesAvailability();
-      if (availability == GooglePlayServicesAvailability.success) {
-        return true;
-      }
-    }
-
-    return false;
-  } catch (e) {
-    unawaited(Sentry.captureException(
-      e,
-      stackTrace: e,
-    ));
-
-    return false;
-  }
 }
 
 extension GetIdFromPath on String {

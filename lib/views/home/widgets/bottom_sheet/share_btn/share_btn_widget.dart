@@ -33,15 +33,19 @@ class ShareBtnWidget extends StatelessWidget {
     try {
       var file = await capturePng(context, key);
       if (file != null) {
-        await Share.shareXFiles(
+        final result = await Share.shareXFiles(
           [XFile(file.path)],
           text: shareText,
         );
+        print('Share result: $result');
       } else {
+        print('File was null');
         showSnackBar(context, StringConstants.someThingWentWrong);
       }
     } catch (e) {
-      showSnackBar(context, e.toString());
+      print('Share error: $e');
+      showSnackBar(context, 'Failed to share: $e');
     }
   }
+
 }
