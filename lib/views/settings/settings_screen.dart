@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../providers/events/analytics_configurator.dart';
+import '../../providers/events/analytics_consent_provider.dart';
 import '../../providers/notification/reminder_provider.dart';
 import '../home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import '../home/widgets/bottom_sheet/row_item_widget.dart';
@@ -106,6 +108,8 @@ class SettingsScreen extends ConsumerWidget {
           path: 'debug',
           type: 'action',
         );
+
+        menuItems.add(_buildAnalyticsConsentTile(ref));
 
         menuItems.add(
           RowItemWidget(
@@ -242,5 +246,68 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (context) => DebugBottomSheetWidget(),
     );
+  }
+
+  Widget _buildAnalyticsConsentTile(WidgetRef ref) {
+    final analyticsConsent = ref.watch(analyticsConsentProvider);
+
+    return RowItemWidget(
+      enableInteractiveSelection: false,
+      icon: IconType.fromIconData(Icons.analytics),
+      title: '3rd Party Analytics',
+      hasUnderline: true,
+      isSwitch: true,
+      switchValue: analyticsConsent,
+      onSwitchChanged: (value) {
+        if (value) {
+          // Turning on analytics, update immediately
+          ref.read(analyticsConsentProvider.notifier).state = true;
+          setAnalyticsConsent(true);
+        } else {
+          // Turning off analytics, update immediately but show confirmation dialog
+          ref.read(analyticsConsentProvider.notifier).state = false;
+
+          // Show dialog after the current build cycle
+          Future.microtask(() => _showAnalyticsConfirmationDialog(ref));
+        }
+      },
+    );
+  }
+
+  Future<void> _showAnalyticsConfirmationDialog(WidgetRef ref) async {
+    final confirm = await showDialog<bool>(
+      context: ref.context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('Are you sure?'),
+        content: Text(
+            'As a nonprofit, Medito uses anonymous analytics data to:\n\n'
+            '• Understand which meditations are most helpful\n'
+            '• Identify areas of the app that need improvement\n'
+            '• Measure the impact of new features\n'
+            '• Secure funding by demonstrating our reach\n\n'
+            'This helps us continue providing free, high-quality meditation content. '
+            'No personal information is ever sold or shared.'),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Keep On'),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: Text('Turn Off'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) {
+      // User decided to keep analytics on, or dismissed the dialog
+      // Revert the switch state and analytics consent
+      ref.read(analyticsConsentProvider.notifier).state = true;
+      await setAnalyticsConsent(true);
+    } else {
+      // User confirmed turning off analytics
+      await setAnalyticsConsent(false);
+    }
   }
 }

@@ -17,6 +17,7 @@ import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
+import 'package:Medito/providers/events/analytics_configurator.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/views/splash_view.dart';
@@ -44,15 +45,14 @@ var currentEnvironment = kReleaseMode
 
 Future<void> main() async {
   await initializeApp();
-  var sharedPreferences = await initializeSharedPreferences();
-  runAppWithSentry(sharedPreferences);
+  runAppWithSentry();
 }
 
 Future<void> initializeApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   await loadEnvironment();
   setupAudioCallback();
-  await initializeFirebase();
+  unawaited(initializeFirebase());
   await initializeAudioService();
   usePathUrlStrategy();
 }
@@ -70,7 +70,8 @@ Future<void> initializeFirebase() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    await updateAnalyticsCollectionBasedOnConsent();
+    await FirebaseAnalytics.instance.setUserId(id: 'medito_user');
     await registerNotification();
   } catch (e) {
     unawaited(Sentry.captureException(e));
@@ -86,7 +87,8 @@ Future<void> initializeAudioService() async {
   }
 }
 
-void runAppWithSentry(SharedPreferences sharedPreferences) {
+Future<void> runAppWithSentry() async {
+  var prefs = await initializeSharedPreferences();
   SentryFlutter.init(
     (options) {
       options.attachScreenshot = true;
@@ -99,7 +101,7 @@ void runAppWithSentry(SharedPreferences sharedPreferences) {
     appRunner: () => runApp(
       ProviderScope(
         overrides: [
-          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+          sharedPreferencesProvider.overrideWithValue(prefs),
         ],
         child: ParentWidget(),
       ),
