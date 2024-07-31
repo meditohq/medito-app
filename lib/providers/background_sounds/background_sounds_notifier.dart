@@ -57,7 +57,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     volume = vol;
     ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
     if (Platform.isAndroid) {
-      _api.setBackgroundSoundVolume(volume);
+      _api.setBackgroundSoundVolume(volume / 100);
     } else {
       iosBackgroundPlayer.setVolume(volume / 10);
     }

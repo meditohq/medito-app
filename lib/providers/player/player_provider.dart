@@ -166,7 +166,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
   void cancelBackgroundThreadForAudioCompleteEvent() async {
     var activeNotifications =
-        await flutterLocalNotificationsPlugin.getActiveNotifications();
+        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
     var containsNotification = activeNotifications
         .any((notification) => notification.id == notificationId);
 
