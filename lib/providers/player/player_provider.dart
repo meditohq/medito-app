@@ -164,7 +164,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     return null;
   }
 
-  void cancelBackgroundThreadForAudioCompleteEvent() async {
+  void cancelPendingNotificationsForAudioCompleteEvent() async {
     var activeNotifications =
         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
     var containsNotification = activeNotifications
@@ -173,6 +173,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (!containsNotification) {
       await flutterLocalNotificationsPlugin.cancel(notificationId);
     }
+
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>

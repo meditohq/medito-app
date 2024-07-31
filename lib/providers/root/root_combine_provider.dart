@@ -39,6 +39,21 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
           handleStats(payload);
         }
       });
+    } else {
+      ref.listen(audioStateProvider, (previous, current) {
+        if (current.isCompleted) {
+          var payload = {
+            TypeConstants.trackIdKey: current.track.id,
+            TypeConstants.durationIdKey: current.duration,
+            TypeConstants.fileIdKey: current.track.title,
+            TypeConstants.guideIdKey: current.track.artist,
+            TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
+            UpdateStatsConstants.userTokenKey: getUserToken(ref),
+          };
+          handleStats(payload);
+          ref.read(playerProvider.notifier).cancelPendingNotificationsForAudioCompleteEvent();
+        }
+      });
     }
   },
 );

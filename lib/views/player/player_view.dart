@@ -151,7 +151,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         _stopAudio();
         ref
             .read(playerProvider.notifier)
-            .cancelBackgroundThreadForAudioCompleteEvent();
+            .cancelPendingNotificationsForAudioCompleteEvent();
         _endScreenOpened = false;
 
         Future.delayed(Duration(milliseconds: 50), () {
