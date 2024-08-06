@@ -129,7 +129,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun playAudio(audioData: AudioData): Boolean {
         val primaryMediaItem = MediaItem.Builder()
             .setUri(audioData.url)
-            .setMediaId(audioData.url)
+            .setMediaId(audioData.track.id)
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle(audioData.track.title)
