@@ -100,3 +100,4 @@ android/app/src/google-services.json
 android/app/local.properties
 firebase.json
 lib/firebase_options.dart
+*.symbols
