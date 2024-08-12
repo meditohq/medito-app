@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 
 class BottomNavigationBarView extends StatefulWidget {
   @override
-  _BottomNavigationBarViewState createState() => _BottomNavigationBarViewState();
+  _BottomNavigationBarViewState createState() =>
+      _BottomNavigationBarViewState();
 }
 
 class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
@@ -39,7 +40,9 @@ class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
   @override
   void initState() {
     _pageController = PageController(initialPage: _currentPageIndex);
-    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
       setState(() {
         _isConnected = !result.contains(ConnectivityResult.none);
       });
@@ -56,21 +59,30 @@ class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: _onDestinationSelected,
-        indicatorColor: ColorConstants.lightPurple,
-        backgroundColor: ColorConstants.ebony,
-        selectedIndex: _currentPageIndex,
-        destinations: _navigationBarItems,
+    return PopScope(
+      canPop: _currentPageIndex == 0,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        _onDestinationSelected(0);
+      },
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: _onDestinationSelected,
+          indicatorColor: ColorConstants.lightPurple,
+          backgroundColor: ColorConstants.ebony,
+          selectedIndex: _currentPageIndex,
+          destinations: _navigationBarItems,
+        ),
+        body: _isConnected
+            ? PageView(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                physics: NeverScrollableScrollPhysics(),
+                children: _pages,
+              )
+            : ConnectivityErrorWidget(),
       ),
-      body: _isConnected ? PageView(
-        controller: _pageController,
-        onPageChanged: _onPageChanged,
-        physics: NeverScrollableScrollPhysics(),
-        children: _pages,
-      ) : ConnectivityErrorWidget(),
     );
   }
 
