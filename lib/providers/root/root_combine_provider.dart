@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -50,8 +51,12 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
             TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
             UpdateStatsConstants.userTokenKey: getUserToken(ref),
           };
-          handleStats(payload);
-          ref.read(playerProvider.notifier).cancelPendingNotificationsForAudioCompleteEvent();
+
+          unawaited(handleStats(payload).then((success) {
+            if (success) {
+              ref.read(playerProvider.notifier).cancelPendingNotificationsForAudioCompleteEvent();
+            }
+          }));
         }
       });
     }
