@@ -47,9 +47,3 @@ Future<void> refreshHomeAPIs(RefreshHomeAPIsRef ref) async {
   ref.invalidate(fetchHomeProvider);
   await ref.read(fetchHomeProvider.future);
 }
-
-@riverpod
-Future<void> refreshStats(RefreshStatsRef ref) async {
-  ref.invalidate(fetchStatsProvider);
-  await ref.read(fetchStatsProvider.future);
-}

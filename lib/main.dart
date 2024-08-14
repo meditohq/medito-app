@@ -31,7 +31,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/environments/environment_constants.dart';
 import 'firebase_options.dart';
@@ -137,8 +136,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
             handleOpeningStatsNotificationsFromBackground(context, ref).then(
               (wasOpened) {
                 if (wasOpened) {
-                  ref.invalidate(refreshStatsProvider);
-                  ref.read(refreshStatsProvider);
+                  ref.invalidate(fetchStatsProvider);
+                  ref.read(fetchStatsProvider);
                 }
               },
             );

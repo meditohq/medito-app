@@ -17,7 +17,7 @@ import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
-    ref.read(refreshStatsProvider);
+    ref.read(fetchStatsProvider);
     ref.read(deviceAppAndUserInfoProvider);
     checkMaintenance(ref, context);
 
@@ -54,6 +54,7 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
 
           unawaited(handleStats(payload).then((success) {
             if (success) {
+              ref.invalidate(fetchStatsProvider);
               ref.read(playerProvider.notifier).cancelPendingNotificationsForAudioCompleteEvent();
             }
           }));

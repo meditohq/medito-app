@@ -25,13 +25,18 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+    with
+        TickerProviderStateMixin,
+        AutomaticKeepAliveClientMixin,
+        WidgetsBindingObserver {
   var _isConnected = true;
   late final StreamSubscription _subscription;
+  bool isCollapsed = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     navigateToDeepLink();
     _subscription = Connectivity()
         .onConnectivityChanged
@@ -44,11 +49,23 @@ class _HomeViewState extends ConsumerState<HomeView>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _subscription.cancel();
     super.dispose();
   }
 
-  bool isCollapsed = false;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshStats();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshStats();
+  }
 
   late CurvedAnimation curvedAnimation = CurvedAnimation(
     parent: AnimationController(
@@ -86,7 +103,6 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     final home = ref.watch(fetchHomeProvider);
     final announcementData = ref.watch(fetchLatestAnnouncementProvider);
-
     final stats = ref.watch(fetchStatsProvider);
 
     return home.when(
@@ -160,8 +176,12 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
-    ref.invalidate(refreshStatsProvider);
-    await ref.read(refreshStatsProvider.future);
+    ref.invalidate(fetchStatsProvider);
+    await ref.read(fetchStatsProvider.future);
+  }
+
+  void _refreshStats() {
+    ref.invalidate(fetchStatsProvider);
   }
 
   void _onStatsButtonTapped(BuildContext context, WidgetRef ref) {
