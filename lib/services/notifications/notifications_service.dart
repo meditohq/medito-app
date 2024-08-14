@@ -129,12 +129,16 @@ void _parseNotificationPayload(payload, BuildContext context, WidgetRef ref) {
   }
 }
 
-void handleStats(payload, {BuildContext? context}) {
+Future<bool> handleStats(payload, {BuildContext? context}) async {
   try {
-    callUpdateStats(payload);
+    await callUpdateStats(payload);
     showSnackBar(context, StringConstants.statsSuccess);
+
+    return true;
   } catch (e, _) {
     showSnackBar(context, StringConstants.statsError);
+
+    return false;
   }
 }
 
