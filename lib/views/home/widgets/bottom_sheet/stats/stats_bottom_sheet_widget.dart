@@ -34,7 +34,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
               error: (err, stack) => Expanded(
                 child: MeditoErrorWidget(
                   message: err.toString(),
-                  onTap: () => ref.refresh(refreshStatsProvider),
+                  onTap: () => ref.refresh(fetchStatsProvider),
                 ),
               ),
               loading: () => SizedBox(
