@@ -32,7 +32,7 @@ class StringConstants {
   static const String statsSuccess = 'Stats updated';
   static const String statsError = 'Error updating stats';
   static const String shareStatsText =
-      '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
+  '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
   static const String swipeToDelete = 'Swipe left on a session to delete it';
   static const String narrator = 'Narrator';
   static const String duration = 'Duration';
@@ -146,10 +146,24 @@ class StringConstants {
   static const String noTimeSelected = 'No time selected';
   static const String pickTimeHelpText = 'Pick a time for your reminder';
   static const String reminderNotificationScheduled = 'Reminder notification scheduled at';
-  static var dailyReminderTitle  = 'Daily Reminder';
+  static var dailyReminderTitle = 'Daily Reminder';
   static var setFor = 'Set for';
 
   static var settings = 'Settings';
   static var reminderNotificationCleared = 'Reminder cancelled';
   static var clearReminder = 'Cancel Reminder';
+
+  static var cancel = 'Cancel';
+  static var ok = 'OK';
+
+  static var mediaPlaybackPermissions = 'Media Playback Permissions';
+  static var reminderPermissions = 'Reminder Permissions';
+  static var statsReminderPermissions = 'Stats Update Permissions';
+  static var statsReminderPermissionsDesc = 'We need permission to send you reminders about updating your meditation stats. This helps you keep track of your progress.';
+  static var weNeedYourPermissionMedia = 'We need permission to show media controls in your notifications. This allows you to control playback without opening the app.';
+  static var weNeedYourPermissionReminder = 'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.';
+  static var mediaPermissionDenied = 'Media controls are not available without permission.';
+  static var statsPermissionDenied = 'Stats reminders are not available without notification permission.';
+  static var reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
+
 }
