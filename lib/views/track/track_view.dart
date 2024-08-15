@@ -22,7 +22,6 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../player/player_view.dart';
 
 class TrackView extends ConsumerStatefulWidget {
@@ -59,9 +58,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackFilesModel file,
   ) async {
     try {
-      // final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
-      // bgSoundNotifier.getVolumeFromPref();
-      // bgSoundNotifier.playBackgroundSoundFromPref();
       await ref.read(playerProvider.notifier).loadSelectedTrack(
             trackModel: trackModel,
             file: file,
