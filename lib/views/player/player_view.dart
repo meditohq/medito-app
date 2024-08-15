@@ -5,7 +5,6 @@ import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
 import 'package:Medito/views/player/widgets/overlay_cover_image_widget.dart';
 import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,7 +29,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(backgroundSoundsNotifierProvider.notifier).playBackgroundSoundFromPref();
+      var currentlyPlayingTrack = ref.watch(playerProvider);
+      if (currentlyPlayingTrack?.hasBackgroundSound ?? false) {
+        ref
+            .read(backgroundSoundsNotifierProvider.notifier)
+            .playBackgroundSoundFromPref();
+      }
     });
   }
 
@@ -49,6 +53,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         message: StringConstants.unableToLoadAudio,
       );
     }
+
     var file = currentlyPlayingTrack.audio.first.files.first;
 
     var size = MediaQuery.of(context).size.width;
@@ -145,7 +150,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     _isClosing = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
       if (Navigator.canPop(context)) {
         _resetState();
         _stopAudio();
