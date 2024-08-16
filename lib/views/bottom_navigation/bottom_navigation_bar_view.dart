@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/views/explore/explore_view.dart';
+import 'package:Medito/views/explore/widgets/explore_view.dart';
 import 'package:Medito/views/home/home_view.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';

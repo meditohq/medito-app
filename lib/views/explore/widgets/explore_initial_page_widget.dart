@@ -17,7 +17,7 @@ class ExploreInitialPageWidget extends ConsumerWidget {
 
     return allPacks.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildMain(ref, data),
+      data: (data) => _buildMain(ref, data, context),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchAllPacksProvider),
@@ -29,6 +29,7 @@ class ExploreInitialPageWidget extends ConsumerWidget {
   Column _buildMain(
     WidgetRef ref,
     List<PackItemsModel> packs,
+    BuildContext context,
   ) {
     return Column(
       children: [
@@ -39,7 +40,7 @@ class ExploreInitialPageWidget extends ConsumerWidget {
               itemCount: packs.length,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.only(
-                top: padding20,
+                top: MediaQuery.of(context).padding.top + padding16,
                 left: padding16,
                 right: padding16,
                 bottom: padding16,
