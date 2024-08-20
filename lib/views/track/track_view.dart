@@ -22,6 +22,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../utils/permission_handler.dart';
 import '../player/player_view.dart';
 
 class TrackView extends ConsumerStatefulWidget {
@@ -58,6 +59,9 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackFilesModel file,
   ) async {
     try {
+      await PermissionHandler.requestMediaPlaybackPermission(context);
+      await PermissionHandler.requestStatsReminderPermission(context);
+
       await ref.read(playerProvider.notifier).loadSelectedTrack(
             trackModel: trackModel,
             file: file,

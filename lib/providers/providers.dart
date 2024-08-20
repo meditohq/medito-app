@@ -7,7 +7,6 @@ export 'home/home_provider.dart';
 export 'me/me_provider.dart';
 export 'meditation/download_track_provider.dart';
 export 'meditation/track_provider.dart';
-export 'notification/notification_provider.dart';
 export 'pack/pack_provider.dart';
 export 'player/audio_state_provider.dart';
 export 'player/download/audio_downloader_provider.dart';
