@@ -12,6 +12,7 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../utils/permission_handler.dart';
 import '../bottom_navigation/bottom_navigation_bar_view.dart';
 import '../player/player_view.dart';
 
@@ -154,6 +155,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     WidgetRef ref,
     TrackModel trackModel,
   ) async {
+    await PermissionHandler.requestMediaPlaybackPermission(context);
+    await PermissionHandler.requestStatsReminderPermission(context);
+
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
           file: trackModel.audio.first.files.first,

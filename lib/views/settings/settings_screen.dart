@@ -2,6 +2,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/permission_handler.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:Medito/widgets/widgets.dart';
@@ -18,6 +19,7 @@ import '../home/widgets/bottom_sheet/row_item_widget.dart';
 
 final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
+
   return _getReminderTimeFromPrefs(prefs);
 });
 
@@ -37,39 +39,18 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var status = ref.watch(notificationPermissionStatusProvider);
 
     return Scaffold(
       appBar: MeditoAppBarSmall(
         isTransparent: true,
         title: StringConstants.settings,
       ),
-      body: status.when(
-        skipLoadingOnRefresh: false,
-        skipLoadingOnReload: false,
-        data: (data) {
-          var isNotificationMenuVisible = true;
-
-          if (data == AuthorizationStatus.authorized ||
-              data == AuthorizationStatus.provisional) {
-            isNotificationMenuVisible = false;
-          }
-
-          return _buildMain(context, isNotificationMenuVisible, ref);
-        },
-        error: (err, stack) => MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(notificationPermissionStatusProvider),
-          isLoading: status.isLoading,
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-      ),
+      body: _buildMain(context, ref),
     );
   }
 
   Widget _buildMain(
     BuildContext context,
-    bool isNotificationMenuVisible,
     WidgetRef ref,
   ) {
     final home = ref.watch(fetchHomeProvider);
@@ -82,13 +63,7 @@ class SettingsScreen extends ConsumerWidget {
         isLoading: home.isLoading,
       ),
       data: (HomeModel homeData) {
-        var menuItems = homeData.menu.map((element) {
-          var isNotificationPath = element.path ==
-              RouteConstants.notificationPermissionPath.sanitisePath();
-
-          if (!isNotificationMenuVisible && isNotificationPath) {
-            return SizedBox();
-          }
+        List<Widget> menuItems = homeData.menu.map((element) {
 
           return RowItemWidget(
             enableInteractiveSelection: false,
@@ -201,6 +176,10 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _selectTime(BuildContext context, WidgetRef ref) async {
+    var accepted = await PermissionHandler.requestAlarmPermission(context);
+
+    if (!accepted) return;
+
     final reminders = ref.read(reminderProvider);
     final prefs = ref.read(sharedPreferencesProvider);
 

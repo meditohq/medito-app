@@ -19,7 +19,6 @@ class ReminderProvider {
   }
 
   Future<void> _initializeNotifications() async {
-    await requestNotificationPermissions();
     tz.initializeTimeZones();
     const initializationSettingsAndroid = AndroidInitializationSettings('logo');
     const initializationSettingsIOS = DarwinInitializationSettings(

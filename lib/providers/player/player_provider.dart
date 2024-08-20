@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/models/models.dart';
-import 'package:Medito/utils/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../constants/strings/shared_preference_constants.dart';
+import '../../constants/strings/string_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../services/notifications/notifications_service.dart';
 import '../../src/audio_pigeon.g.dart';
@@ -66,6 +66,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackFilesModel file,
     String guideName,
   ) async {
+
     if (Platform.isAndroid) {
       await _startNotificationForAudioCompleteEvent(
         track.id,
@@ -113,7 +114,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     int timestamp,
     String fileGuide,
   ) async {
-    await requestNotificationPermissions();
 
     var payload = {
       TypeConstants.trackIdKey: trackId,
@@ -127,19 +127,19 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     try {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notificationId,
-        notificationTitle,
-        notificationBody,
+        StringConstants.notificationTitle,
+        StringConstants.notificationBody,
         payload: json.encode(payload),
         tz.TZDateTime.now(tz.local)
             .add(Duration(milliseconds: notificationDelay)),
         const NotificationDetails(
           android: AndroidNotificationDetails(
             androidNotificationChannelId,
-            androidNotificationChannelName,
+            StringConstants.androidNotificationChannelName,
             playSound: false,
             icon: androidNotificationIcon,
             enableVibration: false,
-            channelDescription: androidNotificationChannelDescription,
+            channelDescription: StringConstants.androidNotificationChannelDescription,
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -261,3 +261,5 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
 const audioPercentageListened = 0.8;
 const androidNotificationIcon = 'logo';
+const notificationId = 1595122;
+const androidNotificationChannelId = 'medito_reminder_channel';

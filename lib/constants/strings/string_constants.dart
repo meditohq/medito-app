@@ -146,24 +146,30 @@ class StringConstants {
   static const String noTimeSelected = 'No time selected';
   static const String pickTimeHelpText = 'Pick a time for your reminder';
   static const String reminderNotificationScheduled = 'Reminder notification scheduled at';
-  static var dailyReminderTitle = 'Daily Reminder';
-  static var setFor = 'Set for';
+  static const dailyReminderTitle = 'Daily Reminder';
+  static const setFor = 'Set for';
 
-  static var settings = 'Settings';
-  static var reminderNotificationCleared = 'Reminder cancelled';
-  static var clearReminder = 'Cancel Reminder';
+  static const settings = 'Settings';
+  static const reminderNotificationCleared = 'Reminder cancelled';
+  static const clearReminder = 'Cancel Reminder';
 
-  static var cancel = 'Cancel';
-  static var ok = 'OK';
+  static const cancel = 'Cancel';
+  static const ok = 'OK';
 
-  static var mediaPlaybackPermissions = 'Media Playback Permissions';
-  static var reminderPermissions = 'Reminder Permissions';
-  static var statsReminderPermissions = 'Stats Update Permissions';
-  static var statsReminderPermissionsDesc = 'We need permission to send you reminders about updating your meditation stats. This helps you keep track of your progress.';
-  static var weNeedYourPermissionMedia = 'We need permission to show media controls in your notifications. This allows you to control playback without opening the app.';
-  static var weNeedYourPermissionReminder = 'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.';
-  static var mediaPermissionDenied = 'Media controls are not available without permission.';
-  static var statsPermissionDenied = 'Stats reminders are not available without notification permission.';
-  static var reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
+  static const requestPermission = 'Request Permission';
+  static const mediaPlaybackPermissions = 'Media Playback Permissions';
+  static const reminderPermissions = 'Reminder Permissions';
+  static const statsReminderPermissions = 'Stats Update Permissions';
+  static const statsReminderPermissionsDesc = 'We need permission to send you reminders about updating your meditation stats. This helps you keep track of your progress.';
+  static const weNeedYourPermissionMedia = 'We need permission to show media controls in your notifications. This allows you to control playback without opening the app.';
+  static const weNeedYourPermissionReminder = 'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.';
+  static const mediaPermissionDenied = 'Media controls are not available without permission.';
+  static const statsPermissionDenied = 'Stats reminders are not available without notification permission.';
+  static const reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
+
+  static const androidNotificationChannelName = 'Stats reminder';
+  static const androidNotificationChannelDescription = 'This notification reminds you to keep track of your meditation stats.';
+  static const notificationTitle = 'Did you meditate today?';
+  static const notificationBody = 'Update your stats to keep track of your progress.';
 
 }
