@@ -3,16 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Medito/models/models.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 import '../../constants/strings/shared_preference_constants.dart';
-import '../../constants/strings/string_constants.dart';
-import '../../constants/types/type_constants.dart';
-import '../../services/notifications/notifications_service.dart';
 import '../../src/audio_pigeon.g.dart';
-import '../../utils/call_update_stats.dart';
 import '../../utils/utils.dart';
 import '../events/events_provider.dart';
 import '../shared_preference/shared_preference_provider.dart';
@@ -39,6 +33,17 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     var track = trackModel.customCopyWith();
     var audios = [...track.audio];
 
+    ref.read(playerProvider.notifier).handleAudioStartedEvent(
+          track.audio
+                  .where((e) => e.files.any((f) => f.duration == file.duration))
+                  .first
+                  .guideName ??
+              '-',
+          track.id,
+          file.id,
+          file.duration,
+        );
+
     audios.forEach((audioModel) {
       var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
       if (fileIndex != -1) {
@@ -54,7 +59,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       ref,
       track,
       file,
-      track.audio.first.guideName ?? '',
     );
 
     state = track;
@@ -64,19 +68,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     Ref ref,
     TrackModel track,
     TrackFilesModel file,
-    String guideName,
   ) async {
-
-    if (Platform.isAndroid) {
-      await _startNotificationForAudioCompleteEvent(
-        track.id,
-        file.duration,
-        file.id,
-        DateTime.now().millisecondsSinceEpoch,
-        guideName,
-      );
-    }
-
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(track, file),
         );
@@ -107,50 +99,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     }
   }
 
-  Future<void> _startNotificationForAudioCompleteEvent(
-    String trackId,
-    int duration,
-    String fileID,
-    int timestamp,
-    String fileGuide,
-  ) async {
-
-    var payload = {
-      TypeConstants.trackIdKey: trackId,
-      TypeConstants.durationIdKey: duration,
-      TypeConstants.fileIdKey: fileID,
-      TypeConstants.guideIdKey: fileGuide,
-      TypeConstants.timestampIdKey: timestamp,
-      UpdateStatsConstants.userTokenKey: getUserToken(),
-    };
-    var notificationDelay = (duration * audioPercentageListened).round();
-    try {
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        notificationId,
-        StringConstants.notificationTitle,
-        StringConstants.notificationBody,
-        payload: json.encode(payload),
-        tz.TZDateTime.now(tz.local)
-            .add(Duration(milliseconds: notificationDelay)),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            androidNotificationChannelId,
-            StringConstants.androidNotificationChannelName,
-            playSound: false,
-            icon: androidNotificationIcon,
-            enableVibration: false,
-            channelDescription: StringConstants.androidNotificationChannelDescription,
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-      );
-    } catch (e, s) {
-      print(s);
-    }
-  }
-
   String? getUserToken() {
     var user = ref
         .read(sharedPreferencesProvider)
@@ -162,19 +110,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     }
 
     return null;
-  }
-
-  void cancelPendingNotificationsForAudioCompleteEvent() async {
-    var activeNotifications =
-        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-    var containsNotification = activeNotifications
-        .any((notification) => notification.id == notificationId);
-
-    if (!containsNotification) {
-      await flutterLocalNotificationsPlugin.cancel(notificationId);
-    }
-
-    await flutterLocalNotificationsPlugin.cancelAll();
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>

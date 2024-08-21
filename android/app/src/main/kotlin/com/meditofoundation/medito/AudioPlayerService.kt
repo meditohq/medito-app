@@ -10,6 +10,7 @@ import Speed
 import Track
 import android.app.Notification
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -27,12 +28,13 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.MediaStyleNotificationHelper
+import com.meditofoundation.medito.SharedPreferencesManager
 import io.flutter.embedding.engine.FlutterEngineCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import org.json.JSONObject
 
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi,
     MediaSession.Callback {
@@ -44,6 +46,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private lateinit var backgroundMusicPlayer: ExoPlayer
     private var primaryMediaSession: MediaSession? = null
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate() {
         super.onCreate()
@@ -293,7 +296,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private val handler = Handler(Looper.getMainLooper())
     private val positionUpdateRunnable = object : Runnable {
         override fun run() {
-
             val currentPosition = primaryPlayer.currentPosition
             val trackDuration = primaryPlayer.duration
 
@@ -318,14 +320,29 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             )
 
             meditoAudioApi?.updatePlaybackState(state) {
-                if (primaryPlayer.playbackState != Player.STATE_ENDED) {
-                    handler.postDelayed(this, 250)
-                } else {
+                if (primaryPlayer.playbackState == Player.STATE_ENDED) {
+                    val completionData = JSONObject().apply {
+                        put("trackId", state.track.id)
+                        put("duration", state.duration)
+                        put("fileId", state.track.title)
+                        put("guideId", state.track.artist)
+                        put("timestamp", System.currentTimeMillis())
+                    }
+                    SharedPreferencesManager.saveCompletionData(
+                        this@AudioPlayerService,
+                        completionData
+                    )
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
+                } else {
+                    handler.postDelayed(this, 250)
                 }
             }
+        }
 
+        private fun saveCompletionData(completionData: JSONObject) {
+            sharedPreferences.edit().putString("lastCompletedTrack", completionData.toString())
+                .apply()
         }
 
         private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {

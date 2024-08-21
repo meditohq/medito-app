@@ -16,7 +16,6 @@ class RouteConstants {
   static const String urlPath = '/url';
   static const String connectivityErrorPath = '/connectivityError';
   static const String backgroundSoundsPath = '/backgroundsounds';
-  static const String notificationPermissionPath = '/notificationPermission';
   static const String explorePath = '/explore';
   static const String endScreenPath = '/endScreen';
 }

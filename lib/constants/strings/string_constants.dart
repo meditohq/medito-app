@@ -88,10 +88,6 @@ class StringConstants {
   static const String dismiss = 'Dismiss';
   static const String watch = 'Watch';
   static const String selectGuideOrDuration = 'Select a guide / duration';
-  static const String allowNotificationsTitle = 'Never miss a moment of calm';
-  static const String allowNotificationsDesc =
-      'Allow notifications for gentle meditation reminders and updates on fresh content and new features.';
-  static const String allowNotifications = 'Allow notifications';
   static const String openSettings = 'Open settings';
   static const String notificationTurnOnMessage =
       'Not ready yet? You can always allow notifications via the menu on the home screen.';
