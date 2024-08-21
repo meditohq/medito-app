@@ -17,7 +17,6 @@ import 'dart:io';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/constants/theme/app_theme.dart';
-import 'package:Medito/providers/events/analytics_configurator.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/views/splash_view.dart';
@@ -34,7 +33,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'constants/environments/environment_constants.dart';
 import 'firebase_options.dart';
-import 'services/notifications/notifications_service.dart';
+import 'services/notifications/firebase_notifications_service.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -50,8 +49,10 @@ Future<void> main() async {
 Future<void> initializeApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   await loadEnvironment();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   setupAudioCallback();
-  unawaited(initializeFirebase());
   await initializeAudioService();
   usePathUrlStrategy();
 }
@@ -62,19 +63,6 @@ Future<void> loadEnvironment() async {
 
 void setupAudioCallback() {
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
-}
-
-Future<void> initializeFirebase() async {
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    await updateAnalyticsCollectionBasedOnConsent();
-    await FirebaseAnalytics.instance.setUserId(id: 'medito_user');
-    await registerNotification();
-  } catch (e) {
-    unawaited(Sentry.captureException(e));
-  }
 }
 
 Future<void> initializeAudioService() async {
@@ -128,25 +116,26 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void initState() {
     super.initState();
     _setUpSystemUi();
-    onFirebaseMessageAppOpened(context, ref);
-    initializeNotification(context, ref).then(
-      (value) {
-        Future.delayed(Duration(seconds: 3)).then(
-          (_) {
-            handleOpeningStatsNotificationsFromBackground(context, ref).then(
-              (wasOpened) {
-                if (wasOpened) {
-                  ref.invalidate(fetchStatsProvider);
-                  ref.read(fetchStatsProvider);
-                }
-              },
-            );
-          },
-        );
-      },
-    );
-
     WidgetsBinding.instance.addObserver(this);
+    _initializeFirebaseMessaging();
+  }
+
+  void _initializeFirebaseMessaging() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final firebaseMessaging = ref.read(firebaseMessagingProvider);
+      firebaseMessaging.initialize(context, ref);
+    });
+  }
+
+  Future<void> initializeApp() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await loadEnvironment();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    setupAudioCallback();
+    await initializeAudioService();
+    usePathUrlStrategy();
   }
 
   void _setUpSystemUi() {
@@ -168,6 +157,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final firebaseMessaging = ref.read(firebaseMessagingProvider);
+      firebaseMessaging.initialize(context, ref);
+    });
+
     return MaterialApp(
       scaffoldMessengerKey: scaffoldMessengerKey,
       theme: appTheme(context),

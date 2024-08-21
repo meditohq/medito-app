@@ -54,19 +54,6 @@ class _HomeViewState extends ConsumerState<HomeView>
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _refreshStats();
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _refreshStats();
-  }
-
   late CurvedAnimation curvedAnimation = CurvedAnimation(
     parent: AnimationController(
       vsync: this,
@@ -178,10 +165,6 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(refreshHomeAPIsProvider.future);
     ref.invalidate(fetchStatsProvider);
     await ref.read(fetchStatsProvider.future);
-  }
-
-  void _refreshStats() {
-    ref.invalidate(fetchStatsProvider);
   }
 
   void _onStatsButtonTapped(BuildContext context, WidgetRef ref) {

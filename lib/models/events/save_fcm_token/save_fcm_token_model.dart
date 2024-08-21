@@ -6,7 +6,7 @@ part 'save_fcm_token_model.g.dart';
 @freezed
 abstract class SaveFcmTokenModel with _$SaveFcmTokenModel {
   const factory SaveFcmTokenModel({
-    required String fcmToken,
+    required String token,
   }) = _SaveFcmTokenModel;
 
   factory SaveFcmTokenModel.fromJson(Map<String, Object?> json) =>

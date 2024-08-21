@@ -189,6 +189,40 @@ data class Track (
     )
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CompletionData (
+  val trackId: String,
+  val duration: Long,
+  val fileId: String,
+  val guideId: String? = null,
+  val timestamp: Long,
+  val userToken: String? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CompletionData {
+      val trackId = list[0] as String
+      val duration = list[1].let { if (it is Int) it.toLong() else it as Long }
+      val fileId = list[2] as String
+      val guideId = list[3] as String?
+      val timestamp = list[4].let { if (it is Int) it.toLong() else it as Long }
+      val userToken = list[5] as String?
+      return CompletionData(trackId, duration, fileId, guideId, timestamp, userToken)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      trackId,
+      duration,
+      fileId,
+      guideId,
+      timestamp,
+      userToken,
+    )
+  }
+}
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface MeditoAndroidAudioServiceManager {
   fun startService()
@@ -503,15 +537,20 @@ private object MeditoAudioServiceCallbackApiCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlaybackState.fromList(it)
+          CompletionData.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Speed.fromList(it)
+          PlaybackState.fromList(it)
         }
       }
       131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          Speed.fromList(it)
+        }
+      }
+      132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           Track.fromList(it)
         }
@@ -525,16 +564,20 @@ private object MeditoAudioServiceCallbackApiCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is PlaybackState -> {
+      is CompletionData -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is Speed -> {
+      is PlaybackState -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is Track -> {
+      is Speed -> {
         stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is Track -> {
+        stream.write(132)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -556,6 +599,22 @@ class MeditoAudioServiceCallbackApi(private val binaryMessenger: BinaryMessenger
     val channelName = "dev.flutter.pigeon.Medito.MeditoAudioServiceCallbackApi.updatePlaybackState"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(stateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun handleCompletedTrack(completionDataArg: CompletionData, callback: (Result<Unit>) -> Unit)
+{
+    val channelName = "dev.flutter.pigeon.Medito.MeditoAudioServiceCallbackApi.handleCompletedTrack"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(completionDataArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))

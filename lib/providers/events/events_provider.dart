@@ -46,6 +46,7 @@ Future<void> audioStartedEvent(
 Future<void> fcmSaveEvent(
   FcmSaveEventRef ref, {
   required Map<String, dynamic> event,
+  required String userToken,
 }) async {
   await FirebaseAnalytics.instance.logEvent(
     name: 'fcmSave',
@@ -54,7 +55,7 @@ Future<void> fcmSaveEvent(
 
   final events = ref.watch(eventsRepositoryProvider);
 
-  return events.saveFirebaseToken(event);
+  return events.saveFirebaseToken(event, userToken);
 }
 
 @riverpod

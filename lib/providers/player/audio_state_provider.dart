@@ -1,11 +1,13 @@
-import 'dart:io';
-
 import 'package:Medito/main.dart';
 import 'package:Medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
+import '../../utils/call_update_stats.dart';
+import '../../utils/stats_updater.dart';
+import '../root/root_combine_provider.dart';
 
 class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   final AudioStateNotifier notifier;
@@ -15,6 +17,19 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   @override
   void updatePlaybackState(PlaybackState state) {
     notifier.updatePlaybackState(state);
+  }
+
+  // only used on Android
+  @override
+  Future<void> handleCompletedTrack(CompletionData completionData) async {
+    await handleStats({
+      TypeConstants.trackIdKey: completionData.trackId,
+      TypeConstants.durationIdKey: completionData.duration,
+      TypeConstants.fileIdKey: completionData.fileId,
+      TypeConstants.guideIdKey: completionData.guideId,
+      TypeConstants.timestampIdKey: completionData.timestamp,
+      UpdateStatsConstants.userTokenKey: await getUserToken(),
+    });
   }
 }
 

@@ -153,9 +153,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       if (Navigator.canPop(context)) {
         _resetState();
         _stopAudio();
-        ref
-            .read(playerProvider.notifier)
-            .cancelPendingNotificationsForAudioCompleteEvent();
         _endScreenOpened = false;
 
         Future.delayed(Duration(milliseconds: 50), () {

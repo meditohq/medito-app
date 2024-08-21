@@ -7,10 +7,8 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/src/audio_pigeon.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-      'android/app/src/main/kotlin/com/meditofoundation/medito/AudioPigeon.g.kt',
+  'android/app/src/main/kotlin/com/meditofoundation/medito/AudioPigeon.g.kt',
   kotlinOptions: KotlinOptions(),
-  // swiftOut: 'ios/Runner/Messages.g.swift',
-  // swiftOptions: SwiftOptions(),
 ))
 // #enddocregion config
 
@@ -123,8 +121,28 @@ class Track {
 
 }
 
+class CompletionData {
+  String trackId;
+  int duration;
+  String fileId;
+  String? guideId;
+  int timestamp;
+  String? userToken;
+
+  CompletionData({
+    required this.trackId,
+    required this.duration,
+    required this.fileId,
+    required this.guideId,
+    required this.timestamp,
+    required this.userToken,
+  });
+}
+
 @FlutterApi()
 abstract class MeditoAudioServiceCallbackApi {
   void updatePlaybackState(PlaybackState state);
+  void handleCompletedTrack(CompletionData completionData);
 }
+
 // #enddocregion flutter-definitions

@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/repositories/repositories.dart';
 import 'package:Medito/services/network/api_response.dart';
-import 'package:Medito/services/notifications/notifications_service.dart';
+import 'package:Medito/services/notifications/firebase_notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -51,6 +53,8 @@ class AuthNotifier extends ChangeNotifier {
       userResponse = ApiResponse.completed(response);
       notifyListeners();
     }
+
+    unawaited(_saveFirebaseToken());
   }
 
   Future<void> generateUserToken() async {
@@ -106,11 +110,13 @@ class AuthNotifier extends ChangeNotifier {
     return await authRepository.getUserFromSharedPreference();
   }
 
-  Future<void> saveFcmTokenEvent() async {
-    var token = await requestGenerateFirebaseToken();
+  Future<void> _saveFirebaseToken() async {
+    var user = await authRepository.getUserFromSharedPreference();
+    var userToken = user?.token ?? '';
+    var token = await ref.read(firebaseMessagingProvider).getToken();
     if (token != null) {
-      var fcm = SaveFcmTokenModel(fcmToken: token);
-      ref.read(fcmSaveEventProvider(event: fcm.toJson()));
+      var fcm = SaveFcmTokenModel(token: token);
+      ref.read(fcmSaveEventProvider(event: fcm.toJson(), userToken: userToken));
     }
   }
 }
