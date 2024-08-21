@@ -610,7 +610,7 @@ class MeditoAudioServiceCallbackApi(private val binaryMessenger: BinaryMessenger
       } 
     }
   }
-  fun handleCompletedTrack(completionDataArg: CompletionData, callback: (Result<Unit>) -> Unit)
+  fun handleCompletedTrack(completionDataArg: CompletionData, callback: (Result<Boolean>) -> Unit)
 {
     val channelName = "dev.flutter.pigeon.Medito.MeditoAudioServiceCallbackApi.handleCompletedTrack"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
@@ -618,8 +618,11 @@ class MeditoAudioServiceCallbackApi(private val binaryMessenger: BinaryMessenger
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(FlutterError("null-error", "Flutter api returned null value for non-null return value.", "")))
         } else {
-          callback(Result.success(Unit))
+          val output = it[0] as Boolean
+          callback(Result.success(output))
         }
       } else {
         callback(Result.failure(createConnectionError(channelName)))

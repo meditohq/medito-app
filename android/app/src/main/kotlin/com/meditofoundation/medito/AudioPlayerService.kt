@@ -3,6 +3,7 @@
 package meditofoundation.medito
 
 import AudioData
+import CompletionData
 import MeditoAudioServiceApi
 import MeditoAudioServiceCallbackApi
 import PlaybackState
@@ -28,13 +29,13 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.MediaStyleNotificationHelper
+import com.meditofoundation.medito.MainActivity
 import com.meditofoundation.medito.SharedPreferencesManager
 import io.flutter.embedding.engine.FlutterEngineCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi,
     MediaSession.Callback {
@@ -68,7 +69,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryMediaSession = MediaSession.Builder(this, primaryPlayer)
             .setCallback(this)
             .build()
-
     }
 
     override fun onDestroy() {
@@ -79,7 +79,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
         handler.removeCallbacks(positionUpdateRunnable)
 
-
         primaryPlayer.removeListener(this)
         backgroundMusicPlayer.removeListener(this)
 
@@ -88,7 +87,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             release()
             primaryMediaSession = null
         }
-
     }
 
     @Deprecated("Deprecated in Java")
@@ -102,9 +100,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         handler.removeCallbacks(positionUpdateRunnable)
-
         clearNotification()
-
         this.primaryPlayer.stop()
         this.backgroundMusicPlayer.stop()
         this.primaryPlayer.clearMediaItems()
@@ -155,9 +151,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return true
     }
 
-    private fun createMediaNotification(
-        artworkBitmap: Bitmap?
-    ): Notification {
+    private fun createMediaNotification(artworkBitmap: Bitmap?): Notification {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
@@ -321,28 +315,45 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
             meditoAudioApi?.updatePlaybackState(state) {
                 if (primaryPlayer.playbackState == Player.STATE_ENDED) {
-                    val completionData = JSONObject().apply {
-                        put("trackId", state.track.id)
-                        put("duration", state.duration)
-                        put("fileId", state.track.title)
-                        put("guideId", state.track.artist)
-                        put("timestamp", System.currentTimeMillis())
-                    }
-                    SharedPreferencesManager.saveCompletionData(
-                        this@AudioPlayerService,
-                        completionData
-                    )
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    stopSelf()
+                    handleTrackCompletion(state)
                 } else {
                     handler.postDelayed(this, 250)
                 }
             }
         }
 
-        private fun saveCompletionData(completionData: JSONObject) {
-            sharedPreferences.edit().putString("lastCompletedTrack", completionData.toString())
-                .apply()
+        private fun handleTrackCompletion(state: PlaybackState) {
+            val completionData = createCompletionData(state)
+            saveAndSendCompletionData(completionData)
+            finishPlayback()
+        }
+
+        private fun createCompletionData(state: PlaybackState): CompletionData {
+            return CompletionData(
+                trackId = state.track.id,
+                duration = state.duration,
+                fileId = state.track.title,
+                guideId = state.track.artist,
+                timestamp = System.currentTimeMillis()
+            )
+        }
+
+        private fun saveAndSendCompletionData(completionData: CompletionData) {
+
+            SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
+
+            // Attempt to send data
+            meditoAudioApi?.handleCompletedTrack(completionData) { success ->
+                // Clear saved data only if sending was successful
+                if (success.isSuccess) {
+                    SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
+                }
+            }
+        }
+
+        private fun finishPlayback() {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
         }
 
         private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
@@ -361,5 +372,4 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         const val CHANNEL_ID = "medito_media_channel"
         const val NOTIFICATION_ID = 101011
     }
-
 }
