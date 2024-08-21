@@ -6,6 +6,8 @@ import '../../models/stats/stats_model.dart';
 
 part 'home_provider.g.dart';
 
+const noneAnnouncementId = 'none';
+
 @riverpod
 Future<HomeModel> fetchHome(FetchHomeRef ref) {
   final homeRepository = ref.watch(homeRepositoryProvider);
@@ -21,7 +23,9 @@ Future<AnnouncementModel?> fetchLatestAnnouncement(
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  return await homeRepository.fetchLatestAnnouncement();
+  var announcement = await homeRepository.fetchLatestAnnouncement();
+
+  return announcement?.id == noneAnnouncementId ? null : announcement;
 }
 
 @riverpod
