@@ -14,12 +14,12 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
         right: padding16,
       ),
       child: Column(
-        children: List.generate(8, (index) => _shimmerList(context)),
+        children: List.generate(8, (index) => _shimmerList()),
       ),
     );
   }
 
-  Container _shimmerList(BuildContext context) {
+  Container _shimmerList() {
     return Container(
       decoration: BoxDecoration(
         color: ColorConstants.onyx,
