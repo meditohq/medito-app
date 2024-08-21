@@ -21,15 +21,21 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
 
   // only used on Android
   @override
-  Future<void> handleCompletedTrack(CompletionData completionData) async {
-    await handleStats({
-      TypeConstants.trackIdKey: completionData.trackId,
-      TypeConstants.durationIdKey: completionData.duration,
-      TypeConstants.fileIdKey: completionData.fileId,
-      TypeConstants.guideIdKey: completionData.guideId,
-      TypeConstants.timestampIdKey: completionData.timestamp,
-      UpdateStatsConstants.userTokenKey: await getUserToken(),
-    });
+  Future<bool> handleCompletedTrack(CompletionData completionData) async {
+    try {
+      await handleStats({
+        TypeConstants.trackIdKey: completionData.trackId,
+        TypeConstants.durationIdKey: completionData.duration,
+        TypeConstants.fileIdKey: completionData.fileId,
+        TypeConstants.guideIdKey: completionData.guideId,
+        TypeConstants.timestampIdKey: completionData.timestamp,
+        UpdateStatsConstants.userTokenKey: await getUserToken(),
+      });
+
+      return true;
+    } on Exception catch (_) {
+      return false;
+    }
   }
 }
 

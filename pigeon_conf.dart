@@ -142,7 +142,8 @@ class CompletionData {
 @FlutterApi()
 abstract class MeditoAudioServiceCallbackApi {
   void updatePlaybackState(PlaybackState state);
-  void handleCompletedTrack(CompletionData completionData);
+  @async
+  bool handleCompletedTrack(CompletionData completionData);
 }
 
 // #enddocregion flutter-definitions

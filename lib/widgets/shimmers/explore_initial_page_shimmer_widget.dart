@@ -9,24 +9,26 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.only(
-        top: 20,
+        top: MediaQuery.of(context).padding.top + padding20,
         left: padding16,
         right: padding16,
       ),
       child: Column(
-        children: List.generate(8, (index) => _shimmerList()),
+        children: List.generate(8, (index) => _shimmerList(context)),
       ),
     );
   }
 
-  Container _shimmerList() {
+  Container _shimmerList(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: ColorConstants.onyx,
         borderRadius: BorderRadius.circular(14),
       ),
       padding: EdgeInsets.all(padding16),
-      margin: EdgeInsets.only(bottom: padding16),
+      margin: EdgeInsets.only(
+        bottom: padding16,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
