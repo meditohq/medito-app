@@ -9,11 +9,14 @@ part 'home_provider.g.dart';
 const noneAnnouncementId = 'none';
 
 @riverpod
-Future<HomeModel> fetchHome(FetchHomeRef ref) {
+Future<HomeModel> fetchHome(FetchHomeRef ref) async {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  return homeRepository.fetchHome();
+  var homeModel = await homeRepository.fetchHome();
+  var sortedShortcuts = await homeRepository.getSortedShortcuts(homeModel.shortcuts);
+
+  return homeModel.copyWith(shortcuts: sortedShortcuts);
 }
 
 @riverpod

@@ -58,6 +58,23 @@ class HomeRepositoryImpl extends HomeRepository {
     });
   }
 
+  Future<List<ShortcutsModel>> getSortedShortcuts(List<ShortcutsModel> shortcuts) async {
+    var savedIds = getLocalShortcutIds();
+    if (savedIds.isEmpty) return shortcuts;
+
+    var sortedShortcuts = List<ShortcutsModel>.from(shortcuts);
+    sortedShortcuts.sort((a, b) {
+      var indexA = savedIds.indexOf(a.id);
+      var indexB = savedIds.indexOf(b.id);
+      if (indexA == -1) return 1;
+      if (indexB == -1) return -1;
+
+      return indexA.compareTo(indexB);
+    });
+
+    return sortedShortcuts;
+  }
+
   @override
   Future<AnnouncementModel?> fetchLatestAnnouncement() {
     return client
