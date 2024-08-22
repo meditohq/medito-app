@@ -11,7 +11,6 @@ class SharedPreferenceConstants {
   static const String notificationPermissionCount =
       'notificationPermissionCount';
   static const String notificationPermission = 'notificationPermission';
-  static const String trackOpenedFirstTime = 'trackOpenedFirstTime';
   static const String secsListened = 'secsListened';
   static const String listened = 'listened';
   static const String stats = 'stats';
