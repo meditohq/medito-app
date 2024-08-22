@@ -80,7 +80,6 @@ class _TrackViewState extends ConsumerState<TrackView>
   Widget build(BuildContext context) {
     super.build(context);
 
-    ref.watch(trackOpenedFirstTimeProvider);
     var tracks = ref.watch(tracksProvider(trackId: widget.id));
 
     return Scaffold(

@@ -22,7 +22,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-        AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
+        AudioDownloadState.DOWNLOADED) {
       return IconButton(
         onPressed: () =>
             _handleRemoveDownload(downloadAudioProvider, ref, context),
@@ -32,7 +32,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         ),
       );
     } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-        AUDIO_DOWNLOAD_STATE.DOWNLOADING) {
+        AudioDownloadState.DOWNLOADING) {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
       return IconButton(

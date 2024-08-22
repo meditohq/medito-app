@@ -16,7 +16,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
   AudioDownloaderProvider(this.ref);
 
   Map<String, double> downloadingProgress = {};
-  Map<String, AUDIO_DOWNLOAD_STATE> audioDownloadState = {};
+  Map<String, AudioDownloadState> audioDownloadState = {};
 
   Future<void> downloadTrackAudio(
     TrackModel trackModel,
@@ -26,7 +26,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADING;
+      audioDownloadState[fileName] = AudioDownloadState.DOWNLOADING;
       await downloadAudio.downloadFile(
         file.path,
         name: fileName,
@@ -38,7 +38,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
         },
       );
       downloadingProgress.remove(fileName);
-      audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOADED;
+      audioDownloadState[fileName] = AudioDownloadState.DOWNLOADED;
       await ref.read(deleteTrackFromPreferenceProvider(
         file: file,
       ).future);
@@ -48,7 +48,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
       ).future);
       notifyListeners();
     } catch (e) {
-      audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOAD;
+      audioDownloadState[fileName] = AudioDownloadState.DOWNLOAD;
       notifyListeners();
       rethrow;
     }
@@ -57,7 +57,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
   Future<void> deleteTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
-    audioDownloadState[fileName] = AUDIO_DOWNLOAD_STATE.DOWNLOAD;
+    audioDownloadState[fileName] = AudioDownloadState.DOWNLOAD;
     notifyListeners();
   }
 
@@ -65,15 +65,15 @@ class AudioDownloaderProvider extends ChangeNotifier {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
     audioDownloadState[fileName] = audioPath != null
-        ? AUDIO_DOWNLOAD_STATE.DOWNLOADED
-        : AUDIO_DOWNLOAD_STATE.DOWNLOAD;
+        ? AudioDownloadState.DOWNLOADED
+        : AudioDownloadState.DOWNLOAD;
     notifyListeners();
 
     return audioPath;
   }
 }
 
-enum AUDIO_DOWNLOAD_STATE {
+enum AudioDownloadState {
   DOWNLOAD,
   DOWNLOADING,
   DOWNLOADED,

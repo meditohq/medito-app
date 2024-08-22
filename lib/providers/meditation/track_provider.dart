@@ -9,22 +9,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'track_provider.g.dart';
 
-final trackOpenedFirstTimeProvider = FutureProvider<bool>((ref) async {
-  final hasOpened = ref.read(sharedPreferencesProvider).getBool(
-        SharedPreferenceConstants.trackOpenedFirstTime,
-      );
-  final isFirstTime = hasOpened ?? true;
-
-  if (isFirstTime) {
-    await ref.read(sharedPreferencesProvider).setBool(
-          SharedPreferenceConstants.trackOpenedFirstTime,
-          false,
-        );
-  }
-
-  return isFirstTime;
-});
-
 @riverpod
 Future<TrackModel> tracks(
   TracksRef ref, {
@@ -62,7 +46,7 @@ final likeDislikeCombineProvider =
   var downloadFileKey =
       '$trackId-$fileId${getAudioFileExtension(data.file.path)}';
   if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-      AUDIO_DOWNLOAD_STATE.DOWNLOADED) {
+      AudioDownloadState.DOWNLOADED) {
     await ref.read(deleteTrackFromPreferenceProvider(
       file: data.file,
     ).future);
