@@ -155,17 +155,9 @@ class StringConstants {
   static const requestPermission = 'Request Permission';
   static const mediaPlaybackPermissions = 'Media Playback Permissions';
   static const reminderPermissions = 'Reminder Permissions';
-  static const statsReminderPermissions = 'Stats Update Permissions';
-  static const statsReminderPermissionsDesc = 'We need permission to send you reminders about updating your meditation stats. This helps you keep track of your progress.';
   static const weNeedYourPermissionMedia = 'We need permission to show media controls in your notifications. This allows you to control playback without opening the app.';
   static const weNeedYourPermissionReminder = 'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.';
   static const mediaPermissionDenied = 'Media controls are not available without permission.';
-  static const statsPermissionDenied = 'Stats reminders are not available without notification permission.';
   static const reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
-
-  static const androidNotificationChannelName = 'Stats reminder';
-  static const androidNotificationChannelDescription = 'This notification reminds you to keep track of your meditation stats.';
-  static const notificationTitle = 'Did you meditate today?';
-  static const notificationBody = 'Update your stats to keep track of your progress.';
 
 }

@@ -60,7 +60,6 @@ class _TrackViewState extends ConsumerState<TrackView>
   ) async {
     try {
       await PermissionHandler.requestMediaPlaybackPermission(context);
-      await PermissionHandler.requestStatsReminderPermission(context);
 
       await ref.read(playerProvider.notifier).loadSelectedTrack(
             trackModel: trackModel,

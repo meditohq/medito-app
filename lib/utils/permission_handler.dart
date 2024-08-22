@@ -43,44 +43,6 @@ class PermissionHandler {
     return false;
   }
 
-  static Future<bool> requestStatsReminderPermission(
-    BuildContext context,
-  ) async {
-
-    if(Platform.isIOS) return true;
-
-    final status = await Permission.notification.status;
-    if (status.isGranted) {
-      return true;
-    }
-
-    if (status.isPermanentlyDenied) {
-      return false;
-    }
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(StringConstants.reminderPermissions),
-        content: Text(StringConstants.weNeedYourPermissionReminder),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(StringConstants.requestPermission),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      final status = await Permission.notification.request();
-
-      return status.isGranted;
-    }
-
-    return false;
-  }
-
   static Future<bool> requestMediaPlaybackPermission(BuildContext context) async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.status;
