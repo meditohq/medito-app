@@ -12,7 +12,9 @@ import '../animated_scale_widget.dart';
 
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
+
   final List<ShortcutsModel> data;
+
   @override
   ConsumerState<ShortcutsItemsWidget> createState() =>
       _ShortcutsItemsWidgetState();
@@ -49,13 +51,18 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     });
   }
 
-  void _handleShortcutItemPlacementInPreference(int oldIndex, int newIndex) {
+  Future<void> _handleShortcutItemPlacementInPreference(
+    int oldIndex,
+    int newIndex,
+  ) async {
     var _data = [...data];
     final element = _data.removeAt(oldIndex);
     _data.insert(newIndex, element);
     data = _data;
     var ids = _data.map((e) => e.id).toList();
-    ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids));
+    await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
+
+    await ref.read(refreshHomeAPIsProvider.future);
   }
 
   void _handleShortcutWidgetPlacement(int newIndex, int oldIndex) {
