@@ -44,13 +44,26 @@ class MainActivity : FlutterActivity(), MeditoAndroidAudioServiceManager {
     private fun createNotificationChannels() {
         createAudioServiceNotificationChannel()
         createReminderNotificationChannel()
+        createNewsNotificationChannel()
     }
 
     private fun createAudioServiceNotificationChannel() {
         val channelName = "Meditation audio"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(AUDIO_CHANNEL_ID, channelName, importance).apply {
+        val channel = NotificationChannel(AudioPlayerService.CHANNEL_ID, channelName, importance).apply {
             description = "Notification for media control of meditation audio"
+        }
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun createNewsNotificationChannel() {
+        val channelName = "News and Updates"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(NEWS_CHANNEL_ID, channelName, importance).apply {
+            description = "Stay up-to-date with the latest news and updates from Medito"
         }
 
         val notificationManager: NotificationManager =
@@ -93,7 +106,7 @@ class MainActivity : FlutterActivity(), MeditoAndroidAudioServiceManager {
 
     companion object {
         const val ENGINE_ID = "medito_flutter_engine"
-        const val AUDIO_CHANNEL_ID = "medito_audio_channel"
         const val REMINDER_CHANNEL_ID = "medito_reminder_channel"
+        const val NEWS_CHANNEL_ID = "medito_news_channel"
     }
 }

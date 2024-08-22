@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../models/user/user_token_model.dart';
-import '../../services/notifications/firebase_notifications_service.dart';
 import '../../utils/call_update_stats.dart';
 import '../../utils/stats_updater.dart';
 import '../../views/maintenance/maintenance_view.dart';

@@ -44,7 +44,7 @@ class FirebaseMessagingHandler {
     BuildContext context,
     WidgetRef ref,
   ) async {
-    await _messaging.requestPermission();
+    // await _messaging.requestPermission();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage
         .listen((message) => _handleForegroundMessage(message, context, ref));
@@ -77,7 +77,10 @@ class FirebaseMessagingHandler {
   }
 
   void _handleForegroundMessage(
-      RemoteMessage message, BuildContext context, WidgetRef ref) {
+    RemoteMessage message,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     final snackBar = SnackBar(
       content: Text(message.notification?.body ?? 'New message'),
       action: SnackBarAction(
@@ -111,7 +114,10 @@ class FirebaseMessagingHandler {
   }
 
   void _handleMessageOpenedApp(
-      RemoteMessage message, BuildContext context, WidgetRef ref) {
+    RemoteMessage message,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     _navigate(context, ref, message.data);
   }
 
@@ -149,8 +155,6 @@ class FirebaseMessagingHandler {
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
-
   final handler = FirebaseMessagingHandler();
   await handler._showBackgroundNotification(message);
 }

@@ -156,7 +156,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     TrackModel trackModel,
   ) async {
     await PermissionHandler.requestMediaPlaybackPermission(context);
-    await PermissionHandler.requestStatsReminderPermission(context);
 
     await ref.read(playerProvider.notifier).loadSelectedTrack(
           trackModel: trackModel,
