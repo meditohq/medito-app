@@ -85,10 +85,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Scaffold(
       body: Column(
         children: [
-          AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
           Container(
             height: MediaQuery.of(context).size.height * 0.25,
             margin: EdgeInsets.symmetric(horizontal: 20),

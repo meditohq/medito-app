@@ -34,7 +34,7 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
     return IconButton(
       onPressed: handleLike,
       icon: Icon(
-        Icons.favorite,
+        Icons.star,
         color:
             isLiked ? ColorConstants.lightPurple : ColorConstants.walterWhite,
       ),

@@ -1,5 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +29,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     return Column(
       children: [
         _title(context),
-        if (artistName.isNotNullAndNotEmpty()) _subtitle(context),
+        if (artistUrlPath.isNotNullAndNotEmpty()) _subtitle(context),
       ],
     );
   }
@@ -44,6 +43,7 @@ class ArtistTitleWidget extends ConsumerWidget {
       padding: const EdgeInsets.all(16.0),
       child: Text(
         trackTitle ?? '',
+        textAlign: TextAlign.center,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
               fontFamily: SourceSerif,
               color: ColorConstants.walterWhite,
@@ -54,7 +54,7 @@ class ArtistTitleWidget extends ConsumerWidget {
     );
   }
 
-  Padding _subtitle(BuildContext context) {
+  InkWell _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
           fontFamily: DmMono,
           fontSize: artistNameFontSize,
@@ -62,24 +62,19 @@ class ArtistTitleWidget extends ConsumerWidget {
           color: ColorConstants.graphite,
         );
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: InkWell(
-        child: Text(
-          artistName ?? '',
-          style: style,
-        ),
-        onTap: () => _handleArtistNameTap(context),
+    return InkWell(
+      onTap: () => _handleArtistNameTap(),
+      child: Text(
+        artistName ?? '',
+        style: style,
       ),
     );
   }
 
-  void _handleArtistNameTap(BuildContext context) async {
+  void _handleArtistNameTap() async {
     if (isPlayerScreen && artistUrlPath != null) {
-      await handleNavigation(
-        TypeConstants.url,
-        [artistUrlPath],
-        context,
+      await launchURLInBrowser(
+        artistUrlPath!,
       );
     }
   }

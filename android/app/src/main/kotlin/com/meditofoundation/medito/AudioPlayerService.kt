@@ -11,7 +11,6 @@ import Speed
 import Track
 import android.app.Notification
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -47,7 +46,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private lateinit var backgroundMusicPlayer: ExoPlayer
     private var primaryMediaSession: MediaSession? = null
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
-    private lateinit var sharedPreferences: SharedPreferences
+    private var isCompletionHandled = false
 
     override fun onCreate() {
         super.onCreate()
@@ -93,6 +92,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         if (playWhenReady && playbackState == Player.STATE_READY) {
             backgroundMusicPlayer.play()
+            isCompletionHandled = false
         } else if (!playWhenReady) {
             backgroundMusicPlayer.pause()
         }
@@ -126,6 +126,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun playAudio(audioData: AudioData): Boolean {
+        isCompletionHandled = false
+
         val primaryMediaItem = MediaItem.Builder()
             .setUri(audioData.url)
             .setMediaId(audioData.track.id)
@@ -247,6 +249,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun seekToPosition(position: Long) {
+        isCompletionHandled = false
         primaryPlayer.seekTo(position)
     }
 
@@ -271,12 +274,14 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun stopAudio() {
+        isCompletionHandled = false
         primaryPlayer.stop()
         backgroundMusicPlayer.stop()
         clearNotification()
     }
 
     override fun playPauseAudio() {
+        isCompletionHandled = false
         if (primaryPlayer.isPlaying) {
             primaryPlayer.pause()
             backgroundMusicPlayer.pause()
@@ -314,9 +319,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             )
 
             meditoAudioApi?.updatePlaybackState(state) {
-                if (primaryPlayer.playbackState == Player.STATE_ENDED) {
+                if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
+                    isCompletionHandled = true
                     handleTrackCompletion(state)
-                } else {
+                } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
                     handler.postDelayed(this, 250)
                 }
             }
@@ -325,7 +331,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         private fun handleTrackCompletion(state: PlaybackState) {
             val completionData = createCompletionData(state)
             saveAndSendCompletionData(completionData)
-            finishPlayback()
         }
 
         private fun createCompletionData(state: PlaybackState): CompletionData {
@@ -339,14 +344,20 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
 
         private fun saveAndSendCompletionData(completionData: CompletionData) {
-
+            // Save completion data to SharedPreferences
             SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
 
-            // Attempt to send data
-            meditoAudioApi?.handleCompletedTrack(completionData) { success ->
-                // Clear saved data only if sending was successful
-                if (success.isSuccess) {
-                    SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
+            // Launch a coroutine to handle the completion asynchronously
+            CoroutineScope(Dispatchers.Main).launch {
+                // Attempt to send data
+                meditoAudioApi?.handleCompletedTrack(completionData) { result ->
+                    // Clear saved data only if sending was successful
+                    if (result.isSuccess) {
+                        SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
+                    }
+
+                    // After ensuring the completion data is handled, finish playback
+                    finishPlayback()
                 }
             }
         }

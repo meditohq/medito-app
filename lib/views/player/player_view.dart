@@ -67,7 +67,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            // Blurred background image
             ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Image.network(
@@ -75,11 +74,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 fit: BoxFit.cover,
               ),
             ),
-            // Dark overlay to improve content visibility
             Container(
               color: Colors.black.withOpacity(0.6),
             ),
-            // Main content
             SafeArea(
               child: Center(
                 child: SingleChildScrollView(
