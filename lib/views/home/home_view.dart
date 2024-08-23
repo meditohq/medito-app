@@ -6,10 +6,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uni_links/uni_links.dart';
 
 import '../../providers/home/home_provider.dart';
-import '../../routes/routes.dart';
 import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'widgets/editorial/carousel_widget.dart';
@@ -37,7 +35,6 @@ class _HomeViewState extends ConsumerState<HomeView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    navigateToDeepLink();
     _subscription = Connectivity()
         .onConnectivityChanged
         .listen((List<ConnectivityResult> result) {
@@ -73,12 +70,6 @@ class _HomeViewState extends ConsumerState<HomeView>
       )..forward(),
       curve: Curves.easeInOut,
     );
-  }
-
-  void navigateToDeepLink() {
-    Future.delayed(Duration(seconds: 1), () async {
-      handleDeepLink(await getInitialUri(), context);
-    });
   }
 
   @override
