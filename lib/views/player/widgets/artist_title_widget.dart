@@ -28,7 +28,6 @@ class ArtistTitleWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _title(context),
         if (artistName.isNotNullAndNotEmpty()) _subtitle(context),
@@ -41,34 +40,27 @@ class ArtistTitleWidget extends ConsumerWidget {
       return SizedBox(height: titleHeight);
     }
 
-    return SizedBox(
-      height: titleHeight,
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              trackTitle ?? '',
-              style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-                fontFamily: SourceSerif,
-                color: ColorConstants.walterWhite,
-                fontSize: trackTitleFontSize,
-                letterSpacing: 0.2,
-              ),
-              overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        trackTitle ?? '',
+        style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+              fontFamily: SourceSerif,
+              color: ColorConstants.walterWhite,
+              fontSize: trackTitleFontSize,
+              letterSpacing: 0.2,
             ),
-          ),
-        ],
       ),
     );
   }
 
   Padding _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontFamily: DmMono,
-      fontSize: artistNameFontSize,
-      letterSpacing: 0,
-      color: ColorConstants.graphite,
-    );
+          fontFamily: DmMono,
+          fontSize: artistNameFontSize,
+          letterSpacing: 0,
+          color: ColorConstants.graphite,
+        );
 
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),

@@ -14,12 +14,14 @@ class BottomActionWidget extends StatelessWidget {
     required this.file,
     required this.isBackgroundSoundSelected,
     required this.onSpeedChanged,
+    required this.onClosePressed,
   });
 
   final bool isBackgroundSoundSelected;
   final TrackModel trackModel;
   final TrackFilesModel file;
   final Function(double) onSpeedChanged;
+  final void Function() onClosePressed;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,16 @@ class BottomActionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: onClosePressed,
+              child: Icon(
+                Icons.close,
+                color: ColorConstants.walterWhite,
+              ),
+            ),
+          ),
+          width8,
           Expanded(
             child: AudioDownloadWidget(
               trackModel: trackModel,

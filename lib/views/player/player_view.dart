@@ -1,9 +1,11 @@
+import 'dart:ui';
+
+import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
-import 'package:Medito/views/player/widgets/overlay_cover_image_widget.dart';
 import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +31,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      var currentlyPlayingTrack = ref.watch(playerProvider);
+      final currentlyPlayingTrack = ref.watch(playerProvider);
       if (currentlyPlayingTrack?.hasBackgroundSound ?? false) {
         ref
             .read(backgroundSoundsNotifierProvider.notifier)
@@ -40,13 +42,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    var playbackState = ref.watch(audioStateProvider);
+    final playbackState = ref.watch(audioStateProvider);
     if (playbackState.isCompleted && playbackState.position > 5000) {
       _openEndScreen();
       _resetState();
     }
 
-    var currentlyPlayingTrack = ref.watch(playerProvider);
+    final currentlyPlayingTrack = ref.watch(playerProvider);
     if (currentlyPlayingTrack == null) {
       return MeditoErrorWidget(
         onTap: () => Navigator.pop(context),
@@ -54,12 +56,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       );
     }
 
-    var file = currentlyPlayingTrack.audio.first.files.first;
-
-    var size = MediaQuery.of(context).size.width;
-    var spacerHeight48 = size <= 380.0 ? 10.0 : 56.0;
-    var spacerHeight20 = size <= 380.0 ? 0.0 : 20.0;
-    var spacerHeight24 = size <= 380.0 ? 0.0 : 24.0;
+    final file = currentlyPlayingTrack.audio.first.files.first;
 
     return PopScope(
       canPop: false,
@@ -67,59 +64,74 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        appBar: MeditoAppBarSmall(
-          hasCloseButton: true,
-          closePressed: () => {_handleClose(true)},
-          isTransparent: true,
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: spacerHeight20),
-                OverlayCoverImageWidget(imageUrl: playbackState.track.imageUrl),
-                SizedBox(height: spacerHeight48),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: ArtistTitleWidget(
-                    trackTitle: playbackState.track.title,
-                    artistName: playbackState.track.artist,
-                    artistUrlPath: playbackState.track.artistUrl,
-                    isPlayerScreen: true,
-                  ),
-                ),
-                DurationIndicatorWidget(
-                  totalDuration: playbackState.duration,
-                  currentPosition: playbackState.position,
-                  onSeekEnd: (value) {
-                    ref.read(playerProvider.notifier).seekToPosition(value);
-                  },
-                ),
-                SizedBox(height: spacerHeight24),
-                Transform.translate(
-                  offset: Offset(0, -10),
-                  child: PlayerButtonsWidget(
-                    isPlaying: playbackState.isPlaying,
-                    onPlayPause: onPlayPausePressed,
-                    onSkip10SecondsBackward: () => ref
-                        .read(playerProvider.notifier)
-                        .skip10SecondsBackward(),
-                    onSkip10SecondsForward: () => ref
-                        .read(playerProvider.notifier)
-                        .skip10SecondsForward(),
-                  ),
-                ),
-                SizedBox(height: spacerHeight24),
-                BottomActionWidget(
-                  trackModel: currentlyPlayingTrack,
-                  file: file,
-                  onSpeedChanged: (speed) =>
-                      ref.read(playerProvider.notifier).setSpeed(speed),
-                  isBackgroundSoundSelected: _isBackgroundSoundSelected(),
-                ),
-                SizedBox(height: 40),
-              ],
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Blurred background image
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Image.network(
+                playbackState.track.imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
+            // Dark overlay to improve content visibility
+            Container(
+              color: Colors.black.withOpacity(0.6),
+            ),
+            // Main content
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ArtistTitleWidget(
+                          trackTitle: playbackState.track.title,
+                          artistName: playbackState.track.artist,
+                          artistUrlPath: playbackState.track.artistUrl,
+                          isPlayerScreen: true,
+                        ),
+                        const SizedBox(height: 32),
+                        DurationIndicatorWidget(
+                          totalDuration: playbackState.duration,
+                          currentPosition: playbackState.position,
+                          onSeekEnd: (value) {
+                            ref.read(playerProvider.notifier).seekToPosition(value);
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        PlayerButtonsWidget(
+                          isPlaying: playbackState.isPlaying,
+                          onPlayPause: onPlayPausePressed,
+                          onSkip10SecondsBackward: () => ref
+                              .read(playerProvider.notifier)
+                              .skip10SecondsBackward(),
+                          onSkip10SecondsForward: () => ref
+                              .read(playerProvider.notifier)
+                              .skip10SecondsForward(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.black.withOpacity(0.2),
+          child: BottomActionWidget(
+            trackModel: currentlyPlayingTrack,
+            file: file,
+            onClosePressed: () => _handleClose(true),
+            onSpeedChanged: (speed) =>
+                ref.read(playerProvider.notifier).setSpeed(speed),
+            isBackgroundSoundSelected: _isBackgroundSoundSelected(),
           ),
         ),
       ),
@@ -127,7 +139,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   void onPlayPausePressed() {
-    var isPlaying = ref.read(audioStateProvider).isPlaying;
+    final isPlaying = ref.read(audioStateProvider).isPlaying;
     ref.read(playerProvider.notifier).playPause();
     ref
         .read(backgroundSoundsNotifierProvider.notifier)
@@ -135,7 +147,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   bool _isBackgroundSoundSelected() {
-    var bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+    final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
 
     return bgSoundNotifier.selectedBgSound != null &&
         bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
@@ -155,7 +167,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         _stopAudio();
         _endScreenOpened = false;
 
-        Future.delayed(Duration(milliseconds: 50), () {
+        Future.delayed(const Duration(milliseconds: 50), () {
           Navigator.pop(context);
           _isClosing = false;
         });
@@ -180,7 +192,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_endScreenOpened) {
         _resetState();
-        var currentlyPlayingTrack = ref.read(playerProvider);
+        final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack != null) {
           Navigator.pushReplacement(
             context,
