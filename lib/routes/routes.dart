@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../utils/utils.dart';
 import '../views/downloads/downloads_view.dart';
 
 extension SanitisePath on String {
@@ -142,15 +143,6 @@ Future<void> handleNavigation(
         },
       );
     }
-  }
-}
-
-Future<void> launchURLInBrowser(String url) async {
-  var uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    throw 'Could not launch $url';
   }
 }
 

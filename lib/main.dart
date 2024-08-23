@@ -163,6 +163,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     });
 
     return MaterialApp(
+      debugShowCheckedModeBanner: kDebugMode,
       scaffoldMessengerKey: scaffoldMessengerKey,
       theme: appTheme(context),
       title: ParentWidget._title,

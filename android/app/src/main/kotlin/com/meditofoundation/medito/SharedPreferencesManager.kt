@@ -20,7 +20,7 @@ object SharedPreferencesManager {
 
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putString(KEY_LAST_COMPLETED_TRACK, completionData.toString())
+            .putString(KEY_LAST_COMPLETED_TRACK, jsonData.toString())
             .apply()
     }
 
