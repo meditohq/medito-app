@@ -39,7 +39,7 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      leading: _leadingWidget(),
+      leading: null,
       automaticallyImplyLeading: false,
       centerTitle: true,
       actions: actions,
@@ -47,16 +47,6 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: isTransparent ? Colors.transparent : ColorConstants.onyx,
       title: getTitleWidget(context),
     );
-  }
-
-  Widget? _leadingWidget() {
-    if (hasCloseButton) {
-      return CloseButton(onPressed: closePressed);
-    } else if (hasBackButton) {
-      return BackButton();
-    } else {
-      return null;
-    }
   }
 
   Widget getTitleWidget(BuildContext context) {
