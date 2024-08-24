@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
@@ -57,9 +59,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final file = currentlyPlayingTrack.audio.first.files.first;
     final imageUrl = playbackState.track.imageUrl;
 
+    // Pre-cache the image for smoother performance
+    precacheImage(NetworkImage(imageUrl), context);
+
     return WillPopScope(
       onWillPop: () async {
         _handleClose(true);
+
         return false;
       },
       child: Scaffold(
@@ -69,21 +75,26 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           fit: StackFit.expand,
           children: [
             if (imageUrl.isNotEmpty)
-              Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
+              Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+
+                  return Image.asset(
+                    'assets/images/placeholder.png',
                     fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 20, // Controls the blur effect
-                      spreadRadius: 10, // Controls the spread effect
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+              ),
+            ),
             SafeArea(
               child: Center(
                 child: SingleChildScrollView(
