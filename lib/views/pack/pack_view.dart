@@ -7,6 +7,7 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:Medito/views/pack/widgets/pack_item_widget.dart';
+import 'package:Medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,9 @@ class _PackViewState extends ConsumerState<PackView>
     var packs = ref.watch(packProvider(packId: widget.id));
 
     return Scaffold(
+      bottomNavigationBar: SingleBackButtonActionBar(onBackPressed: () {
+        Navigator.pop(context);
+      }),
       body: packs.when(
         skipLoadingOnRefresh: false,
         skipLoadingOnReload: false,
@@ -83,6 +87,7 @@ class _PackViewState extends ConsumerState<PackView>
           MeditoAppBarLarge(
             scrollController: _scrollController,
             title: pack.title,
+            hasLeading: false,
             coverUrl: pack.coverUrl,
           ),
           SliverList(

@@ -9,12 +9,14 @@ class MeditoAppBarLarge extends StatefulWidget {
     required this.title,
     this.coverUrl,
     this.bgColor = ColorConstants.onyx,
+    this.hasLeading = false,
   });
 
   final ScrollController scrollController;
   final String title;
   final String? coverUrl;
   final Color bgColor;
+  final bool hasLeading;
 
   @override
   State<MeditoAppBarLarge> createState() => _MeditoAppBarLargeState();
@@ -31,19 +33,15 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
         ? widget.scrollController.offset
         : 0.0;
     final scrollFactor = (scrollPosition / 240).clamp(0.0, 1.0);
-    final titlePaddingDelta =
-        (collapsedPadding - expandedPadding) * scrollFactor;
-    final titlePadding = (expandedPadding + titlePaddingDelta).toDouble();
+    final titlePadding = (expandedPadding).toDouble();
 
     return SliverAppBar.large(
       shadowColor: ColorConstants.ebony,
       surfaceTintColor: Colors.transparent,
       expandedHeight: topBarHeight,
       backgroundColor: ColorConstants.onyx,
-      leading: IconButton(
-        icon: Icon(Icons.close_rounded),
-        onPressed: () => Navigator.pop(context),
-      ),
+      automaticallyImplyLeading: false,
+      leading: widget.hasLeading ? const BackButton() : null,
       flexibleSpace: _flexibleSpaceBar(
         titlePadding,
         widget.title,
@@ -70,8 +68,8 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
             fontFamily: SourceSerif,
-        fontWeight: FontWeight.w700,
-        color: ColorConstants.walterWhite,
+            fontWeight: FontWeight.w700,
+            color: ColorConstants.walterWhite,
           ),
     );
   }
