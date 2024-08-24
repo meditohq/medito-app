@@ -72,7 +72,6 @@ flutter:
     - assets/
     - .prod.env
     - .staging.env
-    - assets/images/
   fonts:
     - family: Source Serif
       fonts:

@@ -45,7 +45,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final playbackState = ref.watch(audioStateProvider);
     if (playbackState.isCompleted && playbackState.position > 5000) {
       _openEndScreen();
-      _resetState();
     }
 
     final currentlyPlayingTrack = ref.watch(playerProvider);
@@ -76,7 +75,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
             if (imageUrl.isNotEmpty)
               FadeInImage.assetNetwork(
                 key: ValueKey(imageUrl),
-                placeholder: 'assets/images/placeholder.png',
+                placeholder: 'assets/images/placeholder.jpg',
                 image: imageUrl,
                 fit: BoxFit.cover,
                 fadeInDuration: const Duration(seconds: 2),
@@ -167,8 +166,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Navigator.canPop(context)) {
-        _stopAudio();
         _resetState();
+        _stopAudio();
         _endScreenOpened = false;
 
         Future.delayed(const Duration(milliseconds: 50), () {
