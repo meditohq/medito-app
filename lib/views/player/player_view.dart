@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
@@ -71,21 +69,21 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           fit: StackFit.expand,
           children: [
             if (imageUrl.isNotEmpty)
-              RepaintBoundary(
-                child: ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: FadeInImage.assetNetwork(
-                    placeholderColor: Colors.black,
-                    placeholder: 'assets/images/placeholder.jpg',
-                    image: imageUrl,
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
                     fit: BoxFit.cover,
-                    fadeInDuration: Duration(seconds: 1),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 20, // Controls the blur effect
+                      spreadRadius: 10, // Controls the spread effect
+                    ),
+                  ],
                 ),
               ),
-            Container(
-              color: Colors.black.withOpacity(0.4),
-            ),
             SafeArea(
               child: Center(
                 child: SingleChildScrollView(
