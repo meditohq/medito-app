@@ -1,7 +1,8 @@
 name: Medito
 description: A meditation learning tool
 
-version: 3.1.6+30042
+# flutter build apk --release --no-tree-shake-icons
+version: 3.1.7+30043
 environment:
   sdk: ">=2.18.0 <3.7.0-13.0"
   flutter: ">=3.0.0"
@@ -92,5 +93,3 @@ flutter:
         - asset: assets/fonts/dm-sans/DMSans-SemiBold.ttf
 
   uses-material-design: true
-
-# flutter build apk --release --no-tree-shake-icons
