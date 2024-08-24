@@ -4,16 +4,16 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/bottom_action_widget.dart';
+import 'package:Medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
 import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
+import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/strings/string_constants.dart';
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
-import '../../widgets/headers/medito_app_bar_small.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({
@@ -97,7 +97,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                           totalDuration: playbackState.duration,
                           currentPosition: playbackState.position,
                           onSeekEnd: (value) {
-                            ref.read(playerProvider.notifier).seekToPosition(value);
+                            ref
+                                .read(playerProvider.notifier)
+                                .seekToPosition(value);
                           },
                         ),
                         const SizedBox(height: 24),
@@ -120,16 +122,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.black.withOpacity(0.2),
-          child: BottomActionWidget(
-            trackModel: currentlyPlayingTrack,
-            file: file,
-            onClosePressed: () => _handleClose(true),
-            onSpeedChanged: (speed) =>
-                ref.read(playerProvider.notifier).setSpeed(speed),
-            isBackgroundSoundSelected: _isBackgroundSoundSelected(),
-          ),
+        bottomNavigationBar: PlayerActionBar(
+          trackModel: currentlyPlayingTrack,
+          file: file,
+          onClosePressed: () => _handleClose(true),
+          onSpeedChanged: (speed) =>
+              ref.read(playerProvider.notifier).setSpeed(speed),
+          isBackgroundSoundSelected: _isBackgroundSoundSelected(),
         ),
       ),
     );
