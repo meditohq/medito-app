@@ -3,16 +3,45 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/strings/string_constants.dart';
 
 class PermissionHandler {
+  static const String _alarmPermissionDialogKey = 'alarm_permission_dialog_shown_count';
+  static const String _mediaPlaybackPermissionDialogKey = 'media_playback_permission_dialog_shown_count';
+  static const int _maxDialogShowCount = 2;
+
+  static Future<SharedPreferences> _initializeSharedPreferences() async {
+    return await SharedPreferences.getInstance();
+  }
+
+  static Future<int> _getDialogShownCount(String key) async {
+    final prefs = await _initializeSharedPreferences();
+    return prefs.getInt(key) ?? 0;
+  }
+
+  static Future<void> _incrementDialogShownCount(String key) async {
+    final prefs = await _initializeSharedPreferences();
+    int count = prefs.getInt(key) ?? 0;
+    await prefs.setInt(key, count + 1);
+  }
+
   static Future<bool> requestAlarmPermission(BuildContext context) async {
     if (Platform.isAndroid) {
       final status = await Permission.scheduleExactAlarm.status;
       if (status.isGranted) {
         return true;
       }
+
+      int dialogShownCount = await _getDialogShownCount(_alarmPermissionDialogKey);
+
+      // Check if the dialog has been shown twice
+      if (dialogShownCount >= _maxDialogShowCount) {
+        return false;
+      }
+
+      await _incrementDialogShownCount(_alarmPermissionDialogKey);
 
       final result = await showDialog<bool>(
         context: context,
@@ -30,7 +59,6 @@ class PermissionHandler {
 
       if (result == true) {
         final permissionStatus = await Permission.scheduleExactAlarm.request();
-
         return permissionStatus.isGranted;
       }
 
@@ -52,8 +80,17 @@ class PermissionHandler {
       }
 
       if (status.isPermanentlyDenied) {
-         return false;
+        return false;
       }
+
+      int dialogShownCount = await _getDialogShownCount(_mediaPlaybackPermissionDialogKey);
+
+      // Check if the dialog has been shown twice
+      if (dialogShownCount >= _maxDialogShowCount) {
+        return false;
+      }
+
+      await _incrementDialogShownCount(_mediaPlaybackPermissionDialogKey);
 
       final result = await showDialog<bool>(
         context: context,
@@ -71,7 +108,6 @@ class PermissionHandler {
 
       if (result == true) {
         final newStatus = await Permission.notification.request();
-
         return newStatus.isGranted;
       }
 
@@ -83,5 +119,4 @@ class PermissionHandler {
 
     return false;
   }
-
 }
