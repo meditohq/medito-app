@@ -65,7 +65,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     return WillPopScope(
       onWillPop: () async {
         _handleClose(true);
-
         return false;
       },
       child: Scaffold(
@@ -75,19 +74,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           fit: StackFit.expand,
           children: [
             if (imageUrl.isNotEmpty)
-              Image.network(
-                imageUrl,
+              FadeInImage.assetNetwork(
+                key: ValueKey(imageUrl),
+                placeholder: 'assets/images/placeholder.png',
+                image: imageUrl,
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-
-                  return Image.asset(
-                    'assets/images/placeholder.png',
-                    fit: BoxFit.cover,
-                  );
-                },
+                fadeInDuration: const Duration(seconds: 2),
               ),
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
