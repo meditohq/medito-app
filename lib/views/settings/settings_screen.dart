@@ -4,6 +4,7 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/permission_handler.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -41,6 +42,11 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     return Scaffold(
+      bottomNavigationBar: SingleBackButtonActionBar(
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       appBar: MeditoAppBarSmall(
         isTransparent: true,
         title: StringConstants.settings,
