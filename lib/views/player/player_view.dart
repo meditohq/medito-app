@@ -7,7 +7,6 @@ import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
 import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
-import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,6 +25,7 @@ class PlayerView extends ConsumerStatefulWidget {
 
 class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
+  bool _isClosing = false;
 
   @override
   void initState() {
@@ -57,25 +57,34 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
 
     final file = currentlyPlayingTrack.audio.first.files.first;
+    final imageUrl = playbackState.track.imageUrl;
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: _handleClose,
+    return WillPopScope(
+      onWillPop: () async {
+        _handleClose(true);
+        return false;
+      },
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
         body: Stack(
           fit: StackFit.expand,
           children: [
-            ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Image.network(
-                playbackState.track.imageUrl,
-                fit: BoxFit.cover,
+            if (imageUrl.isNotEmpty)
+              RepaintBoundary(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: FadeInImage.assetNetwork(
+                    placeholderColor: Colors.black,
+                    placeholder: 'assets/images/placeholder.jpg',
+                    image: imageUrl,
+                    fit: BoxFit.cover,
+                    fadeInDuration: Duration(seconds: 1),
+                  ),
+                ),
               ),
-            ),
             Container(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withOpacity(0.4),
             ),
             SafeArea(
               child: Center(
@@ -149,8 +158,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
   }
 
-  bool _isClosing = false;
-
   void _handleClose(bool _) {
     if (_isClosing) {
       return;
@@ -159,8 +166,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Navigator.canPop(context)) {
-        _resetState();
         _stopAudio();
+        _resetState();
         _endScreenOpened = false;
 
         Future.delayed(const Duration(milliseconds: 50), () {
