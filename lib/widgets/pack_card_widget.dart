@@ -69,6 +69,8 @@ class PackCardWidget extends StatelessWidget {
     if (subtitle != null) {
       return Text(
         '$subtitle',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 2,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
           color: ColorConstants.graphite,

@@ -17,7 +17,7 @@ class ExploreInitialPageWidget extends ConsumerWidget {
 
     return allPacks.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildMain(ref, data, context),
+      data: (data) => _buildMain(ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(fetchAllPacksProvider),
@@ -27,13 +27,13 @@ class ExploreInitialPageWidget extends ConsumerWidget {
   }
 
   Widget _buildMain(
-      WidgetRef ref,
-      List<PackItemsModel> packs,
-      BuildContext context,
-      ) {
+    WidgetRef ref,
+    List<PackItemsModel> packs,
+  ) {
     return OrientationBuilder(
       builder: (context, orientation) {
         final isPortrait = orientation == Orientation.portrait;
+
         return Column(
           children: [
             Expanded(
@@ -41,7 +41,7 @@ class ExploreInitialPageWidget extends ConsumerWidget {
                 onRefresh: () async => ref.refresh(fetchAllPacksProvider),
                 child: isPortrait
                     ? _buildListView(context, packs, ref)
-                    : _buildGridView(context, packs, ref),
+                    : _buildGridView(packs, ref),
               ),
             ),
           ],
@@ -52,9 +52,9 @@ class ExploreInitialPageWidget extends ConsumerWidget {
 
   Widget _buildListView(
       BuildContext context,
-      List<PackItemsModel> packs,
-      WidgetRef ref,
-      ) {
+    List<PackItemsModel> packs,
+    WidgetRef ref,
+  ) {
     return ListView.builder(
       itemCount: packs.length,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -86,37 +86,54 @@ class ExploreInitialPageWidget extends ConsumerWidget {
   }
 
   Widget _buildGridView(
-      BuildContext context,
-      List<PackItemsModel> packs,
-      WidgetRef ref,
-      ) {
-    return GridView.builder(
-      itemCount: packs.length,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + padding16,
-        left: padding16,
-        right: padding16,
-        bottom: padding16,
-      ),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: padding16,
-        mainAxisSpacing: padding16,
-        childAspectRatio: 8 / 2,
-      ),
-      itemBuilder: (context, index) {
-        var element = packs[index];
+    List<PackItemsModel> packs,
+    WidgetRef ref,
+  ) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate the width of each grid item
+        double itemWidth = (constraints.maxWidth - padding16 * 3) / 2;
 
-        return PackCardWidget(
-          title: element.title,
-          subTitle: element.subtitle,
-          coverUrlPath: element.coverUrl,
-          onTap: () => handleNavigation(
-            element.type,
-            [element.id.toString(), element.path],
-            context,
-            ref: ref,
+        // Define a maximum height for each grid item
+        double maxItemHeight = 140.0; // Adjust this value as needed
+
+        // Calculate the aspect ratio based on the item width and the max height
+        double childAspectRatio = itemWidth / maxItemHeight;
+
+        return GridView.builder(
+          itemCount: packs.length,
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + padding16,
+            left: padding16,
+            right: padding16,
+            bottom: padding16,
           ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: padding16,
+            mainAxisSpacing: padding16,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemBuilder: (context, index) {
+            var element = packs[index];
+
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: maxItemHeight,
+              ),
+              child: PackCardWidget(
+                title: element.title,
+                subTitle: element.subtitle,
+                coverUrlPath: element.coverUrl,
+                onTap: () => handleNavigation(
+                  element.type,
+                  [element.id.toString(), element.path],
+                  context,
+                  ref: ref,
+                ),
+              ),
+            );
+          },
         );
       },
     );
