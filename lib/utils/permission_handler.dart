@@ -34,9 +34,9 @@ class PermissionHandler {
         return true;
       }
 
-      int dialogShownCount = await _getDialogShownCount(_alarmPermissionDialogKey);
+      int dialogShownCount = await _getDialogShownCount(
+          _alarmPermissionDialogKey);
 
-      // Check if the dialog has been shown twice
       if (dialogShownCount >= _maxDialogShowCount) {
         return false;
       }
@@ -45,16 +45,29 @@ class PermissionHandler {
 
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(StringConstants.reminderPermissions),
-          content: Text(StringConstants.weNeedYourPermissionReminder),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(StringConstants.requestPermission),
+        builder: (context) =>
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return AlertDialog(
+                  title: Text(StringConstants.reminderPermissions),
+                  content: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: constraints.maxHeight * 0.7,
+                      maxWidth: constraints.maxWidth * 0.7,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Text(StringConstants.weNeedYourPermissionReminder),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(StringConstants.requestPermission),
+                    ),
+                  ],
+                );
+              },
             ),
-          ],
-        ),
       );
 
       if (result == true) {
@@ -64,14 +77,14 @@ class PermissionHandler {
 
       return false;
     } else if (Platform.isIOS) {
-      // iOS doesn't require explicit permission for alarms
       return true;
     }
 
     return false;
   }
 
-  static Future<bool> requestMediaPlaybackPermission(BuildContext context) async {
+  static Future<bool> requestMediaPlaybackPermission(
+      BuildContext context) async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.status;
 
@@ -83,9 +96,9 @@ class PermissionHandler {
         return false;
       }
 
-      int dialogShownCount = await _getDialogShownCount(_mediaPlaybackPermissionDialogKey);
+      int dialogShownCount = await _getDialogShownCount(
+          _mediaPlaybackPermissionDialogKey);
 
-      // Check if the dialog has been shown twice
       if (dialogShownCount >= _maxDialogShowCount) {
         return false;
       }
@@ -94,16 +107,29 @@ class PermissionHandler {
 
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(StringConstants.mediaPlaybackPermissions),
-          content: Text(StringConstants.weNeedYourPermissionMedia),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(StringConstants.requestPermission),
+        builder: (context) =>
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return AlertDialog(
+                  title: Text(StringConstants.mediaPlaybackPermissions),
+                  content: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: constraints.maxHeight * 0.7,
+                      maxWidth: constraints.maxWidth * 0.7,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Text(StringConstants.weNeedYourPermissionMedia),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(StringConstants.requestPermission),
+                    ),
+                  ],
+                );
+              },
             ),
-          ],
-        ),
       );
 
       if (result == true) {
@@ -113,10 +139,10 @@ class PermissionHandler {
 
       return false;
     } else if (Platform.isIOS) {
-      // iOS doesn't require explicit permission for media notifications
       return true;
     }
 
     return false;
   }
+
 }

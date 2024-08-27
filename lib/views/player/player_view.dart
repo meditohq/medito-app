@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/providers/providers.dart';
+import 'package:Medito/src/audio_pigeon.g.dart';
 import 'package:Medito/views/end_screen/end_screen_view.dart';
 import 'package:Medito/views/player/widgets/artist_title_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/player_action_bar.dart';
@@ -58,7 +59,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final file = currentlyPlayingTrack.audio.first.files.first;
     final imageUrl = playbackState.track.imageUrl;
 
-    // Pre-cache the image for smoother performance
     precacheImage(NetworkImage(imageUrl), context);
 
     return WillPopScope(
@@ -69,66 +69,40 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (imageUrl.isNotEmpty)
-              FadeInImage.assetNetwork(
-                key: ValueKey(imageUrl),
-                placeholder: 'assets/images/placeholder.jpg',
-                image: imageUrl,
-                fit: BoxFit.cover,
-                fadeInDuration: const Duration(seconds: 2),
-              ),
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                color: Colors.black.withOpacity(0.3),
-              ),
-            ),
-            SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ArtistTitleWidget(
-                          trackTitle: playbackState.track.title,
-                          artistName: playbackState.track.artist,
-                          artistUrlPath: playbackState.track.artistUrl,
-                          isPlayerScreen: true,
-                        ),
-                        const SizedBox(height: 32),
-                        DurationIndicatorWidget(
-                          totalDuration: playbackState.duration,
-                          currentPosition: playbackState.position,
-                          onSeekEnd: (value) {
-                            ref
-                                .read(playerProvider.notifier)
-                                .seekToPosition(value);
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                        PlayerButtonsWidget(
-                          isPlaying: playbackState.isPlaying,
-                          onPlayPause: onPlayPausePressed,
-                          onSkip10SecondsBackward: () => ref
-                              .read(playerProvider.notifier)
-                              .skip10SecondsBackward(),
-                          onSkip10SecondsForward: () => ref
-                              .read(playerProvider.notifier)
-                              .skip10SecondsForward(),
-                        ),
-                      ],
+        body: OrientationBuilder(
+          builder: (context, orientation) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                if (imageUrl.isNotEmpty)
+                  FadeInImage.assetNetwork(
+                    key: ValueKey(imageUrl),
+                    placeholder: 'assets/images/placeholder.jpg',
+                    image: imageUrl,
+                    fit: BoxFit.cover,
+                    fadeInDuration: const Duration(seconds: 2),
+                  ),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.3),
+                  ),
+                ),
+                SafeArea(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: orientation == Orientation.portrait
+                            ? _buildPortraitLayout(playbackState)
+                            : _buildLandscapeLayout(playbackState),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         bottomNavigationBar: PlayerActionBar(
@@ -140,6 +114,76 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           isBackgroundSoundSelected: _isBackgroundSoundSelected(),
         ),
       ),
+    );
+  }
+
+  Widget _buildPortraitLayout(PlaybackState playbackState) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ArtistTitleWidget(
+          trackTitle: playbackState.track.title,
+          artistName: playbackState.track.artist,
+          artistUrlPath: playbackState.track.artistUrl,
+          isPlayerScreen: true,
+        ),
+        const SizedBox(height: 32),
+        DurationIndicatorWidget(
+          totalDuration: playbackState.duration,
+          currentPosition: playbackState.position,
+          onSeekEnd: (value) {
+            ref.read(playerProvider.notifier).seekToPosition(value);
+          },
+        ),
+        const SizedBox(height: 24),
+        PlayerButtonsWidget(
+          isPlaying: playbackState.isPlaying,
+          onPlayPause: onPlayPausePressed,
+          onSkip10SecondsBackward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsBackward(),
+          onSkip10SecondsForward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsForward(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(PlaybackState playbackState) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ArtistTitleWidget(
+          trackTitle: playbackState.track.title,
+          artistName: playbackState.track.artist,
+          artistUrlPath: playbackState.track.artistUrl,
+          isPlayerScreen: true,
+        ),
+        const SizedBox(height: 32),
+        Row(
+          children: [
+            Expanded(
+              child: DurationIndicatorWidget(
+                totalDuration: playbackState.duration,
+                currentPosition: playbackState.position,
+                onSeekEnd: (value) {
+                  ref.read(playerProvider.notifier).seekToPosition(value);
+                },
+              ),
+            ),
+            const SizedBox(width: 24),
+            PlayerButtonsWidget(
+              isPlaying: playbackState.isPlaying,
+              onPlayPause: onPlayPausePressed,
+              onSkip10SecondsBackward: () =>
+                  ref.read(playerProvider.notifier).skip10SecondsBackward(),
+              onSkip10SecondsForward: () =>
+                  ref.read(playerProvider.notifier).skip10SecondsForward(),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

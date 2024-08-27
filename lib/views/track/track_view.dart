@@ -19,10 +19,30 @@ class TrackView extends ConsumerStatefulWidget {
   ConsumerState<TrackView> createState() => _TrackViewState();
 }
 
-class _TrackViewState extends ConsumerState<TrackView>{
+class _TrackViewState extends ConsumerState<TrackView> {
   TrackAudioModel? selectedAudio;
   TrackFilesModel? selectedDuration;
-  final GlobalKey childKey = GlobalKey();
+  final GlobalKey _contentKey = GlobalKey();
+  bool _useCompactLayout = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkOverflow());
+  }
+
+  void _checkOverflow() {
+    final RenderBox? renderBox = _contentKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      final Size size = renderBox.size;
+      final double screenHeight = MediaQuery.of(context).size.height;
+      final double contentHeight = size.height;
+
+      setState(() {
+        _useCompactLayout = contentHeight > screenHeight;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,40 +53,91 @@ class _TrackViewState extends ConsumerState<TrackView>{
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: tracks.when(
-                  data: (data) => _buildCoverImage(data.coverUrl),
-                  loading: () => _buildLoadingCover(),
-                  error: (_, __) => _buildErrorCover(),
-                ),
+        child: OrientationBuilder(
+          builder: (context, orientation) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: orientation == Orientation.portrait
+                    ? _buildPortraitLayout(tracks)
+                    : _buildLandscapeLayout(tracks),
               ),
-              SizedBox(height: 24),
-              Expanded(
-                child: tracks.when(
-                  skipLoadingOnRefresh: false,
-                  data: (data) => _buildContentWithData(context, data, ref),
-                  error: (err, stack) => MeditoErrorWidget(
-                    message: err.toString(),
-                    onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
-                    isScaffold: false,
-                  ),
-                  loading: () => _buildLoadingWidget(),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildCoverImage(String url) {
+  Widget _buildPortraitLayout(AsyncValue<TrackModel> tracks) {
+    return Column(
+      key: _contentKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(
+          aspectRatio: 16 / 9,
+          child: _buildCoverImage(tracks),
+        ),
+        SizedBox(height: 24),
+        _buildTrackContent(tracks, isLandscape: false),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(AsyncValue<TrackModel> tracks) {
+    return Column(
+      key: _contentKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.25,  // 25% of screen width
+                maxHeight: MediaQuery.of(context).size.height * 0.5,  // 50% of screen height
+              ),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: _buildCoverImage(tracks),
+              ),
+            ),
+            SizedBox(width: 24),
+            Expanded(
+              child: tracks.when(
+                data: (data) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _title(context, data.title),
+                    SizedBox(height: 8),
+                    _getSubTitle(context, data.description),
+                  ],
+                ),
+                loading: () => _buildLoadingWidget(),
+                error: (err, stack) => MeditoErrorWidget(
+                  message: err.toString(),
+                  onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+                  isScaffold: false,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 24),
+        _buildTrackContent(tracks, isLandscape: true),
+      ],
+    );
+  }
+
+  Widget _buildCoverImage(AsyncValue<TrackModel> tracks) {
+    return tracks.when(
+      data: (data) => _buildImageWithData(data.coverUrl),
+      loading: () => _buildLoadingCover(),
+      error: (_, __) => _buildErrorCover(),
+    );
+  }
+
+  Widget _buildImageWithData(String url) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: NetworkImageWidget(
@@ -90,35 +161,81 @@ class _TrackViewState extends ConsumerState<TrackView>{
     );
   }
 
+  Widget _buildTrackContent(AsyncValue<TrackModel> tracks, {required bool isLandscape}) {
+    return tracks.when(
+      skipLoadingOnRefresh: false,
+      data: (data) => _buildContentWithData(context, data, ref, isLandscape: isLandscape),
+      error: (err, stack) => MeditoErrorWidget(
+        message: err.toString(),
+        onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+        isScaffold: false,
+      ),
+      loading: () => _buildLoadingWidget(),
+    );
+  }
+
   Widget _buildContentWithData(
       BuildContext context,
       TrackModel trackModel,
       WidgetRef ref,
+      {required bool isLandscape}
       ) {
-    var showGuideNameDropdown =
-    trackModel.audio.first.guideName.isNotNullAndNotEmpty();
+    var showGuideNameDropdown = trackModel.audio.first.guideName.isNotNullAndNotEmpty();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _title(context, trackModel.title),
-        SizedBox(height: 8),
-        _getSubTitle(context, trackModel.description),
-        SizedBox(height: 24),
-        if (showGuideNameDropdown) ...[
-          _guideNameDropdown(trackModel),
-          SizedBox(height: 12),
+    if (isLandscape) {
+      return Row(
+        children: [
+          if (showGuideNameDropdown)
+            Expanded(child: _guideNameDropdown(trackModel, isLandscape: true))
+          else
+            Spacer(),
+          SizedBox(width: 12),
+          Expanded(child: _durationDropdown(trackModel, isLandscape: true)),
+          SizedBox(width: 12),
+          Expanded(child: _playBtn(ref, trackModel, isFullWidth: false)),
         ],
-        _durationDropdown(trackModel),
-        SizedBox(height: 12),
-        _playBtn(ref, trackModel),
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _title(context, trackModel.title),
+          SizedBox(height: 8),
+          _getSubTitle(context, trackModel.description),
+          SizedBox(height: 24),
+          if (_useCompactLayout && showGuideNameDropdown)
+            _buildCompactPickers(trackModel)
+          else ...[
+            if (showGuideNameDropdown) ...[
+              _guideNameDropdown(trackModel, isLandscape: false),
+              SizedBox(height: 12),
+            ],
+            _durationDropdown(trackModel, isLandscape: false),
+          ],
+          SizedBox(height: 12),
+          _playBtn(ref, trackModel, isFullWidth: true),
+        ],
+      );
+    }
+  }
+
+  Widget _buildCompactPickers(TrackModel trackModel) {
+    return Row(
+      children: [
+        Expanded(
+          child: _guideNameDropdown(trackModel, isLandscape: false),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: _durationDropdown(trackModel, isLandscape: false),
+        ),
       ],
     );
   }
 
   Widget _buildLoadingWidget() => const TrackShimmerWidget();
 
-  InkWell _playBtn(WidgetRef ref, TrackModel trackModel) {
+  Widget _playBtn(WidgetRef ref, TrackModel trackModel, {required bool isFullWidth}) {
     var radius = BorderRadius.all(Radius.circular(7));
 
     return InkWell(
@@ -129,6 +246,7 @@ class _TrackViewState extends ConsumerState<TrackView>{
       borderRadius: radius,
       child: Ink(
         height: 56,
+        width: isFullWidth ? double.infinity : null,
         decoration: BoxDecoration(
           color: ColorConstants.walterWhite,
           borderRadius: radius,
@@ -142,62 +260,6 @@ class _TrackViewState extends ConsumerState<TrackView>{
         ),
       ),
     );
-  }
-
-  DropdownWidget<TrackFilesModel> _durationDropdown(TrackModel trackModel) {
-    var audioFiles = trackModel.audio.first.files;
-    var selectedFile = selectedAudio?.files;
-
-    return DropdownWidget<TrackFilesModel>(
-      value: selectedDuration ?? audioFiles.first,
-      iconData: Icons.timer_sharp,
-      topLeft: 7,
-      topRight: 7,
-      bottomRight: 7,
-      bottomLeft: 7,
-      isDisabled: (selectedFile ?? audioFiles).length > 1,
-      disabledLabelText:
-      '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
-      items: files(selectedFile ?? audioFiles)
-          .map<DropdownMenuItem<TrackFilesModel>>(
-            (TrackFilesModel value) {
-          return DropdownMenuItem<TrackFilesModel>(
-            value: value,
-            child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.mins}',
-            ),
-          );
-        },
-      ).toList(),
-      onChanged: handleOnDurationChange,
-    );
-  }
-
-  Widget _guideNameDropdown(TrackModel trackModel) {
-    var audio = trackModel.audio.first;
-    if (audio.guideName.isNotNullAndNotEmpty()) {
-      return DropdownWidget<TrackAudioModel>(
-        value: selectedAudio ?? audio,
-        iconData: Icons.face,
-        bottomRight: 7,
-        topLeft: 7,
-        topRight: 7,
-        bottomLeft: 7,
-        isDisabled: trackModel.audio.length > 1,
-        disabledLabelText: '${audio.guideName}',
-        items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
-              (TrackAudioModel value) {
-            return DropdownMenuItem<TrackAudioModel>(
-              value: value,
-              child: Text(value.guideName ?? ''),
-            );
-          },
-        ).toList(),
-        onChanged: _handleOnGuideNameChange,
-      );
-    }
-
-    return SizedBox();
   }
 
   Text _title(BuildContext context, String title) {
@@ -282,4 +344,59 @@ class _TrackViewState extends ConsumerState<TrackView>{
 
   List<TrackFilesModel> files(List<TrackFilesModel> files) => files;
 
+  Widget _durationDropdown(TrackModel trackModel, {required bool isLandscape}) {
+    var audioFiles = trackModel.audio.first.files;
+    var selectedFile = selectedAudio?.files;
+
+    return DropdownWidget<TrackFilesModel>(
+      value: selectedDuration ?? audioFiles.first,
+      iconData: Icons.timer_sharp,
+      topLeft: 7,
+      topRight: 7,
+      bottomRight: 7,
+      bottomLeft: 7,
+      disabledLabelText:
+      '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
+      items: files(selectedFile ?? audioFiles)
+          .map<DropdownMenuItem<TrackFilesModel>>(
+            (TrackFilesModel value) {
+          return DropdownMenuItem<TrackFilesModel>(
+            value: value,
+            child: Text(
+              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.mins}',
+            ),
+          );
+        },
+      ).toList(),
+      onChanged: handleOnDurationChange,
+      isLandscape: isLandscape,
+    );
+  }
+
+  Widget _guideNameDropdown(TrackModel trackModel, {required bool isLandscape}) {
+    var audio = trackModel.audio.first;
+    if (audio.guideName.isNotNullAndNotEmpty()) {
+      return DropdownWidget<TrackAudioModel>(
+        value: selectedAudio ?? audio,
+        iconData: Icons.face,
+        bottomRight: 7,
+        topLeft: 7,
+        topRight: 7,
+        bottomLeft: 7,
+        disabledLabelText: '${audio.guideName}',
+        items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
+              (TrackAudioModel value) {
+            return DropdownMenuItem<TrackAudioModel>(
+              value: value,
+              child: Text(value.guideName ?? ''),
+            );
+          },
+        ).toList(),
+        onChanged: _handleOnGuideNameChange,
+        isLandscape: isLandscape,
+      );
+    }
+
+    return SizedBox();
+  }
 }

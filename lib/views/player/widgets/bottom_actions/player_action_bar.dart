@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../models/track/track_model.dart';
 import 'bottom_action_bar.dart';
@@ -27,6 +27,7 @@ class PlayerActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomActionBar(
+      showBackground: true,
       actions: [
         GestureDetector(
           onTap: onClosePressed,
