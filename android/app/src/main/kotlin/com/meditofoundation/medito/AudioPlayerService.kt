@@ -344,19 +344,15 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
 
         private fun saveAndSendCompletionData(completionData: CompletionData) {
-            // Save completion data to SharedPreferences
             SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
 
-            // Launch a coroutine to handle the completion asynchronously
             CoroutineScope(Dispatchers.Main).launch {
                 // Attempt to send data
                 meditoAudioApi?.handleCompletedTrack(completionData) { result ->
-                    // Clear saved data only if sending was successful
                     if (result.isSuccess) {
                         SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
                     }
 
-                    // After ensuring the completion data is handled, finish playback
                     finishPlayback()
                 }
             }
