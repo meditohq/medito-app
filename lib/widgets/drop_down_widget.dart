@@ -12,8 +12,8 @@ class DropdownWidget<T> extends StatelessWidget {
     this.topRight = 14,
     this.bottomLeft = 14,
     this.bottomRight = 14,
-    this.isDisabled = true,
     this.disabledLabelText = '',
+    required this.isLandscape,
   });
 
   final List<DropdownMenuItem<T>>? items;
@@ -24,8 +24,10 @@ class DropdownWidget<T> extends StatelessWidget {
   final double topRight;
   final double bottomLeft;
   final double bottomRight;
-  final bool isDisabled;
   final String disabledLabelText;
+  final bool isLandscape;
+
+  bool get _isClickable => items != null && items!.length > 1;
 
   @override
   Widget build(BuildContext context) {
@@ -36,63 +38,97 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomRight: Radius.circular(bottomRight),
     );
     var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
-          fontFamily: DmMono,
-          color: ColorConstants.walterWhite,
-          fontWeight: FontWeight.w400,
-          fontSize: 16,
-        );
+      fontFamily: DmMono,
+      color: ColorConstants.walterWhite,
+      fontWeight: FontWeight.w400,
+      fontSize: 16,
+    );
 
     return Container(
+      height: isLandscape ? 56 : 48,  // Set height to 48 in portrait mode
       decoration: BoxDecoration(
         borderRadius: radius,
         color: ColorConstants.onyx,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      child: _buildRow(radius, textStyle),
+      child: _buildContent(context, radius, textStyle),
     );
   }
 
-  Row _buildRow(
-    BorderRadius radius,
-    TextStyle? textStyle,
-  ) {
-    return Row(
-      children: [
-        if (iconData != null)
-          Icon(
-            iconData,
-            color: ColorConstants.walterWhite,
-          ),
-        if (iconData != null) width12,
-        isDisabled
-            ? _dropdown(textStyle, radius)
-            : SizedBox(
-                height: 48,
-                child: Center(
-                  child: Text(
-                    disabledLabelText,
-                    style: textStyle,
-                  ),
+  Widget _buildContent(BuildContext context, BorderRadius radius, TextStyle? textStyle) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _isClickable ? () => _showDropdown(context) : null,
+        borderRadius: radius,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              if (iconData != null)
+                Icon(
+                  iconData,
+                  color: ColorConstants.walterWhite,
+                ),
+              if (iconData != null) SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _getDisplayValue(),
+                  style: textStyle,
                 ),
               ),
-      ],
+              if (_isClickable)
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: ColorConstants.walterWhite,
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Expanded _dropdown(TextStyle? textStyle, BorderRadius radius) {
-    return Expanded(
-      child: DropdownButton<T>(
-        value: value,
-        icon: isDisabled ? const Icon(Icons.keyboard_arrow_down) : SizedBox(),
-        isExpanded: true,
-        style: textStyle,
-        onChanged: onChanged,
-        dropdownColor: ColorConstants.onyx,
-        focusColor: ColorConstants.onyx,
-        borderRadius: radius,
-        underline: SizedBox(),
-        items: items,
-      ),
-    );
+  String _getDisplayValue() {
+    if (!_isClickable) {
+      return disabledLabelText;
+    }
+    final selectedItem = items?.firstWhere((item) => item.value == value, orElse: () => items!.first);
+    return (selectedItem?.child as Text).data ?? '';
+  }
+
+  void _showDropdown(BuildContext context) {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    final Offset? offset = renderBox?.localToGlobal(Offset.zero);
+    final Size size = renderBox?.size ?? Size.zero;
+
+    if (offset != null && items != null) {
+      showMenu<T>(
+        context: context,
+        position: RelativeRect.fromLTRB(
+          offset.dx,
+          offset.dy + size.height,
+          offset.dx + size.width,
+          offset.dy + size.height,
+        ),
+        items: items!.map((item) => PopupMenuItem<T>(
+          value: item.value,
+          child: Container(
+            width: size.width - 24,  // Subtract horizontal padding
+            height: isLandscape ? 56 : 48,
+            alignment: AlignmentDirectional.centerStart,
+            child: item.child,
+          ),
+        )).toList(),
+        elevation: 8,
+        color: ColorConstants.onyx,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ).then((T? newValue) {
+        if (newValue != null && onChanged != null) {
+          onChanged!(newValue);
+        }
+      });
+    }
   }
 }
