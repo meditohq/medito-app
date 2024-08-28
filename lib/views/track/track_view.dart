@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/providers/providers.dart';
 import 'package:Medito/routes/routes.dart';
+import 'package:Medito/utils/permission_handler.dart';
 import 'package:Medito/utils/utils.dart';
+import 'package:Medito/views/player/player_view.dart';
 import 'package:Medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:Medito/widgets/widgets.dart';
-import 'package:Medito/utils/permission_handler.dart';
-import 'package:Medito/views/player/player_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TrackView extends ConsumerStatefulWidget {
   final String id;
@@ -32,11 +32,12 @@ class _TrackViewState extends ConsumerState<TrackView> {
   }
 
   void _checkOverflow() {
-    final RenderBox? renderBox = _contentKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox =
+        _contentKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
-      final Size size = renderBox.size;
-      final double screenHeight = MediaQuery.of(context).size.height;
-      final double contentHeight = size.height;
+      final size = renderBox.size;
+      final screenHeight = MediaQuery.of(context).size.height;
+      final contentHeight = size.height;
 
       setState(() {
         _useCompactLayout = contentHeight > screenHeight;
@@ -85,6 +86,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
   }
 
   Widget _buildLandscapeLayout(AsyncValue<TrackModel> tracks) {
+    var size = MediaQuery.of(context).size;
+    var maxWidth = size.width * 0.25;
+    var maxHeight = size.height * 0.45;
+
     return Column(
       key: _contentKey,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,8 +99,8 @@ class _TrackViewState extends ConsumerState<TrackView> {
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.25,  // 25% of screen width
-                maxHeight: MediaQuery.of(context).size.height * 0.5,  // 50% of screen height
+                maxWidth: maxWidth,
+                maxHeight: maxHeight,
               ),
               child: AspectRatio(
                 aspectRatio: 1,
@@ -105,13 +110,23 @@ class _TrackViewState extends ConsumerState<TrackView> {
             SizedBox(width: 24),
             Expanded(
               child: tracks.when(
-                data: (data) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _title(context, data.title),
-                    SizedBox(height: 8),
-                    _getSubTitle(context, data.description),
-                  ],
+                data: (data) => ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: maxHeight,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _title(context, data.title),
+                        SizedBox(height: 8),
+                        _getSubTitle(
+                          context,
+                          data.description,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 loading: () => _buildLoadingWidget(),
                 error: (err, stack) => MeditoErrorWidget(
@@ -161,10 +176,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
     );
   }
 
-  Widget _buildTrackContent(AsyncValue<TrackModel> tracks, {required bool isLandscape}) {
+  Widget _buildTrackContent(
+    AsyncValue<TrackModel> tracks, {
+    required bool isLandscape,
+  }) {
     return tracks.when(
       skipLoadingOnRefresh: false,
-      data: (data) => _buildContentWithData(context, data, ref, isLandscape: isLandscape),
+      data: (data) =>
+          _buildContentWithData(context, data, ref, isLandscape: isLandscape),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
@@ -175,48 +194,42 @@ class _TrackViewState extends ConsumerState<TrackView> {
   }
 
   Widget _buildContentWithData(
-      BuildContext context,
-      TrackModel trackModel,
-      WidgetRef ref,
-      {required bool isLandscape}
-      ) {
-    var showGuideNameDropdown = trackModel.audio.first.guideName.isNotNullAndNotEmpty();
+    BuildContext context,
+    TrackModel trackModel,
+    WidgetRef ref, {
+    required bool isLandscape,
+  }) {
+    var showGuideNameDropdown =
+        trackModel.audio.first.guideName.isNotNullAndNotEmpty();
 
-    if (isLandscape) {
-      return Row(
-        children: [
-          if (showGuideNameDropdown)
-            Expanded(child: _guideNameDropdown(trackModel, isLandscape: true))
-          else
-            Spacer(),
-          SizedBox(width: 12),
-          Expanded(child: _durationDropdown(trackModel, isLandscape: true)),
-          SizedBox(width: 12),
-          Expanded(child: _playBtn(ref, trackModel, isFullWidth: false)),
-        ],
-      );
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _title(context, trackModel.title),
-          SizedBox(height: 8),
-          _getSubTitle(context, trackModel.description),
-          SizedBox(height: 24),
-          if (_useCompactLayout && showGuideNameDropdown)
-            _buildCompactPickers(trackModel)
-          else ...[
-            if (showGuideNameDropdown) ...[
-              _guideNameDropdown(trackModel, isLandscape: false),
-              SizedBox(height: 12),
+    return isLandscape
+        ? Row(children: [
+            if (showGuideNameDropdown)
+              Expanded(child: _guideNameDropdown(trackModel, isLandscape: true))
+            else
+              Spacer(),
+            SizedBox(width: 12),
+            Expanded(child: _durationDropdown(trackModel, isLandscape: true)),
+            SizedBox(width: 12),
+            Expanded(child: _playBtn(ref, trackModel, isFullWidth: false)),
+          ])
+        : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _title(context, trackModel.title),
+            SizedBox(height: 8),
+            _getSubTitle(context, trackModel.description),
+            SizedBox(height: 24),
+            if (_useCompactLayout && showGuideNameDropdown)
+              _buildCompactPickers(trackModel)
+            else ...[
+              if (showGuideNameDropdown) ...[
+                _guideNameDropdown(trackModel, isLandscape: false),
+                SizedBox(height: 12),
+              ],
+              _durationDropdown(trackModel, isLandscape: false),
             ],
-            _durationDropdown(trackModel, isLandscape: false),
-          ],
-          SizedBox(height: 12),
-          _playBtn(ref, trackModel, isFullWidth: true),
-        ],
-      );
-    }
+            SizedBox(height: 12),
+            _playBtn(ref, trackModel, isFullWidth: true),
+          ]);
   }
 
   Widget _buildCompactPickers(TrackModel trackModel) {
@@ -235,7 +248,11 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
   Widget _buildLoadingWidget() => const TrackShimmerWidget();
 
-  Widget _playBtn(WidgetRef ref, TrackModel trackModel, {required bool isFullWidth}) {
+  Widget _playBtn(
+    WidgetRef ref,
+    TrackModel trackModel, {
+    required bool isFullWidth,
+  }) {
     var radius = BorderRadius.all(Radius.circular(7));
 
     return InkWell(
@@ -266,11 +283,11 @@ class _TrackViewState extends ConsumerState<TrackView> {
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-        fontFamily: SourceSerif,
-        color: ColorConstants.walterWhite,
-        letterSpacing: 0.2,
-        fontSize: 24,
-      ),
+            fontFamily: SourceSerif,
+            color: ColorConstants.walterWhite,
+            letterSpacing: 0.2,
+            fontSize: 24,
+          ),
     );
   }
 
@@ -320,17 +337,17 @@ class _TrackViewState extends ConsumerState<TrackView> {
   }
 
   void _handlePlay(
-      WidgetRef ref,
-      TrackModel trackModel,
-      TrackFilesModel file,
-      ) async {
+    WidgetRef ref,
+    TrackModel trackModel,
+    TrackFilesModel file,
+  ) async {
     try {
       await PermissionHandler.requestMediaPlaybackPermission(context);
 
       await ref.read(playerProvider.notifier).loadSelectedTrack(
-        trackModel: trackModel,
-        file: file,
-      );
+            trackModel: trackModel,
+            file: file,
+          );
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -356,10 +373,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomRight: 7,
       bottomLeft: 7,
       disabledLabelText:
-      '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
+          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
       items: files(selectedFile ?? audioFiles)
           .map<DropdownMenuItem<TrackFilesModel>>(
-            (TrackFilesModel value) {
+        (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,
             child: Text(
@@ -373,7 +390,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
     );
   }
 
-  Widget _guideNameDropdown(TrackModel trackModel, {required bool isLandscape}) {
+  Widget _guideNameDropdown(
+    TrackModel trackModel, {
+    required bool isLandscape,
+  }) {
     var audio = trackModel.audio.first;
     if (audio.guideName.isNotNullAndNotEmpty()) {
       return DropdownWidget<TrackAudioModel>(
@@ -385,7 +405,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
         bottomLeft: 7,
         disabledLabelText: '${audio.guideName}',
         items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
-              (TrackAudioModel value) {
+          (TrackAudioModel value) {
             return DropdownMenuItem<TrackAudioModel>(
               value: value,
               child: Text(value.guideName ?? ''),
