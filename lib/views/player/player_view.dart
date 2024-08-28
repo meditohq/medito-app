@@ -64,6 +64,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     return WillPopScope(
       onWillPop: () async {
         _handleClose(true);
+
         return false;
       },
       child: Scaffold(
@@ -160,28 +161,20 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           artistUrlPath: playbackState.track.artistUrl,
           isPlayerScreen: true,
         ),
-        const SizedBox(height: 32),
-        Row(
-          children: [
-            Expanded(
-              child: DurationIndicatorWidget(
-                totalDuration: playbackState.duration,
-                currentPosition: playbackState.position,
-                onSeekEnd: (value) {
-                  ref.read(playerProvider.notifier).seekToPosition(value);
-                },
-              ),
-            ),
-            const SizedBox(width: 24),
-            PlayerButtonsWidget(
-              isPlaying: playbackState.isPlaying,
-              onPlayPause: onPlayPausePressed,
-              onSkip10SecondsBackward: () =>
-                  ref.read(playerProvider.notifier).skip10SecondsBackward(),
-              onSkip10SecondsForward: () =>
-                  ref.read(playerProvider.notifier).skip10SecondsForward(),
-            ),
-          ],
+        DurationIndicatorWidget(
+          totalDuration: playbackState.duration,
+          currentPosition: playbackState.position,
+          onSeekEnd: (value) {
+            ref.read(playerProvider.notifier).seekToPosition(value);
+          },
+        ),
+        PlayerButtonsWidget(
+          isPlaying: playbackState.isPlaying,
+          onPlayPause: onPlayPausePressed,
+          onSkip10SecondsBackward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsBackward(),
+          onSkip10SecondsForward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsForward(),
         ),
       ],
     );
