@@ -58,11 +58,6 @@ Future<bool> _attemptBackendUpdate(
       StringConstants.statsError,
       onActionPressed: () => _attemptBackendUpdate(payload, context),
       actionLabel: StringConstants.tryAgain,
-      actionTextStyle: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
-      actionColor: ColorConstants.lightPurple,
     );
   }
 

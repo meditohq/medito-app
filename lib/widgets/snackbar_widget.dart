@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 
 void showSnackBar(
-    BuildContext? context,
-    String text, {
-      VoidCallback? onActionPressed,
-      String? actionLabel,
-      TextStyle? actionTextStyle,
-      Color? actionColor,
-    }) {
+  BuildContext? context,
+  String text, {
+  VoidCallback? onActionPressed,
+  String? actionLabel,
+}) {
   final snackBar = SnackBar(
     content: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -20,10 +18,10 @@ void showSnackBar(
             text,
             style: context != null
                 ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: ColorConstants.greyIsTheNewBlack,
-              fontFamily: DmSans,
-              fontSize: 14,
-            )
+                      color: ColorConstants.greyIsTheNewBlack,
+                      fontFamily: DmSans,
+                      fontSize: 14,
+                    )
                 : null,
           ),
         ),
@@ -35,8 +33,10 @@ void showSnackBar(
             },
             child: Text(
               actionLabel,
-              style: actionTextStyle ??
-                  TextStyle(color: actionColor ?? ColorConstants.lightPurple),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
       ],
