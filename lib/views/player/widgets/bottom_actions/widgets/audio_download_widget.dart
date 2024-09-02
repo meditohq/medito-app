@@ -45,9 +45,9 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Stack showDownloadProgress(
-    AudioDownloaderProvider downloadAudioProvider,
-    String downloadFileKey,
-  ) {
+      AudioDownloaderProvider downloadAudioProvider,
+      String downloadFileKey,
+      ) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -68,9 +68,9 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   double _getDownloadProgress(
-    AudioDownloaderProvider downloadAudioProvider,
-    String downloadFileKey,
-  ) {
+      AudioDownloaderProvider downloadAudioProvider,
+      String downloadFileKey,
+      ) {
     if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
       return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
     }
@@ -79,9 +79,9 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Future<void> _handleDownload(
-    AudioDownloaderProvider downloadAudioProvider,
-    BuildContext context,
-  ) async {
+      AudioDownloaderProvider downloadAudioProvider,
+      BuildContext context,
+      ) async {
     try {
       await downloadAudioProvider.downloadTrackAudio(
         trackModel,
@@ -93,19 +93,45 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Future<void> _handleRemoveDownload(
-    AudioDownloaderProvider downloadAudioProvider,
-    WidgetRef ref,
-    BuildContext context,
-  ) async {
-    try {
-      await downloadAudioProvider.deleteTrackAudio(
-        '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
-      );
-      ref.read(deleteTrackFromPreferenceProvider(
-        file: file,
-      ));
-    } catch (e) {
-      createSnackBar(e.toString(), context);
+      AudioDownloaderProvider downloadAudioProvider,
+      WidgetRef ref,
+      BuildContext context,
+      ) async {
+    bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(StringConstants.confirmDeletionTitle),
+          content: Text('${StringConstants.confirmDeletionMessage} "${trackModel.title}"?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed the cancel button
+              },
+              child: Text(StringConstants.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User pressed the delete button
+              },
+              child: Text(StringConstants.delete),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      try {
+        await downloadAudioProvider.deleteTrackAudio(
+          '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
+        );
+        ref.read(deleteTrackFromPreferenceProvider(
+          file: file,
+        ));
+      } catch (e) {
+        createSnackBar(e.toString(), context);
+      }
     }
   }
 }
