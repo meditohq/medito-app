@@ -180,20 +180,20 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete "${item.title}"?'),
+          title: Text(StringConstants.confirmDeletionTitle),
+          content: Text(StringConstants.confirmDeletionMessage + ' ${item.title}?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); // User pressed the cancel button
+                Navigator.of(context).pop(false);
               },
-              child: Text('Cancel'),
+              child: Text(StringConstants.cancel),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // User pressed the delete button
+                Navigator.of(context).pop(true);
               },
-              child: Text('Delete'),
+              child: Text(StringConstants.delete),
             ),
           ],
         );
@@ -211,7 +211,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       );
     } else {
       // If the user cancels, refresh the list to ensure all items are visible again.
-      ref.refresh(downloadedTracksProvider);
+      ref.invalidate(downloadedTracksProvider);
     }
   }
 
