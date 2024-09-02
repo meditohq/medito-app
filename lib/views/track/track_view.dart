@@ -353,7 +353,9 @@ class _TrackViewState extends ConsumerState<TrackView> {
         MaterialPageRoute(
           builder: (context) => PlayerView(),
         ),
-      );
+      ).then((value) => {
+            ref.invalidate(packProvider),
+          });
     } catch (e) {
       print(e);
     }

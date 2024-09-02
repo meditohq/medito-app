@@ -50,29 +50,6 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
     }
   },
 );
-// } else {
-//   ref.listen(audioStateProvider, (previous, current) {
-//     if (current.isCompleted) {
-//       var payload = {
-//         TypeConstants.trackIdKey: current.track.id,
-//         TypeConstants.durationIdKey: current.duration,
-//         TypeConstants.fileIdKey: current.track.title,
-//         TypeConstants.guideIdKey: current.track.artist,
-//         TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
-//         UpdateStatsConstants.userTokenKey: getUserToken(),
-//       };
-//
-//       unawaited(handleStats(payload).then((success) {
-//         if (success) {
-//           ref.invalidate(fetchStatsProvider);
-//           ref
-//               .read(playerProvider.notifier)
-//               .cancelPendingNotificationsForAudioCompleteEvent();
-//         }
-//       }));
-//     }
-//   });
-// }
 
 Future<String?> getUserToken() async {
   final prefs = await SharedPreferences.getInstance();
