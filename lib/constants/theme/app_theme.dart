@@ -15,6 +15,7 @@ ThemeData appTheme(BuildContext context) {
     }),
     colorScheme: ColorScheme.dark(
       background: ColorConstants.ebony,
+      surface: ColorConstants.ebony,
       secondary: ColorConstants.walterWhite,
     ),
     textTheme: meditoTextTheme(context),

@@ -5,7 +5,6 @@ import 'package:health/health.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../constants/colors/color_constants.dart';
 import '../constants/strings/string_constants.dart';
 import '../constants/types/type_constants.dart';
 import '../widgets/snackbar_widget.dart';
