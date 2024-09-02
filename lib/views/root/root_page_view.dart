@@ -1,12 +1,9 @@
 import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/providers/root/root_combine_provider.dart';
-import 'package:Medito/services/notifications/firebase_notifications_service.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -49,7 +46,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: ColorConstants.black,
       resizeToAvoidBottomInset: false,

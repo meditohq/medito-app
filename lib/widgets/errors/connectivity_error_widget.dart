@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -24,7 +23,9 @@ class _ConnectivityErrorComponentState
   @override
   void initState() {
     super.initState();
-    _subscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
       setState(() {
         _isConnected = !result.contains(ConnectivityResult.none);
       });

@@ -25,7 +25,7 @@ class FirebaseMessagingHandler {
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     try {
-      await _configureFirebaseMessaging(context, ref);
+      _configureFirebaseMessaging(context, ref);
       await _initializeLocalNotifications(context, ref);
       await updateAnalyticsCollectionBasedOnConsent();
       await FirebaseAnalytics.instance.setUserId(id: 'medito_user');
@@ -40,10 +40,10 @@ class FirebaseMessagingHandler {
     });
   }
 
-  Future<void> _configureFirebaseMessaging(
+  void _configureFirebaseMessaging(
     BuildContext context,
     WidgetRef ref,
-  ) async {
+  ) {
     // await _messaging.requestPermission();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage
