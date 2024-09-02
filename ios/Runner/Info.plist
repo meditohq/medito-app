@@ -71,6 +71,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+    <key>NSHealthShareUsageDescription</key>
+    <string>This app requires the ability to read health data for proper functioning of the mindfulness feature.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>This app needs permission to write mindfulness data to Apple Health to record your meditation sessions.</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>medito_stats_thread_identifier</string>

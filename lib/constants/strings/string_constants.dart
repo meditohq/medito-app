@@ -94,7 +94,7 @@ class StringConstants {
       'Not ready yet? You can always allow notifications via the menu on the home screen.';
   static const String notNow = 'Not now';
   static const String bugReport = 'Bug report';
-  static const String debugInfo = '--- Debug info ---';
+  static const String debugInfo = 'Debug info';
   static const String writeBelowThisLine = '--- Write below this line ---';
   static const String explore = 'Explore';
   static const String welcome = '👋 Welcome';
@@ -152,6 +152,16 @@ class StringConstants {
 
   static const cancel = 'Cancel';
   static const ok = 'OK';
+  static const areYouSure = 'Are you sure?';
+
+  static const thirdPartyAnalytics = '3rd Party Analytics';
+  static const analyticsInfo = 'As a nonprofit, Medito uses anonymous analytics data to:\n\n'
+      '• Understand which meditations are most helpful\n'
+      '• Identify areas of the app that need improvement\n'
+      '• Measure the impact of new features\n'
+      '• Secure funding by demonstrating our reach\n\n'
+      'This helps us continue providing free, high-quality meditation content. '
+      'No personal information is ever sold or shared.';
 
   static const requestPermission = 'Request Permission';
   static const mediaPlaybackPermissions = 'Media Playback Permissions';
@@ -160,5 +170,7 @@ class StringConstants {
   static const weNeedYourPermissionReminder = 'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.';
   static const mediaPermissionDenied = 'Media controls are not available without permission.';
   static const reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
+
+  static const syncWithHealth = 'Sync with Apple Health';
 
 }
