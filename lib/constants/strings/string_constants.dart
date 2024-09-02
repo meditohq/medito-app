@@ -160,4 +160,5 @@ class StringConstants {
   static const mediaPermissionDenied = 'Media controls are not available without permission.';
   static const reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
 
+  static const processingStatsUpdate =  'Processing stats update...';
 }

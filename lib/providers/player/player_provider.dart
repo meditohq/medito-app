@@ -187,11 +187,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     }
   }
 
-  void handleAudioCompletionEvent(
-    String trackId,
-  ) {
-    ref.read(markAsListenedEventProvider(id: trackId));
-  }
 }
 
 const audioPercentageListened = 0.8;

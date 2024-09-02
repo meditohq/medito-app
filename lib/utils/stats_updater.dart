@@ -9,8 +9,7 @@ import 'call_update_stats.dart';
 
 Future<bool> handleStats(payload, {BuildContext? context}) async {
   // Show a snackbar indicating that the stats update is in progress
-  showSnackBar(context, "Processing stats update...");
-  print('Processing stats update');
+  showSnackBar(context, StringConstants.processingStatsUpdate);
 
   var maxRetries = 5;
   var retryCount = 0;
@@ -19,7 +18,6 @@ Future<bool> handleStats(payload, {BuildContext? context}) async {
       await callUpdateStats(payload);
       // Update the snackbar to indicate success
       showSnackBar(context, StringConstants.statsSuccess);
-      print('Stats updated');
 
       return true;
     } catch (e, s) {
@@ -29,20 +27,15 @@ Future<bool> handleStats(payload, {BuildContext? context}) async {
           // Update the snackbar to indicate failure
           showSnackBar(context, StringConstants.statsError);
           await Sentry.captureException(e, stackTrace: s);
-          print('Stats update failed after $retryCount retries');
-          print(e.toString());
 
           return false;
         } else {
-          print('Retrying... ($retryCount/$maxRetries)');
           await Future.delayed(Duration(seconds: 1));
         }
       } else {
         // For non-retryable errors, update the snackbar to indicate failure
         showSnackBar(context, StringConstants.statsError);
         await Sentry.captureException(e, stackTrace: s);
-        print('Stats update failed');
-        print(e.toString());
 
         return false;
       }
