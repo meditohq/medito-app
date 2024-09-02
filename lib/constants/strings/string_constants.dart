@@ -172,5 +172,6 @@ class StringConstants {
   static const reminderPermissionDenied = 'Reminder notifications are not available without notification permission.';
 
   static const syncWithHealth = 'Sync with Apple Health';
+  static const permissionExplanation =  'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito';
 
 }
