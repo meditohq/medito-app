@@ -28,6 +28,7 @@ class RowItemWidget extends StatelessWidget {
     this.leadingIconSize = 24,
     this.iconColor,
     this.enableInteractiveSelection = true,
+    this.trailingIcon = Icons.chevron_right_rounded,
   });
 
   final String title;
@@ -44,6 +45,7 @@ class RowItemWidget extends StatelessWidget {
   final double leadingIconSize;
   final double trailingIconSize;
   final bool enableInteractiveSelection;
+  final IconData trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +98,7 @@ class RowItemWidget extends StatelessWidget {
               ),
               if (isTrailingIcon && !isSwitch)
                 Icon(
-                  Icons.chevron_right,
+                  trailingIcon,
                   size: trailingIconSize,
                 ),
               if (isSwitch)
