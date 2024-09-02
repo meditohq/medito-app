@@ -175,15 +175,44 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     ));
   }
 
-  void _handleDismissible(DismissDirection _, TrackModel item) {
-    if (mounted) {
-      ref.read(removeDownloadedTrackProvider(track: item));
-    }
-    createSnackBar(
-      '"${item.title}" ${StringConstants.removed.toLowerCase()}',
-      context,
-      color: ColorConstants.walterWhite,
+  void _handleDismissible(DismissDirection _, TrackModel item) async {
+    bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete "${item.title}"?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed the cancel button
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User pressed the delete button
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
+
+    if (confirmDelete == true) {
+      if (mounted) {
+        ref.read(removeDownloadedTrackProvider(track: item));
+      }
+      createSnackBar(
+        '"${item.title}" ${StringConstants.removed.toLowerCase()}',
+        context,
+        color: ColorConstants.walterWhite,
+      );
+    } else {
+      // If the user cancels, refresh the list to ensure all items are visible again.
+      ref.refresh(downloadedTracksProvider);
+    }
   }
 
   @override
