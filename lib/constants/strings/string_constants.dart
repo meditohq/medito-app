@@ -174,4 +174,7 @@ class StringConstants {
   static const syncWithHealth = 'Sync with Apple Health';
   static const permissionExplanation =  'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito';
 
+  static const String confirmDeletionTitle = 'Confirm Deletion';
+  static const String confirmDeletionMessage = 'Are you sure you want to delete';
+  static const String delete = 'Delete';
 }
