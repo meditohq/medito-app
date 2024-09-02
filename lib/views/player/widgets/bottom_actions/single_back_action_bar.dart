@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+
 import 'bottom_action_bar.dart';
 
 class SingleBackButtonActionBar extends StatelessWidget {
   const SingleBackButtonActionBar({
     super.key,
     required this.onBackPressed,
+    this.showCloseIcon = false,
   });
 
   final void Function() onBackPressed;
+  final bool showCloseIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class SingleBackButtonActionBar extends StatelessWidget {
         GestureDetector(
           onTap: onBackPressed,
           child: Icon(
-            Icons.arrow_back,
+            showCloseIcon ? Icons.close : Icons.arrow_back,
             color: Colors.white,
           ),
         ),
