@@ -54,16 +54,13 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   BackgroundSoundsNotifier(this.ref);
 
   void handleOnChangeVolume(double vol) {
-    var scaledVolume = vol * vol * vol;  // Cubic scaling
-
-    volume = scaledVolume;
-
-    ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(scaledVolume);
+    ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
+    volume = vol;
 
     if (Platform.isAndroid) {
-      _api.setBackgroundSoundVolume(scaledVolume / 100);
+      _api.setBackgroundSoundVolume(vol / 100);
     } else {
-      iosBackgroundPlayer.setVolume(scaledVolume / 10);
+      iosBackgroundPlayer.setVolume(scaledVolume(vol));
     }
 
     notifyListeners();
@@ -198,11 +195,16 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
         if (remainingTime <= durationFromEnd) {
           var newVolume = volume * remainingTime / durationFromEnd;
-          iosBackgroundPlayer.setVolume(newVolume / 10);
+          iosBackgroundPlayer.setVolume(scaledVolume(newVolume));
         } else {
-          iosBackgroundPlayer.setVolume(volume / 10);
+          iosBackgroundPlayer.setVolume(scaledVolume(volume));
         }
       },
     );
   }
+
+  double scaledVolume(double vol) {
+    return (vol / 100) * 0.5;
+  }
+
 }
