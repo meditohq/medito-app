@@ -41,7 +41,7 @@ Pull requests are welcome. For significant changes, please open an issue first t
 
 API keys are generated for regular contributors (called "volunteers").
 
-To volunteer, send an email (preferably with your CV) and how many hours you can contribute to [Katie](mailto:katie@meditofoundation.org).
+To volunteer, join our [Telegram channel](https://t.me/medito.app) and go to "Discussion", then ask there for a key.
 
 Please note that we are looking for people who are interested in investing at least 2 hours a week regularly. :)
 
@@ -62,7 +62,6 @@ RSIN: 860222627
 - [Why we started Medito](https://meditofoundation.org/blog/why-meditation-should-be-free)
 - [Press release](https://meditofoundation.org/blog/medito-foundation-launches-app-to-free-meditation-from-clutches-of-big-business)
 - [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
-- [Email us](mailto:hi@meditofoundation.org)
 
 ## License
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
