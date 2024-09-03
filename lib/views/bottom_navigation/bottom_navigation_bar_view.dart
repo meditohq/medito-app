@@ -61,8 +61,10 @@ class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: _currentPageIndex == 0,
-      onPopInvoked: (didPop) {
-        if (didPop) return;
+      onPopInvokedWithResult: (bool didPop, _) {
+        if (didPop) {
+          return;
+        }
         _onDestinationSelected(0);
       },
       child: Scaffold(

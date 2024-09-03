@@ -61,11 +61,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     precacheImage(NetworkImage(imageUrl), context);
 
-    return WillPopScope(
-      onWillPop: () async {
-        _handleClose(true);
-
-        return false;
+    return PopScope<void>(
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          _resetState();
+          _stopAudio();
+        }
       },
       child: Scaffold(
         extendBody: true,
@@ -109,7 +110,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         bottomNavigationBar: PlayerActionBar(
           trackModel: currentlyPlayingTrack,
           file: file,
-          onClosePressed: () => _handleClose(true),
+          onClosePressed: () => _handleClose(),
           onSpeedChanged: (speed) =>
               ref.read(playerProvider.notifier).setSpeed(speed),
           isBackgroundSoundSelected: _isBackgroundSoundSelected(),
@@ -195,25 +196,22 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
   }
 
-  void _handleClose(bool _) {
+  void _handleClose({bool shouldPop = true}) {
     if (_isClosing) {
       return;
     }
     _isClosing = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Navigator.canPop(context)) {
-        _resetState();
-        _stopAudio();
-        _endScreenOpened = false;
+      _resetState();
+      _stopAudio();
+      _endScreenOpened = false;
 
-        Future.delayed(const Duration(milliseconds: 50), () {
-          Navigator.pop(context);
-          _isClosing = false;
-        });
-      } else {
-        _isClosing = false;
+      if (shouldPop && Navigator.canPop(context)) {
+        Navigator.pop(context);
       }
+
+      _isClosing = false;
     });
   }
 

@@ -13,7 +13,6 @@ dependencies:
   audio_session: ^0.1.19
   audio_service: ^0.18.13
   auto_size_text: ^3.0.0-nullsafety.0
-  back_button_interceptor: ^6.0.2
   cached_network_image: ^3.2.3
   connectivity_plus: ^6.0.3
   device_info_plus: ^9.0.2
