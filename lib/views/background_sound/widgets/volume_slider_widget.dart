@@ -24,7 +24,7 @@ class VolumeSliderWidget extends ConsumerWidget {
         trackHeight: 72,
       ),
       child: Slider(
-        value: currentVolume,
+        value: currentVolume.clamp(0, 100),
         min: 0,
         max: 100,
         divisions: 100,
