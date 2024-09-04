@@ -31,11 +31,10 @@ Color parseColor(String? color) {
   return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }
 
-void createSnackBar(
-  String message,
-  BuildContext context, {
-  Color color = Colors.red,
-}) {
+void createSnackBar(String message,
+    BuildContext context, {
+      Color color = Colors.red,
+    }) {
   final snackBar = SnackBar(
     content: Text(message),
     backgroundColor: color,
@@ -73,8 +72,7 @@ Future<void> launchURLInBrowser(String url) async {
   }
 }
 
-Future<void> launchEmailSubmission(
-  String href, {
+Future<void> launchEmailSubmission(String href, {
   String? subject,
   String? body,
 }) async {
@@ -120,7 +118,9 @@ String getAudioFileExtension(String path) {
   var lastIndex = path.lastIndexOf('/');
   if (lastIndex != -1) {
     var filenameWithQuery = path.substring(lastIndex + 1);
-    var filename = Uri.decodeFull(filenameWithQuery.split('?').first);
+    var filename = Uri.decodeFull(filenameWithQuery
+        .split('?')
+        .first);
     var dotIndex = filename.lastIndexOf('.');
     if (dotIndex != -1) {
       var fileExtension = filename.substring(dotIndex + 1);
@@ -135,17 +135,17 @@ String getAudioFileExtension(String path) {
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
   try {
     RenderRepaintBoundary boundary =
-        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData!.buffer.asUint8List();
 
     final directory = await getApplicationDocumentsDirectory();
-    final sharePlusDir = Directory('${directory.path}/share_plus');
-    if (!await sharePlusDir.exists()) {
-      await sharePlusDir.create(recursive: true);
+    final appDir = Directory('${directory.path}/medito');
+    if (!await appDir.exists()) {
+      await appDir.create(recursive: true);
     }
-    final file = File('${sharePlusDir.path}/stats.png');
+    final file = File('${appDir.path}/stats.png');
 
     await file.writeAsBytes(pngBytes);
     print('File saved at: ${file.path}');
@@ -153,7 +153,6 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
     return file;
   } catch (e) {
     print('Error in capturePng: $e');
-
     return null;
   }
 }

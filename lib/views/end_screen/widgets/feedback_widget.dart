@@ -37,8 +37,8 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           trackId: widget.trackId,
           feedbackEvent: {
             'rating': feedback,
-            'audioFileDuration': widget.audioFileDuration,
-            'audioFileGuide': widget.audioFileGuide,
+            'audioFileDuration': widget.audioFileDuration.toString(),
+            'audioFileGuide': widget.audioFileGuide.toString(),
             'audioFileId': widget.audioFileId,
           },
         ).future,

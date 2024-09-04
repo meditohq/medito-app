@@ -116,7 +116,12 @@ class AuthNotifier extends ChangeNotifier {
     var token = await ref.read(firebaseMessagingProvider).getToken();
     if (token != null) {
       var fcm = SaveFcmTokenModel(token: token);
-      ref.read(fcmSaveEventProvider(event: fcm.toJson(), userToken: userToken));
+      ref.read(fcmSaveEventProvider(
+        event: fcm.toJson().map(
+              (key, value) => MapEntry(key, value.toString()),
+            ),
+        userToken: userToken,
+      ));
     }
   }
 }

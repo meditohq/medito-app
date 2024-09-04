@@ -129,7 +129,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
     ref.read(
       audioStartedEventProvider(
-        event: audio.toJson(),
+        event: audio.toJson().map(
+          (key, value) => MapEntry(key, value.toString()),
+        ),
         trackId: trackId,
       ),
     );
