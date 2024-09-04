@@ -21,6 +21,16 @@ class AudioDownloadWidget extends ConsumerWidget {
     var downloadFileKey =
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: Center(
+        child: _buildDownloadWidget(context, ref, downloadAudioProvider, downloadFileKey),
+      ),
+    );
+  }
+
+  Widget _buildDownloadWidget(BuildContext context, WidgetRef ref, AudioDownloaderProvider downloadAudioProvider, String downloadFileKey) {
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AudioDownloadState.DOWNLOADED) {
       return IconButton(
@@ -44,7 +54,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     }
   }
 
-  Stack showDownloadProgress(
+  Widget showDownloadProgress(
       AudioDownloaderProvider downloadAudioProvider,
       String downloadFileKey,
       ) {
@@ -97,7 +107,7 @@ class AudioDownloadWidget extends ConsumerWidget {
       WidgetRef ref,
       BuildContext context,
       ) async {
-    bool? confirmDelete = await showDialog<bool>(
+    var confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
