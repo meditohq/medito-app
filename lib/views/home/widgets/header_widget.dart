@@ -1,4 +1,3 @@
-import 'package:Medito/models/models.dart';
 import 'package:Medito/views/home/widgets/stats/stats_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,11 +6,9 @@ import '../../../constants/colors/color_constants.dart';
 import '../../../constants/styles/widget_styles.dart';
 import '../../../models/stats/stats_model.dart';
 import '../../../utils/utils.dart';
-import 'announcement/announcement_widget.dart';
 import 'header/home_header_widget.dart';
 
 class HeaderWidget extends ConsumerStatefulWidget {
-
   const HeaderWidget({
     super.key,
     required this.statsData,
@@ -28,10 +25,8 @@ class HeaderWidget extends ConsumerStatefulWidget {
       _HeaderAndAnnouncementWidgetState();
 }
 
-class _HeaderAndAnnouncementWidgetState
-    extends ConsumerState<HeaderWidget>
+class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-
   @override
   Widget build(BuildContext context) {
     super.build(context);

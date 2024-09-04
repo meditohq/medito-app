@@ -1,5 +1,4 @@
 import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,8 +60,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) =>
-                  SettingsScreen(),
+              builder: (context) => SettingsScreen(),
             ),
           );
         },

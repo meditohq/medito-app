@@ -17,7 +17,6 @@ import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:health/health.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
@@ -59,19 +58,20 @@ class SettingsScreen extends ConsumerWidget {
 
     return home.when(
       loading: () => HomeShimmerWidget(),
-      error: (err, stack) =>
-          MeditoErrorWidget(
-            message: home.error.toString(),
-            onTap: () => _onRefresh(ref),
-            isLoading: home.isLoading,
-          ),
+      error: (err, stack) => MeditoErrorWidget(
+        message: home.error.toString(),
+        onTap: () => _onRefresh(ref),
+        isLoading: home.isLoading,
+      ),
       data: (HomeModel homeData) => _buildSettingsList(context, ref, homeData),
     );
   }
 
-  Widget _buildSettingsList(BuildContext context,
-      WidgetRef ref,
-      HomeModel homeData,) {
+  Widget _buildSettingsList(
+    BuildContext context,
+    WidgetRef ref,
+    HomeModel homeData,
+  ) {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       child: Column(
@@ -88,9 +88,11 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMenuItemTile(BuildContext context,
-      WidgetRef ref,
-      HomeMenuModel element,) {
+  Widget _buildMenuItemTile(
+    BuildContext context,
+    WidgetRef ref,
+    HomeMenuModel element,
+  ) {
     return RowItemWidget(
       enableInteractiveSelection: false,
       icon: IconType.fromString(element.icon),
@@ -136,9 +138,11 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void handleItemPress(BuildContext context,
-      WidgetRef ref,
-      HomeMenuModel element,) async {
+  void handleItemPress(
+    BuildContext context,
+    WidgetRef ref,
+    HomeMenuModel element,
+  ) async {
     await handleNavigation(
       element.type,
       [element.path.toString().getIdFromPath(), element.path],
@@ -158,9 +162,7 @@ class SettingsScreen extends ConsumerWidget {
 
     await reminders.cancelDailyNotification();
     await _clearSavedTime(prefs);
-    ref
-        .read(reminderTimeProvider.notifier)
-        .state = null;
+    ref.read(reminderTimeProvider.notifier).state = null;
     _showClearReminderSnackBar(context);
   }
 
@@ -192,15 +194,15 @@ class SettingsScreen extends ConsumerWidget {
     if (pickedTime != null) {
       await reminders.scheduleDailyNotification(pickedTime);
       await _savePickedTime(prefs, pickedTime);
-      ref
-          .read(reminderTimeProvider.notifier)
-          .state = pickedTime;
+      ref.read(reminderTimeProvider.notifier).state = pickedTime;
       _showSnackBar(context, pickedTime);
     }
   }
 
-  Future<void> _savePickedTime(SharedPreferences prefs,
-      TimeOfDay pickedTime,) async {
+  Future<void> _savePickedTime(
+    SharedPreferences prefs,
+    TimeOfDay pickedTime,
+  ) async {
     await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
     await prefs.setInt(
       SharedPreferenceConstants.savedMinutes,
@@ -241,14 +243,10 @@ class SettingsScreen extends ConsumerWidget {
 
   void _handleAnalyticsConsentChange(WidgetRef ref, bool value) {
     if (value) {
-      ref
-          .read(analyticsConsentProvider.notifier)
-          .state = true;
+      ref.read(analyticsConsentProvider.notifier).state = true;
       setAnalyticsConsent(true);
     } else {
-      ref
-          .read(analyticsConsentProvider.notifier)
-          .state = false;
+      ref.read(analyticsConsentProvider.notifier).state = false;
       Future.microtask(() => _showAnalyticsConfirmationDialog(ref));
     }
   }
@@ -256,33 +254,29 @@ class SettingsScreen extends ConsumerWidget {
   Future<void> _showAnalyticsConfirmationDialog(WidgetRef ref) async {
     final confirm = await showDialog<bool>(
       context: ref.context,
-      builder: (BuildContext context) =>
-          AlertDialog(
-            title: Text(StringConstants.areYouSure),
-            content: Text(
-              StringConstants.analyticsInfo,
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: Text('Keep On'),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-              TextButton(
-                child: Text('Turn Off'),
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-            ],
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(StringConstants.areYouSure),
+        content: Text(
+          StringConstants.analyticsInfo,
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Keep On'),
+            onPressed: () => Navigator.of(context).pop(false),
           ),
+          TextButton(
+            child: Text('Turn Off'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
     );
 
     if (confirm != true) {
-      ref
-          .read(analyticsConsentProvider.notifier)
-          .state = true;
+      ref.read(analyticsConsentProvider.notifier).state = true;
       await setAnalyticsConsent(true);
     } else {
       await setAnalyticsConsent(false);
     }
   }
 }
-
