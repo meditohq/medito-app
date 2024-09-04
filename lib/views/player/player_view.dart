@@ -59,7 +59,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final file = currentlyPlayingTrack.audio.first.files.first;
     final imageUrl = playbackState.track.imageUrl;
 
-    precacheImage(NetworkImage(imageUrl), context);
+    if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
+      precacheImage(NetworkImage(imageUrl), context);
+    }
 
     return PopScope<void>(
       onPopInvokedWithResult: (didPop, result) {
