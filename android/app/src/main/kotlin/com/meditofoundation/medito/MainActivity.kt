@@ -8,14 +8,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.media3.common.util.UnstableApi
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugins.GeneratedPluginRegistrant
 import meditofoundation.medito.AudioPlayerService
 
 @UnstableApi
-class MainActivity : FlutterActivity(), MeditoAndroidAudioServiceManager {
+class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager {
 
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
 

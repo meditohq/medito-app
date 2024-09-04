@@ -2,7 +2,7 @@ import 'package:Medito/constants/constants.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShareBtnWidget extends StatelessWidget {
   const ShareBtnWidget({
@@ -33,19 +33,18 @@ class ShareBtnWidget extends StatelessWidget {
     try {
       var file = await capturePng(context, key);
       if (file != null) {
-        final result = await Share.shareXFiles(
-          [XFile(file.path)],
-          text: shareText,
-        );
-        print('Share result: $result');
+        final uri = Uri.file(file.path);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          showSnackBar(context, 'Could not open the file');
+        }
       } else {
         print('File was null');
         showSnackBar(context, StringConstants.someThingWentWrong);
       }
     } catch (e) {
-      print('Share error: $e');
       showSnackBar(context, 'Failed to share: $e');
     }
   }
-
 }

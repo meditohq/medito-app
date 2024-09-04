@@ -7,10 +7,10 @@ part 'events_provider.g.dart';
 @riverpod
 Future<void> feedback(
   FeedbackRef ref, {
-  required Map<String, dynamic> feedbackEvent,
+  required Map<String, String> feedbackEvent,
   required String trackId,
 }) async {
-  var parameters = <String, dynamic>{'trackId': trackId};
+  var parameters = <String, String>{'trackId': trackId};
   parameters.addAll(feedbackEvent);
 
   await FirebaseAnalytics.instance.logEvent(
@@ -26,10 +26,10 @@ Future<void> feedback(
 @riverpod
 Future<void> audioStartedEvent(
   AudioStartedEventRef ref, {
-  required Map<String, dynamic> event,
+  required Map<String, String> event,
   required String trackId,
 }) async {
-  var parameters = <String, dynamic>{'trackId': trackId};
+  var parameters = <String, String>{'trackId': trackId};
   parameters.addAll(event);
 
   await FirebaseAnalytics.instance.logEvent(
@@ -45,7 +45,7 @@ Future<void> audioStartedEvent(
 @riverpod
 Future<void> fcmSaveEvent(
   FcmSaveEventRef ref, {
-  required Map<String, dynamic> event,
+  required Map<String, String> event,
   required String userToken,
 }) async {
   await FirebaseAnalytics.instance.logEvent(

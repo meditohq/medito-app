@@ -157,11 +157,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final firebaseMessaging = ref.read(firebaseMessagingProvider);
-      firebaseMessaging.initialize(context, ref);
-    });
-
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
       scaffoldMessengerKey: scaffoldMessengerKey,

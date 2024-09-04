@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:Medito/utils/utils.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -25,6 +26,7 @@ class FirebaseMessagingHandler {
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     try {
+      await Firebase.initializeApp();
       _configureFirebaseMessaging(context, ref);
       await _initializeLocalNotifications(context, ref);
       await updateAnalyticsCollectionBasedOnConsent();
