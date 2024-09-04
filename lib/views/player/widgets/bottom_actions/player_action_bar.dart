@@ -47,7 +47,6 @@ class PlayerActionBar extends StatelessWidget {
             file: file,
           ),
         AudioSpeedWidget(onSpeedChanged: onSpeedChanged),
-        MarkFavouriteWidget(trackModel: trackModel, file: file),
       ],
     );
   }

@@ -3,32 +3,25 @@ import 'package:Medito/providers/providers.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../share_btn/share_btn_widget.dart';
 
 class DebugBottomSheetWidget extends ConsumerWidget {
   const DebugBottomSheetWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var globalKey = GlobalKey();
     var deviceAppAndUserInfo = ref.watch(deviceAppAndUserInfoProvider);
 
-    return Container(
-      decoration: bottomSheetBoxDecoration,
-      padding: EdgeInsets.only(bottom: getBottomPadding(context)),
+    return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          height16,
-          HandleBarWidget(),
-          height16,
           deviceAppAndUserInfo.when(
             skipLoadingOnRefresh: false,
             data: (data) => _debugItemsList(
               context,
-              globalKey,
               data,
             ),
             error: (err, stack) => Expanded(
@@ -49,23 +42,19 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   }
 
   Column _debugItemsList(
-    BuildContext context,
-    GlobalKey key,
-    String info,
-  ) {
+      BuildContext context,
+      String info,
+      ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RepaintBoundary(
-          key: key,
-          child: _debugRowItem(
-            context,
-            info,
-          ),
+        _debugRowItem(
+          context,
+          info,
         ),
-        ShareBtnWidget(
-          globalKey: key,
-          onPressed: () => _handleShare(context, info),
+        ElevatedButton(
+          child: Text(StringConstants.copy),
+          onPressed: () => _handleCopy(context, info),
         ),
       ],
     );
@@ -83,22 +72,17 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     );
   }
 
-  void _handleShare(BuildContext context, String deviceInfo) async {
+  void _handleCopy(BuildContext context, String deviceInfo) {
     var _info =
         '${StringConstants.debugInfo}\n$deviceInfo\n${StringConstants.writeBelowThisLine}';
 
-    try {
-      await launchEmailSubmission(
-        StringConstants.supportEmail,
-        subject: StringConstants.bugReport,
-        body: _info,
+    Clipboard.setData(ClipboardData(text: _info)).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(StringConstants.debugInfoCopied),
+          backgroundColor: ColorConstants.ebony,
+        ),
       );
-    } catch (e) {
-      createSnackBar(
-        e.toString(),
-        context,
-        color: ColorConstants.ebony,
-      );
-    }
+    });
   }
 }

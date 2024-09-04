@@ -1,16 +1,19 @@
+import 'package:Medito/views/player/widgets/bottom_actions/widgets/mark_favourite_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'bottom_action_bar.dart';
 
-class SingleBackButtonActionBar extends StatelessWidget {
-  const SingleBackButtonActionBar({
+class BackAndFaveActionBar extends StatelessWidget {
+  const BackAndFaveActionBar({
     super.key,
     required this.onBackPressed,
     this.showCloseIcon = false,
+    required this.trackId,
   });
 
   final void Function() onBackPressed;
   final bool showCloseIcon;
+  final String trackId;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +28,7 @@ class SingleBackButtonActionBar extends StatelessWidget {
         ),
         SizedBox.shrink(),
         SizedBox.shrink(),
+        MarkFavouriteWidget(trackId: trackId),
       ],
     );
   }

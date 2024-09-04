@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:Medito/constants/constants.dart';
 import 'package:Medito/main.dart';
 import 'package:Medito/models/models.dart';
 import 'package:Medito/repositories/repositories.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../me/me_provider.dart';
@@ -28,21 +31,22 @@ String _formatString(
   MeModel? me,
   DeviceAndAppInfoModel? deviceInfo,
 ) {
-  var env = StringConstants.env + ': $currentEnvironment';
+  var isProdString = kDebugMode ? 'Debug' : 'Release';
+  var env = StringConstants.env + ': $isProdString';
   var id = StringConstants.id + ': ${me?.id ?? ''}';
   var email = StringConstants.email + ': ${me?.email ?? ''}';
   var appVersion =
       '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
-  var deviceModel =
-      '${StringConstants.deviceModel}: ${deviceInfo?.model ?? ''}';
-  var deviceOs = '${StringConstants.deviceOs}: ${deviceInfo?.os ?? ''}';
-  var devicePlatform =
-      '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
   var buildNumber =
       '${StringConstants.buildNumber}: ${deviceInfo?.buildNumber ?? ''}';
+  var deviceOs = '${StringConstants.deviceOs}: ${deviceInfo?.os ?? ''}';
+  var deviceModel =
+      '${StringConstants.deviceModel}: ${deviceInfo?.model ?? ''}';
+  var devicePlatform =
+      '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
 
   var formattedString =
-      '$env\n$id\n$email\n$appVersion\n$deviceModel\n$deviceOs\n$devicePlatform\n$buildNumber';
+      '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
 
   return formattedString;
 }
