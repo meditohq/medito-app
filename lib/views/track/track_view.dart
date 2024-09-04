@@ -5,15 +5,15 @@ import 'package:Medito/routes/routes.dart';
 import 'package:Medito/utils/permission_handler.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/views/player/player_view.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:Medito/views/player/widgets/bottom_actions/back_and_fave_action_bar.dart';
 import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TrackView extends ConsumerStatefulWidget {
-  final String id;
+  final String trackId;
 
-  TrackView({Key? key, required this.id}) : super(key: key);
+  TrackView({Key? key, required this.trackId}) : super(key: key);
 
   @override
   ConsumerState<TrackView> createState() => _TrackViewState();
@@ -21,37 +21,43 @@ class TrackView extends ConsumerStatefulWidget {
 
 class _TrackViewState extends ConsumerState<TrackView> {
   TrackAudioModel? selectedAudio;
-  TrackFilesModel? selectedDuration;
+  TrackFilesModel? fileModel;
   final GlobalKey _contentKey = GlobalKey();
   bool _useCompactLayout = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkOverflow());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkOverflow();
+      _initializeFileModel();
+    });
   }
 
-  void _checkOverflow() {
-    final renderBox =
-        _contentKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      final size = renderBox.size;
-      final screenHeight = MediaQuery.of(context).size.height;
-      final contentHeight = size.height;
-
-      setState(() {
-        _useCompactLayout = contentHeight > screenHeight;
-      });
-    }
+  void _initializeFileModel() {
+    var tracks = ref.read(tracksProvider(trackId: widget.trackId));
+    tracks.whenData((trackModel) {
+      if (trackModel.audio.isNotEmpty &&
+          trackModel.audio.first.files.isNotEmpty) {
+        setState(() {
+          fileModel = trackModel.audio.first.files.first;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    var tracks = ref.watch(tracksProvider(trackId: widget.id));
+    var tracks = ref.watch(tracksProvider(trackId: widget.trackId));
 
     return Scaffold(
-      bottomNavigationBar: SingleBackButtonActionBar(
-        onBackPressed: () => Navigator.pop(context),
+      bottomNavigationBar: tracks.when(
+        data: (trackModel) => BackAndFaveActionBar(
+          onBackPressed: () => Navigator.pop(context),
+          trackId: widget.trackId,
+        ),
+        loading: () => SizedBox(), // or a loading indicator
+        error: (_, __) => SizedBox(), // or an error widget
       ),
       body: SafeArea(
         child: OrientationBuilder(
@@ -68,6 +74,20 @@ class _TrackViewState extends ConsumerState<TrackView> {
         ),
       ),
     );
+  }
+
+  void _checkOverflow() {
+    final renderBox =
+        _contentKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      final size = renderBox.size;
+      final screenHeight = MediaQuery.of(context).size.height;
+      final contentHeight = size.height;
+
+      setState(() {
+        _useCompactLayout = contentHeight > screenHeight;
+      });
+    }
   }
 
   Widget _buildPortraitLayout(AsyncValue<TrackModel> tracks) {
@@ -131,7 +151,8 @@ class _TrackViewState extends ConsumerState<TrackView> {
                 loading: () => _buildLoadingWidget(),
                 error: (err, stack) => MeditoErrorWidget(
                   message: err.toString(),
-                  onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+                  onTap: () =>
+                      ref.refresh(tracksProvider(trackId: widget.trackId)),
                   isScaffold: false,
                 ),
               ),
@@ -186,7 +207,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
           _buildContentWithData(context, data, ref, isLandscape: isLandscape),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
-        onTap: () => ref.refresh(tracksProvider(trackId: widget.id)),
+        onTap: () => ref.refresh(tracksProvider(trackId: widget.trackId)),
         isScaffold: false,
       ),
       loading: () => _buildLoadingWidget(),
@@ -257,7 +278,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
     return InkWell(
       onTap: () {
-        var file = selectedDuration ?? trackModel.audio.first.files.first;
+        var file = fileModel ?? trackModel.audio.first.files.first;
         _handlePlay(ref, trackModel, file);
       },
       borderRadius: radius,
@@ -326,13 +347,13 @@ class _TrackViewState extends ConsumerState<TrackView> {
   void _handleOnGuideNameChange(TrackAudioModel? value) {
     setState(() {
       selectedAudio = value;
-      selectedDuration = value?.files.first;
+      fileModel = value?.files.first;
     });
   }
 
   void handleOnDurationChange(TrackFilesModel? value) {
     setState(() {
-      selectedDuration = value;
+      fileModel = value;
     });
   }
 
@@ -368,7 +389,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
     var selectedFile = selectedAudio?.files;
 
     return DropdownWidget<TrackFilesModel>(
-      value: selectedDuration ?? audioFiles.first,
+      value: fileModel ?? audioFiles.first,
       iconData: Icons.timer_sharp,
       topLeft: 7,
       topRight: 7,

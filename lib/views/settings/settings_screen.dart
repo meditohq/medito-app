@@ -222,6 +222,7 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showDebugBottomSheet(BuildContext context) {
     showModalBottomSheet(
+      showDragHandle: true,
       context: context,
       builder: (context) => DebugBottomSheetWidget(),
     );

@@ -45,7 +45,7 @@ Future<void> handleNavigation(
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TrackView(id: trackId),
+          builder: (context) => TrackView(trackId: trackId),
         ),
       ).then(
         (value) {

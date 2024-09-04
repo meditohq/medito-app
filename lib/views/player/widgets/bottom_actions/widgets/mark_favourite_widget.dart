@@ -1,38 +1,24 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MarkFavouriteWidget extends ConsumerStatefulWidget {
+import '../../../../../constants/colors/color_constants.dart';
+import '../../../../../providers/meditation/track_provider.dart';
+
+class MarkFavouriteWidget extends ConsumerWidget {
+  final String trackId;
+
   const MarkFavouriteWidget({
-    super.key,
-    required this.trackModel,
-    required this.file,
-  });
-
-  final TrackModel trackModel;
-  final TrackFilesModel file;
+    Key? key,
+    required this.trackId,
+  }) : super(key: key);
 
   @override
-  ConsumerState<MarkFavouriteWidget> createState() =>
-      _MarkFavouriteWidgetState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLiked = ref.watch(favoriteStatusProvider(trackId: trackId));
 
-class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
-  bool isLiked = false;
-
-  @override
-  void initState() {
-    isLiked = widget.trackModel.isLiked;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return IconButton(
-      onPressed: handleLike,
+      onPressed: () =>
+          ref.read(favoriteStatusProvider(trackId: trackId).notifier).toggle(),
       icon: Icon(
         Icons.star,
         color:
@@ -40,22 +26,4 @@ class _MarkFavouriteWidgetState extends ConsumerState<MarkFavouriteWidget> {
       ),
     );
   }
-
-  void handleLike() async {
-    try {
-      setState(() {
-        isLiked = !isLiked;
-      });
-      var data = LikeDislikeModel(isLiked, widget.trackModel, widget.file);
-      await ref.read(
-        likeDislikeCombineProvider(data).future,
-      );
-    } catch (e) {
-      setState(() {
-        isLiked = !isLiked;
-      });
-      showSnackBar(context, e.toString());
-    }
-  }
-
 }

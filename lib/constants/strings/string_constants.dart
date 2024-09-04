@@ -177,4 +177,6 @@ class StringConstants {
   static const String confirmDeletionTitle = 'Confirm Deletion';
   static const String confirmDeletionMessage = 'Are you sure you want to delete';
   static const String delete = 'Delete';
+  static const String copy = 'Copy';
+  static const String debugInfoCopied = 'Debug info copied to clipboard';
 }

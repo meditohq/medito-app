@@ -1,79 +1,76 @@
+// File: lib/providers/track_provider.dart
+
 import 'dart:async';
 
 import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/utils/utils.dart';
+import 'package:Medito/providers/events/events_provider.dart';
+import 'package:Medito/providers/meditation/download_track_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../repositories/track/track_repository.dart';
 
 part 'track_provider.g.dart';
 
 @riverpod
-Future<TrackModel> tracks(
-  TracksRef ref, {
-  required String trackId,
-}) {
-  var trackRepository = ref.watch(trackRepositoryProvider);
-  ref.keepAlive();
+class Tracks extends _$Tracks {
+  @override
+  Future<TrackModel> build({required String trackId}) async {
+    final trackRepository = ref.watch(trackRepositoryProvider);
 
-  return trackRepository.fetchTrack(trackId);
+    return await trackRepository.fetchTrack(trackId);
+  }
+
+  Future<void> toggleFavorite(bool newLikedState) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final currentTrack = state.value!;
+      final updatedTrack = currentTrack.copyWith(isLiked: newLikedState);
+
+      if (newLikedState) {
+        markAsFavouriteEventProvider(
+          trackId: currentTrack.id,
+        );
+      } else {
+        markAsNotFavouriteEventProvider(
+          trackId: currentTrack.id,
+        );
+      }
+
+      return updatedTrack;
+    });
+  }
 }
 
 @riverpod
-Future<void> likeDislikeTrack(
-  LikeDislikeTrackRef ref, {
-  required bool isLiked,
-  required String trackId,
-}) {
-  return isLiked
-      ? ref.read(markAsFavouriteEventProvider(trackId: trackId).future)
-      : ref.read(markAsNotFavouriteEventProvider(trackId: trackId).future);
-}
-
-final likeDislikeCombineProvider =
-    FutureProvider.family<void, LikeDislikeModel>((ref, data) async {
-  var trackId = data.trackModel.id;
-  var fileId = data.file.id;
-
-  await ref.read(
-    likeDislikeTrackProvider(
-      isLiked: data.isLiked,
-      trackId: trackId,
-    ).future,
-  );
-  final downloadAudioProvider = ref.read(audioDownloaderProvider);
-  var downloadFileKey =
-      '$trackId-$fileId${getAudioFileExtension(data.file.path)}';
-  if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-      AudioDownloadState.DOWNLOADED) {
-    await ref.read(deleteTrackFromPreferenceProvider(
-      file: data.file,
-    ).future);
-    var trackCopy = data.trackModel.customCopyWith();
-    trackCopy.isLiked = data.isLiked;
-    await ref.read(addSingleTrackInPreferenceProvider(
-      trackModel: trackCopy,
-      file: data.file,
-    ).future);
+class FavoriteStatus extends _$FavoriteStatus {
+  @override
+  bool build({required String trackId}) {
+    final trackState = ref.watch(tracksProvider(trackId: trackId));
+    return trackState.value?.isLiked ?? false;
   }
 
-  ref.invalidate(tracksProvider);
-});
+  void toggle() {
+    state = !state;
+    ref.read(tracksProvider(trackId: trackId).notifier).toggleFavorite(state);
+  }
+}
+
 
 @riverpod
 Future<void> addTrackListInPreference(
-  AddTrackListInPreferenceRef ref, {
-  required List<TrackModel> tracks,
-}) async {
+    AddTrackListInPreferenceRef ref, {
+      required List<TrackModel> tracks,
+    }) async {
   return await ref.read(trackRepositoryProvider).addTrackInPreference(tracks);
 }
 
+
 @riverpod
 Future<void> addSingleTrackInPreference(
-  AddSingleTrackInPreferenceRef ref, {
-  required TrackModel trackModel,
-  required TrackFilesModel file,
-}) async {
+    AddSingleTrackInPreferenceRef ref, {
+      required TrackModel trackModel,
+      required TrackFilesModel file,
+    }) async {
   var _track = trackModel.customCopyWith();
   _track.audio = _track.audio.where((element) {
     var fileIndex = element.files.indexWhere((e) => e.id == file.id);
@@ -94,33 +91,4 @@ Future<void> addSingleTrackInPreference(
     addTrackListInPreferenceProvider(tracks: _downloadedTrackList).future,
   );
   unawaited(ref.refresh(downloadedTracksProvider.future));
-}
-
-@riverpod
-void addCurrentlyPlayingTrackInPreference(
-  _, {
-  required TrackModel trackModel,
-  required TrackFilesModel file,
-}) {
-  var _track = trackModel.customCopyWith();
-  _track.audio = _track.audio
-      .map((element) {
-        var fileIndex = element.files.indexWhere((e) => e.id == file.id);
-        if (fileIndex != -1) {
-          element.files = [element.files[fileIndex]];
-        }
-
-        return element;
-      })
-      .where((element) => element.files.isNotEmpty)
-      .toList();
-}
-
-//ignore: prefer-match-file-name
-class LikeDislikeModel {
-  final bool isLiked;
-  final TrackModel trackModel;
-  final TrackFilesModel file;
-
-  LikeDislikeModel(this.isLiked, this.trackModel, this.file);
 }
