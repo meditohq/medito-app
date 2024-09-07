@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BottomActionBar extends StatelessWidget {
   const BottomActionBar({
-    super.key,
+    Key? key,
     required this.actions,
     this.height = 80.0,
     this.showBackground = false,
-  });
+  }) : super(key: key);
 
   final List<Widget> actions;
   final double height;
@@ -27,11 +28,15 @@ class BottomActionBar extends StatelessWidget {
           children: actions.map((widget) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: widget,
+              child: _wrapWithConsumer(widget),
             );
           }).toList(),
         ),
       ),
     );
+  }
+
+  Widget _wrapWithConsumer(Widget widget) {
+    return widget is ConsumerWidget ? widget : Consumer(builder: (_, __, ___) => widget);
   }
 }

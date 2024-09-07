@@ -1,3 +1,9 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.google.gms.google-services'
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -21,18 +27,8 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def appMinSdkVersion = localProperties.getProperty('flutter.minSdkVersion')
-if (appMinSdkVersion == null) {
-    appMinSdkVersion = 26
-}
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
 android {
-    compileSdkVersion 34
+    compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -71,7 +67,7 @@ android {
 
     defaultConfig {
         applicationId "meditofoundation.medito"
-        minSdkVersion appMinSdkVersion
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -97,13 +93,6 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            shrinkResources false
-        }
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
             shrinkResources true
             minifyEnabled true
         }
@@ -113,7 +102,7 @@ android {
         resolutionStrategy {
             eachDependency {
                 if ((requested.group == "org.jetbrains.kotlin") && (requested.name.startsWith("kotlin-stdlib"))) {
-                    useVersion("1.8.0")
+                    useVersion("1.8.22")
                 }
             }
         }
