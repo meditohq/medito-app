@@ -32,7 +32,7 @@ class Pack extends _$Pack {
     ref.keepAlive();
   }
 
-  Future<void> toggle({
+  Future<void> toggleIsComplete({
     required String audioFileId,
     required String trackId,
     required bool isComplete,

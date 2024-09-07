@@ -93,6 +93,7 @@ Future<void> markAsFavouriteEvent(
   MarkAsFavouriteEventRef ref, {
   required String trackId,
 }) async {
+  print('markAsFavouriteEvent');
   await FirebaseAnalytics.instance.logEvent(
     name: 'mark_as_favourite',
     parameters: {'trackId': trackId},
@@ -108,6 +109,8 @@ Future<void> markAsNotFavouriteEvent(
   MarkAsNotFavouriteEventRef ref, {
   required String trackId,
 }) async {
+  print('markAsNotFavouriteEvent');
+
   await FirebaseAnalytics.instance.logEvent(
     name: 'mark_as_not_favourite',
     parameters: {'trackId': trackId},

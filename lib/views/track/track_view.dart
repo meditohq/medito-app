@@ -10,6 +10,8 @@ import 'package:Medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/meditation/track_provider.dart';
+
 class TrackView extends ConsumerStatefulWidget {
   final String trackId;
 
@@ -48,16 +50,16 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
   @override
   Widget build(BuildContext context) {
-    var tracks = ref.watch(tracksProvider(trackId: widget.trackId));
+    final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
 
     return Scaffold(
-      bottomNavigationBar: tracks.when(
-        data: (trackModel) => BackAndFaveActionBar(
-          onBackPressed: () => Navigator.pop(context),
+      bottomNavigationBar: trackAsyncValue.when(
+        data: (trackModel) => TrackViewBottomBar(
           trackId: widget.trackId,
+          onBackPressed: () => Navigator.pop(context),
         ),
-        loading: () => SizedBox(), // or a loading indicator
-        error: (_, __) => SizedBox(), // or an error widget
+        loading: () => SizedBox(),
+        error: (_, __) => SizedBox(),
       ),
       body: SafeArea(
         child: OrientationBuilder(
@@ -65,9 +67,18 @@ class _TrackViewState extends ConsumerState<TrackView> {
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: orientation == Orientation.portrait
-                    ? _buildPortraitLayout(tracks)
-                    : _buildLandscapeLayout(tracks),
+                child: trackAsyncValue.when(
+                  data: (trackModel) => orientation == Orientation.portrait
+                      ? _buildPortraitLayout(trackAsyncValue)
+                      : _buildLandscapeLayout(trackAsyncValue),
+                  loading: () => _buildLoadingWidget(),
+                  error: (err, stack) => MeditoErrorWidget(
+                    message: err.toString(),
+                    onTap: () =>
+                        ref.refresh(tracksProvider(trackId: widget.trackId)),
+                    isScaffold: false,
+                  ),
+                ),
               ),
             );
           },

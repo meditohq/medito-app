@@ -1,34 +1,49 @@
-import 'package:Medito/views/player/widgets/bottom_actions/widgets/mark_favourite_widget.dart';
+import 'package:Medito/constants/colors/color_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../providers/meditation/track_provider.dart';
 import 'bottom_action_bar.dart';
 
-class BackAndFaveActionBar extends StatelessWidget {
-  const BackAndFaveActionBar({
-    super.key,
-    required this.onBackPressed,
-    this.showCloseIcon = false,
-    required this.trackId,
-  });
-
-  final void Function() onBackPressed;
-  final bool showCloseIcon;
+class TrackViewBottomBar extends ConsumerWidget {
   final String trackId;
+  final VoidCallback onBackPressed;
+
+  const TrackViewBottomBar({
+    Key? key,
+    required this.trackId,
+    required this.onBackPressed,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteStatus = ref.watch(favoriteStatusProvider(trackId: trackId));
+
+    final dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
+    var isDailyMeditation = trackId == dailyMeditationId;
+    var colour = favoriteStatus
+        ? ColorConstants.lightPurple
+        : ColorConstants.walterWhite;
+
     return BottomActionBar(
       actions: [
-        GestureDetector(
-          onTap: onBackPressed,
-          child: Icon(
-            showCloseIcon ? Icons.close : Icons.arrow_back,
-            color: Colors.white,
-          ),
+        IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: onBackPressed,
         ),
-        SizedBox.shrink(),
-        SizedBox.shrink(),
-        MarkFavouriteWidget(trackId: trackId),
+        isDailyMeditation
+            ? Container()
+            : IconButton(
+                icon: Icon(
+                  Icons.star,
+                  color: colour,
+                ),
+                onPressed: () {
+                  ref
+                      .read(favoriteStatusProvider(trackId: trackId).notifier)
+                      .toggle();
+                },
+              ),
       ],
     );
   }

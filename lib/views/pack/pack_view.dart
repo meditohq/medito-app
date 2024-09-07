@@ -139,7 +139,7 @@ class _PackViewState extends ConsumerState<PackView>
               : PackDismissibleWidget(
                   child: PackItemWidget(item: item),
                   onDismissed: () {
-                    ref.read(packProvider(packId: widget.id).notifier).toggle(
+                    ref.read(packProvider(packId: widget.id).notifier).toggleIsComplete(
                           audioFileId: item.path.getIdFromPath(),
                           trackId: item.id,
                           isComplete: item.isCompleted == true,
@@ -148,13 +148,10 @@ class _PackViewState extends ConsumerState<PackView>
                 ),
         ),
         if (!isLast)
-          Padding(
-            padding: EdgeInsets.only(left: 16, right: 16),
-            child: Divider(
-              color: ColorConstants.charcoal,
-              thickness: 2,
-              height: 2,
-            ),
+          Divider(
+            color: ColorConstants.charcoal,
+            thickness: 2,
+            height: 2,
           ),
       ],
     );
