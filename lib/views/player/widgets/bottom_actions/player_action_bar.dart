@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../models/track/track_model.dart';
 import 'bottom_action_bar.dart';
-import 'widgets/mark_favourite_widget.dart';
 
 class PlayerActionBar extends StatelessWidget {
   const PlayerActionBar({
