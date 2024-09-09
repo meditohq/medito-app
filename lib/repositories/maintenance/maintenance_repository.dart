@@ -1,5 +1,5 @@
-import 'package:Medito/models/maintenance/maintenance_model.dart';
-import 'package:Medito/services/network/maintenance_dio_api_service.dart';
+import 'package:medito/models/maintenance/maintenance_model.dart';
+import 'package:medito/services/network/maintenance_dio_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'maintenance_repository.g.dart';

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/repositories/repositories.dart';
-import 'package:Medito/services/network/api_response.dart';
-import 'package:Medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/repositories/repositories.dart';
+import 'package:medito/services/network/api_response.dart';
+import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

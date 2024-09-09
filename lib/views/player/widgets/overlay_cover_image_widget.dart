@@ -1,4 +1,4 @@
-import 'package:Medito/widgets/widgets.dart';
+import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class OverlayCoverImageWidget extends StatelessWidget {

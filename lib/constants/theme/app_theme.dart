@@ -1,20 +1,21 @@
-import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/constants/theme/text_theme.dart';
 
+import '../colors/color_constants.dart';
 import 'input_theme.dart';
-import 'slide_transition_builder.dart';
 
 ThemeData appTheme(BuildContext context) {
   return ThemeData(
     useMaterial3: true,
     splashColor: ColorConstants.ebony,
     canvasColor: ColorConstants.ebony,
-    pageTransitionsTheme: PageTransitionsTheme(builders: {
-      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.android: SlideTransitionBuilder(),
-    }),
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
     colorScheme: ColorScheme.dark(
-      background: ColorConstants.ebony,
       surface: ColorConstants.ebony,
       secondary: ColorConstants.walterWhite,
     ),

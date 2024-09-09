@@ -1,12 +1,12 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/permission_handler.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/views/player/player_view.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/back_and_fave_action_bar.dart';
-import 'package:Medito/widgets/widgets.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/routes/routes.dart';
+import 'package:medito/utils/permission_handler.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/views/player/player_view.dart';
+import 'package:medito/views/player/widgets/bottom_actions/back_and_fave_action_bar.dart';
+import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

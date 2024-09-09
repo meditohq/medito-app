@@ -1,4 +1,4 @@
-import 'package:Medito/utils/utils.dart';
+import 'package:medito/utils/utils.dart';
 
 extension DurationExtensions on Duration {
   /// Converts the duration into a readable string

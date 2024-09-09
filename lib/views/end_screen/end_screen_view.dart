@@ -1,7 +1,7 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
-import 'package:Medito/widgets/headers/medito_app_bar_small.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

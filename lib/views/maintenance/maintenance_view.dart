@@ -1,6 +1,6 @@
-import 'package:Medito/models/maintenance/maintenance_model.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/markdown_widget.dart';
+import 'package:medito/models/maintenance/maintenance_model.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/markdown_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

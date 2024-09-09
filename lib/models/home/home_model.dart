@@ -1,5 +1,5 @@
-import 'package:Medito/models/home/shortcuts/shortcuts_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:medito/models/home/shortcuts/shortcuts_model.dart';
 
 part 'home_model.freezed.dart';
 part 'home_model.g.dart';

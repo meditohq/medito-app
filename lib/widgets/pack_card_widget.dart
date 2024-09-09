@@ -1,5 +1,5 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/widgets/widgets.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class PackCardWidget extends StatelessWidget {

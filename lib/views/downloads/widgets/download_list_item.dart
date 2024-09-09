@@ -13,8 +13,8 @@ Affero GNU General Public License for more details.
 You should have received a copy of the Affero GNU General Public License
 along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/widgets.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 //ignore:prefer-match-file-name

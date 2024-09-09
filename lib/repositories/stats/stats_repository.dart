@@ -1,5 +1,5 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/services/network/dio_api_service.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/services/network/dio_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/stats/stats_model.dart';

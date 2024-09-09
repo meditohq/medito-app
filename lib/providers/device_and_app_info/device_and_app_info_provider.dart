@@ -1,12 +1,10 @@
-import 'dart:io';
-
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/main.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../constants/strings/string_constants.dart';
+import '../../models/device_info/device_and_app_info_model.dart';
+import '../../models/me/me_model.dart';
+import '../../repositories/device_and_app_info/device_and_app_info_repository.dart';
 import '../me/me_provider.dart';
 
 part 'device_and_app_info_provider.g.dart';

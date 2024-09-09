@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/views/pack/pack_view.dart';
-import 'package:Medito/views/settings/settings_screen.dart';
-import 'package:Medito/views/track/track_view.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/views/pack/pack_view.dart';
+import 'package:medito/views/settings/settings_screen.dart';
+import 'package:medito/views/track/track_view.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

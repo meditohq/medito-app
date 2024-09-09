@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/constants/strings/string_constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/player/player_provider.dart';
-import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../constants/strings/string_constants.dart';
+import '../../models/background_sounds/background_sounds_model.dart';
+import '../../repositories/background_sounds/background_sounds_repository.dart';
+import '../../repositories/downloader/downloader_repository.dart';
 import '../../src/audio_pigeon.g.dart';
+import '../player/player_provider.dart';
 
 part 'background_sounds_notifier.g.dart';
 

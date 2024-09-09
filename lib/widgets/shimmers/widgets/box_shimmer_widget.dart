@@ -1,4 +1,4 @@
-import 'package:Medito/constants/constants.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 

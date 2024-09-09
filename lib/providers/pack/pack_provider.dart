@@ -1,6 +1,6 @@
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/repositories/repositories.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'pack_provider.g.dart';

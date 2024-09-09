@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:Medito/constants/constants.dart';
+import 'package:medito/constants/constants.dart';
 
 import '../repositories/events/events_repository.dart';
 import '../services/network/dio_api_service.dart';

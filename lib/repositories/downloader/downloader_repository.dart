@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/dio_api_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +20,8 @@ abstract class DownloaderRepository {
   Future<String?> getDownloadedFile(String name);
 
   Future<void> deleteDownloadedFile(String name);
+
+  Future<bool> isFileDownloaded(String name);
 }
 
 class DownloaderRepositoryImpl extends DownloaderRepository {
@@ -29,14 +31,23 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   DownloaderRepositoryImpl({required this.client, required this.ref});
 
   @override
+  Future<bool> isFileDownloaded(String name) async {
+    var file = await getApplicationDocumentsDirectory();
+    var savePath = '${file.path}/$name';
+
+    return await File(savePath).exists();
+  }
+
+  @override
   Future<void> downloadFile(
     String url, {
     required String name,
     void Function(int, int)? onReceiveProgress,
   }) async {
     var file = await getApplicationDocumentsDirectory();
-    var savePath = file.path + '/' + name;
+    var savePath = '${file.path}/$name';
     var isExists = await File(savePath).exists();
+    
     if (!isExists) {
       await client.dio.download(
         url,
@@ -46,8 +57,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
         }),
         onReceiveProgress: onReceiveProgress,
       );
-    } else {
-      throw ('File already exists');
     }
   }
 

@@ -15,11 +15,6 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/constants/theme/app_theme.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/src/audio_pigeon.g.dart';
-import 'package:Medito/views/splash_view.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,9 +24,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:medito/providers/player/audio_state_provider.dart';
+import 'package:medito/providers/player/player_provider.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/views/splash_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'constants/colors/color_constants.dart';
 import 'constants/environments/environment_constants.dart';
+import 'constants/http/http_constants.dart';
+import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
 import 'services/notifications/firebase_notifications_service.dart';
 

@@ -1,5 +1,5 @@
-import 'package:Medito/constants/colors/color_constants.dart';
-import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

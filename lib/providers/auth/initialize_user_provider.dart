@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/dio_client_provider.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/services/network/dio_client_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var retryCounter = 0;

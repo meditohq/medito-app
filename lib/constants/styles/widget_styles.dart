@@ -1,5 +1,6 @@
-import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+
+import '../colors/color_constants.dart';
 
 final String DmMono = 'DM Mono';
 final String DmSans = 'DM Sans';

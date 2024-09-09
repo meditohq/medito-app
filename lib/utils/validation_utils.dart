@@ -1,4 +1,4 @@
-import 'package:Medito/constants/constants.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:email_validator/email_validator.dart';
 
 class ValidationUtils {

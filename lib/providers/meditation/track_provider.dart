@@ -1,4 +1,4 @@
-import 'package:Medito/providers/pack/pack_provider.dart';
+import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/track/track_model.dart';

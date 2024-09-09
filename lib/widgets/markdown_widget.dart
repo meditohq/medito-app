@@ -1,5 +1,5 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/routes/routes.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
