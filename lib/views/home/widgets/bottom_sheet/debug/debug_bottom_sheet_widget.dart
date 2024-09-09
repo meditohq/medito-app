@@ -1,6 +1,5 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
