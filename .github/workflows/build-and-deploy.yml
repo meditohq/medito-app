@@ -1,0 +1,77 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.x'
+  RUBY_VERSION: '3.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+    env:
+      AUTH_BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+      AUTH_CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
+      AUTH_INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
+      AUTH_SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
+      PROD_URL: ${{ secrets.PROD_URL }}
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Generate code
+      run: |
+        flutter pub run build_runner build --delete-conflicting-outputs
+        flutter pub run pigeon --input pigeons/messages.dart
+    
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ env.RUBY_VERSION }}
+    
+    - name: Install Fastlane
+      run: gem install fastlane
+
+    - name: Setup Keychain
+      env:
+        TEMP_KEYCHAIN_PASSWORD: ${{ secrets.TEMP_KEYCHAIN_PASSWORD }}
+        TEMP_KEYCHAIN_USER: ${{ secrets.TEMP_KEYCHAIN_USER }}
+      run: fastlane setup_keychain
+
+    - name: Build and Deploy iOS
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        MEDITO_APPSTORE_CERTIFICATES_REPO: ${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}
+        APPLE_API_KEY_JSON: ${{ secrets.APPLE_API_KEY_JSON }}
+        APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+        DEVELOPER_APP_ID: ${{ secrets.DEVELOPER_APP_ID }}
+        DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+        DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+        FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+        PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
+      run: |
+        fastlane ios build
+        fastlane ios deploy
+    
+    - name: Build and Deploy Android
+      env:
+        FCI_KEYSTORE_PASSWORD: ${{ secrets.FCI_KEYSTORE_PASSWORD }}
+        FCI_KEY_ALIAS: ${{ secrets.FCI_KEY_ALIAS }}
+        FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
+        PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+      run: |
+        fastlane android build
+        fastlane android deploy

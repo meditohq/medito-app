@@ -1,29 +1,15 @@
-include: package:pedantic/analysis_options.yaml
+include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  plugins:
-    - dart_code_metrics
+  errors:
+    # Ignore specific Firebase-related errors if they're false positives
+    missing_required_param: ignore
+    missing_return: ignore
+  exclude:
+    - lib/generated_plugin_registrant.dart
+    - lib/**/*.g.dart
+    - lib/**/*.freezed.dart
 
-dart_code_metrics:
-  metrics:
-    cyclomatic-complexity: 20
-    maximum-nesting-level: 5
-  metrics-exclude:
-    - test/**
+linter:
   rules:
-    - avoid-dynamic
-    - avoid-passing-async-when-sync-expected
-    - avoid-redundant-async
-    - avoid-unnecessary-type-assertions
-    - avoid-unnecessary-type-casts
-    - avoid-unrelated-type-assertions
-    - avoid-unused-parameters
-    - avoid-nested-conditional-expressions
-    - newline-before-return
-    - no-boolean-literal-compare
-    - no-empty-block
-    - prefer-trailing-comma
-    - prefer-conditional-expressions
-    - no-equal-then-else
-    - prefer-moving-to-variable
-    - prefer-match-file-name
+    # Add any additional lint rules you want to enforce

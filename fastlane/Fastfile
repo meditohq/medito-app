@@ -1,0 +1,64 @@
+before_all do
+  ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"]
+end
+
+platform :ios do
+  desc "Build iOS app"
+  lane :build do
+    setup_ci if ENV['CI']
+    match(
+      type: "appstore",
+      readonly: true,
+      git_url: ENV["MEDITO_APPSTORE_CERTIFICATES_REPO"],
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      username: ENV["FASTLANE_APPLE_ID"],
+      team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"]
+    )
+    sh("flutter clean && flutter build ios --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
+  end
+
+  desc "Deploy iOS app to App Store"
+  lane :deploy do
+    app_store_connect_api_key(
+      key_id: ENV['APPLE_API_KEY_JSON'],
+      issuer_id: ENV['APP_STORE_CONNECT_TEAM_ID'],
+      key_content: ENV['APPLE_API_KEY_JSON']
+    )
+    upload_to_app_store(
+      app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
+      app_version: get_version_number(xcodeproj: "ios/Runner.xcodeproj"),
+      build_number: get_build_number(xcodeproj: "ios/Runner.xcodeproj"),
+      skip_metadata: true,
+      skip_screenshots: true,
+      team_id: ENV["APP_STORE_CONNECT_TEAM_ID"],
+      ipa: "./build/ios/ipa/Medito.ipa"
+    )
+  end
+end
+
+platform :android do
+  desc "Build Android app"
+  lane :build do
+    sh("flutter clean && flutter build appbundle --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
+  end
+
+  desc "Deploy Android app to Play Store"
+  lane :deploy do
+    upload_to_play_store(
+      json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
+      aab: "../build/app/outputs/bundle/release/app-release.aab"
+    )
+  end
+end
+
+desc "Set up temporary keychain"
+lane :setup_keychain do
+  create_keychain(
+    name: "fastlane_keychain",
+    password: ENV["TEMP_KEYCHAIN_PASSWORD"],
+    default_keychain: true,
+    unlock: true,
+    timeout: 3600,
+    lock_when_sleeps: false
+  )
+end
