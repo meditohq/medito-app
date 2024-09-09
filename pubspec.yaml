@@ -25,7 +25,6 @@ dependencies:
   firebase_core: ^2.24.2
   firebase_messaging: ^14.7.10
   flutter_dotenv: ^5.1.0
-  flutter_downloader: ^1.11.6
   flutter_html: ^3.0.0-beta.2
   flutter_local_notifications: ^17.2.2
   flutter_markdown: ^0.6.18+3
@@ -53,6 +52,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^2.0.0  # Add this line
   pigeon: ^13.1.2
   mocktail: ^1.0.2
   build_runner: ^2.4.8

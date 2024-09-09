@@ -1,0 +1,23 @@
+flutter_run:
+  env_file: .prod.env
+  dart_defines:
+    - FLUTTER_APP_ENV=prod
+  args:
+    - --release
+    - --dart-define-from-file=.prod.env
+
+flutter_build:
+  env_file: .prod.env
+  dart_defines:
+    - FLUTTER_APP_ENV=prod
+  args:
+    - --release
+    - --dart-define-from-file=.prod.env
+
+custom_commands:
+  - name: generate
+    command: flutter pub run build_runner build --delete-conflicting-outputs && flutter pub run pigeon --input pigeons/messages.dart
+  - name: build_ios
+    command: flutter clean && flutter build ios --release --no-tree-shake-icons --dart-define-from-file=.prod.env
+  - name: build_android
+    command: flutter clean && flutter build apk --release --no-tree-shake-icons --dart-define-from-file=.prod.env

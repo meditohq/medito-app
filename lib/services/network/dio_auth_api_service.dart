@@ -35,14 +35,6 @@ class DioAuthApiService {
     'Bearer ${HTTPConstants.AUTH_TOKEN}';
   }
 
-  Future<void> _onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) async {
-    await _captureException(err);
-    handler.reject(err);
-  }
-
   Future<void> _captureException(
       DioException err,
       ) async {
