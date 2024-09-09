@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Medito/constants/constants.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';

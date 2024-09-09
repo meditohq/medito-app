@@ -1,5 +1,6 @@
-import 'package:Medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+
+import '../constants.dart';
 
 InputDecorationTheme inputDecorationTheme() {
   var outlineInputBorder = _outlineInputBorder();

@@ -1,5 +1,5 @@
-import 'package:Medito/main.dart';
-import 'package:Medito/providers/player/player_provider.dart';
+import 'package:medito/main.dart';
+import 'package:medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 

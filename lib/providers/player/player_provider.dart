@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Medito/models/models.dart';
+import 'package:medito/models/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';

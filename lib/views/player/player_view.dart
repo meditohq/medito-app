@@ -1,13 +1,13 @@
 import 'dart:ui';
 
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/src/audio_pigeon.g.dart';
-import 'package:Medito/views/end_screen/end_screen_view.dart';
-import 'package:Medito/views/player/widgets/artist_title_widget.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/player_action_bar.dart';
-import 'package:Medito/views/player/widgets/duration_indicator_widget.dart';
-import 'package:Medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/views/end_screen/end_screen_view.dart';
+import 'package:medito/views/player/widgets/artist_title_widget.dart';
+import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
+import 'package:medito/views/player/widgets/duration_indicator_widget.dart';
+import 'package:medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

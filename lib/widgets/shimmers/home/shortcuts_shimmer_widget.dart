@@ -1,4 +1,4 @@
-import 'package:Medito/constants/styles/widget_styles.dart';
+import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/box_shimmer_widget.dart';

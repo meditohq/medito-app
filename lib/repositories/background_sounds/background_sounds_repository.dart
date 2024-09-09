@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/models/models.dart';
-import 'package:Medito/providers/providers.dart';
-import 'package:Medito/services/network/dio_api_service.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/services/network/dio_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';

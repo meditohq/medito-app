@@ -1,8 +1,9 @@
-import 'package:Medito/models/models.dart';
-import 'package:Medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../models/home/announcement/announcement_model.dart';
+import '../../models/home/home_model.dart';
 import '../../models/stats/stats_model.dart';
+import '../../repositories/home/home_repository.dart';
 
 part 'home_provider.g.dart';
 
@@ -14,7 +15,8 @@ Future<HomeModel> fetchHome(FetchHomeRef ref) async {
   ref.keepAlive();
 
   var homeModel = await homeRepository.fetchHome();
-  var sortedShortcuts = await homeRepository.getSortedShortcuts(homeModel.shortcuts);
+  var sortedShortcuts =
+      await homeRepository.getSortedShortcuts(homeModel.shortcuts);
 
   return homeModel.copyWith(shortcuts: sortedShortcuts);
 }

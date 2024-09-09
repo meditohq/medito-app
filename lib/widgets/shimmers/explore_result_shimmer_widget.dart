@@ -1,5 +1,5 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:flutter/material.dart';
 
 class ExploreResultShimmerWidget extends StatelessWidget {

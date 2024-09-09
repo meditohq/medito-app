@@ -1,6 +1,7 @@
-import 'package:Medito/repositories/repositories.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../repositories/events/events_repository.dart';
 
 part 'events_provider.g.dart';
 

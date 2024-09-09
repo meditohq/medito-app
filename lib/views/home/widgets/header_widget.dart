@@ -1,4 +1,4 @@
-import 'package:Medito/views/home/widgets/stats/stats_row.dart';
+import 'package:medito/views/home/widgets/stats/stats_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

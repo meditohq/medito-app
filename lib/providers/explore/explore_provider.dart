@@ -1,7 +1,8 @@
-import 'package:Medito/models/models.dart';
-import 'package:Medito/repositories/repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../models/explore/explore_model.dart';
+import '../../repositories/explore/explore_repository.dart';
 
 part 'explore_provider.g.dart';
 

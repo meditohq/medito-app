@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'com.google.gms.google-services'
+    id 'dev.flutter.flutter-gradle-plugin'
 }
 
 def localProperties = new Properties()
@@ -14,7 +14,7 @@ if (localPropertiesFile.exists()) {
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
-    throw new FileNotFoundException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
@@ -27,9 +27,13 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    namespace "meditofoundation.medito"
+    compileSdkVersion 34  // Update this
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -45,66 +49,45 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    def keystoreProperties = new Properties()
-    def keystorePropertiesFile = rootProject.file('keystore.properties')
-
-    def configured = true
-    try {
-        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-    } catch (IOException e) {
-        configured = false
-    }
-
     project.ext {
         APP_ID = keystoreProperties['appId']
-        KEYSTORE_STORE_FILE = configured ? rootProject.file(keystoreProperties['storeFile']) : null
+        KEYSTORE_STORE_FILE = rootProject.file(keystoreProperties['storeFile'])
         KEYSTORE_STORE_PASSWORD = keystoreProperties['storePassword']
         KEYSTORE_KEY_ALIAS = keystoreProperties['keyAlias']
         KEYSTORE_KEY_PASSWORD = keystoreProperties['keyPassword']
-        VERSION_CODE = 1
+        VERSION_CODE = flutterVersionCode.toInteger()
         VERSION_NAME = flutterVersionName
-    }
-
-    defaultConfig {
-        applicationId "meditofoundation.medito"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true
     }
 
     signingConfigs {
         release {
-            if (System.getenv()["CI"]) {
-                storeFile file(System.getenv()["FCI_KEYSTORE_PATH"])
-                storePassword System.getenv()["FCI_KEYSTORE_PASSWORD"]
-                keyAlias System.getenv()["FCI_KEY_ALIAS"]
-                keyPassword System.getenv()["FCI_KEY_PASSWORD"]
-            } else {
-                storeFile project.KEYSTORE_STORE_FILE
-                storePassword project.KEYSTORE_STORE_PASSWORD
-                keyAlias project.KEYSTORE_KEY_ALIAS
-                keyPassword project.KEYSTORE_KEY_PASSWORD
-            }
+            storeFile project.KEYSTORE_STORE_FILE
+            storePassword project.KEYSTORE_STORE_PASSWORD
+            keyAlias project.KEYSTORE_KEY_ALIAS
+            keyPassword project.KEYSTORE_KEY_PASSWORD
         }
     }
 
+    defaultConfig {
+        applicationId project.APP_ID
+        minSdkVersion Math.max(flutter.minSdkVersion, 26)
+        targetSdkVersion 34  // Update this
+        versionCode project.VERSION_CODE
+        versionName project.VERSION_NAME
+        multiDexEnabled true
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            debuggable true
+        }
         release {
             signingConfig signingConfigs.release
-            shrinkResources true
+            debuggable false
             minifyEnabled true
-        }
-    }
-    namespace 'meditofoundation.medito'
-    configurations.all {
-        resolutionStrategy {
-            eachDependency {
-                if ((requested.group == "org.jetbrains.kotlin") && (requested.name.startsWith("kotlin-stdlib"))) {
-                    useVersion("1.8.22")
-                }
-            }
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -114,16 +97,21 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation platform('com.google.firebase:firebase-bom:32.1.1')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation platform('com.google.firebase:firebase-bom:33.2.0')
+    implementation 'com.google.firebase:firebase-analytics'
     implementation "androidx.multidex:multidex:2.0.1"
-    implementation 'androidx.media3:media3-session:1.2.1'
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
-    implementation 'androidx.window:window:1.0.0'
-    implementation 'androidx.window:window-java:1.0.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.1'
 
-    implementation "androidx.media3:media3-exoplayer:1.2.1"
-    implementation "androidx.media3:media3-ui:1.2.1"
-    implementation "androidx.media3:media3-common:1.2.1"
+    // Media3 dependencies
+    def media3_version = "1.2.1"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-ui:$media3_version"
+    implementation "androidx.media3:media3-session:$media3_version"
+    implementation "androidx.media3:media3-common:$media3_version"
+
+    // Other potentially needed dependencies
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "com.google.android.material:material:1.11.0"
 }

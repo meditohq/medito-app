@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:Medito/models/track/track_model.dart';
-import 'package:Medito/providers/background_sounds/background_sounds_notifier.dart';
+import 'package:medito/models/track/track_model.dart';
+import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';

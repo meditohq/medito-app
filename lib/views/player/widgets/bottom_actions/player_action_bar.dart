@@ -1,7 +1,7 @@
-import 'package:Medito/constants/constants.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
-import 'package:Medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
+import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
+import 'package:medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/track/track_model.dart';

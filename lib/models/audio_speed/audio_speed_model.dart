@@ -1,5 +1,6 @@
-import 'package:Medito/constants/constants.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../constants/strings/string_constants.dart';
 
 part 'audio_speed_model.freezed.dart';
 part 'audio_speed_model.g.dart';

@@ -1,8 +1,8 @@
-import 'package:Medito/constants/colors/color_constants.dart';
-import 'package:Medito/constants/styles/widget_styles.dart';
-import 'package:Medito/routes/routes.dart';
-import 'package:Medito/utils/utils.dart';
-import 'package:Medito/widgets/widgets.dart';
+import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/routes/routes.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,4 +1,4 @@
-import 'package:Medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/colors/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
