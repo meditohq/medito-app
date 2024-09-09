@@ -59,7 +59,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
     volume = vol;
 
     var scaledVol = scaledVolume(vol);
-    
+
     if (Platform.isAndroid) {
       _api.setBackgroundSoundVolume(scaledVol);
     } else {
@@ -207,7 +207,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   double scaledVolume(double vol) {
-    return (vol / 100) * 0.5;
+    var scale = Platform.isIOS ? 0.1 : 0.5;
+    return (vol / 100) * scale;
   }
-
 }
