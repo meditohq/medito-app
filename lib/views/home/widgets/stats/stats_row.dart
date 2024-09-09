@@ -46,7 +46,7 @@ class _StatsRowState extends State<StatsRow> with TickerProviderStateMixin {
     )..repeat(reverse: true);
 
     _rotationController = AnimationController(
-      duration: const Duration(seconds: 500),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     )..repeat();
 
