@@ -12,7 +12,8 @@ platform :ios do
       git_url: ENV["MEDITO_APPSTORE_CERTIFICATES_REPO"],
       app_identifier: ENV["DEVELOPER_APP_IDENTIFIER"],
       username: ENV["FASTLANE_APPLE_ID"],
-      team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"]
+      team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"],
+      git_basic_authorization: ENV["MATCH_GIT_TOKEN"]
     )
     sh("flutter clean && flutter build ios --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
   end
@@ -39,14 +40,14 @@ end
 platform :android do
   desc "Build Android app"
   lane :build do
-    sh("flutter clean && flutter build appbundle --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
+    sh("flutter clean && flutter build apk --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
   end
 
   desc "Deploy Android app to Play Store"
   lane :deploy do
     upload_to_play_store(
       json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
-      aab: "../build/app/outputs/bundle/release/app-release.aab"
+      apk: "../build/app/outputs/flutter-apk/app-release.apk"
     )
   end
 end
