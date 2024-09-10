@@ -12,12 +12,6 @@ env:
 jobs:
   build-and-deploy:
     runs-on: macos-latest
-    env:
-      AUTH_BASE_URL: ${{ secrets.AUTH_BASE_URL }}
-      AUTH_CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
-      AUTH_INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
-      AUTH_SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-      PROD_URL: ${{ secrets.PROD_URL }}
     steps:
     - uses: actions/checkout@v3
     
@@ -26,6 +20,9 @@ jobs:
       with:
         flutter-version: ${{ env.FLUTTER_VERSION }}
         channel: 'stable'
+    
+    - name: Create .prod.env file
+      run: echo "${{ secrets.PROD_ENV }}" > .prod.env
     
     - name: Install dependencies
       run: flutter pub get
@@ -52,6 +49,7 @@ jobs:
     - name: Build and Deploy iOS
       env:
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
         MEDITO_APPSTORE_CERTIFICATES_REPO: ${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}
         APPLE_API_KEY_JSON: ${{ secrets.APPLE_API_KEY_JSON }}
         APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
@@ -61,7 +59,9 @@ jobs:
         FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
         FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
         PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
+        GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
       run: |
+        echo "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
         fastlane ios build
         fastlane ios deploy
     
@@ -72,6 +72,8 @@ jobs:
         FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
         PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
         PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
       run: |
+        echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
         fastlane android build
         fastlane android deploy
