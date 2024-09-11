@@ -50,8 +50,8 @@ Future<void> main() async {
 }
 
 Future<void> initializeApp() async {
-  WidgetsFlutterBinding.ensureInitialized();
   await loadEnvironment();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -93,15 +93,16 @@ Future<void> runAppWithSentry() async {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
         ],
-        child: ParentWidget(),
+        child: const ParentWidget(),
       ),
     ),
   );
 }
 
-// ignore: prefer-match-file-name
 class ParentWidget extends ConsumerStatefulWidget {
   static const String _title = 'Medito';
+
+  const ParentWidget({super.key});
 
   @override
   ConsumerState<ParentWidget> createState() => _ParentWidgetState();
@@ -130,20 +131,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     });
   }
 
-  Future<void> initializeApp() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await loadEnvironment();
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    setupAudioCallback();
-    await initializeAudioService();
-    usePathUrlStrategy();
-  }
-
   void _setUpSystemUi() {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
+      const SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: ColorConstants.transparent,
@@ -168,7 +158,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
       ],
-      home: SplashView(),
+      home: const SplashView(),
     );
   }
 }

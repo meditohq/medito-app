@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:medito/firebase_options.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,9 +27,8 @@ class FirebaseMessagingHandler {
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     try {
-      await Firebase.initializeApp();
       _configureFirebaseMessaging(context, ref);
-      await _initializeLocalNotifications(context, ref);
+      _initializeLocalNotifications(context, ref);
       await updateAnalyticsCollectionBasedOnConsent();
       await FirebaseAnalytics.instance.setUserId(id: 'medito_user');
     } catch (e) {
@@ -36,37 +36,29 @@ class FirebaseMessagingHandler {
     }
   }
 
-  void onFirebaseMessageAppOpened(BuildContext context, WidgetRef ref) {
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleMessageOpenedApp(message, context, ref);
-    });
-  }
-
   void _configureFirebaseMessaging(
     BuildContext context,
     WidgetRef ref,
   ) {
-    // await _messaging.requestPermission();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage
         .listen((message) => _handleForegroundMessage(message, context, ref));
     FirebaseMessaging.onMessageOpenedApp
         .listen((message) => _handleMessageOpenedApp(message, context, ref));
-    onFirebaseMessageAppOpened(context, ref);
   }
 
-  Future<void> _initializeLocalNotifications(
+  void _initializeLocalNotifications(
     BuildContext context,
     WidgetRef ref,
-  ) async {
+  ) {
     const initializationSettingsAndroid = AndroidInitializationSettings('logo');
-    final initializationSettingsIOS = DarwinInitializationSettings();
-    final initializationSettings = InitializationSettings(
+    const initializationSettingsIOS = DarwinInitializationSettings();
+    const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
 
-    await _flutterLocalNotificationsPlugin.initialize(
+    _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         final payload = response.payload;
@@ -76,6 +68,7 @@ class FirebaseMessagingHandler {
         }
       },
     );
+
   }
 
   void _handleForegroundMessage(
@@ -157,6 +150,11 @@ class FirebaseMessagingHandler {
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  if (!Firebase.apps.isNotEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   final handler = FirebaseMessagingHandler();
   await handler._showBackgroundNotification(message);
 }
