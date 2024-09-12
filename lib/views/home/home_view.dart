@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/widgets/widgets.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,7 +13,7 @@ import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_widget.dart';
 
 class HomeView extends ConsumerStatefulWidget {
-  HomeView({super.key});
+  const HomeView({super.key});
 
   @override
   ConsumerState<HomeView> createState() => _HomeViewState();
@@ -27,34 +24,24 @@ class _HomeViewState extends ConsumerState<HomeView>
         TickerProviderStateMixin,
         AutomaticKeepAliveClientMixin,
         WidgetsBindingObserver {
-  var _isConnected = true;
-  late final StreamSubscription _subscription;
   bool isCollapsed = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _subscription = Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
-      setState(() {
-        _isConnected = !result.contains(ConnectivityResult.none);
-      });
-    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _subscription.cancel();
     super.dispose();
   }
 
   late CurvedAnimation curvedAnimation = CurvedAnimation(
     parent: AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
     )..forward(),
     curve: Curves.easeInOut,
   );
@@ -66,7 +53,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     curvedAnimation = CurvedAnimation(
       parent: AnimationController(
         vsync: this,
-        duration: Duration(milliseconds: 1000),
+        duration: const Duration(milliseconds: 1000),
       )..forward(),
       curve: Curves.easeInOut,
     );
@@ -75,16 +62,13 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (!_isConnected) {
-      return ConnectivityErrorWidget();
-    }
 
     final home = ref.watch(fetchHomeProvider);
     final announcementData = ref.watch(fetchLatestAnnouncementProvider);
     final stats = ref.watch(fetchStatsProvider);
 
     return home.when(
-      loading: () => HomeShimmerWidget(),
+      loading: () => const HomeShimmerWidget(),
       error: (err, stack) => MeditoErrorWidget(
         message: home.error.toString(),
         onTap: () => _onRefresh(),
@@ -106,7 +90,7 @@ class _HomeViewState extends ConsumerState<HomeView>
           body: RefreshIndicator(
             onRefresh: _onRefresh,
             child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(
+              physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
               child: Column(
@@ -163,7 +147,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     ref.read(fetchStatsProvider);
     showModalBottomSheet<void>(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(14.0),
           topRight: Radius.circular(14.0),
@@ -173,7 +157,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       useRootNavigator: true,
       backgroundColor: ColorConstants.onyx,
       builder: (BuildContext context) {
-        return StatsBottomSheetWidget();
+        return const StatsBottomSheetWidget();
       },
     );
   }

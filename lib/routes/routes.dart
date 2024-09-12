@@ -30,6 +30,8 @@ Future<void> logScreenView(String screenName,
   );
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> handleNavigation(
   String? place,
   List<String?> ids,
@@ -133,15 +135,13 @@ Future<void> handleNavigation(
     return;
   } else if (place == TypeConstants.flow) {
     if (ids.contains('downloads')) {
-      await logScreenView('Downloads View');
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DownloadsView()),
-      ).then(
-        (value) {
-          ref?.invalidate(fetchStatsProvider);
-        },
-      );
+      await navigatorKey.currentState
+          ?.push(
+        MaterialPageRoute(builder: (context) => const DownloadsView()),
+      )
+          .then((value) {
+        ref?.invalidate(fetchStatsProvider);
+      });
     }
   }
 }

@@ -18,6 +18,8 @@ import '../bottom_navigation/bottom_navigation_bar_view.dart';
 import '../player/player_view.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
+  const DownloadsView({super.key});
+
   @override
   ConsumerState<DownloadsView> createState() => _DownloadsViewState();
 }
@@ -70,7 +72,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           message: err.toString(),
           onTap: () => ref.refresh(downloadedTracksProvider),
         ),
-        loading: () => TrackShimmerWidget(),
+        loading: () => const TrackShimmerWidget(),
       ),
     );
   }
@@ -79,7 +81,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     // In order for the Dismissible action still to work on the list items,
     // the default ReorderableListView is used (instead of the .builder one)
     return ReorderableListView(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       onReorder: (int oldIndex, int newIndex) {
         setState(() {
           if (oldIndex < newIndex) {
@@ -97,7 +99,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  Widget _getEmptyWidget() => EmptyStateWidget(
+  Widget _getEmptyWidget() => const EmptyStateWidget(
         message: StringConstants.emptyDownloadsMessage,
       );
 
@@ -120,8 +122,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   Widget _getDismissibleBackgroundWidget() => Container(
         color: ColorConstants.charcoal,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
+        child: const Padding(
+          padding: EdgeInsets.all(24.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,7 +172,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     unawaited(Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PlayerView(),
+        builder: (context) => const PlayerView(),
       ),
     ));
   }
@@ -180,20 +182,20 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(StringConstants.confirmDeletionTitle),
+          title: const Text(StringConstants.confirmDeletionTitle),
           content: Text(StringConstants.confirmDeletionMessage + ' ${item.title}?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(StringConstants.cancel),
+              child: const Text(StringConstants.cancel),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(StringConstants.delete),
+              child: const Text(StringConstants.delete),
             ),
           ],
         );

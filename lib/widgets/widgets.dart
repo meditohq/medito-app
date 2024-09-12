@@ -1,6 +1,5 @@
 export 'buttons/loading_button_widget.dart';
 export 'drop_down_widget.dart';
-export 'errors/connectivity_error_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'handle_bar_widget.dart';
 export 'headers/medito_app_bar_large.dart';

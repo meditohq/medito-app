@@ -80,7 +80,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                     ),
                   if (isShowCheckDownload)
                     TextSpan(
-                      text: '${StringConstants.downloads.toLowerCase()}',
+                      text: StringConstants.downloads.toLowerCase(),
                       style: textStyle?.copyWith(
                         decoration: TextDecoration.underline,
                         color: ColorConstants.lightPurple,

@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/widgets.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,72 +19,27 @@ class BackgroundSoundView extends ConsumerStatefulWidget {
 }
 
 class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
-  final ScrollController _scrollController = ScrollController();
-  var _isConnected = true;
-  late final StreamSubscription _subscription;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    _subscription = Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
-      _isConnected = !result.contains(ConnectivityResult.none);
-    });
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
-    _subscription.cancel();
     super.dispose();
   }
 
   void _scrollListener() {
-    setState(() => {});
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    var localBackgroundSounds =
-    ref.watch(fetchLocallySavedBackgroundSoundsProvider);
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
-
-    if (!_isConnected) {
-      return Scaffold(
-        appBar: const MeditoAppBarSmall(
-          hasCloseButton: false,
-          hasBackButton: false,
-          title: StringConstants.backgroundSounds,
-        ),
-        bottomNavigationBar: SingleBackButtonActionBar(
-          onBackPressed: () => Navigator.pop(context),
-        ),
-        body: localBackgroundSounds.when(
-          skipLoadingOnRefresh: true,
-          skipLoadingOnReload: true,
-          data: (data) {
-            if (data != null) {
-              return _mainContent(_isConnected, data);
-            }
-
-            return MeditoErrorWidget(
-              message: StringConstants.noBgSoundAvailable,
-              onTap: () => ref.refresh(backgroundSoundsProvider),
-            );
-          },
-          error: (err, stack) {
-            return MeditoErrorWidget(
-              message: err.toString(),
-              onTap: () =>
-                  ref.refresh(fetchLocallySavedBackgroundSoundsProvider),
-            );
-          },
-          loading: () => BackgroundSoundsShimmerWidget(),
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: const MeditoAppBarSmall(
@@ -98,44 +50,35 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       ),
       body: backgroundSounds.when(
         skipLoadingOnRefresh: false,
-        data: (data) => _mainContent(_isConnected, data),
+        data: (data) => _mainContent(data),
         error: (err, stack) {
           return MeditoErrorWidget(
             message: err.toString(),
             onTap: () => ref.refresh(backgroundSoundsProvider),
           );
         },
-        loading: () => BackgroundSoundsShimmerWidget(),
+        loading: () => const BackgroundSoundsShimmerWidget(),
       ),
     );
   }
 
-  RefreshIndicator _mainContent(
-      bool isConnected,
-      List<BackgroundSoundsModel> data,
-      ) {
+  RefreshIndicator _mainContent(List<BackgroundSoundsModel> data) {
     return RefreshIndicator(
       onRefresh: () async {
-        if (!isConnected) {
-          showSnackBar(context, StringConstants.connectivityError);
-
-          return;
-        } else {
-          ref.invalidate(backgroundSoundsProvider);
-          ref.read(backgroundSoundsProvider);
-        }
+        ref.invalidate(backgroundSoundsProvider);
+        ref.read(backgroundSoundsProvider);
       },
       child: ListView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 80.0), // Adjust padding to leave space for the bottomNavigationBar
+        padding: const EdgeInsets.only(bottom: 80.0),
         children: [
-          VolumeSliderWidget(),
+          const VolumeSliderWidget(),
           Column(
             children: data
                 .map((e) => SoundListTileWidget(
-              sound: e,
-            ))
+                      sound: e,
+                    ))
                 .toList(),
           ),
           height32,

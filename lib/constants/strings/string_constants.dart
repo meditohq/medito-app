@@ -119,7 +119,7 @@ class StringConstants {
   static const String accessForbidden = 'Access forbidden';
   static const String apiNotFound = 'Api not found';
   static const String anErrorOccurred =
-      "An error occurred. Sorry for the inconvenience. We're fixing this issue";
+      "An unkown error occurred. Either we're having issues or you're offline.";
   static const String noBgSoundAvailable =
       "You don't have any background sounds available in offline mode";
   static const String unableToLoadAudio =
@@ -179,4 +179,7 @@ class StringConstants {
   static const String delete = 'Delete';
   static const String copy = 'Copy';
   static const String debugInfoCopied = 'Debug info copied to clipboard';
+
+  static const String noConnectionMessage = 'No internet connection';
+  static const String goToDownloads = 'Go to Downloads';
 }
