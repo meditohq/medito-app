@@ -15,7 +15,7 @@ import '../../providers/meditation/track_provider.dart';
 class TrackView extends ConsumerStatefulWidget {
   final String trackId;
 
-  TrackView({Key? key, required this.trackId}) : super(key: key);
+  const TrackView({Key? key, required this.trackId}) : super(key: key);
 
   @override
   ConsumerState<TrackView> createState() => _TrackViewState();
@@ -58,8 +58,8 @@ class _TrackViewState extends ConsumerState<TrackView> {
           trackId: widget.trackId,
           onBackPressed: () => Navigator.pop(context),
         ),
-        loading: () => SizedBox(),
-        error: (_, __) => SizedBox(),
+        loading: () => const SizedBox(),
+        error: (_, __) => const SizedBox(),
       ),
       body: SafeArea(
         child: OrientationBuilder(
@@ -110,7 +110,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
           aspectRatio: 16 / 9,
           child: _buildCoverImage(tracks),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         _buildTrackContent(tracks, isLandscape: false),
       ],
     );
@@ -138,7 +138,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
                 child: _buildCoverImage(tracks),
               ),
             ),
-            SizedBox(width: 24),
+            const SizedBox(width: 24),
             Expanded(
               child: tracks.when(
                 data: (data) => ConstrainedBox(
@@ -150,7 +150,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _title(context, data.title),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         _getSubTitle(
                           context,
                           data.description,
@@ -170,7 +170,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
             ),
           ],
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         _buildTrackContent(tracks, isLandscape: true),
       ],
     );
@@ -239,27 +239,27 @@ class _TrackViewState extends ConsumerState<TrackView> {
             if (showGuideNameDropdown)
               Expanded(child: _guideNameDropdown(trackModel, isLandscape: true))
             else
-              Spacer(),
-            SizedBox(width: 12),
+              const Spacer(),
+            const SizedBox(width: 12),
             Expanded(child: _durationDropdown(trackModel, isLandscape: true)),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(child: _playBtn(ref, trackModel, isFullWidth: false)),
           ])
         : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             _title(context, trackModel.title),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             _getSubTitle(context, trackModel.description),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             if (_useCompactLayout && showGuideNameDropdown)
               _buildCompactPickers(trackModel)
             else ...[
               if (showGuideNameDropdown) ...[
                 _guideNameDropdown(trackModel, isLandscape: false),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
               ],
               _durationDropdown(trackModel, isLandscape: false),
             ],
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             _playBtn(ref, trackModel, isFullWidth: true),
           ]);
   }
@@ -270,7 +270,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
         Expanded(
           child: _guideNameDropdown(trackModel, isLandscape: false),
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: _durationDropdown(trackModel, isLandscape: false),
         ),
@@ -285,7 +285,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
     TrackModel trackModel, {
     required bool isFullWidth,
   }) {
-    var radius = BorderRadius.all(Radius.circular(7));
+    var radius = const BorderRadius.all(Radius.circular(7));
 
     return InkWell(
       onTap: () {
@@ -300,7 +300,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
           color: ColorConstants.walterWhite,
           borderRadius: radius,
         ),
-        child: Center(
+        child: const Center(
           child: Icon(
             Icons.play_arrow_rounded,
             color: ColorConstants.black,
@@ -352,7 +352,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 
   void _handleOnGuideNameChange(TrackAudioModel? value) {
@@ -395,7 +395,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PlayerView(),
+          builder: (context) => const PlayerView(),
         ),
       ).then((value) => {
             ref.invalidate(packProvider),
@@ -463,6 +463,6 @@ class _TrackViewState extends ConsumerState<TrackView> {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }
