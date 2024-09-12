@@ -92,7 +92,9 @@ Medito Foundation https://meditofoundation.org/.
 
 4. Set up Firebase:
    - You need `google-services.json` (for Android) and `GoogleService-Info.plist` (for iOS) from the Firebase console.
+   - You also need the `/lib/firebase_options.dart` file.
    - Contact a team member for the contents of these files.
+
 
 ### Generating Code
 
