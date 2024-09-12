@@ -70,3 +70,38 @@ RSIN: 860222627
 Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on Discord or by email.
 
 Medito Foundation https://meditofoundation.org/.
+
+## Development
+
+### Setup
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/meditohq/medito-app.git
+   cd medito-app
+   ```
+
+2. Install dependencies:
+   ```
+   flutter pub get
+   ```
+
+3. Set up environment files:
+   - Create `.env.staging` and `.env.production` files in the root directory.
+   - Contact a team member for the contents of these files.
+
+4. Set up Firebase:
+   - You need `google-services.json` (for Android) and `GoogleService-Info.plist` (for iOS) from the Firebase console.
+   - Contact a team member for the contents of these files.
+
+### Generating Code
+
+To generate Pigeon code. This is required to communicate with native iOS and Android code.
+```
+flutter pub run pigeon --input pigeon_conf.dart
+```
+
+To generate API and state management code with Riverpod:
+```
+dart run build_runner watch --delete-conflicting-outputs
+```

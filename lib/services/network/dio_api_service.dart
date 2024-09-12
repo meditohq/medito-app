@@ -146,16 +146,18 @@ class DioApiService {
   CustomException _returnDioErrorResponse(DioException error) {
     var data = error.response?.data;
     var message;
-    if (!(data is String)) {
+    if (data is! String) {
       message = data?[_errorKey] ?? data?[_messageKey];
     }
 
-    if (error.type == DioExceptionType.receiveTimeout) {
+    if (error.type == DioExceptionType.receiveTimeout ||
+        error.type == DioExceptionType.connectionError) {
       throw FetchDataException(
         error.response?.statusCode,
         StringConstants.connectionTimeout,
       );
     }
+
     switch (error.response?.statusCode) {
       case 400:
         throw BadRequestException(

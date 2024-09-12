@@ -35,9 +35,7 @@ class DioAuthApiService {
     'Bearer ${HTTPConstants.AUTH_TOKEN}';
   }
 
-  Future<void> _captureException(
-      DioException err,
-      ) async {
+  Future<void> _captureException(DioException err) async {
     await Sentry.captureException(
       {
         'error': err.toString(),
@@ -68,14 +66,22 @@ class DioAuthApiService {
 
       return response.data;
     } on DioException catch (err) {
-      _returnDioErrorResponse(err);
+      if (err.error is SocketException) {
+        // Handle SocketException wrapped in DioException
+        throw FetchDataException(null, StringConstants.loadingError);
+      }
+      await _captureException(err);
+      return _returnDioErrorResponse(err);
+    } on SocketException {
+      // This catch might be redundant if Dio always wraps SocketException
+      throw FetchDataException(null, StringConstants.loadingError);
     }
   }
 
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
       String uri, {
-        data,
+        dynamic data,
         Map<String, dynamic>? queryParameters,
         Options? options,
         CancelToken? cancelToken,
@@ -95,7 +101,13 @@ class DioAuthApiService {
 
       return response.data;
     } on DioException catch (err) {
-      _returnDioErrorResponse(err);
+      if (err.error is SocketException) {
+        throw FetchDataException(null, StringConstants.loadingError);
+      }
+      await _captureException(err);
+      return _returnDioErrorResponse(err);
+    } on SocketException {
+      throw FetchDataException(null, StringConstants.loadingError);
     }
   }
 
