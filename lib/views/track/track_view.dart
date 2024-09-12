@@ -357,8 +357,20 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
   void _handleOnGuideNameChange(TrackAudioModel? value) {
     setState(() {
+      var previousDuration = fileModel?.duration;
       selectedAudio = value;
-      fileModel = value?.files.first;
+      
+      if (previousDuration != null && value != null) {
+        fileModel = _findClosestDurationFile(value.files, previousDuration);
+      } else {
+        fileModel = value?.files.first;
+      }
+    });
+  }
+
+  TrackFilesModel _findClosestDurationFile(List<TrackFilesModel> files, int targetDuration) {
+    return files.reduce((a, b) {
+      return (a.duration - targetDuration).abs() < (b.duration - targetDuration).abs() ? a : b;
     });
   }
 
