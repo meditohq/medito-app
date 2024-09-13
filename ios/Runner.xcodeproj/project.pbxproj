@@ -17,10 +17,13 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B005D71E8DBF999C9ECFF58D /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A23AF7F9ACD2E3B60D257DCC /* Pods_Runner.framework */; };
+		EDBD61082C942FA500C578AF /* StatsWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61052C941F8400C578AF /* StatsWidgetEntry.swift */; };
+		EDBD610E2C943F0100C578AF /* StreakWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD610C2C943EBD00C578AF /* StreakWidgetView.swift */; };
+		EDBD61122C943F4500C578AF /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61102C943F3C00C578AF /* Provider.swift */; };
 		EDFD4CFF2C9359BF0066E874 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */; };
 		EDFD4D012C9359BF0066E874 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDFD4D002C9359BF0066E874 /* SwiftUI.framework */; };
 		EDFD4D042C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */; };
-		EDFD4D062C9359BF0066E874 /* MeditoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D052C9359BF0066E874 /* MeditoWidget.swift */; };
+		EDFD4D062C9359BF0066E874 /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D052C9359BF0066E874 /* StreakWidget.swift */; };
 		EDFD4D082C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
 		EDFD4D0C2C9359BF0066E874 /* MeditoWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -91,11 +94,15 @@
 		A23AF7F9ACD2E3B60D257DCC /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A91CE5A70B6D9B6818144898 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		BF080AE7A37BCB5C87220FA8 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EDBD61052C941F8400C578AF /* StatsWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsWidgetEntry.swift; sourceTree = "<group>"; };
+		EDBD61092C9439A100C578AF /* MeditoWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtension.entitlements; sourceTree = "<group>"; };
+		EDBD610C2C943EBD00C578AF /* StreakWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetView.swift; sourceTree = "<group>"; };
+		EDBD61102C943F3C00C578AF /* Provider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Provider.swift; sourceTree = "<group>"; };
 		EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MeditoWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		EDFD4D002C9359BF0066E874 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetBundle.swift; sourceTree = "<group>"; };
-		EDFD4D052C9359BF0066E874 /* MeditoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidget.swift; sourceTree = "<group>"; };
+		EDFD4D052C9359BF0066E874 /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
 		EDFD4D072C9359BF0066E874 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EDFD4D092C9359BF0066E874 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F3DEFA5B7A5C376CA370EAA7 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -165,6 +172,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				EDBD61092C9439A100C578AF /* MeditoWidgetExtension.entitlements */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				EDFD4D022C9359BF0066E874 /* MeditoWidget */,
@@ -202,11 +210,38 @@
 			path = Runner;
 			sourceTree = "<group>";
 		};
+		EDBD61072C941F9000C578AF /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				EDBD61052C941F8400C578AF /* StatsWidgetEntry.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		EDBD610B2C943E6F00C578AF /* View */ = {
+			isa = PBXGroup;
+			children = (
+				EDFD4D052C9359BF0066E874 /* StreakWidget.swift */,
+				EDBD610C2C943EBD00C578AF /* StreakWidgetView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		EDBD610F2C943F2F00C578AF /* Timeline */ = {
+			isa = PBXGroup;
+			children = (
+				EDBD61102C943F3C00C578AF /* Provider.swift */,
+			);
+			path = Timeline;
+			sourceTree = "<group>";
+		};
 		EDFD4D022C9359BF0066E874 /* MeditoWidget */ = {
 			isa = PBXGroup;
 			children = (
+				EDBD610F2C943F2F00C578AF /* Timeline */,
+				EDBD610B2C943E6F00C578AF /* View */,
+				EDBD61072C941F9000C578AF /* Model */,
 				EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */,
-				EDFD4D052C9359BF0066E874 /* MeditoWidget.swift */,
 				EDFD4D072C9359BF0066E874 /* Assets.xcassets */,
 				EDFD4D092C9359BF0066E874 /* Info.plist */,
 			);
@@ -260,6 +295,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				A14CEC1FCB282A5FA1CACEB2 /* [CP] Embed Pods Frameworks */,
 				448AE7CEA8BF04E9919B17D4 /* [CP] Copy Pods Resources */,
+				EDBD610A2C943DE300C578AF /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -472,6 +508,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		EDBD610A2C943DE300C578AF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "generatedPath=\"$SRCROOT/Flutter/Generated.xcconfig\"\n\n# Read and trim versionNumber and buildNumber\nversionNumber=$(grep FLUTTER_BUILD_NAME \"$generatedPath\" | cut -d '=' -f2 | xargs)\nbuildNumber=$(grep FLUTTER_BUILD_NUMBER \"$generatedPath\" | cut -d '=' -f2 | xargs)\n\ninfoPlistPath=\"$SRCROOT/MeditoWidget/Info.plist\"\n\n# Check and add CFBundleVersion if it does not exist\n/usr/libexec/PlistBuddy -c \"Print :CFBundleVersion\" \"$infoPlistPath\" 2>/dev/null\nif [ $? != 0 ]; then\n    /usr/libexec/PlistBuddy -c \"Add :CFBundleVersion string $buildNumber\" \"$infoPlistPath\"\nelse\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$infoPlistPath\"\nfi\n\n# Check and add CFBundleShortVersionString if it does not exist\n/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$infoPlistPath\" 2>/dev/null\nif [ $? != 0 ]; then\n    /usr/libexec/PlistBuddy -c \"Add :CFBundleShortVersionString string $versionNumber\" \"$infoPlistPath\"\nelse\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $versionNumber\" \"$infoPlistPath\"\nfi\n\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -497,7 +550,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDFD4D042C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */,
-				EDFD4D062C9359BF0066E874 /* MeditoWidget.swift in Sources */,
+				EDBD61082C942FA500C578AF /* StatsWidgetEntry.swift in Sources */,
+				EDBD610E2C943F0100C578AF /* StreakWidgetView.swift in Sources */,
+				EDBD61122C943F4500C578AF /* Provider.swift in Sources */,
+				EDFD4D062C9359BF0066E874 /* StreakWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -856,6 +912,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MeditoWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JLKV36C38P;
@@ -896,6 +953,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MeditoWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JLKV36C38P;
@@ -933,6 +991,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MeditoWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JLKV36C38P;
