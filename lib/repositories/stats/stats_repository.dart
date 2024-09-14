@@ -17,9 +17,12 @@ class StatsRepositoryImpl extends StatsRepository {
 
   @override
   Future<StatsModel> fetchStatsFromRemote() async {
-    var response = await client.getRequest(HTTPConstants.STATS);
-
-    return StatsModel.fromJson(response);
+    try {
+      var response = await client.getRequest(HTTPConstants.STATS);
+      return StatsModel.fromJson(response);
+    } catch (e) {
+      return const StatsModel();
+    }
   }
 }
 

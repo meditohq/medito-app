@@ -107,3 +107,39 @@ To generate API and state management code with Riverpod:
 ```
 dart run build_runner watch --delete-conflicting-outputs
 ```
+
+## Development and Production Configurations
+
+This project supports separate development and production configurations. Here's how to set up and use them in different IDEs:
+
+### Visual Studio Code
+
+1. Open the project in VSCode.
+2. Go to the Run and Debug view (Ctrl+Shift+D or Cmd+Shift+D on macOS).
+3. In the dropdown at the top of the sidebar, you can choose between:
+   - "Flutter (Dev)" for development configuration
+   - "Flutter (Prod)" for production configuration
+4. Click the play button or press F5 to start debugging with the selected configuration.
+
+### Android Studio
+
+1. Open the project in Android Studio.
+2. In the toolbar, you'll see a dropdown next to the run button.
+3. Select either "Flutter (Dev)" or "Flutter (Prod)" from this dropdown.
+4. Click the run button or press Shift+F10 to run the selected configuration.
+
+### Configuration Details
+
+- Development configuration:
+  - Entry point: `lib/main_dev.dart`
+  - Flavor: dev
+
+- Production configuration:
+  - Entry point: `lib/main_prod.dart`
+  - Flavor: prod
+
+These configurations are defined in:
+- `.vscode/launch.json` for VSCode
+- `.run/Flutter_Dev.run.xml` and `.run/Flutter_Prod.run.xml` for Android Studio
+
+Ensure that your `android/app/build.gradle` file has the corresponding flavor configurations set up correctly.

@@ -99,11 +99,10 @@ android {
         dev {
             dimension "default"
             applicationIdSuffix ".dev"
-            resValue "string", "app_name", "Medito Dev"
+            versionNameSuffix "-dev"
         }
         prod {
             dimension "default"
-            resValue "string", "app_name", "Medito"
         }
     }
 }

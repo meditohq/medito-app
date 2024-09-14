@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'main_common.dart';
+import 'package:medito/constants/colors/color_constants.dart';
+import 'main.dart';
 
 void main() {
   FlavorConfig(
     name: 'DEV',
-    color: Colors.red,
+    color: ColorConstants.lightPurple,
     location: BannerLocation.topEnd,
-    variables: {
-      "baseUrl": "https://dev-api.example.com",
-    },
   );
 
   mainCommon();

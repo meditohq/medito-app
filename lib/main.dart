@@ -206,6 +206,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
       ],
       home: const SplashView(),
-    ); 
+    );
   }
 }

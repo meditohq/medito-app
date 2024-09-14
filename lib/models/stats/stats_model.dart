@@ -13,6 +13,8 @@ class StatsModel with _$StatsModel {
 
   factory StatsModel.fromJson(Map<String, dynamic> json) =>
       _$StatsModelFromJson(json);
+
+  factory StatsModel.empty() => const StatsModel();
 }
 
 @freezed
