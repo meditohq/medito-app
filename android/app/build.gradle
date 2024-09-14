@@ -93,6 +93,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "default"
+    productFlavors {
+        dev {
+            dimension "default"
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "Medito Dev"
+        }
+        prod {
+            dimension "default"
+            resValue "string", "app_name", "Medito"
+        }
+    }
 }
 
 flutter {

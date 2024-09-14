@@ -38,7 +38,7 @@ import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
 import 'services/notifications/firebase_notifications_service.dart';
 
-import 'package:medito/routes/routes.dart';  // Make sure to import routes.dart
+import 'package:medito/routes/routes.dart'; // Make sure to import routes.dart
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -46,7 +46,7 @@ var currentEnvironment = kReleaseMode
     ? EnvironmentConstants.prodEnv
     : EnvironmentConstants.stagingEnv;
 
-Future<void> main() async {
+Future<void> mainCommon() async {
   await initializeApp();
   runAppWithSentry();
 }
@@ -142,8 +142,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   void _initializeConnectivity() {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
-      _updateConnectionStatus,
-    );
+          _updateConnectionStatus,
+        );
   }
 
   Future<void> _checkInitialConnectivity() async {
@@ -199,13 +199,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
       scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey,  // Add this line
+      navigatorKey: navigatorKey, // Add this line
       theme: appTheme(context),
       title: ParentWidget._title,
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
       ],
       home: const SplashView(),
-    );
+    ); 
   }
 }

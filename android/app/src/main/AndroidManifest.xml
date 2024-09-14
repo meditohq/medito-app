@@ -37,7 +37,7 @@
     <application
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Medito"
+        android:label="@string/app_name"
         android:usesCleartextTraffic="true">
 
         <activity
