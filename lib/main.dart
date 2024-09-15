@@ -46,6 +46,11 @@ var currentEnvironment = kReleaseMode
     ? EnvironmentConstants.prodEnv
     : EnvironmentConstants.stagingEnv;
 
+//Temp main for ios
+void main() {
+  mainCommon();
+}
+
 Future<void> mainCommon() async {
   await initializeApp();
   runAppWithSentry();
