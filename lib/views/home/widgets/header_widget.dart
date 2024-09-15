@@ -36,8 +36,18 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
 
   Column _buildMain() {
     var mini = widget.statsData?.mini;
-    var miniFirst = mini?.first;
-    var miniSecond = mini?[1];
+    var miniFirst = mini?.isNotEmpty == true ? mini?.first : const TilesModel(
+      icon: '',
+      color: '',
+      title: '',
+      subtitle: '',
+    );
+    var miniSecond = ((mini?.length ?? 0) > 1  == true) ? mini![1] : const TilesModel(
+      icon: '',
+      color: '',
+      title: '',
+      subtitle: '',
+    );
 
     return Column(
       children: [
@@ -51,13 +61,13 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
             fontFamily: 'MaterialIcons',
           ),
           rightButtonIcon: IconData(
-            formatIcon(miniSecond?.icon ?? ''),
+            formatIcon(miniSecond.icon),
             fontFamily: 'MaterialIcons',
           ),
           leftButtonIconColor: ColorConstants.walterWhite,
           rightButtonIconColor: ColorConstants.walterWhite,
           leftButtonText: miniFirst?.title ?? '',
-          rightButtonText: miniSecond?.title ?? '',
+          rightButtonText: miniSecond.title,
           leftButtonClicked: () {
             widget.onStatsButtonTap();
           },

@@ -55,6 +55,8 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<StatsModel> fetchStats() {
     return client.getRequest(HTTPConstants.STATS).then((response) {
       return StatsModel.fromJson(response);
+    }).onError((error, stackTrace) {
+      return const StatsModel();
     });
   }
 
