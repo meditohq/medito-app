@@ -68,6 +68,7 @@ jobs:
         GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
       run: |
         echo "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
+        echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
         fastlane ios build
         fastlane ios deploy
     
