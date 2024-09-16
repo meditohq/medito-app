@@ -48,37 +48,6 @@ class DioAuthApiService {
   }
 
   // ignore: avoid-dynamic
-  Future<dynamic> getRequest(
-      String uri, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
-      }) async {
-    try {
-      var response = await dio.get(
-        uri,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      );
-
-      return response.data;
-    } on DioException catch (err) {
-      if (err.error is SocketException) {
-        // Handle SocketException wrapped in DioException
-        throw FetchDataException(null, StringConstants.loadingError);
-      }
-      await _captureException(err);
-      return _returnDioErrorResponse(err);
-    } on SocketException {
-      // This catch might be redundant if Dio always wraps SocketException
-      throw FetchDataException(null, StringConstants.loadingError);
-    }
-  }
-
-  // ignore: avoid-dynamic
   Future<dynamic> postRequest(
       String uri, {
         dynamic data,

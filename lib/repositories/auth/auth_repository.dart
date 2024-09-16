@@ -39,7 +39,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<String> sendOTP(String email) async {
     var response = await client
-        .postRequest('${HTTPConstants.OTP}', data: {'email': email});
+        .postRequest(HTTPConstants.OTP, data: {'email': email});
 
     return response['success'];
   }

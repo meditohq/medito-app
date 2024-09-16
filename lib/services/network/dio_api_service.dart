@@ -18,7 +18,7 @@ class DioApiService {
   }
 
   // Only pass the userToken if you know the headers have not been set in
-  // assignDioHeadersProvider (for example in workManager)
+  // assignDioHeadersProvider
   void _setToken(String? userToken) {
     if (userToken != null && userToken.isNotEmpty) {
       dio.options.headers[HttpHeaders.authorizationHeader] =
@@ -54,17 +54,18 @@ class DioApiService {
     handler.reject(err);
   }
 
-  Future<void> _captureException(
-    DioException err,
-  ) async {
+  Future<void> _captureException(dynamic err) async {
+    var exceptionData = {
+      'error': err.toString(),
+      'endpoint':
+          err is DioException ? err.requestOptions.path.toString() : 'Unknown',
+      'response': err is DioException ? err.response.toString() : 'Unknown',
+      'serverMessage': err is DioException ? err.message.toString() : 'Unknown',
+    };
+
     await Sentry.captureException(
-      {
-        'error': err.toString(),
-        'endpoint': err.requestOptions.path.toString(),
-        'response': err.response.toString(),
-        'serverMessage': err.message.toString(),
-      },
-      stackTrace: err.stackTrace,
+      exceptionData,
+      stackTrace: err is DioException ? err.stackTrace : StackTrace.current,
     );
   }
 

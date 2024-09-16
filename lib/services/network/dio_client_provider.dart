@@ -21,11 +21,11 @@ var assignDioHeadersProvider = FutureProvider<void>((ref) async {
 
 Map<String, dynamic> _createCustomHeaders(DeviceAndAppInfoModel model) {
   return {
-    'Device-Os': '${model.os}',
-    'Device-Language': '${model.languageCode}',
-    'Device-Model': '${model.model}',
-    'App-Version': '${model.appVersion}',
+    'Device-Os': model.os,
+    'Device-Language': model.languageCode,
+    'Device-Model': model.model,
+    'App-Version': model.appVersion,
     'Device-Time': '${DateTime.now()}',
-    'Device-Platform': '${model.platform}',
+    'Device-Platform': model.platform,
   };
 }

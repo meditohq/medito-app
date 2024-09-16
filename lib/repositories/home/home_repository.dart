@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/dio_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:dio/dio.dart';
+import 'package:medito/providers/auth/auth_provider.dart';
+import 'package:medito/services/network/dio_client_provider.dart';
 
 import '../../models/stats/stats_model.dart';
 
@@ -26,6 +31,7 @@ abstract class HomeRepository {
 class HomeRepositoryImpl extends HomeRepository {
   final DioApiService client;
   final Ref ref;
+  Future<void>? _refreshFuture;
 
   HomeRepositoryImpl({required this.ref, required this.client});
 
@@ -44,19 +50,53 @@ class HomeRepositoryImpl extends HomeRepository {
         .setStringList(SharedPreferenceConstants.shortcuts, ids);
   }
 
+  Future<T> _executeWithTokenRefresh<T>(Future<T> Function() apiCall) async {
+    try {
+      return await apiCall();
+    } on UnauthorizedException catch (e) {
+      await _refreshUserToken();
+      return await apiCall();
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<void> _refreshUserToken() async {
+    _refreshFuture ??= _performTokenRefresh();
+    await _refreshFuture;
+  }
+
+  Future<void> _performTokenRefresh() async {
+    try {
+      var authNotifier = ref.read(authProvider);
+      await authNotifier.generateUserToken();
+      ref.invalidate(assignDioHeadersProvider);
+    } finally {
+      _refreshFuture = null;
+    }
+  }
+
   @override
-  Future<HomeModel> fetchHome() {
-    return client.getRequest(HTTPConstants.HOME).then((response) {
+  Future<HomeModel> fetchHome() async {
+    return _executeWithTokenRefresh(() async {
+      var response = await client.getRequest(HTTPConstants.HOME);
       return HomeModel.fromJson(response);
     });
   }
 
   @override
-  Future<StatsModel> fetchStats() {
-    return client.getRequest(HTTPConstants.STATS).then((response) {
+  Future<StatsModel> fetchStats() async {
+    return _executeWithTokenRefresh(() async {
+      var response = await client.getRequest(HTTPConstants.STATS);
       return StatsModel.fromJson(response);
-    }).onError((error, stackTrace) {
-      return const StatsModel();
+    });
+  }
+
+  @override
+  Future<AnnouncementModel?> fetchLatestAnnouncement() async {
+    return _executeWithTokenRefresh(() async {
+      var response = await client.getRequest(HTTPConstants.LATEST_ANNOUNCEMENT);
+      return AnnouncementModel.fromJson(response);
     });
   }
 
@@ -75,15 +115,6 @@ class HomeRepositoryImpl extends HomeRepository {
     });
 
     return sortedShortcuts;
-  }
-
-  @override
-  Future<AnnouncementModel?> fetchLatestAnnouncement() {
-    return client
-        .getRequest(HTTPConstants.LATEST_ANNOUNCEMENT)
-        .then((response) {
-      return AnnouncementModel.fromJson(response);
-    });
   }
 }
 
