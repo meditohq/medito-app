@@ -90,7 +90,7 @@ jobs:
         id: release_version
         run: echo "::set-output name=version::$(echo ${{ github.event.inputs.version || github.ref }} | sed 's#refs/tags/##')"
       - name: Upload app APK to github action artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: medito-${{ steps.release_version.outputs.version }}.apk
           path: build/app/outputs/flutter-apk/app-release.apk

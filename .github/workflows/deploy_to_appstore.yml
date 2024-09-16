@@ -100,5 +100,11 @@ jobs:
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
         working-directory: ios
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-artifacts
+          path: ios/build/
+
       - name: Cleanup .env file
         run: rm ios/.env

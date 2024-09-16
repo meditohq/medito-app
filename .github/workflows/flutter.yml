@@ -70,3 +70,9 @@ jobs:
 
       - name: Run Pigeon generator
         run: flutter pub run pigeon --input pigeon_conf.dart
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: flutter-artifacts
+          path: build/
