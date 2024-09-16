@@ -83,3 +83,11 @@ jobs:
         echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
         fastlane android build
         fastlane android deploy
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          build/ios/ipa/*.ipa
+          build/app/outputs/flutter-apk/*.apk
