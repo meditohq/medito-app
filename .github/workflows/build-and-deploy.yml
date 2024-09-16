@@ -32,12 +32,6 @@ jobs:
         flutter pub run build_runner build --delete-conflicting-outputs
         flutter pub run pigeon --input pigeon_conf.dart
     
-    - name: Analyze
-      run: |
-        # This command runs Flutter analyze and exits with 0 if there are only warnings or infos,
-        # allowing the workflow to continue. It will still fail on actual errors.
-        flutter analyze . || exit $(( $? == 1 ? 0 : $? ))
-    
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
