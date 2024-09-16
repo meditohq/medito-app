@@ -7,7 +7,6 @@ on:
 
 env:
   FLUTTER_VERSION: '3.x'
-  RUBY_VERSION: '3.x'
 
 jobs:
   build-and-deploy:
@@ -35,7 +34,7 @@ jobs:
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ env.RUBY_VERSION }}
+        ruby-version: 'head'  # This will use the latest stable version
     
     - name: Install Fastlane
       run: gem install fastlane
