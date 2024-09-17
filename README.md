@@ -37,8 +37,6 @@ Need more details? [Feel free to raise an issue](https://github.com/meditohq/med
 
 ## Contributing
 
-Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
-
 API keys are generated for regular contributors (called "volunteers").
 
 To volunteer, join our [Telegram channel](https://t.me/medito.app) and go to "Discussion", then ask there for a key.
@@ -137,6 +135,9 @@ This project supports separate development and production configurations. Here's
 - Production configuration:
   - Entry point: `lib/main_prod.dart`
   - Flavor: prod
+
+Temp solution for  iOS
+   - Entry point: `lib/main.dart`
 
 These configurations are defined in:
 - `.vscode/launch.json` for VSCode
