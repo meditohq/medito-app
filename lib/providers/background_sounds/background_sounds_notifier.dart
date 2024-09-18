@@ -207,7 +207,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   double scaledVolume(double vol) {
-    var scale = Platform.isIOS ? 0.1 : 0.5;
+    var scale = Platform.isIOS ? 0.3 : 0.5;
     return (vol / 100) * scale;
   }
 }
