@@ -58,11 +58,11 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
         StatsRow(
           leftButtonIcon: IconData(
             formatIcon(miniFirst?.icon ?? ''),
-            fontFamily: 'MaterialIcons',
+            fontFamily: materialIcons,
           ),
           rightButtonIcon: IconData(
             formatIcon(miniSecond.icon),
-            fontFamily: 'MaterialIcons',
+            fontFamily: materialIcons,
           ),
           leftButtonIconColor: ColorConstants.walterWhite,
           rightButtonIconColor: ColorConstants.walterWhite,

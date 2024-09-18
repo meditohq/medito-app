@@ -81,7 +81,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 if (imageUrl.isNotEmpty)
                   FadeInImage.assetNetwork(
                     key: ValueKey(imageUrl),
-                    placeholder: 'assets/images/placeholder.jpg',
+                    placeholder: AssetConstants.placeholder,
                     image: imageUrl,
                     fit: BoxFit.cover,
                     fadeInDuration: const Duration(seconds: 2),
