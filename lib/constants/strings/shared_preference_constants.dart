@@ -1,6 +1,5 @@
 class SharedPreferenceConstants {
   static const String userToken = 'userToken';
-  static const String userEmail = 'userEmail';
   static const String bgSoundVolume = 'bgSoundVolume';
   static const String bgSound = 'bgSound';
   static const String listBgSound = 'listBgSound';
@@ -8,8 +7,7 @@ class SharedPreferenceConstants {
   static const String downloads = 'downloads';
   static const String currentPlayingTrack = 'currentPlayingTrack';
   static const String audioForBgEvent = 'audioForBgEvent';
-  static const String notificationPermissionCount =
-      'notificationPermissionCount';
+  static const String notificationPermissionCount = 'notificationPermissionCount';
   static const String notificationPermission = 'notificationPermission';
   static const String secsListened = 'secsListened';
   static const String listened = 'listened';
@@ -23,6 +21,10 @@ class SharedPreferenceConstants {
   static const String fakeStreakList = 'fakeStreakList';
   static const String listOfSavedFiles = 'listOfSavedFiles';
   static const String shortcuts = 'shortcuts';
-  static const savedHours = 'savedHours';
+  static const String savedHours = 'savedHours';
   static const String savedMinutes = 'savedMinutes';
+
+  // Add new constants for user ID and email
+  static const String userId = 'userId';
+  static const String userEmail = 'userEmail';
 }

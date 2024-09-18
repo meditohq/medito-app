@@ -12,4 +12,5 @@ class TypeConstants {
   static const String durationIdKey = 'duration';
   static const String donationAskCard = 'donationAskCard';
   static const String feedbackCard = 'feedbackCard';
+  static const String webViewAccount = 'webview-account';
 }

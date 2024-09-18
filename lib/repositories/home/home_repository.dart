@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
@@ -53,7 +52,7 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<T> _executeWithTokenRefresh<T>(Future<T> Function() apiCall) async {
     try {
       return await apiCall();
-    } on UnauthorizedException catch (e) {
+    } on UnauthorizedException catch (_) {
       await _refreshUserToken();
       return await apiCall();
     } on DioException {
@@ -69,7 +68,9 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<void> _performTokenRefresh() async {
     try {
       var authNotifier = ref.read(authProvider);
-      await authNotifier.generateUserToken();
+      var userTokenModel = await authNotifier.getUserFromSharedPref();
+      var userId = userTokenModel?.token;
+      await authNotifier.generateUserToken(userId);
       ref.invalidate(assignDioHeadersProvider);
     } finally {
       _refreshFuture = null;

@@ -10,15 +10,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'auth_repository.g.dart';
 
 abstract class AuthRepository {
-  Future<UserTokenModel> generateUserToken();
+  Future<UserTokenModel> generateUserToken(String? oldUserId);
 
   Future<String> sendOTP(String email);
 
-  Future<String> verifyOTP(String email, String OTP);
+  Future<String> verifyOTP(String email, String otp);
 
   Future<void> addUserInSharedPreference(UserTokenModel user);
 
   Future<UserTokenModel?> getUserFromSharedPreference();
+
+  Future<String?> getUserIdFromSharedPreference();
+
+  Future<void> saveUserIdInSharedPreference(String userId);
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -28,9 +32,10 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthRepositoryImpl({required this.ref, required this.client});
 
   @override
-  Future<UserTokenModel> generateUserToken() async {
+  Future<UserTokenModel> generateUserToken(String? oldUserId) async {
     var response = await client.postRequest(
       HTTPConstants.TOKENS,
+      data: {'clientId': oldUserId},
     );
 
     return UserTokenModel.fromJson(response);
@@ -45,9 +50,9 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<String> verifyOTP(String email, String OTP) async {
+  Future<String> verifyOTP(String email, String otp) async {
     var response = await client
-        .postRequest('${HTTPConstants.OTP}/$OTP', data: {'email': email});
+        .postRequest('${HTTPConstants.OTP}/$otp', data: {'email': email});
 
     return response['success'];
   }
@@ -67,6 +72,21 @@ class AuthRepositoryImpl extends AuthRepository {
         );
 
     return user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
+    }
+
+  @override
+  Future<String?> getUserIdFromSharedPreference() async {
+    return ref.read(sharedPreferencesProvider).getString(
+          SharedPreferenceConstants.userId,
+        );
+  }
+
+  @override
+  Future<void> saveUserIdInSharedPreference(String userId) async {
+    await ref.read(sharedPreferencesProvider).setString(
+          SharedPreferenceConstants.userId,
+          userId,
+        );
   }
 }
 

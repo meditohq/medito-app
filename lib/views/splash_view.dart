@@ -24,7 +24,9 @@ class _SplashViewState extends ConsumerState<SplashView> {
   }
 
   void initializeUser() async {
-    var response = await ref.read(userInitializationProvider.future);
+    await ref.read(userInitializationProvider.notifier).initializeUser();
+
+    var response = ref.read(userInitializationProvider);
     
     if (response == UserInitializationStatus.successful) {
       await FirebaseAnalytics.instance
@@ -41,7 +43,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
       showSnackBar(context, StringConstants.timeout);
       await Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => DownloadsView(),
+        builder: (context) => const DownloadsView(),
       ));
     } else if (response == UserInitializationStatus.retry) {
       await FirebaseAnalytics.instance

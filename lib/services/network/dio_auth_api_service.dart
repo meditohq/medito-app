@@ -20,7 +20,7 @@ class DioAuthApiService {
   DioAuthApiService._internal() {
     dio = Dio();
     dio.options = BaseOptions(
-      connectTimeout: Duration(milliseconds: 30000),
+      connectTimeout: const Duration(milliseconds: 30000),
       baseUrl: HTTPConstants.AUTH_BASE_URL,
     );
     if (kDebugMode) {

@@ -9,6 +9,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:medito/views/web_view/sign_up_log_in_web_view_screen.dart';
 
 import '../utils/utils.dart';
 import '../views/downloads/downloads_view.dart';
@@ -143,6 +144,13 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       });
     }
+  } else if (place == TypeConstants.webViewAccount) {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SignUpLogInWebView(url: ids.last ?? ''),
+      ),
+    );
   }
 }
 
