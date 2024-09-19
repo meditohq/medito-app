@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/services/network/dio_client_provider.dart';
+import 'package:medito/services/network/assign_dio_headers_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart'; // Import the constants
-
-var retryCounter = 0;
-const maxRetryCount = 2;
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/providers/fcm_token_provider.dart';
 
 class UserInitializationNotifier extends StateNotifier<UserInitializationStatus> {
   UserInitializationNotifier(this.ref) : super(UserInitializationStatus.retry);
 
   final Ref ref;
+  int _retryCounter = 0;
+  static const int _maxRetryCount = 2;
 
   Future<void> initializeUser() async {
     try {
@@ -20,14 +20,16 @@ class UserInitializationNotifier extends StateNotifier<UserInitializationStatus>
       var response = auth.userResponse;
       if (response.body != null) {
         await ref.read(assignDioHeadersProvider.future);
+        // Trigger the fcmTokenProvider to listen for changes
+        ref.read(fcmTokenProvider);
         state = UserInitializationStatus.successful;
       } else {
         state = UserInitializationStatus.error;
       }
     } catch (e) {
-      if (retryCounter < maxRetryCount) {
+      if (_retryCounter < _maxRetryCount) {
         await Future.delayed(const Duration(seconds: 2), () {
-          _incrementCounter();
+          _retryCounter++;
         });
         state = UserInitializationStatus.retry;
       } else {
@@ -46,7 +48,5 @@ class UserInitializationNotifier extends StateNotifier<UserInitializationStatus>
 final userInitializationProvider = StateNotifierProvider<UserInitializationNotifier, UserInitializationStatus>((ref) {
   return UserInitializationNotifier(ref);
 });
-
-void _incrementCounter() => retryCounter += 1;
 
 enum UserInitializationStatus { retry, error, successful }

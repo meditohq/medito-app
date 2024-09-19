@@ -45,16 +45,13 @@ class EventsRepositoryImpl extends EventsRepository {
     String trackId,
   ) =>
       client.postRequest(
-        HTTPConstants.AUDIO + '/' + trackId + HTTPConstants.AUDIO_START_EVENT,
+        '${HTTPConstants.AUDIO}/$trackId${HTTPConstants.AUDIO_START_EVENT}',
         data: event,
       );
 
   @override
   Future<void> trackAnnouncementDismissEvent(String id) =>
-      client.postRequest(HTTPConstants.ANNOUNCEMENT_EVENT +
-          '/' +
-          id +
-          HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT);
+      client.postRequest('${HTTPConstants.ANNOUNCEMENT_EVENT}/$id${HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT}');
 
   @override
   Future<void> markTrackAsListenedEvent(String id, {String? userToken}) =>
@@ -95,21 +92,21 @@ class EventsRepositoryImpl extends EventsRepository {
   @override
   Future<void> feedbackEvent(String trackId, Map<String, dynamic> event) =>
       client.postRequest(
-        HTTPConstants.TRACKS + '/' + trackId + HTTPConstants.RATE,
+        '${HTTPConstants.TRACKS}/$trackId${HTTPConstants.RATE}',
         data: event,
       );
 
   @override
   Future<void> markTrackAsFavouriteEvent(String trackId) {
     return client.postRequest(
-      HTTPConstants.TRACKS + '/' + trackId + HTTPConstants.LIKE,
+      '${HTTPConstants.TRACKS}/$trackId${HTTPConstants.LIKE}',
     );
   }
 
   @override
   Future<void> markTrackAsNotFavouriteEvent(String trackId) {
     return client.deleteRequest(
-      HTTPConstants.TRACKS + '/' + trackId + HTTPConstants.LIKE,
+      '${HTTPConstants.TRACKS}/$trackId${HTTPConstants.LIKE}',
     );
   }
 }

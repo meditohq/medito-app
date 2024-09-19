@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:medito/models/models.dart';
-import 'package:medito/providers/providers.dart';
-import 'package:medito/repositories/repositories.dart';
-import 'package:medito/services/network/api_response.dart';
-import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/repositories/repositories.dart';
+import 'package:medito/services/network/api_response.dart';
 import 'package:uuid/uuid.dart';
 
 final authProvider = ChangeNotifierProvider<AuthNotifier>(
@@ -18,7 +16,6 @@ final authProvider = ChangeNotifierProvider<AuthNotifier>(
   },
 );
 
-//ignore:prefer-match-file-name
 class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this.ref, {required this.authRepository});
 
@@ -27,7 +24,7 @@ class AuthNotifier extends ChangeNotifier {
   ApiResponse userResponse = ApiResponse.completed(null);
   ApiResponse sendOTPResponse = ApiResponse.completed(null);
   ApiResponse verifyOTPResponse = ApiResponse.completed(null);
- 
+
   Future<void> initializeUser() async {
     var userId = await authRepository.getUserIdFromSharedPreference();
     if (userId == null) {
@@ -42,50 +39,32 @@ class AuthNotifier extends ChangeNotifier {
       userResponse = ApiResponse.completed(response);
       notifyListeners();
     }
-
-    unawaited(_saveFirebaseToken());
   }
 
-  Future<void> generateUserToken(String? userId) async {
+  Future<void> generateUserToken(String? userId, [String? email]) async {
     userResponse = ApiResponse.loading();
     notifyListeners();
     try {
-      var response = await authRepository.generateUserToken(userId);
-      await saveUserInSharedPref(response);
+      var response = await authRepository.generateUserToken(userId, email);
       userResponse = ApiResponse.completed(response);
+      await saveUser(email);
     } catch (e) {
       userResponse = ApiResponse.error(e.toString());
     }
     notifyListeners();
   }
 
+  Future<void> saveUser(String? email) async {
+    var userTokenModel = userResponse.body as UserTokenModel;
+    var updatedUser = userTokenModel.copyWith(email: email);
+    await saveUserInSharedPref(updatedUser);
+  }
+
   Future<void> saveUserInSharedPref(UserTokenModel user) async {
     await authRepository.addUserInSharedPreference(user);
   }
 
-  Future<void> updateUserInSharedPref(String email) async {
-    var userTokenModel = userResponse.body as UserTokenModel;
-    var user = userTokenModel.copyWith(email: email);
-    userResponse = ApiResponse.completed(user);
-    await saveUserInSharedPref(user);
-  }
-
   Future<UserTokenModel?> getUserFromSharedPref() async {
     return await authRepository.getUserFromSharedPreference();
-  }
-
-  Future<void> _saveFirebaseToken() async {
-    var user = await authRepository.getUserFromSharedPreference();
-    var userToken = user?.token ?? '';
-    var token = await ref.read(firebaseMessagingProvider).getToken();
-    if (token != null) {
-      var fcm = SaveFcmTokenModel(token: token);
-      ref.read(fcmSaveEventProvider(
-        event: fcm.toJson().map(
-              (key, value) => MapEntry(key, value.toString()),
-            ),
-        userToken: userToken,
-      ));
-    }
   }
 }

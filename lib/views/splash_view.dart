@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../services/notifications/firebase_notifications_service.dart';
+
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
@@ -20,10 +22,11 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     super.initState();
-    initializeUser();
+    _initializeUser();
+    _initializeFirebaseMessaging();
   }
 
-  void initializeUser() async {
+  void _initializeUser() async {
     await ref.read(userInitializationProvider.notifier).initializeUser();
 
     var response = ref.read(userInitializationProvider);
@@ -49,8 +52,15 @@ class _SplashViewState extends ConsumerState<SplashView> {
       await FirebaseAnalytics.instance
           .logEvent(name: 'user_initialization_retry');
       ref.invalidate(userInitializationProvider);
-      initializeUser();
+      _initializeUser();
     }
+  }
+
+  void _initializeFirebaseMessaging() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final firebaseMessaging = ref.read(firebaseMessagingProvider);
+      firebaseMessaging.initialize(context, ref);
+    });
   }
 
   @override

@@ -1,16 +1,16 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/dio_auth_api_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_repository.g.dart';
 
 abstract class AuthRepository {
-  Future<UserTokenModel> generateUserToken(String? oldUserId);
+  Future<UserTokenModel> generateUserToken(String? userId, [String? email]);
 
   Future<String> sendOTP(String email);
 
@@ -32,10 +32,16 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthRepositoryImpl({required this.ref, required this.client});
 
   @override
-  Future<UserTokenModel> generateUserToken(String? oldUserId) async {
+  Future<UserTokenModel> generateUserToken(
+    String? userId, [
+    String? email,
+  ]) async {
     var response = await client.postRequest(
       HTTPConstants.TOKENS,
-      data: {'clientId': oldUserId},
+      data: {
+        'clientId': userId,
+        'email': email,
+      },
     );
 
     return UserTokenModel.fromJson(response);
@@ -43,8 +49,8 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<String> sendOTP(String email) async {
-    var response = await client
-        .postRequest(HTTPConstants.OTP, data: {'email': email});
+    var response =
+        await client.postRequest(HTTPConstants.OTP, data: {'email': email});
 
     return response['success'];
   }
@@ -72,7 +78,7 @@ class AuthRepositoryImpl extends AuthRepository {
         );
 
     return user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
-    }
+  }
 
   @override
   Future<String?> getUserIdFromSharedPreference() async {

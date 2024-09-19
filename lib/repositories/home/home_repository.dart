@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:dio/dio.dart';
 import 'package:medito/providers/auth/auth_provider.dart';
-import 'package:medito/services/network/dio_client_provider.dart';
+import 'package:medito/services/network/assign_dio_headers_provider.dart';
 
 import '../../models/stats/stats_model.dart';
 

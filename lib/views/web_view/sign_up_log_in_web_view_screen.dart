@@ -28,18 +28,23 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
+            print('Page started loading: $url');
             setState(() {
               _isLoading = true;
             });
           },
           onPageFinished: (String url) {
+            print('Page finished loading: $url');
             setState(() {
               _isLoading = false;
             });
           },
           onNavigationRequest: (NavigationRequest request) {
+            print('Navigation request: ${request.url}');
             if (request.url.contains('success')) {
+              print('Successful login detected: ${request.url}');
               _handleSuccessfulLogin(request.url);
+
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
@@ -50,11 +55,13 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
   }
 
   void _handleSuccessfulLogin(String url) async {
+    print('Handling successful login: $url');
     final uri = Uri.parse(url);
     final clientId = uri.queryParameters['clientId'];
-    final emailAddress = uri.queryParameters['emailAddress'];
+    final emailAddress = uri.queryParameters['email'];
 
     if (clientId != null && emailAddress != null) {
+      print('Client ID: $clientId, Email: $emailAddress');
       await _saveUserInfo(clientId, emailAddress);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,6 +72,8 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
       );
 
       Navigator.of(context).pop();
+    } else {
+      print('Client ID or Email is null');
     }
   }
 
@@ -76,7 +85,7 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
         .saveUserInfo(userId, email);
     await ref
         .read(authProvider.notifier)
-        .generateUserToken(oldUserId);
+        .generateUserToken(oldUserId, email);
   }
 
   @override

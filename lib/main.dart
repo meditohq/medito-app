@@ -29,6 +29,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/routes/routes.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -36,9 +37,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'constants/environments/environment_constants.dart';
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
-import 'services/notifications/firebase_notifications_service.dart';
-
-import 'package:medito/routes/routes.dart'; // Make sure to import routes.dart
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -53,7 +51,7 @@ void main() {
 
 Future<void> mainCommon() async {
   await initializeApp();
-  runAppWithSentry();
+  _runAppWithSentry();
 }
 
 Future<void> initializeApp() async {
@@ -84,7 +82,7 @@ Future<void> initializeAudioService() async {
   }
 }
 
-Future<void> runAppWithSentry() async {
+Future<void> _runAppWithSentry() async {
   var prefs = await initializeSharedPreferences();
   SentryFlutter.init(
     (options) {
@@ -124,9 +122,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
-    _initializeFirebaseMessaging();
     _checkInitialConnectivity();
-    _initializeConnectivity();
+    _initializeConnectivityListener();
   }
 
   void _setUpSystemUi() {
@@ -138,14 +135,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     ));
   }
 
-  void _initializeFirebaseMessaging() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final firebaseMessaging = ref.read(firebaseMessagingProvider);
-      firebaseMessaging.initialize(context, ref);
-    });
-  }
-
-  void _initializeConnectivity() {
+  void _initializeConnectivityListener() {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
           _updateConnectionStatus,
         );
@@ -204,7 +194,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
       scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey, // Add this line
+      navigatorKey: navigatorKey,
+      // Add this line
       theme: appTheme(context),
       title: ParentWidget._title,
       navigatorObservers: [
