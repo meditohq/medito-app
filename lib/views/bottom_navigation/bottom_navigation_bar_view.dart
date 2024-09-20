@@ -1,17 +1,20 @@
 import 'dart:async';
 
 import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/fcm_token_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BottomNavigationBarView extends StatefulWidget {
+class BottomNavigationBarView extends ConsumerStatefulWidget {
+  const BottomNavigationBarView({Key? key}) : super(key: key);
+
   @override
-  _BottomNavigationBarViewState createState() =>
-      _BottomNavigationBarViewState();
+  ConsumerState<BottomNavigationBarView> createState() => _BottomNavigationBarViewState();
 }
 
-class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
+class _BottomNavigationBarViewState extends ConsumerState<BottomNavigationBarView> {
   int _currentPageIndex = 0;
   late PageController _pageController;
   late final StreamSubscription _subscription;
@@ -37,7 +40,14 @@ class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
   @override
   void initState() {
     _pageController = PageController(initialPage: _currentPageIndex);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveFCMToken();
+    });
     super.initState();
+  }
+
+  Future<void> _saveFCMToken() async {
+    await ref.read(fcmTokenProvider)();
   }
 
   @override

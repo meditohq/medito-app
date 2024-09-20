@@ -1,28 +1,25 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/dio_auth_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'auth_repository.g.dart';
 
 abstract class AuthRepository {
-  Future<UserTokenModel> generateUserToken(String? userId, [String? email]);
-
-  Future<String> sendOTP(String email);
-
-  Future<String> verifyOTP(String email, String otp);
+  Future<UserTokenModel> generateUserToken([String? email]);
 
   Future<void> addUserInSharedPreference(UserTokenModel user);
 
-  Future<UserTokenModel?> getUserFromSharedPreference();
+  Future<String?> getClientIdFromSharedPreference();
 
-  Future<String?> getUserIdFromSharedPreference();
+  Future<String?> getEmailFromSharedPreference();
 
-  Future<void> saveUserIdInSharedPreference(String userId);
+  Future<String?> getToken();
+
+  Future<String> initializeUser();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -32,67 +29,80 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthRepositoryImpl({required this.ref, required this.client});
 
   @override
-  Future<UserTokenModel> generateUserToken(
-    String? userId, [
+  Future<String> initializeUser() async {
+    var token = await getToken();
+
+    if (token == null) {
+      const maxRetries = 3;
+      var retries = 0;
+      UserTokenModel? user;
+
+      while (retries < maxRetries) {
+        user = await generateUserToken();
+        if (user.token != null) {
+          return user.token!;
+        }
+        retries++;
+      }
+
+      throw Exception('Failed to generate token after $maxRetries attempts');
+    } else {
+      return token;
+    }
+  }
+
+  @override
+  Future<UserTokenModel> generateUserToken([
     String? email,
   ]) async {
+    var clientId = await getClientIdFromSharedPreference();
+
+    clientId ??= const Uuid().v4();
+
     var response = await client.postRequest(
       HTTPConstants.TOKENS,
       data: {
-        'clientId': userId,
+        'clientId': clientId,
         'email': email,
       },
     );
 
-    return UserTokenModel.fromJson(response);
-  }
+    var user = UserTokenModel.fromJson(response).copyWith(clientId: clientId);
+    await addUserInSharedPreference(user);
 
-  @override
-  Future<String> sendOTP(String email) async {
-    var response =
-        await client.postRequest(HTTPConstants.OTP, data: {'email': email});
-
-    return response['success'];
-  }
-
-  @override
-  Future<String> verifyOTP(String email, String otp) async {
-    var response = await client
-        .postRequest('${HTTPConstants.OTP}/$otp', data: {'email': email});
-
-    return response['success'];
+    return user;
   }
 
   @override
   Future<void> addUserInSharedPreference(UserTokenModel user) async {
-    await ref.read(sharedPreferencesProvider).setString(
-          SharedPreferenceConstants.userToken,
-          json.encode(user.toJson()),
-        );
+    var prefs = ref.read(sharedPreferencesProvider);
+    if (user.clientId != null) {
+      await prefs.setString(SharedPreferenceConstants.userId, user.clientId!);
+    }
+    if (user.email != null) {
+      await prefs.setString(SharedPreferenceConstants.userEmail, user.email!);
+    }
+    if (user.token != null) {
+      await prefs.setString(SharedPreferenceConstants.userToken, user.token!);
+    }
   }
 
   @override
-  Future<UserTokenModel?> getUserFromSharedPreference() async {
-    var user = ref.read(sharedPreferencesProvider).getString(
-          SharedPreferenceConstants.userToken,
-        );
-
-    return user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
+  Future<String?> getClientIdFromSharedPreference() async {
+    var prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getString(SharedPreferenceConstants.userId);
   }
 
   @override
-  Future<String?> getUserIdFromSharedPreference() async {
-    return ref.read(sharedPreferencesProvider).getString(
-          SharedPreferenceConstants.userId,
-        );
+  Future<String?> getEmailFromSharedPreference() async {
+    var prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getString(SharedPreferenceConstants.userEmail);
   }
 
   @override
-  Future<void> saveUserIdInSharedPreference(String userId) async {
-    await ref.read(sharedPreferencesProvider).setString(
-          SharedPreferenceConstants.userId,
-          userId,
-        );
+  Future<String?> getToken() async {
+    var prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getString(SharedPreferenceConstants.userToken);
   }
 }
 

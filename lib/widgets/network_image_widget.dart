@@ -1,12 +1,8 @@
-import 'dart:io';
-
-import 'package:medito/constants/constants.dart';
-import 'package:medito/models/models.dart';
-import 'package:medito/providers/providers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:shimmer/shimmer.dart';
 
 class NetworkImageWidget extends ConsumerWidget {
@@ -28,8 +24,6 @@ class NetworkImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var userTokenModel =
-        ref.watch(authProvider).userResponse.body as UserTokenModel;
     if (url.contains('.svg')) {
       return SvgPicture.network(
         url,
@@ -41,9 +35,6 @@ class NetworkImageWidget extends ConsumerWidget {
       if (shouldCache) {
         return CachedNetworkImage(
           imageUrl: url,
-          httpHeaders: {
-            HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel.token}',
-          },
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -73,9 +64,6 @@ class NetworkImageWidget extends ConsumerWidget {
         width: width,
         cacheHeight: height?.round(),
         cacheWidth: width?.round(),
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer ${userTokenModel.token}',
-        },
         loadingBuilder: (context, child, loadingProgress) {
           return loadingProgress == null ? child : _shimmerLoading();
         },
@@ -95,7 +83,7 @@ class NetworkImageWidget extends ConsumerWidget {
 
   Shimmer _shimmerLoading() {
     return Shimmer.fromColors(
-      period: Duration(seconds: 1),
+      period: const Duration(seconds: 1),
       baseColor: ColorConstants.black,
       highlightColor: ColorConstants.greyIsTheNewBlack,
       child: Container(

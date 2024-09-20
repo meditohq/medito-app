@@ -82,7 +82,7 @@ class SettingsScreen extends ConsumerWidget {
           ...homeData.menu
               .map((element) => _buildMenuItemTile(context, ref, element)),
           _buildAnalyticsConsentTile(ref),
-          _buildDebugTile(context),
+          _buildDebugTile(context, ref),
         ],
       ),
     );
@@ -102,13 +102,13 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDebugTile(BuildContext context) {
+  Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
     return RowItemWidget(
       enableInteractiveSelection: false,
       icon: IconType.fromIconData(Icons.bug_report),
       title: StringConstants.debugInfo,
       hasUnderline: true,
-      onTap: () => _showDebugBottomSheet(context),
+      onTap: () => _showDebugBottomSheet(context, ref),
     );
   }
 
@@ -220,11 +220,12 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showDebugBottomSheet(BuildContext context) {
+  void _showDebugBottomSheet(BuildContext context, WidgetRef ref) {
+    ref.invalidate(meProvider);
     showModalBottomSheet(
       showDragHandle: true,
       context: context,
-      builder: (context) => DebugBottomSheetWidget(),
+      builder: (context) => const DebugBottomSheetWidget(),
     );
   }
 

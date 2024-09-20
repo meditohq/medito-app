@@ -1,5 +1,5 @@
 class SharedPreferenceConstants {
-  static const String userToken = 'userToken';
+  static const String user = 'user';
   static const String bgSoundVolume = 'bgSoundVolume';
   static const String bgSound = 'bgSound';
   static const String listBgSound = 'listBgSound';
@@ -27,4 +27,5 @@ class SharedPreferenceConstants {
   // Add new constants for user ID and email
   static const String userId = 'userId';
   static const String userEmail = 'userEmail';
+  static const String userToken = 'userToken';
 }

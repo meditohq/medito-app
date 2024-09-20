@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:medito/providers/auth/auth_provider.dart';
-import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/providers/auth/initialize_user_provider.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart'; // Import the constants
+import 'package:medito/constants/constants.dart';
+import 'package:medito/models/models.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/network/assign_dio_headers.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
 class SignUpLogInWebView extends ConsumerStatefulWidget {
   final String url;
@@ -55,37 +56,50 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
   }
 
   void _handleSuccessfulLogin(String url) async {
-    print('Handling successful login: $url');
     final uri = Uri.parse(url);
     final clientId = uri.queryParameters['clientId'];
     final emailAddress = uri.queryParameters['email'];
 
     if (clientId != null && emailAddress != null) {
-      print('Client ID: $clientId, Email: $emailAddress');
       await _saveUserInfo(clientId, emailAddress);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You are now signed in'),
-          backgroundColor: ColorConstants.amsterdamSpring,
-        ),
-      );
+      var auth = await ref
+          .read(authRepositoryProvider)
+          .generateUserToken(emailAddress);
+      if (auth.token != null) {
+        assignHeaders(auth.token!);
 
-      Navigator.of(context).pop();
-    } else {
-      print('Client ID or Email is null');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(StringConstants.signInSuccess),
+            backgroundColor: ColorConstants.amsterdamSpring,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(StringConstants.signInError),
+            backgroundColor: ColorConstants.amsterdamSpring,
+          ),
+        );
+      }
     }
+    Navigator.of(context).pop();
   }
 
-  Future<void> _saveUserInfo(String userId, String email) async {
-    var sharedPref = ref.read(sharedPreferencesProvider);
-    var oldUserId = sharedPref.getString(SharedPreferenceConstants.userId);
-    await ref
-        .read(userInitializationProvider.notifier)
-        .saveUserInfo(userId, email);
-    await ref
-        .read(authProvider.notifier)
-        .generateUserToken(oldUserId, email);
+  void assignHeaders(String token) {
+    ref.read(deviceAndAppInfoProvider).whenData(
+      (value) {
+        AssignDioHeaders(token, value).assign();
+      },
+    );
+  }
+
+  Future<void> _saveUserInfo(String clientId, String email) async {
+    var userTokenModel = UserTokenModel(clientId: clientId, email: email);
+    var authRepo = ref.read(authRepositoryProvider);
+    await authRepo.addUserInSharedPreference(userTokenModel);
+    ref.invalidate(deviceAppAndUserInfoProvider);
   }
 
   @override

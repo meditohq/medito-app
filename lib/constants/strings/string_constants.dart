@@ -182,4 +182,7 @@ class StringConstants {
 
   static const String noConnectionMessage = 'No internet connection';
   static const String goToDownloads = 'Go to Downloads';
+
+  static const String signInSuccess = 'Sign in successful';
+  static const String signInError = 'Sign in failed. Please try again.';
 }

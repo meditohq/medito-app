@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:medito/constants/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 const _errorKey = 'error';
@@ -30,10 +30,13 @@ class DioApiService {
   DioApiService._internal() {
     dio = Dio();
     dio.options = BaseOptions(
-      connectTimeout: Duration(milliseconds: 30000),
+      connectTimeout: const Duration(milliseconds: 30000),
       baseUrl: HTTPConstants.CONTENT_BASE_URL,
     );
     if (kDebugMode) {
+      dio.interceptors.add(
+        InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
+      );
       dio.interceptors.add(LogInterceptor(
         request: true,
         responseBody: true,
@@ -41,9 +44,6 @@ class DioApiService {
         error: true,
       ));
     }
-    dio.interceptors.add(
-      InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
-    );
   }
 
   Future<void> _onError(

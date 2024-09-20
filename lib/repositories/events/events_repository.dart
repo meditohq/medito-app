@@ -50,8 +50,8 @@ class EventsRepositoryImpl extends EventsRepository {
       );
 
   @override
-  Future<void> trackAnnouncementDismissEvent(String id) =>
-      client.postRequest('${HTTPConstants.ANNOUNCEMENT_EVENT}/$id${HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT}');
+  Future<void> trackAnnouncementDismissEvent(String id) => client.postRequest(
+      '${HTTPConstants.ANNOUNCEMENT_EVENT}/$id${HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT}');
 
   @override
   Future<void> markTrackAsListenedEvent(String id, {String? userToken}) =>
@@ -86,8 +86,10 @@ class EventsRepositoryImpl extends EventsRepository {
       );
 
   @override
-  Future<void> saveFirebaseToken(Map<String, dynamic> event, String userToken) =>
-      client.postRequest(HTTPConstants.FIREBASE_EVENT, data: event, userToken: userToken);
+  Future<void> saveFirebaseToken(
+          Map<String, dynamic> event, String userToken) =>
+      client.postRequest(HTTPConstants.FIREBASE_EVENT,
+          data: event, userToken: userToken);
 
   @override
   Future<void> feedbackEvent(String trackId, Map<String, dynamic> event) =>

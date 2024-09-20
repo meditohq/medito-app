@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:medito/models/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/models/models.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../src/audio_pigeon.g.dart';
@@ -100,16 +99,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 
   String? getUserToken() {
-    var user = ref
+    return ref
         .read(sharedPreferencesProvider)
         .getString(SharedPreferenceConstants.userToken);
-    var userModel =
-        user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
-    if (userModel != null) {
-      return userModel.token;
-    }
-
-    return null;
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
@@ -130,8 +122,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     ref.read(
       audioStartedEventProvider(
         event: audio.toJson().map(
-          (key, value) => MapEntry(key, value.toString()),
-        ),
+              (key, value) => MapEntry(key, value.toString()),
+            ),
         trackId: trackId,
       ),
     );
@@ -188,7 +180,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       }
     }
   }
-
 }
 
 const audioPercentageListened = 0.8;

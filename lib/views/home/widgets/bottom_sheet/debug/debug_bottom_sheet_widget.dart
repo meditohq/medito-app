@@ -29,7 +29,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
                 onTap: () => ref.refresh(meProvider),
               ),
             ),
-            loading: () => Expanded(
+            loading: () => const Expanded(
               child: Center(
                 child: CircularProgressIndicator(),
               ),
@@ -52,7 +52,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
           info,
         ),
         ElevatedButton(
-          child: Text(StringConstants.copy),
+          child: const Text(StringConstants.copy),
           onPressed: () => _handleCopy(context, info),
         ),
       ],
@@ -77,7 +77,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
 
     Clipboard.setData(ClipboardData(text: _info)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text(StringConstants.debugInfoCopied),
           backgroundColor: ColorConstants.ebony,
         ),

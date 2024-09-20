@@ -1,5 +1,3 @@
-export 'auth/auth_provider.dart';
-export 'auth/initialize_user_provider.dart';
 export 'device_and_app_info/device_and_app_info_provider.dart';
 export 'events/events_provider.dart';
 export 'explore/explore_provider.dart';

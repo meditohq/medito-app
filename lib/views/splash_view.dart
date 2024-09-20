@@ -1,10 +1,10 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/network/assign_dio_headers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/root/root_page_view.dart';
-import 'package:medito/widgets/widgets.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -27,32 +27,21 @@ class _SplashViewState extends ConsumerState<SplashView> {
   }
 
   void _initializeUser() async {
-    await ref.read(userInitializationProvider.notifier).initializeUser();
-
-    var response = ref.read(userInitializationProvider);
-    
-    if (response == UserInitializationStatus.successful) {
-      await FirebaseAnalytics.instance
-          .logEvent(name: 'user_initialization_successful');
-      
+    try {
+      var authRepo = ref.read(authRepositoryProvider);
+      var token = await authRepo.initializeUser();
+      var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+      AssignDioHeaders(token, deviceInfo).assign();
       await Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => RootPageView(
+        builder: (context) => const RootPageView(
           firstChild: BottomNavigationBarView(),
         ),
       ));
-    } else if (response == UserInitializationStatus.error) {
-      await FirebaseAnalytics.instance
-          .logEvent(name: 'user_initialization_error');
-
-      showSnackBar(context, StringConstants.timeout);
+    } catch (e) {
       await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const DownloadsView(),
       ));
-    } else if (response == UserInitializationStatus.retry) {
-      await FirebaseAnalytics.instance
-          .logEvent(name: 'user_initialization_retry');
-      ref.invalidate(userInitializationProvider);
-      _initializeUser();
+      return;
     }
   }
 

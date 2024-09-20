@@ -1,13 +1,12 @@
-
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/network/assign_dio_headers.dart';
 import 'package:medito/services/network/dio_api_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:dio/dio.dart';
-import 'package:medito/providers/auth/auth_provider.dart';
-import 'package:medito/services/network/assign_dio_headers_provider.dart';
 
 import '../../models/stats/stats_model.dart';
 
@@ -67,11 +66,13 @@ class HomeRepositoryImpl extends HomeRepository {
 
   Future<void> _performTokenRefresh() async {
     try {
-      var authNotifier = ref.read(authProvider);
-      var userTokenModel = await authNotifier.getUserFromSharedPref();
-      var userId = userTokenModel?.token;
-      await authNotifier.generateUserToken(userId);
-      ref.invalidate(assignDioHeadersProvider);
+      var user = await ref.read(authRepositoryProvider).generateUserToken();
+      var token = user.token;
+
+      if (token != null) {
+        var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+        AssignDioHeaders(token, deviceInfo).assign();
+      }
     } finally {
       _refreshFuture = null;
     }
@@ -101,7 +102,8 @@ class HomeRepositoryImpl extends HomeRepository {
     });
   }
 
-  Future<List<ShortcutsModel>> getSortedShortcuts(List<ShortcutsModel> shortcuts) async {
+  Future<List<ShortcutsModel>> getSortedShortcuts(
+      List<ShortcutsModel> shortcuts) async {
     var savedIds = getLocalShortcutIds();
     if (savedIds.isEmpty) return shortcuts;
 
