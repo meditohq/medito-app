@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
@@ -9,7 +8,9 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
-  const ExploreView({super.key});
+  final FocusNode searchFocusNode;
+
+  const ExploreView({super.key, required this.searchFocusNode});
 
   @override
   ConsumerState<ExploreView> createState() => _ExploreViewState();
@@ -25,6 +26,10 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
     super.dispose();
   }
 
+  void unfocusSearch() {
+    widget.searchFocusNode.unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +37,7 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
         slivers: [
           SliverAppBar(
             backgroundColor: ColorConstants.ebony,
-            expandedHeight: 150.0,
+            expandedHeight: 164.0,
             collapsedHeight: 0,
             toolbarHeight: 0,
             floating: true,
@@ -48,6 +53,7 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
                     const SizedBox(height: 18.0),
                     SearchBox(
                       controller: _searchController,
+                      focusNode: widget.searchFocusNode,
                       onChanged: (value) {
                         setState(() {
                           _searchQuery = value;
@@ -68,7 +74,10 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
             ),
           ),
           SliverToBoxAdapter(
-            child: ExploreContentWidget(searchQuery: _searchQuery),
+            child: ExploreContentWidget(
+              searchQuery: _searchQuery,
+              onPackTapped: unfocusSearch,
+            ),
           ),
         ],
       ),
@@ -78,8 +87,13 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
 
 class ExploreContentWidget extends ConsumerWidget {
   final String searchQuery;
+  final VoidCallback onPackTapped;
 
-  const ExploreContentWidget({super.key, required this.searchQuery});
+  const ExploreContentWidget({
+    super.key,
+    required this.searchQuery,
+    required this.onPackTapped,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,12 +142,15 @@ class ExploreContentWidget extends ConsumerWidget {
             title: element.title,
             subTitle: element.subtitle,
             coverUrlPath: element.coverUrl,
-            onTap: () => handleNavigation(
-              element.type,
-              [element.id.toString(), element.path],
-              context,
-              ref: ref,
-            ),
+            onTap: () {
+              onPackTapped();
+              handleNavigation(
+                element.type,
+                [element.id.toString(), element.path],
+                context,
+                ref: ref,
+              );
+            },
           ),
         );
       }).toList(),
@@ -156,12 +173,15 @@ class ExploreContentWidget extends ConsumerWidget {
             title: element.title,
             subTitle: element.subtitle,
             coverUrlPath: element.coverUrl,
-            onTap: () => handleNavigation(
-              element.type,
-              [element.id.toString(), element.path],
-              context,
-              ref: ref,
-            ),
+            onTap: () {
+              onPackTapped();
+              handleNavigation(
+                element.type,
+                [element.id.toString(), element.path],
+                context,
+                ref: ref,
+              );
+            },
           ),
         );
       }).toList(),
@@ -173,18 +193,21 @@ class SearchBox extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
   final TextEditingController controller;
+  final FocusNode focusNode;
 
   const SearchBox({
     super.key,
     required this.onChanged,
     required this.onClear,
     required this.controller,
+    required this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       decoration: InputDecoration(
         hintText: StringConstants.search,
         prefixIcon: const Icon(Icons.search),
