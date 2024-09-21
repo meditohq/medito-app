@@ -10,7 +10,7 @@ import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
 import 'widgets/quote/quote_widget.dart';
-import 'widgets/shortcuts/shortcuts_widget.dart';
+import 'widgets/shortcuts/shortcuts_items_widget.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -97,7 +97,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                 children: [
                   _getAnnouncementBanner(announcementData.value),
                   height20,
-                  ShortcutsWidget(data: homeData.shortcuts),
+                  ShortcutsItemsWidget(data: homeData.shortcuts),
                   height20,
                   CarouselWidget(data: homeData.carousel),
                   height20,

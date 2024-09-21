@@ -85,7 +85,6 @@ class SettingsScreen extends ConsumerWidget {
           if (_isHealthSyncAvailable) HealthSyncTile(),
           ...homeData.menu
               .map((element) => _buildMenuItemTile(context, ref, element)),
-          _buildAnalyticsConsentTile(ref),
           _buildDebugTile(context, ref),
         ],
       ),
@@ -119,26 +118,31 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildDailyNotificationTile(BuildContext context, WidgetRef ref) {
     final reminderTime = ref.watch(reminderTimeProvider);
 
-    return RowItemWidget(
-      enableInteractiveSelection: false,
-      icon: IconType.fromIconData(Icons.notifications),
-      title: StringConstants.dailyReminderTitle,
-      subTitle: reminderTime != null
-          ? (StringConstants.setFor + ' ' + reminderTime.format(context))
-          : null,
-      hasUnderline: true,
-      isSwitch: true,
-      onTap: () {
-        _selectTime(context, ref);
-      },
-      switchValue: reminderTime != null,
-      onSwitchChanged: (value) {
-        if (value) {
+    return Card(
+      borderOnForeground: true,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      color: ColorConstants.onyx,
+      child: RowItemWidget(
+        enableInteractiveSelection: false,
+        icon: IconType.fromIconData(Icons.notifications),
+        title: StringConstants.dailyReminderTitle,
+        subTitle: reminderTime != null
+            ? (StringConstants.setFor + ' ' + reminderTime.format(context))
+            : null,
+        hasUnderline: true,
+        isSwitch: true,
+        onTap: () {
           _selectTime(context, ref);
-        } else {
-          _clearReminder(context, ref);
-        }
-      },
+        },
+        switchValue: reminderTime != null,
+        onSwitchChanged: (value) {
+          if (value) {
+            _selectTime(context, ref);
+          } else {
+            _clearReminder(context, ref);
+          }
+        },
+      ),
     );
   }
 
@@ -230,20 +234,6 @@ class SettingsScreen extends ConsumerWidget {
       showDragHandle: true,
       context: context,
       builder: (context) => const DebugBottomSheetWidget(),
-    );
-  }
-
-  Widget _buildAnalyticsConsentTile(WidgetRef ref) {
-    final analyticsConsent = ref.watch(analyticsConsentProvider);
-
-    return RowItemWidget(
-      enableInteractiveSelection: false,
-      icon: IconType.fromIconData(Icons.analytics),
-      title: StringConstants.thirdPartyAnalytics,
-      hasUnderline: true,
-      isSwitch: true,
-      switchValue: analyticsConsent,
-      onSwitchChanged: (value) => _handleAnalyticsConsentChange(ref, value),
     );
   }
 

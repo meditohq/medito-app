@@ -10,6 +10,7 @@ class ShortcutsModel with _$ShortcutsModel {
     required String type,
     required String title,
     required String path,
+    required String icon,
   }) = _ShortcutsModel;
 
   factory ShortcutsModel.fromJson(Map<String, dynamic> json) =>

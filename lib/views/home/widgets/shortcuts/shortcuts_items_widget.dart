@@ -1,13 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../../../providers/home/home_provider.dart';
+import '../../../../widgets/medito_huge_icon.dart';
 import '../animated_scale_widget.dart';
 
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {
@@ -87,7 +88,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   List<Widget> _getShortcutsItemWidgetList() {
     var size = MediaQuery.of(context).size;
-    final containerHeight = 56.0;
+    const containerHeight = 56.0;
     final containerWidth = (size.width / 2) - (padding20 + 2);
 
     return data
@@ -102,19 +103,27 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                       borderRadius: BorderRadius.circular(14),
                       color: ColorConstants.onyx,
                     ),
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     constraints: BoxConstraints(
                       maxWidth: containerWidth,
                       minWidth: containerWidth,
                     ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '${e.title}',
-                        style: Theme.of(context).textTheme.titleSmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    child: Row(
+                      children: [
+                        MeditoHugeIcon(
+                          icon: e.icon,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            e.title,
+                            style: Theme.of(context).textTheme.titleSmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

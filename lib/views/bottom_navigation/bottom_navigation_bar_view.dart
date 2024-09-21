@@ -1,28 +1,32 @@
 import 'dart:async';
 
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/fcm_token_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
-import 'package:medito/views/settings/settings_screen.dart'; 
+import 'package:medito/views/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
   const BottomNavigationBarView({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<BottomNavigationBarView> createState() => _BottomNavigationBarViewState();
+  ConsumerState<BottomNavigationBarView> createState() =>
+      _BottomNavigationBarViewState();
 }
 
-class _BottomNavigationBarViewState extends ConsumerState<BottomNavigationBarView> {
+class _BottomNavigationBarViewState
+    extends ConsumerState<BottomNavigationBarView> {
   var _currentPageIndex = 0;
 
   final _pages = [
     const HomeView(),
     ExploreView(),
-    const SettingsScreen(), 
+    const SettingsScreen(),
   ];
 
   @override
@@ -49,23 +53,29 @@ class _BottomNavigationBarViewState extends ConsumerState<BottomNavigationBarVie
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: BottomActionBar(
           leftItem: BottomActionBarItem(
-            child: Icon(
-              _currentPageIndex == 0 ? Icons.home : Icons.home_outlined,
-              color: _currentPageIndex == 0 ? ColorConstants.lightPurple : ColorConstants.walterWhite,
+            child: MeditoHugeIcon(
+              icon: _currentPageIndex == 0 ? 'filledhome' : 'duohome',
+              color: _currentPageIndex == 0
+                  ? ColorConstants.lightPurple
+                  : ColorConstants.walterWhite,
             ),
             onTap: () => _onDestinationSelected(0),
           ),
           leftCenterItem: BottomActionBarItem(
-            child: Icon(
-              _currentPageIndex == 1 ? Icons.explore : Icons.explore_outlined,
-              color: _currentPageIndex == 1 ? ColorConstants.lightPurple : ColorConstants.walterWhite,
+            child: MeditoHugeIcon(
+              icon: _currentPageIndex == 1 ? 'filledSearch' : 'duoSearch',
+              color: _currentPageIndex == 1
+                  ? ColorConstants.lightPurple
+                  : ColorConstants.walterWhite,
             ),
             onTap: () => _onDestinationSelected(1),
           ),
           rightItem: BottomActionBarItem(
-            child: Icon(
-              _currentPageIndex == 2 ? Icons.settings : Icons.settings_outlined,
-              color: _currentPageIndex == 2 ? ColorConstants.lightPurple : ColorConstants.walterWhite,
+            child: MeditoHugeIcon(
+              icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
+              color: _currentPageIndex == 2
+                  ? ColorConstants.lightPurple
+                  : ColorConstants.walterWhite,
             ),
             onTap: () => _onDestinationSelected(2),
           ),
