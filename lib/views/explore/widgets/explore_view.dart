@@ -7,7 +7,7 @@ import '../../../constants/strings/string_constants.dart';
 import 'explore_initial_page_widget.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
-  ExploreView({super.key});
+  const ExploreView({super.key});
 
   @override
   ConsumerState<ExploreView> createState() => _ExploreViewState();

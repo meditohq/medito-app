@@ -11,7 +11,6 @@ export 'events/pack_viewed/pack_viewed_model.dart';
 export 'events/save_fcm_token/save_fcm_token_model.dart';
 export 'events/track_viewed/track_viewed_model.dart';
 export 'events/transfer_stats/transfer_stats_model.dart';
-export 'explore/explore_model.dart';
 export 'home/announcement/announcement_model.dart';
 export 'home/home_model.dart';
 export 'home/shortcuts/shortcuts_model.dart';
