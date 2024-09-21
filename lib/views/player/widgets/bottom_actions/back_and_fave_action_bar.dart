@@ -19,7 +19,7 @@ class TrackViewBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final favoriteStatus = ref.watch(favoriteStatusProvider(trackId: trackId));
 
-    final dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
+    const dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
     var isDailyMeditation = trackId == dailyMeditationId;
     var colour = favoriteStatus
         ? ColorConstants.lightPurple
@@ -28,9 +28,11 @@ class TrackViewBottomBar extends ConsumerWidget {
     return BottomActionBar(
       actions: [
         IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: onBackPressed,
         ),
+        Container(),
+        Container(),
         isDailyMeditation
             ? Container()
             : IconButton(

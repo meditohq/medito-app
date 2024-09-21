@@ -23,8 +23,9 @@ class SingleBackButtonActionBar extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        SizedBox.shrink(),
-        SizedBox.shrink(),
+        const SizedBox.shrink(),
+        const SizedBox.shrink(),
+        const SizedBox.shrink(),
       ],
     );
   }

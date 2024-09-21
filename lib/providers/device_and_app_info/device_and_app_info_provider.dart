@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/strings/string_constants.dart';
 import '../../models/device_info/device_and_app_info_model.dart';
 import '../../models/me/me_model.dart';
@@ -22,17 +25,20 @@ final deviceAppAndUserInfoProvider =
   var me = await ref.watch(meProvider.future);
   var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
 
-  return _formatString(me, deviceInfo);
+  var auth = ref.read(authRepositoryProvider);
+  var email = auth.getEmailFromSharedPreference();
+
+  return _formatString(me, deviceInfo, email);
 });
 
 String _formatString(
   MeModel? me,
-  DeviceAndAppInfoModel? deviceInfo,
+  DeviceAndAppInfoModel? deviceInfo, String? emailAddress,
 ) {
   var isProdString = kDebugMode ? 'Debug' : 'Release';
-  var env = StringConstants.env + ': $isProdString';
-  var id = StringConstants.id + ': ${me?.id ?? ''}';
-  var email = StringConstants.email + ': ${me?.email ?? ''}';
+  var env = '${StringConstants.env}: $isProdString';
+  var id = '${StringConstants.id}: ${me?.id ?? ''}';
+  var email = '${StringConstants.email}: ${emailAddress ?? ''}';
   var appVersion =
       '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
   var buildNumber =

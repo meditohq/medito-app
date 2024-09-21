@@ -23,14 +23,13 @@ class DebugBottomSheetWidget extends ConsumerWidget {
               context,
               data,
             ),
-            error: (err, stack) => Expanded(
-              child: MeditoErrorWidget(
-                message: err.toString(),
-                onTap: () => ref.refresh(meProvider),
-              ),
+            error: (err, stack) => MeditoErrorWidget(
+              message: err.toString(),
+              onTap: () => ref.refresh(meProvider),
             ),
-            loading: () => const Expanded(
-              child: Center(
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
                 child: CircularProgressIndicator(),
               ),
             ),

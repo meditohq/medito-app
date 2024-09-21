@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BottomActionBar extends StatelessWidget {
   const BottomActionBar({
-    Key? key,
+    super.key,
     required this.actions,
     this.height = 80.0,
     this.showBackground = false,
-  }) : super(key: key);
+  }) : assert(actions.length == 4, 'BottomActionBar must have exactly 4 actions');
 
   final List<Widget> actions;
   final double height;
@@ -15,20 +15,21 @@ class BottomActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      decoration: BoxDecoration(
-        color: showBackground ? Colors.black.withOpacity(0.2) : Colors.transparent,
-      ),
-      child: SafeArea(
+    return SafeArea(
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: showBackground ? Colors.black.withOpacity(0.2) : Colors.transparent,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: actions.map((widget) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _wrapWithConsumer(widget),
+            return Expanded(
+              child: Center(
+                child: _wrapWithConsumer(widget),
+              ),
             );
           }).toList(),
         ),

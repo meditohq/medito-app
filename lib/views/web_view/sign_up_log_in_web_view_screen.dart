@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/home/home_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/repositories/repositories.dart';
 import 'package:medito/services/network/assign_dio_headers.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../main.dart';
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
 class SignUpLogInWebView extends ConsumerStatefulWidget {
@@ -69,17 +72,17 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
       if (auth.token != null) {
         assignHeaders(auth.token!);
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ref.invalidate(fetchStatsProvider);
+
+        scaffoldMessengerKey.currentState?.showSnackBar(
           const SnackBar(
             content: Text(StringConstants.signInSuccess),
-            backgroundColor: ColorConstants.amsterdamSpring,
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessengerKey.currentState?.showSnackBar(
           const SnackBar(
             content: Text(StringConstants.signInError),
-            backgroundColor: ColorConstants.amsterdamSpring,
           ),
         );
       }

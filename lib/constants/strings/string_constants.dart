@@ -185,4 +185,6 @@ class StringConstants {
 
   static const String signInSuccess = 'Sign in successful';
   static const String signInError = 'Sign in failed. Please try again.';
+
+  static const String backgroundSoundsDisabled = 'Background sounds are disabled for this track';
 }

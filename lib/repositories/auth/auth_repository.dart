@@ -15,9 +15,9 @@ abstract class AuthRepository {
 
   Future<String?> getClientIdFromSharedPreference();
 
-  Future<String?> getEmailFromSharedPreference();
+  String? getEmailFromSharedPreference();
 
-  Future<String?> getToken();
+  String? getToken();
 
   Future<String> initializeUser();
 }
@@ -94,13 +94,13 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<String?> getEmailFromSharedPreference() async {
+  String? getEmailFromSharedPreference() {
     var prefs = ref.read(sharedPreferencesProvider);
     return prefs.getString(SharedPreferenceConstants.userEmail);
   }
 
   @override
-  Future<String?> getToken() async {
+  String? getToken() {
     var prefs = ref.read(sharedPreferencesProvider);
     return prefs.getString(SharedPreferenceConstants.userToken);
   }
