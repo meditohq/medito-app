@@ -23,7 +23,7 @@ class HTTPConstants {
   static const String EDITORIAL = 'main/editorial';
   static const String STATS = '/stats';
   static const String ME = 'me';
-  static const String SEARCH = 'search';
+  static const String SEARCH_TRACKS = 'search/tracks';
 
   // MAINTENANCE END POINTS
   static const String MAINTENANCE = 'https://api.medito.app/v1/maintenance';

@@ -1,77 +1,129 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 
-class ExploreView extends ConsumerWidget {
+class ExploreView extends ConsumerStatefulWidget {
   const ExploreView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ExploreView> createState() => _ExploreViewState();
+}
+
+class _ExploreViewState extends ConsumerState<ExploreView> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ColorConstants.ebony,
-        toolbarHeight: 92.0,
-        title: const Column(
-          children: [
-            HomeHeaderWidget(greeting: StringConstants.explore),
-            SizedBox(height: 18.0),
-          ],
-        ),
-        elevation: 0.0,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: ColorConstants.ebony,
+            expandedHeight: 150.0,
+            collapsedHeight: 0,
+            toolbarHeight: 0,
+            floating: true,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: padding16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const HomeHeaderWidget(greeting: StringConstants.explore),
+                    const SizedBox(height: 18.0),
+                    SearchBox(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      onClear: () {
+                        setState(() {
+                          _searchQuery = '';
+                          _searchController.clear();
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 18.0),
+
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ExploreContentWidget(searchQuery: _searchQuery),
+          ),
+        ],
       ),
-      body: const ExploreInitialPageWidget(),
     );
   }
 }
 
-class ExploreInitialPageWidget extends ConsumerWidget {
-  const ExploreInitialPageWidget({super.key});
+class ExploreContentWidget extends ConsumerWidget {
+  final String searchQuery;
+
+  const ExploreContentWidget({super.key, required this.searchQuery});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var allPacks = ref.watch(fetchAllPacksProvider);
+    var packsProvider = searchQuery.isNotEmpty
+        ? searchPacksProvider(searchQuery)
+        : fetchAllPacksProvider;
 
-    return allPacks.when(
-      data: (data) => _buildMain(ref, data),
+    var packs = ref.watch(packsProvider);
+
+    return packs.when(
+      data: (data) => _buildPacksList(context, ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
-        onTap: () => ref.refresh(fetchAllPacksProvider),
+        onTap: () => ref.refresh(packsProvider),
       ),
-      loading: () => const ExploreInitialPageShimmerWidget(),
+      loading: () => const ExploreResultShimmerWidget(),
     );
   }
 
-  Widget _buildMain(WidgetRef ref, List<PackItemsModel> packs) {
+  Widget _buildPacksList(
+      BuildContext context, WidgetRef ref, List<PackItemsModel> packs) {
     return OrientationBuilder(
       builder: (context, orientation) {
         final isPortrait = orientation == Orientation.portrait;
 
-        return RefreshIndicator(
-          onRefresh: () async => ref.refresh(fetchAllPacksProvider),
-          child: isPortrait
-              ? _buildListView(context, packs, ref)
-              : _buildGridView(packs, ref),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (isPortrait) {
+              return _buildListView(context, packs, ref);
+            } else {
+              return _buildGridView(context, packs, ref, constraints);
+            }
+          },
         );
       },
     );
   }
 
-  Widget _buildListView(BuildContext context, List<PackItemsModel> packs, WidgetRef ref) {
-    return ListView.builder(
-      itemCount: packs.length,
-      padding: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).padding.top + padding16,
-        horizontal: padding16,
-      ),
-      itemBuilder: (context, index) {
-        var element = packs[index];
+  Widget _buildListView(
+      BuildContext context, List<PackItemsModel> packs, WidgetRef ref) {
+    return Column(
+      children: packs.map((element) {
         return Padding(
-          padding: const EdgeInsets.only(bottom: padding16),
+          padding: const EdgeInsets.fromLTRB(padding16, 0, padding16, padding16),
           child: PackCardWidget(
             title: element.title,
             subTitle: element.subtitle,
@@ -84,47 +136,67 @@ class ExploreInitialPageWidget extends ConsumerWidget {
             ),
           ),
         );
-      },
+      }).toList(),
     );
   }
 
-  Widget _buildGridView(List<PackItemsModel> packs, WidgetRef ref) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        var itemWidth = (constraints.maxWidth - padding16 * 3) / 2;
-        var maxItemHeight = 140.0;
+  Widget _buildGridView(BuildContext context, List<PackItemsModel> packs,
+      WidgetRef ref, BoxConstraints constraints) {
+    var itemWidth = (constraints.maxWidth - padding16 * 3) / 2;
+    var maxItemHeight = 140.0;
 
-        return GridView.builder(
-          itemCount: packs.length,
-          padding: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).padding.top + padding16,
-            horizontal: padding16,
+    return Wrap(
+      spacing: padding16,
+      runSpacing: padding16,
+      children: packs.map((element) {
+        return SizedBox(
+          width: itemWidth,
+          height: maxItemHeight,
+          child: PackCardWidget(
+            title: element.title,
+            subTitle: element.subtitle,
+            coverUrlPath: element.coverUrl,
+            onTap: () => handleNavigation(
+              element.type,
+              [element.id.toString(), element.path],
+              context,
+              ref: ref,
+            ),
           ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: padding16,
-            mainAxisSpacing: padding16,
-            childAspectRatio: itemWidth / maxItemHeight,
-          ),
-          itemBuilder: (context, index) {
-            var element = packs[index];
-            return ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: maxItemHeight),
-              child: PackCardWidget(
-                title: element.title,
-                subTitle: element.subtitle,
-                coverUrlPath: element.coverUrl,
-                onTap: () => handleNavigation(
-                  element.type,
-                  [element.id.toString(), element.path],
-                  context,
-                  ref: ref,
-                ),
-              ),
-            );
-          },
         );
-      },
+      }).toList(),
+    );
+  }
+}
+
+class SearchBox extends StatelessWidget {
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+  final TextEditingController controller;
+
+  const SearchBox({
+    super.key,
+    required this.onChanged,
+    required this.onClear,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: StringConstants.search,
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: onClear,
+        ),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+      ),
+      style: const TextStyle(color: Colors.white),
+      onChanged: onChanged,
     );
   }
 }

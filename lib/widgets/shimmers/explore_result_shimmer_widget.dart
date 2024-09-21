@@ -7,17 +7,16 @@ class ExploreResultShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.only(top: 20, left: 15, right: 15),
-      child: Column(
-        children: List.generate(8, (index) => _shimmerList()),
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
+      itemCount: 8,
+      itemBuilder: (context, index) => _shimmerList(),
     );
   }
 
-  Padding _shimmerList() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+  Widget _shimmerList() {
+    return const Padding(
+      padding: EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
           BoxShimmerWidget(
