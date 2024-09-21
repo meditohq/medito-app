@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/events/analytics_configurator.dart';
@@ -11,13 +13,11 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
-import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
-import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../home/widgets/header/home_header_widget.dart';
 
 final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
@@ -42,14 +42,18 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      bottomNavigationBar: SingleBackButtonActionBar(
-        onBackPressed: () => Navigator.pop(context),
+      appBar: AppBar(
+        backgroundColor: ColorConstants.ebony,
+        toolbarHeight: 92.0,
+        title: const Column(
+          children: [
+            HomeHeaderWidget(greeting: StringConstants.settings),
+            SizedBox(height: 18.0),
+          ],
+        ),
+        elevation: 0.0,
       ),
-      appBar: MeditoAppBarSmall(
-        isTransparent: true,
-        title: StringConstants.settings,
-      ),
-      body: _buildMain(context, ref),
+      body: SafeArea(child: _buildMain(context, ref)),
     );
   }
 
@@ -57,7 +61,7 @@ class SettingsScreen extends ConsumerWidget {
     final home = ref.watch(fetchHomeProvider);
 
     return home.when(
-      loading: () => HomeShimmerWidget(),
+      loading: () => const HomeShimmerWidget(),
       error: (err, stack) => MeditoErrorWidget(
         message: home.error.toString(),
         onTap: () => _onRefresh(ref),
@@ -73,7 +77,7 @@ class SettingsScreen extends ConsumerWidget {
     HomeModel homeData,
   ) {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -257,17 +261,17 @@ class SettingsScreen extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: ref.context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text(StringConstants.areYouSure),
-        content: Text(
+        title: const Text(StringConstants.areYouSure),
+        content: const Text(
           StringConstants.analyticsInfo,
         ),
         actions: <Widget>[
           ElevatedButton(
-            child: Text('Keep On'),
+            child: const Text('Keep On'),
             onPressed: () => Navigator.of(context).pop(false),
           ),
           TextButton(
-            child: Text('Turn Off'),
+            child: const Text('Turn Off'),
             onPressed: () => Navigator.of(context).pop(true),
           ),
         ],

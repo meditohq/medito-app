@@ -28,29 +28,28 @@ class PlayerActionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomActionBar(
       showBackground: true,
-      actions: [
-        _buildCloseButton(),
-        _buildAudioDownloadWidget(),
-        _buildBackgroundSoundWidget(),
-        _buildAudioSpeedWidget(),
-      ],
-    );
-  }
-
-  Widget _buildCloseButton() {
-    return GestureDetector(
-      onTap: onClosePressed,
-      child: const Icon(
-        Icons.close,
-        color: ColorConstants.walterWhite,
+      leftItem: BottomActionBarItem(
+        child: const Icon(
+          Icons.close,
+          color: ColorConstants.walterWhite,
+        ),
+        onTap: onClosePressed,
       ),
-    );
-  }
-
-  Widget _buildAudioDownloadWidget() {
-    return AudioDownloadWidget(
-      trackModel: trackModel,
-      file: file,
+      leftCenterItem: BottomActionBarItem(
+        child: AudioDownloadWidget(
+          trackModel: trackModel,
+          file: file,
+        ),
+        onTap: () {}, // The AudioDownloadWidget handles its own tap
+      ),
+      rightCenterItem: BottomActionBarItem(
+        child: _buildBackgroundSoundWidget(),
+        onTap: trackModel.hasBackgroundSound ? () {} : _showBackgroundSoundDisabledMessage,
+      ),
+      rightItem: BottomActionBarItem(
+        child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged),
+        onTap: () {}, // The AudioSpeedWidget likely its own tap
+      ),
     );
   }
 
@@ -61,17 +60,10 @@ class PlayerActionBar extends StatelessWidget {
             trackModel: trackModel,
             file: file,
           )
-        : _buildDisabledBackgroundSoundIcon();
-  }
-
-  Widget _buildDisabledBackgroundSoundIcon() {
-    return GestureDetector(
-      onTap: _showBackgroundSoundDisabledMessage,
-      child: const Icon(
-        Icons.music_off,
-        color: ColorConstants.walterWhite,
-      ),
-    );
+        : const Icon(
+            Icons.music_off,
+            color: ColorConstants.walterWhite,
+          );
   }
 
   void _showBackgroundSoundDisabledMessage() {
@@ -80,9 +72,5 @@ class PlayerActionBar extends StatelessWidget {
         content: Text(StringConstants.backgroundSoundsDisabled),
       ),
     );
-  }
-
-  Widget _buildAudioSpeedWidget() {
-    return AudioSpeedWidget(onSpeedChanged: onSpeedChanged);
   }
 }

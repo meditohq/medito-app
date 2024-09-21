@@ -26,27 +26,23 @@ class TrackViewBottomBar extends ConsumerWidget {
         : ColorConstants.walterWhite;
 
     return BottomActionBar(
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: onBackPressed,
-        ),
-        Container(),
-        Container(),
-        isDailyMeditation
-            ? Container()
-            : IconButton(
-                icon: Icon(
-                  Icons.star,
-                  color: colour,
-                ),
-                onPressed: () {
-                  ref
-                      .read(favoriteStatusProvider(trackId: trackId).notifier)
-                      .toggle();
-                },
+      leftItem: BottomActionBarItem(
+        child: const Icon(Icons.arrow_back),
+        onTap: onBackPressed,
+      ),
+      rightItem: isDailyMeditation
+          ? null
+          : BottomActionBarItem(
+              child: Icon(
+                Icons.star,
+                color: colour,
               ),
-      ],
+              onTap: () {
+                ref
+                    .read(favoriteStatusProvider(trackId: trackId).notifier)
+                    .toggle();
+              },
+            ),
     );
   }
 }

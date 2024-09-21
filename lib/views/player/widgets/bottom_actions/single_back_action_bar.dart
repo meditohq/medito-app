@@ -9,24 +9,19 @@ class SingleBackButtonActionBar extends StatelessWidget {
     this.showCloseIcon = false,
   });
 
-  final void Function() onBackPressed;
+  final VoidCallback onBackPressed;
   final bool showCloseIcon;
 
   @override
   Widget build(BuildContext context) {
     return BottomActionBar(
-      actions: [
-        GestureDetector(
-          onTap: onBackPressed,
-          child: Icon(
-            showCloseIcon ? Icons.close : Icons.arrow_back,
-            color: Colors.white,
-          ),
+      leftItem: BottomActionBarItem(
+        child: Icon(
+          showCloseIcon ? Icons.close : Icons.arrow_back,
+          color: Colors.white,
         ),
-        const SizedBox.shrink(),
-        const SizedBox.shrink(),
-        const SizedBox.shrink(),
-      ],
+        onTap: onBackPressed,
+      ),
     );
   }
 }

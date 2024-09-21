@@ -1,43 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+class BottomActionBarItem {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const BottomActionBarItem({required this.child, required this.onTap});
+}
+
 class BottomActionBar extends StatelessWidget {
   const BottomActionBar({
     super.key,
-    required this.actions,
+    this.leftItem,
+    this.leftCenterItem,
+    this.rightCenterItem,
+    this.rightItem,
     this.height = 80.0,
     this.showBackground = false,
-  }) : assert(actions.length == 4, 'BottomActionBar must have exactly 4 actions');
+  });
 
-  final List<Widget> actions;
+  final BottomActionBarItem? leftItem;
+  final BottomActionBarItem? leftCenterItem;
+  final BottomActionBarItem? rightCenterItem;
+  final BottomActionBarItem? rightItem;
   final double height;
   final bool showBackground;
 
   @override
   Widget build(BuildContext context) {
+    final items = [leftItem, leftCenterItem, rightCenterItem, rightItem]
+        .where((item) => item != null)
+        .toList();
+
     return SafeArea(
       child: Container(
         height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         decoration: BoxDecoration(
           color: showBackground ? Colors.black.withOpacity(0.2) : Colors.transparent,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: actions.map((widget) {
-            return Expanded(
-              child: Center(
-                child: _wrapWithConsumer(widget),
-              ),
-            );
-          }).toList(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: items.length == 3
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.spaceBetween,
+            children: items.map((item) => _buildActionItem(item!)).toList(),
+          ),
         ),
       ),
     );
   }
 
-  Widget _wrapWithConsumer(Widget widget) {
-    return widget is ConsumerWidget ? widget : Consumer(builder: (_, __, ___) => widget);
+  Widget _buildActionItem(BottomActionBarItem item) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: item.onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: item.child is ConsumerWidget
+            ? item.child
+            : Consumer(builder: (_, __, ___) => item.child),
+      ),
+    );
   }
 }

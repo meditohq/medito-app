@@ -21,14 +21,6 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _welcomeWidget(context),
-          Padding(
-            padding: EdgeInsets.only(top: 34),
-            child: Row(
-              children: [
-                _settingsWidget(context),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -44,27 +36,6 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
             fontWeight: FontWeight.w700,
             fontFamily: SourceSerif,
           ),
-    );
-  }
-
-  Widget _settingsWidget(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      shape: CircleBorder(),
-      clipBehavior: Clip.hardEdge,
-      child: IconButton(
-        icon: const Icon(
-          Icons.more_vert,
-          size: 24,
-        ),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => SettingsScreen(),
-            ),
-          );
-        },
-      ),
     );
   }
 
