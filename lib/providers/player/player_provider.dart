@@ -43,16 +43,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
           file.duration,
         );
 
-    audios.forEach((audioModel) {
+    for (var audioModel in audios) {
       var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
       if (fileIndex != -1) {
         track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
         track.audio.first.files
             .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
-
-        return;
       }
-    });
+    }
 
     await _playTrack(
       ref,
