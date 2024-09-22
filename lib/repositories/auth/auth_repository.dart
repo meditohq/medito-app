@@ -30,7 +30,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<String> initializeUser() async {
-    var token = await getToken();
+    var token = getToken();
 
     if (token == null) {
       const maxRetries = 3;
