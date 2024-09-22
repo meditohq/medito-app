@@ -13,9 +13,9 @@ class StringConstants {
   static const String retry = 'Retry';
   static const String statsSuccess = 'Stats updated';
   static const String statsError = 'Updating stats failed. If this keeps happening, close the app and reopen it.';
-  static const processingStatsUpdate =  'Updating stats. Please wait...';
+  static const processingStatsUpdate = 'Updating stats. Please wait...';
   static const String shareStatsText =
-  '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
+      '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
 
 //Player
   static const String backgroundSounds = 'Background Sound';
@@ -100,7 +100,7 @@ class StringConstants {
   static const weNeedYourPermissionReminder = 'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.';
 
   static const syncWithHealth = 'Sync with Apple Health';
-  static const permissionExplanation =  'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito';
+  static const permissionExplanation = 'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito';
 
   static const String confirmDeletionTitle = 'Confirm Deletion';
   static const String confirmDeletionMessage = 'Are you sure you want to delete';

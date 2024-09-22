@@ -16,7 +16,7 @@ class HealthSyncTile extends StatelessWidget {
 
     showSnackBar(
       context,
-     StringConstants.permissionExplanation,
+      StringConstants.permissionExplanation,
     );
   }
 

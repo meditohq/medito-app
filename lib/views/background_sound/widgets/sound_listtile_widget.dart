@@ -52,23 +52,23 @@ class SoundListTileWidget extends ConsumerWidget {
 
   Expanded _loadingSpinner() {
     return const Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: ColorConstants.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            SizedBox(
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: ColorConstants.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Container _radioButton(bool isSelected) {

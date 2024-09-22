@@ -40,9 +40,9 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   }
 
   Column _debugItemsList(
-      BuildContext context,
-      String info,
-      ) {
+    BuildContext context,
+    String info,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

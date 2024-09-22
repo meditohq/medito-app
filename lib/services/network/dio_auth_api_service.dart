@@ -32,7 +32,7 @@ class DioAuthApiService {
       ));
     }
     dio.options.headers[HttpHeaders.authorizationHeader] =
-    'Bearer ${HTTPConstants.AUTH_TOKEN}';
+        'Bearer ${HTTPConstants.AUTH_TOKEN}';
   }
 
   Future<void> _captureException(DioException err) async {
@@ -49,14 +49,14 @@ class DioAuthApiService {
 
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
-      String uri, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-      }) async {
+    String uri, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
     try {
       var response = await dio.post(
         uri,

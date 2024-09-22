@@ -57,7 +57,7 @@ class _DurationIndicatorWidgetState
               activeColor: ColorConstants.white,
               inactiveColor: ColorConstants.onyx,
               value:
-              _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration,
+                  _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration,
               onChanged: (val) {
                 if (!_isSeekbarBeingDragged) {
                   _isSeekbarBeingDragged = true;

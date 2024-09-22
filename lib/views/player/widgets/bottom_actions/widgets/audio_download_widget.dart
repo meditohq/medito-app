@@ -55,9 +55,9 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Widget showDownloadProgress(
-      AudioDownloaderProvider downloadAudioProvider,
-      String downloadFileKey,
-      ) {
+    AudioDownloaderProvider downloadAudioProvider,
+    String downloadFileKey,
+  ) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -78,9 +78,9 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   double _getDownloadProgress(
-      AudioDownloaderProvider downloadAudioProvider,
-      String downloadFileKey,
-      ) {
+    AudioDownloaderProvider downloadAudioProvider,
+    String downloadFileKey,
+  ) {
     if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
       return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
     }
@@ -89,9 +89,9 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Future<void> _handleDownload(
-      AudioDownloaderProvider downloadAudioProvider,
-      BuildContext context,
-      ) async {
+    AudioDownloaderProvider downloadAudioProvider,
+    BuildContext context,
+  ) async {
     try {
       await downloadAudioProvider.downloadTrackAudio(
         trackModel,
@@ -103,10 +103,10 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Future<void> _handleRemoveDownload(
-      AudioDownloaderProvider downloadAudioProvider,
-      WidgetRef ref,
-      BuildContext context,
-      ) async {
+    AudioDownloaderProvider downloadAudioProvider,
+    WidgetRef ref,
+    BuildContext context,
+  ) async {
     var confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {

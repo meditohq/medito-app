@@ -38,14 +38,14 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomRight: Radius.circular(bottomRight),
     );
     var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
-      fontFamily: DmMono,
-      color: ColorConstants.white,
-      fontWeight: FontWeight.w400,
-      fontSize: 16,
-    );
+          fontFamily: DmMono,
+          color: ColorConstants.white,
+          fontWeight: FontWeight.w400,
+          fontSize: 16,
+        );
 
     return Container(
-      height: isLandscape ? 56 : 48,  // Set height to 48 in portrait mode
+      height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
       decoration: BoxDecoration(
         borderRadius: radius,
         color: ColorConstants.onyx,
