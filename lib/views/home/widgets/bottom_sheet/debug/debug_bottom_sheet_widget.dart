@@ -71,10 +71,10 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   }
 
   void _handleCopy(BuildContext context, String deviceInfo) {
-    var _info =
+    var info =
         '${StringConstants.debugInfo}\n$deviceInfo\n${StringConstants.writeBelowThisLine}';
 
-    Clipboard.setData(ClipboardData(text: _info)).then((_) {
+    Clipboard.setData(ClipboardData(text: info)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(StringConstants.debugInfoCopied),
