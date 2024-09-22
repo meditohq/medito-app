@@ -34,7 +34,7 @@ class PackItemWidget extends StatelessWidget {
                         Text(
                           item.title,
                           style: bodyLarge?.copyWith(
-                            color: ColorConstants.walterWhite,
+                            color: ColorConstants.white,
                             fontFamily: DmSans,
                             fontSize: 16,
                           ),

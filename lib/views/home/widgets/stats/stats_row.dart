@@ -115,7 +115,7 @@ class _StatsRowState extends State<StatsRow> with TickerProviderStateMixin {
                   Text(
                     widget.leftButtonText,
                     style: TextStyle(
-                      color: ColorConstants.walterWhite,
+                      color: ColorConstants.white,
                       fontSize: 14,
                     ),
                   ),
@@ -157,7 +157,7 @@ class _StatsRowState extends State<StatsRow> with TickerProviderStateMixin {
                   Text(
                     widget.rightButtonText,
                     style: TextStyle(
-                      color: ColorConstants.walterWhite,
+                      color: ColorConstants.white,
                       fontSize: 14,
                     ),
                   ),

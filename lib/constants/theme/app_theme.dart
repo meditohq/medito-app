@@ -18,7 +18,7 @@ ThemeData appTheme(BuildContext context) {
     ),
     colorScheme: const ColorScheme.dark(
       surface: ColorConstants.ebony,
-      secondary: ColorConstants.walterWhite,
+      secondary: ColorConstants.white,
     ),
     scaffoldBackgroundColor: ColorConstants.ebony,
     textTheme: meditoTextTheme(context),
@@ -27,7 +27,7 @@ ThemeData appTheme(BuildContext context) {
       systemOverlayStyle: SystemUiOverlayStyle(
         systemNavigationBarColor: ColorConstants.ebony,
         systemNavigationBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent,
+        statusBarColor: ColorConstants.transparent,
         statusBarIconBrightness: Brightness.light,
       ),
     ),

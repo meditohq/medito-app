@@ -36,7 +36,7 @@ class SoundListTileWidget extends ConsumerWidget {
             Text(
               sound.title,
               style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                    color: ColorConstants.walterWhite,
+                    color: ColorConstants.white,
                     fontFamily: DmSans,
                     fontSize: 16,
                   ),
@@ -62,7 +62,7 @@ class SoundListTileWidget extends ConsumerWidget {
                           width: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: ColorConstants.walterWhite,
+                            color: ColorConstants.white,
                           ),
                         ),
                       ],
@@ -75,13 +75,13 @@ class SoundListTileWidget extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(width: 2, color: ColorConstants.walterWhite),
+        border: Border.all(width: 2, color: ColorConstants.white),
       ),
       padding: EdgeInsets.all(4),
       child: CircleAvatar(
         radius: 6,
         backgroundColor: isSelected
-            ? ColorConstants.walterWhite
+            ? ColorConstants.white
             : ColorConstants.transparent,
       ),
     );

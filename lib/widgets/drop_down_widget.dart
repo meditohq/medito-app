@@ -39,7 +39,7 @@ class DropdownWidget<T> extends StatelessWidget {
     );
     var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
       fontFamily: DmMono,
-      color: ColorConstants.walterWhite,
+      color: ColorConstants.white,
       fontWeight: FontWeight.w400,
       fontSize: 16,
     );
@@ -56,7 +56,7 @@ class DropdownWidget<T> extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, BorderRadius radius, TextStyle? textStyle) {
     return Material(
-      color: Colors.transparent,
+      color: ColorConstants.transparent,
       child: InkWell(
         onTap: _isClickable ? () => _showDropdown(context) : null,
         borderRadius: radius,
@@ -67,7 +67,7 @@ class DropdownWidget<T> extends StatelessWidget {
               if (iconData != null)
                 Icon(
                   iconData,
-                  color: ColorConstants.walterWhite,
+                  color: ColorConstants.white,
                 ),
               if (iconData != null) SizedBox(width: 12),
               Expanded(
@@ -79,7 +79,7 @@ class DropdownWidget<T> extends StatelessWidget {
               if (_isClickable)
                 Icon(
                   Icons.keyboard_arrow_down,
-                  color: ColorConstants.walterWhite,
+                  color: ColorConstants.white,
                 ),
             ],
           ),

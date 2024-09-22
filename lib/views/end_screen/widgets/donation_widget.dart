@@ -78,7 +78,7 @@ class DonationWidget extends ConsumerWidget {
                 context,
               ),
               btnText: donationPageModel.ctaTitle ?? StringConstants.donateNow,
-              bgColor: ColorConstants.walterWhite,
+              bgColor: ColorConstants.white,
               textColor: parseColor(donationPageModel.colorBackground),
               fontSize: 18,
               fontWeight: FontWeight.w700,

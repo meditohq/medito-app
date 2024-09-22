@@ -18,12 +18,12 @@ class CarouselWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var titleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontFamily: SourceSerif,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontSize: 24,
         );
     var subtitleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
           fontFamily: DmSans,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         );
     var size = MediaQuery.of(context).size;
 

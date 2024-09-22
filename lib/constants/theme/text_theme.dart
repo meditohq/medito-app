@@ -12,7 +12,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         displayMedium: TextStyle(
@@ -30,7 +30,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.3,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         headlineMedium: TextStyle(
@@ -42,7 +42,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w600,
           height: 1.3,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         headlineSmall: TextStyle(
@@ -51,7 +51,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.2,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         titleMedium: TextStyle(
@@ -70,7 +70,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.2,
           fontWeight: FontWeight.w500,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         bodySmall: TextStyle(
@@ -97,7 +97,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         labelLarge: TextStyle(
@@ -106,7 +106,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         labelMedium: TextStyle(
@@ -115,7 +115,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w500,
           height: 1.3,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
         labelSmall: TextStyle(
@@ -124,7 +124,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
       );

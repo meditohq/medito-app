@@ -30,7 +30,7 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
     return Text(
       greeting,
       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: ColorConstants.walterWhite,
+            color: ColorConstants.white,
             height: 0,
             fontSize: 28,
             fontWeight: FontWeight.w700,

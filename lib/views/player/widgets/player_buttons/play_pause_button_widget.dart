@@ -24,12 +24,12 @@ class PlayPauseButtonWidget extends ConsumerWidget {
         firstChild: Icon(
           Icons.play_circle_fill,
           size: iconSize,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         ),
         secondChild: Icon(
           Icons.pause_circle_outlined,
           size: iconSize,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         ),
         crossFadeState:
         isPlaying ? CrossFadeState.showSecond : CrossFadeState.showFirst,

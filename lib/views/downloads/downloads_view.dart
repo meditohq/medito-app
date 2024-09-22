@@ -209,7 +209,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       createSnackBar(
         '"${item.title}" ${StringConstants.removed.toLowerCase()}',
         context,
-        color: ColorConstants.walterWhite,
+        color: ColorConstants.white,
       );
     } else {
       // If the user cancels, refresh the list to ensure all items are visible again.

@@ -64,8 +64,8 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
             formatIcon(miniSecond.icon),
             fontFamily: materialIcons,
           ),
-          leftButtonIconColor: ColorConstants.walterWhite,
-          rightButtonIconColor: ColorConstants.walterWhite,
+          leftButtonIconColor: ColorConstants.white,
+          rightButtonIconColor: ColorConstants.white,
           leftButtonText: miniFirst?.title ?? '',
           rightButtonText: miniSecond.title,
           leftButtonClicked: () {

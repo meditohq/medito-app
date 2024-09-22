@@ -31,7 +31,7 @@ class PlayerActionBar extends StatelessWidget {
       leftItem: BottomActionBarItem(
         child: const Icon(
           Icons.close,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         ),
         onTap: onClosePressed,
       ),
@@ -62,7 +62,7 @@ class PlayerActionBar extends StatelessWidget {
           )
         : const Icon(
             Icons.music_off,
-            color: ColorConstants.walterWhite,
+            color: ColorConstants.white,
           );
   }
 

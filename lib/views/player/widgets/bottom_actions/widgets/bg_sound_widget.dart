@@ -32,7 +32,7 @@ class BgSoundWidget extends ConsumerWidget {
         Icons.music_note,
         color: isBackgroundSoundSelected
             ? ColorConstants.lightPurple
-            : ColorConstants.walterWhite,
+            : ColorConstants.white,
       ),
     );
   }

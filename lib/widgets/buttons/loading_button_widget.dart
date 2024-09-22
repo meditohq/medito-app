@@ -7,7 +7,7 @@ class LoadingButtonWidget extends StatelessWidget {
     this.onPressed,
     required this.btnText,
     this.bgColor = ColorConstants.onyx,
-    this.textColor = ColorConstants.walterWhite,
+    this.textColor = ColorConstants.white,
     this.isLoading = false,
     this.elevation = 0,
     this.fontWeight = FontWeight.w700,
@@ -44,7 +44,7 @@ class LoadingButtonWidget extends StatelessWidget {
           Text(
             btnText,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: isLoading ? Colors.transparent : textColor,
+                  color: isLoading ? ColorConstants.transparent : textColor,
                   fontFamily: DmSans,
                   fontSize: fontSize,
                   fontWeight: fontWeight,

@@ -38,7 +38,7 @@ class PackDismissibleWidget extends StatelessWidget {
               Spacer(),
               Icon(
                 Icons.check,
-                color: ColorConstants.walterWhite,
+                color: ColorConstants.white,
               ),
             ],
           ),

@@ -78,7 +78,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
             style: bodyLarge?.copyWith(
               fontFamily: DmSans,
               fontSize: 16,
-              color: ColorConstants.walterWhite,
+              color: ColorConstants.white,
             ),
             textAlign: TextAlign.center,
           ),

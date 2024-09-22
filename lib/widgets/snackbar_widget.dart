@@ -41,7 +41,7 @@ void showSnackBar(
           ),
       ],
     ),
-    backgroundColor: ColorConstants.walterWhite,
+    backgroundColor: ColorConstants.white,
     behavior: SnackBarBehavior.floating,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
   );

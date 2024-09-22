@@ -21,7 +21,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
   @override
   Widget build(BuildContext context) {
     var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontSize: 16,
           fontWeight: FontWeight.w400,
         );
@@ -41,7 +41,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
               style: TextStyle(
                 fontFamily: SourceSerif,
                 fontSize: 28,
-                color: ColorConstants.walterWhite,
+                color: ColorConstants.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -67,7 +67,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
               child: MaterialButton(
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onPressed: onPressed,
-                color: ColorConstants.walterWhite,
+                color: ColorConstants.white,
                 splashColor: ColorConstants.transparent,
                 padding: EdgeInsets.symmetric(
                   vertical: padding14,

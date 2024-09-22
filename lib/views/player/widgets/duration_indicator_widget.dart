@@ -54,7 +54,7 @@ class _DurationIndicatorWidgetState
             child: Slider(
               min: 0.0,
               max: totalDuration > 0.0 ? totalDuration : 1.0,
-              activeColor: ColorConstants.walterWhite,
+              activeColor: ColorConstants.white,
               inactiveColor: ColorConstants.onyx,
               value:
               _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration,

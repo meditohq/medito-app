@@ -37,7 +37,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
 
     return SliverAppBar.large(
       shadowColor: ColorConstants.ebony,
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: ColorConstants.transparent,
       expandedHeight: topBarHeight,
       backgroundColor: ColorConstants.onyx,
       automaticallyImplyLeading: false,
@@ -69,7 +69,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
             fontFamily: SourceSerif,
             fontWeight: FontWeight.w700,
-            color: ColorConstants.walterWhite,
+            color: ColorConstants.white,
           ),
     );
   }

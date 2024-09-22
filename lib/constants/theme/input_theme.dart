@@ -9,13 +9,13 @@ InputDecorationTheme inputDecorationTheme() {
     labelStyle: TextStyle(
       fontSize: 14.0,
       fontStyle: FontStyle.normal,
-      color: ColorConstants.walterWhite,
+      color: ColorConstants.white,
       fontFamily: DmSans,
     ),
     floatingLabelStyle: TextStyle(
       fontSize: 15.0,
       fontStyle: FontStyle.normal,
-      color: ColorConstants.walterWhite,
+      color: ColorConstants.white,
       fontFamily: DmSans,
     ),
     enabledBorder: outlineInputBorder,
