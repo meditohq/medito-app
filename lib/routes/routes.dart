@@ -73,7 +73,6 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       },
     );
-    ;
   } else if (place != null && place.contains('pack2')) {
     var p2id = ids[1]!;
     await logScreenView('Pack View',
@@ -88,7 +87,6 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       },
     );
-    ;
   } else if (place == TypeConstants.pack) {
     var pid = ids.first!;
     await logScreenView('Pack View', parameters: {'pack_id': pid});

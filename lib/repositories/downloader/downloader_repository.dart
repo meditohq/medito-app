@@ -65,7 +65,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
     String fileName,
   ) async {
     var file = await getApplicationDocumentsDirectory();
-    var savePath = file.path + '/' + fileName;
+    var savePath = '${file.path}/$fileName';
     var filePath = File(savePath);
     var checkIsExists = await filePath.exists();
     if (checkIsExists) {
@@ -77,7 +77,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   Future<String?> getDownloadedFile(String name) async {
     if (kIsWeb) return null;
     var file = await getApplicationDocumentsDirectory();
-    var savePath = file.path + '/' + name;
+    var savePath = '${file.path}/$name';
     var filePath = File(savePath);
 
     return await filePath.exists() ? filePath.path : null;

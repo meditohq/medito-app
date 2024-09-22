@@ -57,7 +57,7 @@ class PackCardWidget extends StatelessWidget {
 
   Text _title(TextTheme textTheme, {required String title}) {
     return Text(
-      '$title',
+      title,
       style: textTheme.displayLarge?.copyWith(
         fontFamily: SourceSerif,
         height: 0,
@@ -68,7 +68,7 @@ class PackCardWidget extends StatelessWidget {
   Widget _description(TextTheme textTheme, {String? subtitle}) {
     if (subtitle != null) {
       return Text(
-        '$subtitle',
+        subtitle,
         overflow: TextOverflow.ellipsis,
         maxLines: 2,
         style: textTheme.titleMedium?.copyWith(

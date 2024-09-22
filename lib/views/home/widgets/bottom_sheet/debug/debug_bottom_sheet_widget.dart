@@ -64,7 +64,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SelectableText(
-        '$info',
+        info,
         style: labelMedium,
       ),
     );

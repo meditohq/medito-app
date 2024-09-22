@@ -18,7 +18,7 @@ class PackRepositoryImpl extends PacksRepository {
 
   @override
   Future<List<PackItemsModel>> fetchAllPacks() async {
-    var response = await client.getRequest('${HTTPConstants.PACKS}');
+    var response = await client.getRequest(HTTPConstants.PACKS);
     var tempResponse = response as List;
 
     return tempResponse.map((x) => PackItemsModel.fromJson(x)).toList();

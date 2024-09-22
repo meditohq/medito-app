@@ -51,7 +51,7 @@ String formatTrackLength(String? item) {
   }
   if (item == null) return '';
 
-  return item + ' min';
+  return '$item min';
 }
 
 Duration clockTimeToDuration(String? lengthText) {

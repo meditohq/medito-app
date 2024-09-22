@@ -137,7 +137,7 @@ class RowItemWidget extends StatelessWidget {
 
   TextSpan _subtitle(BuildContext context) {
     return TextSpan(
-      text: '${subTitle != null ? '\n$subTitle' : ''}',
+      text: subTitle != null ? '\n$subTitle' : '',
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
         color: ColorConstants.graphite,
         letterSpacing: 0,
