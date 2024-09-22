@@ -144,5 +144,4 @@ class PermissionHandler {
 
     return false;
   }
-
 }

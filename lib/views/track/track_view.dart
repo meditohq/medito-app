@@ -359,7 +359,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
     setState(() {
       var previousDuration = fileModel?.duration;
       selectedAudio = value;
-      
+
       if (previousDuration != null && value != null) {
         fileModel = _findClosestDurationFile(value.files, previousDuration);
       } else {

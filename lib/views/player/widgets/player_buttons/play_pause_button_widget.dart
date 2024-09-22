@@ -16,7 +16,6 @@ class PlayPauseButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return InkWell(
       onTap: onPlayPause,
       borderRadius: BorderRadius.circular(iconSize / 2),
@@ -37,5 +36,4 @@ class PlayPauseButtonWidget extends ConsumerWidget {
       ),
     );
   }
-
 }

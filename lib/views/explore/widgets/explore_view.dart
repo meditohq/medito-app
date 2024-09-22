@@ -75,7 +75,6 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
                       },
                     ),
                     const SizedBox(height: 18.0),
-
                   ],
                 ),
               ),

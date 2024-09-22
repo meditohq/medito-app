@@ -15,7 +15,6 @@ class PackDismissibleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: UniqueKey(),
-
       direction: DismissDirection.endToStart,
       background: _getDismissibleBackgroundWidget(),
       confirmDismiss: (direction) async {

@@ -68,7 +68,6 @@ class FirebaseMessagingHandler {
         }
       },
     );
-
   }
 
   void _handleForegroundMessage(

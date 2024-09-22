@@ -47,7 +47,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
     var file = await getApplicationDocumentsDirectory();
     var savePath = '${file.path}/$name';
     var isExists = await File(savePath).exists();
-    
+
     if (!isExists) {
       await client.dio.download(
         url,
