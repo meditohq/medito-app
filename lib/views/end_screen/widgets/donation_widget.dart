@@ -31,7 +31,7 @@ class DonationWidget extends ConsumerWidget {
   }
 
   Widget _buildErrorWidget(String err) {
-    return Container(
+    return SizedBox(
       height: 200,
       child: Center(child: Text(err)),
     );
@@ -68,7 +68,7 @@ class DonationWidget extends ConsumerWidget {
             ),
           ),
           height20,
-          Container(
+          SizedBox(
             height: 48,
             width: MediaQuery.of(context).size.width,
             child: LoadingButtonWidget(
