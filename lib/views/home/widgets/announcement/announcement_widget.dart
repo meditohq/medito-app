@@ -118,7 +118,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
         child: Icon(
           IconData(
             formatIcon(icon!),
-            fontFamily: 'MaterialIcons',
+            fontFamily: materialIcons,
           ),
           size: 24,
         ),

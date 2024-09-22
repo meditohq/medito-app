@@ -10,17 +10,11 @@ class HTTPConstants {
 
   //END POINTS
   static const String TOKENS = 'tokens';
-  static const String USERS = 'users';
-  static const String OTP = 'otp';
   static const String PACKS = 'packs';
   static const String TRACKS = 'tracks';
   static const String BACKGROUND_SOUNDS = 'backgroundsounds';
   static const String HOME = 'home';
   static const String LATEST_ANNOUNCEMENT = 'announcements?latest=true';
-  static const String HEADER = 'main/header';
-  static const String QUOTE = 'main/quote';
-  static const String SHORTCUTS = 'main/shortcuts';
-  static const String EDITORIAL = 'main/editorial';
   static const String STATS = '/stats';
   static const String ME = 'me';
   static const String SEARCH_TRACKS = 'search/tracks';

@@ -120,7 +120,7 @@ class RowItemWidget extends StatelessWidget {
     } else if (icon.iconString != null) {
       iconData = IconData(
         formatIcon(icon.iconString!),
-        fontFamily: 'MaterialIcons',
+        fontFamily: materialIcons,
       );
     } else {
       iconData = Icons.error;
