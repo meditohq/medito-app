@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/strings/string_constants.dart';
 import '../../models/device_info/device_and_app_info_model.dart';
 import '../../models/me/me_model.dart';
