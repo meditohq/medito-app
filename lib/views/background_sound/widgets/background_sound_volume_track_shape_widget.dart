@@ -21,7 +21,7 @@ class BackgroundSoundVolumeTrackShapeWidget
   }) {
     final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
-    var trackTop;
+    double trackTop;
     trackTop = parentBox.size.height - trackHeight;
     final trackWidth = parentBox.size.width;
 

@@ -136,7 +136,7 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     var boxHeight = parentBox.size.height;
     final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
-    var trackTop;
+    double trackTop;
     trackTop = addTopPadding
         ? offset.dy + (boxHeight - trackHeight) / 2 + 6
         : boxHeight / 2 - 2;

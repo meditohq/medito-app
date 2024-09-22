@@ -17,11 +17,11 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
 
   @override
   Future<DeviceAndAppInfoModel> getDeviceAndAppInfo() async {
-    var deviceModel;
-    var deviceOS;
-    var devicePlatform;
-    var buildNumber;
-    var appVersion;
+    String? deviceModel;
+    String? deviceOS;
+    String? devicePlatform;
+    String buildNumber;
+    String appVersion;
     var deviceInfo = DeviceInfoPlugin();
     var packageInfo = await PackageInfo.fromPlatform();
     var languageCode = PlatformDispatcher.instance.locale.languageCode;
