@@ -84,7 +84,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       await _androidServiceApi.startService();
       // wait half a sec for the service to start
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       await _api.playAudio(
         AudioData(
@@ -157,7 +157,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsForward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position + Duration(seconds: 10));
+      iosAudioHandler.seek(iosAudioHandler.position + const Duration(seconds: 10));
     }
   }
 
@@ -165,7 +165,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsBackward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position - Duration(seconds: 10));
+      iosAudioHandler.seek(iosAudioHandler.position - const Duration(seconds: 10));
     }
   }
 

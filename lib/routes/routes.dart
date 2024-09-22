@@ -112,7 +112,7 @@ Future<void> handleNavigation(
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SettingsScreen(),
+        builder: (context) => const SettingsScreen(),
       ),
     ).then(
       (value) {

@@ -21,13 +21,13 @@ class ApiResponse<T> extends Equatable {
   final String? message;
   final int? statusCode;
 
-  ApiResponse.loading()
+  const ApiResponse.loading()
       : status = Status.LOADING,
         body = null,
         statusCode = null,
         message = '';
 
-  ApiResponse.completed(this.body)
+  const ApiResponse.completed(this.body)
       : status = Status.COMPLETED,
         statusCode = null,
         message = '';

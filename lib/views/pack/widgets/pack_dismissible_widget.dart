@@ -29,8 +29,8 @@ class PackDismissibleWidget extends StatelessWidget {
 
   Widget _getDismissibleBackgroundWidget() => Container(
         color: ColorConstants.charcoal,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
+        child: const Padding(
+          padding: EdgeInsets.all(24.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -33,7 +33,7 @@ void showSnackBar(
             },
             child: Text(
               actionLabel,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),

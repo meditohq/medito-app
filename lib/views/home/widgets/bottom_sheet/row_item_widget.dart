@@ -51,7 +51,7 @@ class RowItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var border = Border(
       bottom: hasUnderline
-          ? BorderSide(
+          ? const BorderSide(
         width: 0.7,
         color: ColorConstants.ebony,
       )
@@ -68,7 +68,7 @@ class RowItemWidget extends StatelessWidget {
           decoration: BoxDecoration(
             border: border,
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: 16,
           ),
           child: Row(
@@ -81,9 +81,9 @@ class RowItemWidget extends StatelessWidget {
                   SelectableText.rich(
                     enableInteractiveSelection: enableInteractiveSelection,
                     onTap: onTap,
-                    scrollPhysics: NeverScrollableScrollPhysics(),
+                    scrollPhysics: const NeverScrollableScrollPhysics(),
                     TextSpan(
-                      style: TextStyle(fontSize: 18.0),
+                      style: const TextStyle(fontSize: 18.0),
                       children: [
                         TextSpan(
                           text: title,

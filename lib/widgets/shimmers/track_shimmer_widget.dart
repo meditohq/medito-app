@@ -14,7 +14,7 @@ class TrackShimmerWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BoxShimmerWidget(
+          const BoxShimmerWidget(
             height: 280,
           ),
           Padding(
@@ -23,13 +23,13 @@ class TrackShimmerWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 height12,
-                BoxShimmerWidget(
+                const BoxShimmerWidget(
                   height: 15,
                   width: 150,
                   borderRadius: 14,
                 ),
                 height12,
-                BoxShimmerWidget(
+                const BoxShimmerWidget(
                   height: 15,
                   width: 200,
                   borderRadius: 14,

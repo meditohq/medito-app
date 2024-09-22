@@ -38,7 +38,7 @@ void createSnackBar(String message,
   final snackBar = SnackBar(
     content: Text(message),
     backgroundColor: color,
-    duration: Duration(seconds: 6),
+    duration: const Duration(seconds: 6),
   );
 
   try {

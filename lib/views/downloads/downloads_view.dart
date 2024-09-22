@@ -50,7 +50,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             ref.read(refreshHomeAPIsProvider.future);
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => BottomNavigationBarView(),
+                builder: (context) => const BottomNavigationBarView(),
               ),
             );
           }

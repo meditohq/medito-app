@@ -21,7 +21,7 @@ import 'package:flutter/material.dart';
 class DownloadListItemWidget extends StatelessWidget {
   final PackImageListItemData data;
 
-  DownloadListItemWidget(this.data);
+  const DownloadListItemWidget(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {

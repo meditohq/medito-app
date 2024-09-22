@@ -88,7 +88,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => DownloadsView(),
+                                builder: (context) => const DownloadsView(),
                               ),
                             ),
                     ),

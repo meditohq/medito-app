@@ -40,5 +40,5 @@ class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(72.0);
+  Size get preferredSize => const Size.fromHeight(72.0);
 }

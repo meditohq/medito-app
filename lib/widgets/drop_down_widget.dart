@@ -69,7 +69,7 @@ class DropdownWidget<T> extends StatelessWidget {
                   iconData,
                   color: ColorConstants.white,
                 ),
-              if (iconData != null) SizedBox(width: 12),
+              if (iconData != null) const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   _getDisplayValue(),
@@ -77,7 +77,7 @@ class DropdownWidget<T> extends StatelessWidget {
                 ),
               ),
               if (_isClickable)
-                Icon(
+                const Icon(
                   Icons.keyboard_arrow_down,
                   color: ColorConstants.white,
                 ),

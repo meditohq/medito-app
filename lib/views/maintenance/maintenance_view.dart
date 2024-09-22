@@ -33,10 +33,10 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
-            Text(
+            const Text(
               StringConstants.hey,
               style: TextStyle(
                 fontFamily: SourceSerif,
@@ -45,7 +45,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             MarkdownWidget(
@@ -59,7 +59,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
             SizedBox(
@@ -69,7 +69,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                 onPressed: onPressed,
                 color: ColorConstants.white,
                 splashColor: ColorConstants.transparent,
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   vertical: padding14,
                   horizontal: padding16,
                 ),

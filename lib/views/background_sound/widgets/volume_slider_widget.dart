@@ -19,8 +19,8 @@ class VolumeSliderWidget extends ConsumerWidget {
           leadingTitle: StringConstants.volume,
           tralingText:  currentVolume.toString().split('.').first + '%',
         ),
-        overlayShape: RoundSliderOverlayShape(overlayRadius: 0.0),
-        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 0.0),
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 0.0),
         trackHeight: 72,
       ),
       child: Slider(

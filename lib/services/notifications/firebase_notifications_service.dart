@@ -133,7 +133,7 @@ class FirebaseMessagingHandler {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => BottomNavigationBarView(),
+          builder: (context) => const BottomNavigationBarView(),
         ),
       );
     }

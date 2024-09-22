@@ -24,7 +24,7 @@ class DonationWidget extends ConsumerWidget {
   }
 
   Widget _buildLoadingWidget() {
-    return Container(
+    return const SizedBox(
       height: 200,
       child: Center(child: CircularProgressIndicator()),
     );
@@ -49,7 +49,7 @@ class DonationWidget extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         color: parseColor(donationPageModel.colorBackground),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         children: [
           Text(
@@ -57,7 +57,7 @@ class DonationWidget extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: bodyLarge?.copyWith(fontFamily: SourceSerif, fontSize: 22),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             donationPageModel.text ??
                 StringConstants.meditoReliesOnYourDonationsToSurvive,

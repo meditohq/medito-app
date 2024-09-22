@@ -47,7 +47,7 @@ class _DurationIndicatorWidgetState
             data: SliderThemeData(
               trackHeight: 6,
               trackShape: CustomTrackShape(addTopPadding: false),
-              thumbShape: RoundSliderThumbShape(
+              thumbShape: const RoundSliderThumbShape(
                 enabledThumbRadius: 6.0,
               ),
             ),
@@ -70,7 +70,7 @@ class _DurationIndicatorWidgetState
             ),
           ),
           Transform.translate(
-            offset: Offset(0, -14),
+            offset: const Offset(0, -14),
             child: _durationLabels(
               context,
             ),

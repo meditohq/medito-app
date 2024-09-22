@@ -24,12 +24,12 @@ class PlayerButtonsWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _rewindButton(),
-        SizedBox(width: 32),
+        const SizedBox(width: 32),
         PlayPauseButtonWidget(
           isPlaying: isPlaying,
           onPlayPause: onPlayPause,
         ),
-        SizedBox(width: 32),
+        const SizedBox(width: 32),
         _forwardButton(),
       ],
     );
@@ -38,7 +38,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _rewindButton() {
     return IconButton(
       onPressed: onSkip10SecondsBackward,
-      icon: Icon(
+      icon: const Icon(
         Icons.replay_10_rounded,
         size: 40,
       ),
@@ -48,7 +48,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _forwardButton() {
     return IconButton(
       onPressed: onSkip10SecondsForward,
-      icon: Icon(
+      icon: const Icon(
         Icons.forward_10_rounded,
         size: 40,
       ),

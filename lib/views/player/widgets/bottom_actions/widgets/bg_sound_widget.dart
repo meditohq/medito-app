@@ -24,7 +24,7 @@ class BgSoundWidget extends ConsumerWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BackgroundSoundView(),
+            builder: (context) => const BackgroundSoundView(),
           ),
         );
       },

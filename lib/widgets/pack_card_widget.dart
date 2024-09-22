@@ -25,7 +25,7 @@ class PackCardWidget extends StatelessWidget {
         color: ColorConstants.onyx,
         borderRadius: BorderRadius.circular(14),
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: InkWell(
         onTap: onTap,
         child: Row(
@@ -80,7 +80,7 @@ class PackCardWidget extends StatelessWidget {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 
   Widget _getCoverUrl() {
@@ -98,6 +98,6 @@ class PackCardWidget extends StatelessWidget {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }

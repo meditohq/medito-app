@@ -6,13 +6,13 @@ InputDecorationTheme inputDecorationTheme() {
   var outlineInputBorder = _outlineInputBorder();
 
   return InputDecorationTheme(
-    labelStyle: TextStyle(
+    labelStyle: const TextStyle(
       fontSize: 14.0,
       fontStyle: FontStyle.normal,
       color: ColorConstants.white,
       fontFamily: DmSans,
     ),
-    floatingLabelStyle: TextStyle(
+    floatingLabelStyle: const TextStyle(
       fontSize: 15.0,
       fontStyle: FontStyle.normal,
       color: ColorConstants.white,

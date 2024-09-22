@@ -89,7 +89,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
           ),
           url: coverUrl,
           shouldCache: true,
-          errorWidget: SizedBox(),
+          errorWidget: const SizedBox(),
         ),
       );
     }

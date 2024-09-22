@@ -55,7 +55,7 @@ String formatTrackLength(String? item) {
 }
 
 Duration clockTimeToDuration(String? lengthText) {
-  if (lengthText == null) return Duration();
+  if (lengthText == null) return const Duration();
 
   //formats 00:00:00
   var tempList = lengthText.split(':');

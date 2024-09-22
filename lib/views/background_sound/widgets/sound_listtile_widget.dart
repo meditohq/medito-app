@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../providers/background_sounds/background_sounds_notifier.dart';
 
 class SoundListTileWidget extends ConsumerWidget {
-  const SoundListTileWidget({required this.sound}) : super();
+  const SoundListTileWidget({super.key, required this.sound});
   final BackgroundSoundsModel sound;
 
   @override
@@ -22,12 +22,12 @@ class SoundListTileWidget extends ConsumerWidget {
         bgSoundNotifierProvider,
       ),
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
           ),
         ),
-        constraints: BoxConstraints(minHeight: 88),
+        constraints: const BoxConstraints(minHeight: 88),
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
         child: Row(
           children: [
@@ -51,9 +51,9 @@ class SoundListTileWidget extends ConsumerWidget {
   }
 
   Expanded _loadingSpinner() {
-    return Expanded(
+    return const Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -77,7 +77,7 @@ class SoundListTileWidget extends ConsumerWidget {
         borderRadius: BorderRadius.circular(30),
         border: Border.all(width: 2, color: ColorConstants.white),
       ),
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       child: CircleAvatar(
         radius: 6,
         backgroundColor: isSelected

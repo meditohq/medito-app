@@ -36,7 +36,7 @@ class AudioDownloadWidget extends ConsumerWidget {
       return IconButton(
         onPressed: () =>
             _handleRemoveDownload(downloadAudioProvider, ref, context),
-        icon: Icon(
+        icon: const Icon(
           Icons.downloading_outlined,
           color: ColorConstants.lightPurple,
         ),
@@ -47,7 +47,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     } else {
       return IconButton(
         onPressed: () => _handleDownload(downloadAudioProvider, context),
-        icon: Icon(
+        icon: const Icon(
           Icons.downloading_outlined,
         ),
       );
@@ -61,7 +61,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.downloading,
           size: 24,
         ),
@@ -111,20 +111,20 @@ class AudioDownloadWidget extends ConsumerWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(StringConstants.confirmDeletionTitle),
+          title: const Text(StringConstants.confirmDeletionTitle),
           content: Text('${StringConstants.confirmDeletionMessage} "${trackModel.title}"?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false); // User pressed the cancel button
               },
-              child: Text(StringConstants.cancel),
+              child: const Text(StringConstants.cancel),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true); // User pressed the delete button
               },
-              child: Text(StringConstants.delete),
+              child: const Text(StringConstants.delete),
             ),
           ],
         );

@@ -49,20 +49,20 @@ class PermissionHandler {
             LayoutBuilder(
               builder: (context, constraints) {
                 return AlertDialog(
-                  title: Text(StringConstants.reminderPermissions),
+                  title: const Text(StringConstants.reminderPermissions),
                   content: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxHeight: constraints.maxHeight * 0.7,
                       maxWidth: constraints.maxWidth * 0.7,
                     ),
-                    child: SingleChildScrollView(
+                    child: const SingleChildScrollView(
                       child: Text(StringConstants.weNeedYourPermissionReminder),
                     ),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(StringConstants.requestPermission),
+                      child: const Text(StringConstants.requestPermission),
                     ),
                   ],
                 );
@@ -111,20 +111,20 @@ class PermissionHandler {
             LayoutBuilder(
               builder: (context, constraints) {
                 return AlertDialog(
-                  title: Text(StringConstants.mediaPlaybackPermissions),
+                  title: const Text(StringConstants.mediaPlaybackPermissions),
                   content: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxHeight: constraints.maxHeight * 0.7,
                       maxWidth: constraints.maxWidth * 0.7,
                     ),
-                    child: SingleChildScrollView(
+                    child: const SingleChildScrollView(
                       child: Text(StringConstants.weNeedYourPermissionMedia),
                     ),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(StringConstants.requestPermission),
+                      child: const Text(StringConstants.requestPermission),
                     ),
                   ],
                 );

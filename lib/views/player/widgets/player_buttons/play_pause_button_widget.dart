@@ -33,7 +33,7 @@ class PlayPauseButtonWidget extends ConsumerWidget {
         ),
         crossFadeState:
         isPlaying ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-        duration: Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 250),
       ),
     );
   }

@@ -189,7 +189,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void _handleFadeAtEndForIos() {
-    var durationFromEnd = Duration(seconds: 10).inMilliseconds;
+    var durationFromEnd = const Duration(seconds: 10).inMilliseconds;
 
     iosAudioHandler.positionStream.listen(
       (currentPosition) {

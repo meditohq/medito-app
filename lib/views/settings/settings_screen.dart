@@ -82,7 +82,7 @@ class SettingsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildDailyNotificationTile(context, ref),
-          if (_isHealthSyncAvailable) HealthSyncTile(),
+          if (_isHealthSyncAvailable) const HealthSyncTile(),
           ...homeData.menu
               .map((element) => _buildMenuItemTile(context, ref, element)),
           _buildDebugTile(context, ref),
