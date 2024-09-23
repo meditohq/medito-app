@@ -1,13 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/models/models.dart';
+import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/providers/explore/track_search_provider.dart';
-import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/widgets.dart';
-import 'dart:async';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
@@ -105,40 +105,37 @@ class ExploreContentWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var packsProvider = searchQuery.isNotEmpty
-        ? searchTracksProvider(searchQuery)
-        : fetchAllPacksProvider;
+    var exploreItems = ref.watch(exploreListProvider(searchQuery));
 
-    var packs = ref.watch(packsProvider);
-
-    return packs.when(
-      data: (data) => _buildPacksList(context, ref, data),
+    return exploreItems.when(
+      data: (data) => _buildExploreList(context, ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
-        onTap: () => ref.refresh(packsProvider),
+        onTap: () => ref.refresh(exploreListProvider(searchQuery)),
       ),
       loading: () => const ExploreResultShimmerWidget(),
     );
   }
 
-  Widget _buildPacksList(
-      BuildContext context, WidgetRef ref, List<PackItemsModel> packs) {
+  Widget _buildExploreList(
+      BuildContext context, WidgetRef ref, List<ExploreListItem> items) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWideScreen = MediaQuery.of(context).orientation == Orientation.landscape ||
-            MediaQuery.of(context).size.shortestSide >= 600;
+        final isWideScreen =
+            MediaQuery.of(context).orientation == Orientation.landscape ||
+                MediaQuery.of(context).size.shortestSide >= 600;
 
         return isWideScreen
-            ? _buildGridView(context, packs, ref, constraints)
-            : _buildListView(context, packs, ref);
+            ? _buildGridView(context, items, ref, constraints)
+            : _buildListView(context, items, ref);
       },
     );
   }
 
   Widget _buildListView(
-      BuildContext context, List<PackItemsModel> packs, WidgetRef ref) {
+      BuildContext context, List<ExploreListItem> items, WidgetRef ref) {
     return Column(
-      children: packs.map((element) {
+      children: items.map((item) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             padding16,
@@ -147,14 +144,17 @@ class ExploreContentWidget extends ConsumerWidget {
             padding16,
           ),
           child: PackCardWidget(
-            title: element.title,
-            subTitle: element.subtitle,
-            coverUrlPath: element.coverUrl,
+            title: item.title,
+            subTitle: item.subtitle,
+            coverUrlPath: item.coverUrl,
             onTap: () {
               onPackTapped();
               handleNavigation(
-                element.type,
-                [element.id.toString(), element.path],
+                item.map(
+                  track: (_) => 'track',
+                  pack: (_) => 'pack',
+                ),
+                [item.id, item.path],
                 context,
                 ref: ref,
               );
@@ -165,13 +165,13 @@ class ExploreContentWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildGridView(BuildContext context, List<PackItemsModel> packs,
+  Widget _buildGridView(BuildContext context, List<ExploreListItem> items,
       WidgetRef ref, BoxConstraints constraints) {
     var itemWidth = (constraints.maxWidth - padding16 * 3) / 2;
 
     return Wrap(
       runSpacing: padding16,
-      children: packs.map((element) {
+      children: items.map((item) {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -179,14 +179,17 @@ class ExploreContentWidget extends ConsumerWidget {
             SizedBox(
               width: itemWidth,
               child: PackCardWidget(
-                title: element.title,
-                subTitle: element.subtitle,
-                coverUrlPath: element.coverUrl,
+                title: item.title,
+                subTitle: item.subtitle,
+                coverUrlPath: item.coverUrl,
                 onTap: () {
                   onPackTapped();
                   handleNavigation(
-                    element.type,
-                    [element.id.toString(), element.path],
+                    item.map(
+                      track: (_) => 'track',
+                      pack: (_) => 'pack',
+                    ),
+                    [item.id, item.path],
                     context,
                     ref: ref,
                   );

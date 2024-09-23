@@ -32,7 +32,7 @@ class PackRepositoryImpl extends PacksRepository {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 PackRepositoryImpl packRepository(PackRepositoryRef _) {
   return PackRepositoryImpl(client: DioApiService());
 }
