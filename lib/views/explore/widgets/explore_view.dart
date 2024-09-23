@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/explore/track_search_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'dart:async';
-
-import '../../../providers/explore/track_search_provider.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
@@ -107,7 +106,7 @@ class ExploreContentWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var packsProvider = searchQuery.isNotEmpty
-        ? searchPacksProvider(searchQuery)
+        ? searchTracksProvider(searchQuery)
         : fetchAllPacksProvider;
 
     var packs = ref.watch(packsProvider);
