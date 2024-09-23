@@ -8,7 +8,7 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'dart:async';
 
-import '../../../providers/explore/search_provider.dart';
+import '../../../providers/explore/track_search_provider.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
