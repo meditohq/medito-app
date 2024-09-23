@@ -144,7 +144,12 @@ class ExploreContentWidget extends ConsumerWidget {
     return Column(
       children: packs.map((element) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(padding16, 0, padding16, padding16),
+          padding: const EdgeInsets.fromLTRB(
+            padding16,
+            0,
+            padding16,
+            padding16,
+          ),
           child: PackCardWidget(
             title: element.title,
             subTitle: element.subtitle,

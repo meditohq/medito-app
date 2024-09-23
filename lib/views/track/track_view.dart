@@ -368,7 +368,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
     });
   }
 
-  TrackFilesModel _findClosestDurationFile(List<TrackFilesModel> files, int targetDuration) {
+  TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int targetDuration,
+  ) {
     return files.reduce((a, b) {
       return (a.duration - targetDuration).abs() < (b.duration - targetDuration).abs() ? a : b;
     });

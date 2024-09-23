@@ -25,12 +25,22 @@ class AudioDownloadWidget extends ConsumerWidget {
       width: 48,
       height: 48,
       child: Center(
-        child: _buildDownloadWidget(context, ref, downloadAudioProvider, downloadFileKey),
+        child: _buildDownloadWidget(
+          context,
+          ref,
+          downloadAudioProvider,
+          downloadFileKey,
+        ),
       ),
     );
   }
 
-  Widget _buildDownloadWidget(BuildContext context, WidgetRef ref, AudioDownloaderProvider downloadAudioProvider, String downloadFileKey) {
+  Widget _buildDownloadWidget(
+    BuildContext context,
+    WidgetRef ref,
+    AudioDownloaderProvider downloadAudioProvider,
+    String downloadFileKey,
+  ) {
     if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
         AudioDownloadState.DOWNLOADED) {
       return IconButton(
@@ -112,17 +122,21 @@ class AudioDownloadWidget extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(StringConstants.confirmDeletionTitle),
-          content: Text('${StringConstants.confirmDeletionMessage} "${trackModel.title}"?'),
+          content: Text(
+            '${StringConstants.confirmDeletionMessage} "${trackModel.title}"?',
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); // User pressed the cancel button
+                // User pressed the cancel button
+                Navigator.of(context).pop(false);
               },
               child: const Text(StringConstants.cancel),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // User pressed the delete button
+                // User pressed the delete button
+                Navigator.of(context).pop(true);
               },
               child: const Text(StringConstants.delete),
             ),

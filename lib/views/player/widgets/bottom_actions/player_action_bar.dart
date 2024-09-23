@@ -44,7 +44,9 @@ class PlayerActionBar extends StatelessWidget {
       ),
       rightCenterItem: BottomActionBarItem(
         child: _buildBackgroundSoundWidget(),
-        onTap: trackModel.hasBackgroundSound ? () {} : _showBackgroundSoundDisabledMessage,
+        onTap: trackModel.hasBackgroundSound
+            ? () {}
+            : _showBackgroundSoundDisabledMessage,
       ),
       rightItem: BottomActionBarItem(
         child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged),

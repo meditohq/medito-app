@@ -36,18 +36,22 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
 
   Column _buildMain() {
     var mini = widget.statsData?.mini;
-    var miniFirst = mini?.isNotEmpty == true ? mini?.first : const TilesModel(
-      icon: '',
-      color: '',
-      title: '',
-      subtitle: '',
-    );
-    var miniSecond = ((mini?.length ?? 0) > 1  == true) ? mini![1] : const TilesModel(
-      icon: '',
-      color: '',
-      title: '',
-      subtitle: '',
-    );
+    var miniFirst = mini?.isNotEmpty == true
+        ? mini?.first
+        : const TilesModel(
+            icon: '',
+            color: '',
+            title: '',
+            subtitle: '',
+          );
+    var miniSecond = ((mini?.length ?? 0) > 1 == true)
+        ? mini![1]
+        : const TilesModel(
+            icon: '',
+            color: '',
+            title: '',
+            subtitle: '',
+          );
 
     return Column(
       children: [

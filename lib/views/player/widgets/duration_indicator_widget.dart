@@ -36,9 +36,11 @@ class _DurationIndicatorWidgetState
     );
   }
 
-  Padding _durationBar(BuildContext context,
-      double totalDuration,
-      double currentDuration,) {
+  Padding _durationBar(
+    BuildContext context,
+    double totalDuration,
+    double currentDuration,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
       child: Column(
@@ -85,7 +87,7 @@ class _DurationIndicatorWidgetState
     widget.onSeekEnd((val * 100).toInt());
   }
 
-  Row _durationLabels(BuildContext context,) {
+  Row _durationLabels(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -103,19 +105,14 @@ class _DurationIndicatorWidgetState
     );
   }
 
-  Text _durationLabel(BuildContext context,
-      String label,) {
+  Text _durationLabel(BuildContext context, String label) {
     return Text(
       label,
-      style: Theme
-          .of(context)
-          .textTheme
-          .titleSmall
-          ?.copyWith(
-        color: ColorConstants.graphite,
-        fontFamily: DmMono,
-        fontSize: 12,
-      ),
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: ColorConstants.graphite,
+            fontFamily: DmMono,
+            fontSize: 12,
+          ),
     );
   }
 }
@@ -146,18 +143,19 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
   }
 
   @override
-  void paint(PaintingContext context,
-      Offset offset, {
-        required RenderBox parentBox,
-        required SliderThemeData sliderTheme,
-        required Animation<double> enableAnimation,
-        required TextDirection textDirection,
-        required Offset thumbCenter,
-        Offset? secondaryOffset,
-        bool isDiscrete = false,
-        bool isEnabled = false,
-        double additionalActiveTrackHeight = 0,
-      }) {
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    double additionalActiveTrackHeight = 0,
+  }) {
     super.paint(
       context,
       offset,

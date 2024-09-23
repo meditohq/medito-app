@@ -14,10 +14,7 @@ class HealthSyncTile extends StatelessWidget {
       permissions: [HealthDataAccess.READ_WRITE],
     );
 
-    showSnackBar(
-      context,
-      StringConstants.permissionExplanation,
-    );
+    showSnackBar(context, StringConstants.permissionExplanation);
   }
 
   @override

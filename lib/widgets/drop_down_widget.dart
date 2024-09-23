@@ -54,7 +54,11 @@ class DropdownWidget<T> extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, BorderRadius radius, TextStyle? textStyle) {
+  Widget _buildContent(
+    BuildContext context,
+    BorderRadius radius,
+    TextStyle? textStyle,
+  ) {
     return Material(
       color: ColorConstants.transparent,
       child: InkWell(
@@ -92,7 +96,10 @@ class DropdownWidget<T> extends StatelessWidget {
     if (!_isClickable) {
       return disabledLabelText;
     }
-    final selectedItem = items?.firstWhere((item) => item.value == value, orElse: () => items!.first);
+    final selectedItem = items?.firstWhere(
+      (item) => item.value == value,
+      orElse: () => items!.first,
+    );
     return (selectedItem?.child as Text).data ?? '';
   }
 
@@ -110,15 +117,19 @@ class DropdownWidget<T> extends StatelessWidget {
           offset.dx + size.width,
           offset.dy + size.height,
         ),
-        items: items!.map((item) => PopupMenuItem<T>(
-          value: item.value,
-          child: Container(
-            width: size.width - 24,  // Subtract horizontal padding
-            height: isLandscape ? 56 : 48,
-            alignment: AlignmentDirectional.centerStart,
-            child: item.child,
-          ),
-        )).toList(),
+        items: items!
+            .map(
+              (item) => PopupMenuItem<T>(
+                value: item.value,
+                child: Container(
+                  width: size.width - 24, // Subtract horizontal padding
+                  height: isLandscape ? 56 : 48,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: item.child,
+                ),
+              ),
+            )
+            .toList(),
         elevation: 8,
         color: ColorConstants.onyx,
         shape: RoundedRectangleBorder(

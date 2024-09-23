@@ -13,6 +13,8 @@ class SearchRepository {
       data: {'query': query},
     );
 
-    return (response as List).map((item) => PackItemsModel.fromJson(item)).toList();
+    return (response as List)
+        .map((item) => PackItemsModel.fromJson(item))
+        .toList();
   }
 }

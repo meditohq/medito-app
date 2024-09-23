@@ -41,9 +41,7 @@ class SoundListTileWidget extends ConsumerWidget {
                     fontSize: 16,
                   ),
             ),
-            isDownloading
-                ? _loadingSpinner()
-                : const SizedBox.shrink(),
+            isDownloading ? _loadingSpinner() : const SizedBox.shrink(),
           ],
         ),
       ),

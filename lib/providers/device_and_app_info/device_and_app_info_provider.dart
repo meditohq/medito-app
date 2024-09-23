@@ -31,7 +31,8 @@ final deviceAppAndUserInfoProvider =
 
 String _formatString(
   MeModel? me,
-  DeviceAndAppInfoModel? deviceInfo, String? emailAddress,
+  DeviceAndAppInfoModel? deviceInfo,
+  String? emailAddress,
 ) {
   var isProdString = kDebugMode ? 'Debug' : 'Release';
   var env = '${StringConstants.env}: $isProdString';

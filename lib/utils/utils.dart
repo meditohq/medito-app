@@ -31,10 +31,11 @@ Color parseColor(String? color) {
   return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
 }
 
-void createSnackBar(String message,
-    BuildContext context, {
-      Color color = Colors.red,
-    }) {
+void createSnackBar(
+  String message,
+  BuildContext context, {
+  Color color = Colors.red,
+}) {
   final snackBar = SnackBar(
     content: Text(message),
     backgroundColor: color,
@@ -72,7 +73,8 @@ Future<void> launchURLInBrowser(String url) async {
   }
 }
 
-Future<void> launchEmailSubmission(String href, {
+Future<void> launchEmailSubmission(
+  String href, {
   String? subject,
   String? body,
 }) async {
@@ -118,9 +120,7 @@ String getAudioFileExtension(String path) {
   var lastIndex = path.lastIndexOf('/');
   if (lastIndex != -1) {
     var filenameWithQuery = path.substring(lastIndex + 1);
-    var filename = Uri.decodeFull(filenameWithQuery
-        .split('?')
-        .first);
+    var filename = Uri.decodeFull(filenameWithQuery.split('?').first);
     var dotIndex = filename.lastIndexOf('.');
     if (dotIndex != -1) {
       var fileExtension = filename.substring(dotIndex + 1);

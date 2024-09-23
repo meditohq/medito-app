@@ -155,7 +155,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsForward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position + const Duration(seconds: 10));
+      iosAudioHandler.seek(
+        iosAudioHandler.position + const Duration(seconds: 10),
+      );
     }
   }
 
@@ -163,7 +165,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsBackward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position - const Duration(seconds: 10));
+      iosAudioHandler.seek(
+        iosAudioHandler.position - const Duration(seconds: 10),
+      );
     }
   }
 

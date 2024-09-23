@@ -85,7 +85,8 @@ class StringConstants {
   static const areYouSure = 'Are you sure?';
 
   static const thirdPartyAnalytics = '3rd Party Analytics';
-  static const analyticsInfo = 'As a nonprofit, Medito uses anonymous analytics data to:\n\n'
+  static const analyticsInfo =
+      'As a nonprofit, Medito uses anonymous analytics data to:\n\n'
       '• Understand which meditations are most helpful\n'
       '• Identify areas of the app that need improvement\n'
       '• Measure the impact of new features\n'

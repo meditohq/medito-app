@@ -183,7 +183,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(StringConstants.confirmDeletionTitle),
-          content: Text('${StringConstants.confirmDeletionMessage} ${item.title}?'),
+          content: Text(
+            '${StringConstants.confirmDeletionMessage} ${item.title}?',
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {

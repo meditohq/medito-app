@@ -41,10 +41,9 @@ class TrackRepositoryImpl extends TrackRepository {
   @override
   Future<List<TrackModel>> fetchTrackFromPreference() async {
     var downloadedTrackList = <TrackModel>[];
-    var downloadedTrackFromPref =
-        ref.read(sharedPreferencesProvider).getString(
-              SharedPreferenceConstants.downloads,
-            );
+    var downloadedTrackFromPref = ref
+        .read(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.downloads);
     if (downloadedTrackFromPref != null) {
       var tempList = [];
       tempList = json.decode(downloadedTrackFromPref);

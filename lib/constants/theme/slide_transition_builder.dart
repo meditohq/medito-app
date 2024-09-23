@@ -12,8 +12,10 @@ class SlideTransitionBuilder extends PageTransitionsBuilder {
     animation = CurvedAnimation(curve: Curves.easeInOutExpo, parent: animation);
 
     return SlideTransition(
-      position: Tween(begin: const Offset(1.0, 0.0), end: const Offset(0.0, 0.0))
-          .animate(animation),
+      position: Tween(
+        begin: const Offset(1.0, 0.0),
+        end: const Offset(0.0, 0.0),
+      ).animate(animation),
       child: child,
     );
   }

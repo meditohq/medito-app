@@ -26,6 +26,8 @@ class DonationPageRepositoryImpl extends DonationPageRepository {
 }
 
 @riverpod
-DonationPageRepositoryImpl donationPageRepository(DonationPageRepositoryRef ref) {
+DonationPageRepositoryImpl donationPageRepository(
+  DonationPageRepositoryRef ref,
+) {
   return DonationPageRepositoryImpl(ref: ref, client: DioApiService());
 }

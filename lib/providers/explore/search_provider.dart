@@ -7,7 +7,9 @@ final searchRepositoryProvider = Provider<SearchRepository>((ref) {
   return SearchRepository(DioApiService());
 });
 
-final searchPacksProvider = FutureProvider.family<List<PackItemsModel>, String>((ref, query) async {
-  final repository = ref.watch(searchRepositoryProvider);
-  return repository.searchPacks(query);
-});
+final searchPacksProvider = FutureProvider.family<List<PackItemsModel>, String>(
+  (ref, query) async {
+    final repository = ref.watch(searchRepositoryProvider);
+    return repository.searchPacks(query);
+  },
+);

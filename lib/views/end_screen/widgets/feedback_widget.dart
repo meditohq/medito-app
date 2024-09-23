@@ -103,7 +103,10 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           color: ColorConstants.ebony,
           borderRadius: BorderRadius.circular(14),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: padding16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 30,
+          vertical: padding16,
+        ),
         margin: const EdgeInsets.only(bottom: 4),
         child: Text(
           StringConstants.thanksForSharing,

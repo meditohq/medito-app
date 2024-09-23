@@ -221,7 +221,9 @@ class SettingsScreen extends ConsumerWidget {
   void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${StringConstants.reminderNotificationScheduled} ${pickedTime.format(context)}'),
+        content: Text(
+          '${StringConstants.reminderNotificationScheduled} ${pickedTime.format(context)}',
+        ),
       ),
     );
   }

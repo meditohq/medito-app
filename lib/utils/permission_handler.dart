@@ -34,8 +34,8 @@ class PermissionHandler {
         return true;
       }
 
-      int dialogShownCount = await _getDialogShownCount(
-          _alarmPermissionDialogKey);
+      int dialogShownCount =
+          await _getDialogShownCount(_alarmPermissionDialogKey);
 
       if (dialogShownCount >= _maxDialogShowCount) {
         return false;
@@ -45,29 +45,28 @@ class PermissionHandler {
 
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) =>
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return AlertDialog(
-                  title: const Text(StringConstants.reminderPermissions),
-                  content: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: constraints.maxHeight * 0.7,
-                      maxWidth: constraints.maxWidth * 0.7,
-                    ),
-                    child: const SingleChildScrollView(
-                      child: Text(StringConstants.weNeedYourPermissionReminder),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text(StringConstants.requestPermission),
-                    ),
-                  ],
-                );
-              },
-            ),
+        builder: (context) => LayoutBuilder(
+          builder: (context, constraints) {
+            return AlertDialog(
+              title: const Text(StringConstants.reminderPermissions),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: constraints.maxHeight * 0.7,
+                  maxWidth: constraints.maxWidth * 0.7,
+                ),
+                child: const SingleChildScrollView(
+                  child: Text(StringConstants.weNeedYourPermissionReminder),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(StringConstants.requestPermission),
+                ),
+              ],
+            );
+          },
+        ),
       );
 
       if (result == true) {
@@ -96,8 +95,8 @@ class PermissionHandler {
         return false;
       }
 
-      int dialogShownCount = await _getDialogShownCount(
-          _mediaPlaybackPermissionDialogKey);
+      int dialogShownCount =
+          await _getDialogShownCount(_mediaPlaybackPermissionDialogKey);
 
       if (dialogShownCount >= _maxDialogShowCount) {
         return false;
@@ -107,29 +106,28 @@ class PermissionHandler {
 
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) =>
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return AlertDialog(
-                  title: const Text(StringConstants.mediaPlaybackPermissions),
-                  content: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: constraints.maxHeight * 0.7,
-                      maxWidth: constraints.maxWidth * 0.7,
-                    ),
-                    child: const SingleChildScrollView(
-                      child: Text(StringConstants.weNeedYourPermissionMedia),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text(StringConstants.requestPermission),
-                    ),
-                  ],
-                );
-              },
-            ),
+        builder: (context) => LayoutBuilder(
+          builder: (context, constraints) {
+            return AlertDialog(
+              title: const Text(StringConstants.mediaPlaybackPermissions),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: constraints.maxHeight * 0.7,
+                  maxWidth: constraints.maxWidth * 0.7,
+                ),
+                child: const SingleChildScrollView(
+                  child: Text(StringConstants.weNeedYourPermissionMedia),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(StringConstants.requestPermission),
+                ),
+              ],
+            );
+          },
+        ),
       );
 
       if (result == true) {
