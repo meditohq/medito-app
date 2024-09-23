@@ -10,4 +10,3 @@ export 'player/player_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
 export 'error_widget/medito_error_widget_provider.dart';
 export 'explore/explore_provider.dart';
-export 'explore/search_provider.dart';

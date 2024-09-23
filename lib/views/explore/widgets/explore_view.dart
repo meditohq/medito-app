@@ -8,6 +8,8 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'dart:async';
 
+import '../../../providers/explore/search_provider.dart';
+
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
 
@@ -122,19 +124,14 @@ class ExploreContentWidget extends ConsumerWidget {
 
   Widget _buildPacksList(
       BuildContext context, WidgetRef ref, List<PackItemsModel> packs) {
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        final isPortrait = orientation == Orientation.portrait;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWideScreen = MediaQuery.of(context).orientation == Orientation.landscape ||
+            MediaQuery.of(context).size.shortestSide >= 600;
 
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            if (isPortrait) {
-              return _buildListView(context, packs, ref);
-            } else {
-              return _buildGridView(context, packs, ref, constraints);
-            }
-          },
-        );
+        return isWideScreen
+            ? _buildGridView(context, packs, ref, constraints)
+            : _buildListView(context, packs, ref);
       },
     );
   }
@@ -172,29 +169,32 @@ class ExploreContentWidget extends ConsumerWidget {
   Widget _buildGridView(BuildContext context, List<PackItemsModel> packs,
       WidgetRef ref, BoxConstraints constraints) {
     var itemWidth = (constraints.maxWidth - padding16 * 3) / 2;
-    var maxItemHeight = 140.0;
 
     return Wrap(
-      spacing: padding16,
       runSpacing: padding16,
       children: packs.map((element) {
-        return SizedBox(
-          width: itemWidth,
-          height: maxItemHeight,
-          child: PackCardWidget(
-            title: element.title,
-            subTitle: element.subtitle,
-            coverUrlPath: element.coverUrl,
-            onTap: () {
-              onPackTapped();
-              handleNavigation(
-                element.type,
-                [element.id.toString(), element.path],
-                context,
-                ref: ref,
-              );
-            },
-          ),
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            width16,
+            SizedBox(
+              width: itemWidth,
+              child: PackCardWidget(
+                title: element.title,
+                subTitle: element.subtitle,
+                coverUrlPath: element.coverUrl,
+                onTap: () {
+                  onPackTapped();
+                  handleNavigation(
+                    element.type,
+                    [element.id.toString(), element.path],
+                    context,
+                    ref: ref,
+                  );
+                },
+              ),
+            ),
+          ],
         );
       }).toList(),
     );
