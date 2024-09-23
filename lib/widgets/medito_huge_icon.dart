@@ -37,19 +37,19 @@ class MeditoHugeIcon extends StatelessWidget {
       case 'filledSettings':
         return HugeIcons.solidRoundedSettings01;
       // ids from the package:
-      case 'bulkRoundedSun01':
+      case 'solidRoundedSun01':
         return HugeIcons.solidRoundedSun01;
-      case 'bulkRoundedDownloadSquare02':
+      case 'solidRoundedDownloadSquare02':
         return HugeIcons.solidRoundedDownloadSquare02;
-      case 'bulkRoundedTime01':
+      case 'solidRoundedTime01':
         return HugeIcons.solidRoundedTime01;
-      case 'duotoneRoundedSleeping':
+      case 'solidRoundedSleeping':
         return HugeIcons.solidRoundedSleeping;
-      case 'bulkRoundedMedal06':
+      case 'solidRoundedMedal06':
         return HugeIcons.solidRoundedMedal06;
-      case 'bulkRoundedHealtcare':
+      case 'solidRoundedHealtcare':
         return HugeIcons.solidRoundedHealtcare;
-      case 'duotoneRoundedStar':
+      case 'solidRoundedStar':
         return HugeIcons.solidRoundedStar;
       default:
         return HugeIcons.solidRoundedQuestion;
