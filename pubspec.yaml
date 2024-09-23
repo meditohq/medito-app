@@ -16,7 +16,7 @@ dependencies:
   audio_session: ^0.1.18
   audio_service: ^0.18.12
   auto_size_text: ^3.0.0
-  cached_network_image: ^3.3.1
+  cached_network_image: ^3.2.3
   connectivity_plus: ^6.0.5
   device_info_plus: ^9.1.2
   dio: ^5.4.0
@@ -55,6 +55,7 @@ dependencies:
   hugeicons:
     hosted: https://onepub.dev/api/kdpxxpsdav/
     version: ^0.0.4
+  soft_edge_blur: ^0.1.2
 
 dev_dependencies:
   flutter_test:

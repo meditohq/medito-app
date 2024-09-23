@@ -23,7 +23,7 @@ class StringConstants {
   static const String x09 = 'x0.9';
   static const String x1 = 'x1';
 
-  static const String search = 'Search';
+  static const String searchMeditations = 'Search meditations';
   static const String share = 'Share';
   static const String id = 'id';
   static const String env = 'env';

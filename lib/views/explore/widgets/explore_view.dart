@@ -7,6 +7,7 @@ import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/providers/explore/track_search_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
+import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
@@ -108,12 +109,55 @@ class ExploreContentWidget extends ConsumerWidget {
     var exploreItems = ref.watch(exploreListProvider(searchQuery));
 
     return exploreItems.when(
-      data: (data) => _buildExploreList(context, ref, data),
+      data: (data) => _buildContent(context, ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
         onTap: () => ref.refresh(exploreListProvider(searchQuery)),
       ),
       loading: () => const ExploreResultShimmerWidget(),
+    );
+  }
+
+  Widget _buildContent(
+      BuildContext context, WidgetRef ref, List<ExploreListItem> items) {
+    var packItems = items.whereType<PackItem>().toList();
+    var trackItems = items.whereType<TrackItem>().toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (packItems.isNotEmpty) _buildPackList(context, ref, packItems),
+        if (trackItems.isNotEmpty) _buildExploreList(context, ref, trackItems),
+      ],
+    );
+  }
+
+  Widget _buildPackList(
+      BuildContext context, WidgetRef ref, List<PackItem> packItems) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(top: padding16),
+      itemCount: packItems.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        var item = packItems[index];
+
+        return PackCardWidget(
+          title: item.title,
+          subTitle: item.subtitle,
+          coverUrlPath: item.coverUrl,
+          onTap: () {
+            onPackTapped();
+            handleNavigation(
+              TypeConstants.pack,
+              [item.id, item.path],
+              context,
+              ref: ref,
+            );
+          },
+        );
+      },
     );
   }
 
@@ -134,69 +178,59 @@ class ExploreContentWidget extends ConsumerWidget {
 
   Widget _buildListView(
       BuildContext context, List<ExploreListItem> items, WidgetRef ref) {
-    return Column(
-      children: items.map((item) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(
-            padding16,
-            0,
-            padding16,
-            padding16,
-          ),
-          child: PackCardWidget(
-            title: item.title,
-            subTitle: item.subtitle,
-            coverUrlPath: item.coverUrl,
-            onTap: () {
-              onPackTapped();
-              handleNavigation(
-                item.map(
-                  track: (_) => 'track',
-                  pack: (_) => 'pack',
-                ),
-                [item.id, item.path],
-                context,
-                ref: ref,
-              );
-            },
-          ),
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(padding16),
+      itemCount: items.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        var item = items[index];
+        return TrackCardWidget(
+          title: item.title,
+          subTitle: item.subtitle,
+          coverUrlPath: item.coverUrl,
+          onTap: () {
+            onPackTapped();
+            handleNavigation(
+              TypeConstants.track,
+              [item.id, item.path],
+              context,
+              ref: ref,
+            );
+          },
         );
-      }).toList(),
+      },
     );
   }
 
   Widget _buildGridView(BuildContext context, List<ExploreListItem> items,
       WidgetRef ref, BoxConstraints constraints) {
-    var itemWidth = (constraints.maxWidth - padding16 * 3) / 2;
+    var itemWidth = (constraints.maxWidth - padding16) / 2;
 
     return Wrap(
+      spacing: 0,
       runSpacing: padding16,
       children: items.map((item) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            width16,
-            SizedBox(
-              width: itemWidth,
-              child: PackCardWidget(
-                title: item.title,
-                subTitle: item.subtitle,
-                coverUrlPath: item.coverUrl,
-                onTap: () {
-                  onPackTapped();
-                  handleNavigation(
-                    item.map(
-                      track: (_) => 'track',
-                      pack: (_) => 'pack',
-                    ),
-                    [item.id, item.path],
-                    context,
-                    ref: ref,
-                  );
-                },
-              ),
+        return SizedBox(
+          width: itemWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(left: padding16),
+            child: TrackCardWidget(
+              title: item.title,
+              subTitle: item.subtitle,
+              coverUrlPath: item.coverUrl,
+              onTap: () {
+                onPackTapped();
+                handleNavigation(
+                  TypeConstants.track,
+                  [item.id, item.path],
+                  context,
+                  ref: ref,
+                );
+              },
             ),
-          ],
+          ),
         );
       }).toList(),
     );
@@ -223,7 +257,7 @@ class SearchBox extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       decoration: InputDecoration(
-        hintText: StringConstants.search,
+        hintText: StringConstants.searchMeditations,
         prefixIcon: const Icon(Icons.search),
         suffixIcon: IconButton(
           icon: const Icon(Icons.clear),
