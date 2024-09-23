@@ -78,9 +78,8 @@ class SoundListTileWidget extends ConsumerWidget {
       padding: const EdgeInsets.all(4),
       child: CircleAvatar(
         radius: 6,
-        backgroundColor: isSelected
-            ? ColorConstants.white
-            : ColorConstants.transparent,
+        backgroundColor:
+            isSelected ? ColorConstants.white : ColorConstants.transparent,
       ),
     );
   }

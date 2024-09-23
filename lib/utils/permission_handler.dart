@@ -8,8 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings/string_constants.dart';
 
 class PermissionHandler {
-  static const String _alarmPermissionDialogKey = 'alarm_permission_dialog_shown_count';
-  static const String _mediaPlaybackPermissionDialogKey = 'media_playback_permission_dialog_shown_count';
+  static const String _alarmPermissionDialogKey =
+      'alarm_permission_dialog_shown_count';
+  static const String _mediaPlaybackPermissionDialogKey =
+      'media_playback_permission_dialog_shown_count';
   static const int _maxDialogShowCount = 2;
 
   static Future<SharedPreferences> _initializeSharedPreferences() async {
