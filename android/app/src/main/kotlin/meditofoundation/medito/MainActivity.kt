@@ -1,4 +1,4 @@
-package com.meditofoundation.medito
+package meditofoundation.medito
 
 import MeditoAndroidAudioServiceManager
 import MeditoAudioServiceCallbackApi
@@ -12,7 +12,6 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugins.GeneratedPluginRegistrant
-import meditofoundation.medito.AudioPlayerService
 
 @UnstableApi
 class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager {
