@@ -373,7 +373,9 @@ class _TrackViewState extends ConsumerState<TrackView> {
     int targetDuration,
   ) {
     return files.reduce((a, b) {
-      return (a.duration - targetDuration).abs() < (b.duration - targetDuration).abs() ? a : b;
+      final aDiff = (a.duration - targetDuration).abs();
+      final bDiff = (b.duration - targetDuration).abs();
+      return aDiff < bDiff ? a : b;
     });
   }
 
