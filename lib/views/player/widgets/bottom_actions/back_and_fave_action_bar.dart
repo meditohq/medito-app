@@ -21,9 +21,8 @@ class TrackViewBottomBar extends ConsumerWidget {
 
     const dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
     var isDailyMeditation = trackId == dailyMeditationId;
-    var colour = favoriteStatus
-        ? ColorConstants.lightPurple
-        : ColorConstants.walterWhite;
+    var colour =
+        favoriteStatus ? ColorConstants.lightPurple : ColorConstants.white;
 
     return BottomActionBar(
       leftItem: BottomActionBarItem(

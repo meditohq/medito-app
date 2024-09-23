@@ -38,14 +38,14 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomRight: Radius.circular(bottomRight),
     );
     var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
-      fontFamily: DmMono,
-      color: ColorConstants.walterWhite,
-      fontWeight: FontWeight.w400,
-      fontSize: 16,
-    );
+          fontFamily: DmMono,
+          color: ColorConstants.white,
+          fontWeight: FontWeight.w400,
+          fontSize: 16,
+        );
 
     return Container(
-      height: isLandscape ? 56 : 48,  // Set height to 48 in portrait mode
+      height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
       decoration: BoxDecoration(
         borderRadius: radius,
         color: ColorConstants.onyx,
@@ -54,9 +54,13 @@ class DropdownWidget<T> extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, BorderRadius radius, TextStyle? textStyle) {
+  Widget _buildContent(
+    BuildContext context,
+    BorderRadius radius,
+    TextStyle? textStyle,
+  ) {
     return Material(
-      color: Colors.transparent,
+      color: ColorConstants.transparent,
       child: InkWell(
         onTap: _isClickable ? () => _showDropdown(context) : null,
         borderRadius: radius,
@@ -67,9 +71,9 @@ class DropdownWidget<T> extends StatelessWidget {
               if (iconData != null)
                 Icon(
                   iconData,
-                  color: ColorConstants.walterWhite,
+                  color: ColorConstants.white,
                 ),
-              if (iconData != null) SizedBox(width: 12),
+              if (iconData != null) const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   _getDisplayValue(),
@@ -77,9 +81,9 @@ class DropdownWidget<T> extends StatelessWidget {
                 ),
               ),
               if (_isClickable)
-                Icon(
+                const Icon(
                   Icons.keyboard_arrow_down,
-                  color: ColorConstants.walterWhite,
+                  color: ColorConstants.white,
                 ),
             ],
           ),
@@ -92,7 +96,10 @@ class DropdownWidget<T> extends StatelessWidget {
     if (!_isClickable) {
       return disabledLabelText;
     }
-    final selectedItem = items?.firstWhere((item) => item.value == value, orElse: () => items!.first);
+    final selectedItem = items?.firstWhere(
+      (item) => item.value == value,
+      orElse: () => items!.first,
+    );
     return (selectedItem?.child as Text).data ?? '';
   }
 
@@ -110,15 +117,19 @@ class DropdownWidget<T> extends StatelessWidget {
           offset.dx + size.width,
           offset.dy + size.height,
         ),
-        items: items!.map((item) => PopupMenuItem<T>(
-          value: item.value,
-          child: Container(
-            width: size.width - 24,  // Subtract horizontal padding
-            height: isLandscape ? 56 : 48,
-            alignment: AlignmentDirectional.centerStart,
-            child: item.child,
-          ),
-        )).toList(),
+        items: items!
+            .map(
+              (item) => PopupMenuItem<T>(
+                value: item.value,
+                child: Container(
+                  width: size.width - 24, // Subtract horizontal padding
+                  height: isLandscape ? 56 : 48,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: item.child,
+                ),
+              ),
+            )
+            .toList(),
         elevation: 8,
         color: ColorConstants.onyx,
         shape: RoundedRectangleBorder(

@@ -51,7 +51,6 @@ class _ConnectivityErrorComponentState
     var id = currentlyPlayingTrack?.id;
 
     handleNavigation(TypeConstants.pack, [id], context, ref: ref);
-    
   }
 
   @override

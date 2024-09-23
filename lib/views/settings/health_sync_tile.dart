@@ -6,16 +6,15 @@ import '../../widgets/snackbar_widget.dart';
 import '../home/widgets/bottom_sheet/row_item_widget.dart';
 
 class HealthSyncTile extends StatelessWidget {
+  const HealthSyncTile({super.key});
+
   void _handleHealthSync(BuildContext context) async {
     await Health().requestAuthorization(
       [HealthDataType.MINDFULNESS],
       permissions: [HealthDataAccess.READ_WRITE],
     );
 
-    showSnackBar(
-      context,
-     StringConstants.permissionExplanation,
-    );
+    showSnackBar(context, StringConstants.permissionExplanation);
   }
 
   @override

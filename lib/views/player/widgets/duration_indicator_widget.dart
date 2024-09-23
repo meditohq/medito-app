@@ -36,9 +36,11 @@ class _DurationIndicatorWidgetState
     );
   }
 
-  Padding _durationBar(BuildContext context,
-      double totalDuration,
-      double currentDuration,) {
+  Padding _durationBar(
+    BuildContext context,
+    double totalDuration,
+    double currentDuration,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
       child: Column(
@@ -47,17 +49,17 @@ class _DurationIndicatorWidgetState
             data: SliderThemeData(
               trackHeight: 6,
               trackShape: CustomTrackShape(addTopPadding: false),
-              thumbShape: RoundSliderThumbShape(
+              thumbShape: const RoundSliderThumbShape(
                 enabledThumbRadius: 6.0,
               ),
             ),
             child: Slider(
               min: 0.0,
               max: totalDuration > 0.0 ? totalDuration : 1.0,
-              activeColor: ColorConstants.walterWhite,
+              activeColor: ColorConstants.white,
               inactiveColor: ColorConstants.onyx,
               value:
-              _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration,
+                  _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration,
               onChanged: (val) {
                 if (!_isSeekbarBeingDragged) {
                   _isSeekbarBeingDragged = true;
@@ -70,7 +72,7 @@ class _DurationIndicatorWidgetState
             ),
           ),
           Transform.translate(
-            offset: Offset(0, -14),
+            offset: const Offset(0, -14),
             child: _durationLabels(
               context,
             ),
@@ -85,7 +87,7 @@ class _DurationIndicatorWidgetState
     widget.onSeekEnd((val * 100).toInt());
   }
 
-  Row _durationLabels(BuildContext context,) {
+  Row _durationLabels(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -103,19 +105,14 @@ class _DurationIndicatorWidgetState
     );
   }
 
-  Text _durationLabel(BuildContext context,
-      String label,) {
+  Text _durationLabel(BuildContext context, String label) {
     return Text(
       label,
-      style: Theme
-          .of(context)
-          .textTheme
-          .titleSmall
-          ?.copyWith(
-        color: ColorConstants.graphite,
-        fontFamily: DmMono,
-        fontSize: 12,
-      ),
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: ColorConstants.graphite,
+            fontFamily: DmMono,
+            fontSize: 12,
+          ),
     );
   }
 }
@@ -136,7 +133,7 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     var boxHeight = parentBox.size.height;
     final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
-    var trackTop;
+    double trackTop;
     trackTop = addTopPadding
         ? offset.dy + (boxHeight - trackHeight) / 2 + 6
         : boxHeight / 2 - 2;
@@ -146,18 +143,19 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
   }
 
   @override
-  void paint(PaintingContext context,
-      Offset offset, {
-        required RenderBox parentBox,
-        required SliderThemeData sliderTheme,
-        required Animation<double> enableAnimation,
-        required TextDirection textDirection,
-        required Offset thumbCenter,
-        Offset? secondaryOffset,
-        bool isDiscrete = false,
-        bool isEnabled = false,
-        double additionalActiveTrackHeight = 0,
-      }) {
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    double additionalActiveTrackHeight = 0,
+  }) {
     super.paint(
       context,
       offset,

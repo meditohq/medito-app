@@ -29,7 +29,7 @@ class MeditoErrorWidget extends ConsumerWidget {
     ));
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: SourceSerif,
         );
 
@@ -88,7 +88,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => DownloadsView(),
+                                builder: (context) => const DownloadsView(),
                               ),
                             ),
                     ),
@@ -101,7 +101,7 @@ class MeditoErrorWidget extends ConsumerWidget {
               btnText: StringConstants.retry,
               onPressed: onTap,
               isLoading: isLoading,
-              bgColor: ColorConstants.walterWhite,
+              bgColor: ColorConstants.white,
               textColor: ColorConstants.onyx,
             ),
           ],

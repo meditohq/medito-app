@@ -18,12 +18,12 @@ class CarouselWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var titleStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontFamily: SourceSerif,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontSize: 24,
         );
     var subtitleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
           fontFamily: DmSans,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         );
     var size = MediaQuery.of(context).size;
 
@@ -36,7 +36,7 @@ class CarouselWidget extends ConsumerWidget {
           ColorConstants.black.withOpacity(0.0),
           ColorConstants.black.withOpacity(0.8),
         ],
-        stops: [0.3, 0.9],
+        stops: const [0.3, 0.9],
       ),
     );
 
@@ -58,7 +58,7 @@ class CarouselWidget extends ConsumerWidget {
                 width: size.width,
                 height: 200,
                 decoration: boxDecoration,
-                padding: EdgeInsets.all(padding16),
+                padding: const EdgeInsets.all(padding16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,

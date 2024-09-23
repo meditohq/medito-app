@@ -40,9 +40,9 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   }
 
   Column _debugItemsList(
-      BuildContext context,
-      String info,
-      ) {
+    BuildContext context,
+    String info,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -64,17 +64,17 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SelectableText(
-        '$info',
+        info,
         style: labelMedium,
       ),
     );
   }
 
   void _handleCopy(BuildContext context, String deviceInfo) {
-    var _info =
+    var info =
         '${StringConstants.debugInfo}\n$deviceInfo\n${StringConstants.writeBelowThisLine}';
 
-    Clipboard.setData(ClipboardData(text: _info)).then((_) {
+    Clipboard.setData(ClipboardData(text: info)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(StringConstants.debugInfoCopied),

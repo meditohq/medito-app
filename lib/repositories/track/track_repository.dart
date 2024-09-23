@@ -40,20 +40,19 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<List<TrackModel>> fetchTrackFromPreference() async {
-    var _downloadedTrackList = <TrackModel>[];
-    var _downloadedTrackFromPref =
-        ref.read(sharedPreferencesProvider).getString(
-              SharedPreferenceConstants.downloads,
-            );
-    if (_downloadedTrackFromPref != null) {
+    var downloadedTrackList = <TrackModel>[];
+    var downloadedTrackFromPref = ref
+        .read(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.downloads);
+    if (downloadedTrackFromPref != null) {
       var tempList = [];
-      tempList = json.decode(_downloadedTrackFromPref);
-      tempList.forEach((element) {
-        _downloadedTrackList.add(TrackModel.fromJson(element));
-      });
+      tempList = json.decode(downloadedTrackFromPref);
+      for (var element in tempList) {
+        downloadedTrackList.add(TrackModel.fromJson(element));
+      }
     }
 
-    return _downloadedTrackList;
+    return downloadedTrackList;
   }
 
   @override
@@ -83,11 +82,11 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<TrackModel?> fetchCurrentlyPlayingTrackFromPreference() async {
-    var _track = ref.read(sharedPreferencesProvider).getString(
+    var track = ref.read(sharedPreferencesProvider).getString(
           SharedPreferenceConstants.currentPlayingTrack,
         );
-    if (_track != null) {
-      return TrackModel.fromJson(json.decode(_track));
+    if (track != null) {
+      return TrackModel.fromJson(json.decode(track));
     }
 
     return null;

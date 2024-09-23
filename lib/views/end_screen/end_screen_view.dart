@@ -28,7 +28,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         showCloseIcon: true,
         onBackPressed: () => Navigator.pop(context),
       ),
-      appBar: MeditoAppBarSmall(
+      appBar: const MeditoAppBarSmall(
         isTransparent: true,
         hasCloseButton: true,
       ),
@@ -55,8 +55,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
               audioFileId: files.id,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 20),
             child: DonationWidget(),
           ),
         ],

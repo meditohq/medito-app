@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../constants/colors/color_constants.dart';
+
 class BottomActionBarItem {
   final Widget child;
   final VoidCallback onTap;
@@ -36,7 +38,9 @@ class BottomActionBar extends StatelessWidget {
       child: Container(
         height: height,
         decoration: BoxDecoration(
-          color: showBackground ? Colors.black.withOpacity(0.2) : Colors.transparent,
+          color: showBackground
+              ? ColorConstants.black.withOpacity(0.2)
+              : ColorConstants.transparent,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),

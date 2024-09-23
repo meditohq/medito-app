@@ -20,7 +20,7 @@ class Pack extends _$Pack {
   AsyncValue<PackModel> build({required String packId}) {
     fetchPacks(packId: packId);
 
-    return AsyncLoading();
+    return const AsyncLoading();
   }
 
   Future<void> fetchPacks({required String packId}) async {

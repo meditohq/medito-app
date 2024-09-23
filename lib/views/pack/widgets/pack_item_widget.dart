@@ -34,7 +34,7 @@ class PackItemWidget extends StatelessWidget {
                         Text(
                           item.title,
                           style: bodyLarge?.copyWith(
-                            color: ColorConstants.walterWhite,
+                            color: ColorConstants.white,
                             fontFamily: DmSans,
                             fontSize: 16,
                           ),
@@ -70,12 +70,12 @@ class PackItemWidget extends StatelessWidget {
     if (type == TypeConstants.link) {
       return SvgPicture.asset(AssetConstants.icLink);
     } else if (type == TypeConstants.track && isCompletedTrack == true) {
-      return Icon(
+      return const Icon(
         color: ColorConstants.graphite,
         Icons.check,
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }

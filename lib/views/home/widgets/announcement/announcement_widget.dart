@@ -31,7 +31,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       decoration: BoxDecoration(
         color: bgColor,
       ),
-      padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 24),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 24),
       child: Column(
         children: [
           Row(
@@ -125,7 +125,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 
   void _handleCtaTitlePress(

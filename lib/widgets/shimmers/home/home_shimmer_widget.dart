@@ -33,9 +33,9 @@ class HomeShimmerWidget extends StatelessWidget {
       child: Row(
         children: List.generate(
           5,
-          (index) => Flexible(
+          (index) => const Flexible(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: EdgeInsets.symmetric(horizontal: 5),
               child: BoxShimmerWidget(
                 height: 40,
                 borderRadius: 12,
@@ -48,8 +48,8 @@ class HomeShimmerWidget extends StatelessWidget {
   }
 
   Padding _searchbar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: BoxShimmerWidget(
         height: 52,
         borderRadius: 12,
@@ -58,8 +58,8 @@ class HomeShimmerWidget extends StatelessWidget {
   }
 
   Padding _header() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -84,8 +84,8 @@ class HomeShimmerWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child: BoxShimmerWidget(
               height: 18,
               width: 150,
@@ -115,19 +115,19 @@ class HomeShimmerWidget extends StatelessWidget {
         height: 154,
         width: 154,
         color: ColorConstants.greyIsTheNewGrey,
-        child: Column(
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               child: BoxShimmerWidget(
                 height: 10,
                 width: 300,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               child: BoxShimmerWidget(
                 height: 10,
                 width: 150,

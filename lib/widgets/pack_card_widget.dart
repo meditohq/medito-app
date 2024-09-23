@@ -25,7 +25,7 @@ class PackCardWidget extends StatelessWidget {
         color: ColorConstants.onyx,
         borderRadius: BorderRadius.circular(14),
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: InkWell(
         onTap: onTap,
         child: Row(
@@ -57,7 +57,7 @@ class PackCardWidget extends StatelessWidget {
 
   Text _title(TextTheme textTheme, {required String title}) {
     return Text(
-      '$title',
+      title,
       style: textTheme.displayLarge?.copyWith(
         fontFamily: SourceSerif,
         height: 0,
@@ -68,7 +68,7 @@ class PackCardWidget extends StatelessWidget {
   Widget _description(TextTheme textTheme, {String? subtitle}) {
     if (subtitle != null) {
       return Text(
-        '$subtitle',
+        subtitle,
         overflow: TextOverflow.ellipsis,
         maxLines: 2,
         style: textTheme.titleMedium?.copyWith(
@@ -80,7 +80,7 @@ class PackCardWidget extends StatelessWidget {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 
   Widget _getCoverUrl() {
@@ -98,6 +98,6 @@ class PackCardWidget extends StatelessWidget {
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }

@@ -20,12 +20,12 @@ class StatsBottomSheetWidget extends ConsumerWidget {
       child: Container(
         decoration: bottomSheetBoxDecoration,
         child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               height16,
-              HandleBarWidget(),
+              const HandleBarWidget(),
               height16,
               stats.when(
                 skipLoadingOnRefresh: false,
@@ -36,7 +36,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                     onTap: () => ref.refresh(fetchStatsProvider),
                   ),
                 ),
-                loading: () => SizedBox(
+                loading: () => const SizedBox(
                   height: 300,
                   child: Center(
                     child: CircularProgressIndicator(),

@@ -17,7 +17,7 @@ class QuoteWidget extends ConsumerWidget {
           fontWeight: FontWeight.w500,
           fontSize: fontSize16,
           height: 1.4,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         );
 
     var quote = data?.quote;

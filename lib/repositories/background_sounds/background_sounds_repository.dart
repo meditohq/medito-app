@@ -65,12 +65,12 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
           ) ??
           [];
       if (soundList.isNotEmpty) {
-        var _sounds = <BackgroundSoundsModel>[];
+        var sounds = <BackgroundSoundsModel>[];
         for (var element in soundList) {
-          _sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
+          sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
         }
 
-        return _sounds;
+        return sounds;
       }
     } catch (err) {
       unawaited(Sentry.captureException(
@@ -95,14 +95,14 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
               SharedPreferenceConstants.listBgSound,
             ) ??
             [];
-        var _sounds = <BackgroundSoundsModel>[];
+        var sounds = <BackgroundSoundsModel>[];
         for (var element in soundList) {
-          _sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
+          sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
         }
-        var index = _sounds.indexWhere((element) => element.id == sound.id);
+        var index = sounds.indexWhere((element) => element.id == sound.id);
         if (index == -1) {
-          _sounds.add(sound);
-          var encodeSounds = _sounds.map((e) => json.encode(e)).toList();
+          sounds.add(sound);
+          var encodeSounds = sounds.map((e) => json.encode(e)).toList();
           await pref.setStringList(
             SharedPreferenceConstants.listBgSound,
             encodeSounds,

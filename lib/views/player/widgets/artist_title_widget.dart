@@ -46,7 +46,7 @@ class ArtistTitleWidget extends ConsumerWidget {
         textAlign: TextAlign.center,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
               fontFamily: SourceSerif,
-              color: ColorConstants.walterWhite,
+              color: ColorConstants.white,
               fontSize: trackTitleFontSize,
               letterSpacing: 0.2,
             ),

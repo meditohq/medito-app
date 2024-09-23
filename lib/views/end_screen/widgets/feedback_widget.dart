@@ -64,7 +64,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
         borderRadius: BorderRadius.circular(24),
         color: ColorConstants.onyx,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         children: [
           Text(
@@ -78,7 +78,7 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
             style: bodyLarge?.copyWith(
               fontFamily: DmSans,
               fontSize: 16,
-              color: ColorConstants.walterWhite,
+              color: ColorConstants.white,
             ),
             textAlign: TextAlign.center,
           ),
@@ -93,8 +93,8 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
     var bodyLarge = Theme.of(context).textTheme.bodyLarge;
 
     if (isLoading) {
-      return Padding(
-        padding: const EdgeInsets.all(8),
+      return const Padding(
+        padding: EdgeInsets.all(8),
         child: CircularProgressIndicator(),
       );
     } else if (isFeedbackAdded) {
@@ -103,8 +103,11 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
           color: ColorConstants.ebony,
           borderRadius: BorderRadius.circular(14),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 30, vertical: padding16),
-        margin: EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 30,
+          vertical: padding16,
+        ),
+        margin: const EdgeInsets.only(bottom: 4),
         child: Text(
           StringConstants.thanksForSharing,
           style: bodyLarge,
@@ -125,8 +128,8 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
                 borderRadius: BorderRadius.circular(12),
                 color: ColorConstants.ebony,
               ),
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: const Text(
                 '🙁',
                 style: TextStyle(fontSize: 40),
               ),
@@ -142,8 +145,8 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
                 borderRadius: BorderRadius.circular(12),
                 color: ColorConstants.ebony,
               ),
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: const Text(
                 '😐',
                 style: TextStyle(fontSize: 40),
               ),
@@ -159,8 +162,8 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
                 borderRadius: BorderRadius.circular(12),
                 color: ColorConstants.ebony,
               ),
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: const Text(
                 '😀',
                 style: TextStyle(fontSize: 40),
               ),

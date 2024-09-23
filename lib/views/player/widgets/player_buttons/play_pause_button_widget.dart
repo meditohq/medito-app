@@ -16,7 +16,6 @@ class PlayPauseButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return InkWell(
       onTap: onPlayPause,
       borderRadius: BorderRadius.circular(iconSize / 2),
@@ -24,18 +23,17 @@ class PlayPauseButtonWidget extends ConsumerWidget {
         firstChild: Icon(
           Icons.play_circle_fill,
           size: iconSize,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         ),
         secondChild: Icon(
           Icons.pause_circle_outlined,
           size: iconSize,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         ),
         crossFadeState:
-        isPlaying ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-        duration: Duration(milliseconds: 250),
+            isPlaying ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+        duration: const Duration(milliseconds: 250),
       ),
     );
   }
-
 }

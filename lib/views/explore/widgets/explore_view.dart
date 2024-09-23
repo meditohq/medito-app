@@ -75,7 +75,6 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
                       },
                     ),
                     const SizedBox(height: 18.0),
-
                   ],
                 ),
               ),
@@ -145,7 +144,12 @@ class ExploreContentWidget extends ConsumerWidget {
     return Column(
       children: packs.map((element) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(padding16, 0, padding16, padding16),
+          padding: const EdgeInsets.fromLTRB(
+            padding16,
+            0,
+            padding16,
+            padding16,
+          ),
           child: PackCardWidget(
             title: element.title,
             subTitle: element.subtitle,
@@ -224,9 +228,9 @@ class SearchBox extends StatelessWidget {
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        fillColor: ColorConstants.white.withOpacity(0.1),
       ),
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: ColorConstants.white),
       onChanged: onChanged,
     );
   }

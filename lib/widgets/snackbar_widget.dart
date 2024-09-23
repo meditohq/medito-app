@@ -33,7 +33,7 @@ void showSnackBar(
             },
             child: Text(
               actionLabel,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -41,7 +41,7 @@ void showSnackBar(
           ),
       ],
     ),
-    backgroundColor: ColorConstants.walterWhite,
+    backgroundColor: ColorConstants.white,
     behavior: SnackBarBehavior.floating,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
   );

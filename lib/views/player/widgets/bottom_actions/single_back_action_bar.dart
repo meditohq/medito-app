@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../constants/colors/color_constants.dart';
 import 'bottom_action_bar.dart';
 
 class SingleBackButtonActionBar extends StatelessWidget {
@@ -18,7 +19,7 @@ class SingleBackButtonActionBar extends StatelessWidget {
       leftItem: BottomActionBarItem(
         child: Icon(
           showCloseIcon ? Icons.close : Icons.arrow_back,
-          color: Colors.white,
+          color: ColorConstants.white,
         ),
         onTap: onBackPressed,
       ),

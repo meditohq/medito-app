@@ -82,7 +82,7 @@ class SettingsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildDailyNotificationTile(context, ref),
-          if (_isHealthSyncAvailable) HealthSyncTile(),
+          if (_isHealthSyncAvailable) const HealthSyncTile(),
           ...homeData.menu
               .map((element) => _buildMenuItemTile(context, ref, element)),
           _buildDebugTile(context, ref),
@@ -127,7 +127,7 @@ class SettingsScreen extends ConsumerWidget {
         icon: IconType.fromIconData(Icons.notifications),
         title: StringConstants.dailyReminderTitle,
         subTitle: reminderTime != null
-            ? (StringConstants.setFor + ' ' + reminderTime.format(context))
+            ? ('${StringConstants.setFor} ${reminderTime.format(context)}')
             : null,
         hasUnderline: true,
         isSwitch: true,
@@ -221,9 +221,9 @@ class SettingsScreen extends ConsumerWidget {
   void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(StringConstants.reminderNotificationScheduled +
-            ' ' +
-            pickedTime.format(context)),
+        content: Text(
+          '${StringConstants.reminderNotificationScheduled} ${pickedTime.format(context)}',
+        ),
       ),
     );
   }

@@ -2,14 +2,14 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 
-  class IconType {
-    final IconData? iconData;
-    final String? iconString;
+class IconType {
+  final IconData? iconData;
+  final String? iconString;
 
-    IconType.fromIconData(this.iconData) : iconString = null;
+  IconType.fromIconData(this.iconData) : iconString = null;
 
-    IconType.fromString(this.iconString) : iconData = null;
-  }
+  IconType.fromString(this.iconString) : iconData = null;
+}
 
 class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
@@ -51,10 +51,10 @@ class RowItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var border = Border(
       bottom: hasUnderline
-          ? BorderSide(
-        width: 0.7,
-        color: ColorConstants.ebony,
-      )
+          ? const BorderSide(
+              width: 0.7,
+              color: ColorConstants.ebony,
+            )
           : BorderSide.none,
     );
 
@@ -68,7 +68,7 @@ class RowItemWidget extends StatelessWidget {
           decoration: BoxDecoration(
             border: border,
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: 16,
           ),
           child: Row(
@@ -81,9 +81,9 @@ class RowItemWidget extends StatelessWidget {
                   SelectableText.rich(
                     enableInteractiveSelection: enableInteractiveSelection,
                     onTap: onTap,
-                    scrollPhysics: NeverScrollableScrollPhysics(),
+                    scrollPhysics: const NeverScrollableScrollPhysics(),
                     TextSpan(
-                      style: TextStyle(fontSize: 18.0),
+                      style: const TextStyle(fontSize: 18.0),
                       children: [
                         TextSpan(
                           text: title,
@@ -137,12 +137,12 @@ class RowItemWidget extends StatelessWidget {
 
   TextSpan _subtitle(BuildContext context) {
     return TextSpan(
-      text: '${subTitle != null ? '\n$subTitle' : ''}',
+      text: subTitle != null ? '\n$subTitle' : '',
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        color: ColorConstants.graphite,
-        letterSpacing: 0,
-        height: 1.7,
-      ),
+            color: ColorConstants.graphite,
+            letterSpacing: 0,
+            height: 1.7,
+          ),
     );
   }
 }

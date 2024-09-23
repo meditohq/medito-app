@@ -19,11 +19,11 @@ class ShortcutsShimmerWidget extends StatelessWidget {
       crossAxisSpacing: 8.0,
       mainAxisSpacing: 8.0,
       padding: const EdgeInsets.symmetric(horizontal: padding20),
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       childAspectRatio: 3,
       children: List.generate(4, (index) {
-        return BoxShimmerWidget(
+        return const BoxShimmerWidget(
           height: 40,
           borderRadius: 12,
         );

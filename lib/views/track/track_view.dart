@@ -197,14 +197,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
   Widget _buildLoadingCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: Colors.black.withOpacity(0.6)),
+      child: Container(color: ColorConstants.black.withOpacity(0.6)),
     );
   }
 
   Widget _buildErrorCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: Colors.black.withOpacity(0.6)),
+      child: Container(color: ColorConstants.black.withOpacity(0.6)),
     );
   }
 
@@ -297,7 +297,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
         height: 56,
         width: isFullWidth ? double.infinity : null,
         decoration: BoxDecoration(
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           borderRadius: radius,
         ),
         child: const Center(
@@ -316,7 +316,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
             fontFamily: SourceSerif,
-            color: ColorConstants.walterWhite,
+            color: ColorConstants.white,
             letterSpacing: 0.2,
             fontSize: 24,
           ),
@@ -332,12 +332,12 @@ class _TrackViewState extends ConsumerState<TrackView> {
         selectable: true,
         textAlign: WrapAlignment.start,
         p: bodyLarge?.copyWith(
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
           fontSize: 16,
         ),
         a: bodyLarge?.copyWith(
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
           decoration: TextDecoration.underline,
           fontSize: 16,
@@ -359,7 +359,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
     setState(() {
       var previousDuration = fileModel?.duration;
       selectedAudio = value;
-      
+
       if (previousDuration != null && value != null) {
         fileModel = _findClosestDurationFile(value.files, previousDuration);
       } else {
@@ -368,7 +368,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
     });
   }
 
-  TrackFilesModel _findClosestDurationFile(List<TrackFilesModel> files, int targetDuration) {
+  TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int targetDuration,
+  ) {
     return files.reduce((a, b) {
       return (a.duration - targetDuration).abs() < (b.duration - targetDuration).abs() ? a : b;
     });

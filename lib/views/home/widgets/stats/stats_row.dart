@@ -111,11 +111,11 @@ class _StatsRowState extends State<StatsRow> with TickerProviderStateMixin {
                     widget.leftButtonIcon,
                     size: 20,
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     widget.leftButtonText,
-                    style: TextStyle(
-                      color: ColorConstants.walterWhite,
+                    style: const TextStyle(
+                      color: ColorConstants.white,
                       fontSize: 14,
                     ),
                   ),
@@ -123,7 +123,7 @@ class _StatsRowState extends State<StatsRow> with TickerProviderStateMixin {
               ),
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             flex: 1,
             child: TextButton(
@@ -153,11 +153,11 @@ class _StatsRowState extends State<StatsRow> with TickerProviderStateMixin {
                       );
                     },
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     widget.rightButtonText,
-                    style: TextStyle(
-                      color: ColorConstants.walterWhite,
+                    style: const TextStyle(
+                      color: ColorConstants.white,
                       fontSize: 14,
                     ),
                   ),

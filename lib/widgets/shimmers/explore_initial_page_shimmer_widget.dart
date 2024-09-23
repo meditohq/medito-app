@@ -25,15 +25,15 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
         color: ColorConstants.onyx,
         borderRadius: BorderRadius.circular(14),
       ),
-      padding: EdgeInsets.all(padding16),
-      margin: EdgeInsets.only(
+      padding: const EdgeInsets.all(padding16),
+      margin: const EdgeInsets.only(
         bottom: padding16,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -58,7 +58,7 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
           width12,
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: BoxShimmerWidget(
+            child: const BoxShimmerWidget(
               height: 80,
               width: 80,
             ),

@@ -7,7 +7,7 @@ class LoadingButtonWidget extends StatelessWidget {
     this.onPressed,
     required this.btnText,
     this.bgColor = ColorConstants.onyx,
-    this.textColor = ColorConstants.walterWhite,
+    this.textColor = ColorConstants.white,
     this.isLoading = false,
     this.elevation = 0,
     this.fontWeight = FontWeight.w700,
@@ -34,7 +34,10 @@ class LoadingButtonWidget extends StatelessWidget {
       disabledColor: bgColor.withOpacity(0.7),
       color: bgColor,
       splashColor: ColorConstants.transparent,
-      padding: EdgeInsets.symmetric(vertical: padding12, horizontal: padding16),
+      padding: const EdgeInsets.symmetric(
+        vertical: padding12,
+        horizontal: padding16,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
       ),
@@ -44,7 +47,7 @@ class LoadingButtonWidget extends StatelessWidget {
           Text(
             btnText,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: isLoading ? Colors.transparent : textColor,
+                  color: isLoading ? ColorConstants.transparent : textColor,
                   fontFamily: DmSans,
                   fontSize: fontSize,
                   fontWeight: fontWeight,

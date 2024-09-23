@@ -5,17 +5,17 @@ import '../constants.dart';
 
 TextTheme meditoTextTheme(BuildContext context) {
   return Theme.of(context).textTheme.copyWith(
-        displayLarge: TextStyle(
+        displayLarge: const TextStyle(
           // greetings text
           // btm bar text selected
           fontSize: 18,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        displayMedium: TextStyle(
+        displayMedium: const TextStyle(
           // btm bar text unselected
           fontSize: 18,
           letterSpacing: 0.5,
@@ -24,16 +24,16 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
-        displaySmall: TextStyle(
+        displaySmall: const TextStyle(
           // header of rows on homepage
           fontSize: 18,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.3,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        headlineMedium: TextStyle(
+        headlineMedium: const TextStyle(
           // packs title on home and packs screen
           // streak tile data (not title)
           // downloads tile session name
@@ -42,19 +42,19 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w600,
           height: 1.3,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        headlineSmall: TextStyle(
+        headlineSmall: const TextStyle(
           // stats widget
           fontSize: 20,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.2,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        titleMedium: TextStyle(
+        titleMedium: const TextStyle(
           // packs subtitle on home
           // downloads subtitle
           fontSize: 14,
@@ -64,16 +64,16 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
-        titleSmall: TextStyle(
+        titleSmall: const TextStyle(
           // shortcut title
           fontSize: 14,
           letterSpacing: 0.2,
           fontWeight: FontWeight.w500,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        bodySmall: TextStyle(
+        bodySmall: const TextStyle(
           // shortcut title
           fontSize: 12,
           letterSpacing: 0.8,
@@ -82,7 +82,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
-        bodyMedium: TextStyle(
+        bodyMedium: const TextStyle(
           // error widget
           fontSize: 16,
           letterSpacing: 0.5,
@@ -91,40 +91,40 @@ TextTheme meditoTextTheme(BuildContext context) {
           color: ColorConstants.graphite,
           fontFamily: DmSans,
         ),
-        bodyLarge: TextStyle(
+        bodyLarge: const TextStyle(
           // daily text and quote
           fontSize: 14,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        labelLarge: TextStyle(
+        labelLarge: const TextStyle(
           // shortcut title
           fontSize: 20,
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        labelMedium: TextStyle(
+        labelMedium: const TextStyle(
           // error widget
           fontSize: 16,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w500,
           height: 1.3,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
-        labelSmall: TextStyle(
+        labelSmall: const TextStyle(
           // daily text and quote
           fontSize: 14,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontFamily: DmSans,
         ),
       );

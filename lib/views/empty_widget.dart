@@ -17,14 +17,14 @@ class EmptyStateWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
           child: Text(
             message ?? '',
             textAlign: TextAlign.start,
             style: meditoTextTheme(context).titleMedium,
           ),
         ),
-        Divider(
+        const Divider(
           color: ColorConstants.softGrey,
         ),
         Expanded(child: Center(child: image)),

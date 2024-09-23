@@ -68,7 +68,6 @@ class FirebaseMessagingHandler {
         }
       },
     );
-
   }
 
   void _handleForegroundMessage(
@@ -133,7 +132,7 @@ class FirebaseMessagingHandler {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => BottomNavigationBarView(),
+          builder: (context) => const BottomNavigationBarView(),
         ),
       );
     }

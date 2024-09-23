@@ -43,16 +43,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
           file.duration,
         );
 
-    audios.forEach((audioModel) {
+    for (var audioModel in audios) {
       var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
       if (fileIndex != -1) {
         track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
         track.audio.first.files
             .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
-
-        return;
       }
-    });
+    }
 
     await _playTrack(
       ref,
@@ -84,7 +82,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       await _androidServiceApi.startService();
       // wait half a sec for the service to start
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       await _api.playAudio(
         AudioData(
@@ -157,7 +155,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsForward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position + Duration(seconds: 10));
+      iosAudioHandler.seek(
+        iosAudioHandler.position + const Duration(seconds: 10),
+      );
     }
   }
 
@@ -165,7 +165,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsBackward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position - Duration(seconds: 10));
+      iosAudioHandler.seek(
+        iosAudioHandler.position - const Duration(seconds: 10),
+      );
     }
   }
 

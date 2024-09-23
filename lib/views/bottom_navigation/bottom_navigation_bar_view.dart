@@ -64,7 +64,7 @@ class _BottomNavigationBarViewState
               icon: _currentPageIndex == 0 ? 'filledhome' : 'duohome',
               color: _currentPageIndex == 0
                   ? ColorConstants.lightPurple
-                  : ColorConstants.walterWhite,
+                  : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(0),
           ),
@@ -84,7 +84,7 @@ class _BottomNavigationBarViewState
                 icon: _currentPageIndex == 1 ? 'filledSearch' : 'duoSearch',
                 color: _currentPageIndex == 1
                     ? ColorConstants.lightPurple
-                    : ColorConstants.walterWhite,
+                    : ColorConstants.white,
               ),
             ),
             onTap: () => _onDestinationSelected(1),
@@ -94,7 +94,7 @@ class _BottomNavigationBarViewState
               icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
               color: _currentPageIndex == 2
                   ? ColorConstants.lightPurple
-                  : ColorConstants.walterWhite,
+                  : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(2),
           ),

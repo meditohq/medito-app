@@ -31,7 +31,7 @@ class PlayerActionBar extends StatelessWidget {
       leftItem: BottomActionBarItem(
         child: const Icon(
           Icons.close,
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
         ),
         onTap: onClosePressed,
       ),
@@ -44,7 +44,9 @@ class PlayerActionBar extends StatelessWidget {
       ),
       rightCenterItem: BottomActionBarItem(
         child: _buildBackgroundSoundWidget(),
-        onTap: trackModel.hasBackgroundSound ? () {} : _showBackgroundSoundDisabledMessage,
+        onTap: trackModel.hasBackgroundSound
+            ? () {}
+            : _showBackgroundSoundDisabledMessage,
       ),
       rightItem: BottomActionBarItem(
         child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged),
@@ -62,7 +64,7 @@ class PlayerActionBar extends StatelessWidget {
           )
         : const Icon(
             Icons.music_off,
-            color: ColorConstants.walterWhite,
+            color: ColorConstants.white,
           );
   }
 

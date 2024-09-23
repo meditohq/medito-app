@@ -4,7 +4,7 @@ class AnimatedScaleWidget extends StatefulWidget {
   final Widget child;
   final double scale;
 
-  AnimatedScaleWidget({required this.child, this.scale = 0.9});
+  const AnimatedScaleWidget({super.key, required this.child, this.scale = 0.9});
 
   @override
   _ScaleOnTapState createState() => _ScaleOnTapState();

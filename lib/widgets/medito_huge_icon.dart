@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
+import '../constants/colors/color_constants.dart';
+
 class MeditoHugeIcon extends StatelessWidget {
   const MeditoHugeIcon({
     super.key,
     required this.icon,
-    this.color = Colors.white,
+    this.color = ColorConstants.white,
     this.size = 24,
   });
 

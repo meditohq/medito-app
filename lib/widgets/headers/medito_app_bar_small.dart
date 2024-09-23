@@ -44,7 +44,8 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       actions: actions,
       elevation: 0,
-      backgroundColor: isTransparent ? Colors.transparent : ColorConstants.onyx,
+      backgroundColor:
+          isTransparent ? ColorConstants.transparent : ColorConstants.onyx,
       title: getTitleWidget(context),
     );
   }
@@ -56,5 +57,5 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(56.0);
+  Size get preferredSize => const Size.fromHeight(56.0);
 }

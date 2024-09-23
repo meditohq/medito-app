@@ -50,7 +50,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             ref.read(refreshHomeAPIsProvider.future);
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => BottomNavigationBarView(),
+                builder: (context) => const BottomNavigationBarView(),
               ),
             );
           }
@@ -145,7 +145,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             .toString();
     var guideName = item.audio.first.guideName;
     var duration = _getDuration(audioLength);
-    var subTitle = guideName != null ? '$guideName — $duration' : '$duration';
+    var subTitle = guideName != null ? '$guideName — $duration' : duration;
 
     return DownloadListItemWidget(
       PackImageListItemData(
@@ -183,7 +183,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(StringConstants.confirmDeletionTitle),
-          content: Text(StringConstants.confirmDeletionMessage + ' ${item.title}?'),
+          content: Text(
+            '${StringConstants.confirmDeletionMessage} ${item.title}?',
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -209,7 +211,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       createSnackBar(
         '"${item.title}" ${StringConstants.removed.toLowerCase()}',
         context,
-        color: ColorConstants.walterWhite,
+        color: ColorConstants.white,
       );
     } else {
       // If the user cancels, refresh the list to ensure all items are visible again.

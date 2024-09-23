@@ -21,7 +21,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
   @override
   Widget build(BuildContext context) {
     var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           fontSize: 16,
           fontWeight: FontWeight.w400,
         );
@@ -33,19 +33,19 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
-            Text(
+            const Text(
               StringConstants.hey,
               style: TextStyle(
                 fontFamily: SourceSerif,
                 fontSize: 28,
-                color: ColorConstants.walterWhite,
+                color: ColorConstants.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             MarkdownWidget(
@@ -59,7 +59,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
             SizedBox(
@@ -67,9 +67,9 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
               child: MaterialButton(
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onPressed: onPressed,
-                color: ColorConstants.walterWhite,
+                color: ColorConstants.white,
                 splashColor: ColorConstants.transparent,
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   vertical: padding14,
                   horizontal: padding16,
                 ),

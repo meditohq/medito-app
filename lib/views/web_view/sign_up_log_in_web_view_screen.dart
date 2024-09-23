@@ -108,12 +108,12 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstants.amsterdamSpring,
+      backgroundColor: ColorConstants.onyx,
       appBar: AppBar(
-        backgroundColor: ColorConstants.amsterdamSpring,
+        backgroundColor: ColorConstants.onyx,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ColorConstants.walterWhite),
+          icon: const Icon(Icons.arrow_back, color: ColorConstants.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
