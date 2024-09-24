@@ -9,6 +9,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
@@ -114,7 +115,11 @@ class ExploreContentWidget extends ConsumerWidget {
         message: err.toString(),
         onTap: () => ref.refresh(exploreListProvider(searchQuery)),
       ),
-      loading: () => const ExploreResultShimmerWidget(),
+      loading: () => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+        ),
+      ),
     );
   }
 
@@ -134,26 +139,38 @@ class ExploreContentWidget extends ConsumerWidget {
 
   Widget _buildPackList(
       BuildContext context, WidgetRef ref, List<PackItem> packItems) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(top: padding16),
-      itemCount: packItems.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        var item = packItems[index];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        var crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+        var itemWidth = (constraints.maxWidth - (crossAxisCount + 1) * padding16) / crossAxisCount;
 
-        return PackCardWidget(
-          title: item.title,
-          subTitle: item.subtitle,
-          coverUrlPath: item.coverUrl,
-          onTap: () {
-            onPackTapped();
-            handleNavigation(
-              TypeConstants.pack,
-              [item.id, item.path],
-              context,
-              ref: ref,
+        return MasonryGridView.count(
+          padding: const EdgeInsets.only(left: padding16, right: padding16, top: padding16),
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: padding16,
+          crossAxisSpacing: padding16,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: packItems.length,
+          itemBuilder: (context, index) {
+            var item = packItems[index];
+
+            return SizedBox(
+              width: itemWidth,
+              child: PackCardWidget(
+                title: item.title,
+                subTitle: item.subtitle,
+                coverUrlPath: item.coverUrl,
+                onTap: () {
+                  onPackTapped();
+                  handleNavigation(
+                    TypeConstants.pack,
+                    [item.id, item.path],
+                    context,
+                    ref: ref,
+                  );
+                },
+              ),
             );
           },
         );

@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:medito/constants/constants.dart';
-import 'package:medito/widgets/widgets.dart';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:flutter/material.dart';
 
 class PackCardWidget extends StatelessWidget {
   const PackCardWidget({
@@ -27,46 +26,41 @@ class PackCardWidget extends StatelessWidget {
       future: _generateColorScheme(context),
       builder: (context, snapshot) {
         var colorScheme = snapshot.data;
-        var backgroundColor = colorScheme?.primaryContainer ?? ColorConstants.onyx;
+        var backgroundColor =
+            colorScheme?.primaryContainer ?? ColorConstants.onyx;
         var titleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
-        var subtitleColor = colorScheme?.onPrimaryContainer ?? ColorConstants.graphite;
+        var subtitleColor =
+            colorScheme?.onPrimaryContainer ?? const Color.fromARGB(255, 170, 170, 170);
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: InkWell(
-              onTap: onTap,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: subTitle != null
-                            ? MainAxisAlignment.start
-                            : MainAxisAlignment.center,
-                        children: [
-                          _title(textTheme, title: title, color: titleColor),
-                          if (subTitle != null) height4,
-                          _description(
-                            textTheme,
-                            subtitle: subTitle,
-                            color: subtitleColor,
-                          ),
-                        ],
+        return Container(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (coverUrlPath != null && coverUrlPath!.isNotEmpty)
+                  _getCoverUrl(),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _title(textTheme, title: title, color: titleColor),
+                      if (subTitle != null) 
+                        const SizedBox(height: 4),
+                      _description(
+                        textTheme,
+                        subtitle: subTitle,
+                        color: subtitleColor,
                       ),
-                    ),
+                    ],
                   ),
-                  if (coverUrlPath != null && coverUrlPath!.isNotEmpty)
-                    _getCoverUrl(),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -78,7 +72,7 @@ class PackCardWidget extends StatelessWidget {
     if (coverUrlPath != null && coverUrlPath!.isNotEmpty) {
       try {
         var image = CachedNetworkImageProvider(coverUrlPath!);
-        
+
         return await ColorScheme.fromImageProvider(
           provider: image,
           brightness: Brightness.dark,
@@ -87,25 +81,32 @@ class PackCardWidget extends StatelessWidget {
           throw TimeoutException('ColorScheme generation timed out');
         });
       } catch (e) {
-        print('Error generating ColorScheme: $e');
         return null;
       }
     }
     return null;
   }
 
-  Text _title(TextTheme textTheme, {required String title, required Color color}) {
+  Text _title(
+    TextTheme textTheme, {
+    required String title,
+    required Color color,
+  }) {
     return Text(
       title,
       style: textTheme.displayLarge?.copyWith(
-        fontFamily: SourceSerif,
-        height: 0,
+        fontFamily: DmSans,
+        height: 1.2,
         color: color,
       ),
     );
   }
 
-  Widget _description(TextTheme textTheme, {String? subtitle, required Color color}) {
+  Widget _description(
+    TextTheme textTheme, {
+    String? subtitle,
+    required Color color,
+  }) {
     if (subtitle != null) {
       return Text(
         subtitle,
@@ -124,21 +125,22 @@ class PackCardWidget extends StatelessWidget {
   }
 
   Widget _getCoverUrl() {
-    if (coverUrlPath == null || coverUrlPath!.isEmpty) {
-      return const SizedBox(width: 100); // Placeholder with width
-    }
-
     return ClipRRect(
       borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(14),
         topRight: Radius.circular(14),
-        bottomRight: Radius.circular(14),
       ),
-      child: SizedBox(
-        height: 100,
-        width: 100,
-        child: NetworkImageWidget(
-          url: coverUrlPath!,
-          shouldCache: true,
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: FadeInImage.assetNetwork(
+          placeholder: AssetConstants.dalle,
+          image: coverUrlPath!,
+          fit: BoxFit.cover,
+          fadeInDuration: const Duration(milliseconds: 300),
+          fadeOutDuration: const Duration(milliseconds: 300),
+          imageErrorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.error);
+          },
         ),
       ),
     );
