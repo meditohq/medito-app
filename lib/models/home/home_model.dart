@@ -42,6 +42,7 @@ class HomeCarouselModel with _$HomeCarouselModel {
     List<CarouselButton>? buttons,
     @Default(false) bool showBanner,
     String? bannerColor,
+    String? bannerLabelColor,
     String? bannerLabel,
   }) = _HomeCarouselModel;
 

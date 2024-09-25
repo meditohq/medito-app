@@ -126,4 +126,6 @@ class StringConstants {
 
   static const String backgroundSoundsDisabled =
       'Background sounds are disabled for this track';
+
+  static const String neww = 'New';
 }
