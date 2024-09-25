@@ -9,7 +9,7 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + padding20,
+        top: MediaQuery.of(context).padding.top + padding16,
         left: padding16,
         right: padding16,
       ),

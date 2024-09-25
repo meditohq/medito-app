@@ -44,7 +44,7 @@ class CarouselWidget extends ConsumerWidget {
 
     return AnimatedScaleWidget(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: padding20),
+        padding: const EdgeInsets.symmetric(horizontal: padding16),
         child: InkWell(
           onTap: () => handleNavigation(
             first.type,

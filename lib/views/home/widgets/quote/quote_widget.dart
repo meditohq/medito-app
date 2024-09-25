@@ -29,7 +29,7 @@ class QuoteWidget extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         color: ColorConstants.onyx,
       ),
-      margin: const EdgeInsets.symmetric(horizontal: padding20),
+      margin: const EdgeInsets.symmetric(horizontal: padding16),
       padding: const EdgeInsets.all(padding16),
       child: SelectionArea(
         child: Column(

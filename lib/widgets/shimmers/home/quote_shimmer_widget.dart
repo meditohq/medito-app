@@ -11,7 +11,7 @@ class QuoteShimmerWidget extends StatelessWidget {
     var size = MediaQuery.of(context).size;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: padding20),
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
       child: BoxShimmerWidget(
         height: 150,
         width: size.width,

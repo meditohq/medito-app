@@ -18,7 +18,7 @@ class ShortcutsShimmerWidget extends StatelessWidget {
       crossAxisCount: 2,
       crossAxisSpacing: 8.0,
       mainAxisSpacing: 8.0,
-      padding: const EdgeInsets.symmetric(horizontal: padding20),
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       childAspectRatio: 3,
