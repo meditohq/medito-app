@@ -5,6 +5,7 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/constants/strings/string_constants.dart';
 
 class CarouselWidget extends ConsumerWidget {
   final List<HomeCarouselModel> carouselItems;
@@ -40,7 +41,7 @@ class CarouselWidget extends ConsumerWidget {
     if (isHorizontal || isTablet) {
       cardWidth = (screenSize.width / 2) - (3 * padding16);
     } else {
-      cardWidth = screenSize.width - 2 * padding16;
+      cardWidth = screenSize.width - (3 * padding16);
     }
 
     return Padding(
@@ -109,35 +110,28 @@ class CarouselWidget extends ConsumerWidget {
   }
 
   Widget _buildBanner(HomeCarouselModel item, Widget child) {
-    print('Building banner for item: ${item.id}');
-    print('showBanner: ${item.showBanner}');
-    print('bannerColor: ${item.bannerColor}');
-    print('bannerLabel: ${item.bannerLabel}');
-
-    // If showBanner is null or false, don't show the banner
     if (item.showBanner != true) {
-      print('Banner not shown for item: ${item.id}');
       return child;
     }
 
-    final bannerColor =
-        item.bannerColor != null ? parseColor(item.bannerColor!) : Colors.red;
-    final bannerLabel = item.bannerLabel ?? 'New';
+    final bannerColor = item.bannerColor != null
+        ? parseColor(item.bannerColor!)
+        : ColorConstants.lightPurple;
+    var bannerLabel = item.bannerLabel;
 
-    print('Displaying banner for item: ${item.id}');
-    print('Banner color: $bannerColor');
-    print('Banner label: $bannerLabel');
-
-    return Banner(
-      message: bannerLabel,
-      location: BannerLocation.topEnd,
-      color: bannerColor,
-      textStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: Banner(
+        message: bannerLabel ?? StringConstants.neww,
+        location: BannerLocation.topStart,
+        color: bannerColor,
+        textStyle: TextStyle(
+          color: parseColor(item.bannerLabelColor),
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 

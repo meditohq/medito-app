@@ -44,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ColorConstants.ebony,
-        toolbarHeight: 92.0,
+        toolbarHeight: 56.0,
         title: const Column(
           children: [
             HomeHeaderWidget(greeting: StringConstants.settings),
