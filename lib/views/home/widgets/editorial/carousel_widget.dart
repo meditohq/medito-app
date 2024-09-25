@@ -38,9 +38,9 @@ class CarouselWidget extends ConsumerWidget {
 
     double cardWidth;
     if (isHorizontal || isTablet) {
-      cardWidth = (screenSize.width / 2) - (2 * padding16);
+      cardWidth = (screenSize.width / 2) - (3 * padding16);
     } else {
-      cardWidth = screenSize.width - 3 * padding16;
+      cardWidth = screenSize.width - 2 * padding16;
     }
 
     return Padding(
@@ -50,58 +50,94 @@ class CarouselWidget extends ConsumerWidget {
       ),
       child: SizedBox(
         width: cardWidth,
-        child: Card(
-          margin: EdgeInsets.zero,
-          color: ColorConstants.onyx,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Image.network(item.coverUrl, fit: BoxFit.cover),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(padding16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: SourceSerif,
-                          fontSize: 24,
-                          height: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        item.subtitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: DmSans,
-                          fontSize: 16,
-                          height: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: padding20),
-                      if (item.buttons != null && item.buttons!.isNotEmpty)
-                        _buildButtons(item, context, ref),
-                    ],
+        child: _buildBanner(
+          item,
+          Card(
+            margin: EdgeInsets.zero,
+            color: ColorConstants.onyx,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(item.coverUrl, fit: BoxFit.cover),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(padding16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: SourceSerif,
+                            fontSize: 24,
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.subtitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: DmSans,
+                            fontSize: 16,
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: padding20),
+                        if (item.buttons != null && item.buttons!.isNotEmpty)
+                          _buildButtons(item, context, ref),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBanner(HomeCarouselModel item, Widget child) {
+    print('Building banner for item: ${item.id}');
+    print('showBanner: ${item.showBanner}');
+    print('bannerColor: ${item.bannerColor}');
+    print('bannerLabel: ${item.bannerLabel}');
+
+    // If showBanner is null or false, don't show the banner
+    if (item.showBanner != true) {
+      print('Banner not shown for item: ${item.id}');
+      return child;
+    }
+
+    final bannerColor =
+        item.bannerColor != null ? parseColor(item.bannerColor!) : Colors.red;
+    final bannerLabel = item.bannerLabel ?? 'New';
+
+    print('Displaying banner for item: ${item.id}');
+    print('Banner color: $bannerColor');
+    print('Banner label: $bannerLabel');
+
+    return Banner(
+      message: bannerLabel,
+      location: BannerLocation.topEnd,
+      color: bannerColor,
+      textStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+      ),
+      child: child,
     );
   }
 

@@ -40,6 +40,9 @@ class HomeCarouselModel with _$HomeCarouselModel {
     required String subtitle,
     required String coverUrl,
     List<CarouselButton>? buttons,
+    @Default(false) bool showBanner,
+    String? bannerColor,
+    String? bannerLabel,
   }) = _HomeCarouselModel;
 
   factory HomeCarouselModel.fromJson(Map<String, dynamic> json) =>
