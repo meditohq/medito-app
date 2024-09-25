@@ -30,14 +30,15 @@ class CarouselWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildCarouselItem(BuildContext context, WidgetRef ref, int index, HomeCarouselModel item) {
+  Widget _buildCarouselItem(
+      BuildContext context, WidgetRef ref, int index, HomeCarouselModel item) {
     final screenSize = MediaQuery.of(context).size;
     final isHorizontal = screenSize.width > screenSize.height;
     final isTablet = screenSize.shortestSide >= 600;
 
     double cardWidth;
     if (isHorizontal || isTablet) {
-      cardWidth = (screenSize.width /2) - (2 * padding16);
+      cardWidth = (screenSize.width / 2) - (2 * padding16);
     } else {
       cardWidth = screenSize.width - 3 * padding16;
     }
@@ -52,7 +53,8 @@ class CarouselWidget extends ConsumerWidget {
         child: Card(
           margin: EdgeInsets.zero,
           color: ColorConstants.onyx,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: Column(
