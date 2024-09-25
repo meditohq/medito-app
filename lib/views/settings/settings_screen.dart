@@ -48,7 +48,6 @@ class SettingsScreen extends ConsumerWidget {
         title: const Column(
           children: [
             HomeHeaderWidget(greeting: StringConstants.settings),
-            SizedBox(height: 18.0),
           ],
         ),
         elevation: 0.0,

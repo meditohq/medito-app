@@ -1,30 +1,16 @@
-import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/constants.dart';
 
-class HomeHeaderWidget extends ConsumerWidget implements PreferredSizeWidget {
+class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   const HomeHeaderWidget({
-    Key? key,
+    super.key,
     required this.greeting,
-  }) : super(key: key);
+  });
 
   final String greeting;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      height: 72,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _welcomeWidget(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _welcomeWidget(BuildContext context) {
+  Widget build(BuildContext context) {
     return Text(
       greeting,
       style: Theme.of(context).textTheme.headlineMedium?.copyWith(

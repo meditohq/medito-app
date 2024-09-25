@@ -38,12 +38,6 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
             ),
             const Text(
               StringConstants.hey,
-              style: TextStyle(
-                fontFamily: SourceSerif,
-                fontSize: 28,
-                color: ColorConstants.white,
-                fontWeight: FontWeight.w600,
-              ),
             ),
             const SizedBox(
               height: 12,

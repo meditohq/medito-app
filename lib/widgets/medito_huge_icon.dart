@@ -4,6 +4,8 @@ import 'package:hugeicons/hugeicons.dart';
 import '../constants/colors/color_constants.dart';
 
 class MeditoHugeIcon extends StatelessWidget {
+  static const String streakIcon = 'streak';
+
   const MeditoHugeIcon({
     super.key,
     required this.icon,
@@ -27,6 +29,8 @@ class MeditoHugeIcon extends StatelessWidget {
   IconData _getIconData(String iconString) {
     switch (iconString) {
       // custom ids:
+      case streakIcon:
+        return HugeIcons.solidRoundedFire;
       case 'duohome':
       case 'filledhome':
         return HugeIcons.solidRoundedHome01;

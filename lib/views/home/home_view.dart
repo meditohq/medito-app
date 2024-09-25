@@ -76,10 +76,8 @@ class _HomeViewState extends ConsumerState<HomeView>
       ),
       data: (HomeModel homeData) {
         return Scaffold(
-          backgroundColor: ColorConstants.ebony,
           appBar: AppBar(
-            backgroundColor: ColorConstants.onyx,
-            toolbarHeight: 150.0,
+            toolbarHeight: 92.0,
             title: HeaderWidget(
               greeting: homeData.greeting ?? StringConstants.welcome,
               statsData: stats.value,

@@ -52,7 +52,7 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
         slivers: [
           SliverAppBar(
             backgroundColor: ColorConstants.ebony,
-            expandedHeight: 164.0,
+            expandedHeight: 154.0,
             collapsedHeight: 0,
             toolbarHeight: 0,
             floating: true,
