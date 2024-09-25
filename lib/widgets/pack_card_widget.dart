@@ -29,8 +29,8 @@ class PackCardWidget extends StatelessWidget {
         var backgroundColor =
             colorScheme?.primaryContainer ?? ColorConstants.onyx;
         var titleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
-        var subtitleColor =
-            colorScheme?.onPrimaryContainer ?? const Color.fromARGB(255, 170, 170, 170);
+        var subtitleColor = colorScheme?.onPrimaryContainer ??
+            const Color.fromARGB(255, 170, 170, 170);
 
         return Container(
           decoration: BoxDecoration(
@@ -50,8 +50,7 @@ class PackCardWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _title(textTheme, title: title, color: titleColor),
-                      if (subTitle != null) 
-                        const SizedBox(height: 4),
+                      if (subTitle != null) const SizedBox(height: 4),
                       _description(
                         textTheme,
                         subtitle: subTitle,

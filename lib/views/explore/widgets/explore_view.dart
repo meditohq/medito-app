@@ -142,10 +142,16 @@ class ExploreContentWidget extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         var crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
-        var itemWidth = (constraints.maxWidth - (crossAxisCount + 1) * padding16) / crossAxisCount;
+        var itemWidth =
+            (constraints.maxWidth - (crossAxisCount + 1) * padding16) /
+                crossAxisCount;
 
         return MasonryGridView.count(
-          padding: const EdgeInsets.only(left: padding16, right: padding16, top: padding16),
+          padding: const EdgeInsets.only(
+            left: padding16,
+            right: padding16,
+            top: padding16,
+          ),
           crossAxisCount: crossAxisCount,
           mainAxisSpacing: padding16,
           crossAxisSpacing: padding16,

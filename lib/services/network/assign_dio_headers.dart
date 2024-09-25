@@ -18,7 +18,6 @@ class AssignDioHeaders {
     for (var key in customHeaders.keys) {
       DioApiService().dio.options.headers[key] = customHeaders[key];
     }
-    print('AssignDioHeaders.assign completed. Headers set: ${DioApiService().dio.options.headers}');
   }
 
   Map<String, dynamic> _createCustomHeaders(DeviceAndAppInfoModel model) {

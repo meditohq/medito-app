@@ -15,7 +15,7 @@ class TrackCardWidget extends StatelessWidget {
   final String? subTitle;
   final String? coverUrlPath;
   final void Function()? onTap;
- @override
+  @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
@@ -100,4 +100,3 @@ class TrackCardWidget extends StatelessWidget {
     return const SizedBox();
   }
 }
-
