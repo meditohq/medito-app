@@ -91,5 +91,9 @@ flutter:
         - asset: assets/fonts/dm-sans/DMSans-Medium.ttf
         - asset: assets/fonts/dm-sans/DMSans-Regular.ttf
         - asset: assets/fonts/dm-sans/DMSans-SemiBold.ttf
+    - family: DM Serif Display
+      fonts:
+        - asset: assets/fonts/dm-serif/DMSerifDisplay-Regular.ttf
+        - asset: assets/fonts/dm-serif/DMSerifDisplay-Italic.ttf
 
   uses-material-design: true

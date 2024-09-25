@@ -4,6 +4,7 @@ import '../colors/color_constants.dart';
 
 const String DmMono = 'DM Mono';
 const String DmSans = 'DM Sans';
+const String DmSerif = 'DM Serif Display';
 const String SourceSerif = 'Source Serif';
 const String materialIcons = 'MaterialIcons';
 const padding12 = 12.0;

@@ -39,12 +39,24 @@ class HomeCarouselModel with _$HomeCarouselModel {
     required String title,
     required String subtitle,
     required String coverUrl,
-    required String path,
-    required String type,
+    List<CarouselButton>? buttons,
   }) = _HomeCarouselModel;
 
   factory HomeCarouselModel.fromJson(Map<String, dynamic> json) =>
       _$HomeCarouselModelFromJson(json);
+}
+
+@freezed
+class CarouselButton with _$CarouselButton {
+  const factory CarouselButton({
+    required String title,
+    required String path,
+    required String type,
+    required String color,
+  }) = _CarouselButton;
+
+  factory CarouselButton.fromJson(Map<String, dynamic> json) =>
+      _$CarouselButtonFromJson(json);
 }
 
 @freezed

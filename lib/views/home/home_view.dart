@@ -97,7 +97,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                   height20,
                   ShortcutsItemsWidget(data: homeData.shortcuts),
                   height20,
-                  CarouselWidget(data: homeData.carousel),
+                  CarouselWidget(carouselItems: homeData.carousel),
                   height20,
                   QuoteWidget(data: homeData.todayQuote),
                   height20,
