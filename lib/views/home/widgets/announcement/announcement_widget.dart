@@ -27,23 +27,27 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-      ),
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 24),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _icon(widget.announcement.icon),
-              _text(context),
-            ],
-          ),
-          height16,
-          _actionBtn(context),
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(top: padding16, left: padding16, right: padding16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16, top: padding24),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _icon(widget.announcement.icon),
+                _text(context),
+              ],
+            ),
+            height16,
+            _actionBtn(context),
+          ],
+        ),
       ),
     );
   }
