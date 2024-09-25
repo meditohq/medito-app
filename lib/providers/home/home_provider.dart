@@ -30,18 +30,6 @@ Future<AnnouncementModel?> fetchLatestAnnouncement(
 
   var announcement = await homeRepository.fetchLatestAnnouncement();
 
-  //dummy announcement with color
-  announcement = AnnouncementModel(
-    id: 'asdfdsfa',
-    text: 'Dummy Announcement',
-    colorBackground: null,
-    colorText: null,
-    icon:null,
-    ctaTitle: 'Learn More',
-    ctaType: 'link',
-    ctaPath: 'https://example.com',
-  );
-
   return announcement?.id == noneAnnouncementId ? null : announcement;
 }
 

@@ -37,6 +37,7 @@ class TilesModel with _$TilesModel {
     required String color,
     required String title,
     required String subtitle,
+    @Default(false) bool isStreakDoneToday,
   }) = _TilesModel;
 
   factory TilesModel.fromJson(Map<String, dynamic> json) =>
