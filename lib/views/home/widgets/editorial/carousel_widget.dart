@@ -7,21 +7,73 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 
-class CarouselWidget extends ConsumerWidget {
+const _kAutoScrollDelay = Duration(seconds: 10);
+const _kScrollAnimationDuration = Duration(milliseconds: 500);
+const _kCardBorderRadius = 30.0;
+const _kCardAspectRatio = 16 / 9;
+const _kTitleFontSize = 24.0;
+const _kSubtitleFontSize = 16.0;
+const _kButtonHeight = 48.0;
+const _kButtonBorderRadius = 20.0;
+const _kButtonFontSize = 14.0;
+const _kBannerFontSize = 14.0;
+const _kSmallSpacing = 8.0;
+
+class CarouselWidget extends ConsumerStatefulWidget {
   final List<HomeCarouselModel> carouselItems;
 
   const CarouselWidget({Key? key, required this.carouselItems})
       : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CarouselWidget> createState() => _CarouselWidgetState();
+}
+
+class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleScroll();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scheduleScroll() {
+    Future.delayed(_kAutoScrollDelay, () {
+      if (_scrollController.hasClients && widget.carouselItems.length > 1) {
+        var context = this.context;
+        var screenSize = MediaQuery.of(context).size;
+        var isHorizontal = screenSize.width > screenSize.height;
+        var isTablet = screenSize.shortestSide >= 600;
+        var cardWidth = isHorizontal || isTablet
+            ? (screenSize.width / 2) - (3 * padding16)
+            : screenSize.width - (3 * padding16);
+
+        _scrollController.animateTo(
+          cardWidth + padding16,
+          duration: _kScrollAnimationDuration,
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: _scrollController,
       scrollDirection: Axis.horizontal,
       child: IntrinsicHeight(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: carouselItems.asMap().entries.map((entry) {
+          children: widget.carouselItems.asMap().entries.map((entry) {
             int index = entry.key;
             HomeCarouselModel item = entry.value;
             return _buildCarouselItem(context, ref, index, item);
@@ -37,17 +89,16 @@ class CarouselWidget extends ConsumerWidget {
     final isHorizontal = screenSize.width > screenSize.height;
     final isTablet = screenSize.shortestSide >= 600;
 
-    double cardWidth;
-    if (isHorizontal || isTablet) {
-      cardWidth = (screenSize.width / 2) - (3 * padding16);
-    } else {
-      cardWidth = screenSize.width - (3 * padding16);
-    }
+    var cardWidth = isHorizontal || isTablet
+        ? (screenSize.width / 2) - (3 * padding16)
+        : screenSize.width - (3 * padding16);
 
     return Padding(
       padding: EdgeInsets.only(
         left: index == 0 ? padding16 : padding16 / 2,
-        right: index == carouselItems.length - 1 ? padding16 : padding16 / 2,
+        right: index == widget.carouselItems.length - 1
+            ? padding16
+            : padding16 / 2,
       ),
       child: SizedBox(
         width: cardWidth,
@@ -63,16 +114,16 @@ class CarouselWidget extends ConsumerWidget {
             child: Card(
               margin: EdgeInsets.zero,
               color: ColorConstants.onyx,
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(_kCardBorderRadius)),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     AspectRatio(
-                      aspectRatio: 16 / 9,
+                      aspectRatio: _kCardAspectRatio,
                       child: Image.network(item.coverUrl, fit: BoxFit.cover),
                     ),
                     Padding(
@@ -86,18 +137,18 @@ class CarouselWidget extends ConsumerWidget {
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
                               fontFamily: SourceSerif,
-                              fontSize: 24,
+                              fontSize: _kTitleFontSize,
                               height: 1.1,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: _kSmallSpacing),
                           Text(
                             item.subtitle,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
                               fontFamily: DmSans,
-                              fontSize: 16,
+                              fontSize: _kSubtitleFontSize,
                               height: 1.1,
                             ),
                           ),
@@ -128,14 +179,14 @@ class CarouselWidget extends ConsumerWidget {
     var bannerLabel = item.bannerLabel;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(_kCardBorderRadius),
       child: Banner(
         message: bannerLabel ?? StringConstants.neww,
         location: BannerLocation.topStart,
         color: bannerColor,
         textStyle: TextStyle(
           color: parseColor(item.bannerLabelColor),
-          fontSize: 14,
+          fontSize: _kBannerFontSize,
           fontWeight: FontWeight.bold,
         ),
         child: child,
@@ -146,37 +197,46 @@ class CarouselWidget extends ConsumerWidget {
   Widget _buildButtons(
       HomeCarouselModel item, BuildContext context, WidgetRef ref) {
     return Row(
-      children: item.buttons!.map((button) {
+      children: item.buttons!.asMap().entries.map((entry) {
+        var index = entry.key;
+        var button = entry.value;
+        
         return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: SizedBox(
-              height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: parseColor(button.color),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onPressed: () => handleNavigation(
-                  button.type,
-                  [button.path],
-                  context,
-                  ref: ref,
-                ),
-                child: Text(
-                  button.title,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontFamily: DmSans,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
+          child: Row(
+            children: [
+              if (index > 0) const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: _kButtonHeight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConstants.white,
+                      foregroundColor: ColorConstants.onyx,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(_kButtonBorderRadius),
+                      ),
+                    ),
+                    onPressed: () => handleNavigation(
+                      button.type,
+                      [button.path],
+                      context,
+                      ref: ref,
+                    ),
+                    child: Text(
+                      button.title,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontFamily: DmSans,
+                        fontSize: _kButtonFontSize,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: ColorConstants.onyx,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         );
       }).toList(),

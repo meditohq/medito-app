@@ -58,7 +58,6 @@ class CarouselButton with _$CarouselButton {
     required String title,
     required String path,
     required String type,
-    required String color,
   }) = _CarouselButton;
 
   factory CarouselButton.fromJson(Map<String, dynamic> json) =>
