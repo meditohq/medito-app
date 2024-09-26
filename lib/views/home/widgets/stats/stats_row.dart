@@ -23,8 +23,7 @@ class StreakButtonState extends State<StreakButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
 
-  // Reduce the shimmer duration to make it faster and more noticeable
-  static const _kShimmerDuration = Duration(seconds: 2);
+  static const _kShimmerDuration = Duration(seconds:8);
   static const _kBorderRadius = 30.0;
   static const _kIconSize = 20.0;
   static const _kInnerIconSize = 18.0;
@@ -59,7 +58,7 @@ class StreakButtonState extends State<StreakButton>
                   ? LinearGradient(
                       colors: [
                         ColorConstants.lightPurple.withOpacity(0.05),
-                        ColorConstants.lightPurple.withOpacity(0.3),
+                        ColorConstants.lightPurple.withOpacity(0.4),
                         ColorConstants.lightPurple.withOpacity(0.05),
                       ],
                       stops: const [0.0, 0.5, 1.0],
@@ -69,7 +68,7 @@ class StreakButtonState extends State<StreakButton>
                   : null,
               borderRadius: BorderRadius.circular(_kBorderRadius),
             ),
-            padding: const EdgeInsets.all(1), // Shimmer border size
+            padding: const EdgeInsets.all(1),
             child: Container(
               decoration: BoxDecoration(
                 color: ColorConstants.onyx,

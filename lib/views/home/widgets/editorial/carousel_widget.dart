@@ -106,12 +106,14 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         child: _buildBanner(
           item,
           GestureDetector(
-            onTap: () => handleNavigation(
-              item.type,
-              [item.path],
-              context,
-              ref: ref,
-            ),
+            onTap: () {
+              handleNavigation(
+                item.type,
+                [item.path?.getIdFromPath()],
+                context,
+                ref: ref,
+              );
+            },
             child: Card(
               margin: EdgeInsets.zero,
               color: ColorConstants.onyx,
@@ -221,7 +223,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                     ),
                     onPressed: () => handleNavigation(
                       button.type,
-                      [button.path],
+                      [button.path.getIdFromPath()],
                       context,
                       ref: ref,
                     ),

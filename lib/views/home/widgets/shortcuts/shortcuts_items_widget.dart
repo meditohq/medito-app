@@ -39,7 +39,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   ) async {
     await handleNavigation(
       element.type,
-      [element.path.toString().getIdFromPath(), element.path],
+      [element.path.toString().getIdFromPath()],
       context,
       ref: ref,
     );
@@ -56,11 +56,11 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     int oldIndex,
     int newIndex,
   ) async {
-    var _data = [...data];
-    final element = _data.removeAt(oldIndex);
-    _data.insert(newIndex, element);
-    data = _data;
-    var ids = _data.map((e) => e.id).toList();
+    var updatedData = [...data];
+    final element = updatedData.removeAt(oldIndex);
+    updatedData.insert(newIndex, element);
+    data = updatedData;
+    var ids = updatedData.map((e) => e.id).toList();
     await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
 
     await ref.read(refreshHomeAPIsProvider.future);
@@ -123,10 +123,14 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                         Expanded(
                           child: Text(
                             e.title,
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            style: TextStyle(
+                              fontFamily: Teachers,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              height: 22 / 16,
                               color: e.isHighlighted
                                   ? ColorConstants.onyx
-                                  : null,
+                                  : ColorConstants.white,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

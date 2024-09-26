@@ -23,14 +23,13 @@ extension SanitisePath on String {
 final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> handleNavigation(
-  String? place,
+  String? type,
   List<String?> ids,
   BuildContext context, {
   WidgetRef? ref,
 }) async {
   ids.removeWhere((element) => element == null);
-
-  if (place != null && (place.contains('tracks') || place.contains('track'))) {
+  if (type != null && (type.contains('tracks') || type.contains('track'))) {
     try {
       var trackId = ids.first!;
       await Navigator.push(
@@ -49,7 +48,7 @@ Future<void> handleNavigation(
       }
     }
     return;
-  } else if (place != null && place.contains('pack3')) {
+  } else if (type != null && type.contains('pack3')) {
     var p3id = ids[2]!;
     await Navigator.push(
       context,
@@ -61,7 +60,7 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       },
     );
-  } else if (place != null && place.contains('pack2')) {
+  } else if (type != null && type.contains('pack2')) {
     var p2id = ids[1]!;
     await Navigator.push(
       context,
@@ -73,7 +72,7 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       },
     );
-  } else if (place == TypeConstants.pack) {
+  } else if (type == TypeConstants.pack) {
     var pid = ids.first!;
     await Navigator.push(
       context,
@@ -85,11 +84,11 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       },
     );
-  } else if (place == TypeConstants.url || place == TypeConstants.link) {
+  } else if (type == TypeConstants.url || type == TypeConstants.link) {
     var url = ids.last ?? StringConstants.meditoUrl;
     await launchURLInBrowser(url);
     return;
-  } else if (place != null && place.contains('settings')) {
+  } else if (type != null && type.contains('settings')) {
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -100,7 +99,7 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       },
     );
-  } else if (place == TypeConstants.email) {
+  } else if (type == TypeConstants.email) {
     if (ref != null) {
       var deviceAppAndUserInfo =
           await ref.read(deviceAppAndUserInfoProvider.future);
@@ -113,7 +112,7 @@ Future<void> handleNavigation(
       );
     }
     return;
-  } else if (place == TypeConstants.flow) {
+  } else if (type == TypeConstants.flow) {
     if (ids.contains('downloads')) {
       await navigatorKey.currentState
           ?.push(
@@ -123,7 +122,7 @@ Future<void> handleNavigation(
         ref?.invalidate(fetchStatsProvider);
       });
     }
-  } else if (place == TypeConstants.webViewAccount) {
+  } else if (type == TypeConstants.webViewAccount) {
     await Navigator.push(
       context,
       MaterialPageRoute(
