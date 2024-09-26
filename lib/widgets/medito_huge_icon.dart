@@ -41,6 +41,8 @@ class MeditoHugeIcon extends StatelessWidget {
       case 'filledSettings':
         return HugeIcons.solidRoundedSettings01;
       // ids from the package:
+      case 'solidRoundedBook02':
+        return HugeIcons.solidRoundedBook02;
       case 'solidRoundedSun01':
         return HugeIcons.solidRoundedSun01;
       case 'solidRoundedDownloadSquare02':

@@ -101,7 +101,9 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                     height: containerHeight,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
-                      color: ColorConstants.onyx,
+                      color: e.isHighlighted
+                          ? ColorConstants.brightSky
+                          : ColorConstants.onyx,
                     ),
                     padding: const EdgeInsets.all(12),
                     constraints: BoxConstraints(
@@ -113,12 +115,19 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                         MeditoHugeIcon(
                           icon: e.icon,
                           size: 18,
+                          color: e.isHighlighted
+                              ? ColorConstants.onyx
+                              : ColorConstants.white,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             e.title,
-                            style: Theme.of(context).textTheme.titleSmall,
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: e.isHighlighted
+                                  ? ColorConstants.onyx
+                                  : null,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

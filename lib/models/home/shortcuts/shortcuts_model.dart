@@ -11,6 +11,7 @@ class ShortcutsModel with _$ShortcutsModel {
     required String title,
     required String path,
     required String icon,
+    @Default(false) bool isHighlighted,
   }) = _ShortcutsModel;
 
   factory ShortcutsModel.fromJson(Map<String, dynamic> json) =>
