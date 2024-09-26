@@ -37,14 +37,14 @@ Need more details? [Feel free to raise an issue](https://github.com/meditohq/med
 
 ## Contributing
 
-API keys are generated for regular contributors (called "volunteers").
-
-To volunteer, join our [Telegram channel](https://t.me/medito.app) and go to "Discussion", then ask there for a key.
-
-Please note that we are looking for people who are interested in investing at least 2 hours a week regularly. :)
+It's generally been more effort than it's worth to onboard new contributors, so we're not looking
+for any outside help at this time. If you would like to volunteer regardless, join our
+[Telegram channel](https://t.me/medito.app) and go to "Discussion", then ask there for a key.
+Please be aware that it may take over 6 months for us to provide the details needed to build the app.
 
 Don't feel like contributing to the code?
-Feature requests, feedback and suggestions are welcome. Reach us via Discord/email, or create a new issue.
+Feature requests, feedback and suggestions are welcome. Reach us via Telegram; please don't use
+discord, email, or create an issue as those channels are not monitored.
 
 ## About the Medito Foundation
 
