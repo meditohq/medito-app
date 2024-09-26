@@ -88,7 +88,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   List<Widget> _getShortcutsItemWidgetList() {
     var size = MediaQuery.of(context).size;
-    const containerHeight = 56.0;
+    const containerHeight = 48.0;
     final containerWidth = (size.width / 2) - (padding16 + 2);
 
     return data

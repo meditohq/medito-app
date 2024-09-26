@@ -19,11 +19,12 @@ class StreakButton extends StatefulWidget {
   StreakButtonState createState() => StreakButtonState();
 }
 
-class StreakButtonState extends State<StreakButton> with SingleTickerProviderStateMixin {
+class StreakButtonState extends State<StreakButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
 
-  // Reduce the shimmer duration to make it even faster
-  static const _kShimmerDuration = Duration(milliseconds: 1500);
+  // Reduce the shimmer duration to make it faster and more noticeable
+  static const _kShimmerDuration = Duration(seconds: 2);
   static const _kBorderRadius = 30.0;
   static const _kIconSize = 20.0;
   static const _kInnerIconSize = 18.0;
@@ -57,17 +58,18 @@ class StreakButtonState extends State<StreakButton> with SingleTickerProviderSta
               gradient: widget.isStreakDoneToday
                   ? LinearGradient(
                       colors: [
-                        ColorConstants.lightPurple.withOpacity(0.1),
-                        ColorConstants.lightPurple.withOpacity(0.6),
-                        ColorConstants.lightPurple.withOpacity(0.1),
+                        ColorConstants.lightPurple.withOpacity(0.05),
+                        ColorConstants.lightPurple.withOpacity(0.3),
+                        ColorConstants.lightPurple.withOpacity(0.05),
                       ],
                       stops: const [0.0, 0.5, 1.0],
-                      transform: GradientRotation(_shimmerController.value * 6.28319),
+                      transform:
+                          GradientRotation(_shimmerController.value * 6.28319),
                     )
                   : null,
               borderRadius: BorderRadius.circular(_kBorderRadius),
             ),
-            padding: const EdgeInsets.all(2), // Increased shimmer border size
+            padding: const EdgeInsets.all(1), // Shimmer border size
             child: Container(
               decoration: BoxDecoration(
                 color: ColorConstants.onyx,
@@ -82,16 +84,18 @@ class StreakButtonState extends State<StreakButton> with SingleTickerProviderSta
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        if(widget.isStreakDoneToday)
-                        const MeditoHugeIcon(
-                          icon: MeditoHugeIcon.streakIcon,
-                          size: _kIconSize,
-                          color: Colors.white,
-                        ),
+                        if (widget.isStreakDoneToday)
+                          const MeditoHugeIcon(
+                            icon: MeditoHugeIcon.streakIcon,
+                            size: _kIconSize,
+                            color: Colors.white,
+                          ),
                         MeditoHugeIcon(
                           icon: MeditoHugeIcon.streakIcon,
                           size: _kInnerIconSize,
-                          color: widget.isStreakDoneToday ? ColorConstants.lightPurple : ColorConstants.white,
+                          color: widget.isStreakDoneToday
+                              ? ColorConstants.lightPurple
+                              : ColorConstants.white,
                         ),
                       ],
                     ),
@@ -101,7 +105,9 @@ class StreakButtonState extends State<StreakButton> with SingleTickerProviderSta
                       style: TextStyle(
                         color: ColorConstants.white,
                         fontSize: _kFontSize,
-                        fontWeight: widget.isStreakDoneToday ? FontWeight.bold : FontWeight.w400,
+                        fontWeight: widget.isStreakDoneToday
+                            ? FontWeight.bold
+                            : FontWeight.w400,
                         fontFamily: DmMono,
                         height: _kLineHeight,
                       ),
