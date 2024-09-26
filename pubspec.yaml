@@ -94,5 +94,10 @@ flutter:
       fonts:
         - asset: assets/fonts/dm-serif/DMSerifDisplay-Regular.ttf
         - asset: assets/fonts/dm-serif/DMSerifDisplay-Italic.ttf
-
+    - family: Teachers
+      fonts:
+        - asset: assets/fonts/teachers/Teachers-Regular.ttf
+        - asset: assets/fonts/teachers/Teachers-Bold.ttf
+        - asset: assets/fonts/teachers/Teachers-Medium.ttf
+        - asset: assets/fonts/teachers/Teachers-SemiBold.ttf
   uses-material-design: true

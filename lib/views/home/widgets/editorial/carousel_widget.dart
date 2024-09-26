@@ -6,6 +6,7 @@ import 'package:medito/models/home/home_model.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/widgets/network_image_widget.dart';
 
 const _kAutoScrollDelay = Duration(seconds: 10);
 const _kScrollAnimationDuration = Duration(milliseconds: 500);
@@ -115,7 +116,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
               margin: EdgeInsets.zero,
               color: ColorConstants.onyx,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(_kCardBorderRadius)),
+                borderRadius: BorderRadius.circular(_kCardBorderRadius),
+              ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 child: Column(
@@ -124,7 +126,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   children: [
                     AspectRatio(
                       aspectRatio: _kCardAspectRatio,
-                      child: Image.network(item.coverUrl, fit: BoxFit.cover),
+                      child: NetworkImageWidget(url: item.coverUrl),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(padding16),
@@ -137,8 +139,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
                               fontFamily: SourceSerif,
-                              fontSize: _kTitleFontSize,
-                              height: 1.1,
+                              fontSize: 24,
+                              height: 28 / 24,
                             ),
                           ),
                           const SizedBox(height: _kSmallSpacing),
@@ -147,9 +149,9 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
-                              fontFamily: DmSans,
-                              fontSize: _kSubtitleFontSize,
-                              height: 1.1,
+                              fontFamily: Teachers,
+                              fontSize: 16,
+                              height: 1.2,
                             ),
                           ),
                           const SizedBox(height: padding20),
@@ -200,11 +202,11 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
       children: item.buttons!.asMap().entries.map((entry) {
         var index = entry.key;
         var button = entry.value;
-        
+
         return Expanded(
           child: Row(
             children: [
-              if (index > 0) const SizedBox(width: 8),
+              if (index > 0) const SizedBox(width: padding16),
               Expanded(
                 child: SizedBox(
                   height: _kButtonHeight,
@@ -213,7 +215,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                       backgroundColor: ColorConstants.white,
                       foregroundColor: ColorConstants.onyx,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(_kButtonBorderRadius),
+                        borderRadius:
+                            BorderRadius.circular(_kButtonBorderRadius),
                       ),
                     ),
                     onPressed: () => handleNavigation(
@@ -226,7 +229,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                       button.title,
                       maxLines: 1,
                       style: const TextStyle(
-                        fontFamily: DmSans,
+                        fontFamily: Teachers,
                         fontSize: _kButtonFontSize,
                         fontWeight: FontWeight.w600,
                         height: 1.2,

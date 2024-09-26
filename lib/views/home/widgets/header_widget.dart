@@ -54,7 +54,7 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
         ),
         StreakButton(
           text: streakData?.title ?? '',
-          isStreakDoneToday: streakData?.isStreakDoneToday ?? false,
+          isStreakDoneToday:  true,
           onTap: widget.onStatsButtonTap,
         ),
       ],

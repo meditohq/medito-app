@@ -6,6 +6,8 @@ const String DmMono = 'DM Mono';
 const String DmSans = 'DM Sans';
 const String DmSerif = 'DM Serif Display';
 const String SourceSerif = 'Source Serif';
+const String Teachers = 'Teachers';
+
 const String materialIcons = 'MaterialIcons';
 const padding12 = 12.0;
 const padding14 = 14.0;
