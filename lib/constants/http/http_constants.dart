@@ -1,13 +1,66 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
+
+class EnvConfig {
+  final String environment;
+  final String contentBaseUrl;
+  final String authBaseUrl;
+  final String authToken;
+  final String sentryDsn;
+
+  const EnvConfig({
+    required this.environment,
+    required this.contentBaseUrl,
+    required this.authBaseUrl,
+    required this.authToken,
+    required this.sentryDsn,
+  });
+}
+
+class ProdEnv extends EnvConfig {
+  const ProdEnv({
+    required super.environment,
+    required super.contentBaseUrl,
+    required super.authBaseUrl,
+    required super.authToken,
+    required super.sentryDsn,
+  });
+}
+
+class StagingEnv extends EnvConfig {
+  const StagingEnv({
+    required super.environment,
+    required super.contentBaseUrl,
+    required super.authBaseUrl,
+    required super.authToken,
+    required super.sentryDsn,
+  });
+}
+
+const _prodEnv = ProdEnv(
+  environment: String.fromEnvironment('ENVIRONMENT'),
+  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
+  authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
+  authToken: String.fromEnvironment('AUTH_TOKEN'),
+  sentryDsn: String.fromEnvironment('SENTRY_DSN'),
+);
+
+const _stagingEnv = StagingEnv(
+  environment: String.fromEnvironment('ENVIRONMENT'),
+  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
+  authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
+  authToken: String.fromEnvironment('AUTH_TOKEN'),
+  sentryDsn: String.fromEnvironment('SENTRY_DSN'),
+);
+
+EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
+
+String get environment => _currentEnv.environment;
+String get contentBaseUrl => _currentEnv.contentBaseUrl;
+String get authBaseUrl => _currentEnv.authBaseUrl;
+String get authToken => _currentEnv.authToken;
+String get sentryDsn => _currentEnv.sentryDsn;
 
 class HTTPConstants {
-  static String ENVIRONMENT = dotenv.env['ENVIRONMENT']!;
-  static String ENVIRONMENT_DEBUG = dotenv.env['ENVIRONMENT_DEBUG']!;
-  static String CONTENT_BASE_URL = dotenv.env['CONTENT_BASE_URL']!;
-  static String AUTH_BASE_URL = dotenv.env['AUTH_BASE_URL']!;
-  static String AUTH_TOKEN = dotenv.env['AUTH_TOKEN']!;
-  static String SENTRY_DSN = dotenv.env['SENTRY_DSN']!;
-
   //END POINTS
   static const String TOKENS = 'tokens';
   static const String PACKS = 'packs';

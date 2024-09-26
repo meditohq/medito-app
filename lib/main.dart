@@ -7,7 +7,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:medito/constants/constants.dart';
@@ -19,24 +18,19 @@ import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import 'constants/environments/environment_constants.dart';
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
-var currentEnvironment = kReleaseMode
-    ? EnvironmentConstants.prodEnv
-    : EnvironmentConstants.stagingEnv;
 
-//Temp main for ios
+
 void main() async {
   await initializeApp();
   _runAppWithSentry();
 }
 
 Future<void> initializeApp() async {
-  await loadEnvironment();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -44,10 +38,6 @@ Future<void> initializeApp() async {
   setupAudioCallback();
   await initializeAudioService();
   usePathUrlStrategy();
-}
-
-Future<void> loadEnvironment() async {
-  await dotenv.load(fileName: currentEnvironment);
 }
 
 void setupAudioCallback() {
@@ -68,10 +58,8 @@ Future<void> _runAppWithSentry() async {
   SentryFlutter.init(
     (options) {
       options.attachScreenshot = true;
-      options.environment = kDebugMode
-          ? HTTPConstants.ENVIRONMENT_DEBUG
-          : HTTPConstants.ENVIRONMENT;
-      options.dsn = HTTPConstants.SENTRY_DSN;
+      options.environment = environment;
+      options.dsn = sentryDsn;
       options.tracesSampleRate = 1.0;
     },
     appRunner: () => runApp(

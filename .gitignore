@@ -101,3 +101,5 @@ android/app/local.properties
 firebase.json
 lib/firebase_options.dart
 *.symbols
+.prod.json
+.staging.json

@@ -18,10 +18,11 @@ class DioAuthApiService {
   }
 
   DioAuthApiService._internal() {
+
     dio = Dio();
     dio.options = BaseOptions(
       connectTimeout: const Duration(milliseconds: 30000),
-      baseUrl: HTTPConstants.AUTH_BASE_URL,
+      baseUrl: authBaseUrl,
     );
     if (kDebugMode) {
       dio.interceptors.add(LogInterceptor(
@@ -32,7 +33,7 @@ class DioAuthApiService {
       ));
     }
     dio.options.headers[HttpHeaders.authorizationHeader] =
-        'Bearer ${HTTPConstants.AUTH_TOKEN}';
+        'Bearer $authToken';
   }
 
   Future<void> _captureException(DioException err) async {

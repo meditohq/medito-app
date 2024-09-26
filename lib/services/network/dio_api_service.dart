@@ -31,7 +31,7 @@ class DioApiService {
     dio = Dio();
     dio.options = BaseOptions(
       connectTimeout: const Duration(milliseconds: 30000),
-      baseUrl: HTTPConstants.CONTENT_BASE_URL,
+      baseUrl: contentBaseUrl,
     );
     if (kDebugMode) {
       dio.interceptors.add(
