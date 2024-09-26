@@ -39,6 +39,8 @@ class HomeCarouselModel with _$HomeCarouselModel {
     required String title,
     required String subtitle,
     required String coverUrl,
+    required String? path,
+    required String? type,
     List<CarouselButton>? buttons,
     @Default(false) bool showBanner,
     String? bannerColor,

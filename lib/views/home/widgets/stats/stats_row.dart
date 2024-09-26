@@ -12,7 +12,7 @@ class StreakButton extends StatefulWidget {
     Key? key,
     required this.text,
     required this.onTap,
-    this.isStreakDoneToday = false,
+    this.isStreakDoneToday = true,
   }) : super(key: key);
 
   @override
@@ -22,7 +22,8 @@ class StreakButton extends StatefulWidget {
 class StreakButtonState extends State<StreakButton> with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
 
-  static const _kShimmerDuration = Duration(seconds: 15);
+  // Reduce the shimmer duration to make it even faster
+  static const _kShimmerDuration = Duration(milliseconds: 1500);
   static const _kBorderRadius = 30.0;
   static const _kIconSize = 20.0;
   static const _kInnerIconSize = 18.0;
@@ -56,51 +57,57 @@ class StreakButtonState extends State<StreakButton> with SingleTickerProviderSta
               gradient: widget.isStreakDoneToday
                   ? LinearGradient(
                       colors: [
-                        ColorConstants.white.withOpacity(0.02),
-                        ColorConstants.white.withOpacity(0.08),
-                        ColorConstants.white.withOpacity(0.02),
+                        ColorConstants.lightPurple.withOpacity(0.1),
+                        ColorConstants.lightPurple.withOpacity(0.6),
+                        ColorConstants.lightPurple.withOpacity(0.1),
                       ],
                       stops: const [0.0, 0.5, 1.0],
-                      transform: GradientRotation(_shimmerController.value * 3.14159),
+                      transform: GradientRotation(_shimmerController.value * 6.28319),
                     )
                   : null,
-              border: Border.all(color: ColorConstants.white),
               borderRadius: BorderRadius.circular(_kBorderRadius),
             ),
-            child: Padding(
-              padding: _kPadding,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if(widget.isStreakDoneToday)
-                      const MeditoHugeIcon(
-                        icon: MeditoHugeIcon.streakIcon,
-                        size: _kIconSize,
-                        color: Colors.white,
-                      ),
-                      MeditoHugeIcon(
-                        icon: MeditoHugeIcon.streakIcon,
-                        size: _kInnerIconSize,
-                        color: widget.isStreakDoneToday ? ColorConstants.lightPurple : ColorConstants.white,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.text,
-                    style: TextStyle(
-                      color: ColorConstants.white,
-                      fontSize: _kFontSize,
-                      fontWeight: widget.isStreakDoneToday ? FontWeight.bold : FontWeight.w400,
-                      fontFamily: DmMono,
-                      height: _kLineHeight,
+            padding: const EdgeInsets.all(2), // Increased shimmer border size
+            child: Container(
+              decoration: BoxDecoration(
+                color: ColorConstants.onyx,
+                borderRadius: BorderRadius.circular(_kBorderRadius - 2),
+              ),
+              child: Padding(
+                padding: _kPadding,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if(widget.isStreakDoneToday)
+                        const MeditoHugeIcon(
+                          icon: MeditoHugeIcon.streakIcon,
+                          size: _kIconSize,
+                          color: Colors.white,
+                        ),
+                        MeditoHugeIcon(
+                          icon: MeditoHugeIcon.streakIcon,
+                          size: _kInnerIconSize,
+                          color: widget.isStreakDoneToday ? ColorConstants.lightPurple : ColorConstants.white,
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.text,
+                      style: TextStyle(
+                        color: ColorConstants.white,
+                        fontSize: _kFontSize,
+                        fontWeight: widget.isStreakDoneToday ? FontWeight.bold : FontWeight.w400,
+                        fontFamily: DmMono,
+                        height: _kLineHeight,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

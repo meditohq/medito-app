@@ -53,54 +53,62 @@ class CarouselWidget extends ConsumerWidget {
         width: cardWidth,
         child: _buildBanner(
           item,
-          Card(
-            margin: EdgeInsets.zero,
-            color: ColorConstants.onyx,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Image.network(item.coverUrl, fit: BoxFit.cover),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(padding16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: SourceSerif,
-                            fontSize: 24,
-                            height: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          item.subtitle,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: DmSans,
-                            fontSize: 16,
-                            height: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: padding20),
-                        if (item.buttons != null && item.buttons!.isNotEmpty)
-                          _buildButtons(item, context, ref),
-                      ],
+          GestureDetector(
+            onTap: () => handleNavigation(
+              item.type,
+              [item.path],
+              context,
+              ref: ref,
+            ),
+            child: Card(
+              margin: EdgeInsets.zero,
+              color: ColorConstants.onyx,
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Image.network(item.coverUrl, fit: BoxFit.cover),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(padding16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: SourceSerif,
+                              fontSize: 24,
+                              height: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            item.subtitle,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: DmSans,
+                              fontSize: 16,
+                              height: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: padding20),
+                          if (item.buttons != null && item.buttons!.isNotEmpty)
+                            _buildButtons(item, context, ref),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
