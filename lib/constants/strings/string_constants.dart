@@ -89,16 +89,6 @@ class StringConstants {
   static const String cancel = 'Cancel';
   static const String areYouSure = 'Are you sure?';
 
-  static const String thirdPartyAnalytics = '3rd Party Analytics';
-  static const String analyticsInfo =
-      'As a nonprofit, Medito uses anonymous analytics data to:\n\n'
-      '• Understand which meditations are most helpful\n'
-      '• Identify areas of the app that need improvement\n'
-      '• Measure the impact of new features\n'
-      '• Secure funding by demonstrating our reach\n\n'
-      'This helps us continue providing free, high-quality meditation content. '
-      'No personal information is ever sold or shared.';
-
   static const String requestPermission = 'Request Permission';
   static const String mediaPlaybackPermissions = 'Media Playback Permissions';
   static const String reminderPermissions = 'Reminder Permissions';

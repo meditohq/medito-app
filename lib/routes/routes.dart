@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,17 +18,6 @@ extension SanitisePath on String {
   String sanitisePath() {
     return replaceFirst('/', '');
   }
-}
-
-Future<void> logScreenView(String screenName,
-    {Map<String, dynamic>? parameters}) async {
-  await FirebaseAnalytics.instance.logEvent(
-    name: 'screen_view',
-    parameters: {
-      'screen_name': screenName,
-      ...?parameters,
-    },
-  );
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -44,7 +33,6 @@ Future<void> handleNavigation(
   if (place != null && (place.contains('tracks') || place.contains('track'))) {
     try {
       var trackId = ids.first!;
-      await logScreenView('Track View', parameters: {'track_id': trackId});
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -56,13 +44,13 @@ Future<void> handleNavigation(
         },
       );
     } catch (e, s) {
-      print(s);
+      if (kDebugMode) {
+        print(s);
+      }
     }
     return;
   } else if (place != null && place.contains('pack3')) {
     var p3id = ids[2]!;
-    await logScreenView('Pack View',
-        parameters: {'pack_id': p3id, 'pack_level': '3'});
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -75,8 +63,6 @@ Future<void> handleNavigation(
     );
   } else if (place != null && place.contains('pack2')) {
     var p2id = ids[1]!;
-    await logScreenView('Pack View',
-        parameters: {'pack_id': p2id, 'pack_level': '2'});
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -89,7 +75,6 @@ Future<void> handleNavigation(
     );
   } else if (place == TypeConstants.pack) {
     var pid = ids.first!;
-    await logScreenView('Pack View', parameters: {'pack_id': pid});
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -102,11 +87,9 @@ Future<void> handleNavigation(
     );
   } else if (place == TypeConstants.url || place == TypeConstants.link) {
     var url = ids.last ?? StringConstants.meditoUrl;
-    await logScreenView('External URL', parameters: {'url': url});
     await launchURLInBrowser(url);
     return;
   } else if (place != null && place.contains('settings')) {
-    await logScreenView('Settings Screen');
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -124,8 +107,6 @@ Future<void> handleNavigation(
       var info =
           '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
       var emailAddress = ids.first!;
-      await logScreenView('Email Submission',
-          parameters: {'email': emailAddress});
       await launchEmailSubmission(
         emailAddress,
         body: info,

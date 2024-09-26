@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -180,9 +179,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       // Add this line
       theme: appTheme(context),
       title: ParentWidget._title,
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-      ],
       home: const SplashView(),
     );
   }

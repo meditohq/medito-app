@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/events/analytics_configurator.dart';
-import 'package:medito/providers/events/analytics_consent_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
@@ -234,44 +232,5 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (context) => const DebugBottomSheetWidget(),
     );
-  }
-
-  void _handleAnalyticsConsentChange(WidgetRef ref, bool value) {
-    if (value) {
-      ref.read(analyticsConsentProvider.notifier).state = true;
-      setAnalyticsConsent(true);
-    } else {
-      ref.read(analyticsConsentProvider.notifier).state = false;
-      Future.microtask(() => _showAnalyticsConfirmationDialog(ref));
-    }
-  }
-
-  Future<void> _showAnalyticsConfirmationDialog(WidgetRef ref) async {
-    final confirm = await showDialog<bool>(
-      context: ref.context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(StringConstants.areYouSure),
-        content: const Text(
-          StringConstants.analyticsInfo,
-        ),
-        actions: <Widget>[
-          ElevatedButton(
-            child: const Text('Keep On'),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          TextButton(
-            child: const Text('Turn Off'),
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm != true) {
-      ref.read(analyticsConsentProvider.notifier).state = true;
-      await setAnalyticsConsent(true);
-    } else {
-      await setAnalyticsConsent(false);
-    }
   }
 }
