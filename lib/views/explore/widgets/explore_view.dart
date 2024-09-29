@@ -45,52 +45,60 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
     });
   }
 
+  Future<void> _refreshExploreList() async {
+    ref.invalidate(exploreListProvider(_searchQuery));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              backgroundColor: ColorConstants.ebony,
-              expandedHeight: 134.0,
-              collapsedHeight: 0,
-              toolbarHeight: 0,
-              floating: true,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: padding16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const HomeHeaderWidget(greeting: StringConstants.explore),
-                      const SizedBox(height: 18.0),
-                      SearchBox(
-                        controller: _searchController,
-                        focusNode: widget.searchFocusNode,
-                        onChanged: _onSearchChanged,
-                        onClear: () {
-                          setState(() {
-                            _searchQuery = '';
-                            _searchController.clear();
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 18.0),
-                    ],
+        child: RefreshIndicator(
+          edgeOffset: 150,
+          onRefresh: _refreshExploreList,
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                backgroundColor: ColorConstants.ebony,
+                expandedHeight: 134.0,
+                collapsedHeight: 0,
+                toolbarHeight: 0,
+                floating: true,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: padding16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const HomeHeaderWidget(greeting: StringConstants.explore),
+                        const SizedBox(height: 18.0),
+                        SearchBox(
+                          controller: _searchController,
+                          focusNode: widget.searchFocusNode,
+                          onChanged: _onSearchChanged,
+                          onClear: () {
+                            setState(() {
+                              _searchQuery = '';
+                              _searchController.clear();
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 18.0),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: ExploreContentWidget(
-                searchQuery: _searchQuery,
-                onPackTapped: unfocusSearch,
+              SliverToBoxAdapter(
+                child: ExploreContentWidget(
+                  searchQuery: _searchQuery,
+                  onPackTapped: unfocusSearch,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -115,11 +123,14 @@ class ExploreContentWidget extends ConsumerWidget {
       data: (data) => _buildContent(context, ref, data),
       error: (err, stack) => MeditoErrorWidget(
         message: err.toString(),
-        onTap: () => ref.refresh(exploreListProvider(searchQuery)),
+        onTap: () => ref.invalidate(exploreListProvider(searchQuery)),
       ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+      loading: () => const SizedBox(
+        height: 100,
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+          ),
         ),
       ),
     );
