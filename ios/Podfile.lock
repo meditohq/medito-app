@@ -8,8 +8,6 @@ PODS:
     - FlutterMacOS
   - device_info_plus (0.0.1):
     - Flutter
-  - Firebase/Analytics (10.25.0):
-    - Firebase/Core
   - Firebase/Core (10.25.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (~> 10.25.0)
@@ -18,10 +16,6 @@ PODS:
   - Firebase/Messaging (10.25.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 10.25.0)
-  - firebase_analytics (10.10.7):
-    - Firebase/Analytics (= 10.25.0)
-    - firebase_core
-    - Flutter
   - firebase_core (2.32.0):
     - Firebase/CoreOnly (= 10.25.0)
     - Flutter
@@ -162,7 +156,6 @@ DEPENDENCIES:
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Firebase/Core
-  - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
@@ -202,8 +195,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/connectivity_plus/darwin"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
-  firebase_analytics:
-    :path: ".symlinks/plugins/firebase_analytics/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_messaging:
@@ -239,7 +230,6 @@ SPEC CHECKSUMS:
   connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
   device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
-  firebase_analytics: cc06e24d6a2343c44f845b3112143db72d10ef78
   firebase_core: a626d00494efa398e7c54f25f1454a64c8abf197
   firebase_messaging: 1541105e2a2a6ef8bd869bcc44157d31e82f3a50
   FirebaseAnalytics: ec00fe8b93b41dc6fe4a28784b8e51da0647a248

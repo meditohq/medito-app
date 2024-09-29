@@ -128,7 +128,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   children: [
                     AspectRatio(
                       aspectRatio: _kCardAspectRatio,
-                      child: NetworkImageWidget(url: item.coverUrl),
+                      child: NetworkImageWidget(url: item.coverUrl, shouldCache: true),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(padding16),

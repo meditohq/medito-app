@@ -13,75 +13,108 @@ class NetworkImageWidget extends ConsumerWidget {
   final Widget? errorWidget;
 
   const NetworkImageWidget({
-    Key? key,
+    super.key,
     required this.url,
     this.height,
     this.width,
     this.shouldCache = false,
     this.gradient,
     this.errorWidget,
-  }) : super(key: key);
+  });
+
+  static final Map<double, String> _resolutionSuffixes = {
+    3.0: '_3x.webp',
+    2.0: '_2x.webp',
+    1.0: '_1x.webp',
+  };
+
+  String _getWebPImageUrl(BuildContext context, String imagePath) {
+    var pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    var suffix = _resolutionSuffixes.entries
+        .firstWhere((entry) => pixelRatio >= entry.key,
+            orElse: () => _resolutionSuffixes.entries.last)
+        .value;
+
+    return '$contentBaseUrl$imagePath$suffix';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (url.contains('.svg')) {
-      return SvgPicture.network(
-        url,
-        fit: BoxFit.contain,
-        height: height,
-        width: width,
-      );
-    } else {
-      if (shouldCache) {
-        return CachedNetworkImage(
-          imageUrl: url,
-          imageBuilder: (context, imageProvider) => Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
-            foregroundDecoration: BoxDecoration(
-              gradient: gradient,
+    var scaledImageUrl = url.startsWith('http') ? url : _getWebPImageUrl(context, url);
+    var originalImageUrl = url.startsWith('http') ? url : '$contentBaseUrl$url';
+
+    return scaledImageUrl.endsWith('.svg')
+        ? _buildSvgImage(scaledImageUrl)
+        : shouldCache
+            ? _buildCachedImage(scaledImageUrl, originalImageUrl)
+            : _buildNetworkImage(scaledImageUrl, originalImageUrl);
+  }
+
+  Widget _buildSvgImage(String url) {
+    return SvgPicture.network(
+      url,
+      fit: BoxFit.contain,
+      height: height,
+      width: width,
+    );
+  }
+
+  Widget _buildCachedImage(String scaledUrl, String originalUrl) {
+    return CachedNetworkImage(
+      imageUrl: scaledUrl,
+      imageBuilder: (context, imageProvider) => Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: imageProvider,
+            fit: BoxFit.cover,
+          ),
+        ),
+        foregroundDecoration: BoxDecoration(gradient: gradient),
+      ),
+      placeholder: (_, __) => _shimmerLoading(),
+      errorWidget: (_, __, ___) => CachedNetworkImage(
+        imageUrl: originalUrl,
+        imageBuilder: (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
             ),
           ),
-          placeholder: (context, url) => _shimmerLoading(),
-          errorWidget: (context, url, error) {
-            if (errorWidget != null) {
-              return errorWidget!;
-            }
+          foregroundDecoration: BoxDecoration(gradient: gradient),
+        ),
+        placeholder: (_, __) => _shimmerLoading(),
+        errorWidget: (_, __, ___) => errorWidget ?? Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
+      ),
+    );
+  }
 
-            return _shimmerLoading();
-          },
-        );
-      }
-
-      return Image.network(
-        url,
+  Widget _buildNetworkImage(String scaledUrl, String originalUrl) {
+    return Image.network(
+      scaledUrl,
+      fit: BoxFit.cover,
+      height: height,
+      width: width,
+      cacheHeight: height?.round(),
+      cacheWidth: width?.round(),
+      loadingBuilder: (_, child, loadingProgress) =>
+          loadingProgress == null ? child : _shimmerLoading(),
+      errorBuilder: (_, __, ___) => Image.network(
+        originalUrl,
         fit: BoxFit.cover,
         height: height,
         width: width,
         cacheHeight: height?.round(),
         cacheWidth: width?.round(),
-        loadingBuilder: (context, child, loadingProgress) {
-          return loadingProgress == null ? child : _shimmerLoading();
-        },
-        errorBuilder: (context, error, stackTrace) {
-          if (errorWidget != null) {
-            return errorWidget!;
-          }
-
-          return Image.asset(
-            AssetConstants.dalle,
-            fit: BoxFit.cover,
-          );
-        },
-      );
-    }
+        loadingBuilder: (_, child, loadingProgress) =>
+            loadingProgress == null ? child : _shimmerLoading(),
+        errorBuilder: (_, __, ___) =>
+            errorWidget ?? Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
+      ),
+    );
   }
 
-  Shimmer _shimmerLoading() {
+  Widget _shimmerLoading() {
     return Shimmer.fromColors(
       period: const Duration(seconds: 1),
       baseColor: ColorConstants.black,

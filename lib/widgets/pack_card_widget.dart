@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
 
 class PackCardWidget extends StatelessWidget {
@@ -131,15 +132,9 @@ class PackCardWidget extends StatelessWidget {
       ),
       child: AspectRatio(
         aspectRatio: 16 / 9,
-        child: FadeInImage.assetNetwork(
-          placeholder: AssetConstants.dalle,
-          image: coverUrlPath!,
-          fit: BoxFit.cover,
-          fadeInDuration: const Duration(milliseconds: 300),
-          fadeOutDuration: const Duration(milliseconds: 300),
-          imageErrorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.error);
-          },
+        child: NetworkImageWidget(
+          url: coverUrlPath!,
+          shouldCache: true,
         ),
       ),
     );

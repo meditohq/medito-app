@@ -9,6 +9,7 @@ const String SourceSerif = 'Source Serif';
 const String Teachers = 'Teachers';
 
 const String materialIcons = 'MaterialIcons';
+const padding8 = 8.0;
 const padding12 = 12.0;
 const padding14 = 14.0;
 const padding16 = 16.0;
