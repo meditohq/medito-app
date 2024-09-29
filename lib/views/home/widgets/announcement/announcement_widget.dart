@@ -28,7 +28,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
 
     return Padding(
-      padding: const EdgeInsets.only(top: padding16, left: padding16, right: padding16),
+      padding: const EdgeInsets.only(top: padding8, left: padding16, right: padding16),
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,

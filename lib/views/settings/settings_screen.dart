@@ -41,6 +41,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         backgroundColor: ColorConstants.ebony,
         toolbarHeight: 56.0,
         title: const Column(
@@ -75,15 +76,18 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDailyNotificationTile(context, ref),
-          if (_isHealthSyncAvailable) const HealthSyncTile(),
-          ...homeData.menu
-              .map((element) => _buildMenuItemTile(context, ref, element)),
-          _buildDebugTile(context, ref),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.only(top: padding16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDailyNotificationTile(context, ref),
+            if (_isHealthSyncAvailable) const HealthSyncTile(),
+            ...homeData.menu
+                .map((element) => _buildMenuItemTile(context, ref, element)),
+            _buildDebugTile(context, ref),
+          ],
+        ),
       ),
     );
   }
