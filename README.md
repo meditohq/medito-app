@@ -1,75 +1,28 @@
-# Medito App
+# About Medito
 
-Meditation can positively transform people's lives. We believe no one should have to pay for it. 
+## About
 
-We are the [Medito Foundation](https://meditofoundation.org), and we've built the Medito App for people who have never meditated before or want to deepen their meditation practice. 
+Meditation can positively transform people's lives, and we believe no one should have to pay for it. We are the [Medito Foundation](https://meditofoundation.org), and we've built the Medito App for people who have never meditated before or want to deepen their meditation practice. 
 
-The app is free, forever: no ads, no spam, no need to sign up or pay. 
+The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App is a Flutter project available on Android and iOS maintained by the Medito Foundation and its community.
 
-Medito App is a flutter project available on Android and iOS maintained by the Medito Foundation and its community.
+## Download
 
-
-## Download the app
-- Play Store: https://play.google.com/store/apps/details?id=meditofoundation.medito
-- App Store: https://apps.apple.com/us/app/medito/id1500780518
+- Play Store: [Download on Google Play](https://play.google.com/store/apps/details?id=meditofoundation.medito)
+- App Store: [Download on the App Store](https://apps.apple.com/us/app/medito/id1500780518)
 - APK: <a href="https://github.com/meditohq/medito-app/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/meditohq/medito-app?color=success&label=APK"></a>
 
-NOTE: If you istall Medito app using APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
+**NOTE:** If you install the Medito app using the APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
 
-## Install
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/meditohq/medito-app?label=latest%20version&sort=semver)](https://github.com/meditohq/medito-app/releases)
+## How to Contribute
 
-| Android | iOS |
-| :--: | :--: |
-| <a href="https://play.google.com/store/apps/details?id=meditofoundation.medito"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"/></a><br/>|<a href="https://apps.apple.com/us/app/medito/id1500780518"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="55"/></a> |
+We are a small team and are looking for people who can contribute to the project 2 to 3 hours per week. You must have experience with Flutter. 
 
-## How to use this code
-The best way to start is by opening the project with [Android Studio](https://developer.android.com/studio) or [Visual Studio](https://visualstudio.microsoft.com/).
+To contribute, please message us on our Telegram channel. You can access it by joining [https://t.me/meditoapp](https://t.me/meditoapp) and then going to "Discussion." Let us know that you are looking to contribute to the code, specify for how many hours per week, and how many years of experience with Flutter you have. Also, please include a link to your GitHub profile or portfolio.
 
-You will need an the 2 .env files to build the project. (See "Contributing" below)
+## How to Build the Project
 
-To build the code you also need to run 
-
-```flutter pub run pigeon --input pigeon_conf.dart``` and 
-```dart run build_runner watch --delete-conflicting-outputs```
-
-Need more details? [Feel free to raise an issue](https://github.com/meditohq/medito-app/issues).
-
-## Contributing
-
-API keys are generated for regular contributors (called "volunteers").
-
-To volunteer, join our [Telegram channel](https://t.me/medito.app) and go to "Discussion", then ask there for a key.
-
-Please note that we are looking for people who are interested in investing at least 2 hours a week regularly. :)
-
-Don't feel like contributing to the code?
-Feature requests, feedback and suggestions are welcome. Reach us via Discord/email, or create a new issue.
-
-## About the Medito Foundation
-
-We are a registered Dutch nonprofit:
-
-```html
-Medito Foundation (or in Dutch "Medito Stichting") 
-KvK-nummer: 75284251
-RSIN: 860222627 
-```
-
-- [About us](https://meditofoundation.org/about)
-- [Why we started Medito](https://meditofoundation.org/blog/why-meditation-should-be-free)
-- [Press release](https://meditofoundation.org/blog/medito-foundation-launches-app-to-free-meditation-from-clutches-of-big-business)
-- [Medito on Product Hunt](https://www.producthunt.com/posts/medito)
-
-## License
-- App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
-- Our original content is licensed under a Creative Commons licence. For more information please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
-- Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito". Make sure to respect the original copyright. 
-Now that you know, we cannot be held responsible if you are miss-using this content. If you need more info, reach us on Discord or by email.
-
-Medito Foundation https://meditofoundation.org/.
-
-## Development
+You will not be able to run the project without the necessary keys. Please message us on Telegram first to request access to these keys. We use external libraries that require specific keys, and we will need to chat with you directly to provide these.
 
 ### Setup
 
@@ -93,7 +46,6 @@ Medito Foundation https://meditofoundation.org/.
    - You also need the `/lib/firebase_options.dart` file.
    - Contact a team member for the contents of these files.
 
-
 ### Generating Code
 
 To generate Pigeon code. This is required to communicate with native iOS and Android code.
@@ -106,11 +58,11 @@ To generate API and state management code with Riverpod:
 dart run build_runner watch --delete-conflicting-outputs
 ```
 
-## Development and Production Configurations
+### Development and Production Configurations
 
 This project supports separate development and production configurations. Here's how to set up and use them in different IDEs:
 
-### Visual Studio Code
+#### Visual Studio Code
 
 1. Open the project in VSCode.
 2. Go to the Run and Debug view (Ctrl+Shift+D or Cmd+Shift+D on macOS).
@@ -119,7 +71,7 @@ This project supports separate development and production configurations. Here's
    - "Flutter (Prod)" for production configuration
 4. Click the play button or press F5 to start debugging with the selected configuration.
 
-### Android Studio
+#### Android Studio
 
 1. Open the project in Android Studio.
 2. In the toolbar, you'll see a dropdown next to the run button.
@@ -136,7 +88,7 @@ This project supports separate development and production configurations. Here's
   - Entry point: `lib/main_prod.dart`
   - Flavor: prod
 
-Temp solution for  iOS
+Temporary solution for iOS:
    - Entry point: `lib/main.dart`
 
 These configurations are defined in:
@@ -144,3 +96,11 @@ These configurations are defined in:
 - `.run/Flutter_Dev.run.xml` and `.run/Flutter_Prod.run.xml` for Android Studio
 
 Ensure that your `android/app/build.gradle` file has the corresponding flavor configurations set up correctly.
+
+## License
+
+- App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
+- Our original content is licensed under a Creative Commons license. For more information, please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
+- Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito." Make sure to respect the original copyright. 
+
+Medito Foundation: [https://meditofoundation.org/](https://meditofoundation.org/).
