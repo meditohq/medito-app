@@ -67,20 +67,40 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      child: IntrinsicHeight(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: widget.carouselItems.asMap().entries.map((entry) {
-            int index = entry.key;
-            HomeCarouselModel item = entry.value;
-            return _buildCarouselItem(context, ref, index, item);
-          }).toList(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        height16,
+        const Padding(
+          padding: EdgeInsets.only(left: padding16),
+          child: Text(
+            'Featured',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontFamily: Teachers,
+              fontSize: 20,
+              height: 28 / 24,
+            ),
+          ),
         ),
-      ),
+        height8,
+        SingleChildScrollView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: widget.carouselItems.asMap().entries.map((entry) {
+                int index = entry.key;
+                HomeCarouselModel item = entry.value;
+                return _buildCarouselItem(context, ref, index, item);
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -91,7 +111,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     final isTablet = screenSize.shortestSide >= 600;
 
     var cardWidth = isHorizontal || isTablet
-        ? (screenSize.width / 2) - (3 * padding16)
+        ? (screenSize.longestSide / 2) - (3 * padding16)
         : screenSize.width - (3 * padding16);
 
     return Padding(
@@ -128,7 +148,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   children: [
                     AspectRatio(
                       aspectRatio: _kCardAspectRatio,
-                      child: NetworkImageWidget(url: item.coverUrl, shouldCache: true),
+                      child: NetworkImageWidget(
+                          url: item.coverUrl, shouldCache: true),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(padding16),

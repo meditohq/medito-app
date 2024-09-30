@@ -76,7 +76,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   @override
   Widget build(BuildContext context) {
     return ReorderableWrap(
-      spacing: 8.0,
+      spacing: 16.0,
       runSpacing: 8.0,
       padding: EdgeInsets.zero,
       maxMainAxisCount: 2,

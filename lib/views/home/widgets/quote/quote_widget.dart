@@ -24,21 +24,41 @@ class QuoteWidget extends ConsumerWidget {
       color: ColorConstants.white.withOpacity(0.6),
     );
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: ColorConstants.onyx,
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: padding16),
-      padding: const EdgeInsets.all(padding16),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          _buildBackgroundIcon(),
-          _buildQuoteContent(quoteStyle, authorStyle),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        height16,
+        const Padding(
+          padding: EdgeInsets.only(left: padding16),
+          child: Text(
+            'Daily Quote',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontFamily: Teachers,
+              fontSize: 20,
+              height: 28 / 24,
+            ),
+          ),
+        ),
+        height8,
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: ColorConstants.onyx,
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: padding16),
+          padding: const EdgeInsets.all(padding16),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              _buildBackgroundIcon(),
+              _buildQuoteContent(quoteStyle, authorStyle),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
