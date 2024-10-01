@@ -62,27 +62,27 @@ String get sentryDsn => _currentEnv.sentryDsn;
 
 class HTTPConstants {
   //END POINTS
-  static const String TOKENS = 'tokens';
-  static const String PACKS = 'packs';
-  static const String TRACKS = 'tracks';
-  static const String BACKGROUND_SOUNDS = 'backgroundsounds';
-  static const String HOME = 'home';
-  static const String LATEST_ANNOUNCEMENT = 'announcements?latest=true';
-  static const String STATS = '/stats';
-  static const String ME = 'me';
-  static const String SEARCH_TRACKS = 'search/tracks';
+  static const String tokens = 'tokens';
+  static const String packs = 'packs';
+  static const String tracks = 'tracks';
+  static const String backgroundSounds = 'backgroundsounds';
+  static const String home = 'home';
+  static const String latestAnnouncement = 'announcements?latest=true';
+  static const String stats = '/stats';
+  static const String me = 'me';
+  static const String searchTracks = 'search/tracks';
 
   // MAINTENANCE END POINTS
-  static const String MAINTENANCE = 'https://api.medito.app/v1/maintenance';
+  static String maintenance = '${contentBaseUrl}maintenance';
 
   // EVENT END POINTS
-  static const String AUDIO = '/audio';
-  static const String AUDIO_START_EVENT = '/start';
-  static const String ANNOUNCEMENT_EVENT = '/announcements';
-  static const String ANNOUNCEMENT_DISMISS_EVENT = '/dismiss';
-  static const String COMPLETE_EVENT = '/complete';
-  static const String FIREBASE_EVENT = '/fcm';
-  static const String RATE = '/rate';
-  static const String LIKE = '/like';
-  static const String DONATE = '/donations/asks?random=true';
+  static const String audio = '/audio';
+  static const String audioStartEvent = '/start';
+  static const String announcementEvent = '/announcements';
+  static const String announcementDismissEvent = '/dismiss';
+  static const String completeEvent = '/complete';
+  static const String firebaseEvent = '/fcm';
+  static const String rate = '/rate';
+  static const String like = '/like';
+  static const String donate = '/donations/asks?random=true';
 }

@@ -45,18 +45,18 @@ class EventsRepositoryImpl extends EventsRepository {
     String trackId,
   ) =>
       client.postRequest(
-        '${HTTPConstants.AUDIO}/$trackId${HTTPConstants.AUDIO_START_EVENT}',
+        '${HTTPConstants.audio}/$trackId${HTTPConstants.audioStartEvent}',
         data: event,
       );
 
   @override
   Future<void> trackAnnouncementDismissEvent(String id) => client.postRequest(
-      '${HTTPConstants.ANNOUNCEMENT_EVENT}/$id${HTTPConstants.ANNOUNCEMENT_DISMISS_EVENT}');
+      '${HTTPConstants.announcementEvent}/$id${HTTPConstants.announcementDismissEvent}');
 
   @override
   Future<void> markTrackAsListenedEvent(String id, {String? userToken}) =>
       client.postRequest(
-        '${HTTPConstants.TRACKS}/$id${HTTPConstants.COMPLETE_EVENT}',
+        '${HTTPConstants.tracks}/$id${HTTPConstants.completeEvent}',
         userToken: userToken,
       );
 
@@ -70,7 +70,7 @@ class EventsRepositoryImpl extends EventsRepository {
     String? userToken,
   }) =>
       client.postRequest(
-        '${HTTPConstants.AUDIO}/$trackId${HTTPConstants.COMPLETE_EVENT}',
+        '${HTTPConstants.audio}/$trackId${HTTPConstants.completeEvent}',
         userToken: userToken,
         data: {
           'timestamp': timestamp,
@@ -82,33 +82,33 @@ class EventsRepositoryImpl extends EventsRepository {
 
   @override
   Future<void> markTrackAsNotListenedEvent(String id) => client.deleteRequest(
-        '${HTTPConstants.TRACKS}/$id${HTTPConstants.COMPLETE_EVENT}',
+        '${HTTPConstants.tracks}/$id${HTTPConstants.completeEvent}',
       );
 
   @override
   Future<void> saveFirebaseToken(
           Map<String, dynamic> event, String userToken) =>
-      client.postRequest(HTTPConstants.FIREBASE_EVENT,
+      client.postRequest(HTTPConstants.firebaseEvent,
           data: event, userToken: userToken);
 
   @override
   Future<void> feedbackEvent(String trackId, Map<String, dynamic> event) =>
       client.postRequest(
-        '${HTTPConstants.TRACKS}/$trackId${HTTPConstants.RATE}',
+        '${HTTPConstants.tracks}/$trackId${HTTPConstants.rate}',
         data: event,
       );
 
   @override
   Future<void> markTrackAsFavouriteEvent(String trackId) {
     return client.postRequest(
-      '${HTTPConstants.TRACKS}/$trackId${HTTPConstants.LIKE}',
+      '${HTTPConstants.tracks}/$trackId${HTTPConstants.like}',
     );
   }
 
   @override
   Future<void> markTrackAsNotFavouriteEvent(String trackId) {
     return client.deleteRequest(
-      '${HTTPConstants.TRACKS}/$trackId${HTTPConstants.LIKE}',
+      '${HTTPConstants.tracks}/$trackId${HTTPConstants.like}',
     );
   }
 }

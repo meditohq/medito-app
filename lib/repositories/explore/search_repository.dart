@@ -9,7 +9,7 @@ class SearchRepository {
 
   Future<List<PackItemsModel>> searchPacks(String query) async {
     final response = await _apiService.postRequest(
-      HTTPConstants.SEARCH_TRACKS,
+      HTTPConstants.searchTracks,
       data: {'query': query},
     );
 

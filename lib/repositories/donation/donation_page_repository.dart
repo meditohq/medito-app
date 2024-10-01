@@ -19,7 +19,7 @@ class DonationPageRepositoryImpl extends DonationPageRepository {
 
   @override
   Future<DonationPageModel> fetchDonationPage() async {
-    return client.getRequest(HTTPConstants.DONATE).then((response) {
+    return client.getRequest(HTTPConstants.donate).then((response) {
       return DonationPageModel.fromJson(response);
     });
   }

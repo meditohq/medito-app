@@ -33,7 +33,7 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<TrackModel> fetchTrack(String trackId) async {
-    var response = await client.getRequest('${HTTPConstants.TRACKS}/$trackId');
+    var response = await client.getRequest('${HTTPConstants.tracks}/$trackId');
 
     return TrackModel.fromJson(response);
   }

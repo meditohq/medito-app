@@ -15,7 +15,7 @@ class MaintenanceDioApiService {
   MaintenanceDioApiService._internal() {
     dio = Dio()
       ..options = BaseOptions(
-        baseUrl: HTTPConstants.MAINTENANCE,
+        baseUrl: HTTPConstants.maintenance,
       );
   }
 

@@ -81,7 +81,7 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<HomeModel> fetchHome() async {
     return _executeWithTokenRefresh(() async {
-      var response = await client.getRequest(HTTPConstants.HOME);
+      var response = await client.getRequest(HTTPConstants.home);
       return HomeModel.fromJson(response);
     });
   }
@@ -89,7 +89,7 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<StatsModel> fetchStats() async {
     return _executeWithTokenRefresh(() async {
-      var response = await client.getRequest(HTTPConstants.STATS);
+      var response = await client.getRequest(HTTPConstants.stats);
       return StatsModel.fromJson(response);
     });
   }
@@ -97,7 +97,7 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<AnnouncementModel?> fetchLatestAnnouncement() async {
     return _executeWithTokenRefresh(() async {
-      var response = await client.getRequest(HTTPConstants.LATEST_ANNOUNCEMENT);
+      var response = await client.getRequest(HTTPConstants.latestAnnouncement);
       return AnnouncementModel.fromJson(response);
     });
   }

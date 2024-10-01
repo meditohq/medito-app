@@ -37,7 +37,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
   @override
   Future<List<BackgroundSoundsModel>> fetchBackgroundSounds() async {
-    var response = await client.getRequest(HTTPConstants.BACKGROUND_SOUNDS);
+    var response = await client.getRequest(HTTPConstants.backgroundSounds);
     var tempResponse = response as List;
     var bgSoundList = <BackgroundSoundsModel>[];
     const noneBgSound = BackgroundSoundsModel(

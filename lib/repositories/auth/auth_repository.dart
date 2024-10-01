@@ -60,7 +60,7 @@ class AuthRepositoryImpl extends AuthRepository {
     clientId ??= const Uuid().v4();
 
     var response = await client.postRequest(
-      HTTPConstants.TOKENS,
+      HTTPConstants.tokens,
       data: {
         'clientId': clientId,
         'email': email,

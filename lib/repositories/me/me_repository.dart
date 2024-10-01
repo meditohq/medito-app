@@ -16,7 +16,7 @@ class MeRepositoryImpl extends MeRepository {
 
   @override
   Future<MeModel> fetchMe() async {
-    var response = await client.getRequest(HTTPConstants.ME);
+    var response = await client.getRequest(HTTPConstants.me);
 
     return MeModel.fromJson(response);
   }
