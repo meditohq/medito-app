@@ -68,7 +68,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         height16,
         const Padding(
