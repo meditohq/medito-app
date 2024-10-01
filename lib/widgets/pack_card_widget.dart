@@ -30,8 +30,7 @@ class PackCardWidget extends StatelessWidget {
         var backgroundColor =
             colorScheme?.primaryContainer ?? ColorConstants.onyx;
         var titleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
-        var subtitleColor = colorScheme?.onPrimaryContainer ??
-            const Color.fromARGB(255, 170, 170, 170);
+        var subtitleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
 
         return Container(
           decoration: BoxDecoration(
@@ -110,8 +109,8 @@ class PackCardWidget extends StatelessWidget {
     if (subtitle != null) {
       return Text(
         subtitle,
+        maxLines: 4,
         overflow: TextOverflow.ellipsis,
-        maxLines: 2,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
           color: color,
@@ -131,9 +130,9 @@ class PackCardWidget extends StatelessWidget {
         topRight: Radius.circular(14),
       ),
       child: AspectRatio(
-        aspectRatio: 16 / 9,
+        aspectRatio: 4 / 3,
         child: NetworkImageWidget(
-          url: coverUrlPath!,
+          url: coverUrlPath ?? '',
           shouldCache: true,
         ),
       ),
