@@ -4,7 +4,7 @@ description: A meditation learning tool
 # flutter clean && flutter build apk --release --no-tree-shake-icons  --dart-define-from-file=../.prod.json
 # flutter clean && flutter build appbundle --obfuscate --split-debug-info=./debug-info --target-platform android-arm,android-arm64,android-x64 --no-tree-shake-icons  --dart-define-from-file=../.prod.json
 # flutter clean && flutter build ios --no-tree-shake-icons  --dart-define-from-file=../.prod.json
-version: 3.2.0+30055
+version: 3.2.0+30056
 
 environment:
   sdk: ">=2.18.0 <4.0.0"
