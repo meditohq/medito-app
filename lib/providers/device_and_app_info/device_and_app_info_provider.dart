@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -34,7 +35,7 @@ String _formatString(
   DeviceAndAppInfoModel? deviceInfo,
   String? emailAddress,
 ) {
-  var isProdString = kDebugMode ? 'Debug' : 'Release';
+  var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
   var env = '${StringConstants.env}: $isProdString';
   var id = '${StringConstants.id}: ${me?.id ?? ''}';
   var email = '${StringConstants.email}: ${emailAddress ?? ''}';
