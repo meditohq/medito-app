@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
@@ -406,7 +407,9 @@ class _TrackViewState extends ConsumerState<TrackView> {
             ref.invalidate(packProvider),
           });
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -424,14 +427,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomRight: 7,
       bottomLeft: 7,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
+          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.min}',
       items: files(selectedFile ?? audioFiles)
           .map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,
             child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.mins}',
+              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.min}',
             ),
           );
         },

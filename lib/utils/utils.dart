@@ -84,7 +84,9 @@ Future<void> launchEmailSubmission(
 }
 
 int convertDurationToMinutes({required int milliseconds}) {
-  return Duration(milliseconds: milliseconds).inMinutes;
+  const millisecondsPerMinute = 60000;
+
+  return (milliseconds.abs() / millisecondsPerMinute).round();
 }
 
 //ignore: prefer-match-file-name
