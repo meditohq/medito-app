@@ -31,7 +31,7 @@ Future<void> handleNavigation(
   ids.removeWhere((element) => element == null);
   if (type != null && (type.contains('tracks') || type.contains('track'))) {
     try {
-      var trackId = ids.first!;
+      var trackId = ids.  first!;
       await Navigator.push(
         context,
         MaterialPageRoute(

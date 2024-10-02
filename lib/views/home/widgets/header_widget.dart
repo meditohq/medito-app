@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/stats/stats_model.dart';
 import 'header/home_header_widget.dart';
-import 'stats/stats_row.dart';
+import 'stats/streak_circle.dart';
 
 class HeaderWidget extends ConsumerStatefulWidget {
   const HeaderWidget({
@@ -51,9 +51,9 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
             greeting: widget.greeting,
           ),
         ),
-        StreakButton(
+        StreakCircle(
           text: streakData?.title ?? '',
-          isStreakDoneToday: streakData?.isStreakDoneToday ?? false,
+          isStreakDoneToday: true,
           onTap: widget.onStatsButtonTap,
         ),
       ],

@@ -3,12 +3,12 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import '../../../../constants/colors/color_constants.dart';
 import '../../../../widgets/medito_huge_icon.dart';
 
-class StreakButton extends StatefulWidget {
+class StreakCircle extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
   final bool isStreakDoneToday;
 
-  const StreakButton({
+  const StreakCircle({
     Key? key,
     required this.text,
     required this.onTap,
@@ -16,14 +16,14 @@ class StreakButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  StreakButtonState createState() => StreakButtonState();
+  StreakCircleState createState() => StreakCircleState();
 }
 
-class StreakButtonState extends State<StreakButton>
+class StreakCircleState extends State<StreakCircle>
     with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
 
-  static const _kShimmerDuration = Duration(seconds:8);
+  static const _kShimmerDuration = Duration(seconds: 8);
   static const _kBorderRadius = 30.0;
   static const _kIconSize = 20.0;
   static const _kInnerIconSize = 18.0;
@@ -57,11 +57,12 @@ class StreakButtonState extends State<StreakButton>
               gradient: widget.isStreakDoneToday
                   ? LinearGradient(
                       colors: [
-                        ColorConstants.lightPurple.withOpacity(0.05),
-                        ColorConstants.lightPurple.withOpacity(0.4),
-                        ColorConstants.lightPurple.withOpacity(0.05),
+                        ColorConstants.lightPurple.withOpacity(0.2),
+                        ColorConstants.lightPurple.withOpacity(0.8),
+                        Colors.purple.withOpacity(0.6),
+                        ColorConstants.lightPurple.withOpacity(0.2),
                       ],
-                      stops: const [0.0, 0.5, 1.0],
+                      stops: const [0.0, 0.3, 0.7, 1.0],
                       transform:
                           GradientRotation(_shimmerController.value * 6.28319),
                     )
