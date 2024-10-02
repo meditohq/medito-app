@@ -53,7 +53,7 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
         ),
         StreakCircle(
           text: streakData?.title ?? '',
-          isStreakDoneToday: true,
+          isStreakDoneToday: streakData?.isStreakDoneToday ?? false,
           onTap: widget.onStatsButtonTap,
         ),
       ],

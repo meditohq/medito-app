@@ -59,7 +59,7 @@ class StreakCircleState extends State<StreakCircle>
                       colors: [
                         ColorConstants.lightPurple.withOpacity(0.2),
                         ColorConstants.lightPurple.withOpacity(0.8),
-                        Colors.purple.withOpacity(0.6),
+                       ColorConstants.lightPurple.withOpacity(0.6),
                         ColorConstants.lightPurple.withOpacity(0.2),
                       ],
                       stops: const [0.0, 0.3, 0.7, 1.0],
