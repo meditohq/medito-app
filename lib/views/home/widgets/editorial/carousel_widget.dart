@@ -129,7 +129,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
             onTap: () {
               handleNavigation(
                 item.type,
-                [item.path?.getIdFromPath()],
+                [item.path.toString().getIdFromPath(), item.path],
                 context,
                 ref: ref,
               );
@@ -242,12 +242,14 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                             BorderRadius.circular(_kButtonBorderRadius),
                       ),
                     ),
-                    onPressed: () => handleNavigation(
-                      button.type,
-                      [button.path.getIdFromPath()],
-                      context,
-                      ref: ref,
-                    ),
+                    onPressed: () {
+                      handleNavigation(
+                        button.type,
+                        [button.path.toString().getIdFromPath(), button.path],
+                        context,
+                        ref: ref,
+                      );
+                    },
                     child: Text(
                       button.title,
                       maxLines: 1,
