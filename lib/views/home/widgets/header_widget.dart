@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../constants/styles/widget_styles.dart';
 import '../../../models/stats/stats_model.dart';
 import 'header/home_header_widget.dart';
 import 'stats/stats_row.dart';
