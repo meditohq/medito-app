@@ -22,6 +22,7 @@ class StreakCircle extends StatefulWidget {
 class StreakCircleState extends State<StreakCircle>
     with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
+  var _isPressed = false;
 
   static const _kShimmerDuration = Duration(seconds: 8);
   static const _kBorderRadius = 30.0;
@@ -47,78 +48,88 @@ class StreakCircleState extends State<StreakCircle>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: AnimatedBuilder(
-        animation: _shimmerController,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: widget.isStreakDoneToday
-                  ? LinearGradient(
-                      colors: [
-                        ColorConstants.lightPurple.withOpacity(0.2),
-                        ColorConstants.lightPurple.withOpacity(0.8),
-                       ColorConstants.lightPurple.withOpacity(0.6),
-                        ColorConstants.lightPurple.withOpacity(0.2),
-                      ],
-                      stops: const [0.0, 0.3, 0.7, 1.0],
-                      transform:
-                          GradientRotation(_shimmerController.value * 6.28319),
-                    )
-                  : null,
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, child) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          decoration: BoxDecoration(
+            gradient: widget.isStreakDoneToday
+                ? LinearGradient(
+                    colors: [
+                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.15 : 0.2),
+                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.6 : 0.8),
+                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.45 : 0.6),
+                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.15 : 0.2),
+                    ],
+                    stops: const [0.0, 0.3, 0.7, 1.0],
+                    transform:
+                        GradientRotation(_shimmerController.value * 6.28319),
+                  )
+                : null,
+            borderRadius: BorderRadius.circular(_kBorderRadius),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: widget.onTap,
+              onTapDown: (_) => setState(() => _isPressed = true),
+              onTapUp: (_) => setState(() => _isPressed = false),
+              onTapCancel: () => setState(() => _isPressed = false),
               borderRadius: BorderRadius.circular(_kBorderRadius),
-            ),
-            padding: const EdgeInsets.all(1),
-            child: Container(
-              decoration: BoxDecoration(
-                color: ColorConstants.onyx,
-                borderRadius: BorderRadius.circular(_kBorderRadius - 2),
-              ),
               child: Padding(
-                padding: _kPadding,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
+                padding: const EdgeInsets.all(1),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _isPressed ? ColorConstants.onyx.withOpacity(0.8) : ColorConstants.onyx,
+                    borderRadius: BorderRadius.circular(_kBorderRadius - 2),
+                  ),
+                  child: Padding(
+                    padding: _kPadding,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (widget.isStreakDoneToday)
-                          const MeditoHugeIcon(
-                            icon: MeditoHugeIcon.streakIcon,
-                            size: _kIconSize,
-                            color: Colors.white,
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            if (widget.isStreakDoneToday)
+                              const MeditoHugeIcon(
+                                icon: MeditoHugeIcon.streakIcon,
+                                size: _kIconSize,
+                                color: Colors.white,
+                              ),
+                            MeditoHugeIcon(
+                              icon: MeditoHugeIcon.streakIcon,
+                              size: _kInnerIconSize,
+                              color: widget.isStreakDoneToday
+                                  ? ColorConstants.lightPurple
+                                  : ColorConstants.white,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.text,
+                          style: TextStyle(
+                            color: ColorConstants.white,
+                            fontSize: _kFontSize,
+                            fontWeight: widget.isStreakDoneToday
+                                ? FontWeight.bold
+                                : FontWeight.w400,
+                            fontFamily: DmMono,
+                            height: _kLineHeight,
                           ),
-                        MeditoHugeIcon(
-                          icon: MeditoHugeIcon.streakIcon,
-                          size: _kInnerIconSize,
-                          color: widget.isStreakDoneToday
-                              ? ColorConstants.lightPurple
-                              : ColorConstants.white,
                         ),
                       ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      widget.text,
-                      style: TextStyle(
-                        color: ColorConstants.white,
-                        fontSize: _kFontSize,
-                        fontWeight: widget.isStreakDoneToday
-                            ? FontWeight.bold
-                            : FontWeight.w400,
-                        fontFamily: DmMono,
-                        height: _kLineHeight,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
