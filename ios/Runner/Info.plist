@@ -82,7 +82,7 @@
 		<string>medito_stats_thread_identifier</string>
 	</array>
 	<key>CFBundleDisplayName</key>
-	<string>$(DISPLAY_NAME)</string>
+	<string>Medito</string>
 	<key>UIRequiresFullScreen</key>
 	<string>YES</string>
 </dict>
