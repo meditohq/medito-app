@@ -427,7 +427,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomRight: 7,
       bottomLeft: 7,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.min}',
+          '${convertDurationToMinutes(milliseconds: selectedFile?.first.duration ?? 0)} ${StringConstants.min}',
       items: files(selectedFile ?? audioFiles)
           .map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
