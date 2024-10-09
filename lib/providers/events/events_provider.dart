@@ -19,19 +19,6 @@ Future<void> feedback(
 }
 
 @riverpod
-Future<void> audioStartedEvent(
-  AudioStartedEventRef ref, {
-  required Map<String, String> event,
-  required String trackId,
-}) async {
-  var parameters = <String, String>{'trackId': trackId};
-  parameters.addAll(event);
-  final events = ref.watch(eventsRepositoryProvider);
-
-  return events.trackAudioStartedEvent(event, trackId);
-}
-
-@riverpod
 Future<void> fcmSaveEvent(
   FcmSaveEventRef ref, {
   required Map<String, String> event,
@@ -53,16 +40,6 @@ Future<void> announcementDismissEvent(
 }
 
 @riverpod
-Future<void> markAsListenedEvent(
-  MarkAsListenedEventRef ref, {
-  required String id,
-}) async {
-  final events = ref.watch(eventsRepositoryProvider);
-
-  return events.markTrackAsListenedEvent(id);
-}
-
-@riverpod
 Future<void> markAsFavouriteEvent(
   MarkAsFavouriteEventRef ref, {
   required String trackId,
@@ -80,14 +57,4 @@ Future<void> markAsNotFavouriteEvent(
   final events = ref.watch(eventsRepositoryProvider);
 
   return events.markTrackAsNotFavouriteEvent(trackId);
-}
-
-@riverpod
-Future<void> markAsNotListenedEvent(
-  MarkAsNotListenedEventRef ref, {
-  required String id,
-}) async {
-  final events = ref.watch(eventsRepositoryProvider);
-
-  return events.markTrackAsNotListenedEvent(id);
 }

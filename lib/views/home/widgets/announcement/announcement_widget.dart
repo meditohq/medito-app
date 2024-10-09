@@ -40,7 +40,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _icon(widget.announcement.icon),
                 _text(context),
               ],
             ),
@@ -113,23 +112,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
         ),
       ),
     );
-  }
-
-  Widget _icon(String? icon) {
-    if (icon.isNotNullAndNotEmpty()) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 0, right: 10),
-        child: Icon(
-          IconData(
-            formatIcon(icon!),
-            fontFamily: materialIcons,
-          ),
-          size: 24,
-        ),
-      );
-    }
-
-    return const SizedBox();
   }
 
   void _handleCtaTitlePress(

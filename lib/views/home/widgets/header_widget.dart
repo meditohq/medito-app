@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../models/stats/stats_model.dart';
 import 'header/home_header_widget.dart';
 import 'stats/streak_circle.dart';
 
 class HeaderWidget extends ConsumerStatefulWidget {
   const HeaderWidget({
     super.key,
-    required this.statsData,
     required this.onStatsButtonTap,
     required this.greeting,
   });
 
   final String greeting;
-  final StatsModel? statsData;
   final VoidCallback onStatsButtonTap;
 
   @override
@@ -32,16 +29,6 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
   }
 
   Row _buildMain() {
-    var mini = widget.statsData?.mini;
-    var streakData = mini?.isNotEmpty == true
-        ? mini?.first
-        : const TilesModel(
-            icon: '',
-            color: '',
-            title: '',
-            subtitle: '',
-          );
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,8 +39,6 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
           ),
         ),
         StreakCircle(
-          text: streakData?.title ?? '',
-          isStreakDoneToday: streakData?.isStreakDoneToday ?? false,
           onTap: widget.onStatsButtonTap,
         ),
       ],

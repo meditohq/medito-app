@@ -2,7 +2,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/home/announcement/announcement_model.dart';
 import '../../models/home/home_model.dart';
-import '../../models/stats/stats_model.dart';
 import '../../repositories/home/home_repository.dart';
 
 part 'home_provider.g.dart';
@@ -31,14 +30,6 @@ Future<AnnouncementModel?> fetchLatestAnnouncement(
   var announcement = await homeRepository.fetchLatestAnnouncement();
 
   return announcement?.id == noneAnnouncementId ? null : announcement;
-}
-
-@riverpod
-Future<StatsModel> fetchStats(FetchStatsRef ref) {
-  final homeRepository = ref.watch(homeRepositoryProvider);
-  ref.keepAlive();
-
-  return homeRepository.fetchStats();
 }
 
 @riverpod

@@ -9,8 +9,10 @@ class SharedPreferenceConstants {
   static const String savedHours = 'savedHours';
   static const String savedMinutes = 'savedMinutes';
 
-  // Add new constants for user ID and email
   static const String userId = 'userId';
   static const String userEmail = 'userEmail';
   static const String userToken = 'userToken';
+
+  // New constants for stats
+  static const String localAllStatsKey = 'local_all_stats';
 }

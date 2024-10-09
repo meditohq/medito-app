@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
@@ -13,6 +14,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
@@ -99,7 +101,10 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     return RowItemWidget(
       enableInteractiveSelection: false,
-      icon: IconType.fromString(element.icon),
+      icon: MeditoHugeIcon(
+        icon: element.icon,
+        size: 24,
+      ),
       title: element.title,
       hasUnderline: true,
       onTap: () => handleItemPress(context, ref, element),
@@ -109,7 +114,11 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
     return RowItemWidget(
       enableInteractiveSelection: false,
-      icon: IconType.fromIconData(Icons.bug_report),
+      icon: HugeIcon(
+        icon: HugeIcons.strokeRoundedHelpCircle,
+        size: 24,
+        color: Colors.white
+      ),
       title: StringConstants.debugInfo,
       hasUnderline: true,
       onTap: () => _showDebugBottomSheet(context, ref),
@@ -125,7 +134,10 @@ class SettingsScreen extends ConsumerWidget {
       color: ColorConstants.onyx,
       child: RowItemWidget(
         enableInteractiveSelection: false,
-        icon: IconType.fromIconData(Icons.notifications),
+        icon: HugeIcon(
+          icon: HugeIcons.solidRoundedNotification03,
+          size: 24, color: Colors.white,
+        ),
         title: StringConstants.dailyReminderTitle,
         subTitle: reminderTime != null
             ? ('${StringConstants.setFor} ${reminderTime.format(context)}')

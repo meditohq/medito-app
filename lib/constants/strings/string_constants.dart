@@ -118,4 +118,21 @@ class StringConstants {
       'Background sounds are disabled for this track';
 
   static const String neww = 'New';
+
+  // New constants for stats
+  static const String statsLoadError =
+      'Unable to load stats. Please try again later.';
+  static const String statsRefreshError =
+      'Failed to refresh stats. Please check your connection and try again.';
+  static const String statsLoading = 'Loading stats...';
+  static const String statsErrorRetry = 'Retry';
+
+  // New constants for stats
+  static const String currentStreak = 'Current Streak';
+  static const String longestStreak = 'Longest Streak';
+  static const String totalTracksCompleted = 'Total Tracks Completed';
+  static const String totalTimeListened = 'Total Time Listened';
+  static const String days = 'days';
+  static const String hours = 'h';
+  static const String minutes = 'min';
 }

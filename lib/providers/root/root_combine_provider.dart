@@ -9,14 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
-import '../../utils/call_update_stats.dart';
 import '../../utils/stats_updater.dart';
 import '../../views/maintenance/maintenance_view.dart';
 import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
-    ref.read(fetchStatsProvider);
     ref.read(deviceAppAndUserInfoProvider);
     checkMaintenance(ref, context);
 

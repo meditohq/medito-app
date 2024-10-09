@@ -8,16 +8,12 @@ import 'package:medito/services/network/assign_dio_headers.dart';
 import 'package:medito/services/network/dio_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../models/stats/stats_model.dart';
-
 part 'home_repository.g.dart';
 
 abstract class HomeRepository {
   Future<HomeModel> fetchHome();
 
   List<String> getLocalShortcutIds();
-
-  Future<StatsModel> fetchStats();
 
   Future<AnnouncementModel?> fetchLatestAnnouncement();
 
@@ -83,14 +79,6 @@ class HomeRepositoryImpl extends HomeRepository {
     return _executeWithTokenRefresh(() async {
       var response = await client.getRequest(HTTPConstants.home);
       return HomeModel.fromJson(response);
-    });
-  }
-
-  @override
-  Future<StatsModel> fetchStats() async {
-    return _executeWithTokenRefresh(() async {
-      var response = await client.getRequest(HTTPConstants.stats);
-      return StatsModel.fromJson(response);
     });
   }
 

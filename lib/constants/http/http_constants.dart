@@ -46,7 +46,7 @@ const _prodEnv = ProdEnv(
 
 const _stagingEnv = StagingEnv(
   environment: String.fromEnvironment('ENVIRONMENT'),
-  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
+  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL_V2'),
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
   sentryDsn: String.fromEnvironment('SENTRY_DSN'),
@@ -68,7 +68,7 @@ class HTTPConstants {
   static const String backgroundSounds = 'backgroundsounds';
   static const String home = 'home';
   static const String latestAnnouncement = 'announcements?latest=true';
-  static const String stats = '/stats';
+  static const String allStats = '/stats';
   static const String me = 'me';
   static const String searchTracks = 'search/tracks';
 
@@ -77,7 +77,6 @@ class HTTPConstants {
 
   // EVENT END POINTS
   static const String audio = '/audio';
-  static const String audioStartEvent = '/start';
   static const String announcementEvent = '/announcements';
   static const String announcementDismissEvent = '/dismiss';
   static const String completeEvent = '/complete';

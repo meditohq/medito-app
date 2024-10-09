@@ -33,6 +33,11 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -65,7 +70,6 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     final home = ref.watch(fetchHomeProvider);
     final announcementData = ref.watch(fetchLatestAnnouncementProvider);
-    final stats = ref.watch(fetchStatsProvider);
 
     return home.when(
       loading: () => const HomeShimmerWidget(),
@@ -80,8 +84,7 @@ class _HomeViewState extends ConsumerState<HomeView>
             toolbarHeight: 56.0,
             title: HeaderWidget(
               greeting: homeData.greeting ?? StringConstants.welcome,
-              statsData: stats.value,
-              onStatsButtonTap: () => _onStatsButtonTapped(context, ref),
+              onStatsButtonTap: () => _onStatsButtonTapped(context),
             ),
             elevation: 0.0,
           ),
@@ -136,13 +139,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
-    ref.invalidate(fetchStatsProvider);
-    await ref.read(fetchStatsProvider.future);
   }
 
-  void _onStatsButtonTapped(BuildContext context, WidgetRef ref) {
-    ref.invalidate(fetchStatsProvider);
-    ref.read(fetchStatsProvider);
+  void _onStatsButtonTapped(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(

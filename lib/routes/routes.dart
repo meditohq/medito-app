@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
@@ -31,7 +32,7 @@ Future<void> handleNavigation(
   ids.removeWhere((element) => element == null);
   if (type != null && (type.contains('tracks') || type.contains('track'))) {
     try {
-      var trackId = ids.  first!;
+      var trackId = ids.first!;
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -39,7 +40,7 @@ Future<void> handleNavigation(
         ),
       ).then(
         (value) {
-          ref?.invalidate(fetchStatsProvider);
+          ref?.invalidate(statsProvider);
         },
       );
     } catch (e, s) {
@@ -57,7 +58,7 @@ Future<void> handleNavigation(
       ),
     ).then(
       (value) {
-        ref?.invalidate(fetchStatsProvider);
+        ref?.invalidate(statsProvider);
       },
     );
   } else if (type != null && type.contains('pack2')) {
@@ -69,7 +70,7 @@ Future<void> handleNavigation(
       ),
     ).then(
       (value) {
-        ref?.invalidate(fetchStatsProvider);
+        ref?.invalidate(statsProvider);
       },
     );
   } else if (type == TypeConstants.pack) {
@@ -81,7 +82,7 @@ Future<void> handleNavigation(
       ),
     ).then(
       (value) {
-        ref?.invalidate(fetchStatsProvider);
+        ref?.invalidate(statsProvider);
       },
     );
   } else if (type == TypeConstants.url || type == TypeConstants.link) {
@@ -96,7 +97,7 @@ Future<void> handleNavigation(
       ),
     ).then(
       (value) {
-        ref?.invalidate(fetchStatsProvider);
+        ref?.invalidate(statsProvider);
       },
     );
   } else if (type == TypeConstants.email) {
@@ -119,7 +120,7 @@ Future<void> handleNavigation(
         MaterialPageRoute(builder: (context) => const DownloadsView()),
       )
           .then((value) {
-        ref?.invalidate(fetchStatsProvider);
+        ref?.invalidate(statsProvider);
       });
     }
   } else if (type == TypeConstants.webViewAccount) {

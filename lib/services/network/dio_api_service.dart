@@ -50,7 +50,9 @@ class DioApiService {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    await _captureException(err);
+    if (kReleaseMode) {
+      await _captureException(err);
+    }
     handler.reject(err);
   }
 

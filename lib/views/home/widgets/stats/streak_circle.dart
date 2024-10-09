@@ -1,135 +1,215 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/models/local_audio_completed.dart';
+import 'package:medito/providers/stats_provider.dart';
 import '../../../../constants/colors/color_constants.dart';
 import '../../../../widgets/medito_huge_icon.dart';
+import 'package:hugeicons/hugeicons.dart';
 
-class StreakCircle extends StatefulWidget {
-  final String text;
+class StreakCircle extends ConsumerStatefulWidget {
   final VoidCallback onTap;
-  final bool isStreakDoneToday;
 
   const StreakCircle({
     Key? key,
-    required this.text,
     required this.onTap,
-    this.isStreakDoneToday = true,
   }) : super(key: key);
 
   @override
-  StreakCircleState createState() => StreakCircleState();
+  ConsumerState<StreakCircle> createState() => _StreakCircleState();
 }
 
-class StreakCircleState extends State<StreakCircle>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _shimmerController;
-  var _isPressed = false;
+class _StreakCircleState extends ConsumerState<StreakCircle>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
 
-  static const _kShimmerDuration = Duration(seconds: 8);
   static const _kBorderRadius = 30.0;
   static const _kIconSize = 20.0;
   static const _kInnerIconSize = 18.0;
   static const _kFontSize = 16.0;
   static const _kLineHeight = 1.4;
-
   static const _kPadding = EdgeInsets.fromLTRB(11, 9, 13, 9);
 
   @override
   void initState() {
     super.initState();
-    _shimmerController = AnimationController.unbounded(vsync: this)
-      ..repeat(min: -0.5, max: 1.5, period: _kShimmerDuration);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override
   void dispose() {
-    _shimmerController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _shimmerController,
-      builder: (context, child) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
-          decoration: BoxDecoration(
-            gradient: widget.isStreakDoneToday
-                ? LinearGradient(
-                    colors: [
-                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.15 : 0.2),
-                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.6 : 0.8),
-                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.45 : 0.6),
-                      ColorConstants.lightPurple.withOpacity(_isPressed ? 0.15 : 0.2),
-                    ],
-                    stops: const [0.0, 0.3, 0.7, 1.0],
-                    transform:
-                        GradientRotation(_shimmerController.value * 6.28319),
-                  )
-                : null,
+    return Consumer(
+      builder: (context, ref, child) {
+        final statsAsync = ref.watch(statsProvider);
+
+        return statsAsync.when(
+          loading: () => _buildShimmer(),
+          error: (_, __) => _buildErrorState(ref),
+          data: (stats) {
+            final isStreakDoneToday =
+                _isStreakDoneToday(stats.audioCompleted);
+            final streakText = '${stats.streakCurrent}';
+
+            if (isStreakDoneToday && !_animationController.isAnimating) {
+              _animationController.repeat();
+            } else if (!isStreakDoneToday && _animationController.isAnimating) {
+              _animationController.stop();
+            }
+
+            return AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) =>
+                  _buildStreakCircle(isStreakDoneToday, streakText),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildStreakCircle(bool isStreakDoneToday, String streakText) {
+    return Container(
+      decoration: isStreakDoneToday
+          ? BoxDecoration(
+              gradient: SweepGradient(
+                colors: [
+                  ColorConstants.lightPurple.withOpacity(0.2),
+                  ColorConstants.lightPurple.withOpacity(0.35),
+                  ColorConstants.lightPurple.withOpacity(1),
+                  ColorConstants.lightPurple.withOpacity(0.3),
+                  ColorConstants.lightPurple.withOpacity(0.25),
+                ],
+                stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
+                transform:
+                    GradientRotation(_animationController.value * 2 * 3.14159),
+              ),
+              borderRadius: BorderRadius.circular(_kBorderRadius + 1.5),
+            )
+          : null,
+      child: Padding(
+        padding: isStreakDoneToday ? const EdgeInsets.all(2) : EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onTap,
             borderRadius: BorderRadius.circular(_kBorderRadius),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: widget.onTap,
-              onTapDown: (_) => setState(() => _isPressed = true),
-              onTapUp: (_) => setState(() => _isPressed = false),
-              onTapCancel: () => setState(() => _isPressed = false),
-              borderRadius: BorderRadius.circular(_kBorderRadius),
+            child: Ink(
+              decoration: BoxDecoration(
+                color: ColorConstants.onyx,
+                borderRadius: BorderRadius.circular(_kBorderRadius),
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(1),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _isPressed ? ColorConstants.onyx.withOpacity(0.8) : ColorConstants.onyx,
-                    borderRadius: BorderRadius.circular(_kBorderRadius - 2),
-                  ),
-                  child: Padding(
-                    padding: _kPadding,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
+                padding: _kPadding,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (widget.isStreakDoneToday)
-                              const MeditoHugeIcon(
-                                icon: MeditoHugeIcon.streakIcon,
-                                size: _kIconSize,
-                                color: Colors.white,
-                              ),
-                            MeditoHugeIcon(
-                              icon: MeditoHugeIcon.streakIcon,
-                              size: _kInnerIconSize,
-                              color: widget.isStreakDoneToday
-                                  ? ColorConstants.lightPurple
-                                  : ColorConstants.white,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.text,
-                          style: TextStyle(
-                            color: ColorConstants.white,
-                            fontSize: _kFontSize,
-                            fontWeight: widget.isStreakDoneToday
-                                ? FontWeight.bold
-                                : FontWeight.w400,
-                            fontFamily: DmMono,
-                            height: _kLineHeight,
+                        if (isStreakDoneToday)
+                          const MeditoHugeIcon(
+                            icon: MeditoHugeIcon.streakIcon,
+                            size: _kIconSize,
+                            color: Colors.white,
                           ),
+                        MeditoHugeIcon(
+                          icon: MeditoHugeIcon.streakIcon,
+                          size: _kInnerIconSize,
+                          color: isStreakDoneToday
+                              ? ColorConstants.lightPurple
+                              : ColorConstants.white,
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Text(
+                      streakText,
+                      style: TextStyle(
+                        color: ColorConstants.white,
+                        fontSize: _kFontSize,
+                        fontWeight: isStreakDoneToday
+                            ? FontWeight.bold
+                            : FontWeight.w400,
+                        fontFamily: DmMono,
+                        height: _kLineHeight,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
+    );
+  }
+
+  bool _isStreakDoneToday(List<LocalAudioCompleted>? audioCompleted) {
+    if (audioCompleted == null || audioCompleted.isEmpty) {
+      return false;
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    return audioCompleted.any((audio) {
+      final audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+      return audioDate.isAtSameMomentAs(today) || audioDate.isAfter(today);
+    });
+  }
+
+  Widget _buildShimmer() {
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorConstants.onyx,
+        borderRadius: BorderRadius.circular(_kBorderRadius),
+      ),
+      child: const Padding(
+        padding: _kPadding,
+        child: SizedBox(
+          width: 24,
+          height: 22,
+          child: Center(
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: ColorConstants.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(WidgetRef ref) {
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorConstants.onyx,
+        borderRadius: BorderRadius.circular(_kBorderRadius),
+      ),
+      child: Padding(
+        padding: _kPadding,
+        child: GestureDetector(
+          onTap: () => ref.refresh(statsProvider),
+          child: HugeIcon(
+            icon: HugeIcons.strokeRoundedHelpCircle,
+            color: ColorConstants.white,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -12,8 +12,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 Color parseColor(String? color) {
   if (color == null || color.isEmpty) return ColorConstants.ebony;
-
-  return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
+  try {
+    return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
+  } catch (e) {
+    return ColorConstants.ebony;
+  }
 }
 
 void createSnackBar(
@@ -135,11 +138,15 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
     final file = File('${appDir.path}/stats.png');
 
     await file.writeAsBytes(pngBytes);
-    print('File saved at: ${file.path}');
+    if (kDebugMode) {
+      print('File saved at: ${file.path}');
+    }
 
     return file;
   } catch (e) {
-    print('Error in capturePng: $e');
+    if (kDebugMode) {
+      print('Error in capturePng: $e');
+    }
     return null;
   }
 }

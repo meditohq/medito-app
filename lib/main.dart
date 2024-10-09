@@ -13,8 +13,10 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -23,7 +25,6 @@ import 'firebase_options.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
-
 
 void main() async {
   await initializeApp();
@@ -120,6 +121,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       _showNoConnectionSnackBar();
     } else {
       _hideNoConnectionSnackBar();
+      StatsManager().sync();
     }
   }
 
@@ -164,10 +166,21 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       debugShowCheckedModeBanner: kDebugMode,
       scaffoldMessengerKey: scaffoldMessengerKey,
       navigatorKey: navigatorKey,
-      // Add this line
       theme: appTheme(context),
       title: ParentWidget._title,
       home: const SplashView(),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _onAppForegrounded();
+    }
+  }
+
+  void _onAppForegrounded() {
+    ref.invalidate(statsProvider);
   }
 }

@@ -7,7 +7,6 @@ import 'package:medito/models/models.dart';
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/utils.dart';
-import '../events/events_provider.dart';
 import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
@@ -31,17 +30,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }) async {
     var track = trackModel.customCopyWith();
     var audios = [...track.audio];
-
-    ref.read(playerProvider.notifier).handleAudioStartedEvent(
-          track.audio
-                  .where((e) => e.files.any((f) => f.duration == file.duration))
-                  .first
-                  .guideName ??
-              '-',
-          track.id,
-          file.id,
-          file.duration,
-        );
 
     for (var audioModel in audios) {
       var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
@@ -105,27 +93,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
-  void handleAudioStartedEvent(
-    String guide,
-    String trackId,
-    String audioFileId,
-    int duration,
-  ) {
-    var audio = AudioStartedModel(
-      fileId: audioFileId,
-      fileDuration: duration,
-      fileGuide: guide,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-    );
-    ref.read(
-      audioStartedEventProvider(
-        event: audio.toJson().map(
-              (key, value) => MapEntry(key, value.toString()),
-            ),
-        trackId: trackId,
-      ),
-    );
-  }
 
   Future<void> seekToPosition(int position) async {
     if (Platform.isAndroid) {

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

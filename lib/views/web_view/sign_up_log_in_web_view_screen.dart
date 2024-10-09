@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/home/home_provider.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/services/network/assign_dio_headers.dart';
@@ -32,21 +32,17 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
-            print('Page started loading: $url');
             setState(() {
               _isLoading = true;
             });
           },
           onPageFinished: (String url) {
-            print('Page finished loading: $url');
             setState(() {
               _isLoading = false;
             });
           },
           onNavigationRequest: (NavigationRequest request) {
-            print('Navigation request: ${request.url}');
             if (request.url.contains('success')) {
-              print('Successful login detected: ${request.url}');
               _handleSuccessfulLogin(request.url);
 
               return NavigationDecision.prevent;
@@ -72,7 +68,7 @@ class _SignUpLogInWebViewState extends ConsumerState<SignUpLogInWebView> {
       if (auth.token != null) {
         assignHeaders(auth.token!);
 
-        ref.invalidate(fetchStatsProvider);
+        ref.invalidate(statsProvider);
 
         scaffoldMessengerKey.currentState?.showSnackBar(
           const SnackBar(
