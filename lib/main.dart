@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,6 +28,17 @@ final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final appLinks = AppLinks();
+
+  // Handle app links while the app is already started - deep link
+  appLinks.uriLinkStream.listen((Uri? uri) {
+    if (uri != null) {
+      // Handle the deep link
+      print('Deep link: $uri');
+    }
+  });
+
   await initializeApp();
   _runAppWithSentry();
 }
@@ -86,6 +98,7 @@ class ParentWidget extends ConsumerStatefulWidget {
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  StreamSubscription? _sub;
 
   @override
   void initState() {
@@ -94,6 +107,42 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     WidgetsBinding.instance.addObserver(this);
     _checkInitialConnectivity();
     _initializeConnectivityListener();
+    _initDeepLinkListener();
+    _handleInitialUri();
+  }
+
+  void _initDeepLinkListener() {
+    _sub = AppLinks().uriLinkStream.listen((Uri? uri) {
+      if (uri != null) {
+        _handleDeepLink(uri);
+      }
+    }, onError: (err) {
+      print('Deep link error: $err');
+    });
+  }
+
+  Future<void> _handleInitialUri() async {
+    try {
+      final initialUri = await AppLinks().getInitialAppLink();
+      if (initialUri != null) {
+        _handleDeepLink(initialUri);
+      }
+    } catch (e) {
+      print('Error handling initial URI: $e');
+    }
+  }
+
+  Future<void> _handleDeepLink(Uri uri) async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    var pathSegments = uri.pathSegments;
+    if (pathSegments.length >= 2) {
+      var trackId = pathSegments[1];
+      handleNavigation(
+          pathSegments[0], [trackId], navigatorKey.currentContext!);
+    } else {
+      print('Invalid deep link format');
+    }
   }
 
   void _setUpSystemUi() {
@@ -156,6 +205,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+    _sub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

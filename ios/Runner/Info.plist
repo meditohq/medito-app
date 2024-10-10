@@ -68,15 +68,17 @@
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-			<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-    <key>NSHealthShareUsageDescription</key>
-    <string>We do not ever download or store your health data. The app requires this permission to sync your mindfulness minutes.</string>
-    <key>NSHealthUpdateUsageDescription</key>
-    <string>We need permission to write mindfulness data to Apple Health to record your meditation sessions.</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>We do not ever download or store your health data. The app requires this permission to sync your mindfulness minutes.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>We need permission to write mindfulness data to Apple Health to record your meditation sessions.</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>medito_stats_thread_identifier</string>
@@ -85,5 +87,22 @@
 	<string>Medito</string>
 	<key>UIRequiresFullScreen</key>
 	<string>YES</string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>org.meditofoundation</string>
+			</array>
+		</dict>
+	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:medito.app</string>
+	</array>
 </dict>
 </plist>

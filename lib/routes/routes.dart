@@ -1,24 +1,20 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/web_view/sign_up_log_in_web_view_screen.dart';
-
-import '../utils/utils.dart';
-import '../views/downloads/downloads_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 extension SanitisePath on String {
-  String sanitisePath() {
-    return replaceFirst('/', '');
-  }
+  String sanitisePath() => replaceFirst('/', '');
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -30,106 +26,58 @@ Future<void> handleNavigation(
   WidgetRef? ref,
 }) async {
   ids.removeWhere((element) => element == null);
-  if (type != null && (type.contains('tracks') || type.contains('track'))) {
-    try {
-      var trackId = ids.first!;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TrackView(trackId: trackId),
-        ),
-      ).then(
-        (value) {
-          ref?.invalidate(statsProvider);
-        },
-      );
-    } catch (e, s) {
-      if (kDebugMode) {
-        print(s);
-      }
-    }
-    return;
-  } else if (type != null && type.contains('pack3')) {
-    var p3id = ids[2]!;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PackView(id: p3id),
-      ),
-    ).then(
-      (value) {
-        ref?.invalidate(statsProvider);
-      },
-    );
-  } else if (type != null && type.contains('pack2')) {
-    var p2id = ids[1]!;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PackView(id: p2id),
-      ),
-    ).then(
-      (value) {
-        ref?.invalidate(statsProvider);
-      },
-    );
-  } else if (type == TypeConstants.pack) {
-    var pid = ids.first!;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PackView(id: pid),
-      ),
-    ).then(
-      (value) {
-        ref?.invalidate(statsProvider);
-      },
-    );
+
+  if (type == null) return;
+
+  if (type.contains('tracks') || type.contains('track')) {
+    await _handleTrackNavigation(ids, ref);
+  } else if (type.contains('pack')) {
+    var packId = type.contains('pack3')
+        ? ids[2]!
+        : type.contains('pack2')
+            ? ids[1]!
+            : ids.first!;
+    await _pushRoute(PackView(id: packId), ref);
   } else if (type == TypeConstants.url || type == TypeConstants.link) {
-    var url = ids.last ?? StringConstants.meditoUrl;
-    await launchURLInBrowser(url);
-    return;
-  } else if (type != null && type.contains('settings')) {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SettingsScreen(),
-      ),
-    ).then(
-      (value) {
-        ref?.invalidate(statsProvider);
-      },
-    );
+    await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
+  } else if (type.contains('settings')) {
+    await _pushRoute(const SettingsScreen(), ref);
   } else if (type == TypeConstants.email) {
-    if (ref != null) {
-      var deviceAppAndUserInfo =
-          await ref.read(deviceAppAndUserInfoProvider.future);
-      var info =
-          '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
-      var emailAddress = ids.first!;
-      await launchEmailSubmission(
-        emailAddress,
-        body: info,
-      );
-    }
-    return;
-  } else if (type == TypeConstants.flow) {
-    if (ids.contains('downloads')) {
-      await navigatorKey.currentState
-          ?.push(
-        MaterialPageRoute(builder: (context) => const DownloadsView()),
-      )
-          .then((value) {
-        ref?.invalidate(statsProvider);
-      });
-    }
+    await _handleEmailNavigation(ids, ref);
+  } else if (type == TypeConstants.flow && ids.contains('downloads')) {
+    await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.webViewAccount) {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SignUpLogInWebView(url: ids.last ?? ''),
-      ),
-    );
+    await _pushRoute(SignUpLogInWebView(url: ids.last ?? ''), ref);
+  }
+}
+
+Future<void> _pushRoute(Widget route, WidgetRef? ref) async {
+  await navigatorKey.currentState
+      ?.push(
+        MaterialPageRoute(builder: (context) => route),
+      )
+      .then((_) => ref?.invalidate(statsProvider));
+}
+
+Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
+  try {
+    var trackId = ids.first!;
+    await _pushRoute(TrackView(trackId: trackId), ref);
+  } catch (e, s) {
+    if (kDebugMode) {
+      print(s);
+    }
+  }
+}
+
+Future<void> _handleEmailNavigation(List<String?> ids, WidgetRef? ref) async {
+  if (ref != null) {
+    var deviceAppAndUserInfo =
+        await ref.read(deviceAppAndUserInfoProvider.future);
+    var info =
+        '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+    var emailAddress = ids.first!;
+    await launchEmailSubmission(emailAddress, body: info);
   }
 }
 

@@ -7,7 +7,6 @@ on:
         description: 'Choose which lane to run'
         required: true
         default: 'beta'
-        enum: [ 'beta', 'release' ]
   push:
     tags:
       - 'v*'
