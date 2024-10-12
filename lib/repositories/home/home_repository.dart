@@ -1,10 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/network/assign_dio_headers.dart';
 import 'package:medito/services/network/dio_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,7 +22,6 @@ abstract class HomeRepository {
 class HomeRepositoryImpl extends HomeRepository {
   final DioApiService client;
   final Ref ref;
-  Future<void>? _refreshFuture;
 
   HomeRepositoryImpl({required this.ref, required this.client});
 
@@ -44,50 +40,18 @@ class HomeRepositoryImpl extends HomeRepository {
         .setStringList(SharedPreferenceConstants.shortcuts, ids);
   }
 
-  Future<T> _executeWithTokenRefresh<T>(Future<T> Function() apiCall) async {
-    try {
-      return await apiCall();
-    } on UnauthorizedException catch (_) {
-      await _refreshUserToken();
-      return await apiCall();
-    } on DioException {
-      rethrow;
-    }
-  }
-
-  Future<void> _refreshUserToken() async {
-    _refreshFuture ??= _performTokenRefresh();
-    await _refreshFuture;
-  }
-
-  Future<void> _performTokenRefresh() async {
-    try {
-      var user = await ref.read(authRepositoryProvider).generateUserToken();
-      var token = user.token;
-
-      if (token != null) {
-        var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-        AssignDioHeaders(token, deviceInfo).assign();
-      }
-    } finally {
-      _refreshFuture = null;
-    }
-  }
-
   @override
   Future<HomeModel> fetchHome() async {
-    return _executeWithTokenRefresh(() async {
-      var response = await client.getRequest(HTTPConstants.home);
-      return HomeModel.fromJson(response);
-    });
+    var response = await client.getRequest(HTTPConstants.home);
+    
+    return HomeModel.fromJson(response);
   }
 
   @override
   Future<AnnouncementModel?> fetchLatestAnnouncement() async {
-    return _executeWithTokenRefresh(() async {
-      var response = await client.getRequest(HTTPConstants.latestAnnouncement);
-      return AnnouncementModel.fromJson(response);
-    });
+    var response = await client.getRequest(HTTPConstants.latestAnnouncement);
+    
+    return AnnouncementModel.fromJson(response);
   }
 
   Future<List<ShortcutsModel>> getSortedShortcuts(

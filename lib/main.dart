@@ -17,7 +17,6 @@ import 'package:medito/providers/shared_preference/shared_preference_provider.da
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -29,13 +28,15 @@ var audioStateNotifier = AudioStateNotifier();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final appLinks = AppLinks();
+  var appLinks = AppLinks();
 
   // Handle app links while the app is already started - deep link
   appLinks.uriLinkStream.listen((Uri? uri) {
     if (uri != null) {
       // Handle the deep link
-      print('Deep link: $uri');
+      if (kDebugMode) {
+        print('Deep link: $uri');
+      }
     }
   });
 
@@ -117,7 +118,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         _handleDeepLink(uri);
       }
     }, onError: (err) {
-      print('Deep link error: $err');
+      if (kDebugMode) {
+        print('Deep link error: $err');
+      }
     });
   }
 
@@ -128,7 +131,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         _handleDeepLink(initialUri);
       }
     } catch (e) {
-      print('Error handling initial URI: $e');
+      if (kDebugMode) {
+        print('Error handling initial URI: $e');
+      }
     }
   }
 
@@ -141,7 +146,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       handleNavigation(
           pathSegments[0], [trackId], navigatorKey.currentContext!);
     } else {
-      print('Invalid deep link format');
+      if (kDebugMode) {
+        print('Invalid deep link format');
+      }
     }
   }
 
@@ -170,7 +177,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       _showNoConnectionSnackBar();
     } else {
       _hideNoConnectionSnackBar();
-      StatsManager().sync();
+      // StatsManager().sync();
     }
   }
 
@@ -179,8 +186,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _showNoConnectionSnackBar() {
-    if (scaffoldMessengerKey.currentState?.mounted ?? false) {
-      scaffoldMessengerKey.currentState!
+    var currentState = scaffoldMessengerKey.currentState;
+    if (currentState?.mounted ?? false) {
+      currentState!
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
@@ -189,7 +197,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
             action: SnackBarAction(
               label: StringConstants.goToDownloads,
               onPressed: () {
-                scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+                currentState.hideCurrentSnackBar();
                 _navigateToDownloads(context);
               },
             ),

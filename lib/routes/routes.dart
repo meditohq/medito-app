@@ -10,7 +10,7 @@ import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
-import 'package:medito/views/web_view/sign_up_log_in_web_view_screen.dart';
+import 'package:medito/views/settings/sign_up_log_in_web_view_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 extension SanitisePath on String {
@@ -46,8 +46,8 @@ Future<void> handleNavigation(
     await _handleEmailNavigation(ids, ref);
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
-  } else if (type == TypeConstants.webViewAccount) {
-    await _pushRoute(SignUpLogInWebView(url: ids.last ?? ''), ref);
+  } else if (type == TypeConstants.account) {
+    await _pushRoute(const SignUpLogInPage(), ref);
   }
 }
 

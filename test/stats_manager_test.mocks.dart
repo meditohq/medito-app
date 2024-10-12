@@ -57,17 +57,11 @@ class MockStatsService extends _i1.Mock implements _i3.StatsService {
       ) as _i4.Future<_i2.LocalAllStats>);
 
   @override
-  _i4.Future<void> postUpdatedStats(
-    _i2.LocalAllStats? localStats,
-    String? userToken,
-  ) =>
+  _i4.Future<void> postUpdatedStats(_i2.LocalAllStats? localStats) =>
       (super.noSuchMethod(
         Invocation.method(
           #postUpdatedStats,
-          [
-            localStats,
-            userToken,
-          ],
+          [localStats],
         ),
         returnValue: _i4.Future<void>.value(),
         returnValueForMissingStub: _i4.Future<void>.value(),

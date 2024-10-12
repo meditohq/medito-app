@@ -20,13 +20,11 @@ class StatsService {
 
   Future<void> postUpdatedStats(
     LocalAllStats localStats,
-    String userToken,
   ) async {
     var allStats = localStats.toAllStats();
     try {
       await _dioApiService.postRequest(
         HTTPConstants.allStats,
-        userToken: userToken,
         data: allStats.toJson(),
       );
     } catch (e) {

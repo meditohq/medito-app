@@ -109,7 +109,8 @@ class StatsManager {
         ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
       for (var audio in sortedAudio) {
-        var audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp, isUtc: true);
+        var audioDate =
+            DateTime.fromMillisecondsSinceEpoch(audio.timestamp, isUtc: true);
         var audioDayStart =
             DateTime.utc(audioDate.year, audioDate.month, audioDate.day);
 
@@ -140,7 +141,8 @@ class StatsManager {
       // Check if there's an entry for today (including near-midnight entries)
       var todayEntry = sortedAudio.firstWhere(
         (audio) {
-          var audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp, isUtc: true);
+          var audioDate =
+              DateTime.fromMillisecondsSinceEpoch(audio.timestamp, isUtc: true);
           return audioDate.day == now.day ||
               (audioDate.day == now.day - 1 &&
                   audioDate.hour == 23 &&
@@ -167,18 +169,13 @@ class StatsManager {
   }
 
   Future<void> _postUpdatedStats() async {
-    var prefs = await SharedPreferences.getInstance();
-    var userToken = prefs.getString(SharedPreferenceConstants.userToken);
-
-    if (userToken != null) {
-      try {
-        if (_allStats != null) {
-          await statsService.postUpdatedStats(_allStats!, userToken);
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error posting updated stats: $e');
-        }
+    try {
+      if (_allStats != null) {
+        await statsService.postUpdatedStats(_allStats!);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error posting updated stats: $e');
       }
     }
   }

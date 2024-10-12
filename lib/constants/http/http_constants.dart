@@ -6,6 +6,8 @@ class EnvConfig {
   final String authBaseUrl;
   final String authToken;
   final String sentryDsn;
+  final String supabaseKey;
+  final String supabaseUrl;
 
   const EnvConfig({
     required this.environment,
@@ -13,6 +15,8 @@ class EnvConfig {
     required this.authBaseUrl,
     required this.authToken,
     required this.sentryDsn,
+    required this.supabaseKey,
+    required this.supabaseUrl,
   });
 }
 
@@ -23,6 +27,8 @@ class ProdEnv extends EnvConfig {
     required super.authBaseUrl,
     required super.authToken,
     required super.sentryDsn,
+    required super.supabaseKey,
+    required super.supabaseUrl,
   });
 }
 
@@ -33,10 +39,14 @@ class StagingEnv extends EnvConfig {
     required super.authBaseUrl,
     required super.authToken,
     required super.sentryDsn,
+    required super.supabaseKey,
+    required super.supabaseUrl,
   });
 }
 
 const _prodEnv = ProdEnv(
+  supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
+  supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
@@ -45,6 +55,8 @@ const _prodEnv = ProdEnv(
 );
 
 const _stagingEnv = StagingEnv(
+  supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
+  supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL_V2'),
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
@@ -54,6 +66,8 @@ const _stagingEnv = StagingEnv(
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
 
+String get supabaseUrl => _currentEnv.supabaseUrl;
+String get supabaseKey => _currentEnv.supabaseKey;
 String get environment => _currentEnv.environment;
 String get contentBaseUrl => _currentEnv.contentBaseUrl;
 String get authBaseUrl => _currentEnv.authBaseUrl;

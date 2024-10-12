@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'events_repository.g.dart';
 
 abstract class EventsRepository {
-  Future<void> saveFirebaseToken(Map<String, dynamic> event, String userToken);
+  Future<void> saveFirebaseToken(Map<String, dynamic> event);
 
   Future<void> feedbackEvent(String trackId, Map<String, dynamic> event);
 
@@ -14,7 +14,6 @@ abstract class EventsRepository {
   Future<void> markTrackAsFavouriteEvent(String trackId);
 
   Future<void> markTrackAsNotFavouriteEvent(String trackId);
-
 }
 
 class EventsRepositoryImpl extends EventsRepository {
@@ -28,9 +27,9 @@ class EventsRepositoryImpl extends EventsRepository {
 
   @override
   Future<void> saveFirebaseToken(
-          Map<String, dynamic> event, String userToken) =>
-      client.postRequest(HTTPConstants.firebaseEvent,
-          data: event, userToken: userToken);
+    Map<String, dynamic> event,
+  ) =>
+      client.postRequest(HTTPConstants.firebaseEvent, data: event);
 
   @override
   Future<void> feedbackEvent(String trackId, Map<String, dynamic> event) =>

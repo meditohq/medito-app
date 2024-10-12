@@ -10,5 +10,5 @@ class TypeConstants {
   static const String timestampIdKey = 'timestamp';
   static const String guideIdKey = 'guide';
   static const String durationIdKey = 'duration';
-  static const String webViewAccount = 'webview-account';
+  static const String account = 'account';
 }

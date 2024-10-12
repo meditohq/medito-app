@@ -22,11 +22,10 @@ Future<void> feedback(
 Future<void> fcmSaveEvent(
   FcmSaveEventRef ref, {
   required Map<String, String> event,
-  required String userToken,
 }) async {
   final events = ref.watch(eventsRepositoryProvider);
 
-  return events.saveFirebaseToken(event, userToken);
+  return events.saveFirebaseToken(event);
 }
 
 @riverpod

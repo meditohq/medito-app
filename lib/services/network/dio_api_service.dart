@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const _errorKey = 'error';
 const _messageKey = 'message';
@@ -15,15 +17,6 @@ class DioApiService {
 
   factory DioApiService() {
     return _instance;
-  }
-
-  // Only pass the userToken if you know the headers have not been set in
-  // assignDioHeadersProvider
-  void _setToken(String? userToken) {
-    if (userToken != null && userToken.isNotEmpty) {
-      dio.options.headers[HttpHeaders.authorizationHeader] =
-          'Bearer $userToken';
-    }
   }
 
   // Private constructor
@@ -79,6 +72,8 @@ class DioApiService {
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
   }) async {
+    _updateUserWithClientId();
+    _setToken();
     try {
       var response = await dio.get(
         uri,
@@ -97,7 +92,6 @@ class DioApiService {
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
     String uri, {
-    String? userToken,
     data,
     Map<String, dynamic>? queryParameters,
     Options? options,
@@ -105,8 +99,9 @@ class DioApiService {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    _setToken(userToken);
     try {
+      _updateUserWithClientId();
+      _setToken();
       var response = await dio.post(
         uri,
         data: data,
@@ -132,6 +127,8 @@ class DioApiService {
     CancelToken? cancelToken,
   }) async {
     try {
+      _updateUserWithClientId();
+      _setToken();
       var response = await dio.delete(
         uri,
         data: data,
@@ -188,6 +185,33 @@ class DioApiService {
           error.response?.statusCode ?? 500,
           StringConstants.anErrorOccurred,
         );
+    }
+  }
+
+  void _setToken() {
+    var token = Supabase.instance.client.auth.currentSession?.accessToken;
+    if (token != null) {
+      DioApiService().dio.options.headers[HttpHeaders.authorizationHeader] =
+          'Bearer $token';
+    }
+  }
+
+  Future<void> _updateUserWithClientId() async {
+    var prefs = await SharedPreferences.getInstance();
+    var clientId = prefs.getString(SharedPreferenceConstants.userId);
+    var supabase = Supabase.instance.client;
+    var currentUser = supabase.auth.currentUser;
+
+    if (currentUser != null) {
+      try {
+        await supabase.auth.updateUser(
+          UserAttributes(
+            data: {'client_id': clientId},
+          ),
+        );
+      } catch (e) {
+        throw Exception('Error updating user with client ID: ${e.toString()}');
+      }
     }
   }
 }

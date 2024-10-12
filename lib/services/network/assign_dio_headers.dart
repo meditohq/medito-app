@@ -2,19 +2,15 @@ import 'dart:io';
 
 import 'package:medito/models/models.dart';
 import 'package:medito/services/network/dio_api_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AssignDioHeaders {
-  final String token;
   final DeviceAndAppInfoModel deviceInfo;
 
-  AssignDioHeaders(this.token, this.deviceInfo);
+  AssignDioHeaders(this.deviceInfo);
 
   Future<void> assign() async {
-    print('AssignDioHeaders.assign started with token: $token');
     var customHeaders = _createCustomHeaders(deviceInfo);
-
-    DioApiService().dio.options.headers[HttpHeaders.authorizationHeader] =
-        'Bearer $token';
     for (var key in customHeaders.keys) {
       DioApiService().dio.options.headers[key] = customHeaders[key];
     }
