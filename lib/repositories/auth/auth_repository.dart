@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,10 +13,10 @@ abstract class AuthRepository {
   Future<String?> getClientIdFromSharedPreference();
   Future<void> initializeUser();
   Future<String> getToken();
-  String getEmailFromSharedPreference();
+  String getUserEmail();
   Future<AuthResponse> signUp(String email, String password);
   Future<AuthResponse> logIn(String email, String password);
-  get currentUser;
+  User? get currentUser;
   Future<void> signOut();
 }
 
@@ -35,11 +36,18 @@ class AuthRepositoryImpl extends AuthRepository {
     clientId ??= const Uuid().v4();
 
     await _saveClientIdToSharedPreference(clientId);
-
     if (Supabase.instance.client.auth.currentUser == null) {
+      await _signInAnonymously(clientId);
+    }
+  }
+
+  Future<void> _signInAnonymously(String clientId) async {
+    try {
       await Supabase.instance.client.auth.signInAnonymously(
         data: {'client_id': clientId},
       );
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -65,7 +73,7 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  String getEmailFromSharedPreference() {
+  String getUserEmail() {
     var currentUser = Supabase.instance.client.auth.currentUser;
 
     return currentUser?.email ?? '';
@@ -136,9 +144,9 @@ class AuthRepositoryImpl extends AuthRepository {
 
   Future<void> _saveClientIdToSharedPreference(String clientId) async {
     var sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setString(SharedPreferenceConstants.userId, clientId);
+    await sharedPreferences.setString(
+        SharedPreferenceConstants.userId, clientId);
   }
-
 
   Future<void> _clearClientId() async {
     var sharedPreferences = await SharedPreferences.getInstance();
@@ -146,17 +154,19 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  get currentUser => Supabase.instance.client.auth.currentUser;
-  
+  User? get currentUser => Supabase.instance.client.auth.currentUser;
+
   @override
   Future<void> signOut() async {
     var supabase = Supabase.instance.client;
 
     try {
       await supabase.auth.signOut();
-      
+
       var newClientId = const Uuid().v4();
       await _saveClientIdToSharedPreference(newClientId);
+
+      await _signInAnonymously(newClientId);
     } catch (e) {
       throw Exception('Error signing out: ${e.toString()}');
     }

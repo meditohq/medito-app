@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/network/assign_dio_headers.dart';
 import 'package:medito/views/settings/user_profile_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,7 +17,7 @@ class SignUpLogInPage extends ConsumerWidget {
     final authRepository = ref.watch(authRepositoryProvider);
     final user = authRepository.currentUser;
 
-    if (user.email != null && user.email.isNotEmpty) {
+    if (user?.email != null && user?.email?.isNotEmpty == true) {
       return const UserProfilePage();
     } else {
       return const SignUpLogInForm();
@@ -66,7 +65,6 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     try {
       await authAction();
       await _refreshUserInfo();
-      assignHeaders();
       ref.invalidate(statsProvider);
 
       scaffoldMessengerKey.currentState?.showSnackBar(
@@ -82,14 +80,6 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _isLoading = false;
       });
     }
-  }
-
-  void assignHeaders() {
-    ref.read(deviceAndAppInfoProvider).whenData(
-      (value) {
-        AssignDioHeaders(value).assign();
-      },
-    );
   }
 
   Future<void> _refreshUserInfo() async {

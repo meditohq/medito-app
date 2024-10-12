@@ -9,7 +9,7 @@ import '../../repositories/device_and_app_info/device_and_app_info_repository.da
 import '../me/me_provider.dart';
 
 part 'device_and_app_info_provider.g.dart';
-
+  
 @riverpod
 Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) {
   final info = ref.read(deviceAndAppInfoRepositoryProvider);
@@ -24,7 +24,7 @@ final deviceAppAndUserInfoProvider =
   var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
 
   var auth = ref.read(authRepositoryProvider);
-  var email = auth.getEmailFromSharedPreference();
+  var email = auth.getUserEmail();
 
   return _formatString(me, deviceInfo, email);
 });

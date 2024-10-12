@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
@@ -47,16 +48,21 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    await _pushRoute(const SignUpLogInPage(), ref);
+    await _pushRoute(const SignUpLogInPage(), ref).then((_) async {
+      await StatsManager().clearAllStats();
+      await StatsManager().getRemoteStats();
+      ref?.invalidate(meProvider);
+      ref?.invalidate(statsProvider);
+    });
   }
 }
 
 Future<void> _pushRoute(Widget route, WidgetRef? ref) async {
   await navigatorKey.currentState
-      ?.push(
-        MaterialPageRoute(builder: (context) => route),
-      )
-      .then((_) => ref?.invalidate(statsProvider));
+      ?.push(MaterialPageRoute(builder: (context) => route))
+      .then((_) {
+    ref?.invalidate(statsProvider);
+  });
 }
 
 Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {

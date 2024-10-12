@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 
 class UserProfilePage extends ConsumerWidget {
@@ -33,7 +32,6 @@ class UserProfilePage extends ConsumerWidget {
             ElevatedButton(
               onPressed: () async {
                 await authRepository.signOut();
-                ref.invalidate(statsProvider);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(

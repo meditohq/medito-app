@@ -32,7 +32,7 @@ class StatsManager {
     }
 
     try {
-      _allStats = await statsService.fetchAllStats();
+      getRemoteStats();
       await _merge();
       if (_allStats != null) {
         _allStats = calculateStreak(_allStats!);
@@ -41,8 +41,11 @@ class StatsManager {
       await _postUpdatedStats();
     } catch (e) {
       _allStats = await _loadLocalAllStats();
-      rethrow;
     }
+  }
+
+  Future<void> getRemoteStats() async {
+     _allStats = await statsService.fetchAllStats();
   }
 
   Future<void> _merge() async {
@@ -274,6 +277,11 @@ class StatsManager {
       await _saveLocalAllStats();
       unawaited(_postUpdatedStats());
     }
+  }
+
+  Future<void> clearAllStats() async {
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.remove(SharedPreferenceConstants.localAllStatsKey);
   }
 
   bool get isInitialized => _isInitialized;

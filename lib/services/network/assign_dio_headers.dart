@@ -1,8 +1,6 @@
-import 'dart:io';
 
 import 'package:medito/models/models.dart';
 import 'package:medito/services/network/dio_api_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AssignDioHeaders {
   final DeviceAndAppInfoModel deviceInfo;

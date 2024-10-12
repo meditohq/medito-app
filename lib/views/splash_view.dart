@@ -2,6 +2,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/assign_dio_headers.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/root/root_page_view.dart';
@@ -32,6 +33,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
       await ref.read(authRepositoryProvider).initializeUser();
       var deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
       await AssignDioHeaders(deviceInfo).assign();
+      await StatsManager().sync();
       await Navigator.of(context).pushReplacement(
         FadePageRoute(
           builder: (context) => const RootPageView(
@@ -39,10 +41,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
           ),
         ),
       );
-    } catch (e, s) {
-      print(e);
-      print(s);
-
+    } catch (e) {
       await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const DownloadsView(),
       ));
