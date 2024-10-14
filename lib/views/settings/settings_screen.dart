@@ -116,14 +116,6 @@ class SettingsScreen extends ConsumerWidget {
             color: ColorConstants.white),
         path: 'account',
       ),
-      SettingsItem(
-        type: 'url',
-        title: StringConstants.privacyPolicyTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedShield01,
-            color: ColorConstants.white),
-        path: 'https://meditofoundation.org/privacy',
-      ),
     ];
 
     return Scaffold(

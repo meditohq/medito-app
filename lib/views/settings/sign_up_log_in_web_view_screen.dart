@@ -9,6 +9,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:medito/routes/routes.dart' as routes;
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
@@ -319,9 +320,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       const SizedBox(height: 16),
                       Center(
                         child: GestureDetector(
-                          onTap: () => _launchPrivacyPolicy(),
+                          onTap: _launchPrivacyPolicy,
                           child: const Text(
-                            'https://meditofoundation.org/privacy',
+                            StringConstants.privacyPolicyTitle,
                             style: TextStyle(
                               color: ColorConstants.brightSky,
                               decoration: TextDecoration.underline,
@@ -343,13 +344,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     );
   }
 
-  void _launchPrivacyPolicy() async {
-    var uri = Uri.https('meditofoundation.org/privacy');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      showSnackBar(context, StringConstants.unableToOpenPrivacyPolicy);
-    }
+  void _launchPrivacyPolicy() {
+    routes.handleNavigation(
+      TypeConstants.url,
+      ['https://meditofoundation.org/privacy'],
+      context,
+      ref: ref,
+    );
   }
 }
 

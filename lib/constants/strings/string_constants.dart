@@ -1,5 +1,5 @@
 class StringConstants {
-  static const privacyPolicyTitle = 'Read Privacy Policy';
+  static const privacyPolicyTitle = 'Privacy Policy';
   static const unableToOpenPrivacyPolicy = 'Unable to open privacy policy';
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String downloads = 'Downloads';
