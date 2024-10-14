@@ -21,11 +21,8 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView>
     with
-        TickerProviderStateMixin,
         AutomaticKeepAliveClientMixin,
         WidgetsBindingObserver {
-  bool isCollapsed = false;
-
   @override
   void initState() {
     super.initState();
@@ -43,33 +40,11 @@ class _HomeViewState extends ConsumerState<HomeView>
     super.dispose();
   }
 
-  late CurvedAnimation curvedAnimation = CurvedAnimation(
-    parent: AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..forward(),
-    curve: Curves.easeInOut,
-  );
-
-  void _handleCollapse() {
-    setState(() {
-      isCollapsed = !isCollapsed;
-    });
-    curvedAnimation = CurvedAnimation(
-      parent: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1000),
-      )..forward(),
-      curve: Curves.easeInOut,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
     final home = ref.watch(fetchHomeProvider);
-    final announcementData = ref.watch(fetchLatestAnnouncementProvider);
 
     return home.when(
       loading: () => const HomeShimmerWidget(),
@@ -96,7 +71,7 @@ class _HomeViewState extends ConsumerState<HomeView>
               ),
               child: Column(
                 children: [
-                  _getAnnouncementBanner(announcementData.value),
+                  _getAnnouncementBanner(),
                   height20,
                   ShortcutsItemsWidget(data: homeData.shortcuts),
                   height20,
@@ -113,24 +88,24 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
   }
 
-  Widget _getAnnouncementBanner(AnnouncementModel? data) {
-    if (data == null) {
-      return Container();
-    }
+  Widget _getAnnouncementBanner() {
+    final data = ref.watch(fetchLatestAnnouncementProvider);
 
-    return SizeTransition(
-      axisAlignment: -1,
-      sizeFactor: isCollapsed
-          ? Tween<double>(begin: 1.0, end: 0.0).animate(
-              curvedAnimation,
-            )
-          : Tween<double>(begin: 0.0, end: 1.0).animate(
-              curvedAnimation,
-            ),
-      child: AnnouncementWidget(
-        announcement: data,
-        onPressedDismiss: _handleCollapse,
-      ),
+    return data.when(
+      loading: () => Container(),
+      error: (err, stack) => Container(),
+      data: (announcement) {
+        if (announcement == null) {
+          return Container();
+        }
+
+        return AnnouncementWidget(
+          announcement: announcement,
+          onPressedDismiss: () {
+            ref.invalidate(fetchLatestAnnouncementProvider);
+          },
+        );
+      },
     );
   }
 

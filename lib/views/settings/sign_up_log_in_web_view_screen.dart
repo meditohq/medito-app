@@ -8,7 +8,6 @@ import 'package:email_validator/email_validator.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/routes/routes.dart' as routes;
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';

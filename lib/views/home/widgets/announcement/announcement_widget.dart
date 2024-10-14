@@ -21,31 +21,64 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
 
-class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
+class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleDismiss() {
+    _animationController.reverse().then((_) {
+      widget.onPressedDismiss?.call();
+      _handleTrackEvent();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
 
-    return Padding(
-      padding: const EdgeInsets.only(top: padding8, left: padding16, right: padding16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16, top: padding24),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _text(context),
-              ],
-            ),
-            height16,
-            _actionBtn(context),
-          ],
+    return SizeTransition(
+      sizeFactor: _animation,
+      axisAlignment: -1,
+      child: Padding(
+        padding: const EdgeInsets.only(top: padding8, left: padding16, right: padding16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16, top: padding24),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _text(context),
+                ],
+              ),
+              height16,
+              _actionBtn(context),
+            ],
+          ),
         ),
       ),
     );
@@ -63,10 +96,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> {
 
     var actionWidgets = <Widget>[
       LoadingButtonWidget(
-        onPressed: () {
-          widget.onPressedDismiss?.call();
-          _handleTrackEvent();
-        },
+        onPressed: _handleDismiss,
         btnText: StringConstants.dismiss,
         bgColor: bgColor,
         textColor: textColor,
