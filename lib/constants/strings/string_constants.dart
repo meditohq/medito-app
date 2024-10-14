@@ -1,4 +1,6 @@
 class StringConstants {
+  static const privacyPolicyTitle = 'Read Privacy Policy';
+  static const unableToOpenPrivacyPolicy = 'Unable to open privacy policy';
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String downloads = 'Downloads';
   static const String volume = 'Volume';
@@ -138,12 +140,14 @@ class StringConstants {
   static const String emailLabel = 'Email';
   static const String passwordLabel = 'Password';
   static const String invalidEmailError = 'Please enter a valid email';
-  static const String invalidPasswordError = 'Password must be at least 6 characters';
+  static const String invalidPasswordError =
+      'Password must be at least 6 characters';
   static const String createAccountButtonText = 'Create Account';
   static const String logInButtonText = 'Log In';
   static const String authenticationFailed = 'Authentication failed';
 
-  static const String createAccountBenefits = 'Creating an account allows you to:'
+  static const String createAccountBenefits =
+      'Creating an account allows you to:'
       '\n• Save your meditation progress'
       '\n• Keep your stats and achievements secure';
 
@@ -153,7 +157,8 @@ class StringConstants {
       '\n• Sync your progress across devices';
 
   static const String accountTransitionWarningTitle = 'Save Your Progress';
-  static const String loginWarningMessage = 'Do you currently have unsaved progress? '
+  static const String loginWarningMessage =
+      'Do you currently have unsaved progress? '
       'Logging in to an existing account will download your previously saved data, '
       'but may overwrite any current unsaved progress. '
       'Would you like to create a new account instead to save your current progress?';
@@ -174,22 +179,28 @@ class StringConstants {
   static const String signOutButtonText = 'Sign Out';
 
   /// Message shown when sign out is successful
-  static const String signOutSuccessMessage = 'You have been signed out successfully';
+  static const String signOutSuccessMessage =
+      'You have been signed out successfully';
 
   /// Error message shown when sign out fails
-  static const String signOutErrorMessage = 'Failed to sign out. Please try again.';
+  static const String signOutErrorMessage =
+      'Failed to sign out. Please try again.';
 
   static const String deleteAccountTitle = 'Delete Account';
-  static const String deleteAccountConfirmation = 'Are you sure you want to delete your account? This action cannot be undone.';
+  static const String deleteAccountConfirmation =
+      'Are you sure you want to delete your account? This action cannot be undone.';
   static const String deleteAccountButtonText = 'Delete Account';
-  static const String accountMarkedForDeletion = 'Your account has been marked for deletion and you have been signed out.';
-  static const String deleteAccountError = 'Failed to delete account. Please try again.';
+  static const String accountMarkedForDeletion =
+      'Your account has been marked for deletion and you have been signed out.';
+  static const String deleteAccountError =
+      'Failed to delete account. Please try again.';
 
   // Authentication and Account Management
   /// Error message shown when trying to log in to an account marked for deletion
-  static const String accountMarkedForDeletionError = 'This account has been marked for deletion and cannot be accessed.';
+  static const String accountMarkedForDeletionError =
+      'This account has been marked for deletion and cannot be accessed.';
 
-   /// Title for the FAQ section in the Settings screen
+  /// Title for the FAQ section in the Settings screen
   static const String faqTitle = 'FAQ';
 
   /// Title for the Edit Stats section in the Settings screen
@@ -206,5 +217,4 @@ class StringConstants {
 
   /// Title for the Account section in the Settings screen
   static const String accountTitle = 'Account';
-
 }

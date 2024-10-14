@@ -7,8 +7,9 @@ import 'package:medito/views/settings/user_profile_page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../main.dart';
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
@@ -98,7 +99,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       switch (e.type) {
         case AuthException.accountMarkedForDeletion:
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(StringConstants.accountMarkedForDeletionError)),
+            const SnackBar(
+                content: Text(StringConstants.accountMarkedForDeletionError)),
           );
           break;
         case AuthException.other:
@@ -174,19 +176,14 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         await _refreshUserInfo();
         ref.invalidate(statsProvider);
 
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(content: Text(StringConstants.signInSuccess)),
-        );
+        showSnackBar(context, StringConstants.signInSuccess);
+        
         Navigator.of(context).pop(true);
       } else {
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(content: Text('Authentication failed')),
-        );
+        showSnackBar(context, 'Authentication failed');
       }
     } catch (e) {
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      showSnackBar(context, 'Error: ${e.toString()}');
     } finally {
       ref.invalidate(statsProvider);
       setState(() {
@@ -280,7 +277,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       ),
                       height32,
                       ElevatedButton(
-                        onPressed: (_isLoading || !_isFormValid) ? null : _signUp,
+                        onPressed:
+                            (_isLoading || !_isFormValid) ? null : _signUp,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: ColorConstants.onyx,
                           backgroundColor: ColorConstants.brightSky,
@@ -291,11 +289,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                           ),
                           minimumSize: const Size(double.infinity, 48),
                         ),
-                        child: const Text(StringConstants.createAccountButtonText),
+                        child:
+                            const Text(StringConstants.createAccountButtonText),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: (_isLoading || !_isFormValid) ? null : _logIn,
+                        onPressed:
+                            (_isLoading || !_isFormValid) ? null : _logIn,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: ColorConstants.onyx,
                           backgroundColor: ColorConstants.brightSky,
@@ -316,6 +316,19 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () => _launchPrivacyPolicy(),
+                          child: const Text(
+                            'https://meditofoundation.org/privacy',
+                            style: TextStyle(
+                              color: ColorConstants.brightSky,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -328,6 +341,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         onBackPressed: () => Navigator.of(context).pop(),
       ),
     );
+  }
+
+  void _launchPrivacyPolicy() async {
+    var uri = Uri.https('meditofoundation.org/privacy');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      showSnackBar(context, StringConstants.unableToOpenPrivacyPolicy);
+    }
   }
 }
 
