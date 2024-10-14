@@ -32,7 +32,7 @@ class StatsManager {
     }
 
     try {
-      getRemoteStats();
+      await getRemoteStats();
       await _merge();
       if (_allStats != null) {
         _allStats = calculateStreak(_allStats!);
@@ -45,7 +45,7 @@ class StatsManager {
   }
 
   Future<void> getRemoteStats() async {
-     _allStats = await statsService.fetchAllStats();
+    _allStats = await statsService.fetchAllStats();
   }
 
   Future<void> _merge() async {
