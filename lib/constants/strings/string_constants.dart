@@ -178,4 +178,15 @@ class StringConstants {
 
   /// Error message shown when sign out fails
   static const String signOutErrorMessage = 'Failed to sign out. Please try again.';
+
+  static const String deleteAccountTitle = 'Delete Account';
+  static const String deleteAccountConfirmation = 'Are you sure you want to delete your account? This action cannot be undone.';
+  static const String deleteAccountButtonText = 'Delete Account';
+  static const String accountMarkedForDeletion = 'Your account has been marked for deletion and you have been signed out.';
+  static const String deleteAccountError = 'Failed to delete account. Please try again.';
+
+  // Authentication and Account Management
+  /// Error message shown when trying to log in to an account marked for deletion
+  static const String accountMarkedForDeletionError = 'This account has been marked for deletion and cannot be accessed.';
+
 }

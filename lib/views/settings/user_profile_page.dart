@@ -44,14 +44,62 @@ class UserProfilePage extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 foregroundColor: ColorConstants.onyx,
                 backgroundColor: ColorConstants.brightSky,
-                disabledForegroundColor: Colors.grey,
-                disabledBackgroundColor: Colors.grey[300],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 minimumSize: const Size(double.infinity, 48),
               ),
               child: const Text(StringConstants.signOutButtonText),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text(StringConstants.deleteAccountTitle),
+                    content: const Text(StringConstants.deleteAccountConfirmation),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text(StringConstants.cancel),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text(StringConstants.delete),
+                      ),
+                    ],
+                  ),
+                ) ?? false;
+
+                if (confirmed) {
+                  try {
+                    final success = await authRepository.markAccountForDeletion();
+                    if (success) {
+                      await authRepository.signOut();
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text(StringConstants.accountMarkedForDeletion)),
+                      );
+                    } else {
+                      throw Exception('Failed to mark account for deletion');
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text(StringConstants.deleteAccountError)),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                minimumSize: const Size(double.infinity, 48),
+              ),
+              child: const Text(StringConstants.deleteAccountButtonText),
             ),
           ],
         ),

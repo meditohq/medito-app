@@ -8,6 +8,21 @@ import 'package:uuid/uuid.dart';
 
 part 'auth_repository.g.dart';
 
+enum AuthException {
+  accountMarkedForDeletion,
+  other,
+}
+
+class AuthError implements Exception {
+  final AuthException type;
+  final String message;
+
+  AuthError(this.type, this.message);
+
+  @override
+  String toString() => message;
+}
+
 abstract class AuthRepository {
   Future<String?> getClientIdFromSharedPreference();
   Future<void> initializeUser();
@@ -17,6 +32,8 @@ abstract class AuthRepository {
   Future<bool> logIn(String email, String password);
   User? get currentUser;
   Future<bool> signOut();
+  Future<bool> markAccountForDeletion();
+  Future<bool> isAccountMarkedForDeletion();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -113,13 +130,20 @@ class AuthRepositoryImpl extends AuthRepository {
       );
 
       if (response.user != null) {
+        if (response.user?.userMetadata?['marked_for_deletion'] == true) {
+          throw AuthError(AuthException.accountMarkedForDeletion, 
+            'This account has been marked for deletion.');
+        }
         await _saveClientIdToSharedPreference(
             response.user?.userMetadata?['client_id'] ?? '');
       }
 
       return response.user != null;
     } catch (e) {
-      throw Exception('Error during log-in: ${e.toString()}');
+      if (e is AuthError) {
+        rethrow;
+      }
+      throw AuthError(AuthException.other, 'Error during log-in: ${e.toString()}');
     }
   }
 
@@ -170,6 +194,32 @@ class AuthRepositoryImpl extends AuthRepository {
       return true;
     } catch (e) {
       throw Exception('Error signing out: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<bool> markAccountForDeletion() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final response = await supabase.auth.updateUser(
+        UserAttributes(data: {'marked_for_deletion': true}),
+      );
+      return response.user != null;
+    } catch (e) {
+      print('Error marking account for deletion: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> isAccountMarkedForDeletion() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      return user?.userMetadata?['marked_for_deletion'] == true;
+    } catch (e) {
+      print('Error checking if account is marked for deletion: $e');
+      return false;
     }
   }
 }

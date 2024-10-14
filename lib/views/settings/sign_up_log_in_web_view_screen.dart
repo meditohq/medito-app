@@ -91,8 +91,23 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       if (!shouldProceed) return;
     }
 
-    await _performAuthAction(() => authRepository.logIn(
-        _emailController.text.trim(), _passwordController.text.trim()));
+    try {
+      await _performAuthAction(() => authRepository.logIn(
+          _emailController.text.trim(), _passwordController.text.trim()));
+    } on AuthError catch (e) {
+      switch (e.type) {
+        case AuthException.accountMarkedForDeletion:
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(StringConstants.accountMarkedForDeletionError)),
+          );
+          break;
+        case AuthException.other:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.message}')),
+          );
+          break;
+      }
+    }
   }
 
   Future<bool> _showLoginDialog() async {
