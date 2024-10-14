@@ -29,10 +29,10 @@ class Pack extends _$Pack {
     state = await AsyncValue.guard(() async {
       var pack = await packRepository.fetchPacks(packId);
       var localStats = await statsManager.localAllStats;
-      var completedTracks = localStats.tracksCompleted ?? [];
+      var tracksChecked = localStats.tracksChecked ?? [];
 
       var updatedItems = pack.items.map((item) {
-        return item.copyWith(isCompleted: completedTracks.contains(item.id));
+        return item.copyWith(isCompleted: tracksChecked.contains(item.id));
       }).toList();
 
       return pack.copyWith(items: updatedItems);

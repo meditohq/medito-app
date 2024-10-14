@@ -23,7 +23,7 @@ void main() {
       var twoDaysAgo = now.subtract(const Duration(days: 2));
 
       var mockStats = LocalAllStats(
-        tracksCompleted: [],
+        tracksChecked: [],
         audioCompleted: [
           LocalAudioCompleted(id: '1', timestamp: now.millisecondsSinceEpoch),
           LocalAudioCompleted(
@@ -52,10 +52,7 @@ void main() {
           now.subtract(const Duration(hours: 23, minutes: 45)); // 00:15 today
 
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
-        tracksCompleted: [],
-        tracksFavorited: [],
-        streakLastDate: 0,
+        tracksChecked: [],
         audioCompleted: [
           LocalAudioCompleted(id: '1', timestamp: now.millisecondsSinceEpoch),
           LocalAudioCompleted(
@@ -82,10 +79,7 @@ void main() {
       var threeDaysAgo = now.subtract(const Duration(days: 3));
 
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
-        tracksCompleted: [],
-        tracksFavorited: [],
-        streakLastDate: 0,
+        tracksChecked: [],
         audioCompleted: [
           LocalAudioCompleted(id: '1', timestamp: now.millisecondsSinceEpoch),
           LocalAudioCompleted(
@@ -108,16 +102,13 @@ void main() {
 
     test('calculateStreak should handle empty audioCompleted list', () {
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
-        tracksCompleted: [],
-        tracksFavorited: [],
+        tracksChecked: [],
         audioCompleted: [],
         streakCurrent: 0,
         streakLongest: 0,
         totalTracksCompleted: 0,
         totalTimeListened: 0,
         updated: DateTime.now().millisecondsSinceEpoch,
-        streakLastDate: 0,
       );
 
       var result = statsManager.calculateStreak(mockStats);
@@ -129,9 +120,7 @@ void main() {
     test('calculateStreak should handle single day activity', () {
       var now = DateTime.now();
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
-        tracksCompleted: [],
-        tracksFavorited: [],
+        tracksChecked: [],
         audioCompleted: [
           LocalAudioCompleted(id: '1', timestamp: now.millisecondsSinceEpoch),
         ],
@@ -140,7 +129,6 @@ void main() {
         totalTracksCompleted: 1,
         totalTimeListened: 60,
         updated: now.millisecondsSinceEpoch,
-        streakLastDate: 0,
       );
 
       var result = statsManager.calculateStreak(mockStats);
@@ -152,9 +140,7 @@ void main() {
     test('calculateStreak should handle multiple sessions on the same day', () {
       var now = DateTime.now();
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
-        tracksCompleted: [],
-        tracksFavorited: [],
+        tracksChecked: [],
         audioCompleted: [
           LocalAudioCompleted(id: '1', timestamp: now.millisecondsSinceEpoch),
           LocalAudioCompleted(id: '2', timestamp: now.subtract(const Duration(hours: 2)).millisecondsSinceEpoch),
@@ -165,7 +151,6 @@ void main() {
         totalTracksCompleted: 3,
         totalTimeListened: 180,
         updated: now.millisecondsSinceEpoch,
-        streakLastDate: 0,
       );
 
       var result = statsManager.calculateStreak(mockStats);
@@ -184,16 +169,13 @@ void main() {
       });
 
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
-        tracksCompleted: [],
-        tracksFavorited: [],
+        tracksChecked: [],
         audioCompleted: audioCompleted,
         streakCurrent: 0,
         streakLongest: 0,
         totalTracksCompleted: 100,
         totalTimeListened: 6000,
         updated: now.millisecondsSinceEpoch,
-        streakLastDate: 0,
       );
 
       var result = statsManager.calculateStreak(mockStats);

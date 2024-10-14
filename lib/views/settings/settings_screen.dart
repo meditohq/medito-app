@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
@@ -14,7 +14,6 @@ import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/widgets/widgets.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
@@ -41,6 +40,48 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authRepository = ref.watch(authRepositoryProvider);
+    final userId = authRepository.currentUser?.id ?? '';
+
+    final List<SettingsItem> settingsItems = [
+      SettingsItem(
+        type: 'url',
+        title: StringConstants.faqTitle,
+        icon: HugeIcon(icon: HugeIcons.solidRoundedNews01, color: ColorConstants.white),
+        path: 'https://medito.notion.site/FAQ-3edb3f0a4b984c069b9c401308d874bc?pvs=4',
+      ),
+      SettingsItem(
+        type: 'url',
+        title: StringConstants.editStatsTitle,
+        icon: HugeIcon(icon: HugeIcons.solidRoundedQuestion, color: ColorConstants.white),
+        path: 'https://tally.so/r/wQYKyp?userid=$userId&streakcurrent=0&streaklongest=0&trackscompleted=0&timelist',
+      ),
+      SettingsItem(
+        type: 'url',
+        title: StringConstants.telegramTitle,
+        icon: HugeIcon(icon: HugeIcons.solidRoundedTelegram, color: ColorConstants.white),
+        path: 'https://t.me/meditoapp',
+      ),
+       SettingsItem(
+        type: 'url',
+        title: StringConstants.donateTitle,
+        icon: HugeIcon(icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
+        path: 'https://donate.meditofoundation.org',
+      ),
+      SettingsItem(
+        type: 'url',
+        title: StringConstants.contactUsTitle,
+        icon: HugeIcon(icon: HugeIcons.solidRoundedMessage01, color: ColorConstants.white),
+        path: 'https://tally.so/r/wLGBaO?userId=$userId',
+      ),
+       SettingsItem(
+        type: 'account',
+        title: StringConstants.accountTitle,
+        icon: HugeIcon(icon: HugeIcons.solidRoundedUserAccount, color: ColorConstants.white),
+        path: 'account',
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -53,28 +94,18 @@ class SettingsScreen extends ConsumerWidget {
         ),
         elevation: 0.0,
       ),
-      body: SafeArea(child: _buildMain(context, ref)),
+      body: SafeArea(child: _buildMain(context, ref, settingsItems)),
     );
   }
 
-  Widget _buildMain(BuildContext context, WidgetRef ref) {
-    final home = ref.watch(fetchHomeProvider);
-
-    return home.when(
-      loading: () => const HomeShimmerWidget(),
-      error: (err, stack) => MeditoErrorWidget(
-        message: home.error.toString(),
-        onTap: () => _onRefresh(ref),
-        isLoading: home.isLoading,
-      ),
-      data: (HomeModel homeData) => _buildSettingsList(context, ref, homeData),
-    );
+  Widget _buildMain(BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
+    return _buildSettingsList(context, ref, settingsItems);
   }
 
   Widget _buildSettingsList(
     BuildContext context,
     WidgetRef ref,
-    HomeModel homeData,
+    List<SettingsItem> settingsItems,
   ) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -85,8 +116,8 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             _buildDailyNotificationTile(context, ref),
             if (_isHealthSyncAvailable) const HealthSyncTile(),
-            ...homeData.menu
-                .map((element) => _buildMenuItemTile(context, ref, element)),
+            ...settingsItems
+                .map((item) => _buildMenuItemTile(context, ref, item)),
             _buildDebugTile(context, ref),
           ],
         ),
@@ -97,17 +128,14 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildMenuItemTile(
     BuildContext context,
     WidgetRef ref,
-    HomeMenuModel element,
+    SettingsItem item,
   ) {
     return RowItemWidget(
       enableInteractiveSelection: false,
-      icon: MeditoHugeIcon(
-        icon: element.icon,
-        size: 24,
-      ),
-      title: element.title,
+      icon: item.icon,
+      title: item.title,
       hasUnderline: true,
-      onTap: () => handleItemPress(context, ref, element),
+      onTap: () => handleItemPress(context, ref, item),
     );
   }
 
@@ -115,10 +143,9 @@ class SettingsScreen extends ConsumerWidget {
     return RowItemWidget(
       enableInteractiveSelection: false,
       icon: HugeIcon(
-        icon: HugeIcons.strokeRoundedHelpCircle,
-        size: 24,
-        color: Colors.white
-      ),
+          icon: HugeIcons.strokeRoundedHelpCircle,
+          size: 24,
+          color: Colors.white),
       title: StringConstants.debugInfo,
       hasUnderline: true,
       onTap: () => _showDebugBottomSheet(context, ref),
@@ -136,7 +163,8 @@ class SettingsScreen extends ConsumerWidget {
         enableInteractiveSelection: false,
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedNotification03,
-          size: 24, color: Colors.white,
+          size: 24,
+          color: Colors.white,
         ),
         title: StringConstants.dailyReminderTitle,
         subTitle: reminderTime != null
@@ -162,19 +190,14 @@ class SettingsScreen extends ConsumerWidget {
   void handleItemPress(
     BuildContext context,
     WidgetRef ref,
-    HomeMenuModel element,
+    SettingsItem item,
   ) async {
     await handleNavigation(
-      element.type,
-      [element.path.toString().getIdFromPath(), element.path],
+      item.type,
+      [item.path.toString().getIdFromPath(), item.path],
       context,
       ref: ref,
     );
-  }
-
-  Future<void> _onRefresh(WidgetRef ref) async {
-    ref.invalidate(refreshHomeAPIsProvider);
-    await ref.read(refreshHomeAPIsProvider.future);
   }
 
   void _clearReminder(BuildContext context, WidgetRef ref) async {
@@ -249,4 +272,19 @@ class SettingsScreen extends ConsumerWidget {
       builder: (context) => const DebugBottomSheetWidget(),
     );
   }
+}
+
+
+class SettingsItem {
+  final String type;
+  final String title;
+  final Widget icon;
+  final String path;
+
+  const SettingsItem({
+    required this.type,
+    required this.title,
+    required this.icon,
+    required this.path,
+  });
 }

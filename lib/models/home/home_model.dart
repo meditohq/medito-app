@@ -8,7 +8,6 @@ part 'home_model.g.dart';
 class HomeModel with _$HomeModel {
   const factory HomeModel({
     String? greeting,
-    @Default(<HomeMenuModel>[]) List<HomeMenuModel> menu,
     @Default(<ShortcutsModel>[]) List<ShortcutsModel> shortcuts,
     @Default(<HomeCarouselModel>[]) List<HomeCarouselModel> carousel,
     HomeQuoteModel? todayQuote,
@@ -16,20 +15,6 @@ class HomeModel with _$HomeModel {
 
   factory HomeModel.fromJson(Map<String, dynamic> json) =>
       _$HomeModelFromJson(json);
-}
-
-@freezed
-class HomeMenuModel with _$HomeMenuModel {
-  const factory HomeMenuModel({
-    required String id,
-    required String type,
-    required String title,
-    required String icon,
-    required String path,
-  }) = _HomeMenuModel;
-
-  factory HomeMenuModel.fromJson(Map<String, dynamic> json) =>
-      _$HomeMenuModelFromJson(json);
 }
 
 @freezed

@@ -37,20 +37,6 @@ class MeditoHugeIcon extends StatelessWidget {
         return HugeIcons.solidRoundedPlayCircle;
       case 'Total Time Listened':
         return HugeIcons.solidRoundedHourglass;
-      case 'f7e4':
-        return HugeIcons.solidRoundedQuestion;
-      case 'f67a':
-        return HugeIcons.solidRoundedEdit01;
-      case 'ee93':
-        return HugeIcons.solidRoundedNews01;
-      case 'e153':
-        return HugeIcons.solidRoundedTelegram;
-      case 'f738':
-        return HugeIcons.solidSharpFavourite;
-      case 'f705':
-        return HugeIcons.solidRoundedMessage01;
-      case 'e042':
-        return HugeIcons.solidRoundedUserAccount;
       case streakIcon:
         return HugeIcons.solidRoundedFire;
       case 'duohome':

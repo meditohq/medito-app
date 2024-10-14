@@ -202,10 +202,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   @override
   Widget build(BuildContext context) {
     const inputTextStyle = TextStyle(color: ColorConstants.onyx);
-    const labelTextStyle = TextStyle(color: ColorConstants.onyx);
-    const errorTextStyle = TextStyle(color: Colors.red);
 
-    InputDecoration _getInputDecoration(
+    InputDecoration getInputDecoration(
         String hint, bool isValid, String? errorText) {
       return InputDecoration(
         hintText: hint,
@@ -261,7 +259,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       const SizedBox(height: 24),
                       TextField(
                         controller: _emailController,
-                        decoration: _getInputDecoration(
+                        decoration: getInputDecoration(
                           StringConstants.emailLabel,
                           _isEmailValid || _emailController.text.isEmpty,
                           StringConstants.invalidEmailError,
@@ -272,7 +270,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       const SizedBox(height: 16),
                       TextField(
                         controller: _passwordController,
-                        decoration: _getInputDecoration(
+                        decoration: getInputDecoration(
                           StringConstants.passwordLabel,
                           _isPasswordValid || _passwordController.text.isEmpty,
                           StringConstants.invalidPasswordError,

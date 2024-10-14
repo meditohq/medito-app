@@ -189,4 +189,22 @@ class StringConstants {
   /// Error message shown when trying to log in to an account marked for deletion
   static const String accountMarkedForDeletionError = 'This account has been marked for deletion and cannot be accessed.';
 
+   /// Title for the FAQ section in the Settings screen
+  static const String faqTitle = 'FAQ';
+
+  /// Title for the Edit Stats section in the Settings screen
+  static const String editStatsTitle = 'Edit stats';
+
+  /// Title for the Medito on Telegram section in the Settings screen
+  static const String telegramTitle = 'Medito on Telegram';
+
+  /// Title for the Donate section in the Settings screen
+  static const String donateTitle = 'Donate';
+
+  /// Title for the Contact Us section in the Settings screen
+  static const String contactUsTitle = 'Contact us';
+
+  /// Title for the Account section in the Settings screen
+  static const String accountTitle = 'Account';
+
 }
