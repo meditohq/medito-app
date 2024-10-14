@@ -6,6 +6,8 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -42,43 +44,86 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authRepository = ref.watch(authRepositoryProvider);
     final userId = authRepository.currentUser?.id ?? '';
+    final deviceInfoAsyncValue = ref.watch(deviceAndAppInfoProvider);
+    final statsAsyncValue = ref.watch(statsProvider);
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
         type: 'url',
         title: StringConstants.faqTitle,
-        icon: HugeIcon(icon: HugeIcons.solidRoundedNews01, color: ColorConstants.white),
-        path: 'https://medito.notion.site/FAQ-3edb3f0a4b984c069b9c401308d874bc?pvs=4',
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedNews01, color: ColorConstants.white),
+        path:
+            'https://medito.notion.site/FAQ-3edb3f0a4b984c069b9c401308d874bc?pvs=4',
       ),
       SettingsItem(
         type: 'url',
         title: StringConstants.editStatsTitle,
-        icon: HugeIcon(icon: HugeIcons.solidRoundedQuestion, color: ColorConstants.white),
-        path: 'https://tally.so/r/wQYKyp?userid=$userId&streakcurrent=0&streaklongest=0&trackscompleted=0&timelist',
+        icon: HugeIcon(
+          icon: HugeIcons.solidRoundedQuestion,
+          color: ColorConstants.white,
+        ),
+        path: statsAsyncValue.when(
+          data: (stats) {
+            var timeList = stats.audioCompleted
+                    ?.map((audio) => audio.timestamp)
+                    .join(',') ??
+                '';
+            return 'https://tally.so/r/wQYKyp?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelist=$timeList';
+          },
+          loading: () => 'https://tally.so/r/wQYKyp?userid=$userId',
+          error: (_, __) => 'https://tally.so/r/wQYKyp?userid=$userId',
+        ),
       ),
       SettingsItem(
         type: 'url',
         title: StringConstants.telegramTitle,
-        icon: HugeIcon(icon: HugeIcons.solidRoundedTelegram, color: ColorConstants.white),
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedTelegram, color: ColorConstants.white),
         path: 'https://t.me/meditoapp',
       ),
-       SettingsItem(
+      SettingsItem(
         type: 'url',
         title: StringConstants.donateTitle,
-        icon: HugeIcon(icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
+        icon: HugeIcon(
+            icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
         path: 'https://donate.meditofoundation.org',
       ),
       SettingsItem(
         type: 'url',
         title: StringConstants.contactUsTitle,
-        icon: HugeIcon(icon: HugeIcons.solidRoundedMessage01, color: ColorConstants.white),
-        path: 'https://tally.so/r/wLGBaO?userId=$userId',
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedMessage01, color: ColorConstants.white),
+        path: deviceInfoAsyncValue.when(
+          data: (deviceInfo) {
+            final platform = Uri.encodeComponent(deviceInfo.platform);
+            final language = Uri.encodeComponent(deviceInfo.languageCode);
+            final model = Uri.encodeComponent(deviceInfo.model);
+            final appVersion = Uri.encodeComponent(deviceInfo.appVersion);
+            final os = Uri.encodeComponent(deviceInfo.os);
+
+            return 'https://tally.so/r/wLGBaO?userId=$userId&platform=$platform&language=$language&model=$model&appVersion=$appVersion&os=$os';
+          },
+          loading: () => 'https://tally.so/r/wLGBaO?userId=$userId',
+          error: (_, __) => 'https://tally.so/r/wLGBaO?userId=$userId',
+        ),
       ),
-       SettingsItem(
+      SettingsItem(
         type: 'account',
         title: StringConstants.accountTitle,
-        icon: HugeIcon(icon: HugeIcons.solidRoundedUserAccount, color: ColorConstants.white),
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedUserAccount,
+            color: ColorConstants.white),
         path: 'account',
+      ),
+      // Add the new privacy policy item here
+      SettingsItem(
+        type: 'url',
+        title: StringConstants.privacyPolicyTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedShieldCheck,
+            color: ColorConstants.white),
+        path: 'https://meditofoundation.org/privacy',
       ),
     ];
 
@@ -98,7 +143,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMain(BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
+  Widget _buildMain(
+      BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
     return _buildSettingsList(context, ref, settingsItems);
   }
 
@@ -273,7 +319,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
-
 
 class SettingsItem {
   final String type;

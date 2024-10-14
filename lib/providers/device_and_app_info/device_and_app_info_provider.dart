@@ -9,13 +9,13 @@ import '../../repositories/device_and_app_info/device_and_app_info_repository.da
 import '../me/me_provider.dart';
 
 part 'device_and_app_info_provider.g.dart';
-  
+
 @riverpod
-Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) {
+Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
   final info = ref.read(deviceAndAppInfoRepositoryProvider);
   ref.keepAlive();
 
-  return info.getDeviceAndAppInfo();
+  return await info.getDeviceAndAppInfo();
 }
 
 final deviceAppAndUserInfoProvider =
