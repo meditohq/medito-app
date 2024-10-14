@@ -223,13 +223,13 @@ class StatsManager {
     final newDuration = duration + (_allStats?.totalTimeListened ?? 0);
     final newTotalTracks = 1 + (_allStats?.totalTracksCompleted ?? 0);
 
-    var updatedTracksCompleted = _allStats?.tracksCompleted ?? [];
+    var updatedTracksCompleted = _allStats?.tracksChecked ?? [];
     if (!updatedTracksCompleted.contains(audioCompleted.id)) {
       updatedTracksCompleted.add(audioCompleted.id);
     }
 
     _allStats = _allStats?.copyWith(
-      tracksCompleted: updatedTracksCompleted,
+      tracksChecked: updatedTracksCompleted,
       audioCompleted: [...?_allStats?.audioCompleted, audioCompleted],
       totalTracksCompleted: newTotalTracks,
       updated: DateTime.now().toUtc().millisecondsSinceEpoch,
@@ -243,17 +243,17 @@ class StatsManager {
     unawaited(_postUpdatedStats());
   }
 
-  Future<void> addTrackCompleted(String trackId) async {
+  Future<void> addTrackChecked(String trackId) async {
     if (_allStats == null) {
       await sync();
     }
 
-    var updatedTracksCompleted = _allStats?.tracksCompleted ?? [];
-    if (!updatedTracksCompleted.contains(trackId)) {
-      updatedTracksCompleted.add(trackId);
+    var updatedTracksChecked = _allStats?.tracksChecked ?? [];
+    if (!updatedTracksChecked.contains(trackId)) {
+      updatedTracksChecked.add(trackId);
 
       _allStats = _allStats?.copyWith(
-        tracksCompleted: updatedTracksCompleted,
+        tracksChecked: updatedTracksChecked,
         updated: DateTime.now().toUtc().millisecondsSinceEpoch,
       );
 
@@ -262,15 +262,15 @@ class StatsManager {
     }
   }
 
-  Future<void> removeTrackCompleted(String trackId) async {
+  Future<void> removeTrackChecked(String trackId) async {
     if (_allStats == null) {
       await sync();
     }
 
-    var updatedTracksCompleted = _allStats?.tracksCompleted ?? [];
-    if (updatedTracksCompleted.remove(trackId)) {
+    var updatedTracksChecked = _allStats?.tracksChecked ?? [];
+    if (updatedTracksChecked.remove(trackId)) {
       _allStats = _allStats?.copyWith(
-        tracksCompleted: updatedTracksCompleted,
+        tracksChecked: updatedTracksChecked,
         updated: DateTime.now().toUtc().millisecondsSinceEpoch,
       );
 

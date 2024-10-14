@@ -10,7 +10,7 @@ class LocalAllStats {
   final int streakLongest;
   final int totalTracksCompleted;
   final int totalTimeListened;
-  final List<String>? tracksCompleted;
+  final List<String>? tracksChecked;
   final List<LocalAudioCompleted>? audioCompleted;
   final int updated;
 
@@ -19,7 +19,7 @@ class LocalAllStats {
     required this.streakLongest,
     required this.totalTracksCompleted,
     required this.totalTimeListened,
-    required this.tracksCompleted,
+    required this.tracksChecked,
     required this.audioCompleted,
     required this.updated,
   });
@@ -30,7 +30,7 @@ class LocalAllStats {
       streakLongest: 0,
       totalTracksCompleted: 0,
       totalTimeListened: 0,
-      tracksCompleted: [],
+      tracksChecked: [],
       audioCompleted: [],
       updated: 0,
     );
@@ -42,7 +42,7 @@ class LocalAllStats {
       streakLongest: stats.streakLongest,
       totalTracksCompleted: stats.totalTracksCompleted,
       totalTimeListened: stats.totalTimeListened,
-      tracksCompleted: stats.tracksCompleted ?? [],
+      tracksChecked: stats.tracksChecked ?? [],
       audioCompleted: stats.audioCompleted
               ?.map((e) => LocalAudioCompleted.fromAudioCompleted(e))
               .toList() ??
@@ -57,7 +57,7 @@ class LocalAllStats {
       streakLongest: streakLongest,
       totalTracksCompleted: totalTracksCompleted,
       totalTimeListened: totalTimeListened,
-      tracksCompleted: tracksCompleted,
+      tracksChecked: tracksChecked,
       audioCompleted: audioCompleted?.map((e) => e.toAudioCompleted()).toList(),
       updated: updated,
     );
@@ -73,7 +73,7 @@ class LocalAllStats {
     int? streakLongest,
     int? totalTracksCompleted,
     int? totalTimeListened,
-    List<String>? tracksCompleted,
+    List<String>? tracksChecked,
     List<LocalAudioCompleted>? audioCompleted,
     int? updated,
   }) {
@@ -82,7 +82,7 @@ class LocalAllStats {
       streakLongest: streakLongest ?? this.streakLongest,
       totalTracksCompleted: totalTracksCompleted ?? this.totalTracksCompleted,
       totalTimeListened: totalTimeListened ?? this.totalTimeListened,
-      tracksCompleted: tracksCompleted ?? this.tracksCompleted,
+      tracksChecked: tracksChecked ?? this.tracksChecked,
       audioCompleted: audioCompleted ?? this.audioCompleted,
       updated: updated ?? this.updated,
     );

@@ -5,7 +5,7 @@ class AllStats {
   final int streakLongest;
   final int totalTracksCompleted;
   final int totalTimeListened;
-  final List<String>? tracksCompleted;
+  final List<String>? tracksChecked;
   final List<AudioCompleted>? audioCompleted;
   final int updated;
 
@@ -14,7 +14,7 @@ class AllStats {
     required this.streakLongest,
     required this.totalTracksCompleted,
     required this.totalTimeListened,
-    required this.tracksCompleted,
+    required this.tracksChecked,
     required this.audioCompleted,
     required this.updated,
   });
@@ -25,7 +25,7 @@ class AllStats {
       streakLongest: json['streak_longest'] as int? ?? 0,
       totalTracksCompleted: json['total_tracks_completed'] as int? ?? 0,
       totalTimeListened: json['total_time_listened'] as int? ?? 0,
-      tracksCompleted: (json['tracks_completed'] as List<dynamic>?)?.cast<String>() ?? [],
+      tracksChecked: (json['tracks_checked'] as List<dynamic>?)?.cast<String>() ?? [],
       audioCompleted: (json['audio_completed'] as List<dynamic>?)
           ?.map((item) => AudioCompleted.fromJson(item as Map<String, dynamic>))
           .toList() ?? [],
@@ -39,7 +39,7 @@ class AllStats {
       'streak_longest': streakLongest,
       'total_tracks_completed': totalTracksCompleted,
       'total_time_listened': totalTimeListened,
-      'tracks_completed': tracksCompleted,
+      'tracks_checked': tracksChecked,
       'audio_completed': audioCompleted?.map((item) => item.toJson()).toList(),
       'updated': updated,
     };
@@ -54,7 +54,7 @@ class AllStats {
           streakLongest == other.streakLongest &&
           totalTracksCompleted == other.totalTracksCompleted &&
           totalTimeListened == other.totalTimeListened &&
-          listEquals(tracksCompleted, other.tracksCompleted) &&
+          listEquals(tracksChecked, other.tracksChecked) &&
           listEquals(audioCompleted, other.audioCompleted) &&
           updated == other.updated;
 
@@ -64,7 +64,7 @@ class AllStats {
       streakLongest.hashCode ^
       totalTracksCompleted.hashCode ^
       totalTimeListened.hashCode ^
-      tracksCompleted.hashCode ^
+      tracksChecked.hashCode ^
       audioCompleted.hashCode ^
       updated.hashCode;
 }

@@ -23,9 +23,9 @@ class Pack extends _$Pack {
   Future<void> fetchPacks({required String packId}) async {
     final packRepository = ref.read(packRepositoryProvider);
     final statsManager = StatsManager();
-    
+
     state = const AsyncLoading();
-    
+
     state = await AsyncValue.guard(() async {
       var pack = await packRepository.fetchPacks(packId);
       var localStats = await statsManager.localAllStats;
@@ -37,7 +37,7 @@ class Pack extends _$Pack {
 
       return pack.copyWith(items: updatedItems);
     });
-    
+
     ref.keepAlive();
   }
 
@@ -47,9 +47,9 @@ class Pack extends _$Pack {
     required bool isComplete,
   }) async {
     if (isComplete) {
-      await StatsManager().removeTrackCompleted(trackId);
+      await StatsManager().removeTrackChecked(trackId);
     } else {
-      await StatsManager().addTrackCompleted(trackId);
+      await StatsManager().addTrackChecked(trackId);
     }
 
     state = state.whenData((pack) {
@@ -59,7 +59,7 @@ class Pack extends _$Pack {
         }
         return item;
       }).toList();
-      
+
       return pack.copyWith(items: updatedItems);
     });
   }
