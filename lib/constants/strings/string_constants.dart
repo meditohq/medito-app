@@ -6,7 +6,7 @@ class StringConstants {
   static const String none = 'None';
   static const String removed = 'Removed';
   static const String emptyDownloadsMessage =
-      'It looks like you haven’t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
+      'It looks like you haven\'t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
   static const String meanWhileListen = 'Meanwhile, you can listen to your';
   static const String retrying = 'Retrying...';
   static const String tryAgain = 'Try again';
@@ -18,7 +18,6 @@ class StringConstants {
   static const String shareStatsText =
       '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
 
-//Player
   static const String backgroundSounds = 'Background Sound';
   static const String x06 = 'x0.6';
   static const String x07 = 'x0.7';
@@ -45,7 +44,6 @@ class StringConstants {
   static const String min = 'min';
   static const String hey = '👋 Hey';
 
-  //Error
   static const String someThingWentWrong = 'Something went wrong';
   static const String invalidEmail = 'Invalid Email.';
   static const String fieldRequired = 'Field is Required';
@@ -119,7 +117,6 @@ class StringConstants {
 
   static const String neww = 'New';
 
-  // New constants for stats
   static const String statsLoadError =
       'Unable to load stats. Please try again later.';
   static const String statsRefreshError =
@@ -127,7 +124,6 @@ class StringConstants {
   static const String statsLoading = 'Loading stats...';
   static const String statsErrorRetry = 'Retry';
 
-  // New constants for stats
   static const String currentStreak = 'Current Streak';
   static const String longestStreak = 'Longest Streak';
   static const String totalTracksCompleted = 'Total Tracks Completed';
@@ -135,4 +131,51 @@ class StringConstants {
   static const String days = 'days';
   static const String hours = 'h';
   static const String minutes = 'min';
+
+  static const String signUpLogInTitle = 'Create Account / Log In';
+  static const String createAccountTitle = 'Create an Account';
+  static const String loginTitle = 'Log In';
+  static const String emailLabel = 'Email';
+  static const String passwordLabel = 'Password';
+  static const String invalidEmailError = 'Please enter a valid email';
+  static const String invalidPasswordError = 'Password must be at least 6 characters';
+  static const String createAccountButtonText = 'Create Account';
+  static const String logInButtonText = 'Log In';
+  static const String authenticationFailed = 'Authentication failed';
+
+  static const String createAccountBenefits = 'Creating an account allows you to:'
+      '\n• Save your meditation progress'
+      '\n• Keep your stats and achievements secure';
+
+  static const String loginBenefits = 'Logging in allows you to:'
+      '\n• Download your previously saved data'
+      '\n• Continue your meditation journey from where you left off'
+      '\n• Sync your progress across devices';
+
+  static const String accountTransitionWarningTitle = 'Save Your Progress';
+  static const String loginWarningMessage = 'Do you currently have unsaved progress? '
+      'Logging in to an existing account will download your previously saved data, '
+      'but may overwrite any current unsaved progress. '
+      'Would you like to create a new account instead to save your current progress?';
+
+  static const String createNewAccount = 'Create New Account';
+  static const String continueLogin = 'Continue Login';
+  static const String cancelAction = 'Cancel';
+  static const String goBack = 'Go Back';
+
+  // User Profile Page
+  /// Title for the User Profile page
+  static const String userProfileTitle = 'User Profile';
+
+  /// Label for displaying the user's email in the User Profile page
+  static const String userProfileEmailLabel = 'Email:';
+
+  /// Text for the sign out button in the User Profile page
+  static const String signOutButtonText = 'Sign Out';
+
+  /// Message shown when sign out is successful
+  static const String signOutSuccessMessage = 'You have been signed out successfully';
+
+  /// Error message shown when sign out fails
+  static const String signOutErrorMessage = 'Failed to sign out. Please try again.';
 }

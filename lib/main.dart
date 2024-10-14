@@ -177,7 +177,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       _showNoConnectionSnackBar();
     } else {
       _hideNoConnectionSnackBar();
-      // StatsManager().sync();
     }
   }
 

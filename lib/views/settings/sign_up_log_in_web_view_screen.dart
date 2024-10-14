@@ -4,7 +4,9 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/views/settings/user_profile_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 
 import '../../main.dart';
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
@@ -36,13 +38,38 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   var _isLoading = false;
+  var _isEmailValid = false;
+  var _isPasswordValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateEmail);
+    _passwordController.addListener(_validatePassword);
+  }
 
   @override
   void dispose() {
+    _emailController.removeListener(_validateEmail);
+    _passwordController.removeListener(_validatePassword);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
+
+  void _validateEmail() {
+    setState(() {
+      _isEmailValid = EmailValidator.validate(_emailController.text.trim());
+    });
+  }
+
+  void _validatePassword() {
+    setState(() {
+      _isPasswordValid = _passwordController.text.trim().length >= 6;
+    });
+  }
+
+  bool get _isFormValid => _isEmailValid && _isPasswordValid;
 
   Future<void> _signUp() async {
     await _performAuthAction(() => ref
@@ -51,25 +78,96 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Future<void> _logIn() async {
-    await _performAuthAction(() => ref
-        .read(authRepositoryProvider)
-        .logIn(_emailController.text.trim(), _passwordController.text.trim()));
+    final authRepository = ref.read(authRepositoryProvider);
+    if (authRepository.currentUser?.email == null) {
+      final action = await _showAccountTransitionWarningDialog();
+      if (action == AccountAction.cancel) return;
+      if (action == AccountAction.createAccount) {
+        await _signUp();
+        return;
+      }
+    } else {
+      final shouldProceed = await _showLoginDialog();
+      if (!shouldProceed) return;
+    }
+
+    await _performAuthAction(() => authRepository.logIn(
+        _emailController.text.trim(), _passwordController.text.trim()));
   }
 
-  Future<void> _performAuthAction(
-      Future<AuthResponse> Function() authAction) async {
+  Future<bool> _showLoginDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(StringConstants.accountTransitionWarningTitle),
+              content: const Text(StringConstants.loginWarningMessage),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(StringConstants.cancelAction),
+                  onPressed: () => Navigator.of(context).pop(false),
+                ),
+                TextButton(
+                  child: const Text(StringConstants.continueLogin),
+                  onPressed: () => Navigator.of(context).pop(true),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  Future<AccountAction> _showAccountTransitionWarningDialog() async {
+    return await showDialog<AccountAction>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(StringConstants.accountTransitionWarningTitle),
+              content: const Text(StringConstants.loginWarningMessage),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(StringConstants.cancelAction),
+                  onPressed: () =>
+                      Navigator.of(context).pop(AccountAction.cancel),
+                ),
+                TextButton(
+                  child: const Text(StringConstants.createNewAccount),
+                  onPressed: () =>
+                      Navigator.of(context).pop(AccountAction.createAccount),
+                ),
+                TextButton(
+                  child: const Text(StringConstants.continueLogin),
+                  onPressed: () =>
+                      Navigator.of(context).pop(AccountAction.login),
+                ),
+              ],
+            );
+          },
+        ) ??
+        AccountAction.cancel;
+  }
+
+  Future<void> _performAuthAction(Future<bool> Function() authAction) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      await authAction();
-      await _refreshUserInfo();
-      ref.invalidate(statsProvider);
+      var success = await authAction();
+      if (success) {
+        await _refreshUserInfo();
+        ref.invalidate(statsProvider);
 
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(content: Text(StringConstants.signInSuccess)),
-      );
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text(StringConstants.signInSuccess)),
+        );
+        Navigator.of(context).pop(true);
+      } else {
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text('Authentication failed')),
+        );
+      }
     } catch (e) {
       scaffoldMessengerKey.currentState?.showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
@@ -88,76 +186,140 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(color: Colors.black);
+    const inputTextStyle = TextStyle(color: ColorConstants.onyx);
+    const labelTextStyle = TextStyle(color: ColorConstants.onyx);
+    const errorTextStyle = TextStyle(color: Colors.red);
+
+    InputDecoration _getInputDecoration(
+        String hint, bool isValid, String? errorText) {
+      return InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.black54),
+        filled: true,
+        fillColor: Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.white),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: ColorConstants.onyx),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        errorText: !isValid && errorText != null ? errorText : null,
+        errorStyle: const TextStyle(color: Colors.red),
+      );
+    }
 
     return Scaffold(
       backgroundColor: ColorConstants.onyx,
-      appBar: AppBar(
-        backgroundColor: ColorConstants.onyx,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Sign Up / Log In', style: textStyle),
+      appBar: const MeditoAppBarSmall(
+        title: StringConstants.signUpLogInTitle,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                fillColor: Colors.white,
-                filled: true,
-                labelStyle: textStyle,
-              ),
-              style: textStyle,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                fillColor: Colors.white,
-                filled: true,
-                labelStyle: textStyle,
-              ),
-              style: textStyle,
-              obscureText: true,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _signUp,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        StringConstants.createAccountBenefits,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        StringConstants.loginBenefits,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 24),
+                      TextField(
+                        controller: _emailController,
+                        decoration: _getInputDecoration(
+                          StringConstants.emailLabel,
+                          _isEmailValid || _emailController.text.isEmpty,
+                          StringConstants.invalidEmailError,
+                        ),
+                        style: inputTextStyle,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _passwordController,
+                        decoration: _getInputDecoration(
+                          StringConstants.passwordLabel,
+                          _isPasswordValid || _passwordController.text.isEmpty,
+                          StringConstants.invalidPasswordError,
+                        ),
+                        style: inputTextStyle,
+                        obscureText: true,
+                      ),
+                      height32,
+                      ElevatedButton(
+                        onPressed: (_isLoading || !_isFormValid) ? null : _signUp,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: ColorConstants.onyx,
+                          backgroundColor: ColorConstants.brightSky,
+                          disabledForegroundColor: Colors.grey,
+                          disabledBackgroundColor: Colors.grey[300],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          minimumSize: const Size(double.infinity, 48),
+                        ),
+                        child: const Text(StringConstants.createAccountButtonText),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: (_isLoading || !_isFormValid) ? null : _logIn,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: ColorConstants.onyx,
+                          backgroundColor: ColorConstants.brightSky,
+                          disabledForegroundColor: Colors.grey,
+                          disabledBackgroundColor: Colors.grey[300],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          minimumSize: const Size(double.infinity, 48),
+                        ),
+                        child: const Text(StringConstants.logInButtonText),
+                      ),
+                      if (_isLoading)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16.0),
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                    ],
                   ),
-                  child: const Text('Sign Up'),
-                ),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _logIn,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                  ),
-                  child: const Text('Log In'),
-                ),
-              ],
-            ),
-            if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                 ),
               ),
-          ],
+            );
+          },
         ),
+      ),
+      bottomNavigationBar: SingleBackButtonActionBar(
+        onBackPressed: () => Navigator.of(context).pop(),
       ),
     );
   }
+}
+
+enum AccountAction {
+  cancel,
+  createAccount,
+  login,
 }

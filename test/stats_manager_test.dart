@@ -23,9 +23,7 @@ void main() {
       var twoDaysAgo = now.subtract(const Duration(days: 2));
 
       var mockStats = LocalAllStats(
-        announcementsDismissed: [],
         tracksCompleted: [],
-        tracksFavorited: [],
         audioCompleted: [
           LocalAudioCompleted(id: '1', timestamp: now.millisecondsSinceEpoch),
           LocalAudioCompleted(
@@ -38,7 +36,6 @@ void main() {
         totalTracksCompleted: 3,
         totalTimeListened: 180,
         updated: now.millisecondsSinceEpoch,
-        streakLastDate: now.millisecondsSinceEpoch,
       );
 
       var result = statsManager.calculateStreak(mockStats);

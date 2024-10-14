@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,10 +13,10 @@ abstract class AuthRepository {
   Future<void> initializeUser();
   Future<String> getToken();
   String getUserEmail();
-  Future<AuthResponse> signUp(String email, String password);
-  Future<AuthResponse> logIn(String email, String password);
+  Future<bool> signUp(String email, String password);
+  Future<bool> logIn(String email, String password);
   User? get currentUser;
-  Future<void> signOut();
+  Future<bool> signOut();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -80,9 +79,8 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<AuthResponse> signUp(String email, String password) async {
+  Future<bool> signUp(String email, String password) async {
     var clientId = await getClientIdFromSharedPreference() ?? '';
-
     var supabase = Supabase.instance.client;
 
     try {
@@ -96,14 +94,14 @@ class AuthRepositoryImpl extends AuthRepository {
         await _linkAnonymousAccount(email, password);
       }
 
-      return signUpResponse;
+      return signUpResponse.user != null;
     } catch (e) {
       throw Exception('Error during sign-up: ${e.toString()}');
     }
   }
 
   @override
-  Future<AuthResponse> logIn(String email, String password) async {
+  Future<bool> logIn(String email, String password) async {
     var supabase = Supabase.instance.client;
 
     _clearClientId();
@@ -114,11 +112,12 @@ class AuthRepositoryImpl extends AuthRepository {
         password: password,
       );
 
-      // logged in user should have a client id
-      _saveClientIdToSharedPreference(
-          response.user?.userMetadata?['client_id'] ?? '');
+      if (response.user != null) {
+        await _saveClientIdToSharedPreference(
+            response.user?.userMetadata?['client_id'] ?? '');
+      }
 
-      return response;
+      return response.user != null;
     } catch (e) {
       throw Exception('Error during log-in: ${e.toString()}');
     }
@@ -157,7 +156,7 @@ class AuthRepositoryImpl extends AuthRepository {
   User? get currentUser => Supabase.instance.client.auth.currentUser;
 
   @override
-  Future<void> signOut() async {
+  Future<bool> signOut() async {
     var supabase = Supabase.instance.client;
 
     try {
@@ -167,6 +166,8 @@ class AuthRepositoryImpl extends AuthRepository {
       await _saveClientIdToSharedPreference(newClientId);
 
       await _signInAnonymously(newClientId);
+
+      return true;
     } catch (e) {
       throw Exception('Error signing out: ${e.toString()}');
     }

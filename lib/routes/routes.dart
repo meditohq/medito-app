@@ -48,20 +48,22 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    await _pushRoute(const SignUpLogInPage(), ref).then((_) async {
+    var success = await _pushRoute(const SignUpLogInPage(), ref);
+    if (success == true) {
       await StatsManager().clearAllStats();
       await StatsManager().getRemoteStats();
       ref?.invalidate(meProvider);
       ref?.invalidate(statsProvider);
-    });
+    }
   }
 }
 
-Future<void> _pushRoute(Widget route, WidgetRef? ref) async {
-  await navigatorKey.currentState
-      ?.push(MaterialPageRoute(builder: (context) => route))
-      .then((_) {
+Future<bool?> _pushRoute(Widget route, WidgetRef? ref) async {
+  return await navigatorKey.currentState
+      ?.push<bool>(MaterialPageRoute(builder: (context) => route))
+      .then((success) {
     ref?.invalidate(statsProvider);
+    return success;
   });
 }
 

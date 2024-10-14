@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 
 class UserProfilePage extends ConsumerWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -13,31 +14,44 @@ class UserProfilePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.onyx,
-      appBar: AppBar(
-        backgroundColor: ColorConstants.onyx,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('User Profile', style: TextStyle(color: Colors.white)),
+      appBar: const MeditoAppBarSmall(
+        title: StringConstants.userProfileTitle,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Email: ${user?.email}', style: const TextStyle(color: Colors.white)),
+            Text(
+              '${StringConstants.userProfileEmailLabel} ${user?.email}',
+              style: const TextStyle(color: Colors.white),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                await authRepository.signOut();
-                Navigator.of(context).pop();
+                try {
+                  await authRepository.signOut();
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text(StringConstants.signOutSuccessMessage)),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text(StringConstants.signOutErrorMessage)),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
+                foregroundColor: ColorConstants.onyx,
+                backgroundColor: ColorConstants.brightSky,
+                disabledForegroundColor: Colors.grey,
+                disabledBackgroundColor: Colors.grey[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                minimumSize: const Size(double.infinity, 48),
               ),
-              child: const Text('Sign Out'),
+              child: const Text(StringConstants.signOutButtonText),
             ),
           ],
         ),
