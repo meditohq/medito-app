@@ -417,7 +417,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
   Widget _durationDropdown(TrackModel trackModel, {required bool isLandscape}) {
     var audioFiles = trackModel.audio.first.files;
-    var selectedFile = selectedAudio?.files;
+    var selectedFile = selectedAudio?.files ?? audioFiles;
 
     return DropdownWidget<TrackFilesModel>(
       value: fileModel ?? audioFiles.first,
@@ -427,8 +427,8 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomRight: 7,
       bottomLeft: 7,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: selectedFile?.first.duration ?? 0)} ${StringConstants.min}',
-      items: files(selectedFile ?? audioFiles)
+          '${convertDurationToMinutes(milliseconds: selectedFile.first.duration)} ${StringConstants.min}',
+      items: files(selectedFile)
           .map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(

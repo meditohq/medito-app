@@ -92,7 +92,7 @@ class DropdownWidget<T> extends StatelessWidget {
     );
   }
 
-  String _getDisplayValue() {
+    String _getDisplayValue() {
     if (!_isClickable) {
       return disabledLabelText;
     }

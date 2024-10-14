@@ -12,9 +12,7 @@ class Tracks extends _$Tracks {
   @override
   Future<TrackModel> build({required String trackId}) async {
     final trackRepository = ref.watch(trackRepositoryProvider);
-    print("Fetching track with ID: $trackId"); // Add this line
     final track = await trackRepository.fetchTrack(trackId);
-    print("Fetched track: $track"); // Add this line
     return track;
   }
 
