@@ -96,6 +96,6 @@ class HTTPConstants {
   static const String completeEvent = '/complete';
   static const String firebaseEvent = '/fcm';
   static const String rate = '/rate';
-  static const String like = '/like';
+  static const String favorite = '/favorite';
   static const String donate = '/donations/asks?random=true';
 }

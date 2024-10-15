@@ -43,14 +43,14 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<HomeModel> fetchHome() async {
     var response = await client.getRequest(HTTPConstants.home);
-    
+
     return HomeModel.fromJson(response);
   }
 
   @override
   Future<AnnouncementModel?> fetchLatestAnnouncement() async {
     var response = await client.getRequest(HTTPConstants.latestAnnouncement);
-    
+
     return AnnouncementModel.fromJson(response);
   }
 
@@ -61,8 +61,8 @@ class HomeRepositoryImpl extends HomeRepository {
 
     var sortedShortcuts = List<ShortcutsModel>.from(shortcuts);
     sortedShortcuts.sort((a, b) {
-      var indexA = savedIds.indexOf(a.id);
-      var indexB = savedIds.indexOf(b.id);
+      var indexA = savedIds.indexOf(a.id ?? '');
+      var indexB = savedIds.indexOf(b.id ?? '');
       if (indexA == -1) return 1;
       if (indexB == -1) return -1;
 

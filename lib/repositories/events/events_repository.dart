@@ -41,14 +41,14 @@ class EventsRepositoryImpl extends EventsRepository {
   @override
   Future<void> markTrackAsFavouriteEvent(String trackId) {
     return client.postRequest(
-      '${HTTPConstants.tracks}/$trackId${HTTPConstants.like}',
+      '${HTTPConstants.tracks}/$trackId${HTTPConstants.favorite}',
     );
   }
 
   @override
   Future<void> markTrackAsNotFavouriteEvent(String trackId) {
     return client.deleteRequest(
-      '${HTTPConstants.tracks}/$trackId${HTTPConstants.like}',
+      '${HTTPConstants.tracks}/$trackId${HTTPConstants.favorite}',
     );
   }
 }

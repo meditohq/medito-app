@@ -60,7 +60,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final element = updatedData.removeAt(oldIndex);
     updatedData.insert(newIndex, element);
     data = updatedData;
-    var ids = updatedData.map((e) => e.id).toList();
+    var ids = updatedData.map((e) => e.id).whereType<String>().toList();
     await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
 
     await ref.read(refreshHomeAPIsProvider.future);
@@ -113,7 +113,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                     child: Row(
                       children: [
                         MeditoHugeIcon(
-                          icon: e.icon,
+                          icon: e.icon ?? '',
                           size: 18,
                           color: e.isHighlighted
                               ? ColorConstants.onyx
@@ -122,7 +122,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            e.title,
+                            e.title ?? '',
                             style: TextStyle(
                               fontFamily: Teachers,
                               fontSize: 16,
