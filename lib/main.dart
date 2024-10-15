@@ -3,13 +3,13 @@ import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
@@ -17,6 +17,7 @@ import 'package:medito/providers/shared_preference/shared_preference_provider.da
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -98,8 +99,8 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   StreamSubscription? _sub;
+  late final StreamSubscription<InternetStatus> _connectivityListener;
 
   @override
   void initState() {
@@ -162,22 +163,31 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _initializeConnectivityListener() {
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
-          _updateConnectionStatus,
-        );
+    InternetConnection().onStatusChange.listen((InternetStatus status) {
+      switch (status) {
+        case InternetStatus.connected:
+          // The internet is now connected
+          break;
+        case InternetStatus.disconnected:
+          // The internet is now disconnected
+          break;
+      }
+    });
   }
 
   Future<void> _checkInitialConnectivity() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    _updateConnectionStatus(connectivityResult);
-  }
-
-  void _updateConnectionStatus(List<ConnectivityResult> results) {
-    if (results.contains(ConnectivityResult.none)) {
-      _showNoConnectionSnackBar();
-    } else {
-      _hideNoConnectionSnackBar();
-    }
+    _connectivityListener =
+        InternetConnection().onStatusChange.listen((InternetStatus status) {
+      switch (status) {
+        case InternetStatus.connected:
+          _hideNoConnectionSnackBar();
+          StatsManager().sync().then((_) => ref.invalidate(statsProvider));
+          break;
+        case InternetStatus.disconnected:
+          _showNoConnectionSnackBar();
+          break;
+      }
+    });
   }
 
   void _hideNoConnectionSnackBar() {
@@ -211,7 +221,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    _connectivityListener.cancel();
     _sub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
