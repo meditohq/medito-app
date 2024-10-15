@@ -13,8 +13,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  audio_session: ^0.1.18
-  audio_service: ^0.18.12
+  audio_session: ^0.1.21
+  audio_service: ^0.18.15
   auto_size_text: ^3.0.0
   cached_network_image: ^3.2.3
   connectivity_plus: ^6.0.5
@@ -35,7 +35,7 @@ dependencies:
   image: ^4.1.4
   intl: ^0.19.0
   json_annotation: ^4.8.1
-  just_audio: ^0.9.36
+  just_audio: ^0.9.41
   package_info_plus: ^8.0.1
   path_provider: ^2.1.2
   permission_handler: ^11.2.0
