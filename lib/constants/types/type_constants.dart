@@ -11,4 +11,10 @@ class TypeConstants {
   static const String guideIdKey = 'guide';
   static const String durationIdKey = 'duration';
   static const String account = 'account';
+
+  // New constants for path view
+  static const String article = 'article';
+  static const String session = 'session';
+  static const String journalEntry = 'journal';
+  static const String meditationOutsideApp = 'meditation_outside_app';
 }

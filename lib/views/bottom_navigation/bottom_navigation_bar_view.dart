@@ -8,6 +8,7 @@ import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
+import 'package:medito/views/path/path_view.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
@@ -31,6 +32,7 @@ class _BottomNavigationBarViewState
     _pages = [
       const HomeView(),
       ExploreView(searchFocusNode: _searchFocusNode),
+      const PathView(),
       const SettingsScreen(),
     ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -89,14 +91,23 @@ class _BottomNavigationBarViewState
             ),
             onTap: () => _onDestinationSelected(1),
           ),
-          rightItem: BottomActionBarItem(
+          rightCenterItem: BottomActionBarItem(
             child: MeditoHugeIcon(
-              icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
+              icon: _currentPageIndex == 2 ? 'filledPath' : 'duoPath',
               color: _currentPageIndex == 2
                   ? ColorConstants.lightPurple
                   : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(2),
+          ),
+          rightItem: BottomActionBarItem(
+            child: MeditoHugeIcon(
+              icon: _currentPageIndex == 3 ? 'filledSettings' : 'duoSettings',
+              color: _currentPageIndex == 3
+                  ? ColorConstants.lightPurple
+                  : ColorConstants.white,
+            ),
+            onTap: () => _onDestinationSelected(3),
           ),
         ),
         body: IndexedStack(

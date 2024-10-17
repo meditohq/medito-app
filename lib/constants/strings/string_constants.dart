@@ -18,7 +18,7 @@ class StringConstants {
       'Updating stats failed. If this keeps happening, close the app and reopen it.';
   static const String processingStatsUpdate = 'Updating stats. Please wait...';
   static const String shareStatsText =
-      '''Discover calmness for FREE with #Medito 🧘‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
+      '''Discover calmness for FREE with #Medito‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
 
   static const String backgroundSounds = 'Background Sound';
   static const String x06 = 'x0.6';
@@ -217,4 +217,51 @@ class StringConstants {
 
   /// Title for the Account section in the Settings screen
   static const String accountTitle = 'Account';
+
+  /// Used as the title for the Path screen in the bottom navigation bar
+  static const String path = 'Path';
+
+  /// Used as the title for each step in the Path
+  static const String stepTitle = 'Step';
+
+  /// Used as a label for completed steps in the Path
+  static const String completed = 'Completed';
+
+  /// Used as a label for locked steps in the Path
+  static const String locked = 'Locked';
+
+  /// Used as a message when the Path is loading
+  static const String loadingPath = 'Loading your path...';
+
+  /// Used as an error message when the Path fails to load
+  static const String pathLoadError = 'Failed to load path. Please try again.';
+
+  /// Used as a message when a step is completed successfully
+  static const String stepCompleted = 'Step completed!';
+
+  /// Used as an error message when a step fails to complete
+  static const String stepCompletionError =
+      'Failed to complete step. Please try again.';
+
+  // Path-related error messages
+  static const String meditatedOutsideApp =
+      "You meditated outside the app? Listen to the last unlocked session to unlock the next step in the path";
+  static const String enterMeditationDuration =
+      "Please enter the duration of your meditation outside the app";
+  static const String meditationMarkingError =
+      "Failed to mark meditation. Please try again.";
+  static const String listenToUnlockNextStep =
+      "Listen to the last unlocked session to unlock the next step in the app";
+  static const String unknownTaskType = 'Unknown task type';
+
+  static const String invalidDuration = 'Invalid duration. Please enter a positive number.';
+  static const String submit = 'Submit';
+
+    static const journalEntry = 'Journal Entry';
+  static const writeYourThoughtsHere = 'Write your thoughts here...';
+  static const journalEntrySaved = 'Journal entry saved';
+  
+  /// Used as a message when a session is completed in the Path view
+  static const String sessionCompleted = 'Session completed successfully!';
+
 }
