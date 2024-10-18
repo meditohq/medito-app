@@ -33,10 +33,12 @@ class PathView extends ConsumerWidget {
           itemCount: steps.length,
           itemBuilder: (context, index) {
             final step = steps[index];
+            final isFirstLockedStep = !step.isUnlocked && 
+                (index == 0 || steps[index - 1].isUnlocked);
             return ExpansionTile(
-              title: Text(_getStepTitle(step, index)),
+              title: Text(_getStepTitle(step, isFirstLockedStep)),
               leading: _buildStepIcon(step),
-              children: _buildStepChildren(step, index),
+              children: _buildStepChildren(step, isFirstLockedStep),
             );
           },
         ),
@@ -44,13 +46,11 @@ class PathView extends ConsumerWidget {
     );
   }
 
-  String _getStepTitle(result.Step step, int index) {
-    if (step.isUnlocked) {
-      return '${StringConstants.stepTitle} ${index + 1}: ${step.title}';
-    } else if (index == 0) {
-      return '${StringConstants.stepTitle} ${index + 1}: ${step.title} (${StringConstants.locked})';
+  String _getStepTitle(result.Step step, bool isFirstLockedStep) {
+    if (step.isUnlocked || isFirstLockedStep) {
+      return '${StringConstants.stepTitle}: ${step.title}';
     } else {
-      return '${StringConstants.stepTitle} ${index + 1}: ${StringConstants.lockedStep}';
+      return '${StringConstants.stepTitle}: ...';
     }
   }
 
@@ -64,23 +64,16 @@ class PathView extends ConsumerWidget {
     }
   }
 
-  List<Widget> _buildStepChildren(result.Step step, int index) {
-    if (step.isUnlocked) {
+  List<Widget> _buildStepChildren(result.Step step, bool isFirstLockedStep) {
+    if (step.isUnlocked || isFirstLockedStep) {
       return step.tasks
           .map((task) => TaskListTile(
                 task: task,
-                isEnabled: true,
-              ))
-          .toList();
-    } else if (index == 0) {
-      return step.tasks
-          .map((task) => TaskListTile(
-                task: task,
-                isEnabled: false,
+                isEnabled: step.isUnlocked,
               ))
           .toList();
     } else {
-      return [const ListTile(title: Text(StringConstants.stepLocked))];
+      return [const ListTile(title: Text('...'))];
     }
   }
 }
@@ -123,7 +116,7 @@ class TaskListTile extends ConsumerWidget {
       result.MeditationData(duration: var duration) =>
         '${StringConstants.duration}: $duration ${StringConstants.minutes}',
       result.JournalData(entryText: var entryText) => entryText.isNotEmpty
-          ? StringConstants.journalEntrySaved
+          ? entryText
           : StringConstants.writeYourJournalEntryHere,
       result.ArticleData() => StringConstants.tapToReadArticle,
     };
