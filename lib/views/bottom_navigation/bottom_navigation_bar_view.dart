@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/providers/fcm_token_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
@@ -32,22 +29,15 @@ class _BottomNavigationBarViewState
     _pages = [
       const HomeView(),
       ExploreView(searchFocusNode: _searchFocusNode),
-      const PathView(),
+      // const PathView(),
       const SettingsScreen(),
     ];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _saveFCMToken();
-    });
   }
 
   @override
   void dispose() {
     _searchFocusNode.dispose();
     super.dispose();
-  }
-
-  Future<void> _saveFCMToken() async {
-    await ref.read(fcmTokenProvider)();
   }
 
   @override
@@ -91,15 +81,15 @@ class _BottomNavigationBarViewState
             ),
             onTap: () => _onDestinationSelected(1),
           ),
-          rightCenterItem: BottomActionBarItem(
-            child: MeditoHugeIcon(
-              icon: _currentPageIndex == 2 ? 'filledPath' : 'duoPath',
-              color: _currentPageIndex == 2
-                  ? ColorConstants.lightPurple
-                  : ColorConstants.white,
-            ),
-            onTap: () => _onDestinationSelected(2),
-          ),
+          // rightCenterItem: BottomActionBarItem(
+          //   child: MeditoHugeIcon(
+          //     icon: _currentPageIndex == 2 ? 'filledPath' : 'duoPath',
+          //     color: _currentPageIndex == 2
+          //         ? ColorConstants.lightPurple
+          //         : ColorConstants.white,
+          //   ),
+          //   onTap: () => _onDestinationSelected(2),
+          // ),
           rightItem: BottomActionBarItem(
             child: MeditoHugeIcon(
               icon: _currentPageIndex == 3 ? 'filledSettings' : 'duoSettings',

@@ -1,7 +1,6 @@
 export 'background_sounds/background_sounds_model.dart';
 export 'device_info/device_and_app_info_model.dart';
 export 'events/feedback/feedback_tapped_model.dart';
-export 'events/save_fcm_token/save_fcm_token_model.dart';
 export 'home/announcement/announcement_model.dart';
 export 'home/home_model.dart';
 export 'home/shortcuts/shortcuts_model.dart';

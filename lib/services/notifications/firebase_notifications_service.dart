@@ -19,7 +19,6 @@ final firebaseMessagingProvider = Provider<FirebaseMessagingHandler>((ref) {
 });
 
 class FirebaseMessagingHandler {
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -134,13 +133,6 @@ class FirebaseMessagingHandler {
     }
   }
 
-  Future<String?> getToken() async {
-    return await _messaging.getToken();
-  }
-
-  Future<void> deleteToken() async {
-    await _messaging.deleteToken();
-  }
 }
 
 @pragma('vm:entry-point')

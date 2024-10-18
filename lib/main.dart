@@ -16,6 +16,7 @@ import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/network/dio_header_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
@@ -23,6 +24,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -101,16 +103,26 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
   StreamSubscription? _sub;
   late final StreamSubscription<InternetStatus> _connectivityListener;
+  late DioHeaderService dioHeaderService;
 
   @override
   void initState() {
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
-    _checkInitialConnectivity();
-    _initializeConnectivityListener();
     _initDeepLinkListener();
     _handleInitialUri();
+    _initializeDioHeaderService().then(
+      (_) {
+        _checkInitialConnectivity();
+      },
+    );
+  }
+
+  Future<void> _initializeDioHeaderService() async {
+    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+    dioHeaderService = DioHeaderService(deviceInfo);
+    await dioHeaderService.initialise();
   }
 
   void _initDeepLinkListener() {
@@ -162,19 +174,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     ));
   }
 
-  void _initializeConnectivityListener() {
-    InternetConnection().onStatusChange.listen((InternetStatus status) {
-      switch (status) {
-        case InternetStatus.connected:
-          // The internet is now connected
-          break;
-        case InternetStatus.disconnected:
-          // The internet is now disconnected
-          break;
-      }
-    });
-  }
-
   Future<void> _checkInitialConnectivity() async {
     _connectivityListener =
         InternetConnection().onStatusChange.listen((InternetStatus status) {
@@ -188,6 +187,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           break;
       }
     });
+  
+    return;
   }
 
   void _hideNoConnectionSnackBar() {
@@ -213,6 +214,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           ),
         );
     }
+  
+    return;
   }
 
   void _navigateToDownloads(BuildContext context) {
