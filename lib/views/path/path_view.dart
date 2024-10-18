@@ -34,17 +34,24 @@ class PathView extends ConsumerWidget {
           itemBuilder: (context, index) {
             final step = steps[index];
             return ExpansionTile(
-              title: Text(
-                  '${StringConstants.stepTitle} ${index + 1}: ${step.title}'),
+              title: Text(_getStepTitle(step, index)),
               leading: _buildStepIcon(step),
-              children: step.isUnlocked
-                  ? step.tasks.map((task) => TaskListTile(task: task)).toList()
-                  : [const ListTile(title: Text(StringConstants.stepLocked))],
+              children: _buildStepChildren(step, index),
             );
           },
         ),
       ),
     );
+  }
+
+  String _getStepTitle(result.Step step, int index) {
+    if (step.isUnlocked) {
+      return '${StringConstants.stepTitle} ${index + 1}: ${step.title}';
+    } else if (index == 0) {
+      return '${StringConstants.stepTitle} ${index + 1}: ${step.title} (${StringConstants.locked})';
+    } else {
+      return '${StringConstants.stepTitle} ${index + 1}: ${StringConstants.lockedStep}';
+    }
   }
 
   Widget _buildStepIcon(result.Step step) {
@@ -56,19 +63,49 @@ class PathView extends ConsumerWidget {
       return const Icon(Icons.circle_outlined, color: Colors.grey);
     }
   }
+
+  List<Widget> _buildStepChildren(result.Step step, int index) {
+    if (step.isUnlocked) {
+      return step.tasks
+          .map((task) => TaskListTile(
+                task: task,
+                isEnabled: true,
+              ))
+          .toList();
+    } else if (index == 0) {
+      return step.tasks
+          .map((task) => TaskListTile(
+                task: task,
+                isEnabled: false,
+              ))
+          .toList();
+    } else {
+      return [const ListTile(title: Text(StringConstants.stepLocked))];
+    }
+  }
 }
 
 class TaskListTile extends ConsumerWidget {
   final result.Task task;
+  final bool isEnabled;
 
-  const TaskListTile({Key? key, required this.task}) : super(key: key);
+  const TaskListTile({
+    Key? key,
+    required this.task,
+    required this.isEnabled,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoading = ref.watch(taskLoadingProvider(task.id));
 
     return ListTile(
-      title: Text(task.title),
+      title: Text(
+        task.title,
+        style: TextStyle(
+          color: isEnabled ? null : Colors.grey,
+        ),
+      ),
       subtitle: _buildTaskSubtitle(task),
       trailing: isLoading
           ? const SizedBox(
@@ -77,26 +114,36 @@ class TaskListTile extends ConsumerWidget {
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : _buildTaskIcon(task),
-      onTap: isLoading ? null : () => _onTaskTap(context, ref),
+      onTap: (isEnabled && !isLoading) ? () => _onTaskTap(context, ref) : null,
     );
   }
 
   Widget _buildTaskSubtitle(result.Task task) {
-    return switch (task.data) {
-      result.MeditationData(duration: var duration) => Text(
-          '${StringConstants.duration}: $duration ${StringConstants.minutes}'),
-      result.JournalData(entryText: var entryText) => Text(entryText.isNotEmpty
+    var subtitleText = switch (task.data) {
+      result.MeditationData(duration: var duration) =>
+        '${StringConstants.duration}: $duration ${StringConstants.minutes}',
+      result.JournalData(entryText: var entryText) => entryText.isNotEmpty
           ? StringConstants.journalEntrySaved
-          : StringConstants.writeYourJournalEntryHere),
-      result.ArticleData() => const Text(StringConstants.tapToReadArticle),
+          : StringConstants.writeYourJournalEntryHere,
+      result.ArticleData() => StringConstants.tapToReadArticle,
     };
+
+    return Text(
+      subtitleText,
+      style: TextStyle(
+        color: isEnabled ? null : Colors.grey,
+      ),
+    );
   }
 
   Widget _buildTaskIcon(result.Task task) {
     if (task.isCompleted) {
       return const Icon(Icons.check_circle, color: Colors.green);
     } else {
-      return const Icon(Icons.circle_outlined);
+      return Icon(
+        Icons.circle_outlined,
+        color: isEnabled ? null : Colors.grey,
+      );
     }
   }
 
