@@ -8,8 +8,8 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
-import 'package:medito/views/journal/journal_entry_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
+import 'package:medito/views/path/journal_entry_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_web_view_screen.dart';
@@ -57,9 +57,14 @@ Future<void> handleNavigation(
       ref?.invalidate(statsProvider);
     }
   } else if (type == TypeConstants.journalEntry) {
-    var prompt = ids.first ?? '';
-    var content = ids.length > 1 ? ids[1] : null;
-    await _pushRoute(JournalEntryView(prompt: prompt, content: content), ref);
+    var id = ids.first ?? '';
+    var content = ids.length > 1 ? ids[1] ?? '' : '';
+    var isCompleted = ids.length > 2 ? ids[2] == 'true' : false;
+    await _pushRoute(JournalEntryView(
+      taskId: id,
+      isCompleted: isCompleted,
+      initialText: content,
+    ), ref);
   }
 }
 

@@ -258,10 +258,24 @@ class StringConstants {
   static const String submit = 'Submit';
 
     static const journalEntry = 'Journal Entry';
-  static const writeYourThoughtsHere = 'Write your thoughts here...';
+  static const writeYourJournalEntryHere = 'Write your journal entry here...';
   static const journalEntrySaved = 'Journal entry saved';
   
   /// Used as a message when a session is completed in the Path view
   static const String sessionCompleted = 'Session completed successfully!';
 
+  /// Used as an error message when failing to update a task
+  static const String taskUpdateError = 'Failed to update task. Please try again.';
+
+  /// Used as a message when syncing Path data with the server
+  static const String syncingPath = 'Syncing your progress...';
+
+  /// Used as an error message when syncing fails
+  static const String syncError = 'Failed to sync. Please check your connection and try again.';
+
+  /// Used as a message when a step is locked in the Path view
+  static const String stepLocked = 'Complete previous steps to unlock';
+
+  static const String duration = 'Duration';
+  static const String tapToReadArticle = 'Tap to read article';
 }
