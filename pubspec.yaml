@@ -56,6 +56,7 @@ dependencies:
   app_links: ^3.4.1
   supabase_flutter: ^2.0.0
   internet_connection_checker_plus: ^2.5.2
+  animated_text_kit: ^4.2.2
 
 dev_dependencies:
   flutter_test:

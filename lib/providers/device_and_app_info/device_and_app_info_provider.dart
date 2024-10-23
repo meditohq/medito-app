@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:ui';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:intl/intl.dart';
 
 import '../../constants/strings/string_constants.dart';
 import '../../models/device_info/device_and_app_info_model.dart';
@@ -12,10 +18,46 @@ part 'device_and_app_info_provider.g.dart';
 
 @riverpod
 Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
-  final info = ref.read(deviceAndAppInfoRepositoryProvider);
   ref.keepAlive();
 
-  return await info.getDeviceAndAppInfo();
+  String? deviceModel;
+  String? deviceOS;
+  String? devicePlatform;
+  String buildNumber;
+  String appVersion;
+  var deviceInfo = DeviceInfoPlugin();
+  var packageInfo = await PackageInfo.fromPlatform();
+  var languageCode = PlatformDispatcher.instance.locale.languageCode;
+  var currencySymbol = NumberFormat.simpleCurrency(locale: languageCode).currencySymbol;
+  var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName; // Get currency name
+
+  appVersion = packageInfo.version;
+  buildNumber = packageInfo.buildNumber;
+
+  if (Platform.isIOS) {
+    var iosInfo = await deviceInfo.iosInfo;
+    deviceModel = iosInfo.utsname.machine;
+    deviceOS = iosInfo.utsname.sysname;
+    devicePlatform = 'iOS';
+  } else if (Platform.isAndroid) {
+    var androidInfo = await deviceInfo.androidInfo;
+    deviceModel = androidInfo.model;
+    deviceOS = androidInfo.version.release;
+    devicePlatform = 'android';
+  }
+
+  var data = {
+    'model': deviceModel,
+    'os': deviceOS,
+    'platform': devicePlatform,
+    'buildNumber': buildNumber,
+    'appVersion': appVersion,
+    'languageCode': languageCode,
+    'currencySymbol': currencySymbol, 
+    'currencyName': currencyName,
+  };
+
+  return DeviceAndAppInfoModel.fromJson(data);
 }
 
 final deviceAppAndUserInfoProvider =

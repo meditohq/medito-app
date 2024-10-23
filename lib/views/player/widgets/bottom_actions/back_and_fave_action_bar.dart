@@ -1,3 +1,4 @@
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,17 +24,20 @@ class TrackViewBottomBar extends ConsumerWidget {
     var isDailyMeditation = trackId == dailyMeditationId;
     var colour =
         favoriteStatus ? ColorConstants.lightPurple : ColorConstants.white;
+    var icon = favoriteStatus
+        ? HugeIcons.solidRoundedStar
+        : HugeIcons.strokeRoundedStar;
 
     return BottomActionBar(
       leftItem: BottomActionBarItem(
-        child: const Icon(Icons.arrow_back),
+        child: HugeIcon(icon: HugeIcons.solidSharpArrowLeft02, color: Colors.white,),
         onTap: onBackPressed,
       ),
       rightItem: isDailyMeditation
           ? null
           : BottomActionBarItem(
-              child: Icon(
-                Icons.star,
+              child: HugeIcon(
+                icon: icon,
                 color: colour,
               ),
               onTap: () {

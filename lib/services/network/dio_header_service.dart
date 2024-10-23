@@ -3,7 +3,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/services/network/dio_api_service.dart';
 
 class DioHeaderService {
-  final DeviceAndAppInfoModel deviceInfo; 
+  final DeviceAndAppInfoModel deviceInfo;
   String? _fcmToken;
 
   DioHeaderService(this.deviceInfo) {
@@ -38,6 +38,8 @@ class DioHeaderService {
       'device-time': '${DateTime.now()}',
       'device-platform': deviceInfo.platform,
       if (_fcmToken != null) 'fcmt': _fcmToken!,
+      'currency-symbol': deviceInfo.currencySymbol,
+      'currency-name': deviceInfo.currencyName,
     };
   }
 }

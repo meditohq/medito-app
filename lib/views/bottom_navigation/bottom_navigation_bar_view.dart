@@ -5,7 +5,6 @@ import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
-import 'package:medito/views/path/path_view.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
@@ -92,12 +91,12 @@ class _BottomNavigationBarViewState
           // ),
           rightItem: BottomActionBarItem(
             child: MeditoHugeIcon(
-              icon: _currentPageIndex == 3 ? 'filledSettings' : 'duoSettings',
-              color: _currentPageIndex == 3
+              icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
+              color: _currentPageIndex == 2
                   ? ColorConstants.lightPurple
                   : ColorConstants.white,
             ),
-            onTap: () => _onDestinationSelected(3),
+            onTap: () => _onDestinationSelected(2),
           ),
         ),
         body: IndexedStack(

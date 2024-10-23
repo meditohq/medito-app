@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
@@ -122,16 +123,16 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   Widget _getDismissibleBackgroundWidget() => Container(
         color: ColorConstants.charcoal,
-        child: const Padding(
-          padding: EdgeInsets.all(24.0),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Spacer(),
-              Icon(
-                Icons.delete,
-                color: Colors.redAccent,
+              const Spacer(),
+              HugeIcon(
+                icon: HugeIcons.solidSharpDelete02,
+                color: Colors.redAccent
               ),
             ],
           ),
