@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/donation_widget.dart';
-import '../../../providers/donation/donation_page_provider.dart'; // Import the provider
-import '../../../providers/stats_provider.dart'; // Import the stats provider
+import '../../../providers/donation/donation_page_provider.dart'; 
+import '../../../providers/stats_provider.dart'; 
 
 class EndScreenView extends ConsumerStatefulWidget {
   final TrackModel trackModel;
@@ -40,7 +40,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildStatsArea(), // Call the stats area here
+              _buildStatsArea(),
               _buildCard(),
             ],
           ),
@@ -64,8 +64,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
   }
 
   Widget _buildStatsArea() {
-    final statsAsyncValue =
-        ref.watch(statsProvider); // Watch the stats provider
+    var statsAsyncValue = ref.watch(statsProvider);
 
     return statsAsyncValue.when(
       loading: () => const SizedBox(
@@ -77,9 +76,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
-        final streak = localAllStats.streakCurrent;
-        final daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
-        final lastFiveDays = List.generate(
+        var streak = localAllStats.streakCurrent;
+        var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
+        var lastFiveDays = List.generate(
             5, (index) => DateTime.now().subtract(Duration(days: index)));
 
         return Column(
@@ -114,7 +113,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 StringConstants.dailyPracticeMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'Teachers',
+                  fontFamily: Teachers,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 1.3,
@@ -140,23 +139,22 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
 
   Widget _buildDayLettersAndIcons(
       List<DateTime> lastFiveDays, List<String> daysMeditated) {
-    // Calculate the actual day letters based on the last five days
-    final dayLetters = lastFiveDays.map((day) {
+    var dayLetters = lastFiveDays.map((day) {
       switch (day.weekday) {
         case 1:
-          return StringConstants.monday; // Monday
+          return StringConstants.monday;
         case 2:
-          return StringConstants.tuesday; // Tuesday
+          return StringConstants.tuesday;
         case 3:
-          return StringConstants.wednesday; // Wednesday
+          return StringConstants.wednesday;
         case 4:
-          return StringConstants.thursday; // Thursday
+          return StringConstants.thursday;
         case 5:
-          return StringConstants.friday; // Friday
+          return StringConstants.friday;
         case 6:
-          return StringConstants.saturday; // Saturday
+          return StringConstants.saturday;
         case 7:
-          return StringConstants.sunday; // Sunday
+          return StringConstants.sunday;
         default:
           return '';
       }
@@ -166,7 +164,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(dayLetters.length, (index) {
         DateTime day = lastFiveDays[index];
-        final isMeditated =
+        var isMeditated =
             daysMeditated.contains(day.toIso8601String().split('T')[0]);
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -176,7 +174,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
               Text(
                 dayLetters[index],
                 style: TextStyle(
-                  fontFamily: 'Teachers',
+                  fontFamily: Teachers,
                   fontSize: 14,
                   fontWeight: isMeditated ? FontWeight.w600 : FontWeight.w500,
                   height: 1.2,
