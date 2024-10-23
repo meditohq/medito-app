@@ -254,28 +254,45 @@ class StringConstants {
       "Listen to the last unlocked session to unlock the next step in the app";
   static const String unknownTaskType = 'Unknown task type';
 
-  static const String invalidDuration = 'Invalid duration. Please enter a positive number.';
+  static const String invalidDuration =
+      'Invalid duration. Please enter a positive number.';
   static const String submit = 'Submit';
 
-    static const journalEntry = 'Journal Entry';
+  static const journalEntry = 'Journal Entry';
   static const writeYourJournalEntryHere = 'Write your journal entry here...';
   static const journalEntrySaved = 'Journal entry saved';
-  
+
   /// Used as a message when a session is completed in the Path view
   static const String sessionCompleted = 'Session completed successfully!';
 
   /// Used as an error message when failing to update a task
-  static const String taskUpdateError = 'Failed to update task. Please try again.';
+  static const String taskUpdateError =
+      'Failed to update task. Please try again.';
 
   /// Used as a message when syncing Path data with the server
   static const String syncingPath = 'Syncing your progress...';
 
   /// Used as an error message when syncing fails
-  static const String syncError = 'Failed to sync. Please check your connection and try again.';
+  static const String syncError =
+      'Failed to sync. Please check your connection and try again.';
 
   /// Used as a message when a step is locked in the Path view
   static const String stepLocked = 'Complete previous steps to unlock';
 
   static const String duration = 'Duration';
   static const String tapToReadArticle = 'Tap to read article';
+
+  // Add this to the existing StringConstants class
+  static const String monday = 'M'; // First letter of Monday
+  static const String tuesday = 'T'; // First letter of Tuesday
+  static const String wednesday = 'W'; // First letter of Wednesday
+  static const String thursday = 'T'; // First letter of Thursday
+  static const String friday = 'F'; // First letter of Friday
+  static const String saturday = 'S'; // First letter of Saturday
+  static const String sunday = 'S'; // First letter of Sunday
+
+  /// Message displayed to encourage daily practice and mindfulness
+  static const String dailyPracticeMessage = 'Practicing daily grows your streak, but it also makes you more mindful and happier!';
+
+  static const String dayStreak = 'day streak'; // Used to display the current streak of meditation days
 }

@@ -9,13 +9,27 @@ abstract class DonationPageModel with _$DonationPageModel {
     String? id,
     String? title,
     String? text,
-    String? ctaTitle,
-    String? ctaType,
-    String? ctaPath,
-    String? colorBackground,
-    String? colorText,
+    String? footerText,
+    String? cardBackgroundColor,
+    String? cardTextColor,
+    List<ButtonModel>? buttons,
   }) = _DonationPageModel;
 
   factory DonationPageModel.fromJson(Map<String, Object?> json) =>
       _$DonationPageModelFromJson(json);
+}
+
+// New ButtonModel class
+@freezed
+abstract class ButtonModel with _$ButtonModel {
+  const factory ButtonModel({
+    String? title,
+    String? path,
+    String? type,
+    String? backgroundColor,
+    String? textColor,
+  }) = _ButtonModel;
+
+  factory ButtonModel.fromJson(Map<String, Object?> json) =>
+      _$ButtonModelFromJson(json);
 }

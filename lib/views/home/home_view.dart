@@ -1,6 +1,5 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/views/home/widgets/stats/animated_number_circle.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

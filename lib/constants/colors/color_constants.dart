@@ -11,6 +11,7 @@ class ColorConstants {
   static const charcoal = Color(0xFF303031);
   static const softGrey = Color(0xFF424345);
   static const graphite = Color(0xFFAAAAAA);
+  static const moon = Color(0xFF4F4F66);
 
   static const lightPurple = Color(0xFF917DF0);
   static const amsterdamSummer = Color(0xFF211F26);
