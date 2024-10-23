@@ -16,9 +16,9 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 
 ## How to Contribute
 
-We are a small team and are looking for people who can contribute to the project 2 to 3 hours per week. You must have experience with Flutter. 
+We are a small team and are not looking for people who can contribute to the project at the moment. We don't have time to onboard anyone, sorry.
 
-To contribute, please message us on our Telegram channel. You can access it by joining [https://t.me/meditoapp](https://t.me/meditoapp) and then going to "Discussion." Let us know that you are looking to contribute to the code, specify for how many hours per week, and how many years of experience with Flutter you have. Also, please include a link to your GitHub profile or portfolio.
+~~To contribute, please message us on our Telegram channel. You can access it by joining [https://t.me/meditoapp](https://t.me/meditoapp) and then going to "Discussion." Let us know that you are looking to contribute to the code, specify for how many hours per week, and how many years of experience with Flutter you have. Also, please include a link to your GitHub profile or portfolio.~~
 
 ## How to Build the Project
 
@@ -77,19 +77,6 @@ This project supports separate development and production configurations. Here's
 2. In the toolbar, you'll see a dropdown next to the run button.
 3. Select either "Flutter (Dev)" or "Flutter (Prod)" from this dropdown.
 4. Click the run button or press Shift+F10 to run the selected configuration.
-
-### Configuration Details
-
-- Development configuration:
-  - Entry point: `lib/main_dev.dart`
-  - Flavor: dev
-
-- Production configuration:
-  - Entry point: `lib/main_prod.dart`
-  - Flavor: prod
-
-Temporary solution for iOS:
-   - Entry point: `lib/main.dart`
 
 These configurations are defined in:
 - `.vscode/launch.json` for VSCode
