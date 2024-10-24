@@ -78,8 +78,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
-        // var streak = localAllStats.streakCurrent;
-        var streak = localAllStats.audioCompleted?.length.toString() ?? '!';
+        var streak = localAllStats.streakCurrent;
         var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
           5,
