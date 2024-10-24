@@ -87,7 +87,7 @@ Ensure that your `android/app/build.gradle` file has the corresponding flavor co
 ## License
 
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
-- Our original content is licensed under a Creative Commons license. For more information, please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
+- The content available within the Medito app is subject to a custom license. For more information, please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
 - Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito." Make sure to respect the original copyright. 
 
 Medito Foundation: [https://meditofoundation.org/](https://meditofoundation.org/).
