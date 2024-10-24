@@ -124,6 +124,9 @@ String getAudioFileExtension(String path) {
 
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
   try {
+    // Add a small delay to ensure widget has updated
+    await Future.delayed(const Duration(milliseconds: 100));
+    
     RenderRepaintBoundary boundary =
         globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);

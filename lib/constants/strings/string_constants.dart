@@ -292,4 +292,8 @@ class StringConstants {
   static const String dailyPracticeMessage = 'Practicing daily grows your streak, but it also makes you more mindful and happier!';
 
   static const String dayStreak = 'day streak'; // Used to display the current streak of meditation days
+
+  /// Title displayed above the daily quote widget in the home view
+  static const String dailyQuote = 'Daily Quote';
+
 }
