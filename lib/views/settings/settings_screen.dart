@@ -242,7 +242,6 @@ class SettingsScreen extends ConsumerWidget {
     final prefs = ref.read(sharedPreferencesProvider);
 
     await reminders.cancelDailyNotification();
-    await reminders.clearBadge();
     await _clearSavedTime(prefs);
     ref.read(reminderTimeProvider.notifier).state = null;
     _showClearReminderSnackBar(context);
