@@ -45,9 +45,6 @@ class DonationWidget extends ConsumerWidget {
     BuildContext context,
     DonationPageModel donationPageModel,
   ) {
-    final textColor = donationPageModel.cardTextColor != null
-        ? parseColor(donationPageModel.cardTextColor!)
-        : Colors.white;
 
     return Container(
       decoration: BoxDecoration(
@@ -70,7 +67,7 @@ class DonationWidget extends ConsumerWidget {
               style: TextStyle(
                 fontFamily: teachers,
                 fontSize: 22,
-                color: textColor,
+                color: parseColor(donationPageModel.cardTextColor),
               ),
             ),
           if (donationPageModel.title != null) const SizedBox(height: 8),
@@ -80,7 +77,7 @@ class DonationWidget extends ConsumerWidget {
             textAlign: TextAlign.left,
             style: TextStyle(
               fontSize: 16,
-              color: textColor,
+              color: parseColor(donationPageModel.cardTextColor),
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -95,7 +92,7 @@ class DonationWidget extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: textColor,
+                  color: parseColor(donationPageModel.cardTextColor),
                 ),
               ),
             ),

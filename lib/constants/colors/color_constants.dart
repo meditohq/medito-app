@@ -17,6 +17,7 @@ class ColorConstants {
   static const amsterdamSummer = Color(0xFF211F26);
   static const onyx = Color(0xFF2A2A32);
   static const brightSky = Color(0xFFD4EDF7);
+  static const puddle = Color(0xFFD1BDA9);
 
   static Color getColorFromString(String? name) {
     if (name == null) {

@@ -117,6 +117,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 child: Text(
                   streak.toString(),
                   style: const TextStyle(
+                    color: Colors.white,
                     fontFamily: dmSerif,
                     fontSize: 100,
                     fontWeight: FontWeight.w400,
