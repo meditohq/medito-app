@@ -1,5 +1,6 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -88,27 +89,48 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              streak.toString(),
-              style: const TextStyle(
-                fontFamily: dmSerif,
-                fontSize: 100,
-                fontWeight: FontWeight.w400,
+            AnimatedSwitcher(
+              duration: const Duration(seconds: 1),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  ),
+                );
+              },
+              child: Text(
+                streak.toString(),
+                key: ValueKey(streak),
+                style: const TextStyle(
+                  fontFamily: dmSerif,
+                  fontSize: 100,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.left,
               ),
-              textAlign: TextAlign.left,
             ),
             const Text(
               StringConstants.dayStreak,
               style: TextStyle(
-                  fontFamily: teachers,
-                  fontSize: 40,
-                  fontWeight: FontWeight.w400,
-                  height: 1,
-                  color: ColorConstants.lightPurple),
+                fontFamily: teachers,
+                fontSize: 40,
+                fontWeight: FontWeight.w400,
+                height: 1,
+                color: ColorConstants.lightPurple,
+              ),
               textAlign: TextAlign.left,
             ),
             const SizedBox(height: 24),
-            _buildDayLettersAndIcons(lastFiveDays, daysMeditated),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child: _buildDayLettersAndIcons(
+                lastFiveDays, 
+                daysMeditated,
+                key: ValueKey(daysMeditated.join()),
+              ),
+            ),
             const SizedBox(height: 24),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -141,7 +163,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
   }
 
   Widget _buildDayLettersAndIcons(
-      List<DateTime> lastFiveDays, List<String> daysMeditated) {
+      List<DateTime> lastFiveDays, 
+      List<String> daysMeditated, 
+      {Key? key}
+  ) {
     lastFiveDays = lastFiveDays.reversed.toList();
 
     var dayLetters = lastFiveDays.map((day) {
@@ -166,6 +191,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
     }).toList();
 
     return Row(
+      key: key,
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(dayLetters.length, (index) {
         DateTime day = lastFiveDays[index];
