@@ -1,17 +1,11 @@
-import 'package:flutter/cupertino.dart';
-import '../constants/strings/string_constants.dart';
 import '../constants/types/type_constants.dart';
-import '../widgets/snackbar_widget.dart';
 import 'health_kit_manager.dart';
 import 'stats_manager.dart';
 import '../models/local_audio_completed.dart';
 
 Future<bool> handleStats(
-  Map<String, dynamic> payload, {
-  BuildContext? context,
-}) async {
-  showSnackBar(context, StringConstants.processingStatsUpdate);
-
+  Map<String, dynamic> payload,
+  ) async {
   var healthKitManager = HealthKitManager();
   var permitted = await healthKitManager.isHealthSyncPermitted() == true;
   if (!permitted) {

@@ -14,9 +14,6 @@ class StringConstants {
   static const String tryAgain = 'Try again';
   static const String retry = 'Retry';
   static const String statsSuccess = 'Stats updated';
-  static const String statsError =
-      'Updating stats failed. If this keeps happening, close the app and reopen it.';
-  static const String processingStatsUpdate = 'Updating stats. Please wait...';
   static const String shareStatsText =
       '''Discover calmness for FREE with #Medito‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
 
