@@ -27,7 +27,6 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
   var deviceInfo = DeviceInfoPlugin();
   var packageInfo = await PackageInfo.fromPlatform();
   var languageCode = PlatformDispatcher.instance.locale.languageCode;
-  var currencySymbol = NumberFormat.simpleCurrency(locale: languageCode).currencySymbol;
   var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName; // Get currency name
 
   appVersion = packageInfo.version;
@@ -52,7 +51,6 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
     'buildNumber': buildNumber,
     'appVersion': appVersion,
     'languageCode': languageCode,
-    'currencySymbol': currencySymbol, 
     'currencyName': currencyName,
   };
 

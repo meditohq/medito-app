@@ -30,11 +30,6 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -48,11 +43,13 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     return home.when(
       loading: () => const HomeShimmerWidget(),
-      error: (err, stack) => MeditoErrorWidget(
+      error: (err, stack) {
+        return MeditoErrorWidget(
         message: home.error.toString(),
         onTap: () => _onRefresh(),
         isLoading: home.isLoading,
-      ),
+      );
+      },
       data: (HomeModel homeData) {
         return Scaffold(
           appBar: AppBar(

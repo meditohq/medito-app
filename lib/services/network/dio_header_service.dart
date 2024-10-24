@@ -38,7 +38,6 @@ class DioHeaderService {
       'device-time': '${DateTime.now()}',
       'device-platform': deviceInfo.platform,
       if (_fcmToken != null) 'fcmt': _fcmToken!,
-      'currency-symbol': deviceInfo.currencySymbol,
       'currency-name': deviceInfo.currencyName,
     };
   }
