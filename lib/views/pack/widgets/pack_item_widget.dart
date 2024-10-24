@@ -35,7 +35,7 @@ class PackItemWidget extends StatelessWidget {
                           item.title,
                           style: bodyLarge?.copyWith(
                             color: ColorConstants.white,
-                            fontFamily: DmSans,
+                            fontFamily: dmSans,
                             fontSize: 16,
                           ),
                         ),
@@ -46,7 +46,7 @@ class PackItemWidget extends StatelessWidget {
                             child: Text(
                               item.subtitle ?? '',
                               style: bodyLarge?.copyWith(
-                                fontFamily: DmMono,
+                                fontFamily: dmMono,
                                 color: ColorConstants.graphite,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,

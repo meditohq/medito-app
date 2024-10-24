@@ -124,7 +124,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                           child: Text(
                             e.title ?? '',
                             style: TextStyle(
-                              fontFamily: Teachers,
+                              fontFamily: teachers,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               height: 22 / 16,

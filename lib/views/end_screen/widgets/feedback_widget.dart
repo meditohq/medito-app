@@ -69,14 +69,14 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
         children: [
           Text(
             StringConstants.howDoYouFeel,
-            style: bodyLarge?.copyWith(fontFamily: SourceSerif, fontSize: 22),
+            style: bodyLarge?.copyWith(fontFamily: sourceSerif, fontSize: 22),
             textAlign: TextAlign.center,
           ),
           height8,
           Text(
             StringConstants.yourFeedbackHelpsUs,
             style: bodyLarge?.copyWith(
-              fontFamily: DmSans,
+              fontFamily: dmSans,
               fontSize: 16,
               color: ColorConstants.white,
             ),

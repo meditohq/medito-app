@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -71,8 +72,10 @@ class ReminderProvider {
         matchDateTimeComponents: DateTimeComponents.time,
       );
     } catch (e, s) {
-      print('Error scheduling notification: $e');
-      print('Stack trace: $s');
+      if (kDebugMode) {
+        print('Error scheduling notification: $e');
+        print('Stack trace: $s');
+      }
     }
   }
 

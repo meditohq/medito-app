@@ -55,8 +55,7 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
           loading: () => _buildShimmer(),
           error: (_, __) => _buildErrorState(ref),
           data: (stats) {
-            final isStreakDoneToday =
-                _isStreakDoneToday(stats.audioCompleted);
+            final isStreakDoneToday = _isStreakDoneToday(stats.audioCompleted);
             final streakText = '${stats.streakCurrent}';
 
             if (isStreakDoneToday && !_animationController.isAnimating) {
@@ -140,7 +139,7 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
                         fontWeight: isStreakDoneToday
                             ? FontWeight.bold
                             : FontWeight.w400,
-                        fontFamily: DmMono,
+                        fontFamily: dmMono,
                         height: _kLineHeight,
                       ),
                     ),

@@ -78,7 +78,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w400,
-              fontFamily: Teachers,
+              fontFamily: teachers,
               fontSize: 20,
               height: 28 / 24,
             ),
@@ -161,7 +161,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
-                              fontFamily: SourceSerif,
+                              fontFamily: sourceSerif,
                               fontSize: 24,
                               height: 28 / 24,
                             ),
@@ -172,7 +172,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
-                              fontFamily: Teachers,
+                              fontFamily: teachers,
                               fontSize: 16,
                               height: 1.2,
                             ),
@@ -254,7 +254,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                       button.title,
                       maxLines: 1,
                       style: const TextStyle(
-                        fontFamily: Teachers,
+                        fontFamily: teachers,
                         fontSize: _kButtonFontSize,
                         fontWeight: FontWeight.w600,
                         height: 1.2,

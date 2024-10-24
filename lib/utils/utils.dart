@@ -71,8 +71,8 @@ Future<void> launchEmailSubmission(
     query = 'subject=$subject';
   }
   if (body != null) {
-    var _body = body.replaceAll('\n', '\r\n');
-    query = query != '' ? '$query&body=$_body' : 'body=$_body';
+    var newBody = body.replaceAll('\n', '\r\n');
+    query = query != '' ? '$query&body=$newBody' : 'body=$newBody';
   }
 
   final params = Uri(

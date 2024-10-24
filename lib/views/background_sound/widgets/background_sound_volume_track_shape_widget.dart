@@ -56,7 +56,7 @@ class BackgroundSoundVolumeTrackShapeWidget
       fontSize: 18,
       fontWeight: FontWeight.w500,
       color: ColorConstants.white,
-      fontFamily: DmSans,
+      fontFamily: dmSans,
     );
     TextPainter textPainter(span) => TextPainter(
           text: span,

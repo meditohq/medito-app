@@ -13,7 +13,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w800,
           height: 1.5,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         displayMedium: const TextStyle(
           // btm bar text unselected
@@ -22,7 +22,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w700,
           height: 1.5,
           color: ColorConstants.graphite,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         displaySmall: const TextStyle(
           // header of rows on homepage
@@ -31,7 +31,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w800,
           height: 1.3,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         headlineMedium: const TextStyle(
           // packs title on home and packs screen
@@ -43,7 +43,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w600,
           height: 1.3,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         headlineSmall: const TextStyle(
           // stats widget
@@ -52,7 +52,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w700,
           height: 1.2,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         titleMedium: const TextStyle(
           // packs subtitle on home
@@ -62,7 +62,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w500,
           height: 1.5,
           color: ColorConstants.graphite,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         titleSmall: const TextStyle(
           // shortcut title
@@ -71,7 +71,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w500,
           height: 1.5,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         bodySmall: const TextStyle(
           // shortcut title
@@ -80,7 +80,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w600,
           height: 1.5,
           color: ColorConstants.graphite,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         bodyMedium: const TextStyle(
           // error widget
@@ -89,7 +89,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.normal,
           height: 1.3,
           color: ColorConstants.graphite,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         bodyLarge: const TextStyle(
           // daily text and quote
@@ -98,7 +98,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w400,
           height: 1.5,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         labelLarge: const TextStyle(
           // shortcut title
@@ -107,7 +107,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w600,
           height: 1.5,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         labelMedium: const TextStyle(
           // error widget
@@ -116,7 +116,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w500,
           height: 1.3,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
         labelSmall: const TextStyle(
           // daily text and quote
@@ -125,7 +125,7 @@ TextTheme meditoTextTheme(BuildContext context) {
           fontWeight: FontWeight.w400,
           height: 1.5,
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
         ),
       );
 }

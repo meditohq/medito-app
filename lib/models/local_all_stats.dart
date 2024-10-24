@@ -38,7 +38,7 @@ class LocalAllStats {
 
   factory LocalAllStats.fromAllStats(AllStats stats) {
     return LocalAllStats(
-      streakCurrent: stats.streakCurrent,
+      streakCurrent: 0,
       streakLongest: stats.streakLongest,
       totalTracksCompleted: stats.totalTracksCompleted,
       totalTimeListened: stats.totalTimeListened,
@@ -53,7 +53,6 @@ class LocalAllStats {
 
   AllStats toAllStats() {
     return AllStats(
-      streakCurrent: streakCurrent,
       streakLongest: streakLongest,
       totalTracksCompleted: totalTracksCompleted,
       totalTimeListened: totalTimeListened,

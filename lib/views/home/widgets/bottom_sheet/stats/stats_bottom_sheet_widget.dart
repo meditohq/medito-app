@@ -68,7 +68,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            fontFamily: DmSans,
+            fontFamily: dmSans,
           ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
@@ -63,7 +64,9 @@ class AuthRepositoryImpl extends AuthRepository {
         data: {'client_id': clientId},
       );
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -206,7 +209,9 @@ class AuthRepositoryImpl extends AuthRepository {
       );
       return response.user != null;
     } catch (e) {
-      print('Error marking account for deletion: $e');
+      if (kDebugMode) {
+        print('Error marking account for deletion: $e');
+      }
       return false;
     }
   }
@@ -218,7 +223,9 @@ class AuthRepositoryImpl extends AuthRepository {
       final user = supabase.auth.currentUser;
       return user?.userMetadata?['marked_for_deletion'] == true;
     } catch (e) {
-      print('Error checking if account is marked for deletion: $e');
+      if (kDebugMode) {
+        print('Error checking if account is marked for deletion: $e');
+      }
       return false;
     }
   }

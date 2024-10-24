@@ -38,7 +38,7 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomRight: Radius.circular(bottomRight),
     );
     var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
-          fontFamily: DmMono,
+          fontFamily: dmMono,
           color: ColorConstants.white,
           fontWeight: FontWeight.w400,
           fontSize: 16,
@@ -92,7 +92,7 @@ class DropdownWidget<T> extends StatelessWidget {
     );
   }
 
-    String _getDisplayValue() {
+  String _getDisplayValue() {
     if (!_isClickable) {
       return disabledLabelText;
     }

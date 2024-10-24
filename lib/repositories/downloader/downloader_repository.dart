@@ -13,13 +13,13 @@ part 'downloader_repository.g.dart';
 abstract class DownloaderRepository {
   Future<void> downloadFile(
     String url, {
-    required String name,
+    required String fileName,
     void Function(int, int)? onReceiveProgress,
   });
 
-  Future<String?> getDownloadedFile(String name);
+  Future<String?> getDownloadedFile(String fileName);
 
-  Future<void> deleteDownloadedFile(String name);
+  Future<void> deleteDownloadedFile(String fileName);
 
   Future<bool> isFileDownloaded(String name);
 }
@@ -41,11 +41,11 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   @override
   Future<void> downloadFile(
     String url, {
-    required String name,
+    required String fileName,
     void Function(int, int)? onReceiveProgress,
   }) async {
     var file = await getApplicationDocumentsDirectory();
-    var savePath = '${file.path}/$name';
+    var savePath = '${file.path}/$fileName';
     var isExists = await File(savePath).exists();
 
     if (!isExists) {
@@ -74,10 +74,10 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   }
 
   @override
-  Future<String?> getDownloadedFile(String name) async {
+  Future<String?> getDownloadedFile(String fileName) async {
     if (kIsWeb) return null;
     var file = await getApplicationDocumentsDirectory();
-    var savePath = '${file.path}/$name';
+    var savePath = '${file.path}/$fileName';
     var filePath = File(savePath);
 
     return await filePath.exists() ? filePath.path : null;

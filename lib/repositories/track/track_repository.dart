@@ -65,11 +65,11 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<void> addCurrentlyPlayingTrackInPreference(
-    TrackModel track,
+    TrackModel trackModel,
   ) async {
     await ref.read(sharedPreferencesProvider).setString(
           SharedPreferenceConstants.currentPlayingTrack,
-          json.encode(track),
+          json.encode(trackModel),
         );
   }
 

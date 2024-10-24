@@ -7,19 +7,19 @@ class ApiResponse<T> extends Equatable {
   final int? statusCode;
 
   const ApiResponse.loading()
-      : status = Status.LOADING,
+      : status = Status.loading,
         body = null,
         statusCode = null,
         message = '';
 
   const ApiResponse.completed(this.body)
-      : status = Status.COMPLETED,
+      : status = Status.completed,
         statusCode = null,
         message = '';
 
   ApiResponse.error(
     String? message,
-  )   : status = Status.ERROR,
+  )   : status = Status.error,
         message = message?.split(',').first,
         statusCode = message?.split(',').last != null
             ? int.parse(message!.split(',').last)
@@ -27,7 +27,7 @@ class ApiResponse<T> extends Equatable {
         body = null;
 
   bool hasData() {
-    return status != Status.LOADING && body != null;
+    return status != Status.loading && body != null;
   }
 
   @override
@@ -39,4 +39,4 @@ class ApiResponse<T> extends Equatable {
   List<Object?> get props => [status, body, message];
 }
 
-enum Status { LOADING, COMPLETED, ERROR }
+enum Status { loading, completed, error }

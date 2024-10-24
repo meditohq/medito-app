@@ -316,7 +316,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: SourceSerif,
+            fontFamily: sourceSerif,
             color: ColorConstants.white,
             letterSpacing: 0.2,
             fontSize: 24,
@@ -334,12 +334,12 @@ class _TrackViewState extends ConsumerState<TrackView> {
         textAlign: WrapAlignment.start,
         p: bodyLarge?.copyWith(
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
           fontSize: 16,
         ),
         a: bodyLarge?.copyWith(
           color: ColorConstants.white,
-          fontFamily: DmSans,
+          fontFamily: dmSans,
           decoration: TextDecoration.underline,
           fontSize: 16,
         ),
@@ -428,8 +428,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomLeft: 7,
       disabledLabelText:
           '${convertDurationToMinutes(milliseconds: selectedFile.first.duration)} ${StringConstants.min}',
-      items: files(selectedFile)
-          .map<DropdownMenuItem<TrackFilesModel>>(
+      items: files(selectedFile).map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,

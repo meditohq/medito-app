@@ -1,6 +1,5 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -92,7 +91,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
             Text(
               streak.toString(),
               style: const TextStyle(
-                fontFamily: DmSerif,
+                fontFamily: dmSerif,
                 fontSize: 100,
                 fontWeight: FontWeight.w400,
               ),
@@ -101,7 +100,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
             const Text(
               StringConstants.dayStreak,
               style: TextStyle(
-                  fontFamily: Teachers,
+                  fontFamily: teachers,
                   fontSize: 40,
                   fontWeight: FontWeight.w400,
                   height: 1,
@@ -117,7 +116,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 StringConstants.dailyPracticeMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: Teachers,
+                  fontFamily: teachers,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 1.3,
@@ -180,7 +179,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
               Text(
                 dayLetters[index],
                 style: TextStyle(
-                  fontFamily: Teachers,
+                  fontFamily: teachers,
                   fontSize: 14,
                   fontWeight: isMeditated ? FontWeight.w600 : FontWeight.w500,
                   height: 1.2,

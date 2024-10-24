@@ -18,7 +18,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
             height: 0,
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            fontFamily: SourceSerif,
+            fontFamily: sourceSerif,
           ),
     );
   }

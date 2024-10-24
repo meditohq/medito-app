@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../colors/color_constants.dart';
 
-const String DmMono = 'DM Mono';
-const String DmSans = 'DM Sans';
-const String DmSerif = 'DM Serif Display';
-const String SourceSerif = 'Source Serif';
-const String Teachers = 'Teachers';
+const String dmMono = 'DM Mono';
+const String dmSans = 'DM Sans';
+const String dmSerif = 'DM Serif Display';
+const String sourceSerif = 'Source Serif';
+const String teachers = 'Teachers';
 
 const String materialIcons = 'MaterialIcons';
 const padding8 = 8.0;

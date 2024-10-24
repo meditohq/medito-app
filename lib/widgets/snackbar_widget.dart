@@ -19,7 +19,7 @@ void showSnackBar(
             style: context != null
                 ? Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: ColorConstants.greyIsTheNewBlack,
-                      fontFamily: DmSans,
+                      fontFamily: dmSans,
                       fontSize: 14,
                     )
                 : null,

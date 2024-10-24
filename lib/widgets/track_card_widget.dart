@@ -58,7 +58,7 @@ class TrackCardWidget extends StatelessWidget {
     return Text(
       title,
       style: textTheme.displayLarge?.copyWith(
-        fontFamily: SourceSerif,
+        fontFamily: sourceSerif,
         height: 0,
       ),
     );

@@ -76,7 +76,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                     Text(
                       widget.maintenanceModel.ctaLabel ?? '',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            fontFamily: SourceSerif,
+                            fontFamily: sourceSerif,
                             fontSize: 20,
                             color: ColorConstants.ebony,
                             fontWeight: FontWeight.w700,

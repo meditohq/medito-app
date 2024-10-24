@@ -13,7 +13,7 @@ class QuoteWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final quoteStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontFamily: SourceSerif,
+          fontFamily: sourceSerif,
           fontWeight: FontWeight.w300,
           fontSize: 18,
           height: 1.4,
@@ -35,7 +35,7 @@ class QuoteWidget extends ConsumerWidget {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w400,
-              fontFamily: Teachers,
+              fontFamily: teachers,
               fontSize: 20,
               height: 28 / 24,
             ),

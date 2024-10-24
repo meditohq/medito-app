@@ -37,7 +37,7 @@ class SoundListTileWidget extends ConsumerWidget {
               sound.title,
               style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
                     color: ColorConstants.white,
-                    fontFamily: DmSans,
+                    fontFamily: dmSans,
                     fontSize: 16,
                   ),
             ),

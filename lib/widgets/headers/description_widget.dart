@@ -26,14 +26,14 @@ class DescriptionWidget extends StatelessWidget {
           textAlign: WrapAlignment.start,
           p: bodyLarge?.copyWith(
             color: ColorConstants.white,
-            fontFamily: DmSans,
+            fontFamily: dmSans,
             fontSize: 14,
             fontWeight: FontWeight.w500,
             height: 1.5,
           ),
           a: bodyLarge?.copyWith(
             color: ColorConstants.white,
-            fontFamily: DmSans,
+            fontFamily: dmSans,
             decoration: TextDecoration.underline,
             fontSize: 14,
             fontWeight: FontWeight.w500,

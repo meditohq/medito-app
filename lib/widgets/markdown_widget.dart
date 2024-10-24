@@ -39,7 +39,7 @@ class MarkdownWidget extends StatelessWidget {
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
         p: p ??
             titleMedium?.copyWith(
-              fontFamily: DmMono,
+              fontFamily: dmMono,
               fontSize: pFontSize,
               letterSpacing: 0,
               color: walterWhite,
@@ -47,7 +47,7 @@ class MarkdownWidget extends StatelessWidget {
         textAlign: textAlign ?? WrapAlignment.center,
         a: a ??
             titleMedium?.copyWith(
-              fontFamily: DmMono,
+              fontFamily: dmMono,
               color: walterWhite,
               fontSize: aFontSize,
               fontWeight: FontWeight.w600,

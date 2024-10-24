@@ -45,7 +45,7 @@ class ArtistTitleWidget extends ConsumerWidget {
         trackTitle ?? '',
         textAlign: TextAlign.center,
         style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: SourceSerif,
+              fontFamily: sourceSerif,
               color: ColorConstants.white,
               fontSize: trackTitleFontSize,
               letterSpacing: 0.2,
@@ -56,7 +56,7 @@ class ArtistTitleWidget extends ConsumerWidget {
 
   InkWell _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontFamily: DmMono,
+          fontFamily: dmMono,
           fontSize: artistNameFontSize,
           letterSpacing: 0,
           color: ColorConstants.graphite,

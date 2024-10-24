@@ -1,9 +1,6 @@
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/models/local_all_stats.dart';
-import 'package:medito/providers/stats_provider.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
@@ -68,7 +65,7 @@ class DonationWidget extends ConsumerWidget {
               donationPageModel.title!,
               textAlign: TextAlign.left,
               style: TextStyle(
-                fontFamily: Teachers,
+                fontFamily: teachers,
                 fontSize: 22,
                 color: textColor,
               ),
@@ -168,5 +165,4 @@ class DonationWidget extends ConsumerWidget {
       );
     }
   }
-
 }

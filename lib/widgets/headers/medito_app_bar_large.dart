@@ -67,7 +67,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: SourceSerif,
+            fontFamily: sourceSerif,
             fontWeight: FontWeight.w700,
             color: ColorConstants.white,
           ),
