@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:flutter/material.dart';
@@ -79,8 +80,23 @@ class ReminderProvider {
     }
   }
 
+  Future<void> clearBadge() async {
+    if (Platform.isIOS) {
+      const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
+        badgeNumber: 0,
+      );
+      await _flutterLocalNotificationsPlugin.show(
+        0,
+        null,
+        null,
+        const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+      );
+    }
+  }
+
   Future<void> cancelDailyNotification() async {
     await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
+    await clearBadge();
   }
 }
 

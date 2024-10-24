@@ -26,6 +26,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -252,6 +253,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _onAppForegrounded() {
+    ref.read(reminderProvider).clearBadge();
     ref.invalidate(statsProvider);
   }
 }
