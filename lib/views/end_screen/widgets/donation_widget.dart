@@ -15,12 +15,15 @@ class DonationWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final donationPage = ref.watch(fetchDonationPageProvider);
 
-    return donationPage.when(
-      loading: () => _buildLoadingWidget(),
-      error: (err, _) => _buildErrorWidget(err.toString()),
-      data: (DonationPageModel donationPageModel) {
-        return _buildDonationWidget(context, donationPageModel);
-      },
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: donationPage.when(
+        loading: () => _buildLoadingWidget(),
+        error: (err, _) => _buildErrorWidget(err.toString()),
+        data: (DonationPageModel donationPageModel) {
+          return _buildDonationWidget(context, donationPageModel);
+        },
+      ),
     );
   }
 
