@@ -1,5 +1,6 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -7,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/donation_widget.dart';
-import '../../../providers/donation/donation_page_provider.dart'; 
-import '../../../providers/stats_provider.dart'; 
+import '../../../providers/donation/donation_page_provider.dart';
+import '../../../providers/stats_provider.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
   final TrackModel trackModel;
@@ -27,6 +28,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     ref.invalidate(fetchDonationPageProvider);
+    ref.invalidate(statsProvider);
   }
 
   @override
@@ -76,10 +78,13 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
-        var streak = localAllStats.streakCurrent;
+        // var streak = localAllStats.streakCurrent;
+        var streak = localAllStats.audioCompleted?.length.toString() ?? '!';
         var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
-            5, (index) => DateTime.now().subtract(Duration(days: index)));
+          5,
+          (index) => DateTime.now().subtract(Duration(days: index)),
+        );
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -139,6 +144,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
 
   Widget _buildDayLettersAndIcons(
       List<DateTime> lastFiveDays, List<String> daysMeditated) {
+    lastFiveDays = lastFiveDays.reversed.toList();
+
     var dayLetters = lastFiveDays.map((day) {
       switch (day.weekday) {
         case 1:

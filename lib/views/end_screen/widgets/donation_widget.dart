@@ -63,7 +63,6 @@ class DonationWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Conditionally render the title
           if (donationPageModel.title != null)
             Text(
               donationPageModel.title!,
