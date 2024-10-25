@@ -6,12 +6,12 @@ struct StreakWidgetView: View {
     var entry: Provider.Entry
     
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Text("\(entry.streakValue)")
-                .font(.custom("DMSerifDisplay-Regular", size: 50))
+                .font(.custom("DMSerifDisplay-Regular", size: 30))
                 .foregroundColor(Color.white)
             Text("\(entry.streakTitle)")
-                .font(.custom("Teachers-Regular", size: 20))
+                .font(.custom("Teachers-Regular", size: 16))
                 .foregroundColor(Color(.sRGB, red: 145/255, green: 125/255, blue: 240/255, opacity: 1))
             HStack(spacing: 12) {
                 ForEach(weekDays(), id: \.self) { date in
@@ -35,26 +35,19 @@ struct StreakWidgetView: View {
                 }
             }
         }
-        .padding()
         .containerBackground(for: .widget) {
             Color(.sRGB, red: 33/255, green: 31/255, blue: 38/255, opacity: 1)
         }
     }
     
-    // Helper function to get array of dates for Monday-Friday
+    // Helper function to get array of dates for the last 5 days
     private func weekDays() -> [Date] {
         let calendar = Calendar.current
         let today = Date()
         
-        // Find the most recent Monday
-        var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)
-        components.weekday = 2 // Monday = 2
-        
-        guard let monday = calendar.date(from: components) else { return [] }
-        
-        // Create array of dates from Monday to Friday only
-        return (0...4).compactMap { dayOffset in
-            calendar.date(byAdding: .day, value: dayOffset, to: monday)
+        // Create array of dates for the last 5 days
+        return (-4...0).compactMap { dayOffset in
+            calendar.date(byAdding: .day, value: dayOffset, to: today)
         }
     }
     
