@@ -3,14 +3,15 @@ import WidgetKit
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> StatsWidgetEntry{
-        StatsWidgetEntry(date: Date(), title: "", subtitle: "")
+        StatsWidgetEntry(date: Date(), streakTitle: "", streakValue: 0, isMeditationDoneToday: false)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (StatsWidgetEntry) -> ()) {
         let prefs = UserDefaults(suiteName: "group.org.medito.widget")
-        let title = prefs?.string(forKey: "title") ?? ""
-        let subtitle = prefs?.string(forKey: "subtitle") ?? ""
-        let entry = StatsWidgetEntry(date: Date(), title: title, subtitle: subtitle)
+        let streakTitle = prefs?.string(forKey: "streakTitle") ?? ""
+        let streakValue = prefs?.integer(forKey: "streakValue") ?? 0
+        let isMeditationDoneToday = prefs?.bool(forKey: "isMeditationDoneToday") ?? false
+        let entry = StatsWidgetEntry(date: Date(), streakTitle: streakTitle, streakValue: streakValue, isMeditationDoneToday: isMeditationDoneToday)
         completion(entry)
     }
     

@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
@@ -33,6 +34,7 @@ var audioStateNotifier = AudioStateNotifier();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HomeWidget.setAppGroupId('group.org.medito.widget');
   var appLinks = AppLinks();
 
   // Handle app links while the app is already started - deep link
@@ -189,7 +191,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           break;
       }
     });
-  
+
     return;
   }
 
@@ -216,7 +218,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           ),
         );
     }
-  
+
     return;
   }
 
@@ -252,7 +254,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     }
   }
 
-  void _onAppForegrounded() {
+  Future<void> _onAppForegrounded() async {
     ref.read(reminderProvider).clearBadge();
     ref.invalidate(statsProvider);
   }

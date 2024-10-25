@@ -7,8 +7,9 @@ struct StreakWidgetView : View {
     var body: some View {
         VStack {
             Text("medito")
-            Text(entry.title)
-            Text(entry.subtitle)
+            Text(entry.streakTitle)
+            Text("\(entry.streakValue)")
+            Text(entry.isMeditationDoneToday ? "Done" : "Not done")
             Image(systemName: "flame")
         }
     }

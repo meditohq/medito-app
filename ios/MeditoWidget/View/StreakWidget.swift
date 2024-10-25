@@ -24,10 +24,10 @@ struct StreakWidget: Widget {
         .description("This is an example widget.")
     }
 }
-
-#Preview(as: .systemSmall) {
-    StreakWidget()
-} timeline: {
-    StatsWidgetEntry(date: Date(), title: "8 days", subtitle: "Current streak")
-    StatsWidgetEntry(date: Date(), title: "9 days", subtitle: "Current streak")
-}
+//
+//#Preview(as: .systemSmall) {
+//    StreakWidget()
+//} timeline: {
+//    StatsWidgetEntry(date: Date(), title: "8 days", subtitle: "Current streak")
+//    StatsWidgetEntry(date: Date(), title: "9 days", subtitle: "Current streak")
+//}

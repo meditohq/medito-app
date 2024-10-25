@@ -3,6 +3,7 @@ import WidgetKit
 
 struct StatsWidgetEntry: TimelineEntry {
     var date: Date
-    var title: String
-    var subtitle: String
+    var streakTitle: String
+    var streakValue: Int
+    var isMeditationDoneToday: Bool
 }
