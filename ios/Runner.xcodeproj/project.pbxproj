@@ -19,6 +19,16 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		BA7B014354E482923EFF77C8 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65761987350523DAC467B6C7 /* Pods_RunnerTests.framework */; };
 		D208B58D6C3DC2C128A1EC5A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFFC649AC5C15B0E15530A06 /* Pods_Runner.framework */; };
+		ED43ED982CCBE5B200648C2A /* Teachers-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED942CCBE5B100648C2A /* Teachers-Medium.ttf */; };
+		ED43ED992CCBE5B200648C2A /* Teachers-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED952CCBE5B100648C2A /* Teachers-Regular.ttf */; };
+		ED43ED9A2CCBE5B200648C2A /* SourceSerif4-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED902CCBE5B100648C2A /* SourceSerif4-Regular.ttf */; };
+		ED43ED9B2CCBE5B200648C2A /* SourceSerif4-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED8E2CCBE5B100648C2A /* SourceSerif4-Bold.ttf */; };
+		ED43ED9C2CCBE5B200648C2A /* Teachers-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED962CCBE5B100648C2A /* Teachers-SemiBold.ttf */; };
+		ED43ED9D2CCBE5B200648C2A /* SourceSerif4-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED8F2CCBE5B100648C2A /* SourceSerif4-Medium.ttf */; };
+		ED43ED9E2CCBE5B200648C2A /* Teachers-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED932CCBE5B100648C2A /* Teachers-Bold.ttf */; };
+		ED43ED9F2CCBE5B200648C2A /* SourceSerif4-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43ED912CCBE5B100648C2A /* SourceSerif4-SemiBold.ttf */; };
+		ED43EDA32CCBE77F00648C2A /* DMSerifDisplay-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43EDA02CCBE77F00648C2A /* DMSerifDisplay-Italic.ttf */; };
+		ED43EDA42CCBE77F00648C2A /* DMSerifDisplay-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED43EDA12CCBE77F00648C2A /* DMSerifDisplay-Regular.ttf */; };
 		EDBD61082C942FA500C578AF /* StatsWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61052C941F8400C578AF /* StatsWidgetEntry.swift */; };
 		EDBD610E2C943F0100C578AF /* StreakWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD610C2C943EBD00C578AF /* StreakWidgetView.swift */; };
 		EDBD61122C943F4500C578AF /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61102C943F3C00C578AF /* Provider.swift */; };
@@ -99,6 +109,16 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BFFC649AC5C15B0E15530A06 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED43ED8E2CCBE5B100648C2A /* SourceSerif4-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSerif4-Bold.ttf"; sourceTree = "<group>"; };
+		ED43ED8F2CCBE5B100648C2A /* SourceSerif4-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSerif4-Medium.ttf"; sourceTree = "<group>"; };
+		ED43ED902CCBE5B100648C2A /* SourceSerif4-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSerif4-Regular.ttf"; sourceTree = "<group>"; };
+		ED43ED912CCBE5B100648C2A /* SourceSerif4-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSerif4-SemiBold.ttf"; sourceTree = "<group>"; };
+		ED43ED932CCBE5B100648C2A /* Teachers-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Teachers-Bold.ttf"; sourceTree = "<group>"; };
+		ED43ED942CCBE5B100648C2A /* Teachers-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Teachers-Medium.ttf"; sourceTree = "<group>"; };
+		ED43ED952CCBE5B100648C2A /* Teachers-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Teachers-Regular.ttf"; sourceTree = "<group>"; };
+		ED43ED962CCBE5B100648C2A /* Teachers-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Teachers-SemiBold.ttf"; sourceTree = "<group>"; };
+		ED43EDA02CCBE77F00648C2A /* DMSerifDisplay-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSerifDisplay-Italic.ttf"; sourceTree = "<group>"; };
+		ED43EDA12CCBE77F00648C2A /* DMSerifDisplay-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSerifDisplay-Regular.ttf"; sourceTree = "<group>"; };
 		EDBD61052C941F8400C578AF /* StatsWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsWidgetEntry.swift; sourceTree = "<group>"; };
 		EDBD61092C9439A100C578AF /* MeditoWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtension.entitlements; sourceTree = "<group>"; };
 		EDBD610C2C943EBD00C578AF /* StreakWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetView.swift; sourceTree = "<group>"; };
@@ -195,6 +215,7 @@
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				8EFE9E8010CFB1E2B50D23B4 /* Pods */,
 				7FAFF4ED0B6F36B3DDD23343 /* Frameworks */,
+				ED43ED8D2CCBDB0D00648C2A /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -223,6 +244,48 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		ED43ED8D2CCBDB0D00648C2A /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				248860018A4F7D0C920BC31F /* Pods_Runner.framework */,
+				65761987350523DAC467B6C7 /* Pods_RunnerTests.framework */,
+				EDFD4D002C9359BF0066E874 /* SwiftUI.framework */,
+				EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		ED43ED922CCBE5B100648C2A /* source-serif */ = {
+			isa = PBXGroup;
+			children = (
+				ED43ED8E2CCBE5B100648C2A /* SourceSerif4-Bold.ttf */,
+				ED43ED8F2CCBE5B100648C2A /* SourceSerif4-Medium.ttf */,
+				ED43ED902CCBE5B100648C2A /* SourceSerif4-Regular.ttf */,
+				ED43ED912CCBE5B100648C2A /* SourceSerif4-SemiBold.ttf */,
+			);
+			path = "source-serif";
+			sourceTree = "<group>";
+		};
+		ED43ED972CCBE5B100648C2A /* teachers */ = {
+			isa = PBXGroup;
+			children = (
+				ED43ED932CCBE5B100648C2A /* Teachers-Bold.ttf */,
+				ED43ED942CCBE5B100648C2A /* Teachers-Medium.ttf */,
+				ED43ED952CCBE5B100648C2A /* Teachers-Regular.ttf */,
+				ED43ED962CCBE5B100648C2A /* Teachers-SemiBold.ttf */,
+			);
+			path = teachers;
+			sourceTree = "<group>";
+		};
+		ED43EDA22CCBE77F00648C2A /* dm-serif */ = {
+			isa = PBXGroup;
+			children = (
+				ED43EDA02CCBE77F00648C2A /* DMSerifDisplay-Italic.ttf */,
+				ED43EDA12CCBE77F00648C2A /* DMSerifDisplay-Regular.ttf */,
+			);
+			path = "dm-serif";
 			sourceTree = "<group>";
 		};
 		EDBD61072C941F9000C578AF /* Model */ = {
@@ -259,6 +322,9 @@
 				EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */,
 				EDFD4D072C9359BF0066E874 /* Assets.xcassets */,
 				EDFD4D092C9359BF0066E874 /* Info.plist */,
+				ED43EDA22CCBE77F00648C2A /* dm-serif */,
+				ED43ED922CCBE5B100648C2A /* source-serif */,
+				ED43ED972CCBE5B100648C2A /* teachers */,
 			);
 			path = MeditoWidget;
 			sourceTree = "<group>";
@@ -396,6 +462,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED43ED982CCBE5B200648C2A /* Teachers-Medium.ttf in Resources */,
+				ED43ED992CCBE5B200648C2A /* Teachers-Regular.ttf in Resources */,
+				ED43ED9A2CCBE5B200648C2A /* SourceSerif4-Regular.ttf in Resources */,
+				ED43ED9B2CCBE5B200648C2A /* SourceSerif4-Bold.ttf in Resources */,
+				ED43ED9C2CCBE5B200648C2A /* Teachers-SemiBold.ttf in Resources */,
+				ED43ED9D2CCBE5B200648C2A /* SourceSerif4-Medium.ttf in Resources */,
+				ED43ED9E2CCBE5B200648C2A /* Teachers-Bold.ttf in Resources */,
+				ED43EDA32CCBE77F00648C2A /* DMSerifDisplay-Italic.ttf in Resources */,
+				ED43EDA42CCBE77F00648C2A /* DMSerifDisplay-Regular.ttf in Resources */,
+				ED43ED9F2CCBE5B200648C2A /* SourceSerif4-SemiBold.ttf in Resources */,
 				EDFD4D082C9359BF0066E874 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

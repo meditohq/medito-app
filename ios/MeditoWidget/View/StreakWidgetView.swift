@@ -6,33 +6,36 @@ struct StreakWidgetView: View {
     var entry: Provider.Entry
     
     var body: some View {
-            VStack {
-                Text("\(entry.streakValue)")
-                    .font(.system(size: 40))
-                Text("\(entry.streakTitle)")
-                    .font(.system(size: 20))
-                HStack(spacing: 12) {
-                    ForEach(weekDays(), id: \.self) { date in
-                        VStack(spacing: 4) {
-                            Text(formatWeekDay(date))
-                                .font(.system(size: 12))
-                                .foregroundColor(Color.gray)
+        VStack {
+            Text("\(entry.streakValue)")
+                .font(.custom("DMSerifDisplay-Regular", size: 50))
+                .foregroundColor(Color.white)
+            Text("\(entry.streakTitle)")
+                .font(.custom("Teachers-Regular", size: 20))
+                .foregroundColor(Color(.sRGB, red: 145/255, green: 125/255, blue: 240/255, opacity: 1))
+            HStack(spacing: 12) {
+                ForEach(weekDays(), id: \.self) { date in
+                    VStack(spacing: 4) {
+                        Text(formatWeekDay(date))
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.gray)
+                        
+                        ZStack {
+                            Circle()
+                                .fill(hasTimestamp(on: date) ? Color(.sRGB, red: 145/255, green: 125/255, blue: 240/255, opacity: 1) : Color(.sRGB, red: 79/255, green: 79/255, blue: 102/255, opacity: 1))
+                                .frame(width: 24, height: 24)
                             
-                            ZStack {
-                                Circle()
-                                    .fill(hasTimestamp(on: date) ? Color(.sRGB, red: 145/255, green: 125/255, blue: 240/255, opacity: 1) : Color(.sRGB, red: 79/255, green: 79/255, blue: 102/255, opacity: 1))
-                                    .frame(width: 24, height: 24)
-                                
-                                if hasTimestamp(on: date) {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(.white)
-                                }
+                            if hasTimestamp(on: date) {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.white)
                             }
                         }
                     }
                 }
+            }
         }
+        .padding()
         .containerBackground(for: .widget) {
             Color(.sRGB, red: 33/255, green: 31/255, blue: 38/255, opacity: 1)
         }
