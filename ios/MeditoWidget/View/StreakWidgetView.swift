@@ -60,10 +60,9 @@ struct StreakWidgetView: View {
     
     private func hasTimestamp(on day: Date) -> Bool {
         let calendar = Calendar.current
-        let contains = entry.audioCompleted.contains { timestamp in
+        return entry.audioCompleted.contains { timestamp in
             let date = Date(timeIntervalSince1970: timestamp/1000)
             return calendar.isDate(date, inSameDayAs: day)
         }
-        return contains
     }
 }
