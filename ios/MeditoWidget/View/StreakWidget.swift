@@ -11,14 +11,7 @@ struct StreakWidget: Widget {
             kind: MeditoWidgetConstants.widgetKind,
             provider: Provider()
         ) { entry in
-            if #available(iOS 17.0, *) {
-                StreakWidgetView(entry: entry)
-                    .containerBackground(.fill.tertiary, for: .widget)
-            } else {
-                StreakWidgetView(entry: entry)
-                    .padding()
-                    .background()
-            }
+            StreakWidgetView(entry: entry)
         }
         .configurationDisplayName("My Widget")
         .description("This is an example widget.")
