@@ -5,5 +5,5 @@ struct StatsWidgetEntry: TimelineEntry {
     var date: Date
     var streakTitle: String
     var streakValue: Int
-    var isMeditationDoneToday: Bool
+    var audioCompleted: [TimeInterval]
 }

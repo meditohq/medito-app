@@ -29,7 +29,11 @@ Future<void> _updateiOSWidget(LocalAllStats stats) async {
     await HomeWidget.saveWidgetData<String>(
         'streakTitle', "Current Streak");
     await HomeWidget.saveWidgetData<String>(
-        'streakValue', stats.streakCurrent.toString());
+        'streakValue', stats.streakCurrent.toString()); 
+    await HomeWidget.saveWidgetData<List<int>>(
+        'audioCompleted',
+        stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
+    );
     HomeWidget.updateWidget(iOSName: 'StreakWidget');
   }
 }
