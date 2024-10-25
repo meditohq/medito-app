@@ -18,8 +18,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
   Widget build(BuildContext context) {
     var textColor = _label != StringConstants.x1
         ? ColorConstants.lightPurple
-        : ColorConstants.walterWhite;
-    ColorConstants.walterWhite;
+        : ColorConstants.white;
 
     return GestureDetector(
       onTap: () {
@@ -42,7 +41,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
         style: Theme.of(context)
             .textTheme
             .bodyMedium
-            ?.copyWith(color: textColor, fontFamily: DmMono, fontSize: 18),
+            ?.copyWith(color: textColor, fontFamily: dmMono, fontSize: 18),
         textAlign: TextAlign.center,
       ),
     );

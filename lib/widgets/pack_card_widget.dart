@@ -1,5 +1,8 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/widgets/widgets.dart';
+import 'package:medito/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
 
 class PackCardWidget extends StatelessWidget {
@@ -20,84 +23,119 @@ class PackCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorConstants.onyx,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      padding: EdgeInsets.all(16),
-      child: InkWell(
-        onTap: onTap,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: subTitle != null
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.center,
-                children: [
-                  _title(textTheme, title: title),
-                  if (subTitle != null) height4,
-                  _description(
-                    textTheme,
-                    subtitle: subTitle,
+    return FutureBuilder<ColorScheme?>(
+      future: _generateColorScheme(context),
+      builder: (context, snapshot) {
+        var colorScheme = snapshot.data;
+        var backgroundColor =
+            colorScheme?.primaryContainer ?? ColorConstants.onyx;
+        var titleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
+        var subtitleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (coverUrlPath != null && coverUrlPath!.isNotEmpty)
+                  _getCoverUrl(),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _title(textTheme, title: title, color: titleColor),
+                      if (subTitle != null) const SizedBox(height: 4),
+                      _description(
+                        textTheme,
+                        subtitle: subTitle,
+                        color: subtitleColor,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            width12,
-            _getCoverUrl(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Text _title(TextTheme textTheme, {required String title}) {
+  Future<ColorScheme?> _generateColorScheme(BuildContext context) async {
+    if (coverUrlPath != null && coverUrlPath!.isNotEmpty) {
+      try {
+        var image = CachedNetworkImageProvider(coverUrlPath!);
+
+        return await ColorScheme.fromImageProvider(
+          provider: image,
+          brightness: Brightness.dark,
+          contrastLevel: 1,
+        ).timeout(const Duration(seconds: 5), onTimeout: () {
+          throw TimeoutException('ColorScheme generation timed out');
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Text _title(
+    TextTheme textTheme, {
+    required String title,
+    required Color color,
+  }) {
     return Text(
-      '$title',
+      title,
       style: textTheme.displayLarge?.copyWith(
-        fontFamily: SourceSerif,
-        height: 0,
+        fontFamily: dmSans,
+        height: 1.2,
+        color: color,
       ),
     );
   }
 
-  Widget _description(TextTheme textTheme, {String? subtitle}) {
+  Widget _description(
+    TextTheme textTheme, {
+    String? subtitle,
+    required Color color,
+  }) {
     if (subtitle != null) {
       return Text(
-        '$subtitle',
+        subtitle,
+        maxLines: 4,
         overflow: TextOverflow.ellipsis,
-        maxLines: 2,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
-          color: ColorConstants.graphite,
+          color: color,
           fontSize: 14,
           height: 1.4,
         ),
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 
   Widget _getCoverUrl() {
-    if (coverUrlPath != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(3),
-        child: SizedBox(
-          height: 80,
-          width: 80,
-          child: NetworkImageWidget(
-            url: coverUrlPath ?? '',
-            shouldCache: true,
-          ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(14),
+        topRight: Radius.circular(14),
+      ),
+      child: AspectRatio(
+        aspectRatio: 4 / 3,
+        child: NetworkImageWidget(
+          url: coverUrlPath ?? '',
+          shouldCache: true,
         ),
-      );
-    }
-
-    return SizedBox();
+      ),
+    );
   }
 }

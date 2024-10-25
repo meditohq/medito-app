@@ -1,49 +1,41 @@
-import 'dart:async';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
-import 'package:flutter/material.dart';
+import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
+import 'package:medito/views/settings/settings_screen.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
-class BottomNavigationBarView extends StatefulWidget {
+class BottomNavigationBarView extends ConsumerStatefulWidget {
+  const BottomNavigationBarView({Key? key}) : super(key: key);
+
   @override
-  _BottomNavigationBarViewState createState() =>
+  ConsumerState<BottomNavigationBarView> createState() =>
       _BottomNavigationBarViewState();
 }
 
-class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
-  int _currentPageIndex = 0;
-  late PageController _pageController;
-  late final StreamSubscription _subscription;
+class _BottomNavigationBarViewState
+    extends ConsumerState<BottomNavigationBarView> {
+  var _currentPageIndex = 0;
+  final _searchFocusNode = FocusNode();
 
-  final List<Widget> _pages = [
-    const HomeView(),
-    ExploreView(),
-  ];
-
-  final List<NavigationDestination> _navigationBarItems = [
-    const NavigationDestination(
-      selectedIcon: Icon(Icons.home),
-      icon: Icon(Icons.home_outlined),
-      label: StringConstants.home,
-    ),
-    const NavigationDestination(
-      selectedIcon: Icon(Icons.explore),
-      icon: Icon(Icons.explore_outlined),
-      label: StringConstants.explore,
-    ),
-  ];
+  late final List<Widget> _pages;
 
   @override
   void initState() {
-    _pageController = PageController(initialPage: _currentPageIndex);
     super.initState();
+    _pages = [
+      const HomeView(),
+      ExploreView(searchFocusNode: _searchFocusNode),
+      // const PathView(),
+      const SettingsScreen(),
+    ];
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
-    _pageController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -51,39 +43,74 @@ class _BottomNavigationBarViewState extends State<BottomNavigationBarView> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: _currentPageIndex == 0,
-      onPopInvokedWithResult: (bool didPop, _) {
-        if (didPop) {
-          return;
-        }
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
         _onDestinationSelected(0);
       },
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: _onDestinationSelected,
-          indicatorColor: ColorConstants.lightPurple,
-          backgroundColor: ColorConstants.ebony,
-          selectedIndex: _currentPageIndex,
-          destinations: _navigationBarItems,
-        ),
-        body: PageView(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _pages,
+        bottomNavigationBar: BottomActionBar(
+          leftItem: BottomActionBarItem(
+            child: MeditoHugeIcon(
+              icon: _currentPageIndex == 0 ? 'filledhome' : 'duohome',
+              color: _currentPageIndex == 0
+                  ? ColorConstants.lightPurple
+                  : ColorConstants.white,
+            ),
+            onTap: () => _onDestinationSelected(0),
+          ),
+          leftCenterItem: BottomActionBarItem(
+            child: GestureDetector(
+              onDoubleTap: () {
+                if (_currentPageIndex == 1) {
+                  _searchFocusNode.requestFocus();
+                } else {
+                  _onDestinationSelected(1);
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _searchFocusNode.requestFocus();
+                  });
+                }
+              },
+              child: MeditoHugeIcon(
+                icon: _currentPageIndex == 1 ? 'filledSearch' : 'duoSearch',
+                color: _currentPageIndex == 1
+                    ? ColorConstants.lightPurple
+                    : ColorConstants.white,
               ),
+            ),
+            onTap: () => _onDestinationSelected(1),
+          ),
+          // rightCenterItem: BottomActionBarItem(
+          //   child: MeditoHugeIcon(
+          //     icon: _currentPageIndex == 2 ? 'filledPath' : 'duoPath',
+          //     color: _currentPageIndex == 2
+          //         ? ColorConstants.lightPurple
+          //         : ColorConstants.white,
+          //   ),
+          //   onTap: () => _onDestinationSelected(2),
+          // ),
+          rightItem: BottomActionBarItem(
+            child: MeditoHugeIcon(
+              icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
+              color: _currentPageIndex == 2
+                  ? ColorConstants.lightPurple
+                  : ColorConstants.white,
+            ),
+            onTap: () => _onDestinationSelected(2),
+          ),
+        ),
+        body: IndexedStack(
+          index: _currentPageIndex,
+          children: _pages,
+        ),
       ),
     );
   }
 
   void _onDestinationSelected(int index) {
-    setState(() {
-      _currentPageIndex = index;
-      _pageController.jumpToPage(index);
-    });
-  }
-
-  void _onPageChanged(int index) {
+    if (_currentPageIndex == 1 && index != 1) {
+      _searchFocusNode.unfocus();
+    }
     setState(() {
       _currentPageIndex = index;
     });

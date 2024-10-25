@@ -1,0 +1,5 @@
+#include "Generated.xcconfig"
+FLUTTER_TARGET=lib/main_prod.dart
+ASSET_PREFIX=prod
+BUNDLE_NAME=Medito
+BUNDLE_DISPLAY_NAME=Medito

@@ -1,3 +1,4 @@
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,32 +20,32 @@ class TrackViewBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final favoriteStatus = ref.watch(favoriteStatusProvider(trackId: trackId));
 
-    final dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
+    const dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
     var isDailyMeditation = trackId == dailyMeditationId;
-    var colour = favoriteStatus
-        ? ColorConstants.lightPurple
-        : ColorConstants.walterWhite;
+    var colour =
+        favoriteStatus ? ColorConstants.lightPurple : ColorConstants.white;
+    var icon = favoriteStatus
+        ? HugeIcons.solidRoundedStar
+        : HugeIcons.strokeRoundedStar;
 
     return BottomActionBar(
-      actions: [
-        IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: onBackPressed,
-        ),
-        isDailyMeditation
-            ? Container()
-            : IconButton(
-                icon: Icon(
-                  Icons.star,
-                  color: colour,
-                ),
-                onPressed: () {
-                  ref
-                      .read(favoriteStatusProvider(trackId: trackId).notifier)
-                      .toggle();
-                },
+      leftItem: BottomActionBarItem(
+        child: HugeIcon(icon: HugeIcons.solidSharpArrowLeft02, color: Colors.white,),
+        onTap: onBackPressed,
+      ),
+      rightItem: isDailyMeditation
+          ? null
+          : BottomActionBarItem(
+              child: HugeIcon(
+                icon: icon,
+                color: colour,
               ),
-      ],
+              onTap: () {
+                ref
+                    .read(favoriteStatusProvider(trackId: trackId).notifier)
+                    .toggle();
+              },
+            ),
     );
   }
 }

@@ -1,13 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../../../providers/home/home_provider.dart';
+import '../../../../widgets/medito_huge_icon.dart';
 import '../animated_scale_widget.dart';
 
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {
@@ -38,7 +39,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   ) async {
     await handleNavigation(
       element.type,
-      [element.path.toString().getIdFromPath(), element.path],
+      [element.path.toString().getIdFromPath()],
       context,
       ref: ref,
     );
@@ -55,11 +56,11 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     int oldIndex,
     int newIndex,
   ) async {
-    var _data = [...data];
-    final element = _data.removeAt(oldIndex);
-    _data.insert(newIndex, element);
-    data = _data;
-    var ids = _data.map((e) => e.id).toList();
+    var updatedData = [...data];
+    final element = updatedData.removeAt(oldIndex);
+    updatedData.insert(newIndex, element);
+    data = updatedData;
+    var ids = updatedData.map((e) => e.id).whereType<String>().toList();
     await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
 
     await ref.read(refreshHomeAPIsProvider.future);
@@ -75,8 +76,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   @override
   Widget build(BuildContext context) {
     return ReorderableWrap(
-      spacing: 10.0,
-      runSpacing: 10.0,
+      spacing: 16.0,
+      runSpacing: 8.0,
       padding: EdgeInsets.zero,
       maxMainAxisCount: 2,
       minMainAxisCount: 2,
@@ -87,8 +88,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   List<Widget> _getShortcutsItemWidgetList() {
     var size = MediaQuery.of(context).size;
-    final containerHeight = 56.0;
-    final containerWidth = (size.width / 2) - (padding20 + 2);
+    const containerHeight = 48.0;
+    final containerWidth = (size.width / 2) - 19;
 
     return data
         .map((e) => AnimatedScaleWidget(
@@ -100,21 +101,42 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                     height: containerHeight,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
-                      color: ColorConstants.onyx,
+                      color: e.isHighlighted
+                          ? ColorConstants.brightSky
+                          : ColorConstants.onyx,
                     ),
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     constraints: BoxConstraints(
                       maxWidth: containerWidth,
                       minWidth: containerWidth,
                     ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '${e.title}',
-                        style: Theme.of(context).textTheme.titleSmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    child: Row(
+                      children: [
+                        MeditoHugeIcon(
+                          icon: e.icon ?? '',
+                          size: 18,
+                          color: e.isHighlighted
+                              ? ColorConstants.onyx
+                              : ColorConstants.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            e.title ?? '',
+                            style: TextStyle(
+                              fontFamily: teachers,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              height: 22 / 16,
+                              color: e.isHighlighted
+                                  ? ColorConstants.onyx
+                                  : ColorConstants.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

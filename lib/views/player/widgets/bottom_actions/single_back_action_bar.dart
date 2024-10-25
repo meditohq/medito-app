@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
+import '../../../../constants/colors/color_constants.dart';
 import 'bottom_action_bar.dart';
 
 class SingleBackButtonActionBar extends StatelessWidget {
@@ -9,23 +11,19 @@ class SingleBackButtonActionBar extends StatelessWidget {
     this.showCloseIcon = false,
   });
 
-  final void Function() onBackPressed;
+  final VoidCallback onBackPressed;
   final bool showCloseIcon;
 
   @override
   Widget build(BuildContext context) {
     return BottomActionBar(
-      actions: [
-        GestureDetector(
-          onTap: onBackPressed,
-          child: Icon(
-            showCloseIcon ? Icons.close : Icons.arrow_back,
-            color: Colors.white,
-          ),
+      leftItem: BottomActionBarItem(
+        child: HugeIcon(
+          icon: showCloseIcon ? HugeIcons.solidSharpMultiplicationSign : HugeIcons.solidSharpArrowLeft02,
+          color: ColorConstants.white,
         ),
-        SizedBox.shrink(),
-        SizedBox.shrink(),
-      ],
+        onTap: onBackPressed,
+      ),
     );
   }
 }

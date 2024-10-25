@@ -1,41 +1,108 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
+
+class EnvConfig {
+  final String environment;
+  final String contentBaseUrl;
+  final String authBaseUrl;
+  final String authToken;
+  final String sentryDsn;
+  final String supabaseKey;
+  final String supabaseUrl;
+  final String editStatsUrl;
+
+  const EnvConfig({
+    required this.environment,
+    required this.contentBaseUrl,
+    required this.authBaseUrl,
+    required this.authToken,
+    required this.sentryDsn,
+    required this.supabaseKey,
+    required this.supabaseUrl,
+    required this.editStatsUrl,
+  });
+}
+
+class ProdEnv extends EnvConfig {
+  const ProdEnv({
+    required super.environment,
+    required super.contentBaseUrl,
+    required super.authBaseUrl,
+    required super.authToken,
+    required super.sentryDsn,
+    required super.supabaseKey,
+    required super.supabaseUrl,
+    required super.editStatsUrl,
+  });
+}
+
+class StagingEnv extends EnvConfig {
+  const StagingEnv({
+    required super.environment,
+    required super.contentBaseUrl,
+    required super.authBaseUrl,
+    required super.authToken,
+    required super.sentryDsn,
+    required super.supabaseKey,
+    required super.supabaseUrl,
+    required super.editStatsUrl,
+  });
+}
+
+const _prodEnv = ProdEnv(
+  supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
+  supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
+  environment: String.fromEnvironment('ENVIRONMENT'),
+  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL_V2'),
+  authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
+  authToken: String.fromEnvironment('AUTH_TOKEN'),
+  sentryDsn: String.fromEnvironment('SENTRY_DSN'),
+  editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+);
+
+const _stagingEnv = StagingEnv(
+  supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
+  supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
+  environment: String.fromEnvironment('ENVIRONMENT'),
+  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL_V2'),
+  authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
+  authToken: String.fromEnvironment('AUTH_TOKEN'),
+  sentryDsn: String.fromEnvironment('SENTRY_DSN'),
+  editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+);
+
+EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
+
+String get supabaseUrl => _currentEnv.supabaseUrl;
+String get supabaseKey => _currentEnv.supabaseKey;
+String get environment => _currentEnv.environment;
+String get contentBaseUrl => _currentEnv.contentBaseUrl;
+String get authBaseUrl => _currentEnv.authBaseUrl;
+String get authToken => _currentEnv.authToken;
+String get sentryDsn => _currentEnv.sentryDsn;
+String get editStatsUrl => _currentEnv.editStatsUrl;
 
 class HTTPConstants {
-  static String ENVIRONMENT = dotenv.env['ENVIRONMENT']!;
-  static String ENVIRONMENT_DEBUG = dotenv.env['ENVIRONMENT_DEBUG']!;
-  static String CONTENT_BASE_URL = dotenv.env['CONTENT_BASE_URL']!;
-  static String AUTH_BASE_URL = dotenv.env['AUTH_BASE_URL']!;
-  static String AUTH_TOKEN = dotenv.env['AUTH_TOKEN']!;
-  static String SENTRY_DSN = dotenv.env['SENTRY_DSN']!;
-
   //END POINTS
-  static const String TOKENS = 'tokens';
-  static const String USERS = 'users';
-  static const String OTP = 'otp';
-  static const String PACKS = 'packs';
-  static const String TRACKS = 'tracks';
-  static const String BACKGROUND_SOUNDS = 'backgroundsounds';
-  static const String HOME = 'home';
-  static const String LATEST_ANNOUNCEMENT = 'announcements?latest=true';
-  static const String HEADER = 'main/header';
-  static const String QUOTE = 'main/quote';
-  static const String SHORTCUTS = 'main/shortcuts';
-  static const String EDITORIAL = 'main/editorial';
-  static const String STATS = '/stats';
-  static const String ME = 'me';
-  static const String SEARCH = 'search';
+  static const String tokens = 'tokens';
+  static const String packs = 'packs';
+  static const String tracks = 'tracks';
+  static const String backgroundSounds = 'backgroundsounds';
+  static const String home = 'home';
+  static const String latestAnnouncement = 'announcements?latest=true';
+  static const String allStats = '/stats';
+  static const String me = 'me';
+  static const String searchTracks = 'search/tracks';
 
   // MAINTENANCE END POINTS
-  static const String MAINTENANCE = 'https://api.medito.app/v1/maintenance';
+  static String maintenance = '${contentBaseUrl}maintenance';
 
   // EVENT END POINTS
-  static const String AUDIO = '/audio';
-  static const String AUDIO_START_EVENT = '/start';
-  static const String ANNOUNCEMENT_EVENT = '/announcements';
-  static const String ANNOUNCEMENT_DISMISS_EVENT = '/dismiss';
-  static const String COMPLETE_EVENT = '/complete';
-  static const String FIREBASE_EVENT = '/fcm';
-  static const String RATE = '/rate';
-  static const String LIKE = '/like';
-  static const String DONATE = '/donations/asks?random=true';
+  static const String audio = '/audio';
+  static const String announcementEvent = '/announcements';
+  static const String announcementDismissEvent = '/dismiss';
+  static const String completeEvent = '/complete';
+  static const String firebaseEvent = '/fcm';
+  static const String rate = '/rate';
+  static const String favorite = '/favorite';
+  static const String donate = '/donations/asks?random=true';
 }

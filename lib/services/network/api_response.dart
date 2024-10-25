@@ -1,18 +1,3 @@
-/*This file is part of Medito App.
-
-Medito App is free software: you can redistribute it and/or modify
-it under the terms of the Affero GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Medito App is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-Affero GNU General Public License for more details.
-
-You should have received a copy of the Affero GNU General Public License
-along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-
 import 'package:equatable/equatable.dart';
 
 class ApiResponse<T> extends Equatable {
@@ -21,20 +6,20 @@ class ApiResponse<T> extends Equatable {
   final String? message;
   final int? statusCode;
 
-  ApiResponse.loading()
-      : status = Status.LOADING,
+  const ApiResponse.loading()
+      : status = Status.loading,
         body = null,
         statusCode = null,
         message = '';
 
-  ApiResponse.completed(this.body)
-      : status = Status.COMPLETED,
+  const ApiResponse.completed(this.body)
+      : status = Status.completed,
         statusCode = null,
         message = '';
 
   ApiResponse.error(
     String? message,
-  )   : status = Status.ERROR,
+  )   : status = Status.error,
         message = message?.split(',').first,
         statusCode = message?.split(',').last != null
             ? int.parse(message!.split(',').last)
@@ -42,7 +27,7 @@ class ApiResponse<T> extends Equatable {
         body = null;
 
   bool hasData() {
-    return status != Status.LOADING && body != null;
+    return status != Status.loading && body != null;
   }
 
   @override
@@ -54,4 +39,4 @@ class ApiResponse<T> extends Equatable {
   List<Object?> get props => [status, body, message];
 }
 
-enum Status { LOADING, COMPLETED, ERROR }
+enum Status { loading, completed, error }

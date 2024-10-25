@@ -12,7 +12,7 @@ class BackgroundSoundsShimmerWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          BoxShimmerWidget(
+          const BoxShimmerWidget(
             height: 130,
           ),
           height8,
@@ -31,19 +31,19 @@ class BackgroundSoundsShimmerWidget extends StatelessWidget {
         height: 100,
         width: size.width,
         color: ColorConstants.greyIsTheNewGrey,
-        child: Column(
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               child: BoxShimmerWidget(
                 height: 10,
                 width: 300,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               child: BoxShimmerWidget(
                 height: 10,
                 width: 200,

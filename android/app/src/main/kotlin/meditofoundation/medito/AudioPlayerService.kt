@@ -28,8 +28,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.MediaStyleNotificationHelper
-import com.meditofoundation.medito.MainActivity
-import com.meditofoundation.medito.SharedPreferencesManager
 import io.flutter.embedding.engine.FlutterEngineCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -8,7 +8,6 @@ part 'home_model.g.dart';
 class HomeModel with _$HomeModel {
   const factory HomeModel({
     String? greeting,
-    @Default(<HomeMenuModel>[]) List<HomeMenuModel> menu,
     @Default(<ShortcutsModel>[]) List<ShortcutsModel> shortcuts,
     @Default(<HomeCarouselModel>[]) List<HomeCarouselModel> carousel,
     HomeQuoteModel? todayQuote,
@@ -19,32 +18,35 @@ class HomeModel with _$HomeModel {
 }
 
 @freezed
-class HomeMenuModel with _$HomeMenuModel {
-  const factory HomeMenuModel({
-    required String id,
-    required String type,
-    required String title,
-    required String icon,
-    required String path,
-  }) = _HomeMenuModel;
-
-  factory HomeMenuModel.fromJson(Map<String, dynamic> json) =>
-      _$HomeMenuModelFromJson(json);
-}
-
-@freezed
 class HomeCarouselModel with _$HomeCarouselModel {
   const factory HomeCarouselModel({
     required String id,
     required String title,
     required String subtitle,
     required String coverUrl,
-    required String path,
-    required String type,
+    required String? path,
+    required String? type,
+    List<CarouselButton>? buttons,
+    @Default(false) bool showBanner,
+    String? bannerColor,
+    String? bannerLabelColor,
+    String? bannerLabel,
   }) = _HomeCarouselModel;
 
   factory HomeCarouselModel.fromJson(Map<String, dynamic> json) =>
       _$HomeCarouselModelFromJson(json);
+}
+
+@freezed
+class CarouselButton with _$CarouselButton {
+  const factory CarouselButton({
+    required String title,
+    required String path,
+    required String type,
+  }) = _CarouselButton;
+
+  factory CarouselButton.fromJson(Map<String, dynamic> json) =>
+      _$CarouselButtonFromJson(json);
 }
 
 @freezed

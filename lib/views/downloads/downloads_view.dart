@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
@@ -50,7 +51,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             ref.read(refreshHomeAPIsProvider.future);
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => BottomNavigationBarView(),
+                builder: (context) => const BottomNavigationBarView(),
               ),
             );
           }
@@ -122,16 +123,16 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   Widget _getDismissibleBackgroundWidget() => Container(
         color: ColorConstants.charcoal,
-        child: const Padding(
-          padding: EdgeInsets.all(24.0),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Spacer(),
-              Icon(
-                Icons.delete,
-                color: Colors.redAccent,
+              const Spacer(),
+              HugeIcon(
+                icon: HugeIcons.solidSharpDelete02,
+                color: Colors.redAccent
               ),
             ],
           ),
@@ -145,7 +146,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             .toString();
     var guideName = item.audio.first.guideName;
     var duration = _getDuration(audioLength);
-    var subTitle = guideName != null ? '$guideName — $duration' : '$duration';
+    var subTitle = guideName != null ? '$guideName — $duration' : duration;
 
     return DownloadListItemWidget(
       PackImageListItemData(
@@ -183,7 +184,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(StringConstants.confirmDeletionTitle),
-          content: Text(StringConstants.confirmDeletionMessage + ' ${item.title}?'),
+          content: Text(
+            '${StringConstants.confirmDeletionMessage} ${item.title}?',
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -209,7 +212,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       createSnackBar(
         '"${item.title}" ${StringConstants.removed.toLowerCase()}',
         context,
-        color: ColorConstants.walterWhite,
+        color: ColorConstants.white,
       );
     } else {
       // If the user cancels, refresh the list to ensure all items are visible again.

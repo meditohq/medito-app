@@ -34,8 +34,8 @@ class PackItemWidget extends StatelessWidget {
                         Text(
                           item.title,
                           style: bodyLarge?.copyWith(
-                            color: ColorConstants.walterWhite,
-                            fontFamily: DmSans,
+                            color: ColorConstants.white,
+                            fontFamily: dmSans,
                             fontSize: 16,
                           ),
                         ),
@@ -46,7 +46,7 @@ class PackItemWidget extends StatelessWidget {
                             child: Text(
                               item.subtitle ?? '',
                               style: bodyLarge?.copyWith(
-                                fontFamily: DmMono,
+                                fontFamily: dmMono,
                                 color: ColorConstants.graphite,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -70,12 +70,12 @@ class PackItemWidget extends StatelessWidget {
     if (type == TypeConstants.link) {
       return SvgPicture.asset(AssetConstants.icLink);
     } else if (type == TypeConstants.track && isCompletedTrack == true) {
-      return Icon(
+      return const Icon(
         color: ColorConstants.graphite,
         Icons.check,
       );
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }

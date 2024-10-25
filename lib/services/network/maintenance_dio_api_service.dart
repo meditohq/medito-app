@@ -15,7 +15,7 @@ class MaintenanceDioApiService {
   MaintenanceDioApiService._internal() {
     dio = Dio()
       ..options = BaseOptions(
-        baseUrl: HTTPConstants.MAINTENANCE,
+        baseUrl: HTTPConstants.maintenance,
       );
   }
 
@@ -26,7 +26,7 @@ class MaintenanceDioApiService {
       return response.data as Map<String, Object?>;
     } on DioException catch (err) {
       if (kDebugMode) {
-        print('maintenance request error: ' + err.toString());
+        print('maintenance request error: $err');
       }
       rethrow;
     }

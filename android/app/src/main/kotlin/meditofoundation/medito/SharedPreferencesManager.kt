@@ -1,4 +1,4 @@
-package com.meditofoundation.medito
+package meditofoundation.medito
 
 import CompletionData
 import android.content.Context

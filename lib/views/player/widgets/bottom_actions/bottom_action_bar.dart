@@ -1,42 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../constants/colors/color_constants.dart';
+
+class BottomActionBarItem {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const BottomActionBarItem({required this.child, required this.onTap});
+}
+
 class BottomActionBar extends StatelessWidget {
   const BottomActionBar({
-    Key? key,
-    required this.actions,
+    super.key,
+    this.leftItem,
+    this.leftCenterItem,
+    this.rightCenterItem,
+    this.rightItem,
     this.height = 80.0,
     this.showBackground = false,
-  }) : super(key: key);
+  });
 
-  final List<Widget> actions;
+  final BottomActionBarItem? leftItem;
+  final BottomActionBarItem? leftCenterItem;
+  final BottomActionBarItem? rightCenterItem;
+  final BottomActionBarItem? rightItem;
   final double height;
   final bool showBackground;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      decoration: BoxDecoration(
-        color: showBackground ? Colors.black.withOpacity(0.2) : Colors.transparent,
-      ),
-      child: SafeArea(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: actions.map((widget) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _wrapWithConsumer(widget),
-            );
-          }).toList(),
+    final items = [leftItem, leftCenterItem, rightCenterItem, rightItem]
+        .where((item) => item != null)
+        .toList();
+
+    return SafeArea(
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: showBackground
+              ? ColorConstants.black.withOpacity(0.2)
+              : ColorConstants.transparent,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: items.length == 3
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.spaceBetween,
+            children: items.map((item) => _buildActionItem(item!)).toList(),
+          ),
         ),
       ),
     );
   }
 
-  Widget _wrapWithConsumer(Widget widget) {
-    return widget is ConsumerWidget ? widget : Consumer(builder: (_, __, ___) => widget);
+  Widget _buildActionItem(BottomActionBarItem item) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: item.onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: item.child is ConsumerWidget
+            ? item.child
+            : Consumer(builder: (_, __, ___) => item.child),
+      ),
+    );
   }
 }

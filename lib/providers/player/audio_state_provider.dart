@@ -5,7 +5,6 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
-import '../../utils/call_update_stats.dart';
 import '../../utils/stats_updater.dart';
 import '../root/root_combine_provider.dart';
 
@@ -126,4 +125,8 @@ extension PlaybackStateExt on PlaybackState {
       track: track ?? this.track,
     );
   }
+}
+
+class UpdateStatsConstants {
+  static const userTokenKey = 'userToken';
 }

@@ -1,8 +1,6 @@
 plugins {
     id 'com.android.application'
-    // START: FlutterFire Configuration
     id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
     id 'kotlin-android'
     id 'dev.flutter.flutter-gradle-plugin'
 }
@@ -74,7 +72,7 @@ android {
     defaultConfig {
         applicationId project.APP_ID
         minSdkVersion Math.max(flutter.minSdkVersion, 26)
-        targetSdkVersion 34  // Update this
+        targetSdkVersion 34 
         versionCode project.VERSION_CODE
         versionName project.VERSION_NAME
         multiDexEnabled true
@@ -93,6 +91,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "default"
+    productFlavors {
+        dev {
+            dimension "default"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        prod {
+            dimension "default"
+        }
+    }
 }
 
 flutter {
@@ -103,7 +113,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation platform('com.google.firebase:firebase-bom:33.2.0')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation "androidx.multidex:multidex:2.0.1"
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.1'
 
     // Media3 dependencies

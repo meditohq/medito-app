@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:medito/models/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/models/models.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/utils.dart';
-import '../events/events_provider.dart';
 import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
@@ -33,27 +31,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     var track = trackModel.customCopyWith();
     var audios = [...track.audio];
 
-    ref.read(playerProvider.notifier).handleAudioStartedEvent(
-          track.audio
-                  .where((e) => e.files.any((f) => f.duration == file.duration))
-                  .first
-                  .guideName ??
-              '-',
-          track.id,
-          file.id,
-          file.duration,
-        );
-
-    audios.forEach((audioModel) {
+    for (var audioModel in audios) {
       var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
       if (fileIndex != -1) {
         track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
         track.audio.first.files
             .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
-
-        return;
       }
-    });
+    }
 
     await _playTrack(
       ref,
@@ -85,7 +70,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       await _androidServiceApi.startService();
       // wait half a sec for the service to start
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       await _api.playAudio(
         AudioData(
@@ -100,42 +85,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   }
 
   String? getUserToken() {
-    var user = ref
+    return ref
         .read(sharedPreferencesProvider)
         .getString(SharedPreferenceConstants.userToken);
-    var userModel =
-        user != null ? UserTokenModel.fromJson(json.decode(user)) : null;
-    if (userModel != null) {
-      return userModel.token;
-    }
-
-    return null;
   }
 
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
-  void handleAudioStartedEvent(
-    String guide,
-    String trackId,
-    String audioFileId,
-    int duration,
-  ) {
-    var audio = AudioStartedModel(
-      fileId: audioFileId,
-      fileDuration: duration,
-      fileGuide: guide,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-    );
-    ref.read(
-      audioStartedEventProvider(
-        event: audio.toJson().map(
-          (key, value) => MapEntry(key, value.toString()),
-        ),
-        trackId: trackId,
-      ),
-    );
-  }
 
   Future<void> seekToPosition(int position) async {
     if (Platform.isAndroid) {
@@ -165,7 +122,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsForward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position + Duration(seconds: 10));
+      iosAudioHandler.seek(
+        iosAudioHandler.position + const Duration(seconds: 10),
+      );
     }
   }
 
@@ -173,7 +132,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     if (Platform.isAndroid) {
       _api.skip10SecondsBackward();
     } else {
-      iosAudioHandler.seek(iosAudioHandler.position - Duration(seconds: 10));
+      iosAudioHandler.seek(
+        iosAudioHandler.position - const Duration(seconds: 10),
+      );
     }
   }
 
@@ -188,7 +149,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       }
     }
   }
-
 }
 
 const audioPercentageListened = 0.8;

@@ -5,6 +5,7 @@ import 'package:medito/models/models.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:intl/intl.dart';
 
 part 'device_and_app_info_repository.g.dart';
 
@@ -17,14 +18,15 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
 
   @override
   Future<DeviceAndAppInfoModel> getDeviceAndAppInfo() async {
-    var deviceModel;
-    var deviceOS;
-    var devicePlatform;
-    var buildNumber;
-    var appVersion;
+    String? deviceModel;
+    String? deviceOS;
+    String? devicePlatform;
+    String buildNumber;
+    String appVersion;
     var deviceInfo = DeviceInfoPlugin();
     var packageInfo = await PackageInfo.fromPlatform();
     var languageCode = PlatformDispatcher.instance.locale.languageCode;
+    var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName;
 
     appVersion = packageInfo.version;
     buildNumber = packageInfo.buildNumber;
@@ -41,16 +43,15 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
       devicePlatform = 'android';
     }
 
-    var data = {
-      'model': deviceModel,
-      'os': deviceOS,
-      'platform': devicePlatform,
-      'buildNumber': buildNumber,
-      'appVersion': appVersion,
-      'languageCode': languageCode,
-    };
-
-    return DeviceAndAppInfoModel.fromJson(data);
+    return DeviceAndAppInfoModel(
+      model: deviceModel!,
+      os: deviceOS!,
+      platform: devicePlatform!,
+      buildNumber: buildNumber,
+      appVersion: appVersion,
+      languageCode: languageCode,
+      currencyName: currencyName ?? '',
+    );
   }
 }
 

@@ -12,7 +12,7 @@ class HandleBarWidget extends StatelessWidget {
       height: 4,
       width: 44,
       decoration: BoxDecoration(
-        color: ColorConstants.walterWhite,
+        color: ColorConstants.white,
         borderRadius: BorderRadius.circular(12),
       ),
     );

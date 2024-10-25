@@ -23,14 +23,13 @@ class DebugBottomSheetWidget extends ConsumerWidget {
               context,
               data,
             ),
-            error: (err, stack) => Expanded(
-              child: MeditoErrorWidget(
-                message: err.toString(),
-                onTap: () => ref.refresh(meProvider),
-              ),
+            error: (err, stack) => MeditoErrorWidget(
+              message: err.toString(),
+              onTap: () => ref.refresh(meProvider),
             ),
-            loading: () => Expanded(
-              child: Center(
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
                 child: CircularProgressIndicator(),
               ),
             ),
@@ -41,9 +40,9 @@ class DebugBottomSheetWidget extends ConsumerWidget {
   }
 
   Column _debugItemsList(
-      BuildContext context,
-      String info,
-      ) {
+    BuildContext context,
+    String info,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -52,7 +51,7 @@ class DebugBottomSheetWidget extends ConsumerWidget {
           info,
         ),
         ElevatedButton(
-          child: Text(StringConstants.copy),
+          child: const Text(StringConstants.copy),
           onPressed: () => _handleCopy(context, info),
         ),
       ],
@@ -65,19 +64,19 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SelectableText(
-        '$info',
+        info,
         style: labelMedium,
       ),
     );
   }
 
   void _handleCopy(BuildContext context, String deviceInfo) {
-    var _info =
+    var info =
         '${StringConstants.debugInfo}\n$deviceInfo\n${StringConstants.writeBelowThisLine}';
 
-    Clipboard.setData(ClipboardData(text: _info)).then((_) {
+    Clipboard.setData(ClipboardData(text: info)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text(StringConstants.debugInfoCopied),
           backgroundColor: ColorConstants.ebony,
         ),

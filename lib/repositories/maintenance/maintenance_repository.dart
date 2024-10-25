@@ -19,12 +19,12 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
       var response = await client.getRequest();
 
       if (response == null) {
-        return MaintenanceModel();
+        return const MaintenanceModel();
       }
 
       return MaintenanceModel.fromJson(response);
     } catch (e) {
-      return MaintenanceModel();
+      return const MaintenanceModel();
     }
   }
 }

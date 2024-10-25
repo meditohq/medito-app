@@ -11,8 +11,8 @@ class HeaderAndAnnouncementShimmerWidget extends StatelessWidget {
     return Column(
       children: [
         _header(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: padding20),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: padding16),
           child: BoxShimmerWidget(
             height: 200,
             borderRadius: 12,
@@ -23,9 +23,9 @@ class HeaderAndAnnouncementShimmerWidget extends StatelessWidget {
   }
 
   Padding _header() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: padding20,
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: padding16,
         vertical: padding16,
       ),
       child: Row(

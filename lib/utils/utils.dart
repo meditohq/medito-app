@@ -1,23 +1,8 @@
-/*This file is part of Medito App.
-
-Medito App is free software: you can redistribute it and/or modify
-it under the terms of the Affero GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Medito App is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-Affero GNU General Public License for more details.
-
-You should have received a copy of the Affero GNU General Public License
-along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
-
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -27,18 +12,22 @@ import 'package:url_launcher/url_launcher.dart';
 
 Color parseColor(String? color) {
   if (color == null || color.isEmpty) return ColorConstants.ebony;
-
-  return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
+  try {
+    return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
+  } catch (e) {
+    return ColorConstants.ebony;
+  }
 }
 
-void createSnackBar(String message,
-    BuildContext context, {
-      Color color = Colors.red,
-    }) {
+void createSnackBar(
+  String message,
+  BuildContext context, {
+  Color color = Colors.red,
+}) {
   final snackBar = SnackBar(
     content: Text(message),
     backgroundColor: color,
-    duration: Duration(seconds: 6),
+    duration: const Duration(seconds: 6),
   );
 
   try {
@@ -72,7 +61,8 @@ Future<void> launchURLInBrowser(String url) async {
   }
 }
 
-Future<void> launchEmailSubmission(String href, {
+Future<void> launchEmailSubmission(
+  String href, {
   String? subject,
   String? body,
 }) async {
@@ -81,8 +71,8 @@ Future<void> launchEmailSubmission(String href, {
     query = 'subject=$subject';
   }
   if (body != null) {
-    var _body = body.replaceAll('\n', '\r\n');
-    query = query != '' ? '$query&body=$_body' : 'body=$_body';
+    var newBody = body.replaceAll('\n', '\r\n');
+    query = query != '' ? '$query&body=$newBody' : 'body=$newBody';
   }
 
   final params = Uri(
@@ -97,7 +87,9 @@ Future<void> launchEmailSubmission(String href, {
 }
 
 int convertDurationToMinutes({required int milliseconds}) {
-  return Duration(milliseconds: milliseconds).inMinutes;
+  const millisecondsPerMinute = 60000;
+
+  return (milliseconds.abs() / millisecondsPerMinute).round();
 }
 
 //ignore: prefer-match-file-name
@@ -118,9 +110,7 @@ String getAudioFileExtension(String path) {
   var lastIndex = path.lastIndexOf('/');
   if (lastIndex != -1) {
     var filenameWithQuery = path.substring(lastIndex + 1);
-    var filename = Uri.decodeFull(filenameWithQuery
-        .split('?')
-        .first);
+    var filename = Uri.decodeFull(filenameWithQuery.split('?').first);
     var dotIndex = filename.lastIndexOf('.');
     if (dotIndex != -1) {
       var fileExtension = filename.substring(dotIndex + 1);
@@ -134,8 +124,11 @@ String getAudioFileExtension(String path) {
 
 Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
   try {
+    // Add a small delay to ensure widget has updated
+    await Future.delayed(const Duration(milliseconds: 100));
+    
     RenderRepaintBoundary boundary =
-    globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData!.buffer.asUint8List();
@@ -148,11 +141,15 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
     final file = File('${appDir.path}/stats.png');
 
     await file.writeAsBytes(pngBytes);
-    print('File saved at: ${file.path}');
+    if (kDebugMode) {
+      print('File saved at: ${file.path}');
+    }
 
     return file;
   } catch (e) {
-    print('Error in capturePng: $e');
+    if (kDebugMode) {
+      print('Error in capturePng: $e');
+    }
     return null;
   }
 }

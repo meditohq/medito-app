@@ -7,13 +7,12 @@ on:
 
 env:
   FLUTTER_VERSION: '3.x'
-  RUBY_VERSION: '3.x'
 
 jobs:
   build-and-deploy:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
@@ -30,12 +29,12 @@ jobs:
     - name: Generate code
       run: |
         flutter pub run build_runner build --delete-conflicting-outputs
-        flutter pub run pigeon --input pigeons/messages.dart
+        flutter pub run pigeon --input pigeon_conf.dart
     
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ env.RUBY_VERSION }}
+        ruby-version: 'head'  # This will use the latest stable version
     
     - name: Install Fastlane
       run: gem install fastlane
@@ -62,6 +61,7 @@ jobs:
         GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
       run: |
         echo "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
+        echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
         fastlane ios build
         fastlane ios deploy
     

@@ -26,10 +26,10 @@ class AudioDownloaderProvider extends ChangeNotifier {
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      audioDownloadState[fileName] = AudioDownloadState.DOWNLOADING;
+      audioDownloadState[fileName] = AudioDownloadState.downloading;
       await downloadAudio.downloadFile(
         file.path,
-        name: fileName,
+        fileName: fileName,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             downloadingProgress[fileName] = (received / total * 100);
@@ -38,7 +38,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
         },
       );
       downloadingProgress.remove(fileName);
-      audioDownloadState[fileName] = AudioDownloadState.DOWNLOADED;
+      audioDownloadState[fileName] = AudioDownloadState.downloaded;
       await ref.read(deleteTrackFromPreferenceProvider(
         file: file,
       ).future);
@@ -48,7 +48,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
       ).future);
       notifyListeners();
     } catch (e) {
-      audioDownloadState[fileName] = AudioDownloadState.DOWNLOAD;
+      audioDownloadState[fileName] = AudioDownloadState.download;
       notifyListeners();
       rethrow;
     }
@@ -57,7 +57,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
   Future<void> deleteTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
-    audioDownloadState[fileName] = AudioDownloadState.DOWNLOAD;
+    audioDownloadState[fileName] = AudioDownloadState.download;
     notifyListeners();
   }
 
@@ -65,8 +65,8 @@ class AudioDownloaderProvider extends ChangeNotifier {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
     audioDownloadState[fileName] = audioPath != null
-        ? AudioDownloadState.DOWNLOADED
-        : AudioDownloadState.DOWNLOAD;
+        ? AudioDownloadState.downloaded
+        : AudioDownloadState.download;
     notifyListeners();
 
     return audioPath;
@@ -74,7 +74,7 @@ class AudioDownloaderProvider extends ChangeNotifier {
 }
 
 enum AudioDownloadState {
-  DOWNLOAD,
-  DOWNLOADING,
-  DOWNLOADED,
+  download,
+  downloading,
+  downloaded,
 }

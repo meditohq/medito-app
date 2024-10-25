@@ -55,7 +55,7 @@ class IosAudioHandler extends BaseAudioHandler {
 
   Future<void> _init() async {
     final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.speech());
+    await session.configure(const AudioSessionConfiguration.speech());
 
     iosStateStream.listen(
       (event) {

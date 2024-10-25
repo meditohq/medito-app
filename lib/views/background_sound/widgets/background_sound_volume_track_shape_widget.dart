@@ -21,7 +21,7 @@ class BackgroundSoundVolumeTrackShapeWidget
   }) {
     final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
-    var trackTop;
+    double trackTop;
     trackTop = parentBox.size.height - trackHeight;
     final trackWidth = parentBox.size.width;
 
@@ -52,11 +52,11 @@ class BackgroundSoundVolumeTrackShapeWidget
       thumbCenter: thumbCenter,
     );
     final canvas = context.canvas;
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w500,
-      color: ColorConstants.walterWhite,
-      fontFamily: DmSans,
+      color: ColorConstants.white,
+      fontFamily: dmSans,
     );
     TextPainter textPainter(span) => TextPainter(
           text: span,

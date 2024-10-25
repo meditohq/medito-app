@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -78,16 +78,16 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
       _updateItemsInSavedBgSoundList(sound);
 
       if (sound.title != StringConstants.none) {
-        var name = '${sound.title}.mp3';
+        var fileName = '${sound.title}.mp3';
         final downloadAudio = ref.read(downloaderRepositoryProvider);
-        downloadAudio.getDownloadedFile(name).then((url) {
+        downloadAudio.getDownloadedFile(fileName).then((url) {
           if (url == null) {
             downloadingBgSound = sound;
             notifyListeners();
             downloadAudio
                 .downloadFile(
                   sound.path,
-                  name: name,
+                  fileName: fileName,
                 )
                 .then((_) => downloadingBgSound = null)
                 .then((_) => _play(selectedBgSound?.path))
@@ -134,7 +134,9 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
           await iosBackgroundPlayer.setFilePath(uri);
         }
       } catch (e, s) {
-        print(s);
+        if (kDebugMode) {
+          print(s);
+        }
       }
       unawaited(iosBackgroundPlayer.play());
       _handleFadeAtEndForIos();
@@ -189,7 +191,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void _handleFadeAtEndForIos() {
-    var durationFromEnd = Duration(seconds: 10).inMilliseconds;
+    var durationFromEnd = const Duration(seconds: 10).inMilliseconds;
 
     iosAudioHandler.positionStream.listen(
       (currentPosition) {
@@ -207,7 +209,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   double scaledVolume(double vol) {
-    var scale = Platform.isIOS ? 0.1 : 0.5;
+    var scale = Platform.isIOS ? 0.3 : 0.5;
     return (vol / 100) * scale;
   }
 }

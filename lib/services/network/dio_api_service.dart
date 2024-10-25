@@ -1,9 +1,11 @@
 import 'dart:io';
 
-import 'package:medito/constants/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const _errorKey = 'error';
 const _messageKey = 'message';
@@ -17,23 +19,17 @@ class DioApiService {
     return _instance;
   }
 
-  // Only pass the userToken if you know the headers have not been set in
-  // assignDioHeadersProvider (for example in workManager)
-  void _setToken(String? userToken) {
-    if (userToken != null && userToken.isNotEmpty) {
-      dio.options.headers[HttpHeaders.authorizationHeader] =
-          'Bearer $userToken';
-    }
-  }
-
   // Private constructor
   DioApiService._internal() {
     dio = Dio();
     dio.options = BaseOptions(
-      connectTimeout: Duration(milliseconds: 30000),
-      baseUrl: HTTPConstants.CONTENT_BASE_URL,
+      connectTimeout: const Duration(milliseconds: 30000),
+      baseUrl: contentBaseUrl,
     );
     if (kDebugMode) {
+      dio.interceptors.add(
+        InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
+      );
       dio.interceptors.add(LogInterceptor(
         request: true,
         responseBody: true,
@@ -41,30 +37,30 @@ class DioApiService {
         error: true,
       ));
     }
-    dio.interceptors.add(
-      InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
-    );
   }
 
   Future<void> _onError(
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    await _captureException(err);
+    if (kReleaseMode) {
+      await _captureException(err);
+    }
     handler.reject(err);
   }
 
-  Future<void> _captureException(
-    DioException err,
-  ) async {
+  Future<void> _captureException(dynamic err) async {
+    var exceptionData = {
+      'error': err.toString(),
+      'endpoint':
+          err is DioException ? err.requestOptions.path.toString() : 'Unknown',
+      'response': err is DioException ? err.response.toString() : 'Unknown',
+      'serverMessage': err is DioException ? err.message.toString() : 'Unknown',
+    };
+
     await Sentry.captureException(
-      {
-        'error': err.toString(),
-        'endpoint': err.requestOptions.path.toString(),
-        'response': err.response.toString(),
-        'serverMessage': err.message.toString(),
-      },
-      stackTrace: err.stackTrace,
+      exceptionData,
+      stackTrace: err is DioException ? err.stackTrace : StackTrace.current,
     );
   }
 
@@ -76,6 +72,8 @@ class DioApiService {
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
   }) async {
+    _updateUserWithClientId();
+    _setToken();
     try {
       var response = await dio.get(
         uri,
@@ -94,7 +92,6 @@ class DioApiService {
   // ignore: avoid-dynamic
   Future<dynamic> postRequest(
     String uri, {
-    String? userToken,
     data,
     Map<String, dynamic>? queryParameters,
     Options? options,
@@ -102,8 +99,9 @@ class DioApiService {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    _setToken(userToken);
     try {
+      _updateUserWithClientId();
+      _setToken();
       var response = await dio.post(
         uri,
         data: data,
@@ -129,6 +127,8 @@ class DioApiService {
     CancelToken? cancelToken,
   }) async {
     try {
+      _updateUserWithClientId();
+      _setToken();
       var response = await dio.delete(
         uri,
         data: data,
@@ -145,7 +145,7 @@ class DioApiService {
 
   CustomException _returnDioErrorResponse(DioException error) {
     var data = error.response?.data;
-    var message;
+    String? message;
     if (data is! String) {
       message = data?[_errorKey] ?? data?[_messageKey];
     }
@@ -185,6 +185,33 @@ class DioApiService {
           error.response?.statusCode ?? 500,
           StringConstants.anErrorOccurred,
         );
+    }
+  }
+
+  void _setToken() {
+    var token = Supabase.instance.client.auth.currentSession?.accessToken;
+    if (token != null) {
+      DioApiService().dio.options.headers[HttpHeaders.authorizationHeader] =
+          'Bearer $token';
+    }
+  }
+
+  Future<void> _updateUserWithClientId() async {
+    var prefs = await SharedPreferences.getInstance();
+    var clientId = prefs.getString(SharedPreferenceConstants.userId);
+    var supabase = Supabase.instance.client;
+    var currentUser = supabase.auth.currentUser;
+
+    if (currentUser != null) {
+      try {
+        await supabase.auth.updateUser(
+          UserAttributes(
+            data: {'client_id': clientId},
+          ),
+        );
+      } catch (e) {
+        throw Exception('Error updating user with client ID: ${e.toString()}');
+      }
     }
   }
 }

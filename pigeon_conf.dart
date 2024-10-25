@@ -7,7 +7,7 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/src/audio_pigeon.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-  'android/app/src/main/kotlin/com/meditofoundation/medito/AudioPigeon.g.kt',
+  'android/app/src/main/kotlin/meditofoundation/medito/AudioPigeon.g.kt',
   kotlinOptions: KotlinOptions(),
 ))
 // #enddocregion config

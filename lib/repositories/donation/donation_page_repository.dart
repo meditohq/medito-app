@@ -1,4 +1,3 @@
-
 import 'package:medito/models/events/donation/donation_page_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -20,13 +19,15 @@ class DonationPageRepositoryImpl extends DonationPageRepository {
 
   @override
   Future<DonationPageModel> fetchDonationPage() async {
-    return client.getRequest(HTTPConstants.DONATE).then((response) {
+    return client.getRequest(HTTPConstants.donate).then((response) {
       return DonationPageModel.fromJson(response);
     });
   }
 }
 
 @riverpod
-DonationPageRepositoryImpl donationPageRepository(DonationPageRepositoryRef ref) {
+DonationPageRepositoryImpl donationPageRepository(
+  DonationPageRepositoryRef ref,
+) {
   return DonationPageRepositoryImpl(ref: ref, client: DioApiService());
 }

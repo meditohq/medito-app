@@ -15,23 +15,27 @@ class DonationWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final donationPage = ref.watch(fetchDonationPageProvider);
 
-    return donationPage.when(
-      loading: () => _buildLoadingWidget(),
-      error: (err, _) => _buildErrorWidget(err.toString()),
-      data: (DonationPageModel donationPageModel) =>
-          _buildDonationWidget(context, donationPageModel),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: donationPage.when(
+        loading: () => _buildLoadingWidget(),
+        error: (err, _) => _buildErrorWidget(err.toString()),
+        data: (DonationPageModel donationPageModel) {
+          return _buildDonationWidget(context, donationPageModel);
+        },
+      ),
     );
   }
 
   Widget _buildLoadingWidget() {
-    return Container(
+    return const SizedBox(
       height: 200,
       child: Center(child: CircularProgressIndicator()),
     );
   }
 
   Widget _buildErrorWidget(String err) {
-    return Container(
+    return SizedBox(
       height: 200,
       child: Center(child: Text(err)),
     );
@@ -41,45 +45,84 @@ class DonationWidget extends ConsumerWidget {
     BuildContext context,
     DonationPageModel donationPageModel,
   ) {
-    final textColor = parseColor(donationPageModel.colorText);
-    var bodyLarge = Theme.of(context).textTheme.bodyLarge;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: parseColor(donationPageModel.colorBackground),
+        color: donationPageModel.cardBackgroundColor != null
+            ? parseColor(donationPageModel.cardBackgroundColor!)
+            : ColorConstants.lightPurple,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 15,
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            donationPageModel.title ?? StringConstants.didYouKnow,
-            textAlign: TextAlign.center,
-            style: bodyLarge?.copyWith(fontFamily: SourceSerif, fontSize: 22),
-          ),
-          SizedBox(height: 8),
+          if (donationPageModel.title != null)
+            Text(
+              donationPageModel.title!,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontFamily: teachers,
+                fontSize: 22,
+                color: parseColor(donationPageModel.cardTextColor),
+              ),
+            ),
+          if (donationPageModel.title != null) const SizedBox(height: 8),
           Text(
             donationPageModel.text ??
                 StringConstants.meditoReliesOnYourDonationsToSurvive,
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.left,
             style: TextStyle(
               fontSize: 16,
-              color: textColor,
+              color: parseColor(donationPageModel.cardTextColor),
+              fontWeight: FontWeight.w400,
             ),
           ),
           height20,
-          Container(
-            height: 48,
-            width: MediaQuery.of(context).size.width,
+          _buildButtonRow(donationPageModel.buttons, context),
+          if (donationPageModel.footerText != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                donationPageModel.footerText!,
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: parseColor(donationPageModel.cardTextColor),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButtonRow(List<ButtonModel>? buttons, BuildContext context) {
+    if (buttons == null || buttons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    List<Widget> buttonWidgets = [];
+
+    if (buttons.length == 1) {
+      ButtonModel button = buttons[0];
+
+      return Row(
+        children: [
+          Expanded(
             child: LoadingButtonWidget(
               onPressed: () => handleNavigation(
-                donationPageModel.ctaType,
-                [donationPageModel.ctaPath],
+                button.type,
+                [button.path],
                 context,
               ),
-              btnText: donationPageModel.ctaTitle ?? StringConstants.donateNow,
-              bgColor: ColorConstants.walterWhite,
-              textColor: parseColor(donationPageModel.colorBackground),
+              btnText: button.title ?? StringConstants.donateNow,
+              bgColor: parseColor(button.backgroundColor),
+              textColor: parseColor(button.textColor),
               fontSize: 18,
               fontWeight: FontWeight.w700,
               isLoading: false,
@@ -87,7 +130,39 @@ class DonationWidget extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
+      );
+    } else {
+      for (int i = 0; i < buttons.length; i++) {
+        ButtonModel button = buttons[i];
+
+        buttonWidgets.add(
+          Expanded(
+            child: LoadingButtonWidget(
+              onPressed: () => handleNavigation(
+                button.type,
+                [button.path],
+                context,
+              ),
+              btnText: button.title ?? StringConstants.donateNow,
+              bgColor: parseColor(button.backgroundColor),
+              textColor: parseColor(button.textColor),
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              isLoading: false,
+              borderRadius: 24,
+            ),
+          ),
+        );
+
+        if (i < buttons.length - 1) {
+          buttonWidgets.add(const SizedBox(width: 8));
+        }
+      }
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: buttonWidgets,
+      );
+    }
   }
 }

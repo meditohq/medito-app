@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:medito/firebase_options.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../models/notification/notification_payload_model.dart';
-import '../../providers/events/analytics_configurator.dart';
 import '../../routes/routes.dart';
 import '../../views/bottom_navigation/bottom_navigation_bar_view.dart';
 
@@ -21,7 +19,6 @@ final firebaseMessagingProvider = Provider<FirebaseMessagingHandler>((ref) {
 });
 
 class FirebaseMessagingHandler {
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -29,8 +26,6 @@ class FirebaseMessagingHandler {
     try {
       _configureFirebaseMessaging(context, ref);
       _initializeLocalNotifications(context, ref);
-      await updateAnalyticsCollectionBasedOnConsent();
-      await FirebaseAnalytics.instance.setUserId(id: 'medito_user');
     } catch (e) {
       unawaited(Sentry.captureException(e));
     }
@@ -68,7 +63,6 @@ class FirebaseMessagingHandler {
         }
       },
     );
-
   }
 
   void _handleForegroundMessage(
@@ -133,19 +127,12 @@ class FirebaseMessagingHandler {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => BottomNavigationBarView(),
+          builder: (context) => const BottomNavigationBarView(),
         ),
       );
     }
   }
 
-  Future<String?> getToken() async {
-    return await _messaging.getToken();
-  }
-
-  Future<void> deleteToken() async {
-    await _messaging.deleteToken();
-  }
 }
 
 @pragma('vm:entry-point')

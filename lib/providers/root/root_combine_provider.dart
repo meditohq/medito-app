@@ -1,24 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
-import '../../models/user/user_token_model.dart';
-import '../../utils/call_update_stats.dart';
 import '../../utils/stats_updater.dart';
 import '../../views/maintenance/maintenance_view.dart';
 import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
-    ref.read(fetchStatsProvider);
     ref.read(deviceAppAndUserInfoProvider);
     checkMaintenance(ref, context);
 
@@ -53,15 +49,7 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
 
 Future<String?> getUserToken() async {
   final prefs = await SharedPreferences.getInstance();
-  final userJson = prefs.getString(SharedPreferenceConstants.userToken);
-
-  if (userJson == null) {
-    return null;
-  }
-
-  final userModel = UserTokenModel.fromJson(json.decode(userJson));
-
-  return userModel.token;
+  return prefs.getString(SharedPreferenceConstants.userToken);
 }
 
 void checkMaintenance(ProviderRef<void> ref, BuildContext context) {

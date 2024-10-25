@@ -27,19 +27,19 @@ class MarkdownWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;
-    var walterWhite = ColorConstants.walterWhite.withOpacity(0.9);
+    var walterWhite = ColorConstants.white.withOpacity(0.9);
 
     return Markdown(
       data: body,
       onTapLink: onTapLink ?? (text, href, title) => _linkTap(context, href),
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       selectable: selectable,
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
         p: p ??
             titleMedium?.copyWith(
-              fontFamily: DmMono,
+              fontFamily: dmMono,
               fontSize: pFontSize,
               letterSpacing: 0,
               color: walterWhite,
@@ -47,7 +47,7 @@ class MarkdownWidget extends StatelessWidget {
         textAlign: textAlign ?? WrapAlignment.center,
         a: a ??
             titleMedium?.copyWith(
-              fontFamily: DmMono,
+              fontFamily: dmMono,
               color: walterWhite,
               fontSize: aFontSize,
               fontWeight: FontWeight.w600,

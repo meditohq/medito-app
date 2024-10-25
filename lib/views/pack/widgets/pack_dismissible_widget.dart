@@ -15,7 +15,6 @@ class PackDismissibleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: UniqueKey(),
-
       direction: DismissDirection.endToStart,
       background: _getDismissibleBackgroundWidget(),
       confirmDismiss: (direction) async {
@@ -29,8 +28,8 @@ class PackDismissibleWidget extends StatelessWidget {
 
   Widget _getDismissibleBackgroundWidget() => Container(
         color: ColorConstants.charcoal,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
+        child: const Padding(
+          padding: EdgeInsets.all(24.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -38,7 +37,7 @@ class PackDismissibleWidget extends StatelessWidget {
               Spacer(),
               Icon(
                 Icons.check,
-                color: ColorConstants.walterWhite,
+                color: ColorConstants.white,
               ),
             ],
           ),

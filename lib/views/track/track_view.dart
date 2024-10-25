@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
@@ -197,14 +198,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
   Widget _buildLoadingCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: Colors.black.withOpacity(0.6)),
+      child: Container(color: ColorConstants.black.withOpacity(0.6)),
     );
   }
 
   Widget _buildErrorCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: Colors.black.withOpacity(0.6)),
+      child: Container(color: ColorConstants.black.withOpacity(0.6)),
     );
   }
 
@@ -297,7 +298,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
         height: 56,
         width: isFullWidth ? double.infinity : null,
         decoration: BoxDecoration(
-          color: ColorConstants.walterWhite,
+          color: ColorConstants.white,
           borderRadius: radius,
         ),
         child: const Center(
@@ -315,8 +316,8 @@ class _TrackViewState extends ConsumerState<TrackView> {
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: SourceSerif,
-            color: ColorConstants.walterWhite,
+            fontFamily: sourceSerif,
+            color: ColorConstants.white,
             letterSpacing: 0.2,
             fontSize: 24,
           ),
@@ -332,13 +333,13 @@ class _TrackViewState extends ConsumerState<TrackView> {
         selectable: true,
         textAlign: WrapAlignment.start,
         p: bodyLarge?.copyWith(
-          color: ColorConstants.walterWhite,
-          fontFamily: DmSans,
+          color: ColorConstants.white,
+          fontFamily: dmSans,
           fontSize: 16,
         ),
         a: bodyLarge?.copyWith(
-          color: ColorConstants.walterWhite,
-          fontFamily: DmSans,
+          color: ColorConstants.white,
+          fontFamily: dmSans,
           decoration: TextDecoration.underline,
           fontSize: 16,
         ),
@@ -359,7 +360,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
     setState(() {
       var previousDuration = fileModel?.duration;
       selectedAudio = value;
-      
+
       if (previousDuration != null && value != null) {
         fileModel = _findClosestDurationFile(value.files, previousDuration);
       } else {
@@ -368,9 +369,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
     });
   }
 
-  TrackFilesModel _findClosestDurationFile(List<TrackFilesModel> files, int targetDuration) {
+  TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int targetDuration,
+  ) {
     return files.reduce((a, b) {
-      return (a.duration - targetDuration).abs() < (b.duration - targetDuration).abs() ? a : b;
+      final aDiff = (a.duration - targetDuration).abs();
+      final bDiff = (b.duration - targetDuration).abs();
+      return aDiff < bDiff ? a : b;
     });
   }
 
@@ -401,7 +407,9 @@ class _TrackViewState extends ConsumerState<TrackView> {
             ref.invalidate(packProvider),
           });
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -409,7 +417,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
   Widget _durationDropdown(TrackModel trackModel, {required bool isLandscape}) {
     var audioFiles = trackModel.audio.first.files;
-    var selectedFile = selectedAudio?.files;
+    var selectedFile = selectedAudio?.files ?? audioFiles;
 
     return DropdownWidget<TrackFilesModel>(
       value: fileModel ?? audioFiles.first,
@@ -419,14 +427,13 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomRight: 7,
       bottomLeft: 7,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: audioFiles.first.duration)} ${StringConstants.mins}',
-      items: files(selectedFile ?? audioFiles)
-          .map<DropdownMenuItem<TrackFilesModel>>(
+          '${convertDurationToMinutes(milliseconds: selectedFile.first.duration)} ${StringConstants.min}',
+      items: files(selectedFile).map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,
             child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.mins}',
+              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.min}',
             ),
           );
         },

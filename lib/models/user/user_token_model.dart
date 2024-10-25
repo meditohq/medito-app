@@ -6,8 +6,9 @@ part 'user_token_model.g.dart';
 @freezed
 abstract class UserTokenModel with _$UserTokenModel {
   const factory UserTokenModel({
+    String? token,
+    String? clientId,
     String? email,
-    required String token,
   }) = _UserTokenModel;
 
   factory UserTokenModel.fromJson(Map<String, Object?> json) =>

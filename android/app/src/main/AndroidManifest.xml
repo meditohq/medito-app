@@ -35,13 +35,14 @@
     </queries>
 
     <application
+        android:label="@string/app_name"
+        android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Medito"
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name="com.meditofoundation.medito.MainActivity"
+            android:name=".MainActivity"
             android:allowBackup="false"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
@@ -55,24 +56,26 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
 
+            <!-- Existing intent filter for https links -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="https" />
                 <data android:host="medito.app" />
                 <data android:pathPrefix="/tracks/" />
+                <data android:pathPrefix="/packs/" />
             </intent-filter>
+
+            <!-- New intent filter for custom scheme -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="https" />
-                <data android:host="medito.app" />
+                <data android:scheme="org.meditofoundation" />
+                <data android:host="medito" />
+                <data android:pathPrefix="/tracks/" />
                 <data android:pathPrefix="/packs/" />
             </intent-filter>
 

@@ -11,7 +11,6 @@ import 'package:medito/views/player/widgets/player_buttons/player_buttons_widget
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../constants/strings/string_constants.dart';
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
 
@@ -81,7 +80,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 if (imageUrl.isNotEmpty)
                   FadeInImage.assetNetwork(
                     key: ValueKey(imageUrl),
-                    placeholder: 'assets/images/placeholder.jpg',
+                    placeholder: AssetConstants.placeholder,
                     image: imageUrl,
                     fit: BoxFit.cover,
                     fadeInDuration: const Duration(seconds: 2),
@@ -89,7 +88,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    color: Colors.black.withOpacity(0.3),
+                    color: ColorConstants.black.withOpacity(0.3),
                   ),
                 ),
                 SafeArea(

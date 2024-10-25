@@ -10,7 +10,6 @@ abstract class AnnouncementModel with _$AnnouncementModel {
     required String? text,
     required String? colorBackground,
     required String? colorText,
-    String? icon,
     String? ctaTitle,
     String? ctaType,
     String? ctaPath,

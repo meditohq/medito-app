@@ -6,17 +6,17 @@ InputDecorationTheme inputDecorationTheme() {
   var outlineInputBorder = _outlineInputBorder();
 
   return InputDecorationTheme(
-    labelStyle: TextStyle(
+    labelStyle: const TextStyle(
       fontSize: 14.0,
       fontStyle: FontStyle.normal,
-      color: ColorConstants.walterWhite,
-      fontFamily: DmSans,
+      color: ColorConstants.white,
+      fontFamily: dmSans,
     ),
-    floatingLabelStyle: TextStyle(
+    floatingLabelStyle: const TextStyle(
       fontSize: 15.0,
       fontStyle: FontStyle.normal,
-      color: ColorConstants.walterWhite,
-      fontFamily: DmSans,
+      color: ColorConstants.white,
+      fontFamily: dmSans,
     ),
     enabledBorder: outlineInputBorder,
     focusedBorder: outlineInputBorder,

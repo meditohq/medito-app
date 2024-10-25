@@ -10,7 +10,7 @@ import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
 import 'widgets/quote/quote_widget.dart';
-import 'widgets/shortcuts/shortcuts_widget.dart';
+import 'widgets/shortcuts/shortcuts_items_widget.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -21,11 +21,8 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView>
     with
-        TickerProviderStateMixin,
         AutomaticKeepAliveClientMixin,
         WidgetsBindingObserver {
-  bool isCollapsed = false;
-
   @override
   void initState() {
     super.initState();
@@ -38,52 +35,28 @@ class _HomeViewState extends ConsumerState<HomeView>
     super.dispose();
   }
 
-  late CurvedAnimation curvedAnimation = CurvedAnimation(
-    parent: AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..forward(),
-    curve: Curves.easeInOut,
-  );
-
-  void _handleCollapse() {
-    setState(() {
-      isCollapsed = !isCollapsed;
-    });
-    curvedAnimation = CurvedAnimation(
-      parent: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1000),
-      )..forward(),
-      curve: Curves.easeInOut,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
     final home = ref.watch(fetchHomeProvider);
-    final announcementData = ref.watch(fetchLatestAnnouncementProvider);
-    final stats = ref.watch(fetchStatsProvider);
 
     return home.when(
       loading: () => const HomeShimmerWidget(),
-      error: (err, stack) => MeditoErrorWidget(
+      error: (err, stack) {
+        return MeditoErrorWidget(
         message: home.error.toString(),
         onTap: () => _onRefresh(),
         isLoading: home.isLoading,
-      ),
+      );
+      },
       data: (HomeModel homeData) {
         return Scaffold(
-          backgroundColor: ColorConstants.ebony,
           appBar: AppBar(
-            backgroundColor: ColorConstants.onyx,
-            toolbarHeight: 150.0,
+            toolbarHeight: 56.0,
             title: HeaderWidget(
               greeting: homeData.greeting ?? StringConstants.welcome,
-              statsData: stats.value,
-              onStatsButtonTap: () => _onStatsButtonTapped(context, ref),
+              onStatsButtonTap: () => _onStatsButtonTapped(context),
             ),
             elevation: 0.0,
           ),
@@ -95,11 +68,11 @@ class _HomeViewState extends ConsumerState<HomeView>
               ),
               child: Column(
                 children: [
-                  _getAnnouncementBanner(announcementData.value),
+                  _getAnnouncementBanner(),
                   height20,
-                  ShortcutsWidget(data: homeData.shortcuts),
+                  ShortcutsItemsWidget(data: homeData.shortcuts),
                   height20,
-                  CarouselWidget(data: homeData.carousel),
+                  CarouselWidget(carouselItems: homeData.carousel),
                   height20,
                   QuoteWidget(data: homeData.todayQuote),
                   height20,
@@ -112,24 +85,24 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
   }
 
-  Widget _getAnnouncementBanner(AnnouncementModel? data) {
-    if (data == null) {
-      return Container();
-    }
+  Widget _getAnnouncementBanner() {
+    final data = ref.watch(fetchLatestAnnouncementProvider);
 
-    return SizeTransition(
-      axisAlignment: -1,
-      sizeFactor: isCollapsed
-          ? Tween<double>(begin: 1.0, end: 0.0).animate(
-              curvedAnimation,
-            )
-          : Tween<double>(begin: 0.0, end: 1.0).animate(
-              curvedAnimation,
-            ),
-      child: AnnouncementWidget(
-        announcement: data,
-        onPressedDismiss: _handleCollapse,
-      ),
+    return data.when(
+      loading: () => Container(),
+      error: (err, stack) => Container(),
+      data: (announcement) {
+        if (announcement == null) {
+          return Container();
+        }
+
+        return AnnouncementWidget(
+          announcement: announcement,
+          onPressedDismiss: () {
+            ref.invalidate(fetchLatestAnnouncementProvider);
+          },
+        );
+      },
     );
   }
 
@@ -138,13 +111,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
-    ref.invalidate(fetchStatsProvider);
-    await ref.read(fetchStatsProvider.future);
   }
 
-  void _onStatsButtonTapped(BuildContext context, WidgetRef ref) {
-    ref.invalidate(fetchStatsProvider);
-    ref.read(fetchStatsProvider);
+  void _onStatsButtonTapped(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(

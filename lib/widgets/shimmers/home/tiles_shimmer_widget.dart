@@ -9,7 +9,7 @@ class TilesShimmerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: padding20),
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
       child: Row(
         children: [
           _tiles(context),
