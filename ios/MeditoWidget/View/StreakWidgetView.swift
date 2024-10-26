@@ -6,7 +6,6 @@ struct StreakWidgetView: View {
     var entry: Provider.Entry
     
     var body: some View {
-        
         VStack(spacing: 16) {
             Text("\(entry.streakValue)")
                 .font(.custom(MeditoFont.dmSerifRegular, size: 30))
@@ -62,5 +61,18 @@ struct StreakWidgetView: View {
             let date = Date(timeIntervalSince1970: timestamp/1000)
             return calendar.isDate(date, inSameDayAs: day)
         }
+    }
+}
+
+struct StreakWidgetView_Previews: PreviewProvider {
+    static var previews: some View {
+        StreakWidgetView(entry: StatsWidgetEntry(
+            date: Date(),
+            streakTitle: "Today",
+            streakValue: 30,
+            audioCompleted: []
+        ))
+        .previewContext(WidgetPreviewContext(family: .systemLarge))
+        .previewDisplayName("Empty")
     }
 }
