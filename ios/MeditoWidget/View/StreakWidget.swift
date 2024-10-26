@@ -19,9 +19,9 @@ struct StreakWidget: Widget {
 }
 
 
-#Preview(as: .systemSmall) {
-    StreakWidget()
-} timeline: {
-    StatsWidgetEntry(date: Date(), streakTitle: "Title", streakValue: 30, audioCompleted: [])
-    StatsWidgetEntry(date: Date(), streakTitle: "Title", streakValue: 30, audioCompleted: [])
-}
+//#Preview(as: .systemSmall) {
+//    StreakWidget()
+//} timeline: {
+//    StatsWidgetEntry(date: Date(), streakTitle: "Title", streakValue: 30, audioCompleted: [])
+//    StatsWidgetEntry(date: Date(), streakTitle: "Title", streakValue: 30, audioCompleted: [])
+//}

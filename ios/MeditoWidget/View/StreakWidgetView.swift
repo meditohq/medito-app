@@ -6,13 +6,14 @@ struct StreakWidgetView: View {
     var entry: Provider.Entry
     
     var body: some View {
+        
         VStack(spacing: 16) {
             Text("\(entry.streakValue)")
-                .font(.custom("DMSerifDisplay-Regular", size: 30))
+                .font(.custom(MeditoFont.dmSerifRegular, size: 30))
                 .foregroundColor(Color.white)
             Text("\(entry.streakTitle)")
-                .font(.custom("Teachers-Regular", size: 16))
-                .foregroundColor(Color(.sRGB, red: 145/255, green: 125/255, blue: 240/255, opacity: 1))
+                .font(.custom(MeditoFont.teachersRegular, size: 16))
+                .foregroundColor(Color.accentPurple)
             HStack(spacing: 12) {
                 ForEach(weekDays(), id: \.self) { date in
                     VStack(spacing: 4) {
@@ -22,9 +23,8 @@ struct StreakWidgetView: View {
                         
                         ZStack {
                             Circle()
-                                .fill(hasTimestamp(on: date) ? Color(.sRGB, red: 145/255, green: 125/255, blue: 240/255, opacity: 1) : Color(.sRGB, red: 79/255, green: 79/255, blue: 102/255, opacity: 1))
+                                .fill(hasTimestamp(on: date) ? Color.accentPurple : Color.moon)
                                 .frame(width: 24, height: 24)
-                            
                             if hasTimestamp(on: date) {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 12))
@@ -35,9 +35,7 @@ struct StreakWidgetView: View {
                 }
             }
         }
-        .containerBackground(for: .widget) {
-            Color(.sRGB, red: 33/255, green: 31/255, blue: 38/255, opacity: 1)
-        }
+        .widgetBackground(Color.deepBlue)
     }
     
     // Helper function to get array of dates for the last 5 days
