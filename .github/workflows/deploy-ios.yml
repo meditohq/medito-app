@@ -17,24 +17,28 @@ jobs:
     runs-on: macos-latest
     environment: prod
     steps:
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
           channel: stable
-
-      - run: flutter doctor -v
-
+      
       - name: Checkout code
         uses: actions/checkout@v2
-
+      
+      - name: Setup OnePub
+        env:
+          ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
+        run: |
+          echo "Setting up OnePub..."
+          mkdir -p $PUB_CACHE/credentials
+          dart pub global activate onepub
+          dart pub global run onepub import
+          echo '{
+            "https://onepub.dev/api/kdpxxpsdav/": {
+              "token": "${{ secrets.ONEPUB_TOKEN }}"
+            }
+          }' > $PUB_CACHE/credentials/credentials.json
+      
       - name: Set environment variables from GitHub Secrets
         run: |
           echo "URL=${{ secrets.PROD_URL }}" >> $GITHUB_ENV
@@ -53,8 +57,13 @@ jobs:
       - name: Update packages
         run: flutter upgrade
 
-      - name: Get dependencies
-        run: flutter pub get
+      - name: Get dependencies and generate icons
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: flutter pub get && flutter pub run huge_icons:generate
+          retry_wait_seconds: 10
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs

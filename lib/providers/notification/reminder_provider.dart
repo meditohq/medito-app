@@ -84,6 +84,9 @@ class ReminderProvider {
     if (Platform.isIOS) {
       const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
         badgeNumber: 0,
+        presentAlert: false,
+        presentBadge: false,
+        presentSound: false
       );
       await _flutterLocalNotificationsPlugin.show(
         0,

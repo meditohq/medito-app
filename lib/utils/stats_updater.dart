@@ -5,7 +5,7 @@ import '../models/local_audio_completed.dart';
 
 Future<bool> handleStats(
   Map<String, dynamic> payload,
-  ) async {
+) async {
   var healthKitManager = HealthKitManager();
   var permitted = await healthKitManager.isHealthSyncPermitted() == true;
   if (!permitted) {

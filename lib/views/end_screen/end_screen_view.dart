@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_audio_completed.dart';
@@ -7,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/donation_widget.dart';
-import '../../../providers/donation/donation_page_provider.dart';
 import '../../../providers/stats_provider.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
@@ -23,19 +24,22 @@ class EndScreenView extends ConsumerStatefulWidget {
 }
 
 class _EndScreenViewState extends ConsumerState<EndScreenView> {
+  Timer? _refreshTimer;
+
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    ref.invalidate(fetchDonationPageProvider);
-    ref.invalidate(statsProvider);
+  void initState() {
+    super.initState();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        ref.read(statsProvider.notifier).refresh();
+      }
+    });
   }
 
   @override
-  void didUpdateWidget(EndScreenView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.trackModel != widget.trackModel) {
-      ref.invalidate(statsProvider);
-    }
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   @override

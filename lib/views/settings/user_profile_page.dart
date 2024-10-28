@@ -31,7 +31,7 @@ class UserProfilePage extends ConsumerWidget {
               onPressed: () async {
                 try {
                   await authRepository.signOut();
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text(StringConstants.signOutSuccessMessage)),
                   );
@@ -77,7 +77,7 @@ class UserProfilePage extends ConsumerWidget {
                     final success = await authRepository.markAccountForDeletion();
                     if (success) {
                       await authRepository.signOut();
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(true);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text(StringConstants.accountMarkedForDeletion)),
                       );

@@ -80,11 +80,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
         path: statsAsyncValue.when(
           data: (stats) {
-            var timeList = stats.audioCompleted
-                    ?.map((audio) => audio.timestamp)
-                    .join(',') ??
-                '';
-            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelist=$timeList';
+            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelistened=${stats.totalTimeListened}';
           },
           loading: () => '$editStatsUrl?userid=$userId',
           error: (_, __) => '$editStatsUrl?userid=$userId',

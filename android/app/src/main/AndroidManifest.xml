@@ -58,24 +58,37 @@
             </intent-filter>
 
             <!-- Existing intent filter for https links -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" />
-                <data android:host="medito.app" />
-                <data android:pathPrefix="/tracks/" />
-                <data android:pathPrefix="/packs/" />
-            </intent-filter>
 
             <!-- New intent filter for custom scheme -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="org.meditofoundation" />
                 <data android:host="medito" />
                 <data android:pathPrefix="/tracks/" />
+                <data android:pathPrefix="/packs/" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="medito.app" />
+                <data android:pathPrefix="/tracks/" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="medito.app" />
                 <data android:pathPrefix="/packs/" />
             </intent-filter>
 

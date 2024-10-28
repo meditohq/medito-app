@@ -75,12 +75,15 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    var isWideScreen = size.width > 600; 
+
     return ReorderableWrap(
-      spacing: 16.0,
+      spacing: 8.0,
       runSpacing: 8.0,
       padding: EdgeInsets.zero,
-      maxMainAxisCount: 2,
-      minMainAxisCount: 2,
+      maxMainAxisCount: isWideScreen ? 3 : 2,
+      minMainAxisCount: isWideScreen ? 3 : 2,
       onReorder: _onReorder,
       children: shortcutsWidgetList,
     );
@@ -88,8 +91,9 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   List<Widget> _getShortcutsItemWidgetList() {
     var size = MediaQuery.of(context).size;
+    var isWideScreen = size.width > 600;
     const containerHeight = 48.0;
-    final containerWidth = (size.width / 2) - 19;
+    final containerWidth = (size.width / (isWideScreen ? 3 : 2)) - (isWideScreen ? 16 : 19);
 
     return data
         .map((e) => AnimatedScaleWidget(

@@ -15,7 +15,7 @@ platform :ios do
       team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"],
       git_basic_authorization: ENV["MATCH_GIT_TOKEN"]
     )
-    sh("flutter clean && flutter build ios --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
+    sh("flutter pub get && flutter pub run huge_icons:generate && flutter clean && flutter build ios --release --dart-define-from-file=.prod.env")
   end
 
   desc "Deploy iOS app to App Store"
@@ -40,7 +40,7 @@ end
 platform :android do
   desc "Build Android app"
   lane :build do
-    sh("flutter clean && flutter build apk --release --no-tree-shake-icons --dart-define-from-file=.prod.env")
+    sh("flutter pub get && flutter pub run huge_icons:generate && flutter clean && flutter build apk --release --dart-define-from-file=.prod.env")
   end
 
   desc "Deploy Android app to Play Store"

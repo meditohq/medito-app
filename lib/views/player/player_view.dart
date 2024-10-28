@@ -232,12 +232,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       if (!_endScreenOpened) {
         _resetState();
         final currentlyPlayingTrack = ref.read(playerProvider);
-        if (currentlyPlayingTrack != null) {
+        if (currentlyPlayingTrack != null && mounted) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  EndScreenView(trackModel: currentlyPlayingTrack),
+              builder: (context) => EndScreenView(
+                trackModel: currentlyPlayingTrack,
+              ),
             ),
           );
 

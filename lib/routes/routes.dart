@@ -52,7 +52,7 @@ Future<void> handleNavigation(
     var success = await _pushRoute(const SignUpLogInPage(), ref);
     if (success == true) {
       await StatsManager().clearAllStats();
-      await StatsManager().getRemoteStats();
+      await StatsManager().sync();
       ref?.invalidate(meProvider);
       ref?.invalidate(statsProvider);
     }
