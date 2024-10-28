@@ -24,9 +24,9 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     try {
       await statsManager.initialize();
 
-        final stats = await statsManager.localAllStats;
-    _updateiOSWidget(stats);
-    return stats;
+      final stats = await statsManager.localAllStats;
+      _updateiOSWidget(stats);
+      return stats;
     } catch (e, stackTrace) {
       if (e is StateError) {
         throw AsyncError(
@@ -45,16 +45,14 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   }
 }
 
-
 Future<void> _updateiOSWidget(LocalAllStats stats) async {
   if (Platform.isIOS) {
+    await HomeWidget.saveWidgetData<String>('streakTitle', "Current Streak");
     await HomeWidget.saveWidgetData<String>(
-        'streakTitle', "Current Streak");
-    await HomeWidget.saveWidgetData<String>(
-        'streakValue', stats.streakCurrent.toString()); 
+        'streakValue', stats.streakCurrent.toString());
     await HomeWidget.saveWidgetData<List<int>>(
-        'audioCompleted',
-        stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
+      'audioCompleted',
+      stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
     );
     HomeWidget.updateWidget(iOSName: 'StreakWidgetMedium');
     HomeWidget.updateWidget(iOSName: 'StreakWidgetSmall');
