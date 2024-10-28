@@ -34,6 +34,7 @@ Future<void> _updateiOSWidget(LocalAllStats stats) async {
         'audioCompleted',
         stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
     );
-    HomeWidget.updateWidget(iOSName: 'StreakWidget');
+    HomeWidget.updateWidget(iOSName: 'StreakWidgetMedium');
+    HomeWidget.updateWidget(iOSName: 'StreakWidgetSmall');
   }
 }

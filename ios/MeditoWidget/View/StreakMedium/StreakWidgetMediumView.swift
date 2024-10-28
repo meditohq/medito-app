@@ -2,18 +2,20 @@ import SwiftUI
 import WidgetKit
 import SwiftUI
 
-struct StreakWidgetView: View {
-    var entry: Provider.Entry
+struct StreakWidgetMediumView: View {
+    var entry: MeditoTimelineProvider.Entry
     
     var body: some View {
         VStack(spacing: 16) {
-            Text("\(entry.streakValue)")
-                .font(.custom(MeditoFont.dmSerifRegular, size: 30))
-                .foregroundColor(Color.white)
-            Text("\(entry.streakTitle)")
-                .font(.custom(MeditoFont.teachersRegular, size: 16))
-                .foregroundColor(Color.accentPurple)
-            HStack(spacing: 12) {
+            HStack(alignment: .center) {
+                Text("\(entry.streakValue)")
+                    .font(.custom(MeditoFont.dmSerifRegular, size: 50))
+                    .foregroundColor(Color.white)
+                Text("\(entry.streakTitle)")
+                    .font(.custom(MeditoFont.teachersRegular, size: 16))
+                    .foregroundColor(Color.accentPurple)
+            }
+            HStack(spacing: 20) {
                 ForEach(weekDays(), id: \.self) { date in
                     VStack(spacing: 4) {
                         Text(formatWeekDay(date))
@@ -64,15 +66,15 @@ struct StreakWidgetView: View {
     }
 }
 
-struct StreakWidgetView_Previews: PreviewProvider {
-    static var previews: some View {
-        StreakWidgetView(entry: StatsWidgetEntry(
-            date: Date(),
-            streakTitle: "Today",
-            streakValue: 30,
-            audioCompleted: []
-        ))
-        .previewContext(WidgetPreviewContext(family: .systemLarge))
-        .previewDisplayName("Empty")
-    }
-}
+//struct StreakWidgetView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        StreakWidgetMediumView(entry: StatsWidgetEntry(
+//            date: Date(),
+//            streakTitle: "Today",
+//            streakValue: 30,
+//            audioCompleted: []
+//        ))
+//        .previewContext(WidgetPreviewContext(family: .systemLarge))
+//        .previewDisplayName("Empty")
+//    }
+//}

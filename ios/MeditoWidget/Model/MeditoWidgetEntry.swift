@@ -1,7 +1,7 @@
 import Foundation
 import WidgetKit
 
-struct StatsWidgetEntry: TimelineEntry {
+struct MeditoWidgetEntry: TimelineEntry {
     var date: Date
     var streakTitle: String
     var streakValue: Int

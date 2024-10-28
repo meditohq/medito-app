@@ -1,19 +1,17 @@
 import WidgetKit
 import SwiftUI
 
-enum MeditoWidgetConstants {
-    static let widgetKind = "StreakWidget"
-}
 
-struct StreakWidget: Widget {
+struct StreakWidgetMedium: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(
-            kind: MeditoWidgetConstants.widgetKind,
-            provider: Provider()
+            kind: MeditoWidgetKind.streakMedium,
+            provider: MeditoTimelineProvider()
         ) { entry in
-            StreakWidgetView(entry: entry)
+            StreakWidgetMediumView(entry: entry)
         }
         .configurationDisplayName("My Widget")
         .description("This is an example widget.")
+        .supportedFamilies([.systemMedium])
     }
 }
