@@ -16,15 +16,15 @@ dependencies:
   audio_service: ^0.18.15
   auto_size_text: ^3.0.0
   cached_network_image: ^3.2.3
-  device_info_plus: ^9.1.2
+  device_info_plus: ^10.1.2
   dio: ^5.4.0
-  email_validator: ^2.1.17
+  email_validator: ^3.0.0
   equatable: ^2.0.5
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3
   flutter_html: ^3.0.0-beta.2
   flutter_local_notifications: ^17.2.2
-  flutter_markdown: ^0.6.18+3
+  flutter_markdown: ^0.7.4+1
   flutter_riverpod: ^2.4.9
   flutter_svg: ^2.0.9
   freezed_annotation: ^2.4.4
@@ -39,7 +39,7 @@ dependencies:
   permission_handler: ^11.2.0
   reorderables: ^0.6.0
   riverpod_annotation: ^2.3.3
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   sentry_flutter: ^8.9.0
   shimmer: ^3.0.0
   shared_preferences: ^2.2.2
@@ -52,7 +52,7 @@ dependencies:
     version: ^0.0.1
   flutter_staggered_grid_view: ^0.7.0
   share_plus: ^10.0.2
-  app_links: ^3.4.1
+  app_links: ^6.3.2
   supabase_flutter: ^2.0.0
   internet_connection_checker_plus: ^2.5.2
   animated_text_kit: ^4.2.2
@@ -61,15 +61,15 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  pigeon: ^13.1.2
+  flutter_lints: ^5.0.0
+  pigeon: ^22.6.0
   mocktail: ^1.0.2
   build_runner: ^2.4.13
   riverpod_generator: ^2.3.9
   json_serializable: ^6.7.1
   freezed: ^2.5.2
   mockito: ^5.4.4
-  analyzer: ^5.13.0
+  analyzer: ^6.7.0
 
 flutter:
   assets:

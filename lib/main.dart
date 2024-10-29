@@ -115,7 +115,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinkListener();
-    _handleInitialUri();
     _initializeDioHeaderService().then(
       (_) {
         _checkInitialConnectivity();
@@ -139,19 +138,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         print('Deep link error: $err');
       }
     });
-  }
-
-  Future<void> _handleInitialUri() async {
-    try {
-      final initialUri = await AppLinks().getInitialAppLink();
-      if (initialUri != null) {
-        _handleDeepLink(initialUri);
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error handling initial URI: $e');
-      }
-    }
   }
 
   Future<void> _handleDeepLink(Uri uri) async {
