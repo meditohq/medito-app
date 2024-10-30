@@ -1,10 +1,3 @@
-//
-//  FlameImageView.swift
-//  MeditoWidgetExtension
-//
-//  Created by Luz Racca on 30/10/2024.
-//
-
 import SwiftUI
 
 struct FlameImageView: View {
