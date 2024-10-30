@@ -4,12 +4,12 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/donation_widget.dart';
-import '../../../providers/stats_provider.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
   final TrackModel trackModel;
@@ -214,6 +214,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         DateTime day = lastFiveDays[index];
         var isMeditated =
             daysMeditated.contains(day.toIso8601String().split('T')[0]);
+        
+        var isConsecutive = isMeditated && 
+            (index > 0 && daysMeditated.contains(lastFiveDays[index - 1].toIso8601String().split('T')[0]) ||
+             index < dayLetters.length - 1 && daysMeditated.contains(lastFiveDays[index + 1].toIso8601String().split('T')[0]));
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
@@ -232,15 +237,26 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 ),
               ),
               const SizedBox(height: 4),
-              isMeditated
-                  ? HugeIcon(
-                      size: 32,
-                      icon: HugeIcons.solidSharpCheckmarkCircle02,
-                      color: ColorConstants.lightPurple)
-                  : HugeIcon(
-                      size: 32,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (isConsecutive)
+                    HugeIcon(
+                      size: 36,
                       icon: HugeIcons.solidSharpCircle,
-                      color: ColorConstants.moon),
+                      color: Colors.white,
+                    ),
+                  isMeditated
+                      ? HugeIcon(
+                          size: 32,
+                          icon: HugeIcons.solidSharpCheckmarkCircle02,
+                          color: ColorConstants.lightPurple)
+                      : HugeIcon(
+                          size: 32,
+                          icon: HugeIcons.solidSharpCircle,
+                          color: ColorConstants.moon),
+                ],
+              ),
             ],
           ),
         );

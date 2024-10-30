@@ -299,4 +299,7 @@ class StringConstants {
   static const termsOfService = 'Terms of Service';
   static const privacyPolicy = 'Privacy Policy';
 
+  //Snackbar text for when we have to go into offlinemode due to an error:
+  static const offlineMode = 'You are now in offline mode due to an error.';
+
 }

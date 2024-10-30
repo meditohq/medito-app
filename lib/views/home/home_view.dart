@@ -45,10 +45,10 @@ class _HomeViewState extends ConsumerState<HomeView>
       loading: () => const HomeShimmerWidget(),
       error: (err, stack) {
         return MeditoErrorWidget(
-        message: home.error.toString(),
-        onTap: () => _onRefresh(),
-        isLoading: home.isLoading,
-      );
+          message: home.error.toString(),
+          onTap: () => _onRefresh(),
+          isLoading: home.isLoading,
+        );
       },
       data: (HomeModel homeData) {
         return Scaffold(
@@ -92,7 +92,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       loading: () => Container(),
       error: (err, stack) => Container(),
       data: (announcement) {
-        if (announcement == null) {
+        if (announcement == null || announcement.text == null || announcement.text == '') {
           return Container();
         }
 

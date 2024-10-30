@@ -23,19 +23,25 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
 
 class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _animation;
+  late Animation<double> _sizeAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
     );
-    _animation = CurvedAnimation(
+    _sizeAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+    _animationController.forward();
   }
 
   @override
@@ -53,31 +59,38 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
 
   @override
   Widget build(BuildContext context) {
+    if (widget.announcement.text == null) {
+      return const SizedBox.shrink();
+    }
+
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
 
     return SizeTransition(
-      sizeFactor: _animation,
+      sizeFactor: _sizeAnimation,
       axisAlignment: -1,
-      child: Padding(
-        padding: const EdgeInsets.only(top: padding8, left: padding16, right: padding16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16, top: padding24),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _text(context),
-                ],
-              ),
-              height16,
-              _actionBtn(context),
-            ],
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Padding(
+          padding: const EdgeInsets.only(top: padding8, left: padding16, right: padding16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16, top: padding24),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _text(context),
+                  ],
+                ),
+                height16,
+                _actionBtn(context),
+              ],
+            ),
           ),
         ),
       ),

@@ -74,6 +74,6 @@ class HomeRepositoryImpl extends HomeRepository {
 }
 
 @riverpod
-HomeRepositoryImpl homeRepository(HomeRepositoryRef ref) {
+HomeRepositoryImpl homeRepository(Ref ref) {
   return HomeRepositoryImpl(ref: ref, client: DioApiService());
 }

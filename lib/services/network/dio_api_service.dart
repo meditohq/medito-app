@@ -10,6 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 const _errorKey = 'error';
 const _messageKey = 'message';
 
+const _maxAuthRetries = 3;
+
 // ignore: avoid_dynamic_calls
 class DioApiService {
   static final DioApiService _instance = DioApiService._internal();
@@ -21,32 +23,93 @@ class DioApiService {
 
   // Private constructor
   DioApiService._internal() {
+    _initializeDio();
+  }
+
+  void _initializeDio() {
     dio = Dio();
     dio.options = BaseOptions(
       connectTimeout: const Duration(milliseconds: 30000),
       baseUrl: contentBaseUrl,
     );
+
+    _addInterceptors();
+  }
+  void _addInterceptors() {
+    dio.interceptors.add(_createAuthInterceptor());
+    
+    if (kReleaseMode) {
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onError: (e, handler) async {
+            await _captureException(e);
+            handler.next(e);
+          },
+        ),
+      );
+    }
+    
     if (kDebugMode) {
       dio.interceptors.add(
-        InterceptorsWrapper(onError: (e, handler) => _onError(e, handler)),
+        LogInterceptor(
+          request: true,
+          responseBody: true,
+          requestBody: true,
+          error: true,
+        ),
       );
-      dio.interceptors.add(LogInterceptor(
-        request: true,
-        responseBody: true,
-        requestBody: true,
-        error: true,
-      ));
     }
   }
 
-  Future<void> _onError(
-    DioException err,
+  Interceptor _createAuthInterceptor() {
+    return InterceptorsWrapper(
+      onError: (e, handler) async {
+        if (e.response?.statusCode == 401) {
+          final retryCount = (e.requestOptions.extra['authRetryCount'] as int?) ?? 0;
+          
+          if (retryCount >= _maxAuthRetries) {
+            if (kDebugMode) print('Max auth retries reached');
+            return handler.next(e);
+          }
+
+          try {
+            final success = await _refreshTokenAndRetry(e, handler, retryCount);
+            if (success) return;
+          } catch (refreshError) {
+            if (kDebugMode) print('Token refresh failed: $refreshError');
+          }
+        }
+        return handler.next(e);
+      },
+    );
+  }
+
+  Future<bool> _refreshTokenAndRetry(
+    DioException e, 
     ErrorInterceptorHandler handler,
+    int retryCount,
   ) async {
-    if (kReleaseMode) {
-      await _captureException(err);
-    }
-    handler.reject(err);
+    final session = await Supabase.instance.client.auth.refreshSession();
+    if (session.session?.accessToken == null) return false;
+
+    await _updateUserWithClientId();
+    _setToken();
+    
+    final opts = Options(
+      method: e.requestOptions.method,
+      headers: dio.options.headers,
+      extra: {'authRetryCount': retryCount + 1},
+    );
+    
+    final response = await dio.request(
+      e.requestOptions.path,
+      options: opts,
+      data: e.requestOptions.data,
+      queryParameters: e.requestOptions.queryParameters,
+    );
+    
+    handler.resolve(response);
+    return true;
   }
 
   Future<void> _captureException(dynamic err) async {
@@ -229,8 +292,7 @@ class CustomException implements Exception {
 }
 
 class FetchDataException extends CustomException {
-  FetchDataException([int? statusCode, String? message])
-      : super(statusCode, message);
+  FetchDataException([super.statusCode, super.message]);
 }
 
 class BadRequestException extends CustomException {

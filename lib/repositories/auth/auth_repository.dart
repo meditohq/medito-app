@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:medito/utils/retry_mixin.dart';
 
 part 'auth_repository.g.dart';
 
@@ -37,16 +38,21 @@ abstract class AuthRepository {
   Future<bool> isAccountMarkedForDeletion();
 }
 
-class AuthRepositoryImpl extends AuthRepository {
+class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   final Ref ref;
 
   AuthRepositoryImpl({required this.ref});
 
   @override
   Future<void> initializeUser() async {
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseKey,
+    await retryOperation(
+      operation: () async {
+        await Supabase.initialize(
+          url: supabaseUrl,
+          anonKey: supabaseKey,
+        );
+      },
+      errorMessage: 'Failed to initialize authentication',
     );
 
     var clientId = await getClientIdFromSharedPreference();
@@ -59,15 +65,12 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   Future<void> _signInAnonymously(String clientId) async {
-    try {
-      await Supabase.instance.client.auth.signInAnonymously(
+    await retryOperation(
+      operation: () => Supabase.instance.client.auth.signInAnonymously(
         data: {'client_id': clientId},
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
+      ),
+      errorMessage: 'Failed to create anonymous account',
+    );
   }
 
   @override
@@ -101,53 +104,52 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<bool> signUp(String email, String password) async {
     var clientId = await getClientIdFromSharedPreference() ?? '';
-    var supabase = Supabase.instance.client;
+    
+    return retryOperation(
+      operation: () async {
+        var signUpResponse = await Supabase.instance.client.auth.signUp(
+          email: email,
+          password: password,
+          data: {'client_id': clientId},
+        );
 
-    try {
-      var signUpResponse = await supabase.auth.signUp(
-        email: email,
-        password: password,
-        data: {'client_id': clientId},
-      );
+        if (signUpResponse.user != null) {
+          await _linkAnonymousAccount(email, password);
+        }
 
-      if (signUpResponse.user != null) {
-        await _linkAnonymousAccount(email, password);
-      }
-
-      return signUpResponse.user != null;
-    } catch (e) {
-      throw Exception('Error during sign-up: ${e.toString()}');
-    }
+        return signUpResponse.user != null;
+      },
+      errorMessage: 'Error during sign-up',
+    );
   }
 
   @override
   Future<bool> logIn(String email, String password) async {
-    var supabase = Supabase.instance.client;
-
     _clearClientId();
 
-    try {
-      var response = await supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+    return retryOperation(
+      operation: () async {
+        var response = await Supabase.instance.client.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
 
-      if (response.user != null) {
-        if (response.user?.userMetadata?['marked_for_deletion'] == true) {
-          throw AuthError(AuthException.accountMarkedForDeletion, 
-            'This account has been marked for deletion.');
+        if (response.user != null) {
+          if (response.user?.userMetadata?['marked_for_deletion'] == true) {
+            throw AuthError(
+              AuthException.accountMarkedForDeletion,
+              'This account has been marked for deletion.',
+            );
+          }
+          await _saveClientIdToSharedPreference(
+            response.user?.userMetadata?['client_id'] ?? '',
+          );
         }
-        await _saveClientIdToSharedPreference(
-            response.user?.userMetadata?['client_id'] ?? '');
-      }
 
-      return response.user != null;
-    } catch (e) {
-      if (e is AuthError) {
-        rethrow;
-      }
-      throw AuthError(AuthException.other, 'Error during log-in: ${e.toString()}');
-    }
+        return response.user != null;
+      },
+      errorMessage: 'Error during log-in',
+    );
   }
 
   Future<void> _linkAnonymousAccount(String email, String password) async {
@@ -155,16 +157,15 @@ class AuthRepositoryImpl extends AuthRepository {
     var anonymousUser = supabase.auth.currentUser;
 
     if (anonymousUser != null && anonymousUser.email == null) {
-      try {
-        await supabase.auth.updateUser(
+      await retryOperation(
+        operation: () => supabase.auth.updateUser(
           UserAttributes(
             email: email,
             password: password,
           ),
-        );
-      } catch (e) {
-        throw Exception('Error linking anonymous account: ${e.toString()}');
-      }
+        ),
+        errorMessage: 'Error linking anonymous account',
+      );
     }
   }
 
@@ -232,6 +233,6 @@ class AuthRepositoryImpl extends AuthRepository {
 }
 
 @riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+AuthRepository authRepository(Ref ref) {
   return AuthRepositoryImpl(ref: ref);
 }

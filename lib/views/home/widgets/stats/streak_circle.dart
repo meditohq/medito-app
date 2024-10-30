@@ -116,18 +116,18 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
                       alignment: Alignment.center,
                       children: [
                         if (isStreakDoneToday)
-                          const MeditoHugeIcon(
-                            icon: MeditoHugeIcon.streakIcon,
+                          HugeIcon(
+                            icon: HugeIcons.solidRoundedFire,
                             size: _kIconSize,
                             color: Colors.white,
                           ),
-                        MeditoHugeIcon(
-                          icon: MeditoHugeIcon.streakIcon,
-                          size: _kInnerIconSize,
+                        HugeIcon(
+                          icon: HugeIcons.solidRoundedFire,
                           color: isStreakDoneToday
                               ? ColorConstants.lightPurple
                               : ColorConstants.white,
-                        ),
+                          size: _kInnerIconSize,
+                        )
                       ],
                     ),
                     const SizedBox(width: 8),

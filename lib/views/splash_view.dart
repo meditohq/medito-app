@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/main.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/utils/fade_page_route.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
@@ -29,6 +31,9 @@ class _SplashViewState extends ConsumerState<SplashView> {
     try {
       await ref.read(authRepositoryProvider).initializeUser();
       await StatsManager().sync();
+
+      if (!mounted) return;
+
       await Navigator.of(context).pushReplacement(
         FadePageRoute(
           builder: (context) => const RootPageView(
@@ -37,10 +42,13 @@ class _SplashViewState extends ConsumerState<SplashView> {
         ),
       );
     } catch (e) {
-      await Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const DownloadsView(),
-      ));
-      return;
+      if (!mounted) return;
+
+      showSnackBar(context, StringConstants.offlineMode);
+
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const DownloadsView()),
+      );
     }
   }
 
