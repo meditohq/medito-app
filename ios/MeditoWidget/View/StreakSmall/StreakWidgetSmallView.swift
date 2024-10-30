@@ -1,10 +1,3 @@
-//
-//  StreakWidgetSmallView.swift
-//  MeditoWidgetExtension
-//
-//  Created by Luz Racca on 27/10/2024.
-//
-
 import SwiftUI
 
 enum StreakWidgetSmallViewConstants {

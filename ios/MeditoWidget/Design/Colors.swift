@@ -1,10 +1,3 @@
-//
-//  Colors.swift
-//  Runner
-//
-//  Created by Luz Racca on 26/10/2024.
-//
-
 import SwiftUI
 
 extension Color {

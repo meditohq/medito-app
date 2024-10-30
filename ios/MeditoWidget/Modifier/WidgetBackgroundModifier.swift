@@ -1,10 +1,3 @@
-//
-//  WidgetBackgroundModifier.swift
-//  Runner
-//
-//  Created by Luz Racca on 26/10/2024.
-//
-
 import Foundation
 import SwiftUI
 import WidgetKit
