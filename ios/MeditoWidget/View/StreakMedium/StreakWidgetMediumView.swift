@@ -2,33 +2,14 @@ import SwiftUI
 import WidgetKit
 import SwiftUI
 
-enum StreakWidgetMediumViewConstants {
-    static let flameFontSize: CGFloat = 23
-}
-
 struct StreakWidgetMediumView: View {
-    typealias Constants = StreakWidgetMediumViewConstants
-    
     var entry: MeditoTimelineProvider.Entry
-    
-    var isDoneToday: Bool {
-        entry.audioCompleted.contains { timeInterval in
-            Calendar.current.isDateInToday(Date(timeIntervalSince1970: timeInterval/1000))
-        }
-    }
     
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
             HStack(spacing: 12) {
-                if isDoneToday {
-                    Image(systemName: "flame.fill")
-                        .foregroundColor(Color.accentPurple)
-                        .font(.system(size: Constants.flameFontSize))
-                } else {
-                    Image(systemName: "flame")
-                        .foregroundColor(Color.moon)
-                        .font(.system(size: Constants.flameFontSize))
-                }
+                FlameImageView(entry: entry)
+                    .font(.system(size: 23))
                 HStack(spacing: 8) {
                     Text("\(entry.streakValue)")
                         .font(.custom(MeditoFont.teachersBold, size: 30))

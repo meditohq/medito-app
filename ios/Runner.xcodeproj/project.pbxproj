@@ -27,6 +27,7 @@
 		EDBD61082C942FA500C578AF /* MeditoWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61052C941F8400C578AF /* MeditoWidgetEntry.swift */; };
 		EDBD610E2C943F0100C578AF /* StreakWidgetMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD610C2C943EBD00C578AF /* StreakWidgetMediumView.swift */; };
 		EDBD61122C943F4500C578AF /* MeditoTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61102C943F3C00C578AF /* MeditoTimelineProvider.swift */; };
+		EDC71F9F2CD2892100B81AA9 /* FlameImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */; };
 		EDCBF1112CCD1AD300EEC22A /* StreakWidgetSmall.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCBF1102CCD1AD300EEC22A /* StreakWidgetSmall.swift */; };
 		EDCBF1132CCE699200EEC22A /* StreakWidgetSmallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCBF1122CCE699200EEC22A /* StreakWidgetSmallView.swift */; };
 		EDCBF1382CCF607300EEC22A /* MeditoWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */; };
@@ -113,6 +114,7 @@
 		EDBD61092C9439A100C578AF /* MeditoWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtension.entitlements; sourceTree = "<group>"; };
 		EDBD610C2C943EBD00C578AF /* StreakWidgetMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetMediumView.swift; sourceTree = "<group>"; };
 		EDBD61102C943F3C00C578AF /* MeditoTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoTimelineProvider.swift; sourceTree = "<group>"; };
+		EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameImageView.swift; sourceTree = "<group>"; };
 		EDCBF1102CCD1AD300EEC22A /* StreakWidgetSmall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetSmall.swift; sourceTree = "<group>"; };
 		EDCBF1122CCE699200EEC22A /* StreakWidgetSmallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetSmallView.swift; sourceTree = "<group>"; };
 		EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetKind.swift; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */,
+				EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */,
 				EDCBF1362CCF605900EEC22A /* StreakMedium */,
 				EDCBF1352CCF605100EEC22A /* StreakSmall */,
 			);
@@ -647,6 +650,7 @@
 				EDCBF1382CCF607300EEC22A /* MeditoWidgetKind.swift in Sources */,
 				EDBD61122C943F4500C578AF /* MeditoTimelineProvider.swift in Sources */,
 				ED8A5B3D2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */,
+				EDC71F9F2CD2892100B81AA9 /* FlameImageView.swift in Sources */,
 				EDFD4D062C9359BF0066E874 /* StreakWidgetMedium.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
