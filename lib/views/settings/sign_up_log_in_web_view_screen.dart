@@ -13,7 +13,7 @@ import 'package:medito/routes/routes.dart' as routes;
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
-  const SignUpLogInPage({Key? key}) : super(key: key);
+  const SignUpLogInPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,7 +29,7 @@ class SignUpLogInPage extends ConsumerWidget {
 }
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
-  const SignUpLogInForm({Key? key}) : super(key: key);
+  const SignUpLogInForm({super.key});
 
   @override
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();

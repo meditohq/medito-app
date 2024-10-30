@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 
 class UserProfilePage extends ConsumerWidget {
-  const UserProfilePage({Key? key}) : super(key: key);
+  const UserProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,6 +18,9 @@ class UserProfilePage extends ConsumerWidget {
       appBar: const MeditoAppBarSmall(
         title: StringConstants.userProfileTitle,
       ),
+      bottomNavigationBar: SingleBackButtonActionBar(onBackPressed: () {
+        Navigator.of(context).pop();
+      }),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -33,11 +37,13 @@ class UserProfilePage extends ConsumerWidget {
                   await authRepository.signOut();
                   Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text(StringConstants.signOutSuccessMessage)),
+                    const SnackBar(
+                        content: Text(StringConstants.signOutSuccessMessage)),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text(StringConstants.signOutErrorMessage)),
+                    const SnackBar(
+                        content: Text(StringConstants.signOutErrorMessage)),
                   );
                 }
               },
@@ -55,38 +61,44 @@ class UserProfilePage extends ConsumerWidget {
             ElevatedButton(
               onPressed: () async {
                 final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text(StringConstants.deleteAccountTitle),
-                    content: const Text(StringConstants.deleteAccountConfirmation),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text(StringConstants.cancel),
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text(StringConstants.deleteAccountTitle),
+                        content: const Text(
+                            StringConstants.deleteAccountConfirmation),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text(StringConstants.cancel),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text(StringConstants.delete),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text(StringConstants.delete),
-                      ),
-                    ],
-                  ),
-                ) ?? false;
+                    ) ??
+                    false;
 
                 if (confirmed) {
                   try {
-                    final success = await authRepository.markAccountForDeletion();
+                    final success =
+                        await authRepository.markAccountForDeletion();
                     if (success) {
                       await authRepository.signOut();
                       Navigator.of(context).pop(true);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text(StringConstants.accountMarkedForDeletion)),
+                        const SnackBar(
+                            content:
+                                Text(StringConstants.accountMarkedForDeletion)),
                       );
                     } else {
                       throw Exception('Failed to mark account for deletion');
                     }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text(StringConstants.deleteAccountError)),
+                      const SnackBar(
+                          content: Text(StringConstants.deleteAccountError)),
                     );
                   }
                 }

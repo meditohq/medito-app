@@ -1,19 +1,15 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/services/auth/auth_interceptor.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medito/utils/retry_mixin.dart';
 
 const _errorKey = 'error';
 const _messageKey = 'message';
 
-const _maxAuthRetries = 3;
-
 // ignore: avoid_dynamic_calls
-class DioApiService {
+class DioApiService with RetryMixin {
   static final DioApiService _instance = DioApiService._internal();
   late Dio dio;
 
@@ -35,20 +31,22 @@ class DioApiService {
 
     _addInterceptors();
   }
+
   void _addInterceptors() {
-    dio.interceptors.add(_createAuthInterceptor());
-    
-    if (kReleaseMode) {
-      dio.interceptors.add(
-        InterceptorsWrapper(
-          onError: (e, handler) async {
+    dio.interceptors.add(AuthInterceptor(dio));
+
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (e, handler) async {
+          if (kReleaseMode) {
             await _captureException(e);
-            handler.next(e);
-          },
-        ),
-      );
-    }
-    
+          }
+          
+          throw _returnDioErrorResponse(e);
+        },
+      ),
+    );
+
     if (kDebugMode) {
       dio.interceptors.add(
         LogInterceptor(
@@ -59,57 +57,6 @@ class DioApiService {
         ),
       );
     }
-  }
-
-  Interceptor _createAuthInterceptor() {
-    return InterceptorsWrapper(
-      onError: (e, handler) async {
-        if (e.response?.statusCode == 401) {
-          final retryCount = (e.requestOptions.extra['authRetryCount'] as int?) ?? 0;
-          
-          if (retryCount >= _maxAuthRetries) {
-            if (kDebugMode) print('Max auth retries reached');
-            return handler.next(e);
-          }
-
-          try {
-            final success = await _refreshTokenAndRetry(e, handler, retryCount);
-            if (success) return;
-          } catch (refreshError) {
-            if (kDebugMode) print('Token refresh failed: $refreshError');
-          }
-        }
-        return handler.next(e);
-      },
-    );
-  }
-
-  Future<bool> _refreshTokenAndRetry(
-    DioException e, 
-    ErrorInterceptorHandler handler,
-    int retryCount,
-  ) async {
-    final session = await Supabase.instance.client.auth.refreshSession();
-    if (session.session?.accessToken == null) return false;
-
-    await _updateUserWithClientId();
-    _setToken();
-    
-    final opts = Options(
-      method: e.requestOptions.method,
-      headers: dio.options.headers,
-      extra: {'authRetryCount': retryCount + 1},
-    );
-    
-    final response = await dio.request(
-      e.requestOptions.path,
-      options: opts,
-      data: e.requestOptions.data,
-      queryParameters: e.requestOptions.queryParameters,
-    );
-    
-    handler.resolve(response);
-    return true;
   }
 
   Future<void> _captureException(dynamic err) async {
@@ -135,21 +82,15 @@ class DioApiService {
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
   }) async {
-    _updateUserWithClientId();
-    _setToken();
-    try {
-      var response = await dio.get(
-        uri,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      );
+    var response = await dio.get(
+      uri,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+      onReceiveProgress: onReceiveProgress,
+    );
 
-      return response.data;
-    } on DioException catch (err) {
-      _returnDioErrorResponse(err);
-    }
+    return response.data;
   }
 
   // ignore: avoid-dynamic
@@ -162,23 +103,17 @@ class DioApiService {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    try {
-      _updateUserWithClientId();
-      _setToken();
-      var response = await dio.post(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
+    var response = await dio.post(
+      uri,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
 
-      return response.data;
-    } on DioException catch (err) {
-      _returnDioErrorResponse(err);
-    }
+    return response.data;
   }
 
   // ignore: avoid-dynamic
@@ -189,21 +124,15 @@ class DioApiService {
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    try {
-      _updateUserWithClientId();
-      _setToken();
-      var response = await dio.delete(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
+    var response = await dio.delete(
+      uri,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+    );
 
-      return response.data;
-    } on DioException catch (err) {
-      _returnDioErrorResponse(err);
-    }
+    return response.data;
   }
 
   CustomException _returnDioErrorResponse(DioException error) {
@@ -250,36 +179,9 @@ class DioApiService {
         );
     }
   }
-
-  void _setToken() {
-    var token = Supabase.instance.client.auth.currentSession?.accessToken;
-    if (token != null) {
-      DioApiService().dio.options.headers[HttpHeaders.authorizationHeader] =
-          'Bearer $token';
-    }
-  }
-
-  Future<void> _updateUserWithClientId() async {
-    var prefs = await SharedPreferences.getInstance();
-    var clientId = prefs.getString(SharedPreferenceConstants.userId);
-    var supabase = Supabase.instance.client;
-    var currentUser = supabase.auth.currentUser;
-
-    if (currentUser != null) {
-      try {
-        await supabase.auth.updateUser(
-          UserAttributes(
-            data: {'client_id': clientId},
-          ),
-        );
-      } catch (e) {
-        throw Exception('Error updating user with client ID: ${e.toString()}');
-      }
-    }
-  }
 }
 
-class CustomException implements Exception {
+sealed class CustomException implements Exception {
   final int? statusCode;
   final String? message;
 
@@ -296,15 +198,13 @@ class FetchDataException extends CustomException {
 }
 
 class BadRequestException extends CustomException {
-  BadRequestException([int? statusCode, message]) : super(statusCode, message);
+  BadRequestException([super.statusCode, super.message]);
 }
 
 class UnauthorizedException extends CustomException {
-  UnauthorizedException([int? statusCode, message])
-      : super(statusCode, message);
+  UnauthorizedException([super.statusCode, super.message]);
 }
 
 class InvalidInputException extends CustomException {
-  InvalidInputException([int? statusCode, String? message])
-      : super(statusCode, message);
+  InvalidInputException([super.statusCode, super.message]);
 }
