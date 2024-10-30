@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -126,7 +126,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		ED8A5BE02CCCE1120043D20A /* Exceptions for "Fonts" folder in "Runner" target */ = {
+		ED8A5BE02CCCE1120043D20A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"dm-serif/DMSerifDisplay-Italic.ttf",
@@ -145,18 +145,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		ED8A5BC82CCCE1060043D20A /* Fonts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				ED8A5BE02CCCE1120043D20A /* Exceptions for "Fonts" folder in "Runner" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
+		ED8A5BC82CCCE1060043D20A /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (ED8A5BE02CCCE1120043D20A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +266,7 @@
 			children = (
 				EDFD4D002C9359BF0066E874 /* SwiftUI.framework */,
 				EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */,
+				5A11126A4378D292B597120B /* Pods_RunnerTests.framework */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";

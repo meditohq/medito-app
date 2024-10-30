@@ -16,8 +16,8 @@ struct StreakWidgetSmall: Widget {
         ) { entry in
             StreakWidgetSmallView(entry: entry)
         }
-        .configurationDisplayName("My Small Widget")
-        .description("This is an example widget.")
+        .configurationDisplayName("Medito")
+        .description("Mindful streak count: one breath at a time.")
         .supportedFamilies([.systemSmall])
     }
 }

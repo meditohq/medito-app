@@ -2,18 +2,41 @@ import SwiftUI
 import WidgetKit
 import SwiftUI
 
+enum StreakWidgetMediumViewConstants {
+    static let flameFontSize: CGFloat = 23
+}
+
 struct StreakWidgetMediumView: View {
+    typealias Constants = StreakWidgetMediumViewConstants
+    
     var entry: MeditoTimelineProvider.Entry
     
+    var isDoneToday: Bool {
+        entry.audioCompleted.contains { timeInterval in
+            Calendar.current.isDateInToday(Date(timeIntervalSince1970: timeInterval/1000))
+        }
+    }
+    
     var body: some View {
-        VStack(spacing: 16) {
-            HStack(alignment: .center) {
-                Text("\(entry.streakValue)")
-                    .font(.custom(MeditoFont.dmSerifRegular, size: 50))
-                    .foregroundColor(Color.white)
-                Text("\(entry.streakTitle)")
-                    .font(.custom(MeditoFont.teachersRegular, size: 16))
-                    .foregroundColor(Color.accentPurple)
+        VStack(alignment: .center, spacing: 16) {
+            HStack(spacing: 12) {
+                if isDoneToday {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(Color.accentPurple)
+                        .font(.system(size: Constants.flameFontSize))
+                } else {
+                    Image(systemName: "flame")
+                        .foregroundColor(Color.moon)
+                        .font(.system(size: Constants.flameFontSize))
+                }
+                HStack(spacing: 8) {
+                    Text("\(entry.streakValue)")
+                        .font(.custom(MeditoFont.teachersBold, size: 30))
+                        .foregroundColor(Color.white)
+                    Text("day streak")
+                        .font(.custom(MeditoFont.teachersRegular, size: 30))
+                        .foregroundColor(Color.white)
+                }
             }
             HStack(spacing: 20) {
                 ForEach(weekDays(), id: \.self) { date in
@@ -65,16 +88,3 @@ struct StreakWidgetMediumView: View {
         }
     }
 }
-
-//struct StreakWidgetView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        StreakWidgetMediumView(entry: StatsWidgetEntry(
-//            date: Date(),
-//            streakTitle: "Today",
-//            streakValue: 30,
-//            audioCompleted: []
-//        ))
-//        .previewContext(WidgetPreviewContext(family: .systemLarge))
-//        .previewDisplayName("Empty")
-//    }
-//}

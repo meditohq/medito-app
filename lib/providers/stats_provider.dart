@@ -47,7 +47,6 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
 
 Future<void> _updateiOSWidget(LocalAllStats stats) async {
   if (Platform.isIOS) {
-    await HomeWidget.saveWidgetData<String>('streakTitle', "Current Streak");
     await HomeWidget.saveWidgetData<String>(
         'streakValue', stats.streakCurrent.toString());
     await HomeWidget.saveWidgetData<List<int>>(
