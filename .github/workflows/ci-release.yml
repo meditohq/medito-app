@@ -3,7 +3,8 @@ name: Build and Deploy
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 env:
   FLUTTER_VERSION: '3.x'
@@ -24,25 +25,19 @@ jobs:
       env:
         ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
       run: |
-        echo "Setting up OnePub..."
-        mkdir -p $PUB_CACHE/credentials
         dart pub global activate onepub
-        dart pub global run onepub import
-        echo '{
-          "https://onepub.dev/api/kdpxxpsdav/": {
-            "token": "${{ secrets.ONEPUB_TOKEN }}"
-          }
-        }' > $PUB_CACHE/credentials/credentials.json
+        onepub import
+        onepub pub add hugeicons
     
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
     
-    - name: Install dependencies and generate icons
+    - name: Install dependencies
       uses: nick-invision/retry@v2
       with:
         timeout_minutes: 5
         max_attempts: 3
-        command: flutter pub get && flutter pub run huge_icons:generate
+        command: flutter pub get
         retry_wait_seconds: 10
     
     - name: Generate code
@@ -78,7 +73,14 @@ jobs:
         FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
         PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
         GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
       run: |
+        if [ -z "$MEDITO_APPSTORE_CERTIFICATES_REPO" ] || [ -z "$MATCH_PASSWORD" ] || [ -z "$MATCH_GIT_TOKEN" ]; then
+          echo "Error: Required iOS deployment secrets are not set"
+          echo "Please ensure MEDITO_APPSTORE_CERTIFICATES_REPO, MATCH_PASSWORD, and MATCH_GIT_TOKEN are configured"
+          exit 1
+        fi
+        
         echo "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
         echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
         fastlane ios build

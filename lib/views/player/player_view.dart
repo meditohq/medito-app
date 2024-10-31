@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
+import '../../utils/health_kit_manager.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({
@@ -31,13 +33,22 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentlyPlayingTrack = ref.watch(playerProvider);
-      if (currentlyPlayingTrack?.hasBackgroundSound ?? false) {
-        ref
-            .read(backgroundSoundsNotifierProvider.notifier)
-            .playBackgroundSoundFromPref();
-      }
+      _initializePlayer();
     });
+  }
+
+  Future<void> _initializePlayer() async {
+    final currentlyPlayingTrack = ref.watch(playerProvider);
+    if (currentlyPlayingTrack?.hasBackgroundSound ?? false) {
+      ref
+          .read(backgroundSoundsNotifierProvider.notifier)
+          .playBackgroundSoundFromPref();
+    }
+
+    var healthKitManager = HealthKitManager();
+    if (await healthKitManager.isHealthSyncPermitted() != true) {
+      await healthKitManager.requestAuthorization();
+    }
   }
 
   @override
@@ -233,14 +244,18 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         _resetState();
         final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack != null && mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EndScreenView(
-                trackModel: currentlyPlayingTrack,
+          Future.delayed(const Duration(milliseconds: 500), () {
+            ref.read(statsProvider.notifier).refresh();
+            
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EndScreenView(
+                  trackModel: currentlyPlayingTrack,
+                ),
               ),
-            ),
-          );
+            );
+          });
 
           _endScreenOpened = true;
         }
