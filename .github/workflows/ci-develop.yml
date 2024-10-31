@@ -8,6 +8,8 @@ name: Flutter
 on:
   push:
     branches: [ develop ]
+    tags-ignore:
+      - 'v*'
   pull_request:
     branches: [ develop ]
 
@@ -85,6 +87,15 @@ jobs:
 
       - name: Run Pigeon generator
         run: flutter pub run pigeon --input pigeon_conf.dart
+
+      - name: Run Unit Tests
+        run: flutter test --coverage
+
+      - name: Upload Test Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

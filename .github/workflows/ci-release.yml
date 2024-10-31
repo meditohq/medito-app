@@ -3,7 +3,8 @@ name: Build and Deploy
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 env:
   FLUTTER_VERSION: '3.x'
@@ -24,25 +25,19 @@ jobs:
       env:
         ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
       run: |
-        echo "Setting up OnePub..."
-        mkdir -p $PUB_CACHE/credentials
         dart pub global activate onepub
-        dart pub global run onepub import
-        echo '{
-          "https://onepub.dev/api/kdpxxpsdav/": {
-            "token": "${{ secrets.ONEPUB_TOKEN }}"
-          }
-        }' > $PUB_CACHE/credentials/credentials.json
+        onepub import
+        onepub pub add hugeicons
     
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
     
-    - name: Install dependencies and generate icons
+    - name: Install dependencies
       uses: nick-invision/retry@v2
       with:
         timeout_minutes: 5
         max_attempts: 3
-        command: flutter pub get && flutter pub run huge_icons:generate
+        command: flutter pub get
         retry_wait_seconds: 10
     
     - name: Generate code
