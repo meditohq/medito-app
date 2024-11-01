@@ -16,12 +16,20 @@ Future<void> updateiOSWidget(LocalAllStats stats) async {
   if (Platform.isIOS) {
     // await HomeWidget.saveWidgetData<String>(
     //     'streakValue', stats.streakCurrent.toString());
-        await HomeWidget.saveWidgetData<String>(
-        'streakValue', (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100)).toString());
+    await HomeWidget.saveWidgetData<String>(
+        'streakValue',
+        (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100))
+            .toString());
     await HomeWidget.saveWidgetData<List<int>>(
       'audioCompleted',
       stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
     );
+    await HomeWidget.saveWidgetData<String>(
+      'dailyQuote',
+      DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+    await HomeWidget.saveWidgetData<bool>(
+            'isMonthlyDonor', DateTime.now().millisecondsSinceEpoch % 2 == 0);
     await HomeWidget.updateWidget(iOSName: 'StreakWidgetMedium');
     await HomeWidget.updateWidget(iOSName: 'StreakWidgetSmall');
   }
