@@ -17,6 +17,8 @@ class AppDelegate: FlutterAppDelegate {
         WorkmanagerPlugin.setPluginRegistrantCallback { registry in
             GeneratedPluginRegistrant.register(with: registry)
         }
+        WorkmanagerPlugin.registerTask(withIdentifier: "medito-widget-update")
+//        WorkmanagerPlugin.registerPeriodicTask(withIdentifier: "be.tramckrijte.workmanagerExample.iOSBackgroundAppRefresh", frequency: NSNumber(value: 20 * 60))
 
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate

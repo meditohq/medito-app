@@ -33,10 +33,11 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   _setUpWidget();
+  _setUpWidget();
   await initializeApp();
   _runAppWithSentry();
 }
+
 var audioStateNotifier = AudioStateNotifier();
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -64,7 +65,7 @@ void setupAudioCallback() {
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 }
 
-@pragma('vm:entry-point') 
+@pragma('vm:entry-point')
 void widgetCallbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
@@ -73,12 +74,12 @@ void widgetCallbackDispatcher() {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
-        
+
         await HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
 
         var statsManager = StatsManager();
         await statsManager.initialize();
-        
+
         try {
           await statsManager.sync();
         } catch (e) {
@@ -86,7 +87,7 @@ void widgetCallbackDispatcher() {
             print('Stats sync failed: $e');
           }
         }
-        
+
         var stats = await statsManager.localAllStats;
         await updateiOSWidget(stats);
 
@@ -108,7 +109,8 @@ void _setUpWidget() {
   Workmanager().registerPeriodicTask(
     WidgetConstants.taskIdentifier,
     WidgetConstants.taskName,
-    frequency: kDebugMode ? const Duration(minutes: 15) : const Duration(minutes: 45),
+    frequency:
+        kDebugMode ? const Duration(minutes: 15) : const Duration(minutes: 45),
     backoffPolicy: BackoffPolicy.linear,
     backoffPolicyDelay: const Duration(minutes: 1),
   );
