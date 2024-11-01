@@ -98,7 +98,7 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
             // Preview with a full week streak
             StreakWidgetMediumView(entry: MeditoWidgetEntry(
                 date: Date(),
-                streakValue: 43,
+                streakValue: 52,
                 audioCompleted: [
                     Date().timeIntervalSince1970 * 1000,
                     Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,
@@ -113,7 +113,7 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
             // Preview with a broken streak
             StreakWidgetMediumView(entry: MeditoWidgetEntry(
                 date: Date(),
-                streakValue: 234,
+                streakValue: 2,
                 audioCompleted: [
                     Date().timeIntervalSince1970 * 1000,
                     Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,
