@@ -14,12 +14,27 @@ private struct DonateModifier: ViewModifier {
             content
             if !didDonate {
                 Color.overlay
-                Text("Donate")
-                    .font(.custom(MeditoFont.dmSerifRegular, size: 12))
-                    .foregroundColor(Color.deepBlue)
+                donateCapsule
             }
         }
         .widgetBackground(didDonate ? Color.deepBlue : Color.overlayBlend)
+    }
+    
+    @ViewBuilder
+    var donateCapsule: some View {
+        HStack {
+            Image(systemName: "heart.fill")
+                .foregroundColor(.white)
+            Text("Donate")
+                .font(.custom(MeditoFont.teachersRegular, size: 16))
+                .foregroundColor(Color.white)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(
+            Capsule()
+                .fill(Color.deepBlue)
+        )
     }
 }
 
