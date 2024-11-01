@@ -17,6 +17,7 @@ struct StreakWidgetMediumView: View {
                     Text("day streak")
                         .font(.custom(MeditoFont.teachersRegular, size: 30))
                         .foregroundColor(Color.white)
+                        .layoutPriority(1)
                 }
             }
             HStack(spacing: 20) {
@@ -88,5 +89,62 @@ struct StreakWidgetMediumView: View {
         
         // Check if both current day and next day have timestamps
         return hasTimestamp(on: date) && hasTimestamp(on: nextDay)
+    }
+}
+
+struct StreakWidgetMediumView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            // Preview with a full week streak
+            StreakWidgetMediumView(entry: MeditoWidgetEntry(
+                date: Date(),
+                streakValue: 43,
+                audioCompleted: [
+                    Date().timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-172800).timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-345600).timeIntervalSince1970 * 1000
+                ]
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemMedium))  // Fixed widget family
+            .previewDisplayName("Full week")
+            
+            // Preview with a broken streak
+            StreakWidgetMediumView(entry: MeditoWidgetEntry(
+                date: Date(),
+                streakValue: 234,
+                audioCompleted: [
+                    Date().timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000
+                ]
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .previewDisplayName("Broken")
+            
+            // Preview with no streak
+            StreakWidgetMediumView(entry: MeditoWidgetEntry(
+                date: Date(),
+                streakValue: 0,
+                audioCompleted: []
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .previewDisplayName("No Streak")
+            
+            // Preview with previous days complete but not today
+            StreakWidgetMediumView(entry: MeditoWidgetEntry(
+                date: Date(),
+                streakValue: 156,
+                audioCompleted: [
+                    Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,  // yesterday
+                    Date().addingTimeInterval(-172800).timeIntervalSince1970 * 1000, // 2 days ago
+                    Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000, // 3 days ago
+                    Date().addingTimeInterval(-345600).timeIntervalSince1970 * 1000  // 4 days ago
+                ]
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .previewDisplayName("Not Today")
+        }
     }
 }
