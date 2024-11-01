@@ -19,6 +19,7 @@ struct StreakWidgetSmallView: View {
                 .foregroundColor(Color.white)
         }
         .widgetBackground(Color.deepBlue)
+        .donationLayer(didDonate: false)
     }
 }
 

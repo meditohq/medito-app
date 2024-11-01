@@ -5,55 +5,67 @@ import SwiftUI
 struct StreakWidgetMediumView: View {
     var entry: MeditoTimelineProvider.Entry
     
+    var donated = false
+    
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
-            HStack(spacing: 12) {
-                FlameImageView(entry: entry)
-                    .font(.system(size: 23))
-                HStack(spacing: 8) {
-                    Text("\(entry.streakValue)")
-                        .font(.custom(MeditoFont.teachersBold, size: 30))
-                        .foregroundColor(Color.white)
-                    Text("day streak")
-                        .font(.custom(MeditoFont.teachersRegular, size: 30))
-                        .foregroundColor(Color.white)
-                        .layoutPriority(1)
-                }
+            topView
+            weekView
+        }
+        .widgetBackground(Color.deepBlue)
+        .widgetBackground(donated ? Color.deepBlue : Color.overlayBlend)
+        .donationLayer(didDonate: donated)
+    }
+    
+    var topView: some View {
+        HStack(spacing: 12) {
+            FlameImageView(entry: entry)
+                .font(.system(size: 23))
+            HStack(spacing: 8) {
+                Text("\(entry.streakValue)")
+                    .font(.custom(MeditoFont.teachersBold, size: 30))
+                    .foregroundColor(Color.white)
+                Text("day streak")
+                    .font(.custom(MeditoFont.teachersRegular, size: 30))
+                    .foregroundColor(Color.white)
+                    .layoutPriority(1)
             }
-            HStack(spacing: 20) {
-                ForEach(weekDays(), id: \.self) { date in
-                    VStack(spacing: 4) {
-                        Text(formatWeekDay(date))
-                            .font(.system(size: 12))
-                            .foregroundColor(Color.gray)
-                        
-                        ZStack {
+        }
+    }
+    
+    @ViewBuilder
+    var weekView: some View {
+        HStack(spacing: 20) {
+            ForEach(weekDays(), id: \.self) { date in
+                VStack(spacing: 4) {
+                    Text(formatWeekDay(date))
+                        .font(.system(size: 12))
+                        .foregroundColor(Color.gray)
+                    
+                    ZStack {
+                        Circle()
+                            .fill(hasTimestamp(on: date) ? Color.accentPurple : Color.moon)
+                            .frame(width: 24, height: 24)
+                        if hasTimestamp(on: date) {
                             Circle()
-                                .fill(hasTimestamp(on: date) ? Color.accentPurple : Color.moon)
+                                .stroke(Color.white, lineWidth: 2)
                                 .frame(width: 24, height: 24)
-                            if hasTimestamp(on: date) {
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 2)
-                                    .frame(width: 24, height: 24)
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white)
-                                
-                                // Add connecting line to next day if part of streak
-                                if isPartOfStreak(date) {
-                                    Rectangle()
-                                        .fill(Color.white)
-                                        .frame(width: 20, height: 2)
-                                        .offset(x: 22)
-                                }
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 12))
+                                .foregroundColor(.white)
+                            
+                            // Add connecting line to next day if part of streak
+                            if isPartOfStreak(date) {
+                                Rectangle()
+                                    .fill(Color.white)
+                                    .frame(width: 20, height: 2)
+                                    .offset(x: 22)
                             }
                         }
                     }
                 }
-                
             }
         }
-        .widgetBackground(Color.deepBlue)
     }
     
     // Helper function to get array of dates for the last 5 days
@@ -146,5 +158,32 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Not Today")
         }
+    }
+}
+extension Color {
+    // Function to blend with another color
+    func blend(with color: Color, opacity: Double) -> Color {
+        // Convert colors to RGB components
+        guard let components1 = self.cgColor?.components,
+              let components2 = color.cgColor?.components else {
+            return self
+        }
+        
+        // Extract RGB values for first color
+        let r1 = Double(components1[0])
+        let g1 = Double(components1[1])
+        let b1 = Double(components1[2])
+        
+        // Extract RGB values for second color
+        let r2 = Double(components2[0])
+        let g2 = Double(components2[1])
+        let b2 = Double(components2[2])
+        
+        // Blend colors using opacity
+        let r = r1 * (1 - opacity) + r2 * opacity
+        let g = g1 * (1 - opacity) + g2 * opacity
+        let b = b1 * (1 - opacity) + b2 * opacity
+        
+        return Color(red: r, green: g, blue: b)
     }
 }
