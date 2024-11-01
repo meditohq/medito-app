@@ -5,16 +5,13 @@ import SwiftUI
 struct StreakWidgetMediumView: View {
     var entry: MeditoTimelineProvider.Entry
     
-    var donated = false
-    
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
             topView
             weekView
         }
         .widgetBackground(Color.deepBlue)
-        .widgetBackground(donated ? Color.deepBlue : Color.overlayBlend)
-        .donationLayer(didDonate: donated)
+        .donationLayer(didDonate: entry.isMonthlyDonor)
     }
     
     var topView: some View {
@@ -117,7 +114,9 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-172800).timeIntervalSince1970 * 1000,
                     Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000,
                     Date().addingTimeInterval(-345600).timeIntervalSince1970 * 1000
-                ]
+                ],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))  // Fixed widget family
             .previewDisplayName("Full week")
@@ -130,7 +129,9 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().timeIntervalSince1970 * 1000,
                     Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,
                     Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000
-                ]
+                ],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Broken")
@@ -139,7 +140,9 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
             StreakWidgetMediumView(entry: MeditoWidgetEntry(
                 date: Date(),
                 streakValue: 0,
-                audioCompleted: []
+                audioCompleted: [],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("No Streak")
@@ -153,10 +156,27 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-172800).timeIntervalSince1970 * 1000, // 2 days ago
                     Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000, // 3 days ago
                     Date().addingTimeInterval(-345600).timeIntervalSince1970 * 1000  // 4 days ago
-                ]
+                ],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Not Today")
+            
+            // Donate
+            StreakWidgetMediumView(entry: MeditoWidgetEntry(
+                date: Date(),
+                streakValue: 2,
+                audioCompleted: [
+                    Date().timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000,
+                    Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000
+                ],
+                isMonthlyDonor: false,
+                dailyQuote: ""
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .previewDisplayName("Donate")
         }
     }
 }

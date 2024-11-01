@@ -19,7 +19,7 @@ struct StreakWidgetSmallView: View {
                 .foregroundColor(Color.white)
         }
         .widgetBackground(Color.deepBlue)
-        .donationLayer(didDonate: false)
+        .donationLayer(didDonate: entry.isMonthlyDonor)
     }
 }
 
@@ -32,7 +32,9 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
                 streakValue: 7,
                 audioCompleted: [
                     Date().timeIntervalSince1970 * 1000  // today
-                ]
+                ],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Done Today")
@@ -43,7 +45,9 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
                 streakValue: 6,
                 audioCompleted: [
                     Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000  // yesterday
-                ]
+                ],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Not Done Today")
@@ -52,10 +56,25 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
             StreakWidgetSmallView(entry: MeditoWidgetEntry(
                 date: Date(),
                 streakValue: 0,
-                audioCompleted: []
+                audioCompleted: [],
+                isMonthlyDonor: true,
+                dailyQuote: ""
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Zero Streak")
+            
+            // Donate!
+            StreakWidgetSmallView(entry: MeditoWidgetEntry(
+                date: Date(),
+                streakValue: 7,
+                audioCompleted: [
+                    Date().timeIntervalSince1970 * 1000  // today
+                ],
+                isMonthlyDonor: false,
+                dailyQuote: ""
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+            .previewDisplayName("Donate")
         }
     }
 }
