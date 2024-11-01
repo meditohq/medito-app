@@ -12,6 +12,21 @@ final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
   return StatsNotifier();
 });
 
+Future<void> updateiOSWidget(LocalAllStats stats) async {
+  if (Platform.isIOS) {
+    // await HomeWidget.saveWidgetData<String>(
+    //     'streakValue', stats.streakCurrent.toString());
+        await HomeWidget.saveWidgetData<String>(
+        'streakValue', (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100)).toString());
+    await HomeWidget.saveWidgetData<List<int>>(
+      'audioCompleted',
+      stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
+    );
+    await HomeWidget.updateWidget(iOSName: 'StreakWidgetMedium');
+    await HomeWidget.updateWidget(iOSName: 'StreakWidgetSmall');
+  }
+}
+
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   @override
   Future<LocalAllStats> build() async {
@@ -25,7 +40,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       await statsManager.initialize();
 
       final stats = await statsManager.localAllStats;
-      _updateiOSWidget(stats);
+      await updateiOSWidget(stats);
       return stats;
     } catch (e, stackTrace) {
       if (e is StateError) {
@@ -40,20 +55,6 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   }
 
   Future<void> refresh() async {
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchStats());
-  }
-}
-
-Future<void> _updateiOSWidget(LocalAllStats stats) async {
-  if (Platform.isIOS) {
-    await HomeWidget.saveWidgetData<String>(
-        'streakValue', stats.streakCurrent.toString());
-    await HomeWidget.saveWidgetData<List<int>>(
-      'audioCompleted',
-      stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
-    );
-    HomeWidget.updateWidget(iOSName: 'StreakWidgetMedium');
-    HomeWidget.updateWidget(iOSName: 'StreakWidgetSmall');
   }
 }

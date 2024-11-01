@@ -6,20 +6,7 @@ import '../models/local_audio_completed.dart';
 Future<bool> handleStats(
   Map<String, dynamic> payload,
 ) async {
-  var healthKitManager = HealthKitManager();
-  var permitted = await healthKitManager.isHealthSyncPermitted() == true;
-  if (!permitted) {
-    await healthKitManager.requestAuthorization();
-  }
-
-  if (!await healthKitManager
-      .isSessionSynced(payload[TypeConstants.timestampIdKey])) {
-    var success = await _updateHealthKit(payload);
-    if (success) {
-      await healthKitManager
-          .markSessionAsSynced(payload[TypeConstants.timestampIdKey]);
-    }
-  }
+  await _syncHealthKit(payload);
 
   var statsManager = StatsManager();
 
@@ -35,6 +22,19 @@ Future<bool> handleStats(
     return true;
   } catch (e) {
     return false;
+  }
+}
+
+Future<void> _syncHealthKit(Map<String, dynamic> payload) async {
+  var healthKitManager = HealthKitManager();
+
+  if (!await healthKitManager
+      .isSessionSynced(payload[TypeConstants.timestampIdKey])) {
+    var success = await _updateHealthKit(payload);
+    if (success) {
+      await healthKitManager
+          .markSessionAsSynced(payload[TypeConstants.timestampIdKey]);
+    }
   }
 }
 

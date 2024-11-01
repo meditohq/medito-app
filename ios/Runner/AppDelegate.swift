@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import Firebase
 import app_links
+import workmanager
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -13,6 +14,9 @@ class AppDelegate: FlutterAppDelegate {
         FirebaseApp.configure()
         
         GeneratedPluginRegistrant.register(with: self)
+        WorkmanagerPlugin.setPluginRegistrantCallback { registry in
+            GeneratedPluginRegistrant.register(with: registry)
+        }
 
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
@@ -20,9 +24,8 @@ class AppDelegate: FlutterAppDelegate {
 
         // Retrieve the link from parameters
         if let url = AppLinks.shared.getLink(launchOptions: launchOptions) {
-            // We have a link, propagate it to your Flutter app or not
             AppLinks.shared.handleLink(url: url)
-            return true // Returning true will stop the propagation to other packages
+            return true
         }
                 
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)

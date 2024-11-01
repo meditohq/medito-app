@@ -73,7 +73,14 @@ jobs:
         FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
         PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
         GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
       run: |
+        if [ -z "$MEDITO_APPSTORE_CERTIFICATES_REPO" ] || [ -z "$MATCH_PASSWORD" ] || [ -z "$MATCH_GIT_TOKEN" ]; then
+          echo "Error: Required iOS deployment secrets are not set"
+          echo "Please ensure MEDITO_APPSTORE_CERTIFICATES_REPO, MATCH_PASSWORD, and MATCH_GIT_TOKEN are configured"
+          exit 1
+        fi
+        
         echo "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
         echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
         fastlane ios build

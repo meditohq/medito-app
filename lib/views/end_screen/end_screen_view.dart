@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_audio_completed.dart';
@@ -24,22 +22,18 @@ class EndScreenView extends ConsumerStatefulWidget {
 }
 
 class _EndScreenViewState extends ConsumerState<EndScreenView> {
-  Timer? _refreshTimer;
-
   @override
   void initState() {
     super.initState();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
-        ref.read(statsProvider.notifier).refresh();
-      }
-    });
+    _loadStats();
   }
 
-  @override
-  void dispose() {
-    _refreshTimer?.cancel();
-    super.dispose();
+  void _loadStats() {
+    Future.delayed(const Duration(seconds: 1), () {
+      ref.read(statsProvider.notifier).refresh().then((_) {
+        ref.invalidate(statsProvider);
+      });
+    });
   }
 
   @override
@@ -214,10 +208,16 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         DateTime day = lastFiveDays[index];
         var isMeditated =
             daysMeditated.contains(day.toIso8601String().split('T')[0]);
-        
-        var isConsecutive = isMeditated && 
-            (index > 0 && daysMeditated.contains(lastFiveDays[index - 1].toIso8601String().split('T')[0]) ||
-             index < dayLetters.length - 1 && daysMeditated.contains(lastFiveDays[index + 1].toIso8601String().split('T')[0]));
+
+        var isConsecutive = isMeditated &&
+            (index > 0 &&
+                    daysMeditated.contains(lastFiveDays[index - 1]
+                        .toIso8601String()
+                        .split('T')[0]) ||
+                index < dayLetters.length - 1 &&
+                    daysMeditated.contains(lastFiveDays[index + 1]
+                        .toIso8601String()
+                        .split('T')[0]));
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
