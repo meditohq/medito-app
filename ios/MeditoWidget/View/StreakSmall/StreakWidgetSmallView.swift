@@ -16,7 +16,7 @@ struct StreakWidgetSmallView: View {
             }
             Text("day streak")
                 .font(.custom(MeditoFont.teachersRegular, size: 16))
-                .foregroundColor(Color.accentPurple)
+                .foregroundColor(Color.white)
         }
         .widgetBackground(Color.deepBlue)
     }
