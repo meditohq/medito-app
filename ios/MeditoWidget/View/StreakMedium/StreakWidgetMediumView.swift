@@ -31,13 +31,25 @@ struct StreakWidgetMediumView: View {
                                 .fill(hasTimestamp(on: date) ? Color.accentPurple : Color.moon)
                                 .frame(width: 24, height: 24)
                             if hasTimestamp(on: date) {
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 2)
+                                    .frame(width: 24, height: 24)
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 12))
                                     .foregroundColor(.white)
+                                
+                                // Add connecting line to next day if part of streak
+                                if isPartOfStreak(date) {
+                                    Rectangle()
+                                        .fill(Color.white)
+                                        .frame(width: 20, height: 2)
+                                        .offset(x: 22)
+                                }
                             }
                         }
                     }
                 }
+                
             }
         }
         .widgetBackground(Color.deepBlue)
@@ -67,5 +79,14 @@ struct StreakWidgetMediumView: View {
             let date = Date(timeIntervalSince1970: timestamp/1000)
             return calendar.isDate(date, inSameDayAs: day)
         }
+    }
+    
+    // New helper function to check if a date is part of a streak
+    private func isPartOfStreak(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        guard let nextDay = calendar.date(byAdding: .day, value: 1, to: date) else { return false }
+        
+        // Check if both current day and next day have timestamps
+        return hasTimestamp(on: date) && hasTimestamp(on: nextDay)
     }
 }
