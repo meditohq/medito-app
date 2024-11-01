@@ -81,7 +81,7 @@ struct StreakWidgetMediumView: View {
         }
     }
     
-    // New helper function to check if a date is part of a streak
+    // Helper function to check if a date is part of a streak
     private func isPartOfStreak(_ date: Date) -> Bool {
         let calendar = Calendar.current
         guard let nextDay = calendar.date(byAdding: .day, value: 1, to: date) else { return false }
