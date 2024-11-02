@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -430,7 +430,6 @@
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
-
 /* Begin PBXProject section */
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
@@ -470,6 +469,17 @@
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */,
 			);
+			SystemCapabilities = {
+				com.apple.BackgroundModes = {
+					enabled = 1;
+					items = (
+						{
+							enabled = 1;
+							value = backgroundFetch;
+						},
+					);
+				};
+			};
 		};
 /* End PBXProject section */
 

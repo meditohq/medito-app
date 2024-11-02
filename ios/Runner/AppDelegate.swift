@@ -1,35 +1,48 @@
-import UIKit
 import Flutter
+import UIKit
 import Firebase
-import app_links
+import home_widget
 import workmanager
+import app_links
 
 @main
-class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate {
+  
+  override func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
+    // Initialize Firebase
+    FirebaseApp.configure()
     
-    override func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        FirebaseApp.configure()
-        
-        GeneratedPluginRegistrant.register(with: self)
-        WorkmanagerPlugin.setPluginRegistrantCallback { registry in
-            GeneratedPluginRegistrant.register(with: registry)
-        }
-        WorkmanagerPlugin.registerTask(withIdentifier: "medito-widget-update")
-//        WorkmanagerPlugin.registerPeriodicTask(withIdentifier: "be.tramckrijte.workmanagerExample.iOSBackgroundAppRefresh", frequency: NSNumber(value: 20 * 60))
-
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
-        }
-
-        // Retrieve the link from parameters
-        if let url = AppLinks.shared.getLink(launchOptions: launchOptions) {
-            AppLinks.shared.handleLink(url: url)
-            return true
-        }
-                
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    // Register Flutter plugins
+    GeneratedPluginRegistrant.register(with: self)
+    
+    // Set background fetch interval
+    UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60 * 15)) // 15 minutes
+    
+    // Set up Workmanager callback
+    WorkmanagerPlugin.setPluginRegistrantCallback { registry in
+      GeneratedPluginRegistrant.register(with: registry)
     }
+    
+    // Set up HomeWidget callback for iOS 17+
+    if #available(iOS 17, *) {
+      HomeWidgetBackgroundWorker.setPluginRegistrantCallback { registry in
+        GeneratedPluginRegistrant.register(with: registry)
+      }
+    }
+    
+    // Set notification delegate for iOS 10+
+    if #available(iOS 10.0, *) {
+      UNUserNotificationCenter.current().delegate = self
+    }
+    
+    // Handle app links if present
+    if let url = AppLinks.shared.getLink(launchOptions: launchOptions) {
+      AppLinks.shared.handleLink(url: url)
+    }
+
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
 }

@@ -39,11 +39,9 @@ void main() async {
 }
 
 var audioStateNotifier = AudioStateNotifier();
-
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> initializeApp() async {
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -69,12 +67,10 @@ void setupAudioCallback() {
 void widgetCallbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
-      if (task == WidgetConstants.taskName) {
-        WidgetsFlutterBinding.ensureInitialized();
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+      if (task == WidgetConstants.taskName) {
         await HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
 
         var statsManager = StatsManager();
@@ -83,9 +79,7 @@ void widgetCallbackDispatcher() {
         try {
           await statsManager.sync();
         } catch (e) {
-          if (kDebugMode) {
-            print('Stats sync failed: $e');
-          }
+          if (kDebugMode) print('Stats sync failed: $e');
         }
 
         var stats = await statsManager.localAllStats;
@@ -93,19 +87,22 @@ void widgetCallbackDispatcher() {
 
         return Future.value(true);
       }
-
       return Future.value(false);
     } catch (e) {
-      if (kDebugMode) {
-        print('Widget update failed: $e');
-      }
+      if (kDebugMode) print('Widget update failed: $e');
       return Future.value(false);
     }
   });
 }
 
 void _setUpWidget() {
-  Workmanager().initialize(widgetCallbackDispatcher, isInDebugMode: kDebugMode);
+  // Initialize Workmanager with the dispatcher callback
+  Workmanager().initialize(
+    widgetCallbackDispatcher,
+    isInDebugMode: kDebugMode,
+  );
+
+  // Register periodic background task for iOS and Android
   Workmanager().registerPeriodicTask(
     WidgetConstants.taskIdentifier,
     WidgetConstants.taskName,
@@ -114,12 +111,14 @@ void _setUpWidget() {
     backoffPolicy: BackoffPolicy.linear,
     backoffPolicyDelay: const Duration(minutes: 1),
   );
+
+  // Set the app group ID for HomeWidget usage
   HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
 }
 
 Future<void> _runAppWithSentry() async {
   var prefs = await initializeSharedPreferences();
-  SentryFlutter.init(
+  await SentryFlutter.init(
     (options) {
       options.attachScreenshot = true;
       options.environment = environment;
