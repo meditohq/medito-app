@@ -1,6 +1,5 @@
 import SwiftUI
 import WidgetKit
-import SwiftUI
 
 struct StreakWidgetMediumView: View {
     var entry: MeditoTimelineProvider.Entry

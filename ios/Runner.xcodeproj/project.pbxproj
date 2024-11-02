@@ -17,6 +17,11 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A6D31EA51587E9B92EE05B05 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B85D0DB6CBEEDCE5207D2DFF /* Pods_Runner.framework */; };
+		ED73D7B82CD607DF005EB56D /* QuoteWidgetSmallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7B72CD607DF005EB56D /* QuoteWidgetSmallView.swift */; };
+		ED73D7BB2CD60830005EB56D /* QuoteWidgetSmall.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7BA2CD60828005EB56D /* QuoteWidgetSmall.swift */; };
+		ED73D7BE2CD60AC0005EB56D /* QuoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */; };
+		ED73D7C42CD60C28005EB56D /* QuoteWidgetMedium.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */; };
+		ED73D7C62CD60C31005EB56D /* QuoteWidgetMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */; };
 		ED8A5B3D2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
 		ED8A5B3E2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
 		ED8A5B832CCCDB540043D20A /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B822CCCDB4E0043D20A /* Colors.swift */; };
@@ -107,6 +112,11 @@
 		B85D0DB6CBEEDCE5207D2DFF /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0EDF0B4DF633EC5992CED81 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		EBD524AA9827342194908637 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED73D7B72CD607DF005EB56D /* QuoteWidgetSmallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetSmallView.swift; sourceTree = "<group>"; };
+		ED73D7BA2CD60828005EB56D /* QuoteWidgetSmall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetSmall.swift; sourceTree = "<group>"; };
+		ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteView.swift; sourceTree = "<group>"; };
+		ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetMedium.swift; sourceTree = "<group>"; };
+		ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetMediumView.swift; sourceTree = "<group>"; };
 		ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBackgroundModifier.swift; sourceTree = "<group>"; };
 		ED8A5B822CCCDB4E0043D20A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
@@ -272,6 +282,44 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
+		ED73D7B62CD607B3005EB56D /* QuoteWidgetSmall */ = {
+			isa = PBXGroup;
+			children = (
+				ED73D7BA2CD60828005EB56D /* QuoteWidgetSmall.swift */,
+				ED73D7B72CD607DF005EB56D /* QuoteWidgetSmallView.swift */,
+			);
+			path = QuoteWidgetSmall;
+			sourceTree = "<group>";
+		};
+		ED73D7C02CD60BF1005EB56D /* Quote */ = {
+			isa = PBXGroup;
+			children = (
+				ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */,
+				ED73D7C22CD60C1A005EB56D /* QuoteWidgetMedium */,
+				ED73D7B62CD607B3005EB56D /* QuoteWidgetSmall */,
+			);
+			path = Quote;
+			sourceTree = "<group>";
+		};
+		ED73D7C12CD60BFB005EB56D /* Streak */ = {
+			isa = PBXGroup;
+			children = (
+				EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */,
+				EDCBF1362CCF605900EEC22A /* StreakMedium */,
+				EDCBF1352CCF605100EEC22A /* StreakSmall */,
+			);
+			path = Streak;
+			sourceTree = "<group>";
+		};
+		ED73D7C22CD60C1A005EB56D /* QuoteWidgetMedium */ = {
+			isa = PBXGroup;
+			children = (
+				ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */,
+				ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */,
+			);
+			path = QuoteWidgetMedium;
+			sourceTree = "<group>";
+		};
 		ED8A5B3B2CCCCB800043D20A /* Modifier */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,10 +357,9 @@
 		EDBD610B2C943E6F00C578AF /* View */ = {
 			isa = PBXGroup;
 			children = (
-				EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */,
+				ED73D7C12CD60BFB005EB56D /* Streak */,
+				ED73D7C02CD60BF1005EB56D /* Quote */,
 				EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */,
-				EDCBF1362CCF605900EEC22A /* StreakMedium */,
-				EDCBF1352CCF605100EEC22A /* StreakSmall */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -644,11 +691,16 @@
 				ED8A5BC72CCCDFCF0043D20A /* Fonts.swift in Sources */,
 				EDFD4D042C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */,
 				EDBD61082C942FA500C578AF /* MeditoWidgetEntry.swift in Sources */,
+				ED73D7BE2CD60AC0005EB56D /* QuoteView.swift in Sources */,
+				ED73D7C62CD60C31005EB56D /* QuoteWidgetMediumView.swift in Sources */,
+				ED73D7C42CD60C28005EB56D /* QuoteWidgetMedium.swift in Sources */,
+				ED73D7B82CD607DF005EB56D /* QuoteWidgetSmallView.swift in Sources */,
 				EDBD610E2C943F0100C578AF /* StreakWidgetMediumView.swift in Sources */,
 				EDCBF1112CCD1AD300EEC22A /* StreakWidgetSmall.swift in Sources */,
 				ED8A5B832CCCDB540043D20A /* Colors.swift in Sources */,
 				EDCBF1132CCE699200EEC22A /* StreakWidgetSmallView.swift in Sources */,
 				EDCBF1382CCF607300EEC22A /* MeditoWidgetKind.swift in Sources */,
+				ED73D7BB2CD60830005EB56D /* QuoteWidgetSmall.swift in Sources */,
 				EDBD61122C943F4500C578AF /* MeditoTimelineProvider.swift in Sources */,
 				EDA1F9DF2CD50D620062AD07 /* DonateModifier.swift in Sources */,
 				ED8A5B3D2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */,
