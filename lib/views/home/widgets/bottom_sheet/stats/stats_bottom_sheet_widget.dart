@@ -41,7 +41,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                 ),
                 error: (error, stack) => Center(
                   child: GestureDetector(
-                    onTap: () => ref.refresh(statsProvider),
+                    onTap: () => ref.read(statsProvider.notifier).refresh(),
                     child: HugeIcon(
                         icon: HugeIcons.strokeRoundedHelpCircle,
                         color: ColorConstants.white),

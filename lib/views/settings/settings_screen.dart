@@ -98,31 +98,8 @@ class SettingsScreen extends ConsumerWidget {
           icon: HugeIcons.solidRoundedQuestion,
           color: ColorConstants.white,
         ),
-        path: clientIdSync.when(
-          data: (clientId) {
-            final stats = ref.watch(statsProvider.select((value) => value.whenData((stats) => {
-              'streakCurrent': stats.streakCurrent,
-              'streakLongest': stats.streakLongest,
-              'totalTracksCompleted': stats.totalTracksCompleted,
-              'totalTimeListened': stats.totalTimeListened,
-            })));
-            
-            return stats.when(
-              data: (data) {
-                final totalTimeListenedInMinutes = (data['totalTimeListened']! / 60000).round();
-                
-                return '$editStatsUrl?clientid=$clientId&streakcurrent=${data['streakCurrent']}&streaklongest=${data['streakLongest']}&trackscompleted=${data['totalTracksCompleted']}&timelistened=$totalTimeListenedInMinutes';
-              },
-              loading: () => '$editStatsUrl?userid=$clientId',
-              error: (_, __) => '$editStatsUrl?userid=$clientId',
-            );
-          },
-          loading: () => editStatsUrl,
-          error: (_, __) => editStatsUrl,
-        ),
-        onNavigationComplete: () {
-          ref.read(statsProvider.notifier).refresh();
-        },
+        path: ref.watch(editStatsUrlProvider),
+        onNavigationComplete: () => ref.read(statsProvider.notifier).refresh(),
       ),
       SettingsItem(
         type: 'url',

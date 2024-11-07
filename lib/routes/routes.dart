@@ -84,7 +84,7 @@ Future<bool?> _pushRoute(Widget route, WidgetRef? ref) async {
   return await navigatorKey.currentState
       ?.push<bool>(MaterialPageRoute(builder: (context) => route))
       .then((success) {
-    ref?.invalidate(statsProvider);
+    ref?.read(statsProvider.notifier).refresh();
     return success;
   });
 }

@@ -246,7 +246,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         if (currentlyPlayingTrack != null && mounted) {
           Future.delayed(const Duration(milliseconds: 500), () {
             ref.read(statsProvider.notifier).refresh();
-            
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

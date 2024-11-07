@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:isolate';
+
 import 'package:medito/constants/constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
@@ -29,7 +32,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void _initializeUser() async {
     try {
       await ref.read(authRepositoryProvider).initializeUser();
-      await StatsManager().sync();
+      await StatsManager().initialize();
 
       if (!mounted) return;
 

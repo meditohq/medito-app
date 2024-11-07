@@ -157,8 +157,7 @@ class StringConstants {
   static const String loginWarningMessage =
       'Do you currently have unsaved progress? '
       'Logging in to an existing account will download your previously saved data, '
-      'but may overwrite any current unsaved progress. '
-      'Would you like to create a new account instead to save your current progress?';
+      'but may overwrite any current unsaved progress.';
 
   static const String createNewAccount = 'Create New Account';
   static const String continueLogin = 'Continue Login';

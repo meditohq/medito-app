@@ -181,6 +181,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   void _onAppForegrounded() {
     ref.read(reminderProvider).clearBadge();
-    ref.invalidate(statsProvider);
+    ref.read(statsProvider.notifier).refresh();
   }
 }

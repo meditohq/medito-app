@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -21,37 +23,60 @@ class StatsManager {
 
   Future<void> initialize() async {
     if (!_isInitialized) {
-      statsService = StatsService(DioApiService());
+      statsService = StatsService(DioApiService(), await SharedPreferences.getInstance());
       _isInitialized = true;
     }
   }
 
   Future<void> sync() async {
+    dev.log('StatsManager: Starting sync');
     if (!_isInitialized) {
       await initialize();
     }
 
     try {
-      await getRemoteStats();
+      dev.log('StatsManager: Fetching remote stats');
+      _allStats = await statsService.fetchAllStats();
+      
+      dev.log('StatsManager: Merging stats');
       await _merge();
+      
       if (_allStats != null) {
+        dev.log('StatsManager: Calculating streak');
         _allStats = calculateStreak(_allStats!);
+        
+        dev.log('StatsManager: Saving local stats');
+        await _saveLocalAllStats();
+        
+        dev.log('StatsManager: Posting updated stats');
+        await statsService.postUpdatedStats(_allStats!);
       }
-      await _saveLocalAllStats();
-      await _postUpdatedStats();
-    } catch (e) {
-      _allStats = await _loadLocalAllStats();
+      
+      dev.log('StatsManager: Sync completed');
+    } catch (e, stackTrace) {
+      if (e.toString().contains('Please wait')) {
+        dev.log('StatsManager: Sync throttled');
+      } else {
+        dev.log('StatsManager: Error during sync', error: e, stackTrace: stackTrace);
+        _allStats = await _loadLocalAllStats();
+      }
     }
   }
 
-  Future<void> getRemoteStats() async {
-    _allStats = await statsService.fetchAllStats();
+  Future<LocalAllStats> get localAllStats async {
+    if (_allStats == null) {
+      dev.log('StatsManager: Loading local stats');
+      _allStats = await _loadLocalAllStats();
+    }
+    return _allStats!;
   }
 
   Future<void> _merge() async {
+    dev.log('StatsManager: Starting merge');
     var prefs = await SharedPreferences.getInstance();
-    var localAllStatsJson =
-        prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+    var localAllStatsJson = prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+    dev.log('StatsManager: Local stats JSON: ${localAllStatsJson?.substring(0, min(50, localAllStatsJson.length))}...');
+    
     var localAudioCompleted = <LocalAudioCompleted>[];
 
     LocalAllStats? localAllStats;
@@ -171,15 +196,11 @@ class StatsManager {
     );
   }
 
-  Future<void> _postUpdatedStats() async {
-    try {
-      if (_allStats != null) {
-        await statsService.postUpdatedStats(_allStats!);
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error posting updated stats: $e');
-      }
+  Future<void> _saveLocalAllStats() async {
+    var prefs = await SharedPreferences.getInstance();
+    if (_allStats != null) {
+      await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
+          jsonEncode(_allStats!.toJson()));
     }
   }
 
@@ -199,21 +220,6 @@ class StatsManager {
       }
     }
     return LocalAllStats.empty();
-  }
-
-  Future<void> _saveLocalAllStats() async {
-    var prefs = await SharedPreferences.getInstance();
-    if (_allStats != null) {
-      await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
-          jsonEncode(_allStats!.toJson()));
-    }
-  }
-
-  Future<LocalAllStats> get localAllStats async {
-    if (_allStats == null) {
-      await sync();
-    }
-    return _allStats!;
   }
 
   Future<void> addAudioCompleted(
@@ -240,7 +246,7 @@ class StatsManager {
       _allStats = calculateStreak(_allStats!);
     }
     await _saveLocalAllStats();
-    unawaited(_postUpdatedStats());
+    unawaited(statsService.postUpdatedStats(_allStats!));
   }
 
   Future<void> addTrackChecked(String trackId) async {
@@ -258,7 +264,7 @@ class StatsManager {
       );
 
       await _saveLocalAllStats();
-      unawaited(_postUpdatedStats());
+      unawaited(statsService.postUpdatedStats(_allStats!));
     }
   }
 
@@ -275,7 +281,7 @@ class StatsManager {
       );
 
       await _saveLocalAllStats();
-      unawaited(_postUpdatedStats());
+      unawaited(statsService.postUpdatedStats(_allStats!));
     }
   }
 

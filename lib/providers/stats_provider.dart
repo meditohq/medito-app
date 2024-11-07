@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/stats_manager.dart';
+import 'dart:developer' as dev;
+
+import 'package:medito/views/settings/settings_screen.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
 
@@ -9,32 +12,56 @@ final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
   return StatsNotifier();
 });
 
+final editStatsUrlProvider = Provider<String>((ref) {
+  final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
+  final stats = ref.watch(statsProvider).valueOrNull;
+  
+  if (stats == null) return '$editStatsUrl?clientid=$clientId';
+  
+  final timeListened = (stats.totalTimeListened / 60000).round();
+  
+  return '$editStatsUrl?clientid=$clientId'
+    '&streakcurrent=${stats.streakCurrent}'
+    '&streaklongest=${stats.streakLongest}'
+    '&trackscompleted=${stats.totalTracksCompleted}'
+    '&timelistened=$timeListened';
+});
+
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
+  static DateTime? _lastRefresh;
+  static const _minRefreshInterval = Duration(seconds: 2);
+
   @override
   Future<LocalAllStats> build() async {
+    dev.log('StatsNotifier: Building');
     return _fetchStats();
   }
 
   Future<LocalAllStats> _fetchStats() async {
+    dev.log('StatsNotifier: Starting fetch');
     var statsManager = ref.read(statsManagerProvider);
 
     try {
       await statsManager.initialize();
-
+      await statsManager.sync();
       return await statsManager.localAllStats;
     } catch (e, stackTrace) {
-      if (e is StateError) {
-        throw AsyncError(
-          'Failed to initialize StatsManager: ${e.message}',
-          stackTrace,
-        );
-      }
-
-      throw AsyncError(StringConstants.statsLoadError, stackTrace);
+      dev.log('StatsNotifier: Error during fetch', error: e, stackTrace: stackTrace);
+      rethrow;
     }
   }
 
   Future<void> refresh() async {
+    dev.log('StatsNotifier: Starting refresh');
+    if (_lastRefresh != null) {
+      var timeSinceLastRefresh = DateTime.now().difference(_lastRefresh!);
+      if (timeSinceLastRefresh < _minRefreshInterval) {
+        dev.log('StatsNotifier: Skipping refresh - too soon');
+        return;
+      }
+    }
+    
     state = await AsyncValue.guard(() => _fetchStats());
+    dev.log('StatsNotifier: Refresh completed');
   }
 }

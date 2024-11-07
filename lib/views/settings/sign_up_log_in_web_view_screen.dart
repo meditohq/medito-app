@@ -174,7 +174,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       var success = await authAction();
       if (success) {
         await _refreshUserInfo();
-        ref.invalidate(statsProvider);
+        ref.read(statsProvider.notifier).refresh();
 
         showSnackBar(context, StringConstants.signInSuccess);
         
@@ -185,7 +185,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     } catch (e) {
       showSnackBar(context, 'Error: ${e.toString()}');
     } finally {
-      ref.invalidate(statsProvider);
+      ref.read(statsProvider.notifier).refresh();
       setState(() {
         _isLoading = false;
       });
