@@ -8,7 +8,6 @@ import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/user_profile_page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
-import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
@@ -38,7 +37,8 @@ class SignUpLogInForm extends ConsumerStatefulWidget {
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();
 }
 
-class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTickerProviderStateMixin {
+class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   late TabController _tabController;
@@ -220,26 +220,26 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
     const inputTextStyle = TextStyle(color: ColorConstants.onyx);
 
     return Scaffold(
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: ColorConstants.ebony,
       body: SafeArea(
         child: Column(
           children: [
             TabBar(
               controller: _tabController,
               tabs: const [
-                Tab(text: StringConstants.logInButtonText),
                 Tab(text: StringConstants.createAccountButtonText),
+                Tab(text: StringConstants.logInButtonText),
               ],
-              labelColor: Colors.white,
+              labelColor: ColorConstants.lightPurple,
               unselectedLabelColor: Colors.white60,
-              indicatorColor: ColorConstants.brightSky,
+              indicatorColor: ColorConstants.lightPurple,
             ),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildLoginTab(inputTextStyle),
                   _buildSignUpTab(inputTextStyle),
+                  _buildLoginTab(inputTextStyle),
                 ],
               ),
             ),
@@ -258,10 +258,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            StringConstants.loginBenefits,
-            style: TextStyle(color: Colors.white),
-          ),
+          _buildBenefitsText(StringConstants.loginBenefits),
           height32,
           _buildEmailField(inputTextStyle),
           const SizedBox(height: 16),
@@ -285,10 +282,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            StringConstants.createAccountBenefits,
-            style: TextStyle(color: Colors.white),
-          ),
+          _buildBenefitsText(StringConstants.createAccountBenefits),
           height32,
           _buildEmailField(inputTextStyle),
           const SizedBox(height: 16),
@@ -357,7 +351,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
 
   Widget _buildLoadingIndicator() {
     if (!_isLoading) return const SizedBox.shrink();
-    
+
     return const Padding(
       padding: EdgeInsets.only(top: 16.0),
       child: CircularProgressIndicator(
@@ -418,7 +412,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
   ButtonStyle _getButtonStyle() {
     return ElevatedButton.styleFrom(
       foregroundColor: ColorConstants.onyx,
-      backgroundColor: ColorConstants.brightSky,
+      backgroundColor: ColorConstants.lightPurple,
       disabledForegroundColor: Colors.grey,
       disabledBackgroundColor: Colors.grey[300],
       shape: RoundedRectangleBorder(
@@ -428,16 +422,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
     );
   }
 
-  void _launchPrivacyPolicy() {
-    routes.handleNavigation(
-      TypeConstants.url,
-      ['https://meditofoundation.org/privacy'],
-      context,
-      ref: ref,
-    );
-  }
-
-  InputDecoration getInputDecoration(String hint, bool isValid, String? errorText) {
+  InputDecoration getInputDecoration(
+      String hint, bool isValid, String? errorText) {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.black54),
@@ -461,6 +447,17 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTic
       ),
       errorText: !isValid && errorText != null ? errorText : null,
       errorStyle: const TextStyle(color: Colors.red),
+    );
+  }
+
+  Widget _buildBenefitsText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Colors.white70,
+        fontSize: 18,
+        height: 1.5,
+      ),
     );
   }
 }
