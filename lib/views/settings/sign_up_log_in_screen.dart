@@ -11,6 +11,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/routes/routes.dart' as routes;
+import 'package:flutter/gestures.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
@@ -37,22 +38,26 @@ class SignUpLogInForm extends ConsumerStatefulWidget {
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();
 }
 
-class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
+class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  late TabController _tabController;
   var _isLoading = false;
   var _isEmailValid = false;
   var _isPasswordValid = false;
+  var _isPasswordVisible = false;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _emailController.addListener(_validateEmail);
     _passwordController.addListener(_validatePassword);
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _emailController.removeListener(_validateEmail);
     _passwordController.removeListener(_validatePassword);
     _emailController.dispose();
@@ -214,146 +219,212 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Widget build(BuildContext context) {
     const inputTextStyle = TextStyle(color: ColorConstants.onyx);
 
-    InputDecoration getInputDecoration(
-        String hint, bool isValid, String? errorText) {
-      return InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black54),
-        filled: true,
-        fillColor: Colors.white,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.white),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: ColorConstants.onyx),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        errorText: !isValid && errorText != null ? errorText : null,
-        errorStyle: const TextStyle(color: Colors.red),
-      );
-    }
-
     return Scaffold(
       backgroundColor: ColorConstants.onyx,
-      appBar: const MeditoAppBarSmall(
-        title: StringConstants.signUpLogInTitle,
-      ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        StringConstants.createAccountBenefits,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        StringConstants.loginBenefits,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 24),
-                      TextField(
-                        controller: _emailController,
-                        decoration: getInputDecoration(
-                          StringConstants.emailLabel,
-                          _isEmailValid || _emailController.text.isEmpty,
-                          StringConstants.invalidEmailError,
-                        ),
-                        style: inputTextStyle,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: _passwordController,
-                        decoration: getInputDecoration(
-                          StringConstants.passwordLabel,
-                          _isPasswordValid || _passwordController.text.isEmpty,
-                          StringConstants.invalidPasswordError,
-                        ),
-                        style: inputTextStyle,
-                        obscureText: true,
-                      ),
-                      height32,
-                      ElevatedButton(
-                        onPressed:
-                            (_isLoading || !_isFormValid) ? null : _signUp,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: ColorConstants.onyx,
-                          backgroundColor: ColorConstants.brightSky,
-                          disabledForegroundColor: Colors.grey,
-                          disabledBackgroundColor: Colors.grey[300],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          minimumSize: const Size(double.infinity, 48),
-                        ),
-                        child:
-                            const Text(StringConstants.createAccountButtonText),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed:
-                            (_isLoading || !_isFormValid) ? null : _logIn,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: ColorConstants.onyx,
-                          backgroundColor: ColorConstants.brightSky,
-                          disabledForegroundColor: Colors.grey,
-                          disabledBackgroundColor: Colors.grey[300],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          minimumSize: const Size(double.infinity, 48),
-                        ),
-                        child: const Text(StringConstants.logInButtonText),
-                      ),
-                      if (_isLoading)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 16.0),
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: GestureDetector(
-                          onTap: _launchPrivacyPolicy,
-                          child: const Text(
-                            StringConstants.privacyPolicyTitle,
-                            style: TextStyle(
-                              color: ColorConstants.brightSky,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        child: Column(
+          children: [
+            TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: StringConstants.logInButtonText),
+                Tab(text: StringConstants.createAccountButtonText),
+              ],
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white60,
+              indicatorColor: ColorConstants.brightSky,
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildLoginTab(inputTextStyle),
+                  _buildSignUpTab(inputTextStyle),
+                ],
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.of(context).pop(),
       ),
+    );
+  }
+
+  Widget _buildLoginTab(TextStyle inputTextStyle) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            StringConstants.loginBenefits,
+            style: TextStyle(color: Colors.white),
+          ),
+          height32,
+          _buildEmailField(inputTextStyle),
+          const SizedBox(height: 16),
+          _buildPasswordField(inputTextStyle),
+          height32,
+          ElevatedButton(
+            onPressed: (_isLoading || !_isFormValid) ? null : _logIn,
+            style: _getButtonStyle(),
+            child: const Text(StringConstants.logInButtonText),
+          ),
+          _buildLoadingIndicator(),
+          _buildPrivacyPolicyLink(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSignUpTab(TextStyle inputTextStyle) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            StringConstants.createAccountBenefits,
+            style: TextStyle(color: Colors.white),
+          ),
+          height32,
+          _buildEmailField(inputTextStyle),
+          const SizedBox(height: 16),
+          _buildPasswordField(inputTextStyle),
+          height32,
+          ElevatedButton(
+            onPressed: (_isLoading || !_isFormValid) ? null : _signUp,
+            style: _getButtonStyle(),
+            child: const Text(StringConstants.createAccountButtonText),
+          ),
+          _buildLoadingIndicator(),
+          _buildPrivacyPolicyLink(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmailField(TextStyle inputTextStyle) {
+    return TextField(
+      controller: _emailController,
+      decoration: getInputDecoration(
+        StringConstants.emailLabel,
+        _isEmailValid || _emailController.text.isEmpty,
+        StringConstants.invalidEmailError,
+      ).copyWith(
+        suffixIcon: _emailController.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.grey),
+                onPressed: () {
+                  _emailController.clear();
+                  _validateEmail();
+                },
+              )
+            : null,
+      ),
+      onChanged: (_) => setState(() {}),
+      style: inputTextStyle,
+      keyboardType: TextInputType.emailAddress,
+    );
+  }
+
+  Widget _buildPasswordField(TextStyle inputTextStyle) {
+    return TextField(
+      controller: _passwordController,
+      decoration: getInputDecoration(
+        StringConstants.passwordLabel,
+        _isPasswordValid || _passwordController.text.isEmpty,
+        StringConstants.invalidPasswordError,
+      ).copyWith(
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
+      ),
+      style: inputTextStyle,
+      obscureText: !_isPasswordVisible,
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    if (!_isLoading) return const SizedBox.shrink();
+    
+    return const Padding(
+      padding: EdgeInsets.only(top: 16.0),
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildPrivacyPolicyLink() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Center(
+        child: Text.rich(
+          TextSpan(
+            text: 'By continuing, you agree to our ',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+            ),
+            children: [
+              TextSpan(
+                text: 'Terms of Service',
+                style: const TextStyle(
+                  color: ColorConstants.brightSky,
+                  decoration: TextDecoration.underline,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => routes.handleNavigation(
+                        TypeConstants.url,
+                        ['https://meditofoundation.org/terms'],
+                        context,
+                        ref: ref,
+                      ),
+              ),
+              const TextSpan(text: ' and '),
+              TextSpan(
+                text: 'Privacy Policy',
+                style: const TextStyle(
+                  color: ColorConstants.brightSky,
+                  decoration: TextDecoration.underline,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => routes.handleNavigation(
+                        TypeConstants.url,
+                        ['https://meditofoundation.org/privacy'],
+                        context,
+                        ref: ref,
+                      ),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  ButtonStyle _getButtonStyle() {
+    return ElevatedButton.styleFrom(
+      foregroundColor: ColorConstants.onyx,
+      backgroundColor: ColorConstants.brightSky,
+      disabledForegroundColor: Colors.grey,
+      disabledBackgroundColor: Colors.grey[300],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      minimumSize: const Size(double.infinity, 48),
     );
   }
 
@@ -363,6 +434,33 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       ['https://meditofoundation.org/privacy'],
       context,
       ref: ref,
+    );
+  }
+
+  InputDecoration getInputDecoration(String hint, bool isValid, String? errorText) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.black54),
+      filled: true,
+      fillColor: Colors.white,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.white),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: ColorConstants.onyx),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      errorText: !isValid && errorText != null ? errorText : null,
+      errorStyle: const TextStyle(color: Colors.red),
     );
   }
 }

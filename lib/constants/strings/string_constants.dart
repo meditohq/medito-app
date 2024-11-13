@@ -144,14 +144,12 @@ class StringConstants {
   static const String authenticationFailed = 'Authentication failed';
 
   static const String createAccountBenefits =
-      'Creating an account allows you to:'
-      '\n• Save your meditation progress'
+      '• Save your meditation progress'
       '\n• Keep your stats and achievements secure';
 
-  static const String loginBenefits = 'Logging in allows you to:'
-      '\n• Download your previously saved data'
-      '\n• Continue your meditation journey from where you left off'
-      '\n• Sync your progress across devices';
+  static const String loginBenefits = 
+      '• Download your previously saved data'
+      '\n• Continue your meditation journey from where you left off';
 
   static const String accountTransitionWarningTitle = 'Save Your Progress';
   static const String loginWarningMessage =
@@ -288,9 +286,11 @@ class StringConstants {
   static const String sunday = 'S'; // First letter of Sunday
 
   /// Message displayed to encourage daily practice and mindfulness
-  static const String dailyPracticeMessage = 'Practicing daily grows your streak, but it also makes you more mindful and happier!';
+  static const String dailyPracticeMessage =
+      'Practicing daily grows your streak, but it also makes you more mindful and happier!';
 
-  static const String dayStreak = 'day streak'; // Used to display the current streak of meditation days
+  static const String dayStreak =
+      'day streak'; // Used to display the current streak of meditation days
 
   /// Title displayed above the daily quote widget in the home view
   static const String dailyQuote = 'Daily Quote';
@@ -300,5 +300,4 @@ class StringConstants {
 
   //Snackbar text for when we have to go into offlinemode due to an error:
   static const offlineMode = 'You are now in offline mode due to an error.';
-
 }
