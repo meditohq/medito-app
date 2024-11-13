@@ -5,13 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/path/journal_entry_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
-import 'package:medito/views/settings/sign_up_log_in_web_view_screen.dart';
+import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 extension SanitisePath on String {
@@ -44,15 +43,12 @@ Future<void> handleNavigation(
     final url = ids.last ?? StringConstants.meditoUrl;
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      final result = await Navigator.push(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => _URLLauncherScreen(url: uri),
         ),
       );
-      if (result == true) {
-        onNavigationComplete?.call();
-      }
     }
   } else if (type.contains('settings')) {
     await _pushRoute(const SettingsScreen(), ref);
@@ -61,22 +57,18 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    var success = await _pushRoute(const SignUpLogInPage(), ref);
-    if (success == true) {
-      await StatsManager().clearAllStats();
-      await StatsManager().sync();
-      ref?.invalidate(meProvider);
-      ref?.invalidate(statsProvider);
-    }
+    _pushRoute(const SignUpLogInPage(), ref);
   } else if (type == TypeConstants.journalEntry) {
     var id = ids.first ?? '';
     var content = ids.length > 1 ? ids[1] ?? '' : '';
     var isCompleted = ids.length > 2 ? ids[2] == 'true' : false;
-    await _pushRoute(JournalEntryView(
-      taskId: id,
-      isCompleted: isCompleted,
-      initialText: content,
-    ), ref);
+    await _pushRoute(
+        JournalEntryView(
+          taskId: id,
+          isCompleted: isCompleted,
+          initialText: content,
+        ),
+        ref);
   }
 }
 
@@ -134,7 +126,8 @@ class _URLLauncherScreen extends StatefulWidget {
   State<_URLLauncherScreen> createState() => _URLLauncherScreenState();
 }
 
-class _URLLauncherScreenState extends State<_URLLauncherScreen> with WidgetsBindingObserver {
+class _URLLauncherScreenState extends State<_URLLauncherScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

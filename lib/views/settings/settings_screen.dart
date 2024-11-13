@@ -46,14 +46,12 @@ class SettingsItem {
   final String title;
   final Widget icon;
   final String path;
-  final VoidCallback? onNavigationComplete;
 
   const SettingsItem({
     required this.type,
     required this.title,
     required this.icon,
     required this.path,
-    this.onNavigationComplete,
   });
 }
 
@@ -99,7 +97,6 @@ class SettingsScreen extends ConsumerWidget {
           color: ColorConstants.white,
         ),
         path: ref.watch(editStatsUrlProvider),
-        onNavigationComplete: () => ref.read(statsProvider.notifier).refresh(),
       ),
       SettingsItem(
         type: 'url',
@@ -264,7 +261,6 @@ class SettingsScreen extends ConsumerWidget {
       [item.path.toString().getIdFromPath(), item.path],
       context,
       ref: ref,
-      onNavigationComplete: item.onNavigationComplete,
     );
   }
 

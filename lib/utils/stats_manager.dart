@@ -23,7 +23,8 @@ class StatsManager {
 
   Future<void> initialize() async {
     if (!_isInitialized) {
-      statsService = StatsService(DioApiService(), await SharedPreferences.getInstance());
+      statsService =
+          StatsService(DioApiService(), await SharedPreferences.getInstance());
       _isInitialized = true;
     }
   }
@@ -37,27 +38,28 @@ class StatsManager {
     try {
       dev.log('StatsManager: Fetching remote stats');
       _allStats = await statsService.fetchAllStats();
-      
+
       dev.log('StatsManager: Merging stats');
       await _merge();
-      
+
       if (_allStats != null) {
         dev.log('StatsManager: Calculating streak');
         _allStats = calculateStreak(_allStats!);
-        
+
         dev.log('StatsManager: Saving local stats');
         await _saveLocalAllStats();
-        
+
         dev.log('StatsManager: Posting updated stats');
         await statsService.postUpdatedStats(_allStats!);
       }
-      
+
       dev.log('StatsManager: Sync completed');
     } catch (e, stackTrace) {
       if (e.toString().contains('Please wait')) {
         dev.log('StatsManager: Sync throttled');
       } else {
-        dev.log('StatsManager: Error during sync', error: e, stackTrace: stackTrace);
+        dev.log('StatsManager: Error during sync',
+            error: e, stackTrace: stackTrace);
         _allStats = await _loadLocalAllStats();
       }
     }
@@ -74,55 +76,42 @@ class StatsManager {
   Future<void> _merge() async {
     dev.log('StatsManager: Starting merge');
     var prefs = await SharedPreferences.getInstance();
-    var localAllStatsJson = prefs.getString(SharedPreferenceConstants.localAllStatsKey);
-    dev.log('StatsManager: Local stats JSON: ${localAllStatsJson?.substring(0, min(50, localAllStatsJson.length))}...');
-    
-    var localAudioCompleted = <LocalAudioCompleted>[];
+    var localAllStatsJson =
+        prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+    dev.log('StatsManager: Local stats JSON: $localAllStatsJson...');
 
     LocalAllStats? localAllStats;
-    var areRemoteStatsNewer = true;
+
     if (localAllStatsJson != null && localAllStatsJson != 'null') {
       localAllStats = LocalAllStats.fromJson(
           jsonDecode(localAllStatsJson) as Map<String, dynamic>);
-      localAudioCompleted = localAllStats.audioCompleted ?? [];
-      areRemoteStatsNewer = (_allStats?.updated ?? 0) > (localAllStats.updated);
     }
 
-    var mergedAudioCompleted = [
-      ...?_allStats?.audioCompleted,
-      ...localAudioCompleted,
-    ];
+    // If we have no remote stats but have local stats, use local
+    if ((_allStats?.totalTracksCompleted ?? 0) == 0 &&
+        (localAllStats?.totalTracksCompleted ?? 0) > 0) {
+      _allStats = localAllStats?.copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
 
-    // Remove duplicates based on id and timestamp
-    mergedAudioCompleted =
-        mergedAudioCompleted.fold<List<LocalAudioCompleted>>([], (list, item) {
-      if (!list.any((element) =>
-          element.id == item.id && element.timestamp == item.timestamp)) {
-        list.add(item);
-      }
-      return list;
-    });
+      return;
+    }
 
-    // Sort by timestamp, most recent to oldest
-    mergedAudioCompleted.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    // Check if remote stats are newer
+    var areRemoteStatsNewer =
+        (_allStats?.updated ?? 0) > (localAllStats?.updated ?? 0);
 
-    // Update LocalAllStats with merged list and other fields
-    _allStats = _allStats?.copyWith(
-      audioCompleted: mergedAudioCompleted,
-      streakCurrent: areRemoteStatsNewer
-          ? _allStats?.streakCurrent
-          : localAllStats?.streakCurrent,
-      streakLongest: areRemoteStatsNewer
-          ? _allStats?.streakLongest
-          : localAllStats?.streakLongest,
-      totalTracksCompleted: areRemoteStatsNewer
-          ? _allStats?.totalTracksCompleted
-          : localAllStats?.totalTracksCompleted,
-      totalTimeListened: areRemoteStatsNewer
-          ? _allStats?.totalTimeListened
-          : localAllStats?.totalTimeListened,
-      updated: DateTime.now().millisecondsSinceEpoch,
-    );
+    if (areRemoteStatsNewer) {
+      // Use remote stats and recalculate streak
+      _allStats = calculateStreak(_allStats!).copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
+    } else {
+      // Keep local stats if they're newer
+      _allStats = localAllStats?.copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
+    }
   }
 
   LocalAllStats calculateStreak(LocalAllStats allStats) {

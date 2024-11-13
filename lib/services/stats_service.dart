@@ -11,15 +11,15 @@ class StatsService {
   final SharedPreferences _prefs;
   static const _lastSyncKey = 'last_stats_sync';
   static const _minTimeBetweenRequests = 2000; // 2 seconds
-  
+
   StatsService(this._dioApiService, this._prefs);
 
   Future<LocalAllStats> fetchAllStats() async {
     dev.log('StatsService: Attempting to fetch stats');
-    
+
     var now = DateTime.now().millisecondsSinceEpoch;
     var lastSync = _prefs.getInt(_lastSyncKey) ?? 0;
-    
+
     if (now - lastSync < _minTimeBetweenRequests) {
       dev.log('StatsService: Too soon, returning cached stats');
       return _getCachedStats();
