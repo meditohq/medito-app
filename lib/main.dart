@@ -144,12 +144,17 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _setUpSystemUi() {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: ColorConstants.transparent,
-      statusBarColor: ColorConstants.transparent,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+          systemStatusBarContrastEnforced: false,
+          systemNavigationBarColor: Colors.transparent ,
+          systemNavigationBarDividerColor: Colors.transparent,
+          systemNavigationBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.dark),
+    );
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+    );
   }
 
   @override
