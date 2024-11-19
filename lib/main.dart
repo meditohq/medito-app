@@ -24,13 +24,12 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/network/dio_header_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
-import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
-import 'package:medito/providers/notification/reminder_provider.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -47,9 +46,6 @@ void main() async {
   await initializeApp();
   await _runApp();
 }
-
-var audioStateNotifier = AudioStateNotifier();
-final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> initializeApp() async {
   await Firebase.initializeApp(
@@ -174,7 +170,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   void dispose() {
-    _connectivityListener.cancel();
     _sub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -224,32 +219,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     }
   }
 
-  void _hideNoConnectionSnackBar() {
-    scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-  }
-
-  void _initDeepLinkListener() {
-    _sub = AppLinks().uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        _handleDeepLink(uri);
-      }
-    }, onError: (err) {
-      if (kDebugMode) {
-        print('Deep link error: $err');
-      }
-    });
-  }
-
-  Future<void> _initializeDioHeaderService() async {
-    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-    dioHeaderService = DioHeaderService(deviceInfo);
-    await dioHeaderService.initialise();
-  }
-
-  void _navigateToDownloads(BuildContext context) {
-    handleNavigation(TypeConstants.flow, ['downloads'], context, ref: ref);
-  }
-
   Future<void> _onAppForegrounded() async {
     ref.read(reminderProvider).clearBadge();
     ref.invalidate(statsProvider);
@@ -269,35 +238,4 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
   }
 
-  @override
-  void dispose() {
-    _sub?.cancel();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: kDebugMode,
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey,
-      theme: appTheme(context),
-      title: ParentWidget._title,
-      home: SplashView(),
-    );
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      _onAppForegrounded();
-    }
-  }
-
-  void _onAppForegrounded() {
-    ref.read(reminderProvider).clearBadge();
-    ref.read(statsProvider.notifier).refresh();
-  }
 }
