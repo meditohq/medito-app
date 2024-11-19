@@ -77,10 +77,10 @@ jobs:
           echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
 
       - name: Create a dummy .prod.env file
-        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
+        run: echo -e "var BASE_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
 
       - name: Create a dummy .staging.env file
-        run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .staging.env
+        run: echo -e "var BASE_URL = ''; \nvar INIT_TOKEN = '';" > .staging.env
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs

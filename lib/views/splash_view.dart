@@ -1,5 +1,4 @@
 import 'package:medito/constants/constants.dart';
-import 'package:medito/main.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -30,7 +29,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void _initializeUser() async {
     try {
       await ref.read(authRepositoryProvider).initializeUser();
-      await StatsManager().sync();
+      await StatsManager().initialize();
 
       if (!mounted) return;
 
@@ -62,6 +61,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: ColorConstants.ebony,
       body: Center(
         child: SvgPicture.asset(

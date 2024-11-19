@@ -7,7 +7,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -35,6 +34,27 @@ TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
       : null;
 }
 
+final userIdProvider = FutureProvider<String>((ref) async {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final userId = await authRepository.getClientIdFromSharedPreference();
+
+  return userId ?? '';
+});
+
+class SettingsItem {
+  final String type;
+  final String title;
+  final Widget icon;
+  final String path;
+
+  const SettingsItem({
+    required this.type,
+    required this.title,
+    required this.icon,
+    required this.path,
+  });
+}
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
@@ -42,10 +62,8 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
-    final userId = authRepository.currentUser?.id ?? '';
+    final clientIdSync = ref.watch(userIdProvider);
     final deviceInfoAsyncValue = ref.watch(deviceAndAppInfoProvider);
-    final statsAsyncValue = ref.watch(statsProvider);
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
@@ -56,7 +74,7 @@ class SettingsScreen extends ConsumerWidget {
             color: ColorConstants.white),
         path: 'account',
       ),
-       SettingsItem(
+      SettingsItem(
         type: 'url',
         title: StringConstants.donateTitle,
         icon: HugeIcon(
@@ -78,13 +96,7 @@ class SettingsScreen extends ConsumerWidget {
           icon: HugeIcons.solidRoundedQuestion,
           color: ColorConstants.white,
         ),
-        path: statsAsyncValue.when(
-          data: (stats) {
-            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelistened=${stats.totalTimeListened}';
-          },
-          loading: () => '$editStatsUrl?userid=$userId',
-          error: (_, __) => '$editStatsUrl?userid=$userId',
-        ),
+        path: ref.watch(editStatsUrlProvider),
       ),
       SettingsItem(
         type: 'url',
@@ -98,18 +110,22 @@ class SettingsScreen extends ConsumerWidget {
         title: StringConstants.contactUsTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedMessage01, color: ColorConstants.white),
-        path: deviceInfoAsyncValue.when(
-          data: (deviceInfo) {
-            final platform = Uri.encodeComponent(deviceInfo.platform);
-            final language = Uri.encodeComponent(deviceInfo.languageCode);
-            final model = Uri.encodeComponent(deviceInfo.model);
-            final appVersion = Uri.encodeComponent(deviceInfo.appVersion);
-            final os = Uri.encodeComponent(deviceInfo.os);
+        path: clientIdSync.when(
+          data: (userId) => deviceInfoAsyncValue.when(
+            data: (deviceInfo) {
+              final platform = Uri.encodeComponent(deviceInfo.platform);
+              final language = Uri.encodeComponent(deviceInfo.languageCode);
+              final model = Uri.encodeComponent(deviceInfo.model);
+              final appVersion = Uri.encodeComponent(deviceInfo.appVersion);
+              final os = Uri.encodeComponent(deviceInfo.os);
 
-            return 'https://tally.so/r/wLGBaO?userId=$userId&platform=$platform&language=$language&model=$model&appVersion=$appVersion&os=$os';
-          },
-          loading: () => 'https://tally.so/r/wLGBaO?userId=$userId',
-          error: (_, __) => 'https://tally.so/r/wLGBaO?userId=$userId',
+              return 'https://tally.so/r/wLGBaO?userId=$userId&platform=$platform&language=$language&model=$model&appVersion=$appVersion&os=$os';
+            },
+            loading: () => 'https://tally.so/r/wLGBaO?userId=$userId',
+            error: (_, __) => 'https://tally.so/r/wLGBaO?userId=$userId',
+          ),
+          loading: () => 'https://tally.so/r/wLGBaO',
+          error: (_, __) => 'https://tally.so/r/wLGBaO',
         ),
       ),
       SettingsItem(
@@ -320,18 +336,4 @@ class SettingsScreen extends ConsumerWidget {
       builder: (context) => const DebugBottomSheetWidget(),
     );
   }
-}
-
-class SettingsItem {
-  final String type;
-  final String title;
-  final Widget icon;
-  final String path;
-
-  const SettingsItem({
-    required this.type,
-    required this.title,
-    required this.icon,
-    required this.path,
-  });
 }

@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import '../../constants/colors/color_constants.dart';
 import '../../constants/styles/widget_styles.dart';
 import '../markdown_widget.dart';
-
 class DescriptionWidget extends StatelessWidget {
   const DescriptionWidget({super.key, required this.description});
 
-  final description;
+  final String description;
 
   @override
   Widget build(BuildContext context) {

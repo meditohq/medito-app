@@ -40,11 +40,10 @@ abstract class TrackModel with _$TrackModel {
               (e) => TrackAudioModel(
                 guideName: e.guideName,
                 files: [
-                  ...e.files.map((e) => e).toList(),
+                  ...e.files.map((e) => e),
                 ],
               ),
-            )
-            .toList(),
+            ),
       ],
     );
   }

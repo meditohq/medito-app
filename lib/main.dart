@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:core';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -23,19 +24,28 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/network/dio_header_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
+
+final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+var audioStateNotifier = AudioStateNotifier();
+bool _hasInitialized = false;
 
 void main() async {
+  if (_hasInitialized) {
+    return;
+  }
+  _hasInitialized = true;
+
   WidgetsFlutterBinding.ensureInitialized();
   _setUpWidget();
   await initializeApp();
-  _runAppWithSentry();
+  await _runApp();
 }
 
 var audioStateNotifier = AudioStateNotifier();
@@ -116,22 +126,14 @@ void _setUpWidget() {
   HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
 }
 
-Future<void> _runAppWithSentry() async {
+Future<void> _runApp() async {
   var prefs = await initializeSharedPreferences();
-  await SentryFlutter.init(
-    (options) {
-      options.attachScreenshot = true;
-      options.environment = environment;
-      options.dsn = sentryDsn;
-      options.tracesSampleRate = 1.0;
-    },
-    appRunner: () => runApp(
-      ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
-        child: const ParentWidget(),
-      ),
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const ParentWidget(),
     ),
   );
 }
@@ -148,7 +150,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
   StreamSubscription? _sub;
-  late final StreamSubscription<InternetStatus> _connectivityListener;
   late DioHeaderService dioHeaderService;
 
   @override
@@ -185,24 +186,23 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinkListener();
-    _initializeDioHeaderService().then(
-      (_) {
-        _checkInitialConnectivity();
-      },
-    );
+    _initializeDioHeaderService();
   }
 
-  Future<void> _checkInitialConnectivity() async {
-    _connectivityListener =
-        InternetConnection().onStatusChange.listen((InternetStatus status) {
-      switch (status) {
-        case InternetStatus.connected:
-          _hideNoConnectionSnackBar();
-          StatsManager().sync().then((_) => ref.invalidate(statsProvider));
-          break;
-        case InternetStatus.disconnected:
-          _showNoConnectionSnackBar();
-          break;
+  Future<void> _initializeDioHeaderService() async {
+    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+    dioHeaderService = DioHeaderService(deviceInfo);
+    await dioHeaderService.initialise();
+  }
+
+  void _initDeepLinkListener() {
+    _sub = AppLinks().uriLinkStream.listen((Uri? uri) {
+      if (uri != null) {
+        _handleDeepLink(uri);
+      }
+    }, onError: (err) {
+      if (kDebugMode) {
+        print('Deep link error: $err');
       }
     });
 
@@ -256,34 +256,48 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _setUpSystemUi() {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: ColorConstants.transparent,
-      statusBarColor: ColorConstants.transparent,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+          systemStatusBarContrastEnforced: false,
+          systemNavigationBarColor: Colors.transparent ,
+          systemNavigationBarDividerColor: Colors.transparent,
+          systemNavigationBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.dark),
+    );
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+    );
   }
 
-  void _showNoConnectionSnackBar() {
-    var currentState = scaffoldMessengerKey.currentState;
-    if (currentState?.mounted ?? false) {
-      currentState!
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: const Text(StringConstants.noConnectionMessage),
-            duration: const Duration(days: 365),
-            action: SnackBarAction(
-              label: StringConstants.goToDownloads,
-              onPressed: () {
-                currentState.hideCurrentSnackBar();
-                _navigateToDownloads(context);
-              },
-            ),
-          ),
-        );
-    }
+  @override
+  void dispose() {
+    _sub?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-    return;
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: kDebugMode,
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      navigatorKey: navigatorKey,
+      theme: appTheme(context),
+      title: ParentWidget._title,
+      home: SplashView(),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _onAppForegrounded();
+    }
+  }
+
+  void _onAppForegrounded() {
+    ref.read(reminderProvider).clearBadge();
+    ref.read(statsProvider.notifier).refresh();
   }
 }

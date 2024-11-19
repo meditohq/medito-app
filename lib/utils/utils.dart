@@ -7,7 +7,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Color parseColor(String? color) {
@@ -53,11 +52,10 @@ Future<void> launchURLInBrowser(String url) async {
         );
       }
     }
-  } catch (e, stackTrace) {
-    await Sentry.captureException(
-      e,
-      stackTrace: stackTrace,
-    );
+  } catch (e) {
+    if (kDebugMode) {
+        print(e);
+      }
   }
 }
 

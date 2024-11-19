@@ -5,7 +5,6 @@ class EnvConfig {
   final String contentBaseUrl;
   final String authBaseUrl;
   final String authToken;
-  final String sentryDsn;
   final String supabaseKey;
   final String supabaseUrl;
   final String editStatsUrl;
@@ -15,7 +14,6 @@ class EnvConfig {
     required this.contentBaseUrl,
     required this.authBaseUrl,
     required this.authToken,
-    required this.sentryDsn,
     required this.supabaseKey,
     required this.supabaseUrl,
     required this.editStatsUrl,
@@ -28,7 +26,6 @@ class ProdEnv extends EnvConfig {
     required super.contentBaseUrl,
     required super.authBaseUrl,
     required super.authToken,
-    required super.sentryDsn,
     required super.supabaseKey,
     required super.supabaseUrl,
     required super.editStatsUrl,
@@ -41,7 +38,6 @@ class StagingEnv extends EnvConfig {
     required super.contentBaseUrl,
     required super.authBaseUrl,
     required super.authToken,
-    required super.sentryDsn,
     required super.supabaseKey,
     required super.supabaseUrl,
     required super.editStatsUrl,
@@ -55,7 +51,6 @@ const _prodEnv = ProdEnv(
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
-  sentryDsn: String.fromEnvironment('SENTRY_DSN'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
@@ -66,7 +61,6 @@ const _stagingEnv = StagingEnv(
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
-  sentryDsn: String.fromEnvironment('SENTRY_DSN'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
@@ -78,7 +72,6 @@ String get environment => _currentEnv.environment;
 String get contentBaseUrl => _currentEnv.contentBaseUrl;
 String get authBaseUrl => _currentEnv.authBaseUrl;
 String get authToken => _currentEnv.authToken;
-String get sentryDsn => _currentEnv.sentryDsn;
 String get editStatsUrl => _currentEnv.editStatsUrl;
 
 class HTTPConstants {

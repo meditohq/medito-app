@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,7 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../models/notification/notification_payload_model.dart';
 import '../../routes/routes.dart';
@@ -27,7 +27,9 @@ class FirebaseMessagingHandler {
       _configureFirebaseMessaging(context, ref);
       _initializeLocalNotifications(context, ref);
     } catch (e) {
-      unawaited(Sentry.captureException(e));
+        if (kDebugMode) {
+          print(e);
+        }  
     }
   }
 
@@ -132,7 +134,6 @@ class FirebaseMessagingHandler {
       );
     }
   }
-
 }
 
 @pragma('vm:entry-point')

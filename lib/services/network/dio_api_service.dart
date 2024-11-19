@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/services/auth/auth_interceptor.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:medito/utils/retry_mixin.dart';
 
 const _errorKey = 'error';
@@ -38,10 +37,6 @@ class DioApiService with RetryMixin {
     dio.interceptors.add(
       InterceptorsWrapper(
         onError: (e, handler) async {
-          if (kReleaseMode) {
-            await _captureException(e);
-          }
-          
           throw _returnDioErrorResponse(e);
         },
       ),
@@ -57,21 +52,6 @@ class DioApiService with RetryMixin {
         ),
       );
     }
-  }
-
-  Future<void> _captureException(dynamic err) async {
-    var exceptionData = {
-      'error': err.toString(),
-      'endpoint':
-          err is DioException ? err.requestOptions.path.toString() : 'Unknown',
-      'response': err is DioException ? err.response.toString() : 'Unknown',
-      'serverMessage': err is DioException ? err.message.toString() : 'Unknown',
-    };
-
-    await Sentry.captureException(
-      exceptionData,
-      stackTrace: err is DioException ? err.stackTrace : StackTrace.current,
-    );
   }
 
   // ignore: avoid-dynamic

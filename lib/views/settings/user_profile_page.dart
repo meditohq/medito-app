@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 
@@ -31,10 +32,12 @@ class UserProfilePage extends ConsumerWidget {
               style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
+            OutlinedButton(
               onPressed: () async {
                 try {
                   await authRepository.signOut();
+                  await StatsManager().clearAllStats();
+
                   Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -47,9 +50,9 @@ class UserProfilePage extends ConsumerWidget {
                   );
                 }
               },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: ColorConstants.onyx,
-                backgroundColor: ColorConstants.brightSky,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: ColorConstants.brightSky,
+                side: const BorderSide(color: ColorConstants.brightSky),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/dio_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'background_sounds_repository.g.dart';
 
@@ -73,10 +73,9 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         return sounds;
       }
     } catch (err) {
-      unawaited(Sentry.captureException(
-        err,
-        stackTrace: err,
-      ));
+      if (kDebugMode) {
+        print(err);
+      }
     }
 
     return null;
@@ -110,10 +109,9 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         }
       }
     } catch (err) {
-      unawaited(Sentry.captureException(
-        err,
-        stackTrace: err,
-      ));
+      if (kDebugMode) {
+        print(err);
+      }
     }
   }
 

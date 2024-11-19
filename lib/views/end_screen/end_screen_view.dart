@@ -30,9 +30,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
 
   void _loadStats() {
     Future.delayed(const Duration(seconds: 1), () {
-      ref.read(statsProvider.notifier).refresh().then((_) {
-        ref.invalidate(statsProvider);
-      });
+      ref.read(statsProvider.notifier).refresh();
     });
   }
 

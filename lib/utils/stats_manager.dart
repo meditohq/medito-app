@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -21,83 +23,95 @@ class StatsManager {
 
   Future<void> initialize() async {
     if (!_isInitialized) {
-      statsService = StatsService(DioApiService());
+      statsService =
+          StatsService(DioApiService(), await SharedPreferences.getInstance());
       _isInitialized = true;
     }
   }
 
   Future<void> sync() async {
+    dev.log('StatsManager: Starting sync');
     if (!_isInitialized) {
       await initialize();
     }
 
     try {
-      await getRemoteStats();
+      dev.log('StatsManager: Fetching remote stats');
+      _allStats = await statsService.fetchAllStats();
+
+      dev.log('StatsManager: Merging stats');
       await _merge();
+
       if (_allStats != null) {
+        dev.log('StatsManager: Calculating streak');
         _allStats = calculateStreak(_allStats!);
+
+        dev.log('StatsManager: Saving local stats');
+        await _saveLocalAllStats();
+
+        dev.log('StatsManager: Posting updated stats');
+        await statsService.postUpdatedStats(_allStats!);
       }
-      await _saveLocalAllStats();
-      await _postUpdatedStats();
-    } catch (e) {
-      _allStats = await _loadLocalAllStats();
+
+      dev.log('StatsManager: Sync completed');
+    } catch (e, stackTrace) {
+      if (e.toString().contains('Please wait')) {
+        dev.log('StatsManager: Sync throttled');
+      } else {
+        dev.log('StatsManager: Error during sync',
+            error: e, stackTrace: stackTrace);
+        _allStats = await _loadLocalAllStats();
+      }
     }
   }
 
-  Future<void> getRemoteStats() async {
-    _allStats = await statsService.fetchAllStats();
+  Future<LocalAllStats> get localAllStats async {
+    if (_allStats == null) {
+      dev.log('StatsManager: Loading local stats');
+      _allStats = await _loadLocalAllStats();
+    }
+    return _allStats!;
   }
 
   Future<void> _merge() async {
+    dev.log('StatsManager: Starting merge');
     var prefs = await SharedPreferences.getInstance();
     var localAllStatsJson =
         prefs.getString(SharedPreferenceConstants.localAllStatsKey);
-    var localAudioCompleted = <LocalAudioCompleted>[];
+    dev.log('StatsManager: Local stats JSON: $localAllStatsJson...');
 
     LocalAllStats? localAllStats;
-    var areRemoteStatsNewer = true;
+
     if (localAllStatsJson != null && localAllStatsJson != 'null') {
       localAllStats = LocalAllStats.fromJson(
           jsonDecode(localAllStatsJson) as Map<String, dynamic>);
-      localAudioCompleted = localAllStats.audioCompleted ?? [];
-      areRemoteStatsNewer = (_allStats?.updated ?? 0) > (localAllStats.updated);
     }
 
-    var mergedAudioCompleted = [
-      ...?_allStats?.audioCompleted,
-      ...localAudioCompleted,
-    ];
+    // If we have no remote stats but have local stats, use local
+    if ((_allStats?.totalTracksCompleted ?? 0) == 0 &&
+        (localAllStats?.totalTracksCompleted ?? 0) > 0) {
+      _allStats = localAllStats?.copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
 
-    // Remove duplicates based on id and timestamp
-    mergedAudioCompleted =
-        mergedAudioCompleted.fold<List<LocalAudioCompleted>>([], (list, item) {
-      if (!list.any((element) =>
-          element.id == item.id && element.timestamp == item.timestamp)) {
-        list.add(item);
-      }
-      return list;
-    });
+      return;
+    }
 
-    // Sort by timestamp, most recent to oldest
-    mergedAudioCompleted.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    // Check if remote stats are newer
+    var areRemoteStatsNewer =
+        (_allStats?.updated ?? 0) > (localAllStats?.updated ?? 0);
 
-    // Update LocalAllStats with merged list and other fields
-    _allStats = _allStats?.copyWith(
-      audioCompleted: mergedAudioCompleted,
-      streakCurrent: areRemoteStatsNewer
-          ? _allStats?.streakCurrent
-          : localAllStats?.streakCurrent,
-      streakLongest: areRemoteStatsNewer
-          ? _allStats?.streakLongest
-          : localAllStats?.streakLongest,
-      totalTracksCompleted: areRemoteStatsNewer
-          ? _allStats?.totalTracksCompleted
-          : localAllStats?.totalTracksCompleted,
-      totalTimeListened: areRemoteStatsNewer
-          ? _allStats?.totalTimeListened
-          : localAllStats?.totalTimeListened,
-      updated: DateTime.now().millisecondsSinceEpoch,
-    );
+    if (areRemoteStatsNewer) {
+      // Use remote stats and recalculate streak
+      _allStats = calculateStreak(_allStats!).copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
+    } else {
+      // Keep local stats if they're newer
+      _allStats = localAllStats?.copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
+    }
   }
 
   LocalAllStats calculateStreak(LocalAllStats allStats) {
@@ -171,15 +185,11 @@ class StatsManager {
     );
   }
 
-  Future<void> _postUpdatedStats() async {
-    try {
-      if (_allStats != null) {
-        await statsService.postUpdatedStats(_allStats!);
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error posting updated stats: $e');
-      }
+  Future<void> _saveLocalAllStats() async {
+    var prefs = await SharedPreferences.getInstance();
+    if (_allStats != null) {
+      await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
+          jsonEncode(_allStats!.toJson()));
     }
   }
 
@@ -199,21 +209,6 @@ class StatsManager {
       }
     }
     return LocalAllStats.empty();
-  }
-
-  Future<void> _saveLocalAllStats() async {
-    var prefs = await SharedPreferences.getInstance();
-    if (_allStats != null) {
-      await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
-          jsonEncode(_allStats!.toJson()));
-    }
-  }
-
-  Future<LocalAllStats> get localAllStats async {
-    if (_allStats == null) {
-      await sync();
-    }
-    return _allStats!;
   }
 
   Future<void> addAudioCompleted(
@@ -240,7 +235,7 @@ class StatsManager {
       _allStats = calculateStreak(_allStats!);
     }
     await _saveLocalAllStats();
-    unawaited(_postUpdatedStats());
+    unawaited(statsService.postUpdatedStats(_allStats!));
   }
 
   Future<void> addTrackChecked(String trackId) async {
@@ -258,7 +253,7 @@ class StatsManager {
       );
 
       await _saveLocalAllStats();
-      unawaited(_postUpdatedStats());
+      unawaited(statsService.postUpdatedStats(_allStats!));
     }
   }
 
@@ -275,7 +270,7 @@ class StatsManager {
       );
 
       await _saveLocalAllStats();
-      unawaited(_postUpdatedStats());
+      unawaited(statsService.postUpdatedStats(_allStats!));
     }
   }
 
