@@ -4,7 +4,6 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/stats_provider.dart';
 import '../../../../constants/colors/color_constants.dart';
-import '../../../../widgets/medito_huge_icon.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class StreakCircle extends ConsumerStatefulWidget {
