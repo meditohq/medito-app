@@ -26,7 +26,7 @@ import 'package:medito/services/network/dio_header_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
-import 'package:workmanager/workmanager.dart';
+// import 'package:workmanager/workmanager.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
@@ -69,54 +69,54 @@ void setupAudioCallback() {
   MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
 }
 
-@pragma('vm:entry-point')
-void widgetCallbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    try {
-      WidgetsFlutterBinding.ensureInitialized();
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+// @pragma('vm:entry-point')
+// void widgetCallbackDispatcher() {
+//   Workmanager().executeTask((task, inputData) async {
+//     try {
+//       WidgetsFlutterBinding.ensureInitialized();
+//       await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-      if (task == WidgetConstants.taskName) {
-        await HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
+//       if (task == WidgetConstants.taskName) {
+//         await HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
 
-        var statsManager = StatsManager();
-        await statsManager.initialize();
+//         var statsManager = StatsManager();
+//         await statsManager.initialize();
 
-        try {
-          await statsManager.sync();
-        } catch (e) {
-          if (kDebugMode) print('Stats sync failed: $e');
-        }
+//         try {
+//           await statsManager.sync();
+//         } catch (e) {
+//           if (kDebugMode) print('Stats sync failed: $e');
+//         }
 
-        var stats = await statsManager.localAllStats;
-        await updateiOSWidget(stats);
+//         var stats = await statsManager.localAllStats;
+//         await updateiOSWidget(stats);
 
-        return Future.value(true);
-      }
-      return Future.value(false);
-    } catch (e) {
-      if (kDebugMode) print('Widget update failed: $e');
-      return Future.value(false);
-    }
-  });
-}
+//         return Future.value(true);
+//       }
+//       return Future.value(false);
+//     } catch (e) {
+//       if (kDebugMode) print('Widget update failed: $e');
+//       return Future.value(false);
+//     }
+//   });
+// }
 
 void _setUpWidget() {
   // Initialize Workmanager with the dispatcher callback
-  Workmanager().initialize(
-    widgetCallbackDispatcher,
-    isInDebugMode: kDebugMode,
-  );
+  // Workmanager().initialize(
+  //   widgetCallbackDispatcher,
+  //   isInDebugMode: kDebugMode,
+  // );
 
-  // Register periodic background task for iOS and Android
-  Workmanager().registerPeriodicTask(
-    WidgetConstants.taskIdentifier,
-    WidgetConstants.taskName,
-    frequency:
-        kDebugMode ? const Duration(minutes: 15) : const Duration(minutes: 45),
-    backoffPolicy: BackoffPolicy.linear,
-    backoffPolicyDelay: const Duration(minutes: 1),
-  );
+  // // Register periodic background task for iOS and Android
+  // Workmanager().registerPeriodicTask(
+  //   WidgetConstants.taskIdentifier,
+  //   WidgetConstants.taskName,
+  //   frequency:
+  //       kDebugMode ? const Duration(minutes: 15) : const Duration(minutes: 45),
+  //   backoffPolicy: BackoffPolicy.linear,
+  //   backoffPolicyDelay: const Duration(minutes: 1),
+  // );
 
   // Set the app group ID for HomeWidget usage
   HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);

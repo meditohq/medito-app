@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import Firebase
 import home_widget
-import workmanager
+// import workmanager
 import app_links
 
 @main
@@ -22,9 +22,9 @@ import app_links
     UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60 * 15)) // 15 minutes
     
     // Set up Workmanager callback
-    WorkmanagerPlugin.setPluginRegistrantCallback { registry in
-      GeneratedPluginRegistrant.register(with: registry)
-    }
+    // WorkmanagerPlugin.setPluginRegistrantCallback { registry in
+    //   GeneratedPluginRegistrant.register(with: registry)
+    // }
     
     // Set up HomeWidget callback for iOS 17+
     if #available(iOS 17, *) {
