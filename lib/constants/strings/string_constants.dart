@@ -206,6 +206,9 @@ class StringConstants {
   /// Title for the Donate section in the Settings screen
   static const String donateTitle = 'Donate';
 
+  /// Title for the Donate with RevenueCat section in the Settings screen
+  static const String donateRevenueCatTitle = 'Donate with RevenueCat';
+
   /// Title for the Contact Us section in the Settings screen
   static const String contactUsTitle = 'Contact us';
 

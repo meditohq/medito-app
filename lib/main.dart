@@ -27,6 +27,7 @@ import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 // import 'package:workmanager/workmanager.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
@@ -45,6 +46,7 @@ void main() async {
   _setUpWidget();
   await initializeApp();
   await _runApp();
+  initPlatformState(); 
 }
 
 Future<void> initializeApp() async {
@@ -54,6 +56,16 @@ Future<void> initializeApp() async {
   setupAudioCallback();
   await initializeAudioService();
   usePathUrlStrategy();
+}
+
+Future<void> initPlatformState() async {
+  PurchasesConfiguration configuration;
+  if (Platform.isIOS) {
+    configuration = PurchasesConfiguration(revenueCatIOSKey);
+  } else {
+    configuration = PurchasesConfiguration(revenueCatAndroidKey);
+  }
+  await Purchases.configure(configuration);
 }
 
 Future<void> initializeAudioService() async {

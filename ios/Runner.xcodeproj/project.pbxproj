@@ -22,6 +22,7 @@
 		ED73D7BE2CD60AC0005EB56D /* QuoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */; };
 		ED73D7C42CD60C28005EB56D /* QuoteWidgetMedium.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */; };
 		ED73D7C62CD60C31005EB56D /* QuoteWidgetMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */; };
+		ED8614562CECF4F600453B75 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED8614552CECF4F600453B75 /* StoreKit.framework */; };
 		ED8A5B3D2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
 		ED8A5B3E2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
 		ED8A5B832CCCDB540043D20A /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B822CCCDB4E0043D20A /* Colors.swift */; };
@@ -117,6 +118,7 @@
 		ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteView.swift; sourceTree = "<group>"; };
 		ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetMedium.swift; sourceTree = "<group>"; };
 		ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetMediumView.swift; sourceTree = "<group>"; };
+		ED8614552CECF4F600453B75 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBackgroundModifier.swift; sourceTree = "<group>"; };
 		ED8A5B822CCCDB4E0043D20A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
@@ -139,7 +141,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		ED8A5BE02CCCE1120043D20A /* Exceptions for "Fonts" folder in "Runner" target */ = {
+		ED8A5BE02CCCE1120043D20A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"dm-serif/DMSerifDisplay-Italic.ttf",
@@ -158,18 +160,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		ED8A5BC82CCCE1060043D20A /* Fonts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				ED8A5BE02CCCE1120043D20A /* Exceptions for "Fonts" folder in "Runner" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
+		ED8A5BC82CCCE1060043D20A /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (ED8A5BE02CCCE1120043D20A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCCE5064A81064C476F89A5F /* Pods_Runner.framework in Frameworks */,
+				ED8614562CECF4F600453B75 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +217,7 @@
 		95ACCE06FA1D8D6FDA1DF450 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ED8614552CECF4F600453B75 /* StoreKit.framework */,
 				16BE8B22D54AB74694F36327 /* Pods_Runner.framework */,
 				6C2EEC647C1F50839E656BF6 /* Pods_RunnerTests.framework */,
 			);

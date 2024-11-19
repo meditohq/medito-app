@@ -8,6 +8,8 @@ class EnvConfig {
   final String supabaseKey;
   final String supabaseUrl;
   final String editStatsUrl;
+  final String revenueCatIOSKey;
+  final String revenueCatAndroidKey;
 
   const EnvConfig({
     required this.environment,
@@ -17,6 +19,8 @@ class EnvConfig {
     required this.supabaseKey,
     required this.supabaseUrl,
     required this.editStatsUrl,
+    required this.revenueCatIOSKey,
+    required this.revenueCatAndroidKey,
   });
 }
 
@@ -29,6 +33,8 @@ class ProdEnv extends EnvConfig {
     required super.supabaseKey,
     required super.supabaseUrl,
     required super.editStatsUrl,
+    required super.revenueCatIOSKey,
+    required super.revenueCatAndroidKey,
   });
 }
 
@@ -41,6 +47,8 @@ class StagingEnv extends EnvConfig {
     required super.supabaseKey,
     required super.supabaseUrl,
     required super.editStatsUrl,
+    required super.revenueCatIOSKey,
+    required super.revenueCatAndroidKey,
   });
 }
 
@@ -52,6 +60,8 @@ const _prodEnv = ProdEnv(
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+  revenueCatIOSKey: String.fromEnvironment('REVENUECAT_IOS_KEY'),
+  revenueCatAndroidKey: String.fromEnvironment('REVENUECAT_ANDROID_KEY'),
 );
 
 const _stagingEnv = StagingEnv(
@@ -62,6 +72,8 @@ const _stagingEnv = StagingEnv(
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+  revenueCatIOSKey: String.fromEnvironment('REVENUECAT_IOS_KEY'),
+  revenueCatAndroidKey: String.fromEnvironment('REVENUECAT_ANDROID_KEY'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -73,6 +85,8 @@ String get contentBaseUrl => _currentEnv.contentBaseUrl;
 String get authBaseUrl => _currentEnv.authBaseUrl;
 String get authToken => _currentEnv.authToken;
 String get editStatsUrl => _currentEnv.editStatsUrl;
+String get revenueCatIOSKey => _currentEnv.revenueCatIOSKey;
+String get revenueCatAndroidKey => _currentEnv.revenueCatAndroidKey;
 
 class HTTPConstants {
   //END POINTS

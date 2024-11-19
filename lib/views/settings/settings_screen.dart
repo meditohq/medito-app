@@ -178,6 +178,10 @@ class SettingsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            OutlinedButton(
+              onPressed: () => { print('donate revenue cat') },
+              child: Text(StringConstants.donateRevenueCatTitle),
+            ),
             _buildDailyNotificationTile(context, ref),
             if (_isHealthSyncAvailable) const HealthSyncTile(),
             ...settingsItems
