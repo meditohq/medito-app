@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../providers/meditation/track_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
 import 'bottom_action_bar.dart';
+import 'package:medito/constants/strings/string_constants.dart';
 
 class TrackViewBottomBar extends ConsumerWidget {
   final String trackId;
@@ -42,12 +43,12 @@ class TrackViewBottomBar extends ConsumerWidget {
                 size: 20,
               ),
               title: const Text(
-                'Add to Siri',
+                StringConstants.addToSiri,
                 style: TextStyle(color: ColorConstants.white),
               ),
               onTap: () {
                 addToSiri(
-                  title: 'Open $trackName',
+                  title: '${StringConstants.open} $trackName',
                   id: trackId,
                   url: 'org.meditofoundation://tracks/$trackId',
                 );
@@ -63,7 +64,7 @@ class TrackViewBottomBar extends ConsumerWidget {
                 size: 20,
               ),
               title: const Text(
-                'Share Track',
+                StringConstants.shareTrack,
                 style: TextStyle(color: ColorConstants.white),
               ),
               onTap: () {
@@ -83,13 +84,6 @@ class TrackViewBottomBar extends ConsumerWidget {
         ? HugeIcons.strokeRoundedShare05
         : HugeIcons.strokeRoundedShare08;
 
-    if (Platform.isIOS) {
-      return HugeIcon(
-        icon: shareIcon,
-        color: ColorConstants.white,
-      );
-    }
-    
     return HugeIcon(
       icon: shareIcon,
       color: ColorConstants.white,

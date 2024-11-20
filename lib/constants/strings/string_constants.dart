@@ -300,4 +300,13 @@ class StringConstants {
 
   //Snackbar text for when we have to go into offlinemode due to an error:
   static const offlineMode = 'You are now in offline mode due to an error.';
+
+  /// Used in TrackViewBottomBar for the Siri shortcut option
+  static const addToSiri = 'Add to Siri';
+  
+  /// Used in TrackViewBottomBar for the share track option
+  static const shareTrack = 'Share Track';
+
+  /// Used as a prefix for Siri shortcuts
+  static const open = 'Open';
 }
