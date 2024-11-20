@@ -6,7 +6,7 @@ import 'dart:io' show Platform;
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../providers/meditation/track_provider.dart';
-import '../../../../widgets/add_to_siri_button.dart';
+import '../../../../widgets/add_to_siri_util.dart';
 import 'bottom_action_bar.dart';
 
 class TrackViewBottomBar extends ConsumerWidget {
@@ -26,57 +26,67 @@ class TrackViewBottomBar extends ConsumerWidget {
     Share.share(deepLink);
   }
 
+  void _showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      showDragHandle: true,
+      context: context,
+      backgroundColor: ColorConstants.onyx,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: HugeIcon(
+                icon: HugeIcons.solidRoundedSiri,
+                color: ColorConstants.white,
+                size: 20,
+              ),
+              title: const Text(
+                'Add to Siri',
+                style: TextStyle(color: ColorConstants.white),
+              ),
+              onTap: () {
+                addToSiri(
+                  title: 'Open $trackName',
+                  id: trackId,
+                  url: 'org.meditofoundation://tracks/$trackId',
+                );
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: HugeIcon(
+                icon: Platform.isIOS 
+                  ? HugeIcons.strokeRoundedShare05
+                  : HugeIcons.strokeRoundedShare08,
+                color: ColorConstants.white,
+                size: 20,
+              ),
+              title: const Text(
+                'Share Track',
+                style: TextStyle(color: ColorConstants.white),
+              ),
+              onTap: () {
+                _shareTrack();
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPlatformSpecificButton() {
     var shareIcon = Platform.isIOS 
         ? HugeIcons.strokeRoundedShare05
         : HugeIcons.strokeRoundedShare08;
 
     if (Platform.isIOS) {
-      return PopupMenuButton<String>(
-        icon: HugeIcon(
-          icon: shareIcon,
-          color: ColorConstants.white,
-        ),
-        color: ColorConstants.onyx,
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            child: AddToSiriButton(
-              title: 'Open $trackName',
-              id: trackId,
-              url: 'org.meditofoundation://tracks/$trackId',
-              child: Row(
-                children: [
-                  HugeIcon(
-                    icon: HugeIcons.bulkRoundedSiri,
-                    color: ColorConstants.white,
-                    size: 20,
-                  ),
-                  Text(
-                    'Add to Siri',
-                    style: TextStyle(color: ColorConstants.white),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          PopupMenuItem(
-            onTap: _shareTrack,
-            child: Row(
-              children: [
-                HugeIcon(
-                  icon: shareIcon,
-                  color: ColorConstants.white,
-                  size: 20,
-                ),
-                SizedBox(width: 12),
-                Text(
-                  'Share Track',
-                  style: TextStyle(color: ColorConstants.white),
-                ),
-              ],
-            ),
-          ),
-        ],
+      return HugeIcon(
+        icon: shareIcon,
+        color: ColorConstants.white,
       );
     }
     
@@ -106,7 +116,7 @@ class TrackViewBottomBar extends ConsumerWidget {
       ),
       rightCenterItem: BottomActionBarItem(
         child: _buildPlatformSpecificButton(),
-        onTap: Platform.isIOS ? null : _shareTrack,
+        onTap: Platform.isIOS ? () => _showBottomSheet(context) : _shareTrack,
       ),
       rightItem: isDailyMeditation
           ? null
