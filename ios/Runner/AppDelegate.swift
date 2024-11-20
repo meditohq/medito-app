@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 import Firebase
 import home_widget
-// import workmanager
+import workmanager
 import app_links
 
 @main
@@ -59,6 +59,8 @@ import app_links
                                            binaryMessenger: controller.binaryMessenger)
         
         channel.setMethodCallHandler { [weak self] (call, result) in
+            guard let self = self else { return }
+            
             if call.method == "showRevenueCatNativeDebugView" {
                 let swiftUIView = RevenueCatDebugView()
                 let hostingController = UIHostingController(rootView: swiftUIView)
