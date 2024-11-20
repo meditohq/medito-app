@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
@@ -28,6 +27,7 @@ import 'package:medito/providers/notification/reminder_provider.dart';
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
+var appLinks = AppLinks();
 
 void main() async {
   if (_hasInitialized) {
@@ -36,18 +36,6 @@ void main() async {
   _hasInitialized = true;
 
   WidgetsFlutterBinding.ensureInitialized();
-  var appLinks = AppLinks();
-
-  // Handle app links while the app is already started - deep link
-  appLinks.uriLinkStream.listen((Uri? uri) {
-    if (uri != null) {
-      // Handle the deep link
-      if (kDebugMode) {
-        print('Deep link: $uri');
-      }
-    }
-  });
-
   await initializeApp();
   await _runApp();
 }
@@ -98,16 +86,17 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  StreamSubscription? _sub;
   late DioHeaderService dioHeaderService;
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
 
   @override
   void initState() {
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
-    _initDeepLinkListener();
     _initializeDioHeaderService();
+    _initDeepLinks();
   }
 
   Future<void> _initializeDioHeaderService() async {
@@ -116,38 +105,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     await dioHeaderService.initialise();
   }
 
-  void _initDeepLinkListener() {
-    _sub = AppLinks().uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        _handleDeepLink(uri);
-      }
-    }, onError: (err) {
-      if (kDebugMode) {
-        print('Deep link error: $err');
-      }
-    });
-  }
-
-  Future<void> _handleDeepLink(Uri uri) async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    var pathSegments = uri.pathSegments;
-    if (pathSegments.length >= 2) {
-      var trackId = pathSegments[1];
-      handleNavigation(
-          pathSegments[0], [trackId], navigatorKey.currentContext!);
-    } else {
-      if (kDebugMode) {
-        print('Invalid deep link format');
-      }
-    }
-  }
-
   void _setUpSystemUi() {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
           systemStatusBarContrastEnforced: false,
-          systemNavigationBarColor: Colors.transparent ,
+          systemNavigationBarColor: Colors.transparent,
           systemNavigationBarDividerColor: Colors.transparent,
           systemNavigationBarIconBrightness: Brightness.dark,
           statusBarIconBrightness: Brightness.dark),
@@ -157,9 +119,74 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
   }
 
+  Future<void> _initDeepLinks() async {
+    _appLinks = AppLinks();
+
+    if (kDebugMode) {
+      print('[DEEPLINK] Setting up deep link handlers');
+    }
+
+    // Handle links
+    _linkSubscription = _appLinks.uriLinkStream.listen(
+      (uri) {
+        if (kDebugMode) {
+          print('[DEEPLINK] Got deep link: $uri');
+        }
+        _handleDeepLink(uri);
+      },
+      onError: (err) {
+        if (kDebugMode) {
+          print('[DEEPLINK] Error from link stream: $err');
+        }
+      },
+    );
+  }
+
+  void _handleDeepLink(Uri uri) {
+    if (kDebugMode) {
+      print('[DEEPLINK] Handling deep link: ${uri.toString()}');
+      print('[DEEPLINK] Scheme: ${uri.scheme}');
+      print('[DEEPLINK] Host: ${uri.host}');
+      print('[DEEPLINK] Path: ${uri.path}');
+    }
+
+    var path = '';
+    var id = '';
+    
+    if (uri.scheme == 'org.meditofoundation') {
+      path = uri.host;
+      id = uri.path.replaceFirst('/', '');
+    } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
+      var pathSegments = uri.path.split('/')
+        ..removeWhere((segment) => segment.isEmpty);
+      
+      if (pathSegments.isNotEmpty) {
+        path = pathSegments[0];
+        id = pathSegments.length > 1 ? pathSegments[1] : '';
+      }
+    } else {
+      return;
+    }
+
+    if (kDebugMode) {
+      print('[DEEPLINK] Navigating to: $path with id: $id');
+    }
+
+    scaffoldMessengerKey.currentState?.showSnackBar(
+      const SnackBar(
+        content: Text('Following deep link...'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      handleNavigation(path, [id], context);
+    });
+  }
+
   @override
   void dispose() {
-    _sub?.cancel();
+    _linkSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

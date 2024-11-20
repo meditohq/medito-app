@@ -76,6 +76,10 @@ android {
         versionCode project.VERSION_CODE
         versionName project.VERSION_NAME
         multiDexEnabled true
+        manifestPlaceholders += [
+            hostName: "medito.app",
+            scheme: "https"
+        ]
     }
 
     buildTypes {

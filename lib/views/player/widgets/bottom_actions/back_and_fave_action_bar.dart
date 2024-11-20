@@ -11,10 +11,10 @@ class TrackViewBottomBar extends ConsumerWidget {
   final VoidCallback onBackPressed;
 
   const TrackViewBottomBar({
-    Key? key,
+    super.key,
     required this.trackId,
     required this.onBackPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,7 +30,10 @@ class TrackViewBottomBar extends ConsumerWidget {
 
     return BottomActionBar(
       leftItem: BottomActionBarItem(
-        child: HugeIcon(icon: HugeIcons.solidSharpArrowLeft02, color: Colors.white,),
+        child: HugeIcon(
+          icon: HugeIcons.solidSharpArrowLeft02,
+          color: Colors.white,
+        ),
         onTap: onBackPressed,
       ),
       rightItem: isDailyMeditation
