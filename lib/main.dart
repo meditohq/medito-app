@@ -15,6 +15,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:medito/constants/work_manager.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
@@ -28,6 +29,10 @@ import 'package:workmanager/workmanager.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -48,6 +53,9 @@ void main() async {
 }
 
 Future<void> initializeApp() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await AuthRepositoryImpl.initializeSupabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

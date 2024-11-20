@@ -87,13 +87,9 @@ class BottomActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Container(
-        height: 80,
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-        ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        
         child: Row(
           mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced 
               ? MainAxisAlignment.spaceEvenly 
