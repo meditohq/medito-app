@@ -6,7 +6,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
-import 'package:medito/views/player/widgets/bottom_actions/back_and_fave_action_bar.dart';
+import 'package:medito/views/player/widgets/bottom_actions/track_view_bottom_bar.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,6 +57,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
       bottomNavigationBar: trackAsyncValue.when(
         data: (trackModel) => TrackViewBottomBar(
           trackId: widget.trackId,
+          trackName: trackModel.title,
           onBackPressed: () => Navigator.pop(context),
         ),
         loading: () => const SizedBox(),

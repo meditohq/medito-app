@@ -122,10 +122,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         bottomNavigationBar: PlayerActionBar(
           trackModel: currentlyPlayingTrack,
           file: file,
-          onClosePressed: () => _handleClose(),
-          onSpeedChanged: (speed) =>
-              ref.read(playerProvider.notifier).setSpeed(speed),
           isBackgroundSoundSelected: _isBackgroundSoundSelected(),
+          onSpeedChanged: (speed) => ref.read(playerProvider.notifier).setSpeed(speed),
+          onClosePressed: () => _handleClose(),
         ),
       ),
     );

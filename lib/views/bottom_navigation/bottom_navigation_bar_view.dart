@@ -50,6 +50,7 @@ class _BottomNavigationBarViewState
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: BottomActionBar(
+          layout: BottomActionBarLayout.evenlySpaced,
           leftItem: BottomActionBarItem(
             child: MeditoHugeIcon(
               icon: _currentPageIndex == 0 ? 'filledhome' : 'duohome',
@@ -80,16 +81,8 @@ class _BottomNavigationBarViewState
             ),
             onTap: () => _onDestinationSelected(1),
           ),
-          // rightCenterItem: BottomActionBarItem(
-          //   child: MeditoHugeIcon(
-          //     icon: _currentPageIndex == 2 ? 'filledPath' : 'duoPath',
-          //     color: _currentPageIndex == 2
-          //         ? ColorConstants.lightPurple
-          //         : ColorConstants.white,
-          //   ),
-          //   onTap: () => _onDestinationSelected(2),
-          // ),
-          rightItem: BottomActionBarItem(
+    
+          rightCenterItem: BottomActionBarItem(
             child: MeditoHugeIcon(
               icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
               color: _currentPageIndex == 2

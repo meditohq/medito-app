@@ -27,7 +27,7 @@ class PlayerActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomActionBar(
-      showBackground: true,
+      layout: BottomActionBarLayout.edgeAligned,
       leftItem: BottomActionBarItem(
         child: const Icon(
           Icons.close,
@@ -50,7 +50,7 @@ class PlayerActionBar extends StatelessWidget {
       ),
       rightItem: BottomActionBarItem(
         child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged),
-        onTap: () {}, // The AudioSpeedWidget likely its own tap
+        onTap: () {}, // The AudioSpeedWidget handles its own tap
       ),
     );
   }

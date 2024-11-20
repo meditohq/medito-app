@@ -1,69 +1,105 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../constants/colors/color_constants.dart';
+enum BottomActionBarLayout {
+  evenlySpaced,     // For bottom nav - all items evenly spaced
+  edgeAligned,      // For player view - outer items at edges, inner items evenly spaced
+  compactRight,     // For track view - items at edges with last two grouped
+}
 
 class BottomActionBarItem {
   final Widget child;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const BottomActionBarItem({required this.child, required this.onTap});
 }
 
 class BottomActionBar extends StatelessWidget {
+  final BottomActionBarItem? leftItem;
+  final BottomActionBarItem? leftCenterItem;
+  final BottomActionBarItem? rightCenterItem;
+  final BottomActionBarItem? rightItem;
+  final BottomActionBarLayout layout;
+
   const BottomActionBar({
     super.key,
     this.leftItem,
     this.leftCenterItem,
     this.rightCenterItem,
     this.rightItem,
-    this.height = 80.0,
-    this.showBackground = false,
+    this.layout = BottomActionBarLayout.compactRight,
   });
 
-  final BottomActionBarItem? leftItem;
-  final BottomActionBarItem? leftCenterItem;
-  final BottomActionBarItem? rightCenterItem;
-  final BottomActionBarItem? rightItem;
-  final double height;
-  final bool showBackground;
+  Widget _buildItem(BottomActionBarItem? item) {
+    if (item == null) {
+      return const SizedBox(width: 48);
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    final items = [leftItem, leftCenterItem, rightCenterItem, rightItem]
-        .where((item) => item != null)
-        .toList();
-
-    return SafeArea(
-      child: Container(
-        height: height,
-        decoration: BoxDecoration(
-          color: showBackground
-              ? ColorConstants.black.withOpacity(0.2)
-              : ColorConstants.transparent,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: items.length == 3
-                ? MainAxisAlignment.spaceEvenly
-                : MainAxisAlignment.spaceBetween,
-            children: items.map((item) => _buildActionItem(item!)).toList(),
-          ),
-        ),
-      ),
+    return GestureDetector(
+      onTap: item.onTap,
+      child: item.child,
     );
   }
 
-  Widget _buildActionItem(BottomActionBarItem item) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: item.onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: item.child is ConsumerWidget
-            ? item.child
-            : Consumer(builder: (_, __, ___) => item.child),
+  List<Widget> _buildLayoutChildren() {
+    switch (layout) {
+      case BottomActionBarLayout.evenlySpaced:
+        return [
+          _buildItem(leftItem),
+          _buildItem(leftCenterItem),
+          _buildItem(rightCenterItem),
+          if (rightItem != null) _buildItem(rightItem),
+        ];
+
+      case BottomActionBarLayout.edgeAligned:
+        return [
+          _buildItem(leftItem),
+          const Spacer(),
+          _buildItem(leftCenterItem),
+          const Spacer(),
+          _buildItem(rightCenterItem),
+          const Spacer(),
+          _buildItem(rightItem),
+          SizedBox.square(dimension: 20,)
+        ];
+
+      case BottomActionBarLayout.compactRight:
+        if (rightItem != null) {
+          return [
+            _buildItem(leftItem),
+            const Spacer(),
+            _buildItem(rightCenterItem),
+            const SizedBox(width: 16),
+            _buildItem(rightItem),
+          ];
+        } else {
+          return [
+            _buildItem(leftItem),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: _buildItem(rightCenterItem),
+            ),
+          ];
+        }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        height: 80,
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+        ),
+        child: Row(
+          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced 
+              ? MainAxisAlignment.spaceEvenly 
+              : MainAxisAlignment.start,
+          children: _buildLayoutChildren(),
+        ),
       ),
     );
   }

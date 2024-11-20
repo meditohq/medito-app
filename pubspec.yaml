@@ -3,7 +3,8 @@ description: A meditation learning tool
 
 # flutter clean && flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
 # flutter clean && flutter build ios --dart-define-from-file=../.prod.json
-version: 3.3.1+30069
+version: 3.3.2+30071
+
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -50,7 +51,7 @@ dependencies:
     hosted: https://onepub.dev/api/kdpxxpsdav
     version: ^0.0.1
   flutter_staggered_grid_view: ^0.7.0
-  share_plus: ^10.0.2
+  share_plus: ^7.2.1
   app_links: ^6.3.2
   supabase_flutter: ^2.0.0
   internet_connection_checker_plus: ^2.5.2
