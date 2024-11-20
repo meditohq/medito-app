@@ -14,22 +14,22 @@ class SubscriptionPage extends ConsumerWidget {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             OutlinedButton(
                   onPressed: () => presentPaywall(),
                   child: const Text("Present Paywall"),
                 ),
-                OutlinedButton(
+            OutlinedButton(
                   onPressed: () async {
-    try {
-      await methodChannel.invokeMethod('showSwiftUIView');
-    } catch (e) {
-      print('Error showing SwiftUI view: $e');
-    }
-  },
+                    try {
+                      await methodChannel.invokeMethod('showRevenueCatNativeDebugView');
+                    } catch (e) {
+                      print('Error showing SwiftUI view: $e');
+                    }
+                  },
                   child: const Text("Launch Debug"),
                 ),
-
           ],
         ),
       ),

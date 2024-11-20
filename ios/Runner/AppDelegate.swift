@@ -59,7 +59,7 @@ import app_links
                                            binaryMessenger: controller.binaryMessenger)
         
         channel.setMethodCallHandler { [weak self] (call, result) in
-            if call.method == "showSwiftUIView" {
+            if call.method == "showRevenueCatNativeDebugView" {
                 let swiftUIView = RevenueCatDebugView()
                 let hostingController = UIHostingController(rootView: swiftUIView)
                 controller.present(hostingController, animated: true)
