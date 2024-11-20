@@ -11,6 +11,7 @@ import 'package:medito/views/path/journal_entry_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/views/pro/subscription_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 extension SanitisePath on String {
@@ -58,6 +59,8 @@ Future<void> handleNavigation(
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
     _pushRoute(const SignUpLogInPage(), ref);
+  } else if (type == TypeConstants.subscription) {
+    _pushRoute(const SubscriptionPage(), ref);
   } else if (type == TypeConstants.journalEntry) {
     var id = ids.first ?? '';
     var content = ids.length > 1 ? ids[1] ?? '' : '';

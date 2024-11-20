@@ -57,7 +57,8 @@ dependencies:
   animated_text_kit: ^4.2.2
   home_widget: ^0.7.0
   # workmanager: ^0.5.2
-  purchases_flutter: ^6.0.0
+  purchases_flutter: ^8.2.1
+  purchases_ui_flutter: ^8.2.1
 
 dev_dependencies:
   flutter_test:

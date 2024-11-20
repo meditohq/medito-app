@@ -46,7 +46,7 @@ void main() async {
   _setUpWidget();
   await initializeApp();
   await _runApp();
-  initPlatformState(); 
+  await configureRevenueCat();
 }
 
 Future<void> initializeApp() async {
@@ -58,14 +58,18 @@ Future<void> initializeApp() async {
   usePathUrlStrategy();
 }
 
-Future<void> initPlatformState() async {
+Future<void> configureRevenueCat() async {
   PurchasesConfiguration configuration;
   if (Platform.isIOS) {
     configuration = PurchasesConfiguration(revenueCatIOSKey);
+    print("REVENUECAT IOS");
   } else {
     configuration = PurchasesConfiguration(revenueCatAndroidKey);
+    print("REVENUECAT ANDROID");
   }
+  await Purchases.setLogLevel(LogLevel.debug);
   await Purchases.configure(configuration);
+  print("REVENUECAT CONFIGURED");
 }
 
 Future<void> initializeAudioService() async {

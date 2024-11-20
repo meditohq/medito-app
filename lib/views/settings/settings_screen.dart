@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
+
 final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
 
@@ -73,6 +74,14 @@ class SettingsScreen extends ConsumerWidget {
             icon: HugeIcons.solidRoundedUserAccount,
             color: ColorConstants.white),
         path: 'account',
+      ),
+      SettingsItem(
+        type: 'subscription',
+        title: StringConstants.donateRevenueCatTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidSharpFavourite,
+            color: ColorConstants.white),
+        path: 'subscription',
       ),
       SettingsItem(
         type: 'url',
@@ -178,10 +187,6 @@ class SettingsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OutlinedButton(
-              onPressed: () => { print('donate revenue cat') },
-              child: Text(StringConstants.donateRevenueCatTitle),
-            ),
             _buildDailyNotificationTile(context, ref),
             if (_isHealthSyncAvailable) const HealthSyncTile(),
             ...settingsItems
