@@ -22,7 +22,8 @@ We are a small team and are not looking for people who can contribute to the pro
 
 ## How to Build the Project
 
-You will not be able to run the project without the necessary keys. Please message us on Telegram first to request access to these keys. We use external libraries that require specific keys, and we will need to chat with you directly to provide these.
+We cannot provide keys at the moment due to various constraints. This will hopefully change in the near future.
+~~You will not be able to run the project without the necessary keys. Please message us on Telegram first to request access to these keys. We use external libraries that require specific keys, and we will need to chat with you directly to provide these.~~
 
 ### Setup
 
