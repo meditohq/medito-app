@@ -86,18 +86,20 @@ class BottomActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 80,
-      padding: EdgeInsets.only(
-        left: 20,
-        right: layout == BottomActionBarLayout.compactRight && rightItem != null ? 20 : 0,
-        bottom: MediaQuery.of(context).padding.bottom,
-      ),
-      child: Row(
-        mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced 
-            ? MainAxisAlignment.spaceEvenly 
-            : MainAxisAlignment.start,
-        children: _buildLayoutChildren(),
+    return SafeArea(
+      child: Container(
+        height: 80,
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+        ),
+        child: Row(
+          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced 
+              ? MainAxisAlignment.spaceEvenly 
+              : MainAxisAlignment.start,
+          children: _buildLayoutChildren(),
+        ),
       ),
     );
   }
