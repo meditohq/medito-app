@@ -39,21 +39,44 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImpl extends AuthRepository with RetryMixin {
+  static bool _hasInitialized = false;
   final Ref ref;
 
   AuthRepositoryImpl({required this.ref});
 
-  @override
-  Future<void> initializeUser() async {
-    await retryOperation(
-      operation: () async {
+  static Future<void> initializeSupabase() async {
+    if (_hasInitialized) return;
+    
+    var attempts = 0;
+    const maxAttempts = 3;
+    const delay = Duration(seconds: 2);
+    const errorMessage = 'Failed to initialize Supabase';
+
+    while (attempts < maxAttempts) {
+      try {
         await Supabase.initialize(
           url: supabaseUrl,
           anonKey: supabaseKey,
         );
-      },
-      errorMessage: 'Failed to initialize authentication',
-    );
+        _hasInitialized = true;
+        return;
+      } catch (e) {
+        attempts++;
+        if (attempts == maxAttempts) {
+          if (kDebugMode) {
+            print('$errorMessage after $maxAttempts attempts: $e');
+          }
+          rethrow;
+        }
+        await Future.delayed(delay * attempts);
+      }
+    }
+    throw Exception(errorMessage);
+  }
+
+  @override
+  Future<void> initializeUser() async {
+    await initializeSupabase();
 
     var clientId = await getClientIdFromSharedPreference();
     clientId ??= const Uuid().v4();
