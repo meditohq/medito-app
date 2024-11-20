@@ -50,7 +50,7 @@ void main() async {
 
 Future<void> initializeApp() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await AuthRepositoryImpl.initializeSupabase();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -78,7 +78,8 @@ void widgetCallbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
 
       if (task == WidgetConstants.taskName) {
         await HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
@@ -93,7 +94,7 @@ void widgetCallbackDispatcher() {
         }
 
         var stats = await statsManager.localAllStats;
-        await updateiOSWidget(stats);
+        await updateWidgets(stats);
 
         return Future.value(true);
       }
@@ -193,7 +194,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     ref.invalidate(statsProvider);
   }
 
-
   void _setUpSystemUi() {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -241,14 +241,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     var path = '';
     var id = '';
-    
+
     if (uri.scheme == 'org.meditofoundation') {
       path = uri.host;
       id = uri.path.replaceFirst('/', '');
     } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
       var pathSegments = uri.path.split('/')
         ..removeWhere((segment) => segment.isEmpty);
-      
+
       if (pathSegments.isNotEmpty) {
         path = pathSegments[0];
         id = pathSegments.length > 1 ? pathSegments[1] : '';
@@ -279,5 +279,4 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-  
 }

@@ -38,6 +38,30 @@ Future<void> updateiOSWidget(LocalAllStats stats) async {
   }
 }
 
+Future<void> updateAndroidWidget(LocalAllStats stats) async {
+  await HomeWidget.saveWidgetData<String>('streakValue', stats.streakCurrent.toString());
+  await HomeWidget.saveWidgetData<String>(
+    'timeListened', 
+    (stats.totalTimeListened / 60000).round().toString()
+  );
+  await HomeWidget.saveWidgetData<String>(
+    'tracksCompleted', 
+    stats.totalTracksCompleted.toString()
+  );
+
+  await HomeWidget.updateWidget(
+    androidName: 'meditofoundation.medito.StatsWidgetReceiver'
+  );
+}
+
+Future<void> updateWidgets(LocalAllStats stats) async {
+  if (Platform.isIOS) {
+    await updateiOSWidget(stats);
+  } else if (Platform.isAndroid) {
+    await updateAndroidWidget(stats);
+  }
+}
+
 final editStatsUrlProvider = Provider<String>((ref) {
   final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
   final stats = ref.watch(statsProvider).valueOrNull;
@@ -71,7 +95,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       await statsManager.initialize();
       await statsManager.sync();
       final stats = await statsManager.localAllStats;
-      await updateiOSWidget(stats);
+      await updateWidgets(stats);
       return stats;
     } catch (e, stackTrace) {
       dev.log('StatsNotifier: Error during fetch', error: e, stackTrace: stackTrace);
