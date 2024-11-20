@@ -309,4 +309,8 @@ class StringConstants {
 
   /// Used as a prefix for Siri shortcuts
   static const open = 'Open';
+
+  /// Used as the share text template when sharing a track
+  static const shareTrackText = 
+      'Take a moment to breathe. Try this meditation session: "{trackName}" on Medito. {link}';
 }
