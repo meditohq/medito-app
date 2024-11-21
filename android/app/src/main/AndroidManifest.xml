@@ -162,12 +162,5 @@
                 android:resource="@xml/stats_widget_info" />
         </receiver>
 
-        <receiver
-            android:name=".StatsUpdateReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.UPDATE_STATS" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

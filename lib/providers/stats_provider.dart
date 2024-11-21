@@ -17,8 +17,8 @@ final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
 
 Future<void> updateiOSWidget(LocalAllStats stats) async {
   if (Platform.isIOS) {
-    // await HomeWidget.saveWidgetData<String>(
-    //     'streakValue', stats.streakCurrent.toString());
+    await HomeWidget.saveWidgetData<String>(
+        'streakValue', stats.streakCurrent.toString());
     await HomeWidget.saveWidgetData<String>(
         'streakValue',
         (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100))
@@ -39,19 +39,31 @@ Future<void> updateiOSWidget(LocalAllStats stats) async {
 }
 
 Future<void> updateAndroidWidget(LocalAllStats stats) async {
-  await HomeWidget.saveWidgetData<String>('streakValue', stats.streakCurrent.toString());
+  await HomeWidget.saveWidgetData<String>(
+    'streakValue',
+    stats.streakCurrent.toString(),
+  );
+  
   await HomeWidget.saveWidgetData<String>(
     'timeListened', 
     (stats.totalTimeListened / 60000).round().toString()
   );
+  
   await HomeWidget.saveWidgetData<String>(
     'tracksCompleted', 
     stats.totalTracksCompleted.toString()
   );
 
-  await HomeWidget.updateWidget(
-    androidName: 'StatsWidgetReceiver'
-  );
+  const basePackage = 'meditofoundation.medito';
+  final widgetName = '$basePackage.StatsWidgetReceiver';
+  
+  try {
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName: widgetName
+    );
+  } catch (e, stackTrace) {
+    dev.log('Error updating Android widget', error: e, stackTrace: stackTrace);
+  }
 }
 
 Future<void> updateWidgets(LocalAllStats stats) async {
@@ -65,16 +77,16 @@ Future<void> updateWidgets(LocalAllStats stats) async {
 final editStatsUrlProvider = Provider<String>((ref) {
   final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
   final stats = ref.watch(statsProvider).valueOrNull;
-  
+
   if (stats == null) return '$editStatsUrl?clientid=$clientId';
-  
+
   final timeListened = (stats.totalTimeListened / 60000).round();
-  
+
   return '$editStatsUrl?clientid=$clientId'
-    '&streakcurrent=${stats.streakCurrent}'
-    '&streaklongest=${stats.streakLongest}'
-    '&trackscompleted=${stats.totalTracksCompleted}'
-    '&timelistened=$timeListened';
+      '&streakcurrent=${stats.streakCurrent}'
+      '&streaklongest=${stats.streakLongest}'
+      '&trackscompleted=${stats.totalTracksCompleted}'
+      '&timelistened=$timeListened';
 });
 
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
@@ -98,7 +110,8 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       await updateWidgets(stats);
       return stats;
     } catch (e, stackTrace) {
-      dev.log('StatsNotifier: Error during fetch', error: e, stackTrace: stackTrace);
+      dev.log('StatsNotifier: Error during fetch',
+          error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -112,7 +125,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
         return;
       }
     }
-    
+
     state = await AsyncValue.guard(() => _fetchStats());
     dev.log('StatsNotifier: Refresh completed');
   }

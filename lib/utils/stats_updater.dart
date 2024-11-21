@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../constants/types/type_constants.dart';
 import 'health_kit_manager.dart';
 import 'stats_manager.dart';
@@ -26,6 +28,7 @@ Future<bool> handleStats(
 }
 
 Future<void> _syncHealthKit(Map<String, dynamic> payload) async {
+  if (Platform.isIOS) {
   var healthKitManager = HealthKitManager();
 
   if (!await healthKitManager
@@ -35,7 +38,7 @@ Future<void> _syncHealthKit(Map<String, dynamic> payload) async {
       await healthKitManager
           .markSessionAsSynced(payload[TypeConstants.timestampIdKey]);
     }
-  }
+  }}
 }
 
 Future<bool> _updateHealthKit(Map<String, dynamic> payload) async {
