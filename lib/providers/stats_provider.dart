@@ -46,6 +46,58 @@ final editStatsUrlProvider = Provider<String>((ref) {
       '&timelistened=$timeListened';
 });
 
+Future<void> updateWidgets(LocalAllStats stats) async {
+  if (Platform.isIOS) {
+    await _updateiOSWidget(stats);
+  } else if (Platform.isAndroid) {
+    await _updateAndroidWidget(stats);
+  }
+}
+
+Future<void> _updateiOSWidget(LocalAllStats stats) async {
+  await HomeWidget.saveWidgetData<String>(
+    _kStreakValue,
+    stats.streakCurrent.toString(),
+  );
+  await HomeWidget.saveWidgetData<List<int>>(
+    _kAudioCompleted,
+    stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
+  );
+  await HomeWidget.saveWidgetData<String>(
+    _kDailyQuote,
+    DateTime.now().millisecondsSinceEpoch.toString(),
+  );
+  await HomeWidget.saveWidgetData<bool>(
+    _kIsMonthlyDonor,
+    DateTime.now().millisecondsSinceEpoch % 2 == 0,
+  );
+  await HomeWidget.updateWidget(iOSName: _kStreakWidgetMedium);
+  await HomeWidget.updateWidget(iOSName: _kStreakWidgetSmall);
+}
+
+Future<void> _updateAndroidWidget(LocalAllStats stats) async {
+  await HomeWidget.saveWidgetData<String>(
+    _kStreakValue,
+    stats.streakCurrent.toString(),
+  );
+
+  await HomeWidget.saveWidgetData<String>(
+    _kTimeListened,
+    (stats.totalTimeListened / 60000).round().toString(),
+  );
+
+  await HomeWidget.saveWidgetData<String>(
+    _kTracksCompleted,
+    stats.totalTracksCompleted.toString(),
+  );
+
+  try {
+    await HomeWidget.updateWidget(qualifiedAndroidName: _kAndroidWidgetName);
+  } catch (e, stackTrace) {
+    dev.log('Error updating Android widget', error: e, stackTrace: stackTrace);
+  }
+}
+
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   static DateTime? _lastRefresh;
   static const _minRefreshInterval = Duration(seconds: 2);
@@ -87,63 +139,11 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     }
 
     state = await AsyncValue.guard(() => _fetchStats());
+    _lastRefresh = DateTime.now();
     dev.log('StatsNotifier: Refresh completed');
   }
 
   Future<void> _updateWidgets(LocalAllStats stats) async {
-    if (Platform.isIOS) {
-      await _updateiOSWidget(stats);
-    } else if (Platform.isAndroid) {
-      await _updateAndroidWidget(stats);
-    }
-  }
-
-  Future<void> _updateiOSWidget(LocalAllStats stats) async {
-    await HomeWidget.saveWidgetData<String>(
-      _kStreakValue,
-      stats.streakCurrent.toString(),
-    );
-    await HomeWidget.saveWidgetData<String>(
-      _kStreakValue,
-      (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100))
-          .toString(),
-    );
-    await HomeWidget.saveWidgetData<List<int>>(
-      _kAudioCompleted,
-      stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
-    );
-    await HomeWidget.saveWidgetData<String>(
-      _kDailyQuote,
-      DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-    await HomeWidget.saveWidgetData<bool>(
-      _kIsMonthlyDonor,
-      DateTime.now().millisecondsSinceEpoch % 2 == 0,
-    );
-    await HomeWidget.updateWidget(iOSName: _kStreakWidgetMedium);
-    await HomeWidget.updateWidget(iOSName: _kStreakWidgetSmall);
-  }
-
-  Future<void> _updateAndroidWidget(LocalAllStats stats) async {
-    await HomeWidget.saveWidgetData<String>(
-      _kStreakValue,
-      stats.streakCurrent.toString(),
-    );
-
-    await HomeWidget.saveWidgetData<String>(
-      _kTimeListened,
-      (stats.totalTimeListened / 60000).round().toString(),
-    );
-
-    await HomeWidget.saveWidgetData<String>(
-      _kTracksCompleted,
-      stats.totalTracksCompleted.toString(),
-    );
-
-    try {
-      await HomeWidget.updateWidget(qualifiedAndroidName: _kAndroidWidgetName);
-    } catch (e, stackTrace) {
-      dev.log('Error updating Android widget', error: e, stackTrace: stackTrace);
-    }
+    await updateWidgets(stats);
   }
 }
