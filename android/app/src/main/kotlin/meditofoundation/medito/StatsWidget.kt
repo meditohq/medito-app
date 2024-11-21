@@ -2,22 +2,31 @@ package meditofoundation.medito
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
-import androidx.compose.ui.graphics.Color
 
 class StatsWidget : GlanceAppWidget() {
+    companion object {
+        suspend fun updateStats(context: Context) {
+            val manager = GlanceAppWidgetManager(context)
+            val glanceIds = manager.getGlanceIds(StatsWidget::class.java)
+            val widget = StatsWidget()
+            glanceIds.forEach { glanceId ->
+                widget.update(context, glanceId)
+            }
+        }
+    }
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             StatsWidgetContent(context)
@@ -27,45 +36,38 @@ class StatsWidget : GlanceAppWidget() {
 
 @Composable
 private fun StatsWidgetContent(context: Context) {
-    val white = ColorProvider(Color.White)
-    val gray = ColorProvider(Color.Gray)
-    val black = ColorProvider(Color.Black)
-
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(white)
-            .padding(16),
+            .padding(16.dp),
         horizontalAlignment = Alignment.Start,
         verticalAlignment = Alignment.Top
     ) {
         Text(
             text = "Current Streak",
-            style = TextStyle(color = gray)
-        )
+
+            )
         Text(
             text = "${getStreakValue(context)} days",
-            style = TextStyle(color = black)
-        )
-        
+
+            )
+
         Text(
             text = "Time Listened",
-            style = TextStyle(color = gray),
-            modifier = GlanceModifier.padding(top = 8)
+
+            modifier = GlanceModifier.padding(top = 8.dp)
         )
         Text(
             text = "${getTimeListened(context)} minutes",
-            style = TextStyle(color = black)
-        )
-        
+
+            )
+
         Text(
             text = "Tracks Completed",
-            style = TextStyle(color = gray),
-            modifier = GlanceModifier.padding(top = 8)
+            modifier = GlanceModifier.padding(top = 8.dp)
         )
         Text(
             text = getTracksCompleted(context),
-            style = TextStyle(color = black)
         )
     }
 }

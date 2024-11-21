@@ -50,7 +50,7 @@ Future<void> updateAndroidWidget(LocalAllStats stats) async {
   );
 
   await HomeWidget.updateWidget(
-    androidName: 'meditofoundation.medito.StatsWidgetReceiver'
+    androidName: 'StatsWidgetReceiver'
   );
 }
 
