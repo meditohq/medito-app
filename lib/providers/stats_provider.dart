@@ -1,84 +1,41 @@
 import 'dart:io';
+import 'dart:developer' as dev;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'dart:developer' as dev;
-
 import 'package:medito/views/settings/settings_screen.dart';
 
+// Widget Keys
+const _kStreakValue = 'streakValue';
+const _kAudioCompleted = 'audioCompleted';
+const _kDailyQuote = 'dailyQuote';
+const _kIsMonthlyDonor = 'isMonthlyDonor';
+const _kTimeListened = 'timeListened';
+const _kTracksCompleted = 'tracksCompleted';
+
+// Widget Names
+const _kStreakWidgetMedium = 'StreakWidgetMedium';
+const _kStreakWidgetSmall = 'StreakWidgetSmall';
+const _kBasePackage = 'meditofoundation.medito';
+const _kAndroidWidgetName = '$_kBasePackage.StatsWidgetReceiver';
+
+// Providers
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
 
-final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
-  return StatsNotifier();
-});
-
-Future<void> updateiOSWidget(LocalAllStats stats) async {
-  if (Platform.isIOS) {
-    await HomeWidget.saveWidgetData<String>(
-        'streakValue', stats.streakCurrent.toString());
-    await HomeWidget.saveWidgetData<String>(
-        'streakValue',
-        (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100))
-            .toString());
-    await HomeWidget.saveWidgetData<List<int>>(
-      'audioCompleted',
-      stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
-    );
-    await HomeWidget.saveWidgetData<String>(
-      'dailyQuote',
-      DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-    await HomeWidget.saveWidgetData<bool>(
-            'isMonthlyDonor', DateTime.now().millisecondsSinceEpoch % 2 == 0);
-    await HomeWidget.updateWidget(iOSName: 'StreakWidgetMedium');
-    await HomeWidget.updateWidget(iOSName: 'StreakWidgetSmall');
-  }
-}
-
-Future<void> updateAndroidWidget(LocalAllStats stats) async {
-  await HomeWidget.saveWidgetData<String>(
-    'streakValue',
-    stats.streakCurrent.toString(),
-  );
-  
-  await HomeWidget.saveWidgetData<String>(
-    'timeListened', 
-    (stats.totalTimeListened / 60000).round().toString()
-  );
-  
-  await HomeWidget.saveWidgetData<String>(
-    'tracksCompleted', 
-    stats.totalTracksCompleted.toString()
-  );
-
-  const basePackage = 'meditofoundation.medito';
-  final widgetName = '$basePackage.StatsWidgetReceiver';
-  
-  try {
-    await HomeWidget.updateWidget(
-      qualifiedAndroidName: widgetName
-    );
-  } catch (e, stackTrace) {
-    dev.log('Error updating Android widget', error: e, stackTrace: stackTrace);
-  }
-}
-
-Future<void> updateWidgets(LocalAllStats stats) async {
-  if (Platform.isIOS) {
-    await updateiOSWidget(stats);
-  } else if (Platform.isAndroid) {
-    await updateAndroidWidget(stats);
-  }
-}
+final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(
+  () => StatsNotifier(),
+);
 
 final editStatsUrlProvider = Provider<String>((ref) {
   final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
   final stats = ref.watch(statsProvider).valueOrNull;
 
-  if (stats == null) return '$editStatsUrl?clientid=$clientId';
+  if (stats == null) {
+    return '$editStatsUrl?clientid=$clientId';
+  }
 
   final timeListened = (stats.totalTimeListened / 60000).round();
 
@@ -96,6 +53,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   @override
   Future<LocalAllStats> build() async {
     dev.log('StatsNotifier: Building');
+
     return _fetchStats();
   }
 
@@ -107,7 +65,8 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       await statsManager.initialize();
       await statsManager.sync();
       final stats = await statsManager.localAllStats;
-      await updateWidgets(stats);
+      await _updateWidgets(stats);
+
       return stats;
     } catch (e, stackTrace) {
       dev.log('StatsNotifier: Error during fetch',
@@ -122,11 +81,69 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       var timeSinceLastRefresh = DateTime.now().difference(_lastRefresh!);
       if (timeSinceLastRefresh < _minRefreshInterval) {
         dev.log('StatsNotifier: Skipping refresh - too soon');
+
         return;
       }
     }
 
     state = await AsyncValue.guard(() => _fetchStats());
     dev.log('StatsNotifier: Refresh completed');
+  }
+
+  Future<void> _updateWidgets(LocalAllStats stats) async {
+    if (Platform.isIOS) {
+      await _updateiOSWidget(stats);
+    } else if (Platform.isAndroid) {
+      await _updateAndroidWidget(stats);
+    }
+  }
+
+  Future<void> _updateiOSWidget(LocalAllStats stats) async {
+    await HomeWidget.saveWidgetData<String>(
+      _kStreakValue,
+      stats.streakCurrent.toString(),
+    );
+    await HomeWidget.saveWidgetData<String>(
+      _kStreakValue,
+      (stats.streakCurrent + (DateTime.now().millisecondsSinceEpoch % 100))
+          .toString(),
+    );
+    await HomeWidget.saveWidgetData<List<int>>(
+      _kAudioCompleted,
+      stats.audioCompleted?.map((audio) => audio.timestamp).toList(),
+    );
+    await HomeWidget.saveWidgetData<String>(
+      _kDailyQuote,
+      DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+    await HomeWidget.saveWidgetData<bool>(
+      _kIsMonthlyDonor,
+      DateTime.now().millisecondsSinceEpoch % 2 == 0,
+    );
+    await HomeWidget.updateWidget(iOSName: _kStreakWidgetMedium);
+    await HomeWidget.updateWidget(iOSName: _kStreakWidgetSmall);
+  }
+
+  Future<void> _updateAndroidWidget(LocalAllStats stats) async {
+    await HomeWidget.saveWidgetData<String>(
+      _kStreakValue,
+      stats.streakCurrent.toString(),
+    );
+
+    await HomeWidget.saveWidgetData<String>(
+      _kTimeListened,
+      (stats.totalTimeListened / 60000).round().toString(),
+    );
+
+    await HomeWidget.saveWidgetData<String>(
+      _kTracksCompleted,
+      stats.totalTracksCompleted.toString(),
+    );
+
+    try {
+      await HomeWidget.updateWidget(qualifiedAndroidName: _kAndroidWidgetName);
+    } catch (e, stackTrace) {
+      dev.log('Error updating Android widget', error: e, stackTrace: stackTrace);
+    }
   }
 }

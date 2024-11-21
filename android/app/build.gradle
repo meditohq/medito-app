@@ -142,6 +142,9 @@ dependencies {
 
     // Glance dependencies
     implementation "androidx.glance:glance-appwidget:1.1.1"
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance-appwidget-preview:1.1.1")
+    implementation("androidx.glance:glance-preview:1.1.1")
 }
 
 configurations.all {

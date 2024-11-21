@@ -5,10 +5,13 @@ import HomeWidgetGlanceStateDefinition
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.preferencesOf
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -18,15 +21,18 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.preview.ExperimentalGlancePreviewApi
+import androidx.glance.preview.Preview
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import java.lang.reflect.Modifier
 
 class StatsWidget : GlanceAppWidget() {
 
-    override val stateDefinition: GlanceStateDefinition<*>?
+    override val stateDefinition: GlanceStateDefinition<*>
         get() = HomeWidgetGlanceStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -107,4 +113,24 @@ class StatsWidget : GlanceAppWidget() {
             }
         }
     }
+}
+
+
+@OptIn(ExperimentalGlanceRemoteViewsApi::class)
+@Preview
+@Composable
+fun MyGlanceWidgetPreview() {
+    // The size of the widget
+    val displaySize = DpSize(200.dp, 200.dp)
+    // Your GlanceAppWidget instance
+    val instance = StatsWidget()
+    // Provide a state depending on the GlanceAppWidget state definition
+    val state = preferencesOf(StatsWidget. to 2)
+
+    GlanceContent(
+        modifier = Modifier.fillMaxSize(),
+        glanceAppWidget = instance,
+        state = state,
+        displaySize = displaySize,
+    )
 }
