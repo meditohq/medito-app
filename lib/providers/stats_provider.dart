@@ -91,6 +91,13 @@ Future<void> _updateAndroidWidget(LocalAllStats stats) async {
     stats.totalTracksCompleted.toString(),
   );
 
+  var now = DateTime.now();
+  var timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+  await HomeWidget.saveWidgetData<String>(
+    'lastUpdated',
+    timeStr,
+  );
+
   try {
     await HomeWidget.updateWidget(qualifiedAndroidName: _kAndroidWidgetName);
   } catch (e, stackTrace) {

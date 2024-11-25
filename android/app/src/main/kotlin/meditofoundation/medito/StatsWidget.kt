@@ -5,13 +5,10 @@ import HomeWidgetGlanceStateDefinition
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.preferencesOf
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -21,14 +18,11 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
-import androidx.glance.preview.ExperimentalGlancePreviewApi
-import androidx.glance.preview.Preview
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import java.lang.reflect.Modifier
 
 class StatsWidget : GlanceAppWidget() {
 
@@ -42,16 +36,21 @@ class StatsWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun GlanceContent(currentState: HomeWidgetGlanceState) {
+    fun GlanceContent(currentState: HomeWidgetGlanceState) {
         val data = currentState.preferences
         val streakValue = data.getString("streakValue", "0")
         val timeListened = data.getString("timeListened", "0")
         val tracksCompleted = data.getString("tracksCompleted", "0")
+        val lastUpdated = data.getString("lastUpdated", "Never")
+
+        // Material You Dynamic Colors
+        val backgroundColor = ColorProvider(Color.Black) // Replace with a dynamic color API if needed
+        val textColor = ColorProvider(Color.White)
 
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(backgroundColor)
                 .padding(16.dp)
         ) {
             Column(
@@ -61,26 +60,28 @@ class StatsWidget : GlanceAppWidget() {
                 horizontalAlignment = Alignment.Start,
                 verticalAlignment = Alignment.Top
             ) {
+                // Streak Section
                 Text(
                     text = "Current Streak",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = textColor,
                         fontSize = 14.sp
                     )
                 )
                 Text(
                     text = "$streakValue days",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = textColor,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
 
+                // Time Listened Section
                 Text(
                     text = "Time Listened",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = textColor,
                         fontSize = 14.sp
                     ),
                     modifier = GlanceModifier.padding(top = 8.dp)
@@ -88,16 +89,17 @@ class StatsWidget : GlanceAppWidget() {
                 Text(
                     text = "$timeListened minutes",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = textColor,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
 
+                // Tracks Completed Section
                 Text(
                     text = "Tracks Completed",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = textColor,
                         fontSize = 14.sp
                     ),
                     modifier = GlanceModifier.padding(top = 8.dp)
@@ -105,32 +107,29 @@ class StatsWidget : GlanceAppWidget() {
                 Text(
                     text = tracksCompleted ?: "!!",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = textColor,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
+                    )
+                )
+
+                // Last Updated Section
+                Text(
+                    text = "Last Updated",
+                    style = TextStyle(
+                        color = textColor,
+                        fontSize = 12.sp
+                    ),
+                    modifier = GlanceModifier.padding(top = 8.dp)
+                )
+                Text(
+                    text = lastUpdated ?: "?",
+                    style = TextStyle(
+                        color = textColor,
+                        fontSize = 14.sp
                     )
                 )
             }
         }
     }
-}
-
-
-@OptIn(ExperimentalGlanceRemoteViewsApi::class)
-@Preview
-@Composable
-fun MyGlanceWidgetPreview() {
-    // The size of the widget
-    val displaySize = DpSize(200.dp, 200.dp)
-    // Your GlanceAppWidget instance
-    val instance = StatsWidget()
-    // Provide a state depending on the GlanceAppWidget state definition
-    val state = preferencesOf(StatsWidget. to 2)
-
-    GlanceContent(
-        modifier = Modifier.fillMaxSize(),
-        glanceAppWidget = instance,
-        state = state,
-        displaySize = displaySize,
-    )
 }

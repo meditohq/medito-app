@@ -10,7 +10,7 @@ class StatsService {
   final DioApiService _dioApiService;
   final SharedPreferences _prefs;
   static const _lastSyncKey = 'last_stats_sync';
-  static const _minTimeBetweenRequests = 2000; // 2 seconds
+  static const _minTimeBetweenRequests = 2000; // 2 seconds minimum between syncs
 
   StatsService(this._dioApiService, this._prefs);
 
