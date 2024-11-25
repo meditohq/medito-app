@@ -10,9 +10,9 @@ class StreakCircle extends ConsumerStatefulWidget {
   final VoidCallback onTap;
 
   const StreakCircle({
-    Key? key,
+    super.key,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<StreakCircle> createState() => _StreakCircleState();

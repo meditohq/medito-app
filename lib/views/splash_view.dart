@@ -1,14 +1,16 @@
+import 'dart:developer' as dev;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/utils/fade_page_route.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/root/root_page_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:medito/utils/fade_page_route.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 class SplashView extends ConsumerStatefulWidget {
@@ -22,14 +24,26 @@ class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     super.initState();
-    _initializeUser();
+    _initializeApp();
     _initializeFirebaseMessaging();
   }
 
-  void _initializeUser() async {
+  Future<void> _initializeApp() async {
     try {
+      // First initialize auth
       await ref.read(authRepositoryProvider).initializeUser();
-      await StatsManager().initialize();
+      
+      // Then try to initialize stats
+      try {
+        await StatsManager().initialize();
+      } catch (e) {
+        dev.log('Stats initialization failed', error: e);
+        if (!mounted) return;
+        showSnackBar(
+          context, 
+          StringConstants.statsInitError,
+        );
+      }
 
       if (!mounted) return;
 
@@ -41,6 +55,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
         ),
       );
     } catch (e) {
+      dev.log('App initialization failed', error: e);
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);

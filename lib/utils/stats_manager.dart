@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as dev;
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -37,7 +36,8 @@ class StatsManager {
 
     try {
       dev.log('StatsManager: Fetching remote stats');
-      _allStats = await statsService.fetchAllStats();
+      var remoteStats = await statsService.fetchAllStats();
+      _allStats = remoteStats;
 
       dev.log('StatsManager: Merging stats');
       await _merge();
@@ -47,10 +47,12 @@ class StatsManager {
         _allStats = calculateStreak(_allStats!);
 
         dev.log('StatsManager: Saving local stats');
-        await _saveLocalAllStats();
+        await _saveLocalAllStatsToSharedPrefs();
 
         dev.log('StatsManager: Posting updated stats');
         await statsService.postUpdatedStats(_allStats!);
+      } else {
+        throw Exception("Stats are null");
       }
 
       dev.log('StatsManager: Sync completed');
@@ -60,8 +62,8 @@ class StatsManager {
       } else {
         dev.log('StatsManager: Error during sync',
             error: e, stackTrace: stackTrace);
-        _allStats = await _loadLocalAllStats();
       }
+      rethrow;
     }
   }
 
@@ -78,36 +80,40 @@ class StatsManager {
     var prefs = await SharedPreferences.getInstance();
     var localAllStatsJson =
         prefs.getString(SharedPreferenceConstants.localAllStatsKey);
-    dev.log('StatsManager: Local stats JSON: $localAllStatsJson...');
 
     LocalAllStats? localAllStats;
-
     if (localAllStatsJson != null && localAllStatsJson != 'null') {
       localAllStats = LocalAllStats.fromJson(
           jsonDecode(localAllStatsJson) as Map<String, dynamic>);
     }
 
-    // If we have no remote stats but have local stats, use local
-    if ((_allStats?.totalTracksCompleted ?? 0) == 0 &&
-        (localAllStats?.totalTracksCompleted ?? 0) > 0) {
-      _allStats = localAllStats?.copyWith(
-        updated: DateTime.now().millisecondsSinceEpoch,
-      );
-
+    // Never use empty local stats
+    if ((localAllStats?.totalTracksCompleted ?? 0) == 0) {
+      if (_allStats != null) {
+        _allStats = calculateStreak(_allStats!).copyWith(
+          updated: DateTime.now().millisecondsSinceEpoch,
+        );
+      }
       return;
     }
 
-    // Check if remote stats are newer
+    // If we have no remote stats but have local stats, use local
+    if ((_allStats?.totalTracksCompleted ?? 0) == 0 && localAllStats != null) {
+      _allStats = localAllStats.copyWith(
+        updated: DateTime.now().millisecondsSinceEpoch,
+      );
+      return;
+    }
+
+    // Normal sync logic - use newer stats
     var areRemoteStatsNewer =
         (_allStats?.updated ?? 0) > (localAllStats?.updated ?? 0);
 
     if (areRemoteStatsNewer) {
-      // Use remote stats and recalculate streak
       _allStats = calculateStreak(_allStats!).copyWith(
         updated: DateTime.now().millisecondsSinceEpoch,
       );
     } else {
-      // Keep local stats if they're newer
       _allStats = localAllStats?.copyWith(
         updated: DateTime.now().millisecondsSinceEpoch,
       );
@@ -185,7 +191,7 @@ class StatsManager {
     );
   }
 
-  Future<void> _saveLocalAllStats() async {
+  Future<void> _saveLocalAllStatsToSharedPrefs() async {
     var prefs = await SharedPreferences.getInstance();
     if (_allStats != null) {
       await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
@@ -234,7 +240,7 @@ class StatsManager {
     if (_allStats != null) {
       _allStats = calculateStreak(_allStats!);
     }
-    await _saveLocalAllStats();
+    await _saveLocalAllStatsToSharedPrefs();
     unawaited(statsService.postUpdatedStats(_allStats!));
   }
 
@@ -252,7 +258,7 @@ class StatsManager {
         updated: DateTime.now().toUtc().millisecondsSinceEpoch,
       );
 
-      await _saveLocalAllStats();
+      await _saveLocalAllStatsToSharedPrefs();
       unawaited(statsService.postUpdatedStats(_allStats!));
     }
   }
@@ -269,7 +275,7 @@ class StatsManager {
         updated: DateTime.now().toUtc().millisecondsSinceEpoch,
       );
 
-      await _saveLocalAllStats();
+      await _saveLocalAllStatsToSharedPrefs();
       unawaited(statsService.postUpdatedStats(_allStats!));
     }
   }

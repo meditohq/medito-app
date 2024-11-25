@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthInterceptor extends Interceptor with RetryMixin {
   static const _maxAuthRetries = 3;
+  static const _maxNetworkRetries = 3;
   final Dio dio;
 
   AuthInterceptor(this.dio);
@@ -20,6 +21,14 @@ class AuthInterceptor extends Interceptor with RetryMixin {
     } catch (_) {
       await AuthRepositoryImpl.initializeSupabase();
     }
+  }
+
+  bool _shouldRetry(DioException err) {
+    return err.type == DioExceptionType.connectionTimeout ||
+           err.type == DioExceptionType.receiveTimeout ||
+           err.type == DioExceptionType.connectionError ||
+           err.response?.statusCode == 500 ||
+           err.response?.statusCode == 503;
   }
 
   @override
@@ -36,21 +45,22 @@ class AuthInterceptor extends Interceptor with RetryMixin {
           throw Exception('Token refresh failed');
         }
 
-        final opts = Options(
-          method: err.requestOptions.method,
-          headers: {
-            ...err.requestOptions.headers,
-            HttpHeaders.authorizationHeader: 'Bearer $token',
-          },
+        final response = await _retryRequest(err.requestOptions, token);
+        handler.resolve(response);
+      } catch (e) {
+        handler.next(err);
+      }
+    } else if (_shouldRetry(err)) {
+      try {
+        final response = await retryOperation(
+          operation: () => _retryRequest(
+            err.requestOptions,
+            err.requestOptions.headers[HttpHeaders.authorizationHeader],
+          ),
+          errorMessage: 'Request failed after retries',
+          maxAttempts: _maxNetworkRetries,
         );
-
-        final response = await dio.request(
-          err.requestOptions.path,
-          options: opts,
-          data: err.requestOptions.data,
-          queryParameters: err.requestOptions.queryParameters,
-        );
-
+        
         handler.resolve(response);
       } catch (e) {
         handler.next(err);
@@ -58,6 +68,23 @@ class AuthInterceptor extends Interceptor with RetryMixin {
     } else {
       handler.next(err);
     }
+  }
+
+  Future<Response> _retryRequest(RequestOptions requestOptions, String? token) async {
+    final opts = Options(
+      method: requestOptions.method,
+      headers: {
+        ...requestOptions.headers,
+        if (token != null) HttpHeaders.authorizationHeader: token,
+      },
+    );
+
+    return await dio.request(
+      requestOptions.path,
+      options: opts,
+      data: requestOptions.data,
+      queryParameters: requestOptions.queryParameters,
+    );
   }
 
   @override

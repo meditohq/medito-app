@@ -1,9 +1,9 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'dart:developer' as dev;
-
 import 'package:medito/views/settings/settings_screen.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
@@ -15,16 +15,16 @@ final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
 final editStatsUrlProvider = Provider<String>((ref) {
   final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
   final stats = ref.watch(statsProvider).valueOrNull;
-  
+
   if (stats == null) return '$editStatsUrl?clientid=$clientId';
-  
+
   final timeListened = (stats.totalTimeListened / 60000).round();
-  
+
   return '$editStatsUrl?clientid=$clientId'
-    '&streakcurrent=${stats.streakCurrent}'
-    '&streaklongest=${stats.streakLongest}'
-    '&trackscompleted=${stats.totalTracksCompleted}'
-    '&timelistened=$timeListened';
+      '&streakcurrent=${stats.streakCurrent}'
+      '&streaklongest=${stats.streakLongest}'
+      '&trackscompleted=${stats.totalTracksCompleted}'
+      '&timelistened=$timeListened';
 });
 
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
@@ -42,11 +42,13 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     var statsManager = ref.read(statsManagerProvider);
 
     try {
-      await statsManager.initialize();
       await statsManager.sync();
+
       return await statsManager.localAllStats;
     } catch (e, stackTrace) {
-      dev.log('StatsNotifier: Error during fetch', error: e, stackTrace: stackTrace);
+      dev.log('StatsNotifier: Error during fetch',
+          error: e, stackTrace: stackTrace);
+
       rethrow;
     }
   }
@@ -60,7 +62,8 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
         return;
       }
     }
-    
+
+    _lastRefresh = DateTime.now();
     state = await AsyncValue.guard(() => _fetchStats());
     dev.log('StatsNotifier: Refresh completed');
   }

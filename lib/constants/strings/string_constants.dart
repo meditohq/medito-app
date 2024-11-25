@@ -313,4 +313,18 @@ class StringConstants {
   /// Used as the share text template when sharing a track
   static const shareTrackText = 
       'Take a moment to breathe. Try this meditation session: "{trackName}" on Medito. {link}';
+
+  // Deep linking related strings - used when handling deep links in the app
+  static const String followingDeepLink = 'Following deep link...';
+  static const String invalidDeepLink = 'Invalid deep link';
+  static const String deepLinkError = 'Unable to handle deep link';
+
+  // Splash view related messages
+  /// Error message shown when stats initialization fails in the splash view
+  static const String statsInitError = 
+      'Stats sync may have failed. Please check your connection.';
+
+  /// Message shown when app initialization fails and app enters offline mode
+  static const String appInitError = 
+      'App initialization failed. Entering offline mode.';
 }

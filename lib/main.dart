@@ -10,11 +10,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/network/dio_header_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -22,10 +25,6 @@ import 'package:medito/views/splash_view.dart';
 
 import 'constants/theme/app_theme.dart';
 import 'firebase_options.dart';
-import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
-import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:medito/repositories/auth/auth_repository.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -158,35 +157,64 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     var path = '';
     var id = '';
     
-    if (uri.scheme == 'org.meditofoundation') {
-      path = uri.host;
-      id = uri.path.replaceFirst('/', '');
-    } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
-      var pathSegments = uri.path.split('/')
-        ..removeWhere((segment) => segment.isEmpty);
-      
-      if (pathSegments.isNotEmpty) {
-        path = pathSegments[0];
-        id = pathSegments.length > 1 ? pathSegments[1] : '';
+    try {
+      if (uri.scheme == 'org.meditofoundation') {
+        path = uri.host;
+        id = uri.path.replaceFirst('/', '');
+      } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
+        var pathSegments = uri.path.split('/')
+          ..removeWhere((segment) => segment.isEmpty);
+        
+        if (pathSegments.isNotEmpty) {
+          path = pathSegments[0];
+          id = pathSegments.length > 1 ? pathSegments[1] : '';
+        }
+      } else {
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(
+            content: Text(StringConstants.invalidDeepLink),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
       }
-    } else {
-      return;
+
+      if (path.isEmpty) {
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(
+            content: Text(StringConstants.invalidDeepLink),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
+      if (kDebugMode) {
+        print('[DEEPLINK] Navigating to: $path with id: $id');
+      }
+
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          content: Text(StringConstants.followingDeepLink),
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      Future.delayed(const Duration(seconds: 2), () {
+        handleNavigation(path, [id], context);
+      });
+      
+    } catch (e) {
+      if (kDebugMode) {
+        print('[DEEPLINK] Error handling deep link: $e');
+      }
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          content: Text(StringConstants.deepLinkError),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
-
-    if (kDebugMode) {
-      print('[DEEPLINK] Navigating to: $path with id: $id');
-    }
-
-    scaffoldMessengerKey.currentState?.showSnackBar(
-      const SnackBar(
-        content: Text('Following deep link...'),
-        duration: Duration(seconds: 3),
-      ),
-    );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      handleNavigation(path, [id], context);
-    });
   }
 
   @override

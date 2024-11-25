@@ -8,7 +8,7 @@ Future<bool> handleStats(
 ) async {
   await _syncHealthKit(payload);
 
-  var statsManager = StatsManager();
+  var statsManager = StatsManager()..initialize();
 
   var newAudioCompleted = LocalAudioCompleted(
     id: payload[TypeConstants.trackIdKey],
