@@ -14,6 +14,13 @@ class StatsService {
 
   StatsService(this._dioApiService, this._prefs);
 
+  Future<bool> hasRecentlySync() async {
+    var now = DateTime.now().millisecondsSinceEpoch;
+    var lastSync = _prefs.getInt(_lastSyncKey) ?? 0;
+
+    return now - lastSync < _minTimeBetweenRequests;
+  }
+
   Future<LocalAllStats> fetchAllStats() async {
     dev.log('StatsService: Attempting to fetch stats');
 
@@ -21,17 +28,19 @@ class StatsService {
     var lastSync = _prefs.getInt(_lastSyncKey) ?? 0;
 
     if (now - lastSync < _minTimeBetweenRequests) {
-      dev.log('StatsService: Too soon, returning cached stats');
+      throw Exception('Please wait before syncing again');
     }
 
     await _prefs.setInt(_lastSyncKey, now);
     var response = await _dioApiService.getRequest(HTTPConstants.allStats);
     var serverStats = AllStats.fromJson(response);
-    
+
     return LocalAllStats.fromAllStats(serverStats);
   }
 
   Future<void> postUpdatedStats(LocalAllStats stats) async {
+    if (stats.totalTracksCompleted == 0) return;
+    dev.log('StatsManager: Posting updated stats');
     try {
       await _dioApiService.postRequest(
         HTTPConstants.allStats,
@@ -41,5 +50,4 @@ class StatsService {
       dev.log('StatsService: Error posting stats', error: e);
     }
   }
-
 }

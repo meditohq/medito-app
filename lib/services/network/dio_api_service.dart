@@ -24,7 +24,7 @@ class DioApiService with RetryMixin {
   void _initializeDio() {
     dio = Dio();
     dio.options = BaseOptions(
-      connectTimeout: const Duration(milliseconds: 30000),
+      connectTimeout: const Duration(milliseconds: 60000),
       baseUrl: contentBaseUrl,
     );
 
