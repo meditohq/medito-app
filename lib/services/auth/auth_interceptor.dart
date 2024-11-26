@@ -25,10 +25,10 @@ class AuthInterceptor extends Interceptor with RetryMixin {
 
   bool _shouldRetry(DioException err) {
     return err.type == DioExceptionType.connectionTimeout ||
-           err.type == DioExceptionType.receiveTimeout ||
-           err.type == DioExceptionType.connectionError ||
-           err.response?.statusCode == 500 ||
-           err.response?.statusCode == 503;
+        err.type == DioExceptionType.receiveTimeout ||
+        err.type == DioExceptionType.connectionError ||
+        err.response?.statusCode == 500 ||
+        err.response?.statusCode == 503;
   }
 
   @override
@@ -40,7 +40,7 @@ class AuthInterceptor extends Interceptor with RetryMixin {
           errorMessage: 'Token refresh failed',
           maxAttempts: _maxAuthRetries,
         );
-        
+
         if (token == null) {
           throw Exception('Token refresh failed');
         }
@@ -60,7 +60,7 @@ class AuthInterceptor extends Interceptor with RetryMixin {
           errorMessage: 'Request failed after retries',
           maxAttempts: _maxNetworkRetries,
         );
-        
+
         handler.resolve(response);
       } catch (e) {
         handler.next(err);
@@ -70,7 +70,8 @@ class AuthInterceptor extends Interceptor with RetryMixin {
     }
   }
 
-  Future<Response> _retryRequest(RequestOptions requestOptions, String? token) async {
+  Future<Response> _retryRequest(
+      RequestOptions requestOptions, String? token) async {
     final opts = Options(
       method: requestOptions.method,
       headers: {
@@ -88,11 +89,12 @@ class AuthInterceptor extends Interceptor with RetryMixin {
   }
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     await _ensureInitialized();
-    
+
     var token = Supabase.instance.client.auth.currentSession?.accessToken;
-    
+
     if (token == null) {
       try {
         token = await retryOperation(
@@ -108,7 +110,7 @@ class AuthInterceptor extends Interceptor with RetryMixin {
     if (token != null) {
       options.headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
     }
-    
+
     await _updateUserWithClientId();
     handler.next(options);
   }
@@ -132,7 +134,7 @@ class AuthInterceptor extends Interceptor with RetryMixin {
           errorMessage: 'Token refresh failed',
           maxAttempts: _maxAuthRetries,
         );
-        
+
         await Supabase.instance.client.auth.updateUser(
           UserAttributes(
             data: {'client_id': clientId},

@@ -39,11 +39,67 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImpl extends AuthRepository with RetryMixin {
+  static const _initLockKey = 'auth_init_lock';
+  static const _initLockTimeout = Duration(seconds: 30);
+  
   bool _hasInitialized = false;
+  String? _cachedClientId;
   final Ref ref;
   static bool _hasInitializedSupabase = false;
 
   AuthRepositoryImpl({required this.ref});
+
+  Future<bool> _acquireLock() async {
+    var prefs = await SharedPreferences.getInstance();
+    var lastLockTime = prefs.getInt(_initLockKey) ?? 0;
+    var now = DateTime.now().millisecondsSinceEpoch;
+
+    if (now - lastLockTime > _initLockTimeout.inMilliseconds) {
+      var success = await prefs.setInt(_initLockKey, now);
+      if (!success) return false;
+      
+      var checkLock = prefs.getInt(_initLockKey);
+      return checkLock == now;
+    }
+    return false;
+  }
+
+  Future<void> _releaseLock() async {
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_initLockKey);
+  }
+
+  @override
+  Future<void> initializeUser() async {
+    if (_hasInitialized) return;
+
+    for (var i = 0; i < 3; i++) {
+      if (await _acquireLock()) {
+        try {
+          await _doInitialize();
+          return;
+        } finally {
+          await _releaseLock();
+        }
+      }
+      if (i < 2) await Future.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
+  Future<void> _doInitialize() async {
+    await initializeSupabaseIfNeeded();
+
+    var clientId = await getClientIdFromSharedPreference();
+    clientId ??= const Uuid().v4();
+
+    _cachedClientId = clientId;
+    await _saveClientIdToSharedPreference(clientId);
+    if (Supabase.instance.client.auth.currentUser == null) {
+      await _signInAnonymously(clientId);
+    }
+    
+    _hasInitialized = true;
+  }
 
   static Future<void> initializeSupabase() async {
     if (_hasInitializedSupabase) return;
@@ -82,19 +138,6 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
     }
   }
 
-  @override
-  Future<void> initializeUser() async {
-    await initializeSupabaseIfNeeded();
-
-    var clientId = await getClientIdFromSharedPreference();
-    clientId ??= const Uuid().v4();
-
-    await _saveClientIdToSharedPreference(clientId);
-    if (Supabase.instance.client.auth.currentUser == null) {
-      await _signInAnonymously(clientId);
-    }
-  }
-
   Future<void> _signInAnonymously(String clientId) async {
     await retryOperation(
       operation: () => Supabase.instance.client.auth.signInAnonymously(
@@ -106,9 +149,16 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   @override
   Future<String?> getClientIdFromSharedPreference() async {
-    var prefs = ref.read(sharedPreferencesProvider);
+    if (_cachedClientId != null) return _cachedClientId;
 
-    return prefs.getString(SharedPreferenceConstants.userId);
+    try {
+      var prefs = ref.read(sharedPreferencesProvider);
+      var clientId = prefs.getString(SharedPreferenceConstants.userId);
+      _cachedClientId = clientId;
+      return clientId;
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -156,7 +206,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   @override
   Future<bool> logIn(String email, String password) async {
-    _clearClientId();
+    var originalClientId = await getClientIdFromSharedPreference();
 
     return retryOperation(
       operation: () async {
@@ -172,12 +222,18 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
               'This account has been marked for deletion.',
             );
           }
+          
+          await _clearClientId();
           await _saveClientIdToSharedPreference(
             response.user?.userMetadata?['client_id'] ?? '',
           );
+
+          return true;
         }
 
-        return response.user != null;
+        // Restore original client ID if login failed
+        await _saveClientIdToSharedPreference(originalClientId ?? '');
+        return false;
       },
       errorMessage: 'Error during log-in',
     );
@@ -201,14 +257,16 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   }
 
   Future<void> _saveClientIdToSharedPreference(String clientId) async {
-    var sharedPreferences = await SharedPreferences.getInstance();
+    var sharedPreferences = ref.read(sharedPreferencesProvider);
     await sharedPreferences.setString(
-        SharedPreferenceConstants.userId, clientId);
+      SharedPreferenceConstants.userId,
+      clientId,
+    );
   }
 
   Future<void> _clearClientId() async {
-    var sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.remove('client_id');
+    var sharedPreferences = ref.read(sharedPreferencesProvider);
+    await sharedPreferences.remove(SharedPreferenceConstants.userId);
   }
 
   @override
