@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 
@@ -15,16 +16,29 @@ final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
 final editStatsUrlProvider = Provider<String>((ref) {
   final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
   final stats = ref.watch(statsProvider).valueOrNull;
+  final deviceInfo = ref.watch(deviceAndAppInfoProvider).valueOrNull;
 
-  if (stats == null) return '$editStatsUrl?clientid=$clientId';
+  if (deviceInfo == null || stats == null) {
+    return '$editStatsUrl?clientid=$clientId';
+  }
 
   final timeListened = (stats.totalTimeListened / 60000).round();
+  final timezone = DateTime.now().timeZoneName;
+  final os = deviceInfo.os;
+  final platform = deviceInfo.platform;
+  final appVersion = deviceInfo.appVersion;
+  final model = deviceInfo.model;
 
   return '$editStatsUrl?clientid=$clientId'
-      '&streakcurrent=${stats.streakCurrent}'
-      '&streaklongest=${stats.streakLongest}'
-      '&trackscompleted=${stats.totalTracksCompleted}'
-      '&timelistened=$timeListened';
+        '&streakcurrent=${stats.streakCurrent}'
+        '&streaklongest=${stats.streakLongest}'
+        '&trackscompleted=${stats.totalTracksCompleted}'
+        '&timelistened=$timeListened'
+        '&timezone=$timezone'
+        '&os=$os'
+        '&platform=$platform'
+        '&appVersion=$appVersion'
+        '&model=$model';
 });
 
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
