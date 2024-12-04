@@ -15,7 +15,7 @@ import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
-    ref.read(deviceAppAndUserInfoProvider);
+
     checkMaintenance(ref, context);
 
     if (Platform.isIOS) {
@@ -52,7 +52,7 @@ Future<String?> getUserToken() async {
   return prefs.getString(SharedPreferenceConstants.userToken);
 }
 
-void checkMaintenance(ProviderRef<void> ref, BuildContext context) {
+void checkMaintenance(Ref<void> ref, BuildContext context) {
   ref.read(fetchMaintenanceProvider.future).then(
     (maintenanceData) {
       ref.read(deviceAndAppInfoProvider.future).then(
