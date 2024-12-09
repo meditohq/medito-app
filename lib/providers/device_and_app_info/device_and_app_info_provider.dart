@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,7 +17,7 @@ import '../me/me_provider.dart';
 part 'device_and_app_info_provider.g.dart';
 
 @riverpod
-Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
+Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
   ref.keepAlive();
 
   String? deviceModel;
@@ -27,7 +28,7 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
   var deviceInfo = DeviceInfoPlugin();
   var packageInfo = await PackageInfo.fromPlatform();
   var languageCode = PlatformDispatcher.instance.locale.languageCode;
-  var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName; // Get currency name
+  var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName;
 
   appVersion = packageInfo.version;
   buildNumber = packageInfo.buildNumber;
@@ -57,16 +58,15 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(DeviceAndAppInfoRef ref) async {
   return DeviceAndAppInfoModel.fromJson(data);
 }
 
-final deviceAppAndUserInfoProvider =
-    FutureProvider.autoDispose<String>((ref) async {
+@riverpod
+Future<String> deviceAppAndUserInfo(Ref ref) async {
   var me = await ref.watch(meProvider.future);
   var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
-
   var auth = ref.read(authRepositoryProvider);
   var email = auth.getUserEmail();
 
   return _formatString(me, deviceInfo, email);
-});
+}
 
 String _formatString(
   MeModel? me,
