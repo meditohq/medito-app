@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/fade_page_route.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -30,10 +29,6 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   Future<void> _initializeApp() async {
     try {
-      // First initialize auth
-      await ref.read(authRepositoryProvider).initializeUser();
-      
-      // Then try to initialize stats
       try {
         await StatsManager().initialize();
       } catch (e) {
