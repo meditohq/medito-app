@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,6 +52,10 @@ Future<void> initializeAudioService() async {
       builder: () => iosAudioHandler,
       config: const AudioServiceConfig(),
     );
+  } else if (Platform.isAndroid) {
+    setupAudioCallback();
+    final manager = MeditoAndroidAudioServiceManager();
+    await manager.startService();
   }
 }
 

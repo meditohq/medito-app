@@ -28,7 +28,6 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
         TypeConstants.fileIdKey: completionData.fileId,
         TypeConstants.guideIdKey: completionData.guideId,
         TypeConstants.timestampIdKey: completionData.timestamp,
-        UpdateStatsConstants.userTokenKey: await getUserToken(),
       });
 
       return true;
@@ -37,11 +36,6 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
     }
   }
 
-Future<String?> getUserToken() async {
-    var supabase = Supabase.instance.client;
-    var user = supabase.auth.currentUser;
-    return user?.userMetadata?['userToken'] as String?;
-  }
 }
 
 class AudioStateNotifier extends StateNotifier<PlaybackState> {
