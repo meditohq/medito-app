@@ -118,7 +118,7 @@ class AuthInterceptor extends Interceptor with RetryMixin {
         ),
       );
     } catch (e) {
-      if (e.toString().contains('403')) {
+      if (e.toString().contains('403') || e.toString().contains('401')) {
         await retryOperation(
           operation: _refreshToken,
           errorMessage: 'Token refresh failed',
