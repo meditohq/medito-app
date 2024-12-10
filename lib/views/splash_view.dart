@@ -143,43 +143,80 @@ class SplashViewState extends ConsumerState<SplashView> {
       child: Scaffold(
         extendBody: true,
         backgroundColor: ColorConstants.ebony,
-        body: Center(
+        body: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                AssetConstants.icLogo,
-                width: 160,
-              ),
-              const SizedBox(height: 32),
-              if (_showGuestButton) ...[
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const SignUpLogInPage(),
-                    ),
-                  ).then((value) {
-                    if (value == true) {
-                      _checkAuthAndInitialize();
-                    }
-                  }),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorConstants.lightPurple,
-                    foregroundColor: ColorConstants.white,
-                    minimumSize: const Size(200, 48),
+              Expanded(
+                child: Center(
+                  child: SvgPicture.asset(
+                    AssetConstants.icLogo,
+                    width: 160,
                   ),
-                  child: const Text(StringConstants.createAccountLogInButtonText),
                 ),
-                const SizedBox(height: 16),
-                OutlinedButton(
-                  onPressed: _handleAnonymousSignIn,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: ColorConstants.lightPurple),
-                    minimumSize: const Size(200, 48),
-                  ),
-                  child: const Text(
-                    StringConstants.continueAsGuest,
-                    style: TextStyle(color: ColorConstants.lightPurple),
+              ),
+              if (_showGuestButton) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpLogInPage(initialTabIndex: 0),
+                            ),
+                          ).then((value) {
+                            if (value == true) {
+                              _checkAuthAndInitialize();
+                            }
+                          }),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorConstants.lightPurple,
+                            foregroundColor: ColorConstants.white,
+                          ),
+                          child: const Text(StringConstants.createAccountButtonText),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpLogInPage(initialTabIndex: 1),
+                            ),
+                          ).then((value) {
+                            if (value == true) {
+                              _checkAuthAndInitialize();
+                            }
+                          }),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorConstants.lightPurple,
+                            foregroundColor: ColorConstants.white,
+                          ),
+                          child: const Text(StringConstants.logInButtonText),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: _handleAnonymousSignIn,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: ColorConstants.lightPurple),
+                          ),
+                          child: const Text(
+                            StringConstants.continueAsGuest,
+                            style: TextStyle(color: ColorConstants.lightPurple),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

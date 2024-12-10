@@ -15,7 +15,9 @@ import 'package:flutter/gestures.dart';
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
-  const SignUpLogInPage({super.key});
+  final int initialTabIndex;
+  
+  const SignUpLogInPage({super.key, this.initialTabIndex = 0});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,13 +27,15 @@ class SignUpLogInPage extends ConsumerWidget {
     if (user?.email != null && user?.email?.isNotEmpty == true) {
       return const UserProfilePage();
     } else {
-      return const SignUpLogInForm();
+      return SignUpLogInForm(initialTabIndex: initialTabIndex);
     }
   }
 }
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
-  const SignUpLogInForm({super.key});
+  final int initialTabIndex;
+  
+  const SignUpLogInForm({super.key, this.initialTabIndex = 0});
 
   @override
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();
@@ -50,7 +54,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2, 
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
     _emailController.addListener(_validateEmail);
     _passwordController.addListener(_validatePassword);
   }
@@ -195,7 +203,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
           await StatsManager().clearAllStats();
           ref.read(statsProvider.notifier).refresh();
         }
-        
+
         if (!mounted) return;
         showSnackBar(context, StringConstants.signInSuccess);
         ref.invalidate(meProvider);
@@ -227,15 +235,43 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
       body: SafeArea(
         child: Column(
           children: [
-            TabBar(
-              controller: _tabController,
-              tabs: const [
-                Tab(text: StringConstants.createAccountButtonText),
-                Tab(text: StringConstants.logInButtonText),
-              ],
-              labelColor: ColorConstants.lightPurple,
-              unselectedLabelColor: Colors.white60,
-              indicatorColor: ColorConstants.lightPurple,
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: ColorConstants.softGrey,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        StringConstants.createAccountButtonText,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        StringConstants.logInButtonText,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                ],
+                labelColor: ColorConstants.lightPurple,
+                unselectedLabelColor: Colors.white60,
+                indicatorColor: ColorConstants.lightPurple,
+                indicatorWeight: 4,
+                indicatorSize: TabBarIndicatorSize.tab,
+              ),
             ),
             Expanded(
               child: TabBarView(
@@ -257,7 +293,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
 
   Widget _buildLoginTab(TextStyle inputTextStyle) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -281,7 +317,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
 
   Widget _buildSignUpTab(TextStyle inputTextStyle) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -313,7 +349,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
       ).copyWith(
         suffixIcon: _emailController.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear, color: Colors.grey),
+                icon: const Icon(Icons.clear, color: Colors.white60),
                 onPressed: () {
                   _emailController.clear();
                   _validateEmail();
@@ -322,7 +358,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
             : null,
       ),
       onChanged: (_) => setState(() {}),
-      style: inputTextStyle,
+      style: const TextStyle(color: Colors.white),
       keyboardType: TextInputType.emailAddress,
     );
   }
@@ -338,7 +374,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: Colors.grey,
+            color: Colors.white60,
           ),
           onPressed: () {
             setState(() {
@@ -347,7 +383,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
           },
         ),
       ),
-      style: inputTextStyle,
+      style: const TextStyle(color: Colors.white),
       obscureText: !_isPasswordVisible,
     );
   }
@@ -416,8 +452,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
     return ElevatedButton.styleFrom(
       foregroundColor: ColorConstants.onyx,
       backgroundColor: ColorConstants.lightPurple,
-      disabledForegroundColor: Colors.grey,
-      disabledBackgroundColor: Colors.grey[300],
+      disabledForegroundColor: Colors.white60,
+      disabledBackgroundColor: ColorConstants.lightPurple.withOpacity(0.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -429,16 +465,16 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
       String hint, bool isValid, String? errorText) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.black54),
+      hintStyle: const TextStyle(color: Colors.white60),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: ColorConstants.onyx,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.white),
+        borderSide: const BorderSide(color: ColorConstants.softGrey),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: ColorConstants.onyx),
+        borderSide: const BorderSide(color: ColorConstants.lightPurple),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -456,6 +492,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
   Widget _buildBenefitsText(String text) {
     return Text(
       text,
+      textAlign: TextAlign.center,
       style: const TextStyle(
         color: Colors.white70,
         fontSize: 18,

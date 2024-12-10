@@ -131,17 +131,17 @@ class StringConstants {
   static const String hours = 'h';
   static const String minutes = 'min';
 
-  static const String signUpLogInTitle = 'Create Account / Log In';
-  static const String createAccountTitle = 'Create an Account';
-  static const String loginTitle = 'Log In';
+  static const String signUpLogInTitle = 'Create acount / Sign up';
+  static const String createAccountTitle = 'Create account';
+  static const String loginTitle = 'Sign in';
   static const String emailLabel = 'Email';
   static const String passwordLabel = 'Password';
   static const String invalidEmailError = 'Please enter a valid email';
   static const String invalidPasswordError =
       'Password must be at least 6 characters';
   static const String createAccountButtonText = 'Create Account';
-  static const String createAccountLogInButtonText = 'Create Account/Log in';
-  static const String logInButtonText = 'Log In';
+  static const String createAccountLogInButtonText = 'Create Account/Sign in';
+  static const String logInButtonText = 'Sign In';
   static const String authenticationFailed = 'Authentication failed';
 
   static const String createAccountBenefits =
@@ -329,5 +329,5 @@ class StringConstants {
   static const String appInitError = 
       'App initialization failed. Entering offline mode.';
 
-  static const continueAsGuest = 'Continue as Guest';
+  static const continueAsGuest = 'Skip';
 }
