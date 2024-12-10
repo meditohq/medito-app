@@ -109,35 +109,26 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   Future<void> _initDeepLinks() async {
     _appLinks = AppLinks();
-
-    if (kDebugMode) {
-      debugPrint('[DEEPLINK] Setting up deep link handlers');
-    }
-
+    debugPrint('[DEEPLINK] Setting up deep link handlers');
+  
     // Handle links
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
-        if (kDebugMode) {
-          debugPrint('[DEEPLINK] Got deep link: $uri');
-        }
+        debugPrint('[DEEPLINK] Got deep link: $uri');
         _handleDeepLink(uri);
       },
       onError: (err) {
-        if (kDebugMode) {
-          debugPrint('[DEEPLINK] Error from link stream: $err');
-        }
+        debugPrint('[DEEPLINK] Error from link stream: $err');
       },
     );
   }
 
   void _handleDeepLink(Uri uri) {
-    if (kDebugMode) {
-      debugPrint('[DEEPLINK] Handling deep link: ${uri.toString()}');
-      debugPrint('[DEEPLINK] Scheme: ${uri.scheme}');
-      debugPrint('[DEEPLINK] Host: ${uri.host}');
-      debugPrint('[DEEPLINK] Path: ${uri.path}');
-    }
-
+    debugPrint('[DEEPLINK] Handling deep link: ${uri.toString()}');
+    debugPrint('[DEEPLINK] Scheme: ${uri.scheme}');
+    debugPrint('[DEEPLINK] Host: ${uri.host}');
+    debugPrint('[DEEPLINK] Path: ${uri.path}');
+  
     var path = '';
     var id = '';
     
@@ -173,9 +164,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         return;
       }
 
-      if (kDebugMode) {
-        debugPrint('[DEEPLINK] Navigating to: $path with id: $id');
-      }
+      debugPrint('[DEEPLINK] Navigating to: $path with id: $id');
 
       scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
@@ -189,9 +178,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       });
       
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[DEEPLINK] Error handling deep link: $e');
-      }
+      debugPrint('[DEEPLINK] Error handling deep link: $e');
       scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text(StringConstants.deepLinkError),
