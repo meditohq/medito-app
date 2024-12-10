@@ -46,13 +46,13 @@ class DebugBottomSheetWidget extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _debugRowItem(
-          context,
-          info,
-        ),
         ElevatedButton(
           child: const Text(StringConstants.copy),
           onPressed: () => _handleCopy(context, info),
+        ),
+        _debugRowItem(
+          context,
+          info,
         ),
       ],
     );

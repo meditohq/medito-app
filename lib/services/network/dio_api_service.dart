@@ -11,37 +11,24 @@ const _messageKey = 'message';
 class DioApiService with RetryMixin {
   static final DioApiService _instance = DioApiService._internal();
   late Dio dio;
+  bool _isInitialized = false;
 
   factory DioApiService() {
     return _instance;
   }
 
-  // Private constructor
   DioApiService._internal() {
-    _initializeDio();
+    _initializeDioWithoutAuth();
   }
 
-  void _initializeDio() {
+  void _initializeDioWithoutAuth() {
     dio = Dio();
     dio.options = BaseOptions(
       connectTimeout: const Duration(milliseconds: 60000),
       baseUrl: contentBaseUrl,
     );
 
-    _addInterceptors();
-  }
-
-  void _addInterceptors() {
-    dio.interceptors.add(AuthInterceptor(dio));
-
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onError: (e, handler) async {
-          throw _returnDioErrorResponse(e);
-        },
-      ),
-    );
-
+    // Only add non-auth interceptors
     if (kDebugMode) {
       dio.interceptors.add(
         LogInterceptor(
@@ -51,6 +38,13 @@ class DioApiService with RetryMixin {
           error: true,
         ),
       );
+    }
+  }
+
+  void initializeAuth() {
+    if (!_isInitialized) {
+      dio.interceptors.add(AuthInterceptor(dio));
+      _isInitialized = true;
     }
   }
 

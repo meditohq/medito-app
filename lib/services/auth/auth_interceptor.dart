@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
-import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/retry_mixin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,14 +13,6 @@ class AuthInterceptor extends Interceptor with RetryMixin {
   final Dio dio;
 
   AuthInterceptor(this.dio);
-
-  Future<void> _ensureInitialized() async {
-    try {
-      Supabase.instance;
-    } catch (_) {
-      await AuthRepositoryImpl.initializeSupabase();
-    }
-  }
 
   bool _shouldRetry(DioException err) {
     return err.type == DioExceptionType.connectionTimeout ||
@@ -91,7 +82,6 @@ class AuthInterceptor extends Interceptor with RetryMixin {
   @override
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    await _ensureInitialized();
 
     var token = Supabase.instance.client.auth.currentSession?.accessToken;
 

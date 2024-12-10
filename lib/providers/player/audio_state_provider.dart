@@ -2,11 +2,11 @@ import 'package:medito/main.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/stats_updater.dart';
-import '../root/root_combine_provider.dart';
 
 class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   final AudioStateNotifier notifier;
@@ -35,6 +35,12 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
     } on Exception catch (_) {
       return false;
     }
+  }
+
+Future<String?> getUserToken() async {
+    var supabase = Supabase.instance.client;
+    var user = supabase.auth.currentUser;
+    return user?.userMetadata?['userToken'] as String?;
   }
 }
 

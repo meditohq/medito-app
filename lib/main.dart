@@ -11,20 +11,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:medito/constants/strings/string_constants.dart';
-import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
-import 'package:medito/services/network/dio_header_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/splash_view.dart';
 
 import 'constants/theme/app_theme.dart';
-import 'firebase_options.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -42,14 +38,7 @@ void main() async {
   await _runApp();
 }
 
-Future<void> initializeApp() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  await AuthRepositoryImpl.initializeSupabase();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  setupAudioCallback();
+Future<void> initializeApp() async {    
   await initializeAudioService();
   usePathUrlStrategy();
 }
@@ -90,7 +79,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  late DioHeaderService dioHeaderService;
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
@@ -99,14 +87,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
-    _initializeDioHeaderService();
     _initDeepLinks();
-  }
-
-  Future<void> _initializeDioHeaderService() async {
-    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-    dioHeaderService = DioHeaderService(deviceInfo);
-    await dioHeaderService.initialise();
   }
 
   void _setUpSystemUi() {

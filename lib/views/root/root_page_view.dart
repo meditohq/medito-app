@@ -1,5 +1,4 @@
 import 'package:medito/constants/constants.dart';
-import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,7 +15,6 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
   @override
   void initState() {
     super.initState();
-    ref.read(rootCombineProvider(context));
   }
 
   @override

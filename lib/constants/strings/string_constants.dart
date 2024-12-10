@@ -140,6 +140,7 @@ class StringConstants {
   static const String invalidPasswordError =
       'Password must be at least 6 characters';
   static const String createAccountButtonText = 'Create Account';
+  static const String createAccountLogInButtonText = 'Create Account/Log in';
   static const String logInButtonText = 'Log In';
   static const String authenticationFailed = 'Authentication failed';
 
@@ -327,4 +328,6 @@ class StringConstants {
   /// Message shown when app initialization fails and app enters offline mode
   static const String appInitError = 
       'App initialization failed. Entering offline mode.';
+
+  static const continueAsGuest = 'Continue as Guest';
 }

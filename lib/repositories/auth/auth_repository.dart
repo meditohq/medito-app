@@ -1,14 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/providers/providers.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:medito/utils/retry_mixin.dart';
-
-part 'auth_repository.g.dart';
+import 'dart:developer' as dev;
 
 enum AuthException {
   accountMarkedForDeletion,
@@ -27,6 +25,7 @@ class AuthError implements Exception {
 
 abstract class AuthRepository {
   Future<String?> getClientIdFromSharedPreference();
+  Future<void> initializeSupabase();
   Future<void> initializeUser();
   Future<String> getToken();
   String getUserEmail();
@@ -39,146 +38,13 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImpl extends AuthRepository with RetryMixin {
-  static const _initLockKey = 'auth_init_lock';
-  static const _initLockTimeout = Duration(seconds: 30);
-
-  bool _hasInitialized = false;
-  String? _cachedClientId;
-  final Ref ref;
-  static bool _hasInitializedSupabase = false;
-
-  AuthRepositoryImpl({required this.ref});
-
-  Future<bool> _acquireLock() async {
-    var prefs = await SharedPreferences.getInstance();
-    var lastLockTime = prefs.getInt(_initLockKey) ?? 0;
-    var now = DateTime.now().millisecondsSinceEpoch;
-
-    if (now - lastLockTime > _initLockTimeout.inMilliseconds) {
-      var success = await prefs.setInt(_initLockKey, now);
-      if (!success) return false;
-
-      var checkLock = prefs.getInt(_initLockKey);
-      return checkLock == now;
-    }
-    return false;
-  }
-
-  Future<void> _releaseLock() async {
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_initLockKey);
-  }
-
-  Future<void> migrateClientId() async {
-    var prefs = await SharedPreferences.getInstance();
-    var clientId = prefs.getString(SharedPreferenceConstants.userId);
-
-    if (clientId == null) {
-      // Generate a new clientId if it doesn't exist
-      clientId = const Uuid().v4();
-      await prefs.setString(SharedPreferenceConstants.userId, clientId);
-    }
-
-    // Cache the clientId for later use
-    _cachedClientId = clientId;
-
-    if (kDebugMode) {
-      print('Migrated clientId: $clientId');
-    }
-  }
-
-  @override
-  Future<void> initializeUser() async {
-    if (_hasInitialized) return;
-
-    for (var i = 0; i < 3; i++) {
-      if (await _acquireLock()) {
-        try {
-          await migrateClientId();
-          await _doInitialize();
-          return;
-        } finally {
-          await _releaseLock();
-        }
-      }
-      if (i < 2) await Future.delayed(const Duration(milliseconds: 100));
-    }
-  }
-
-  Future<void> _doInitialize() async {
-    await initializeSupabaseIfNeeded();
-
-    var clientId = await getClientIdFromSharedPreference();
-    clientId ??= const Uuid().v4();
-
-    _cachedClientId = clientId;
-    await _saveClientIdToSharedPreference(clientId);
-    if (Supabase.instance.client.auth.currentUser == null) {
-      await _signInAnonymously(clientId);
-    }
-
-    _hasInitialized = true;
-
-    if (kDebugMode) {
-      print('Initialized user with clientId: $clientId');
-    }
-  }
-
-  static Future<void> initializeSupabase() async {
-    if (_hasInitializedSupabase) return;
-
-    var attempts = 0;
-    const maxAttempts = 3;
-    const delay = Duration(seconds: 2);
-    const errorMessage = 'Failed to initialize Supabase';
-
-    while (attempts < maxAttempts) {
-      try {
-        await Supabase.initialize(
-          url: supabaseUrl,
-          anonKey: supabaseKey,
-        );
-        _hasInitializedSupabase = true;
-        return;
-      } catch (e) {
-        attempts++;
-        if (attempts == maxAttempts) {
-          if (kDebugMode) {
-            print('$errorMessage after $maxAttempts attempts: $e');
-          }
-          rethrow;
-        }
-        await Future.delayed(delay * attempts);
-      }
-    }
-    throw Exception(errorMessage);
-  }
-
-  Future<void> initializeSupabaseIfNeeded() async {
-    if (!_hasInitialized) {
-      await initializeSupabase();
-      _hasInitialized = true;
-    }
-  }
-
-  Future<void> _signInAnonymously(String clientId) async {
-    await retryOperation(
-      operation: () => Supabase.instance.client.auth.signInAnonymously(
-        data: {'client_id': clientId},
-      ),
-      errorMessage: 'Failed to create anonymous account',
-    );
-  }
+  static bool _hasInitialized = false;
 
   @override
   Future<String?> getClientIdFromSharedPreference() async {
-    if (_cachedClientId != null) return _cachedClientId;
-
     try {
       var prefs = await SharedPreferences.getInstance();
-      var clientId = prefs.getString(SharedPreferenceConstants.userId);
-      _cachedClientId = clientId;
-      return clientId;
+      return prefs.getString(SharedPreferenceConstants.userId);
     } catch (e) {
       if (kDebugMode) {
         print('Error reading clientId: $e');
@@ -187,15 +53,96 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
     }
   }
 
-  Future<void> _saveClientIdToSharedPreference(String clientId) async {
-    var prefs = await SharedPreferences.getInstance();
-    var existingClientId = prefs.getString(SharedPreferenceConstants.userId);
-
-    if (existingClientId == null || existingClientId != clientId) {
+  Future<void> saveClientIdToSharedPreference(String clientId) async {
+    try {
+      var prefs = await SharedPreferences.getInstance();
       await prefs.setString(SharedPreferenceConstants.userId, clientId);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving clientId: $e');
+      }
+    }
+  }
+
+  @override
+  Future<void> initializeUser() async {
+    dev.log('[AUTH] Starting user initialization');
+    if (Supabase.instance.client.auth.currentUser == null) {
+      dev.log('[AUTH] No current user, creating anonymous account');
+      await _signInAnonymously();
+    } else {
+      dev.log(
+          '[AUTH] Found existing user: ${Supabase.instance.client.auth.currentUser?.id}');
+    }
+  }
+
+  @override
+  Future<void> initializeSupabase() async {
+    if (_hasInitialized) {
+      dev.log('[AUTH] Supabase already initialized, skipping');
+      return;
     }
 
-    _cachedClientId = clientId;
+    var attempts = 0;
+    const maxAttempts = 3;
+    const delay = Duration(seconds: 2);
+    const errorMessage = 'Failed to initialize Supabase';
+
+    while (attempts < maxAttempts) {
+      try {
+        dev.log(
+            '[AUTH] Attempting to initialize Supabase (attempt ${attempts + 1}/$maxAttempts)');
+        await Supabase.initialize(
+          url: supabaseUrl,
+          anonKey: supabaseKey,
+        );
+        _hasInitialized = true;
+        dev.log('[AUTH] Supabase initialization successful');
+        return;
+      } catch (e) {
+        attempts++;
+        dev.log('[AUTH] Supabase initialization attempt failed', error: e);
+        if (attempts == maxAttempts) {
+          dev.log('[AUTH] $errorMessage after $maxAttempts attempts', error: e);
+          rethrow;
+        }
+        await Future.delayed(delay * attempts);
+      }
+    }
+    throw Exception(errorMessage);
+  }
+
+  String _generateClientId() {
+    var date = DateFormat('ddMMyy_HHmmss_').format(DateTime.now());
+    
+    return '$date${const Uuid().v4()}';
+  }
+
+  Future<void> _signInAnonymously() async {
+    var clientId =
+        await getClientIdFromSharedPreference() ?? _generateClientId();
+    dev.log('[AUTH] client ID for anonymous user: $clientId');
+
+    saveClientIdToSharedPreference(clientId);
+
+    await retryOperation(
+      operation: () async {
+        dev.log('[AUTH] Attempting anonymous sign in');
+        var response = await Supabase.instance.client.auth.signInAnonymously(
+          data: {'client_id': clientId},
+        );
+
+        if (response.user != null) {
+          dev.log(
+              '[AUTH] Anonymous sign in successful, updating user metadata');
+          await Supabase.instance.client.auth.updateUser(
+            UserAttributes(data: {'client_id': clientId}),
+          );
+          dev.log('[AUTH] User metadata updated successfully');
+        }
+      },
+      errorMessage: 'Failed to create anonymous account',
+    );
   }
 
   @override
@@ -220,7 +167,16 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   @override
   Future<bool> signUp(String email, String password) async {
-    var clientId = await getClientIdFromSharedPreference() ?? '';
+    var currentUser = Supabase.instance.client.auth.currentUser;
+    var clientId = currentUser?.userMetadata?['client_id'] as String?;
+
+    if (clientId == null) {
+      clientId = await getClientIdFromSharedPreference() ?? _generateClientId();
+      dev.log('[AUTH] Using client ID for signup: $clientId');
+    }
+
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.setString(SharedPreferenceConstants.userId, clientId);
 
     return retryOperation(
       operation: () async {
@@ -242,8 +198,6 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   @override
   Future<bool> logIn(String email, String password) async {
-    var originalClientId = await getClientIdFromSharedPreference();
-
     return retryOperation(
       operation: () async {
         var response = await Supabase.instance.client.auth.signInWithPassword(
@@ -259,14 +213,15 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
             );
           }
 
-          await _saveClientIdToSharedPreference(
-            response.user?.userMetadata?['client_id'] ?? '',
-          );
+          var clientId = response.user?.userMetadata?['client_id'] as String?;
+
+          clientId ??= _generateClientId();
+
+          await saveClientIdToSharedPreference(clientId);
 
           return true;
         }
 
-        await _saveClientIdToSharedPreference(originalClientId ?? '');
         return false;
       },
       errorMessage: 'Error during log-in',
@@ -297,13 +252,12 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   Future<bool> signOut() async {
     var supabase = Supabase.instance.client;
 
+    final sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.remove(SharedPreferenceConstants.userId);
+
     try {
       await supabase.auth.signOut();
-
-      var newClientId = const Uuid().v4();
-      await _saveClientIdToSharedPreference(newClientId);
-
-      await _signInAnonymously(newClientId);
+      await _signInAnonymously();
 
       return true;
     } catch (e) {
@@ -342,7 +296,6 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   }
 }
 
-@riverpod
-AuthRepository authRepository(Ref ref) {
-  return AuthRepositoryImpl(ref: ref);
-}
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl();
+});

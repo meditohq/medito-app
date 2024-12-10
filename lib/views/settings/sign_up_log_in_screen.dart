@@ -195,10 +195,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
           await StatsManager().clearAllStats();
           ref.read(statsProvider.notifier).refresh();
         }
+        
+        if (!mounted) return;
         showSnackBar(context, StringConstants.signInSuccess);
         ref.invalidate(meProvider);
 
-        Navigator.of(context).pop();
+        // Pop back to splash screen which will handle initialization
+        Navigator.of(context).pop(true);
       } else {
         showSnackBar(context, 'Authentication failed');
       }

@@ -33,12 +33,18 @@ TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
       ? TimeOfDay(hour: savedHour, minute: savedMinute)
       : null;
 }
-
 final userIdProvider = FutureProvider<String>((ref) async {
   final authRepository = ref.watch(authRepositoryProvider);
   final userId = await authRepository.getClientIdFromSharedPreference();
 
   return userId ?? '';
+});
+
+final bearerTokenProvider = FutureProvider<String>((ref) async {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final bearerToken = await authRepository.getToken();
+
+  return bearerToken;
 });
 
 class SettingsItem {

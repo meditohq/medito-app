@@ -2,9 +2,11 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/views/settings/settings_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +30,8 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
   var deviceInfo = DeviceInfoPlugin();
   var packageInfo = await PackageInfo.fromPlatform();
   var languageCode = PlatformDispatcher.instance.locale.languageCode;
-  var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName;
+  var currencyName =
+      NumberFormat.simpleCurrency(locale: languageCode).currencyName;
 
   appVersion = packageInfo.version;
   buildNumber = packageInfo.buildNumber;
@@ -65,17 +68,20 @@ Future<String> deviceAppAndUserInfo(Ref ref) async {
   var auth = ref.read(authRepositoryProvider);
   var email = auth.getUserEmail();
 
-  return _formatString(me, deviceInfo, email);
+  return await _formatString(me, deviceInfo, email, ref);
 }
 
-String _formatString(
+Future<String> _formatString(
   MeModel? me,
   DeviceAndAppInfoModel? deviceInfo,
   String? emailAddress,
-) {
+  Ref ref,
+) async {
+  var clientIdFromSupabase = await ref.read(userIdProvider.future);
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
   var env = '${StringConstants.env}: $isProdString';
   var id = '${StringConstants.id}: ${me?.id ?? ''}';
+  var clientId = '${StringConstants.id} from sp: $clientIdFromSupabase';
   var email = '${StringConstants.email}: ${emailAddress ?? ''}';
   var appVersion =
       '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
@@ -88,7 +94,13 @@ String _formatString(
       '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
 
   var formattedString =
-      '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
+      '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$clientId';
+
+  if (kDebugMode) {
+    var token = await ref.read(bearerTokenProvider.future);
+    var tokenString = 'token: $token';
+    formattedString += '\n$tokenString';
+  }
 
   return formattedString;
 }
