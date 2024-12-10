@@ -82,7 +82,6 @@ class AuthInterceptor extends Interceptor with RetryMixin {
   @override
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-
     var token = Supabase.instance.client.auth.currentSession?.accessToken;
 
     if (token == null) {
@@ -107,11 +106,11 @@ class AuthInterceptor extends Interceptor with RetryMixin {
 
   Future<String?> _refreshToken() async {
     final session = await Supabase.instance.client.auth.refreshSession();
-    
+
     if (session.session?.accessToken != null) {
       debugPrint('Token refreshed successfully');
     }
-    
+
     return session.session?.accessToken;
   }
 

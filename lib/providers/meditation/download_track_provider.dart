@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -12,13 +13,13 @@ import '../player/download/audio_downloader_provider.dart';
 part 'download_track_provider.g.dart';
 
 @riverpod
-Future<List<TrackModel>> downloadedTracks(DownloadedTracksRef ref) {
+Future<List<TrackModel>> downloadedTracks(Ref ref) {
   ref.keepAlive();
   return ref.watch(trackRepositoryProvider).fetchTrackFromPreference();
 }
 
 @riverpod
-Future<void> removeDownloadedTrack(RemoveDownloadedTrackRef ref,
+Future<void> removeDownloadedTrack(Ref ref,
     {required TrackModel track}) async {
   var firstItem = track.audio.first.files.first;
   var fileName =
@@ -34,7 +35,7 @@ Future<void> removeDownloadedTrack(RemoveDownloadedTrackRef ref,
 }
 
 @riverpod
-Future<void> deleteTrackFromPreference(DeleteTrackFromPreferenceRef ref,
+Future<void> deleteTrackFromPreference(Ref ref,
     {required TrackFilesModel file}) async {
   try {
     var downloadedTrackList = await ref.watch(downloadedTracksProvider.future);
@@ -47,20 +48,18 @@ Future<void> deleteTrackFromPreference(DeleteTrackFromPreferenceRef ref,
 
     ref.invalidate(downloadedTracksProvider);
   } catch (e) {
-    if (kDebugMode) {
-      print('Error in deleteTrackFromPreference: $e');
-    }
+    debugPrint('Error in deleteTrackFromPreference: $e');
   }
 }
 
 @riverpod
-Future<void> addTrackListInPreference(AddTrackListInPreferenceRef ref,
+Future<void> addTrackListInPreference(Ref ref,
     {required List<TrackModel> tracks}) async {
   return await ref.read(trackRepositoryProvider).addTrackInPreference(tracks);
 }
 
 @riverpod
-Future<void> addSingleTrackInPreference(AddSingleTrackInPreferenceRef ref,
+Future<void> addSingleTrackInPreference(Ref ref,
     {required TrackModel trackModel, required TrackFilesModel file}) async {
   var track = trackModel.customCopyWith();
   track.audio = track.audio.where((element) {

@@ -46,9 +46,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
       var prefs = await SharedPreferences.getInstance();
       return prefs.getString(SharedPreferenceConstants.userId);
     } catch (e) {
-      if (kDebugMode) {
-        print('Error reading clientId: $e');
-      }
+      debugPrint('Error reading clientId: $e');
       return null;
     }
   }
@@ -58,9 +56,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
       var prefs = await SharedPreferences.getInstance();
       await prefs.setString(SharedPreferenceConstants.userId, clientId);
     } catch (e) {
-      if (kDebugMode) {
-        print('Error saving clientId: $e');
-      }
+      debugPrint('Error saving clientId: $e');
     }
   }
 
@@ -274,9 +270,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
       );
       return response.user != null;
     } catch (e) {
-      if (kDebugMode) {
-        print('Error marking account for deletion: $e');
-      }
+      debugPrint('Error marking account for deletion: $e');
       return false;
     }
   }
@@ -288,9 +282,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
       final user = supabase.auth.currentUser;
       return user?.userMetadata?['marked_for_deletion'] == true;
     } catch (e) {
-      if (kDebugMode) {
-        print('Error checking if account is marked for deletion: $e');
-      }
+      debugPrint('Error checking if account is marked for deletion: $e');
       return false;
     }
   }

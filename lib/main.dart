@@ -111,20 +111,20 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _appLinks = AppLinks();
 
     if (kDebugMode) {
-      print('[DEEPLINK] Setting up deep link handlers');
+      debugPrint('[DEEPLINK] Setting up deep link handlers');
     }
 
     // Handle links
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
         if (kDebugMode) {
-          print('[DEEPLINK] Got deep link: $uri');
+          debugPrint('[DEEPLINK] Got deep link: $uri');
         }
         _handleDeepLink(uri);
       },
       onError: (err) {
         if (kDebugMode) {
-          print('[DEEPLINK] Error from link stream: $err');
+          debugPrint('[DEEPLINK] Error from link stream: $err');
         }
       },
     );
@@ -132,10 +132,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   void _handleDeepLink(Uri uri) {
     if (kDebugMode) {
-      print('[DEEPLINK] Handling deep link: ${uri.toString()}');
-      print('[DEEPLINK] Scheme: ${uri.scheme}');
-      print('[DEEPLINK] Host: ${uri.host}');
-      print('[DEEPLINK] Path: ${uri.path}');
+      debugPrint('[DEEPLINK] Handling deep link: ${uri.toString()}');
+      debugPrint('[DEEPLINK] Scheme: ${uri.scheme}');
+      debugPrint('[DEEPLINK] Host: ${uri.host}');
+      debugPrint('[DEEPLINK] Path: ${uri.path}');
     }
 
     var path = '';
@@ -174,7 +174,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       }
 
       if (kDebugMode) {
-        print('[DEEPLINK] Navigating to: $path with id: $id');
+        debugPrint('[DEEPLINK] Navigating to: $path with id: $id');
       }
 
       scaffoldMessengerKey.currentState?.showSnackBar(
@@ -190,7 +190,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       
     } catch (e) {
       if (kDebugMode) {
-        print('[DEEPLINK] Error handling deep link: $e');
+        debugPrint('[DEEPLINK] Error handling deep link: $e');
       }
       scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(

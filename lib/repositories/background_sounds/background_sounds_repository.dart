@@ -73,9 +73,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         return sounds;
       }
     } catch (err) {
-      if (kDebugMode) {
-        print(err);
-      }
+      debugPrint(err.toString());
     }
 
     return null;
@@ -109,9 +107,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         }
       }
     } catch (err) {
-      if (kDebugMode) {
-        print(err);
-      }
+      debugPrint(err.toString());
     }
   }
 

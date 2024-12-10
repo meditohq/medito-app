@@ -134,9 +134,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
           await iosBackgroundPlayer.setFilePath(uri);
         }
       } catch (e, s) {
-        if (kDebugMode) {
-          print(s);
-        }
+          debugPrintStack(stackTrace: s);
       }
       unawaited(iosBackgroundPlayer.play());
       _handleFadeAtEndForIos();

@@ -126,33 +126,29 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun playAudio(audioData: AudioData): Boolean {
         isCompletionHandled = false
 
-        val mediaMetadata = MediaMetadata.Builder()
-            .setTitle(audioData.track.title)
-            .setArtist(audioData.track.artist)
-            .setDescription(audioData.track.description)
-            .setArtworkUri(Uri.parse(audioData.track.imageUrl))
-            .build()
-
-        val mediaItem = MediaItem.Builder()
+        val primaryMediaItem = MediaItem.Builder()
             .setUri(audioData.url)
             .setMediaId(audioData.track.id)
-            .setMediaMetadata(mediaMetadata)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(audioData.track.title)
+                    .setArtist(audioData.track.artist)
+                    .setDescription(audioData.track.description)
+                    .setArtworkUri(Uri.parse(audioData.track.imageUrl))
+                    .build()
+            )
             .build()
 
-        try {
-            primaryPlayer.setMediaItem(mediaItem)
-            primaryPlayer.prepare()
-            primaryPlayer.play()
-            
-            handler.postDelayed(positionUpdateRunnable, 500)
-            playBackgroundSound()
-            updateNotification()
-            
-            return true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
+        primaryPlayer.setMediaItem(primaryMediaItem)
+        primaryPlayer.prepare()
+        primaryPlayer.play()
+
+        handler.postDelayed(positionUpdateRunnable, 500)
+
+        playBackgroundSound()
+        updateNotification()
+
+        return true
     }
 
     private fun createMediaNotification(artworkBitmap: Bitmap?): Notification {

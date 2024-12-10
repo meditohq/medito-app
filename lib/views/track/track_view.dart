@@ -408,9 +408,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
             ref.invalidate(packProvider),
           });
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      debugPrint(e.toString());
     }
   }
 

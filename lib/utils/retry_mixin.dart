@@ -14,9 +14,7 @@ mixin RetryMixin {
       } catch (e) {
         attempts++;
         if (attempts == maxAttempts) {
-          if (kDebugMode) {
-            print('$errorMessage after $maxAttempts attempts: $e');
-          }
+          debugPrint('$errorMessage after $maxAttempts attempts: $e');
           rethrow;
         }
         await Future.delayed(delay * attempts);

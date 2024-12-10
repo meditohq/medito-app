@@ -139,15 +139,11 @@ Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
     final file = File('${appDir.path}/stats.png');
 
     await file.writeAsBytes(pngBytes);
-    if (kDebugMode) {
-      print('File saved at: ${file.path}');
-    }
+    debugPrint('File saved at: ${file.path}');
 
     return file;
   } catch (e) {
-    if (kDebugMode) {
-      print('Error in capturePng: $e');
-    }
+    debugPrint('Error in capturePng: $e');
     return null;
   }
 }
