@@ -28,7 +28,7 @@ class SplashView extends ConsumerStatefulWidget {
 }
 
 class SplashViewState extends ConsumerState<SplashView> {
-  var _showGuestButton = false;
+  var _showAccountButtons = false;
 
   @override
   void initState() {
@@ -56,7 +56,7 @@ class SplashViewState extends ConsumerState<SplashView> {
       } else {
         if (!mounted) return;
         setState(() {
-          _showGuestButton = true;
+          _showAccountButtons = true;
         });
       }
     } catch (e) {
@@ -154,7 +154,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                   ),
                 ),
               ),
-              if (_showGuestButton) ...[
+              if (_showAccountButtons) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                   child: Column(
