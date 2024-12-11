@@ -11,6 +11,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
+import 'package:medito/models/account_action.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 
@@ -98,26 +99,30 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
   }
 
   Future<void> _logIn() async {
-    final authRepository = ref.read(authRepositoryProvider);
-    if (authRepository.currentUser?.email == null) {
+    final stats = ref.read(statsProvider).valueOrNull;
+    final hasCompletedAudio = stats?.audioCompleted?.isNotEmpty ?? false;
+
+    if (hasCompletedAudio) {
       final action = await _showAccountTransitionWarningDialog();
-      if (action == AccountAction.cancel) return;
-      if (action == AccountAction.createAccount) {
-        await _signUp();
-        return;
+      switch (action) {
+        case AccountActionCancel():
+          return;
+        case AccountActionCreateAccount():
+          await _signUp();
+          return;
+        case AccountActionLogin():
+          break;
       }
-    } else {
-      final shouldProceed = await _showLoginDialog();
-      if (!shouldProceed) return;
     }
 
     try {
       await _performAuthAction(
-          () => authRepository.logIn(
-                _emailController.text.trim(),
-                _passwordController.text.trim(),
-              ),
-          true);
+        () => ref.read(authRepositoryProvider).logIn(
+              _emailController.text.trim(),
+              _passwordController.text.trim(),
+            ),
+        true,
+      );
     } on AuthError catch (e) {
       switch (e.type) {
         case AuthException.accountMarkedForDeletion:
@@ -168,24 +173,24 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
               actions: <Widget>[
                 TextButton(
                   child: const Text(StringConstants.cancelAction),
-                  onPressed: () =>
-                      Navigator.of(context).pop(AccountAction.cancel),
+                  onPressed: () => 
+                      Navigator.of(context).pop(const AccountActionCancel()),
                 ),
                 TextButton(
                   child: const Text(StringConstants.createNewAccount),
-                  onPressed: () =>
-                      Navigator.of(context).pop(AccountAction.createAccount),
+                  onPressed: () => 
+                      Navigator.of(context).pop(const AccountActionCreateAccount()),
                 ),
                 TextButton(
                   child: const Text(StringConstants.continueLogin),
-                  onPressed: () =>
-                      Navigator.of(context).pop(AccountAction.login),
+                  onPressed: () => 
+                      Navigator.of(context).pop(const AccountActionLogin()),
                 ),
               ],
             );
           },
-        ) ??
-        AccountAction.cancel;
+        ) ?? 
+        const AccountActionCancel();
   }
 
   Future<void> _performAuthAction(
@@ -500,10 +505,4 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
       ),
     );
   }
-}
-
-enum AccountAction {
-  cancel,
-  createAccount,
-  login,
 }
