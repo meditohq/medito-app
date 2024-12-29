@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/routes/routes.dart';
+import 'package:medito/views/track/track_view.dart';
 import '../../controllers/path_notifier.dart';
 import '../../models/path/path_result.dart' as result;
 import '../../constants/strings/string_constants.dart';
 import 'journal_entry_view.dart';
 
-class PathView extends ConsumerWidget {
-  const PathView({Key? key}) : super(key: key);
+class JourneyView extends ConsumerWidget {
+  const JourneyView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Sync updates when the view is loaded
+    Future(() {
+      ref.read(pathNotifierProvider.notifier).syncPendingUpdates();
+    });
+
     final pathState = ref.watch(pathNotifierProvider);
 
     return Scaffold(
@@ -29,47 +38,63 @@ class PathView extends ConsumerWidget {
             ],
           ),
         ),
-        data: (steps) => ListView.builder(
-          itemCount: steps.length,
-          itemBuilder: (context, index) {
-            final step = steps[index];
-            final isFirstLockedStep = !step.isUnlocked && 
-                (index == 0 || steps[index - 1].isUnlocked);
-            return ExpansionTile(
-              title: Text(_getStepTitle(step, isFirstLockedStep)),
-              leading: _buildStepIcon(step),
-              children: _buildStepChildren(step, isFirstLockedStep),
-            );
-          },
-        ),
+        data: (steps) => _buildStepsList(steps),
       ),
     );
   }
 
-  String _getStepTitle(result.Step step, bool isFirstLockedStep) {
-    if (step.isUnlocked || isFirstLockedStep) {
+  Widget _buildStepsList(List<result.JourneyStep> steps) {
+    return ListView.builder(
+      itemCount: steps.length,
+      itemBuilder: (context, index) {
+        final step = steps[index];
+        final isFirstLockedStep =
+            step.isLocked && (index == 0 || !steps[index - 1].isLocked);
+        return ExpansionTile(
+          title: Text(_getStepTitle(step, isFirstLockedStep)),
+          leading: _buildStepIcon(step),
+          children: _buildStepChildren(step, isFirstLockedStep),
+        );
+      },
+    );
+  }
+
+  String _getStepTitle(result.JourneyStep step, bool isFirstLockedStep) {
+    if (!step.isLocked || isFirstLockedStep) {
       return '${StringConstants.stepTitle}: ${step.title}';
     } else {
       return '${StringConstants.stepTitle}: ...';
     }
   }
 
-  Widget _buildStepIcon(result.Step step) {
+  Widget _buildStepIcon(result.JourneyStep step) {
     if (step.isCompleted) {
-      return const Icon(Icons.check_circle, color: Colors.green);
-    } else if (!step.isUnlocked) {
-      return const Icon(Icons.lock, color: Colors.grey);
+      return HugeIcon(
+          icon: HugeIcons.solidSharpCheckmarkCircle02, color: Colors.green);
+    } else if (step.isLocked) {
+      return HugeIcon(
+          icon: HugeIcons.solidRoundedSquareLock02, color: Colors.grey);
     } else {
-      return const Icon(Icons.circle_outlined, color: Colors.grey);
+      var allRequiredTasksCompleted = step.tasks
+          .where((task) => task.isRequired)
+          .every((task) => task.isCompleted);
+
+      return HugeIcon(
+        icon: allRequiredTasksCompleted 
+            ? HugeIcons.solidSharpCheckmarkCircle02 
+            : HugeIcons.strokeRoundedCircle,
+        color: allRequiredTasksCompleted ? Colors.green : Colors.grey,
+      );
     }
   }
 
-  List<Widget> _buildStepChildren(result.Step step, bool isFirstLockedStep) {
-    if (step.isUnlocked || isFirstLockedStep) {
+  List<Widget> _buildStepChildren(
+      result.JourneyStep step, bool isFirstLockedStep) {
+    if (!step.isLocked || isFirstLockedStep) {
       return step.tasks
           .map((task) => TaskListTile(
                 task: task,
-                isEnabled: step.isUnlocked,
+                isEnabled: !step.isLocked,
               ))
           .toList();
     } else {
@@ -77,22 +102,22 @@ class PathView extends ConsumerWidget {
     }
   }
 }
-
 class TaskListTile extends ConsumerWidget {
   final result.Task task;
   final bool isEnabled;
 
   const TaskListTile({
-    Key? key,
+    super.key,
     required this.task,
     required this.isEnabled,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoading = ref.watch(taskLoadingProvider(task.id));
 
     return ListTile(
+      leading: _buildLeadingIcon(task),
       title: Text(
         task.title,
         style: TextStyle(
@@ -106,19 +131,27 @@ class TaskListTile extends ConsumerWidget {
               height: 24,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : _buildTaskIcon(task),
+          : _buildTaskIcon(task, ref),
+      
       onTap: (isEnabled && !isLoading) ? () => _onTaskTap(context, ref) : null,
     );
   }
 
   Widget _buildTaskSubtitle(result.Task task) {
+    const maxLength = 35;
     var subtitleText = switch (task.data) {
-      result.MeditationData(duration: var duration) =>
+      result.TrackData(duration: var duration) =>
         '${StringConstants.duration}: $duration ${StringConstants.minutes}',
-      result.JournalData(entryText: var entryText) => entryText.isNotEmpty
-          ? entryText
-          : StringConstants.writeYourJournalEntryHere,
-      result.ArticleData() => StringConstants.tapToReadArticle,
+      result.JournalData(entryText: var entryText) =>
+        entryText.length > maxLength
+            ? '${entryText.substring(0, maxLength)}...'
+            : entryText.isNotEmpty
+                ? entryText
+                : StringConstants.writeYourJournalEntryHere,
+      result.ArticleData() =>
+        StringConstants.tapToReadArticle.length > maxLength
+            ? '${StringConstants.tapToReadArticle.substring(0, maxLength)}...'
+            : StringConstants.tapToReadArticle,
     };
 
     return Text(
@@ -129,15 +162,31 @@ class TaskListTile extends ConsumerWidget {
     );
   }
 
-  Widget _buildTaskIcon(result.Task task) {
+  Widget _buildTaskIcon(result.Task task, WidgetRef ref) {
     if (task.isCompleted) {
-      return const Icon(Icons.check_circle, color: Colors.green);
-    } else {
-      return Icon(
-        Icons.circle_outlined,
-        color: isEnabled ? null : Colors.grey,
+      return HugeIcon(
+        icon: HugeIcons.solidSharpCheckmarkCircle02,
+        color: Colors.green,
       );
     }
+
+    return HugeIcon(
+      icon: HugeIcons.strokeRoundedCircle,
+      color: isEnabled ? Colors.white : Colors.grey,
+    );
+  }
+
+  Widget _buildLeadingIcon(result.Task task) {
+    var iconData = switch (task.type) {
+      result.TaskType.journal => HugeIcons.strokeRoundedPenTool03,
+      result.TaskType.track => HugeIcons.strokeRoundedHeadphones,
+      result.TaskType.article => HugeIcons.strokeRoundedDoc01,
+    };
+
+    return HugeIcon(
+      icon: iconData,
+      color: isEnabled ? Colors.white : Colors.grey,
+    );
   }
 
   void _onTaskTap(BuildContext context, WidgetRef ref) async {
@@ -154,15 +203,17 @@ class TaskListTile extends ConsumerWidget {
           ),
         );
         break;
-      case result.TaskType.meditation:
-        // TODO: Implement meditation session logic
+      case result.TaskType.track:
+        final trackData = task.data as result.TrackData;
+        await handleNavigation('track', [trackData.id], context,
+            ref: ref);
         break;
       case result.TaskType.article:
         // TODO: Implement article viewing logic
         break;
     }
 
-    if (task.type != result.TaskType.journal) {
+    if (task.type == result.TaskType.article) {
       ref.read(taskLoadingProvider(task.id).notifier).setLoading(true);
       await ref.read(pathNotifierProvider.notifier).updateTaskCompletion(
             task.id,

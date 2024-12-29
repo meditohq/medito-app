@@ -1,13 +1,19 @@
+import 'package:flutter/foundation.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/repositories/path_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/path/path_result.dart';
+import '../services/task_update_service.dart';
 
 part 'path_notifier.g.dart';
 
 @riverpod
 class PathNotifier extends _$PathNotifier {
+  late final TaskUpdateService _taskUpdateService;
+
   @override
-  AsyncValue<List<Step>> build() {
+  AsyncValue<List<JourneyStep>> build() {
+    _taskUpdateService = TaskUpdateService(ref.read(sharedPreferencesProvider));
     fetchPathData();
     return const AsyncValue.loading();
   }
@@ -18,32 +24,68 @@ class PathNotifier extends _$PathNotifier {
     _updateState(result);
   }
 
+  Future<void> syncPendingUpdates() async {
+    final updates = _taskUpdateService.getPendingUpdates();
+    if (updates.isEmpty) return;
+
+    final payload = TaskUpdatePayload(
+      updated: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      tasks: updates,
+    );
+
+    try {
+      await ref.read(pathRepositoryProvider).updateTaskProgress('1', payload);
+      await _taskUpdateService.clearUpdates();
+      // Refresh path data to get the latest state from server
+      await fetchPathData();
+    } catch (e) {
+      debugPrint('Failed to sync updates: $e');
+    }
+  }
+
   Future<void> updateTaskCompletion(String taskId, bool isCompleted) async {
-    final currentState = state;
-    if (currentState is AsyncData<List<Step>>) {
-      state = AsyncValue.data(_updateTaskInState(
-        currentState.value,
-        taskId,
-        (task) => task.copyWith(isCompleted: isCompleted),
-      ));
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    var stepId = '';
+    for (final step in currentState) {
+      if (step.tasks.any((t) => t.id == taskId)) {
+        stepId = step.id;
+        break;
+      }
     }
 
-    final result = await ref
-        .read(pathRepositoryProvider)
-        .updateTaskCompletion(taskId, isCompleted);
-    _updateState(result);
+    final update = TaskUpdate(
+      stepId: stepId,
+      taskId: taskId,
+      completedAt: [DateTime.now().millisecondsSinceEpoch ~/ 1000],
+    );
+
+    await _taskUpdateService.addUpdate(update);
+
+    // Update local state immediately
+    state = AsyncData(currentState.map((step) {
+      return step.copyWith(
+        tasks: step.tasks.map((task) {
+          if (task.id == taskId) {
+            return task.copyWith(isCompleted: isCompleted);
+          }
+          return task;
+        }).toList(),
+      );
+    }).toList());
   }
 
   Future<void> updateJournalEntry(
       String taskId, String entryText, bool markAsCompleted) async {
     final currentState = state;
-    if (currentState is AsyncData<List<Step>>) {
+    if (currentState is AsyncData<List<JourneyStep>>) {
       state = AsyncValue.data(_updateTaskInState(
         currentState.value,
         taskId,
         (task) => task.copyWith(
           isCompleted: markAsCompleted,
-          data: JournalData(entryText: entryText),
+          data: JournalData(id: 'wow', entryText: entryText),
         ),
       ));
     }
@@ -54,8 +96,8 @@ class PathNotifier extends _$PathNotifier {
     _updateState(result);
   }
 
-  List<Step> _updateTaskInState(
-    List<Step> steps,
+  List<JourneyStep> _updateTaskInState(
+    List<JourneyStep> steps,
     String taskId,
     Task Function(Task) updateFunction,
   ) {
@@ -69,18 +111,20 @@ class PathNotifier extends _$PathNotifier {
         }).toList(),
       );
 
-      // Check if all tasks in this step are completed
-      bool allTasksCompleted =
-          updatedStep.tasks.every((task) => task.isCompleted);
-      updatedStep = updatedStep.copyWith(isCompleted: allTasksCompleted);
+      // Check if all required tasks in this step are completed
+      bool allRequiredTasksCompleted = updatedStep.tasks
+          .where((task) => task.isRequired)
+          .every((task) => task.isCompleted);
+      updatedStep =
+          updatedStep.copyWith(isCompleted: allRequiredTasksCompleted);
 
       return updatedStep;
     }).toList();
 
     // Unlock the next step if the current step is completed
     for (int i = 0; i < updatedSteps.length - 1; i++) {
-      if (updatedSteps[i].isCompleted && !updatedSteps[i + 1].isUnlocked) {
-        updatedSteps[i + 1] = updatedSteps[i + 1].copyWith(isUnlocked: true);
+      if (updatedSteps[i].isCompleted && updatedSteps[i + 1].isLocked) {
+        updatedSteps[i + 1] = updatedSteps[i + 1].copyWith(isLocked: false);
         break;
       }
     }
@@ -88,9 +132,9 @@ class PathNotifier extends _$PathNotifier {
     return updatedSteps;
   }
 
-  void _updateState(PathResult result) {
+  void _updateState(JourneyResult result) {
     state = switch (result) {
-      PathResultSuccess(steps: var steps) => AsyncValue.data(steps),
+      JourneyResultSuccess(steps: var steps) => AsyncValue.data(steps),
       PathResultError(message: var errorMessage) =>
         AsyncValue.error(errorMessage, StackTrace.current),
     };

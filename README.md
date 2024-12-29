@@ -56,7 +56,7 @@ flutter pub run pigeon --input pigeon_conf.dart
 
 To generate API and state management code with Riverpod:
 ```
-dart run build_runner watch --delete-conflicting-outputs
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 ### Development and Production Configurations

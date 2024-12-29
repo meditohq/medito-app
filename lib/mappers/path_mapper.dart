@@ -1,24 +1,29 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/path/path_dto.dart';
 import '../models/path/path_result.dart';
 
 class PathMapper {
-  PathResult mapDtoToResult(PathDTO dto) {
+  JourneyResult mapDtoToResult(PathDTO dto) {
     try {
-      var steps = dto.steps.map((stepDto) => _mapStepDtoToStep(stepDto)).toList();
-      return PathResultSuccess(steps);
+      var steps =
+          dto.steps.map((stepDto) => _mapStepDtoToStep(stepDto)).toList();
+      return JourneyResultSuccess(steps);
     } catch (e) {
-      return PathResultError('Failed to map path data: ${e.toString()}');
-    }
+      debugPrint(e.toString());
+      return PathResultError.JourneyResultError(
+          'Failed to map path data: ${e.toString()}');
+    } 
   }
 
-  Step _mapStepDtoToStep(StepDTO dto) {
+  JourneyStep _mapStepDtoToStep(StepDTO dto) {
     var tasks = dto.tasks.map((taskDto) => _mapTaskDtoToTask(taskDto)).toList();
-    return Step(
+    return JourneyStep(
       id: dto.id,
       title: dto.title,
       tasks: tasks,
-      isUnlocked: dto.isUnlocked,
-      isCompleted: dto.isCompleted, 
+      isLocked: dto.isLocked,
+      isCompleted: dto.isCompleted,
     );
   }
 
@@ -28,15 +33,16 @@ class PathMapper {
       type: _mapStringToTaskType(dto.type),
       title: dto.title,
       isCompleted: dto.isCompleted,
-      lastUpdated: DateTime.fromMillisecondsSinceEpoch(dto.lastUpdated),
-      data: _mapTaskData(dto.type, dto.data),
+      lastUpdated: DateTime.fromMillisecondsSinceEpoch(dto.lastUpdated ?? 0),
+      data: _mapTaskData(dto.id, dto.type, dto.data),
+      isRequired: dto.isRequired,
     );
   }
 
   TaskType _mapStringToTaskType(String type) {
     switch (type) {
-      case 'meditation':
-        return TaskType.meditation;
+      case 'track':
+        return TaskType.track;
       case 'journal':
         return TaskType.journal;
       case 'article':
@@ -46,14 +52,21 @@ class PathMapper {
     }
   }
 
-  TaskData _mapTaskData(String type, Map<String, dynamic> data) {
+  TaskData _mapTaskData(String id, String type, Map<String, dynamic> data) {
     switch (type) {
-      case 'meditation':
-        return MeditationData(duration: data['duration'] as int);
+      case 'track':
+        var trackId = data['track_id'] as String? ?? '';
+        var duration = data['duration'] as int? ?? 0;
+        
+        return TrackData(id: trackId, duration: duration);
       case 'journal':
-        return JournalData(entryText: data['entryText'] as String);
+        var entryText = data['entryText'] as String? ?? '';
+        
+        return JournalData(id: id, entryText: entryText);
       case 'article':
-        return ArticleData(content: data['content'] as String);
+        var content = data['content'] as String? ?? '';
+        
+        return ArticleData(id: id, content: content);
       default:
         throw ArgumentError('Unknown task type: $type');
     }

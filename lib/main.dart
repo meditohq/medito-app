@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/controllers/path_notifier.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
@@ -37,7 +38,7 @@ void main() async {
   await _runApp();
 }
 
-Future<void> initializeApp() async {    
+Future<void> initializeApp() async {
   await initializeAudioService();
   usePathUrlStrategy();
 }
@@ -110,7 +111,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Future<void> _initDeepLinks() async {
     _appLinks = AppLinks();
     debugPrint('[DEEPLINK] Setting up deep link handlers');
-  
+
     // Handle links
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
@@ -128,10 +129,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     debugPrint('[DEEPLINK] Scheme: ${uri.scheme}');
     debugPrint('[DEEPLINK] Host: ${uri.host}');
     debugPrint('[DEEPLINK] Path: ${uri.path}');
-  
+
     var path = '';
     var id = '';
-    
+
     try {
       if (uri.scheme == 'org.meditofoundation') {
         path = uri.host;
@@ -139,7 +140,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
         var pathSegments = uri.path.split('/')
           ..removeWhere((segment) => segment.isEmpty);
-        
+
         if (pathSegments.isNotEmpty) {
           path = pathSegments[0];
           id = pathSegments.length > 1 ? pathSegments[1] : '';
@@ -176,7 +177,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       Future.delayed(const Duration(seconds: 2), () {
         handleNavigation(path, [id], context);
       });
-      
     } catch (e) {
       debugPrint('[DEEPLINK] Error handling deep link: $e');
       scaffoldMessengerKey.currentState?.showSnackBar(
@@ -218,5 +218,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _onAppForegrounded() {
     ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
+    ref.read(pathNotifierProvider.notifier).syncPendingUpdates();
   }
 }

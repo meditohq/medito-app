@@ -16,7 +16,7 @@ import '../../providers/meditation/track_provider.dart';
 class TrackView extends ConsumerStatefulWidget {
   final String trackId;
 
-  const TrackView({Key? key, required this.trackId}) : super(key: key);
+  const TrackView({super.key, required this.trackId});
 
   @override
   ConsumerState<TrackView> createState() => _TrackViewState();

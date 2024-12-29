@@ -9,17 +9,17 @@ class JournalEntryView extends ConsumerStatefulWidget {
   final bool isCompleted;
 
   const JournalEntryView({
-    Key? key,
+    super.key,
     required this.taskId,
     required this.isCompleted,
     this.initialText = '',
-  }) : super(key: key);
+  });
 
   @override
-  _JournalEntryViewState createState() => _JournalEntryViewState();
+  JournalEntryViewState createState() => JournalEntryViewState();
 }
 
-class _JournalEntryViewState extends ConsumerState<JournalEntryView> {
+class JournalEntryViewState extends ConsumerState<JournalEntryView> {
   late TextEditingController _controller;
   bool _isSaving = false;
 
@@ -68,14 +68,25 @@ class _JournalEntryViewState extends ConsumerState<JournalEntryView> {
     setState(() {
       _isSaving = true;
     });
+
+    var entryText = _controller.text;
     await ref.read(pathNotifierProvider.notifier).updateJournalEntry(
           widget.taskId,
-          _controller.text,
-          !widget.isCompleted,
+          entryText,
+          entryText.isNotEmpty,
         );
+
+    if (entryText.isNotEmpty) {
+      await ref.read(pathNotifierProvider.notifier).updateTaskCompletion(
+            widget.taskId,
+            true,
+          );
+    }
+
     setState(() {
       _isSaving = false;
     });
+
     Navigator.of(context).pop();
   }
 }

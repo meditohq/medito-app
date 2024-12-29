@@ -8,7 +8,7 @@ import 'dart:async' as _i4;
 import 'package:medito/models/local_all_stats.dart' as _i2;
 import 'package:medito/services/stats_service.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:shared_preferences/src/shared_preferences_legacy.dart' as _i5;
+import 'package:shared_preferences/shared_preferences.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -42,6 +42,15 @@ class MockStatsService extends _i1.Mock implements _i3.StatsService {
   }
 
   @override
+  _i4.Future<bool> hasRecentlySync() => (super.noSuchMethod(
+        Invocation.method(
+          #hasRecentlySync,
+          [],
+        ),
+        returnValue: _i4.Future<bool>.value(false),
+      ) as _i4.Future<bool>);
+
+  @override
   _i4.Future<_i2.LocalAllStats> fetchAllStats() => (super.noSuchMethod(
         Invocation.method(
           #fetchAllStats,
@@ -57,11 +66,11 @@ class MockStatsService extends _i1.Mock implements _i3.StatsService {
       ) as _i4.Future<_i2.LocalAllStats>);
 
   @override
-  _i4.Future<void> postUpdatedStats(_i2.LocalAllStats? localStats) =>
+  _i4.Future<void> postUpdatedStats(_i2.LocalAllStats? stats) =>
       (super.noSuchMethod(
         Invocation.method(
           #postUpdatedStats,
-          [localStats],
+          [stats],
         ),
         returnValue: _i4.Future<void>.value(),
         returnValueForMissingStub: _i4.Future<void>.value(),

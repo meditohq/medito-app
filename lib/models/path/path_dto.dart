@@ -6,6 +6,9 @@ part 'path_dto.g.dart';
 @freezed
 class PathDTO with _$PathDTO {
   const factory PathDTO({
+    required String id,
+    required String title,
+    required String description,
     required List<StepDTO> steps,
   }) = _PathDTO;
 
@@ -17,8 +20,9 @@ class StepDTO with _$StepDTO {
   const factory StepDTO({
     required String id,
     required String title,
+    required String description,
+    @Default(true) bool isLocked,
     required List<TaskDTO> tasks,
-    @Default(false) bool isUnlocked,
     @Default(false) bool isCompleted,
   }) = _StepDTO;
 
@@ -31,9 +35,11 @@ class TaskDTO with _$TaskDTO {
     required String id,
     required String type,
     required String title,
-    required bool isCompleted,
-    required int lastUpdated,
-    required Map<String, dynamic> data,
+    required String description,
+    @Default(false) bool isRequired,
+    @Default(false) bool isCompleted,
+    int? lastUpdated,
+    @Default({}) Map<String, dynamic> data,
   }) = _TaskDTO;
 
   factory TaskDTO.fromJson(Map<String, dynamic> json) => _$TaskDTOFromJson(json);

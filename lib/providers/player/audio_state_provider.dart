@@ -2,7 +2,6 @@ import 'package:medito/main.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
