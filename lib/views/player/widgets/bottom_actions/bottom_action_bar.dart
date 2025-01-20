@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 enum BottomActionBarLayout {
-  evenlySpaced,     // For bottom nav - all items evenly spaced
-  edgeAligned,      // For player view - outer items at edges, inner items evenly spaced
-  compactRight,     // For track view - items at edges with last two grouped
+  evenlySpaced, // For bottom nav - all items evenly spaced
+  edgeAligned, // For player view - outer items at edges, inner items evenly spaced
+  compactRight, // For track view - items at edges with last two grouped
 }
 
 class BottomActionBarItem {
@@ -34,13 +34,32 @@ class BottomActionBar extends StatelessWidget {
       return const SizedBox(width: 48);
     }
 
-    return GestureDetector(
-      onTap: item.onTap,
-      child: item.child,
+    return IconButton(
+      onPressed: item.onTap,
+      icon: item.child,
     );
   }
 
   List<Widget> _buildLayoutChildren() {
+    // Check for 3-item layout first
+    var hasThreeItems = leftItem != null &&
+        (leftCenterItem != null || rightCenterItem != null) &&
+        rightItem != null &&
+        !(leftCenterItem != null && rightCenterItem != null);
+
+    if (hasThreeItems) {
+      var middleItem = leftCenterItem ?? rightCenterItem;
+      return [
+        const Spacer(),
+        _buildItem(leftItem),
+        const Spacer(),
+        _buildItem(middleItem),
+        const Spacer(),
+        _buildItem(rightItem),
+        const Spacer(),
+      ];
+    }
+
     switch (layout) {
       case BottomActionBarLayout.evenlySpaced:
         return [
@@ -59,7 +78,9 @@ class BottomActionBar extends StatelessWidget {
           _buildItem(rightCenterItem),
           const Spacer(),
           _buildItem(rightItem),
-          SizedBox.square(dimension: 20,)
+          SizedBox.square(
+            dimension: 20,
+          )
         ];
 
       case BottomActionBarLayout.compactRight:
@@ -89,10 +110,9 @@ class BottomActionBar extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        
         child: Row(
-          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced 
-              ? MainAxisAlignment.spaceEvenly 
+          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced
+              ? MainAxisAlignment.spaceEvenly
               : MainAxisAlignment.start,
           children: _buildLayoutChildren(),
         ),

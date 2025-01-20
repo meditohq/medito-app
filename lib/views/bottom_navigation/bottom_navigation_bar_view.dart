@@ -9,7 +9,7 @@ import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
-  const BottomNavigationBarView({Key? key}) : super(key: key);
+  const BottomNavigationBarView({super.key});
 
   @override
   ConsumerState<BottomNavigationBarView> createState() =>
@@ -61,7 +61,7 @@ class _BottomNavigationBarViewState
             ),
             onTap: () => _onDestinationSelected(0),
           ),
-          leftCenterItem: BottomActionBarItem(
+          rightCenterItem: BottomActionBarItem(
             child: GestureDetector(
               onDoubleTap: () {
                 if (_currentPageIndex == 1) {
@@ -82,15 +82,15 @@ class _BottomNavigationBarViewState
             ),
             onTap: () => _onDestinationSelected(1),
           ),
-          rightCenterItem: BottomActionBarItem(
-            child: MeditoHugeIcon(
-              icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
-              color: _currentPageIndex == 2
-                  ? ColorConstants.lightPurple
-                  : ColorConstants.white,
-            ),
-            onTap: () => _onDestinationSelected(2),
-          ),
+          // rightCenterItem: BottomActionBarItem(
+          //   child: MeditoHugeIcon(
+          //     icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
+          //     color: _currentPageIndex == 2
+          //         ? ColorConstants.lightPurple
+          //         : ColorConstants.white,
+          //   ),
+          //   onTap: () => _onDestinationSelected(2),
+          // ),
           rightItem: BottomActionBarItem(
             child: MeditoHugeIcon(
               icon: _currentPageIndex == 3 ? 'filledSettings' : 'duoSettings',
