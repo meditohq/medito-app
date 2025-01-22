@@ -202,7 +202,6 @@ class SettingsScreen extends ConsumerWidget {
     SettingsItem item,
   ) {
     return RowItemWidget(
-      enableInteractiveSelection: false,
       icon: item.icon,
       title: item.title,
       hasUnderline: true,
@@ -212,7 +211,6 @@ class SettingsScreen extends ConsumerWidget {
 
   Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
     return RowItemWidget(
-      enableInteractiveSelection: false,
       icon: HugeIcon(
           icon: HugeIcons.strokeRoundedHelpCircle,
           size: 24,
@@ -231,7 +229,6 @@ class SettingsScreen extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
       color: ColorConstants.onyx,
       child: RowItemWidget(
-        enableInteractiveSelection: false,
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedNotification03,
           size: 24,

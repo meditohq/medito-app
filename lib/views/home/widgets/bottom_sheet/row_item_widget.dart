@@ -17,7 +17,6 @@ class RowItemWidget extends StatelessWidget {
     this.trailingIconSize = 24,
     this.leadingIconSize = 24,
     this.iconColor,
-    this.enableInteractiveSelection = true,
     this.trailingIcon = Icons.chevron_right_rounded,
   });
 
@@ -34,7 +33,6 @@ class RowItemWidget extends StatelessWidget {
   final TextStyle? titleStyle;
   final double leadingIconSize;
   final double trailingIconSize;
-  final bool enableInteractiveSelection;
   final IconData trailingIcon;
 
   @override
