@@ -51,7 +51,7 @@ class _BottomNavigationBarViewState
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: BottomActionBar(
-          layout: BottomActionBarLayout.evenlySpaced,
+          layout: BottomActionBarLayout.homePage,
           leftItem: BottomActionBarItem(
             child: MeditoHugeIcon(
               icon: _currentPageIndex == 0 ? 'filledhome' : 'duohome',

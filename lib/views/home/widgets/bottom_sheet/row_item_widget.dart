@@ -68,10 +68,7 @@ class RowItemWidget extends StatelessWidget {
                 children: [
                   icon,
                   width16,
-                  SelectableText.rich(
-                    enableInteractiveSelection: enableInteractiveSelection,
-                    onTap: onTap,
-                    scrollPhysics: const NeverScrollableScrollPhysics(),
+                  Text.rich(
                     TextSpan(
                       style: const TextStyle(fontSize: 18.0),
                       children: [

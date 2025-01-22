@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 enum BottomActionBarLayout {
-  evenlySpaced, // For bottom nav - all items evenly spaced
+  homePage, // For bottom nav - all items evenly spaced
+  evenlySpaced, //  4 all items evenly spaced
   edgeAligned, // For player view - outer items at edges, inner items evenly spaced
   compactRight, // For track view - items at edges with last two grouped
 }
@@ -41,27 +42,27 @@ class BottomActionBar extends StatelessWidget {
   }
 
   List<Widget> _buildLayoutChildren() {
-    // Check for 3-item layout first
-    var hasThreeItems = leftItem != null &&
-        (leftCenterItem != null || rightCenterItem != null) &&
-        rightItem != null &&
-        !(leftCenterItem != null && rightCenterItem != null);
-
-    if (hasThreeItems) {
-      var middleItem = leftCenterItem ?? rightCenterItem;
-      return [
-        const Spacer(),
-        _buildItem(leftItem),
-        const Spacer(),
-        _buildItem(middleItem),
-        const Spacer(),
-        _buildItem(rightItem),
-        const Spacer(),
-      ];
-    }
-
     switch (layout) {
-      case BottomActionBarLayout.evenlySpaced:
+      case BottomActionBarLayout.compactRight:
+        return [
+          _buildItem(leftItem),
+          const Spacer(),
+          if (rightCenterItem != null) _buildItem(rightCenterItem),
+          if (rightItem != null) _buildItem(rightItem),
+        ];
+
+      case BottomActionBarLayout.homePage:
+        return [
+          const Spacer(),
+          _buildItem(leftItem),
+          const Spacer(),
+          _buildItem(rightCenterItem),
+          const Spacer(),
+          _buildItem(rightItem),
+          const Spacer(),
+        ];
+        
+         case BottomActionBarLayout.evenlySpaced:
         return [
           _buildItem(leftItem),
           _buildItem(leftCenterItem),
@@ -82,26 +83,6 @@ class BottomActionBar extends StatelessWidget {
             dimension: 20,
           )
         ];
-
-      case BottomActionBarLayout.compactRight:
-        if (rightItem != null) {
-          return [
-            _buildItem(leftItem),
-            const Spacer(),
-            _buildItem(rightCenterItem),
-            const SizedBox(width: 16),
-            _buildItem(rightItem),
-          ];
-        } else {
-          return [
-            _buildItem(leftItem),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: _buildItem(rightCenterItem),
-            ),
-          ];
-        }
     }
   }
 
