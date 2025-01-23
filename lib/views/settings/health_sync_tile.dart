@@ -21,7 +21,6 @@ class HealthSyncTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RowItemWidget(
-      enableInteractiveSelection: false,
       icon: HugeIcon(
         icon: HugeIcons.solidRoundedHealth,
         color: Colors.white,
