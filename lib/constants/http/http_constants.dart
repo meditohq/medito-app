@@ -3,8 +3,6 @@ import 'package:flutter/foundation.dart';
 class EnvConfig {
   final String environment;
   final String contentBaseUrl;
-  final String authBaseUrl;
-  final String authToken;
   final String supabaseKey;
   final String supabaseUrl;
   final String editStatsUrl;
@@ -12,8 +10,6 @@ class EnvConfig {
   const EnvConfig({
     required this.environment,
     required this.contentBaseUrl,
-    required this.authBaseUrl,
-    required this.authToken,
     required this.supabaseKey,
     required this.supabaseUrl,
     required this.editStatsUrl,
@@ -24,8 +20,6 @@ class ProdEnv extends EnvConfig {
   const ProdEnv({
     required super.environment,
     required super.contentBaseUrl,
-    required super.authBaseUrl,
-    required super.authToken,
     required super.supabaseKey,
     required super.supabaseUrl,
     required super.editStatsUrl,
@@ -36,8 +30,6 @@ class StagingEnv extends EnvConfig {
   const StagingEnv({
     required super.environment,
     required super.contentBaseUrl,
-    required super.authBaseUrl,
-    required super.authToken,
     required super.supabaseKey,
     required super.supabaseUrl,
     required super.editStatsUrl,
@@ -49,8 +41,6 @@ const _prodEnv = ProdEnv(
   supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
-  authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
-  authToken: String.fromEnvironment('AUTH_TOKEN'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
@@ -59,8 +49,6 @@ const _stagingEnv = StagingEnv(
   supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
-  authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
-  authToken: String.fromEnvironment('AUTH_TOKEN'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
@@ -70,8 +58,6 @@ String get supabaseUrl => _currentEnv.supabaseUrl;
 String get supabaseKey => _currentEnv.supabaseKey;
 String get environment => _currentEnv.environment;
 String get contentBaseUrl => _currentEnv.contentBaseUrl;
-String get authBaseUrl => _currentEnv.authBaseUrl;
-String get authToken => _currentEnv.authToken;
 String get editStatsUrl => _currentEnv.editStatsUrl;
 
 class HTTPConstants {

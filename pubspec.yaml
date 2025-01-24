@@ -2,7 +2,7 @@ name: medito
 description: A meditation learning tool
 
 # flutter clean && flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
-# flutter clean && flutter build ios --dart-define-from-file=../.prod.json
+# flutter clean && flutter build ios --release --dart-define-from-file=../.prod.json
 version: 3.3.4+30074
 
 
@@ -15,7 +15,6 @@ dependencies:
     sdk: flutter
   audio_session: ^0.1.21
   audio_service: ^0.18.15
-  auto_size_text: ^3.0.0
   cached_network_image: ^3.2.3
   device_info_plus: ^10.1.2
   dio: ^5.4.0
@@ -23,7 +22,6 @@ dependencies:
   equatable: ^2.0.5
   firebase_core: ^3.10.1
   firebase_messaging: ^15.2.1
-  flutter_html: ^3.0.0-beta.2
   flutter_local_notifications: ^18.0.0
   flutter_markdown: ^0.7.4+1
   flutter_riverpod: ^2.4.9
@@ -33,7 +31,6 @@ dependencies:
   http: ^1.2.0
   image: ^4.1.4
   intl: ^0.19.0
-  json_annotation: ^4.8.1
   just_audio: ^0.9.41
   package_info_plus: ^8.0.1
   path_provider: ^2.1.2
@@ -45,7 +42,6 @@ dependencies:
   shared_preferences: ^2.2.2
   timezone: ^0.9.2
   url_launcher: ^6.2.3
-  webview_flutter: ^4.9.0
   uuid: ^4.5.0
   hugeicons:
     hosted: https://onepub.dev/api/kdpxxpsdav
@@ -54,7 +50,6 @@ dependencies:
   share_plus: ^7.2.1
   app_links: ^6.3.2
   supabase_flutter: ^2.0.0
-  internet_connection_checker_plus: ^2.5.2
 
 dev_dependencies:
   flutter_test:

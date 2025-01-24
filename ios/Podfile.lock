@@ -5,9 +5,6 @@ PODS:
     - Flutter
   - audio_session (0.0.1):
     - Flutter
-  - connectivity_plus (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - device_info_plus (0.0.1):
     - Flutter
   - Firebase/Core (11.6.0):
@@ -143,15 +140,11 @@ PODS:
     - FlutterMacOS
   - url_launcher_ios (0.0.1):
     - Flutter
-  - webview_flutter_wkwebview (0.0.1):
-    - Flutter
-    - FlutterMacOS
 
 DEPENDENCIES:
   - app_links (from `.symlinks/plugins/app_links/ios`)
   - audio_service (from `.symlinks/plugins/audio_service/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
-  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Firebase/Core
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -167,7 +160,6 @@ DEPENDENCIES:
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -190,8 +182,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audio_service/ios"
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
-  connectivity_plus:
-    :path: ".symlinks/plugins/connectivity_plus/darwin"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_core:
@@ -220,14 +210,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
-  webview_flutter_wkwebview:
-    :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
   app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
   audio_service: f509d65da41b9521a61f1c404dd58651f265a567
   audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
-  connectivity_plus: 4c41c08fc6d7c91f63bc7aec70ffe3730b04f563
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   Firebase: 374a441a91ead896215703a674d58cdb3e9d772b
   firebase_core: e2aa06dbd854d961f8ce46c2e20933bee1bf2d2b
@@ -253,7 +240,6 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqflite_darwin: a553b1fd6fe66f53bbb0fe5b4f5bab93f08d7a13
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
-  webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
 
 PODFILE CHECKSUM: 2b30a92390032cfcab6983e54dc1e63a68881bd0
 
