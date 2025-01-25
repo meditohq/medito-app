@@ -9,8 +9,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/controllers/path_notifier.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
@@ -197,6 +200,25 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = ref.watch(internetConnectionProvider);
+
+    connectionStatus.whenData((status) {
+      if (status == InternetConnectionStatus.disconnected) {
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: const Text(StringConstants.noConnection),
+            action: SnackBarAction(
+              label: StringConstants.goToDownloads,
+              onPressed: () {
+                handleNavigation(
+                    TypeConstants.flow, [TypeConstants.downloads], context);
+              },
+            ),
+          ),
+        );
+      }
+    });
+
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
       scaffoldMessengerKey: scaffoldMessengerKey,

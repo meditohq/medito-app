@@ -46,21 +46,6 @@ class _BottomNavigationBarViewState
 
   @override
   Widget build(BuildContext context) {
-    final connectionStatus = ref.watch(internetConnectionProvider);
-
-    connectionStatus.whenData((status) {
-      if (status == InternetConnectionStatus.disconnected) {
-        showSnackBar(
-          context,
-          StringConstants.noConnection,
-          actionLabel: StringConstants.goToDownloads,
-          onActionPressed: () {
-            handleNavigation(TypeConstants.flow, [TypeConstants.downloads], context);
-          },
-        );
-      }
-    });
-
     return PopScope(
       canPop: _currentPageIndex == 0,
       onPopInvokedWithResult: (didPop, _) {
