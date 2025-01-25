@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/routes/routes.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
   const BottomNavigationBarView({super.key});
@@ -42,6 +46,21 @@ class _BottomNavigationBarViewState
 
   @override
   Widget build(BuildContext context) {
+    final connectionStatus = ref.watch(internetConnectionProvider);
+
+    connectionStatus.whenData((status) {
+      if (status == InternetConnectionStatus.disconnected) {
+        showSnackBar(
+          context,
+          StringConstants.noConnection,
+          actionLabel: StringConstants.goToDownloads,
+          onActionPressed: () {
+            handleNavigation(TypeConstants.flow, [TypeConstants.downloads], context);
+          },
+        );
+      }
+    });
+
     return PopScope(
       canPop: _currentPageIndex == 0,
       onPopInvokedWithResult: (didPop, _) {

@@ -11,6 +11,7 @@ class TypeConstants {
   static const String guideIdKey = 'guide';
   static const String durationIdKey = 'duration';
   static const String account = 'account';
+  static const String downloads = 'downloads';
 
   // New constants for path view
   static const String article = 'article';

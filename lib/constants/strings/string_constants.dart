@@ -58,8 +58,6 @@ class StringConstants {
       'Unable to load audio. Please go back and try again';
   static const String loadingError =
       "It looks like you're offline or there was little hiccup from our end";
-  static const String checkConnection =
-      'It seems you are offline. Please connect to the internet to continue';
   static const String timeout =
       'Oops! It seems like there was an error. If the problem persists, Close the app and try again.';
   static const String connectivityError =
@@ -105,7 +103,6 @@ class StringConstants {
   static const String copy = 'Copy';
   static const String debugInfoCopied = 'Debug info copied to clipboard';
 
-  static const String noConnectionMessage = 'No internet connection';
   static const String goToDownloads = 'Go to Downloads';
 
   static const String signInSuccess = 'Sign in successful';
@@ -118,8 +115,6 @@ class StringConstants {
 
   static const String statsLoadError =
       'Unable to load stats. Please try again later.';
-  static const String statsRefreshError =
-      'Failed to refresh stats. Please check your connection and try again.';
   static const String statsLoading = 'Loading stats...';
   static const String statsErrorRetry = 'Retry';
 
@@ -144,12 +139,10 @@ class StringConstants {
   static const String logInButtonText = 'Sign In';
   static const String authenticationFailed = 'Authentication failed';
 
-  static const String createAccountBenefits =
-      '• Save your meditation progress'
+  static const String createAccountBenefits = '• Save your meditation progress'
       '\n• Keep your stats and achievements secure';
 
-  static const String loginBenefits = 
-      '• Download your previously saved data'
+  static const String loginBenefits = '• Download your previously saved data'
       '\n• Continue your meditation journey from where you left off';
 
   static const String accountTransitionWarningTitle = 'Save Your Progress';
@@ -267,10 +260,6 @@ class StringConstants {
   /// Used as a message when syncing Path data with the server
   static const String syncingPath = 'Syncing your progress...';
 
-  /// Used as an error message when syncing fails
-  static const String syncError =
-      'Failed to sync. Please check your connection and try again.';
-
   /// Used as a message when a step is locked in the Path view
   static const String stepLocked = 'Complete previous steps to unlock';
 
@@ -304,7 +293,7 @@ class StringConstants {
 
   /// Used in TrackViewBottomBar for the Siri shortcut option
   static const addToSiri = 'Add to Siri';
-  
+
   /// Used in TrackViewBottomBar for the share track option
   static const shareTrack = 'Share Track';
 
@@ -312,7 +301,7 @@ class StringConstants {
   static const open = 'Open';
 
   /// Used as the share text template when sharing a track
-  static const shareTrackText = 
+  static const shareTrackText =
       'Take a moment to breathe. Try this meditation session: "{trackName}" on Medito. {link}';
 
   // Deep linking related strings - used when handling deep links in the app
@@ -322,12 +311,14 @@ class StringConstants {
 
   // Splash view related messages
   /// Error message shown when stats initialization fails in the splash view
-  static const String statsInitError = 
+  static const String statsInitError =
       'Stats sync may have failed. Please check your connection.';
 
   /// Message shown when app initialization fails and app enters offline mode
-  static const String appInitError = 
+  static const String appInitError =
       'App initialization failed. Entering offline mode.';
+
+  static const noConnection = 'No connection';
 
   static const continueAsGuest = 'Skip';
 }

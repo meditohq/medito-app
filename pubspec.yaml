@@ -50,6 +50,7 @@ dependencies:
   share_plus: ^7.2.1
   app_links: ^6.3.2
   supabase_flutter: ^2.0.0
+  internet_connection_checker: ^3.0.1
 
 dev_dependencies:
   flutter_test:
