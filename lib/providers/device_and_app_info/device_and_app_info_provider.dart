@@ -97,10 +97,8 @@ Future<String> _formatString(
       '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$clientId';
 
   if (kDebugMode) {
-    var token = await ref.read(bearerTokenProvider.future);
-    var tokenString = 'token: $token';
     var isMonthlyDonorString = '${StringConstants.isMonthlyDonor}: ${me?.isMonthlyDonor ?? false}';
-    formattedString += '\n$tokenString\n$isMonthlyDonorString';
+    formattedString += '\n$isMonthlyDonorString';
   }
 
   return formattedString;
