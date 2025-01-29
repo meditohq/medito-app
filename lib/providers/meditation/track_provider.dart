@@ -1,11 +1,33 @@
+import 'package:medito/providers/events/events_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../constants/strings/shared_preference_constants.dart';
 import '../../models/track/track_model.dart';
-import '../../repositories/events/events_repository.dart';
 import '../../repositories/track/track_repository.dart';
+import '../shared_preference/shared_preference_provider.dart';
 
 part 'track_provider.g.dart';
+
+@riverpod
+class GuideNamePreference extends _$GuideNamePreference {
+  @override
+  String? build({required String trackId}) {
+    var prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString(SharedPreferenceConstants.lastSelectedGuideName);
+  }
+
+  void setGuideName(String? guideName) {
+    var prefs = ref.read(sharedPreferencesProvider);
+    if (guideName != null) {
+      prefs.setString(
+          SharedPreferenceConstants.lastSelectedGuideName, guideName);
+    } else {
+      prefs.remove(SharedPreferenceConstants.lastSelectedGuideName);
+    }
+    state = guideName;
+  }
+}
 
 @riverpod
 class Tracks extends _$Tracks {
@@ -48,22 +70,4 @@ class FavoriteStatus extends _$FavoriteStatus {
     state = !state;
     ref.read(tracksProvider(trackId: trackId).notifier).toggleFavorite(state);
   }
-}
-
-@riverpod
-Future<void> markAsFavouriteEvent(
-  MarkAsFavouriteEventRef ref, {
-  required String trackId,
-}) {
-  final events = ref.watch(eventsRepositoryProvider);
-  return events.markTrackAsFavouriteEvent(trackId);
-}
-
-@riverpod
-Future<void> markAsNotFavouriteEvent(
-  MarkAsNotFavouriteEventRef ref, {
-  required String trackId,
-}) {
-  final events = ref.watch(eventsRepositoryProvider);
-  return events.markTrackAsNotFavouriteEvent(trackId);
 }

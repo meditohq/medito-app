@@ -99,7 +99,8 @@ Future<String> _formatString(
   if (kDebugMode) {
     var token = await ref.read(bearerTokenProvider.future);
     var tokenString = 'token: $token';
-    formattedString += '\n$tokenString';
+    var isMonthlyDonorString = '${StringConstants.isMonthlyDonor}: ${me?.isMonthlyDonor ?? false}';
+    formattedString += '\n$tokenString\n$isMonthlyDonorString';
   }
 
   return formattedString;

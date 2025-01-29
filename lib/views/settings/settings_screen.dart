@@ -336,6 +336,10 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(meProvider);
     showModalBottomSheet(
       showDragHandle: true,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
       context: context,
       builder: (context) => const DebugBottomSheetWidget(),
     );

@@ -33,25 +33,33 @@ class _TrackViewState extends ConsumerState<TrackView> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkOverflow();
-      _initializeFileModel();
-    });
-  }
-
-  void _initializeFileModel() {
-    var tracks = ref.read(tracksProvider(trackId: widget.trackId));
-    tracks.whenData((trackModel) {
-      if (trackModel.audio.isNotEmpty &&
-          trackModel.audio.first.files.isNotEmpty) {
-        setState(() {
-          fileModel = trackModel.audio.first.files.first;
-        });
-      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
+    final lastSelectedGuideName =
+        ref.watch(guideNamePreferenceProvider(trackId: widget.trackId));
+
+    // Initialize selected audio and file model when track data changes
+    trackAsyncValue.whenData((trackModel) {
+      if (trackModel.audio.isNotEmpty && selectedAudio == null) {
+        var initialAudio = lastSelectedGuideName != null
+            ? trackModel.audio.firstWhere(
+                (audio) => audio.guideName == lastSelectedGuideName,
+                orElse: () => trackModel.audio.first,
+              )
+            : trackModel.audio.first;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            selectedAudio = initialAudio;
+            fileModel = initialAudio.files.first;
+          });
+        });
+      }
+    });
 
     return Scaffold(
       bottomNavigationBar: trackAsyncValue.when(
@@ -357,16 +365,21 @@ class _TrackViewState extends ConsumerState<TrackView> {
     return const SizedBox();
   }
 
-  void _handleOnGuideNameChange(TrackAudioModel? value) {
+  void _handleOnGuideNameChange(TrackAudioModel? selectedAudio) {
     setState(() {
       var previousDuration = fileModel?.duration;
-      selectedAudio = value;
 
-      if (previousDuration != null && value != null) {
-        fileModel = _findClosestDurationFile(value.files, previousDuration);
+      if (previousDuration != null && selectedAudio != null) {
+        fileModel =
+            _findClosestDurationFile(selectedAudio.files, previousDuration);
       } else {
-        fileModel = value?.files.first;
+        fileModel = selectedAudio?.files.first;
       }
+
+      this.selectedAudio = selectedAudio;
+      ref
+          .read(guideNamePreferenceProvider(trackId: widget.trackId).notifier)
+          .setGuideName(selectedAudio?.guideName);
     });
   }
 

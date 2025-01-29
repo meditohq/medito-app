@@ -15,13 +15,11 @@ import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/controllers/path_notifier.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:medito/providers/player/audio_state_provider.dart';
-import 'package:medito/providers/player/player_provider.dart';
-import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/splash_view.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 
 import 'constants/theme/app_theme.dart';
 
@@ -149,32 +147,26 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           id = pathSegments.length > 1 ? pathSegments[1] : '';
         }
       } else {
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(
-            content: Text(StringConstants.invalidDeepLink),
-            duration: Duration(seconds: 3),
-          ),
+        showSnackBar(
+          context,
+          StringConstants.invalidDeepLink,
         );
         return;
       }
 
       if (path.isEmpty) {
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(
-            content: Text(StringConstants.invalidDeepLink),
-            duration: Duration(seconds: 3),
-          ),
+        showSnackBar(
+          context,
+          StringConstants.invalidDeepLink,
         );
         return;
       }
 
       debugPrint('[DEEPLINK] Navigating to: $path with id: $id');
 
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(
-          content: Text(StringConstants.followingDeepLink),
-          duration: Duration(seconds: 3),
-        ),
+      showSnackBar(
+        context,
+        StringConstants.followingDeepLink,
       );
 
       Future.delayed(const Duration(seconds: 2), () {
@@ -182,11 +174,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       });
     } catch (e) {
       debugPrint('[DEEPLINK] Error handling deep link: $e');
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(
-          content: Text(StringConstants.deepLinkError),
-          duration: Duration(seconds: 3),
-        ),
+      showSnackBar(
+        context,
+        StringConstants.deepLinkError,
       );
     }
   }
@@ -204,17 +194,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     connectionStatus.whenData((status) {
       if (status == InternetConnectionStatus.disconnected) {
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: const Text(StringConstants.noConnection),
-            action: SnackBarAction(
-              label: StringConstants.goToDownloads,
-              onPressed: () {
-                handleNavigation(
-                    TypeConstants.flow, [TypeConstants.downloads], context);
-              },
-            ),
-          ),
+        showSnackBar(
+          context,
+          StringConstants.noConnection,
+          actionLabel: StringConstants.goToDownloads,
+          onActionPressed: () {
+            handleNavigation(
+                TypeConstants.flow, [TypeConstants.downloads], context);
+          },
         );
       }
     });
