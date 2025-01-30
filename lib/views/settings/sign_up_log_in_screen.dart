@@ -14,10 +14,11 @@ import 'package:flutter/gestures.dart';
 import 'package:medito/models/account_action.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
+import '../../providers/pack/pack_provider.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
   final int initialTabIndex;
-  
+
   const SignUpLogInPage({super.key, this.initialTabIndex = 0});
 
   @override
@@ -35,7 +36,7 @@ class SignUpLogInPage extends ConsumerWidget {
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
   final int initialTabIndex;
-  
+
   const SignUpLogInForm({super.key, this.initialTabIndex = 0});
 
   @override
@@ -56,7 +57,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 2, 
+      length: 2,
       vsync: this,
       initialIndex: widget.initialTabIndex,
     );
@@ -173,23 +174,23 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
               actions: <Widget>[
                 TextButton(
                   child: const Text(StringConstants.cancelAction),
-                  onPressed: () => 
+                  onPressed: () =>
                       Navigator.of(context).pop(const AccountActionCancel()),
                 ),
                 TextButton(
                   child: const Text(StringConstants.createNewAccount),
-                  onPressed: () => 
-                      Navigator.of(context).pop(const AccountActionCreateAccount()),
+                  onPressed: () => Navigator.of(context)
+                      .pop(const AccountActionCreateAccount()),
                 ),
                 TextButton(
                   child: const Text(StringConstants.continueLogin),
-                  onPressed: () => 
+                  onPressed: () =>
                       Navigator.of(context).pop(const AccountActionLogin()),
                 ),
               ],
             );
           },
-        ) ?? 
+        ) ??
         const AccountActionCancel();
   }
 
@@ -207,6 +208,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
         if (shouldClearStats) {
           await StatsManager().clearAllStats();
           ref.read(statsProvider.notifier).refresh();
+          ref.invalidate(packProvider);
         }
 
         if (!mounted) return;
@@ -257,7 +259,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Text(
                         StringConstants.createAccountButtonText,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ),
@@ -266,7 +269,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm>
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Text(
                         StringConstants.logInButtonText,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ),

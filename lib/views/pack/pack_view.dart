@@ -130,7 +130,7 @@ class _PackViewState extends ConsumerState<PackView>
                         .toggleIsComplete(
                           audioFileId: item.path.getIdFromPath(),
                           trackId: item.id,
-                          isComplete: item.isCompleted == true,
+                          isComplete: item.isCompleted ?? false,
                         );
                   },
                 ),

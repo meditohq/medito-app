@@ -30,15 +30,15 @@ final editStatsUrlProvider = Provider<String>((ref) {
   final model = deviceInfo.model;
 
   return '$editStatsUrl?clientid=$clientId'
-        '&streakcurrent=${stats.streakCurrent}'
-        '&streaklongest=${stats.streakLongest}'
-        '&trackscompleted=${stats.totalTracksCompleted}'
-        '&timelistened=$timeListened'
-        '&timezone=$timezone'
-        '&os=$os'
-        '&platform=$platform'
-        '&appVersion=$appVersion'
-        '&model=$model';
+      '&streakcurrent=${stats.streakCurrent}'
+      '&streaklongest=${stats.streakLongest}'
+      '&trackscompleted=${stats.totalTracksCompleted}'
+      '&timelistened=$timeListened'
+      '&timezone=$timezone'
+      '&os=$os'
+      '&platform=$platform'
+      '&appVersion=$appVersion'
+      '&model=$model';
 });
 
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
@@ -56,6 +56,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     var statsManager = ref.read(statsManagerProvider);
 
     try {
+      await statsManager.initialize();
       await statsManager.sync();
 
       return await statsManager.localAllStats;

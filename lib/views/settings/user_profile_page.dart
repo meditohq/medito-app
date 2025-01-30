@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/providers/pack/pack_provider.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
@@ -37,6 +39,8 @@ class UserProfilePage extends ConsumerWidget {
                 try {
                   await authRepository.signOut();
                   await StatsManager().clearAllStats();
+                  ref.read(statsProvider.notifier).refresh();
+                  ref.invalidate(packProvider);
 
                   Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(

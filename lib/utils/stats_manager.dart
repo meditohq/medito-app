@@ -31,7 +31,7 @@ class StatsManager {
     if (now - lastLockTime > _syncLockTimeout.inMilliseconds) {
       var success = await prefs.setInt(_syncLockKey, now);
       if (!success) return false;
-      
+
       var checkLock = prefs.getInt(_syncLockKey);
       return checkLock == now;
     }
@@ -68,20 +68,22 @@ class StatsManager {
       }
       if (i < 2) await Future.delayed(Duration(milliseconds: 100));
     }
-    
+
     dev.log('StatsManager: Failed to acquire sync lock after retries');
   }
 
   Future<void> _doSync() async {
     dev.log('StatsManager: Fetching remote stats');
     var remoteStats = await statsService.fetchAllStats();
-    dev.log('StatsManager: Remote stats received: ${remoteStats.totalTracksCompleted}');
+    dev.log(
+        'StatsManager: Remote stats received: ${remoteStats.totalTracksCompleted}');
     _allStats = remoteStats;
 
     dev.log('StatsManager: Merging stats');
     await _merge();
 
-    dev.log('StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
+    dev.log(
+        'StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
 
     if (_allStats != null) {
       dev.log('StatsManager: Calculating streak');
@@ -115,7 +117,8 @@ class StatsManager {
     if (localAllStatsJson != null && localAllStatsJson != 'null') {
       localAllStats = LocalAllStats.fromJson(
           jsonDecode(localAllStatsJson) as Map<String, dynamic>);
-      dev.log('StatsManager: Loaded local stats: ${localAllStats.totalTracksCompleted}');
+      dev.log(
+          'StatsManager: Loaded local stats: ${localAllStats.totalTracksCompleted}');
     } else {
       dev.log('StatsManager: No local stats found');
     }
@@ -145,8 +148,9 @@ class StatsManager {
 
     // If both exist, use the one that was updated more recently
     if (localAllStats != null && _allStats != null) {
-      var areRemoteStatsNewer = (_allStats?.updated ?? 0) > (localAllStats.updated);
-      
+      var areRemoteStatsNewer =
+          (_allStats?.updated ?? 0) > (localAllStats.updated);
+
       _allStats = (areRemoteStatsNewer ? _allStats : localAllStats)?.copyWith(
         updated: DateTime.now().millisecondsSinceEpoch,
       );
@@ -226,9 +230,9 @@ class StatsManager {
 
   Future<void> _saveLocalAllStatsToSharedPrefs() async {
     if (_allStats != null && _allStats?.totalTracksCompleted == 0) return;
-    
+
     dev.log('StatsManager: Saving local stats');
-    
+
     var prefs = await SharedPreferences.getInstance();
     if (_allStats != null) {
       await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
@@ -320,6 +324,7 @@ class StatsManager {
   Future<void> clearAllStats() async {
     var prefs = await SharedPreferences.getInstance();
     await prefs.remove(SharedPreferenceConstants.localAllStatsKey);
+    _allStats = LocalAllStats.empty();
   }
 
   bool get isInitialized => _isInitialized;
