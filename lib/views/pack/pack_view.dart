@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/headers/description_widget.dart';
 
 class PackView extends ConsumerStatefulWidget {
-  const PackView({Key? key, required this.id}) : super(key: key);
+  const PackView({super.key, required this.id});
 
   final String id;
 
