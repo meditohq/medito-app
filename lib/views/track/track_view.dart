@@ -1,7 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/duration_preference_provider.dart';
+import 'package:medito/providers/guide_name_preference_provider.dart';
+import 'package:medito/providers/meditation/track_provider.dart';
+import 'package:medito/providers/pack/pack_provider.dart';
+import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
@@ -10,8 +13,6 @@ import 'package:medito/views/player/widgets/bottom_actions/track_view_bottom_bar
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../providers/meditation/track_provider.dart';
 
 class TrackView extends ConsumerStatefulWidget {
   final String trackId;
@@ -39,8 +40,8 @@ class _TrackViewState extends ConsumerState<TrackView> {
   @override
   Widget build(BuildContext context) {
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
-    final lastSelectedGuideName =
-        ref.watch(guideNamePreferenceProvider(trackId: widget.trackId));
+    final lastSelectedGuideName = ref.watch(guideNamePreferenceProvider);
+    final lastSelectedDuration = ref.watch(durationPreferenceProvider);
 
     // Initialize selected audio and file model when track data changes
     trackAsyncValue.whenData((trackModel) {
@@ -55,7 +56,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           setState(() {
             selectedAudio = initialAudio;
-            fileModel = initialAudio.files.first;
+            fileModel = lastSelectedDuration != null
+                ? _findClosestDurationFile(
+                    initialAudio.files, lastSelectedDuration)
+                : initialAudio.files.first;
           });
         });
       }
@@ -375,11 +379,13 @@ class _TrackViewState extends ConsumerState<TrackView> {
       } else {
         fileModel = selectedAudio?.files.first;
       }
-
       this.selectedAudio = selectedAudio;
       ref
-          .read(guideNamePreferenceProvider(trackId: widget.trackId).notifier)
+          .read(guideNamePreferenceProvider.notifier)
           .setGuideName(selectedAudio?.guideName);
+      ref
+          .read(durationPreferenceProvider.notifier)
+          .setDuration(fileModel?.duration);
     });
   }
 
@@ -398,6 +404,9 @@ class _TrackViewState extends ConsumerState<TrackView> {
     setState(() {
       fileModel = value;
     });
+    if (value != null) {
+      ref.read(durationPreferenceProvider.notifier).setDuration(value.duration);
+    }
   }
 
   void _handlePlay(

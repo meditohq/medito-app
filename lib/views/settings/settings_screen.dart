@@ -63,7 +63,7 @@ class SettingsItem {
 }
 
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   static final _isHealthSyncAvailable = Platform.isIOS;
 
