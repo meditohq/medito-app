@@ -40,15 +40,17 @@ class _TrackViewState extends ConsumerState<TrackView> {
   @override
   Widget build(BuildContext context) {
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
-    final lastSelectedGuideName = ref.watch(guideNamePreferenceProvider);
+    final guideNameState = ref.watch(guideNamePreferenceProvider);
     final lastSelectedDuration = ref.watch(durationPreferenceProvider);
 
     // Initialize selected audio and file model when track data changes
     trackAsyncValue.whenData((trackModel) {
-      if (trackModel.audio.isNotEmpty && selectedAudio == null) {
-        var initialAudio = lastSelectedGuideName != null
+      if (trackModel.audio.isNotEmpty &&
+          selectedAudio == null &&
+          guideNameState is AsyncData<String?>) {
+        var initialAudio = guideNameState.value != null
             ? trackModel.audio.firstWhere(
-                (audio) => audio.guideName == lastSelectedGuideName,
+                (audio) => audio.guideName == guideNameState.value,
                 orElse: () => trackModel.audio.first,
               )
             : trackModel.audio.first;
@@ -251,9 +253,10 @@ class _TrackViewState extends ConsumerState<TrackView> {
     return isLandscape
         ? Row(children: [
             if (showGuideNameDropdown)
-              Expanded(child: _guideNameDropdown(trackModel, isLandscape: true))
-            else
-              const Spacer(),
+              Expanded(
+                  child: _guideNameDropdown(trackModel,
+                      isLandscape: true,
+                      guideNameState: ref.watch(guideNamePreferenceProvider))),
             const SizedBox(width: 12),
             Expanded(child: _durationDropdown(trackModel, isLandscape: true)),
             const SizedBox(width: 12),
@@ -265,10 +268,12 @@ class _TrackViewState extends ConsumerState<TrackView> {
             _getSubTitle(context, trackModel.description),
             const SizedBox(height: 24),
             if (_useCompactLayout && showGuideNameDropdown)
-              _buildCompactPickers(trackModel)
+              _buildCompactPickers(trackModel, ref)
             else ...[
               if (showGuideNameDropdown) ...[
-                _guideNameDropdown(trackModel, isLandscape: false),
+                _guideNameDropdown(trackModel,
+                    isLandscape: false,
+                    guideNameState: ref.watch(guideNamePreferenceProvider)),
                 const SizedBox(height: 12),
               ],
               _durationDropdown(trackModel, isLandscape: false),
@@ -278,11 +283,13 @@ class _TrackViewState extends ConsumerState<TrackView> {
           ]);
   }
 
-  Widget _buildCompactPickers(TrackModel trackModel) {
+  Widget _buildCompactPickers(TrackModel trackModel, WidgetRef ref) {
     return Row(
       children: [
         Expanded(
-          child: _guideNameDropdown(trackModel, isLandscape: false),
+          child: _guideNameDropdown(trackModel,
+              isLandscape: false,
+              guideNameState: ref.watch(guideNamePreferenceProvider)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -467,9 +474,16 @@ class _TrackViewState extends ConsumerState<TrackView> {
   Widget _guideNameDropdown(
     TrackModel trackModel, {
     required bool isLandscape,
+    required AsyncValue<String?> guideNameState,
   }) {
     var audio = trackModel.audio.first;
     if (audio.guideName.isNotNullAndNotEmpty()) {
+      if (guideNameState.isLoading) {
+        return const SizedBox(
+          height: 40,
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
       return DropdownWidget<TrackAudioModel>(
         value: selectedAudio ?? audio,
         iconData: Icons.face,

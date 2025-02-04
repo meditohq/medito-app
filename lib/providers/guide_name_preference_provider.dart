@@ -2,27 +2,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 
-class GuideNamePreferenceNotifier extends Notifier<String?> {
+class GuideNamePreferenceNotifier extends AsyncNotifier<String?> {
   @override
-  @override
-  String? build() {
+  Future<String?> build() async {
     var prefs = ref.watch(sharedPreferencesProvider);
-    return prefs.getString(SharedPreferenceConstants.lastSelectedGuideName);
+
+    return prefs!.getString(SharedPreferenceConstants.lastSelectedGuideName);
   }
 
-  void setGuideName(String? guideName) {
+  Future<void> setGuideName(String? guideName) async {
     var prefs = ref.read(sharedPreferencesProvider);
     if (guideName != null) {
-      prefs.setString(
+      await prefs!.setString(
           SharedPreferenceConstants.lastSelectedGuideName, guideName);
     } else {
-      prefs.remove(SharedPreferenceConstants.lastSelectedGuideName);
+      await prefs!.remove(SharedPreferenceConstants.lastSelectedGuideName);
     }
-    state = guideName;
+
+    state = AsyncValue.data(guideName);
   }
 }
 
 final guideNamePreferenceProvider =
-    NotifierProvider<GuideNamePreferenceNotifier, String?>(
+    AsyncNotifierProvider<GuideNamePreferenceNotifier, String?>(
   GuideNamePreferenceNotifier.new,
 );
