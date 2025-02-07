@@ -174,17 +174,6 @@ class StatsManager {
         var audioDayStart =
             DateTime.utc(audioDate.year, audioDate.month, audioDate.day);
 
-        // Check if the audio is within 30 minutes of midnight UTC
-        var isNearMidnight = (audioDate.hour == 23 && audioDate.minute >= 30) ||
-            (audioDate.hour == 0 && audioDate.minute < 30);
-
-        if (isNearMidnight) {
-          // Adjust the date if it's near midnight
-          audioDayStart = audioDate.hour == 23
-              ? audioDayStart.add(const Duration(days: 1))
-              : audioDayStart.subtract(const Duration(days: 1));
-        }
-
         if (audioDayStart.difference(lastDate).inDays == 0) {
           // Same day, continue
           continue;
@@ -198,15 +187,12 @@ class StatsManager {
         }
       }
 
-      // Check if there's an entry for today (including near-midnight entries)
+      // Check if there's an entry for today
       var todayEntry = sortedAudio.firstWhere(
         (audio) {
           var audioDate =
               DateTime.fromMillisecondsSinceEpoch(audio.timestamp, isUtc: true);
-          return audioDate.day == now.day ||
-              (audioDate.day == now.day - 1 &&
-                  audioDate.hour == 23 &&
-                  audioDate.minute >= 30);
+          return audioDate.day == now.day;
         },
         orElse: () => LocalAudioCompleted(id: '', timestamp: 0),
       );
