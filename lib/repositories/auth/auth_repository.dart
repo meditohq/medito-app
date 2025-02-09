@@ -29,8 +29,8 @@ abstract class AuthRepository {
   Future<void> initializeUser();
   Future<String> getToken();
   String getUserEmail();
-  Future<bool> signUp(String email, String password);
-  Future<bool> logIn(String email, String password);
+  Future<bool> requestOtp(String email);
+  Future<bool> verifyOtp(String email, String otp);
   User? get currentUser;
   Future<bool> signOut();
   Future<bool> markAccountForDeletion();
@@ -162,43 +162,31 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   }
 
   @override
-  Future<bool> signUp(String email, String password) async {
-    var currentUser = Supabase.instance.client.auth.currentUser;
-    var clientId = currentUser?.userMetadata?['client_id'] as String?;
-
-    if (clientId == null) {
-      clientId = await getClientIdFromSharedPreference() ?? _generateClientId();
-      dev.log('[AUTH] Using client ID for signup: $clientId');
-    }
-
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setString(SharedPreferenceConstants.userId, clientId);
-
+  Future<bool> requestOtp(String email) async {
     return retryOperation(
       operation: () async {
-        var signUpResponse = await Supabase.instance.client.auth.signUp(
+        var clientId = await getClientIdFromSharedPreference() ?? _generateClientId();
+        dev.log('[AUTH] Using client ID for OTP request: $clientId');
+
+        await Supabase.instance.client.auth.signInWithOtp(
           email: email,
-          password: password,
           data: {'client_id': clientId},
         );
 
-        if (signUpResponse.user != null) {
-          await _linkAnonymousAccount(email, password);
-        }
-
-        return signUpResponse.user != null;
+        return true;
       },
-      errorMessage: 'Error during sign-up',
+      errorMessage: 'Error sending OTP',
     );
   }
 
   @override
-  Future<bool> logIn(String email, String password) async {
+  Future<bool> verifyOtp(String email, String otp) async {
     return retryOperation(
       operation: () async {
-        var response = await Supabase.instance.client.auth.signInWithPassword(
+        var response = await Supabase.instance.client.auth.verifyOTP(
           email: email,
-          password: password,
+          token: otp,
+          type: OtpType.magiclink,
         );
 
         if (response.user != null) {
@@ -210,9 +198,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
           }
 
           var clientId = response.user?.userMetadata?['client_id'] as String?;
-
           clientId ??= _generateClientId();
-
           await saveClientIdToSharedPreference(clientId);
 
           return true;
@@ -220,25 +206,8 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
         return false;
       },
-      errorMessage: 'Error during log-in',
+      errorMessage: 'Error verifying OTP',
     );
-  }
-
-  Future<void> _linkAnonymousAccount(String email, String password) async {
-    var supabase = Supabase.instance.client;
-    var anonymousUser = supabase.auth.currentUser;
-
-    if (anonymousUser != null && anonymousUser.email == null) {
-      await retryOperation(
-        operation: () => supabase.auth.updateUser(
-          UserAttributes(
-            email: email,
-            password: password,
-          ),
-        ),
-        errorMessage: 'Error linking anonymous account',
-      );
-    }
   }
 
   @override

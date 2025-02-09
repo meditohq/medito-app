@@ -26,6 +26,7 @@ const height12 = SizedBox(height: 12);
 const height16 = SizedBox(height: 16);
 const height20 = SizedBox(height: 20);
 const height32 = SizedBox(height: 32);
+const height64 = SizedBox(height: 64);
 const bottomSheetBoxDecoration = BoxDecoration(
   color: ColorConstants.onyx,
   borderRadius: BorderRadius.only(

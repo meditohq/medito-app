@@ -12,7 +12,6 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
-import 'package:medito/utils/fade_page_route.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -47,7 +46,7 @@ class SplashViewState extends ConsumerState<SplashView> {
         if (!mounted) return;
 
         await Navigator.of(context).pushReplacement(
-          FadePageRoute(
+          MaterialPageRoute(
             builder: (context) => const RootPageView(
               firstChild: BottomNavigationBarView(),
             ),
@@ -66,7 +65,7 @@ class SplashViewState extends ConsumerState<SplashView> {
       showSnackBar(context, StringConstants.offlineMode);
 
       await Navigator.of(context).pushReplacement(
-        FadePageRoute(
+        MaterialPageRoute(
           builder: (context) => const DownloadsView(),
         ),
       );
@@ -83,7 +82,7 @@ class SplashViewState extends ConsumerState<SplashView> {
       if (!mounted) return;
 
       await Navigator.of(context).pushReplacement(
-        FadePageRoute(
+        MaterialPageRoute(
           builder: (context) => const RootPageView(
             firstChild: BottomNavigationBarView(),
           ),
@@ -96,7 +95,7 @@ class SplashViewState extends ConsumerState<SplashView> {
       showSnackBar(context, StringConstants.offlineMode);
 
       await Navigator.of(context).pushReplacement(
-        FadePageRoute(
+        MaterialPageRoute(
           builder: (context) => const DownloadsView(),
         ),
       );
@@ -156,7 +155,7 @@ class SplashViewState extends ConsumerState<SplashView> {
               ),
               if (_showAccountButtons) ...[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -167,8 +166,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                           onPressed: () => Navigator.of(context)
                               .push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const SignUpLogInPage(initialTabIndex: 0),
+                              builder: (context) => const SignUpLogInPage(),
                             ),
                           )
                               .then((value) {
@@ -179,33 +177,12 @@ class SplashViewState extends ConsumerState<SplashView> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ColorConstants.lightPurple,
                             foregroundColor: ColorConstants.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           child: const Text(
-                              StringConstants.createAccountButtonText),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.of(context)
-                              .push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const SignUpLogInPage(initialTabIndex: 1),
-                            ),
-                          )
-                              .then((value) {
-                            if (value == true) {
-                              _checkAuthAndInitialize();
-                            }
-                          }),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ColorConstants.lightPurple,
-                            foregroundColor: ColorConstants.white,
-                          ),
-                          child: const Text(StringConstants.logInButtonText),
+                              StringConstants.createAccountLogInButtonText),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -217,6 +194,9 @@ class SplashViewState extends ConsumerState<SplashView> {
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                                 color: ColorConstants.lightPurple),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           child: const Text(
                             StringConstants.continueAsGuest,

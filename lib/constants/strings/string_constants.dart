@@ -126,21 +126,24 @@ class StringConstants {
   static const String hours = 'h';
   static const String minutes = 'min';
 
-  static const String signUpLogInTitle = 'Create acount / Sign up';
+  static const String signUpLogInTitle = 'Sign in to Medito';
   static const String createAccountTitle = 'Create account';
   static const String loginTitle = 'Sign in';
   static const String emailLabel = 'Email';
-  static const String passwordLabel = 'Password';
   static const String invalidEmailError = 'Please enter a valid email';
-  static const String invalidPasswordError =
-      'Password must be at least 6 characters';
   static const String createAccountButtonText = 'Create Account';
-  static const String createAccountLogInButtonText = 'Create Account/Sign in';
+  static const String createAccountLogInButtonText = 'Continue with email';
+  static const String sendMeMyPasswordText = 'Continue';
   static const String logInButtonText = 'Sign In';
   static const String authenticationFailed = 'Authentication failed';
 
-  static const String createAccountBenefits = '• Save your meditation progress'
-      '\n• Keep your stats and achievements secure';
+  static const String emailVerificationText =
+      'We\'ll send you a code by email to verify your account';
+
+  static const String createAccountBenefits =
+      '◦ Track your mindfulness journey \n'
+      '◦ Never lose your meditation progress\n'
+      '◦ Build a lasting meditation practice 💜';
 
   static const String loginBenefits = '• Download your previously saved data'
       '\n• Continue your meditation journey from where you left off';
@@ -324,4 +327,13 @@ class StringConstants {
 
   // For logging on debug bottomsheet
   static const isMonthlyDonor = 'Donor';
+
+  // OTP Authentication
+  static const String otpLabel = 'Enter verification code';
+  static const String invalidOtpError = 'Please enter a valid 6-digit code';
+  static const String otpSentSuccess =
+      'Check your email for the verification code';
+  static const String otpInstructions = 'Enter the code we just sent to';
+  static const String resendCode = 'Didn\'t get the code? Resend it';
+  static const String verifyOtpButtonText = 'Continue';
 }
