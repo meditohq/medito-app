@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_repository.g.dart';
@@ -20,7 +20,7 @@ abstract class HomeRepository {
 }
 
 class HomeRepositoryImpl extends HomeRepository {
-  final DioApiService client;
+  final HttpApiService client;
   final Ref ref;
 
   HomeRepositoryImpl({required this.ref, required this.client});
@@ -75,5 +75,5 @@ class HomeRepositoryImpl extends HomeRepository {
 
 @riverpod
 HomeRepositoryImpl homeRepository(Ref ref) {
-  return HomeRepositoryImpl(ref: ref, client: DioApiService());
+  return HomeRepositoryImpl(ref: ref, client: HttpApiService());
 }

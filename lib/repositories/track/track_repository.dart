@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -26,7 +26,7 @@ abstract class TrackRepository {
 }
 
 class TrackRepositoryImpl extends TrackRepository {
-  final DioApiService client;
+  final HttpApiService client;
   final Ref ref;
 
   TrackRepositoryImpl({required this.ref, required this.client});
@@ -95,5 +95,5 @@ class TrackRepositoryImpl extends TrackRepository {
 
 @riverpod
 TrackRepository trackRepository(TrackRepositoryRef ref) {
-  return TrackRepositoryImpl(ref: ref, client: DioApiService());
+  return TrackRepositoryImpl(ref: ref, client: HttpApiService());
 }

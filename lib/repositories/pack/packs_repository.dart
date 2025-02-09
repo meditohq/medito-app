@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'packs_repository.g.dart';
@@ -13,7 +13,7 @@ abstract class PacksRepository {
 }
 
 class PackRepositoryImpl extends PacksRepository {
-  final DioApiService client;
+  final HttpApiService client;
 
   PackRepositoryImpl({required this.client});
 
@@ -35,5 +35,5 @@ class PackRepositoryImpl extends PacksRepository {
 
 @Riverpod(keepAlive: true)
 PackRepositoryImpl packRepository(Ref _) {
-  return PackRepositoryImpl(client: DioApiService());
+  return PackRepositoryImpl(client: HttpApiService());
 }

@@ -2,10 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/repositories/explore/track_search_repository.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 final trackSearchRepositoryProvider = Provider<TrackSearchRepository>((ref) {
-  return TrackSearchRepository(DioApiService());
+  return TrackSearchRepository(HttpApiService());
 });
 
 final searchTracksProvider =

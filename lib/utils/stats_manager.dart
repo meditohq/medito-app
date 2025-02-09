@@ -5,7 +5,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/stats_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/local_audio_completed.dart';
@@ -17,7 +17,7 @@ class StatsManager {
   static const _syncLockKey = 'stats_sync_lock';
   static const _syncLockTimeout = Duration(seconds: 30);
 
-  late StatsService statsService;
+  late StatsService _statsService;
   LocalAllStats? _allStats;
   bool _isInitialized = false;
 
@@ -45,8 +45,10 @@ class StatsManager {
 
   Future<void> initialize() async {
     if (!_isInitialized) {
-      statsService =
-          StatsService(DioApiService(), await SharedPreferences.getInstance());
+      _statsService = StatsService(
+        HttpApiService(),
+        await SharedPreferences.getInstance(),
+      );
       _isInitialized = true;
     }
   }
@@ -74,7 +76,7 @@ class StatsManager {
 
   Future<void> _doSync() async {
     dev.log('StatsManager: Fetching remote stats');
-    var remoteStats = await statsService.fetchAllStats();
+    var remoteStats = await _statsService.fetchAllStats();
     dev.log(
         'StatsManager: Remote stats received: ${remoteStats.totalTracksCompleted}');
     _allStats = remoteStats;
@@ -91,7 +93,7 @@ class StatsManager {
 
       await _saveLocalAllStatsToSharedPrefs();
 
-      await statsService.postUpdatedStats(_allStats!);
+      await _statsService.postStats(_allStats!);
     } else {
       throw Exception("Stats are null");
     }
@@ -268,7 +270,7 @@ class StatsManager {
       _allStats = calculateStreak(_allStats!);
     }
     await _saveLocalAllStatsToSharedPrefs();
-    unawaited(statsService.postUpdatedStats(_allStats!));
+    await _statsService.postStats(_allStats!);
   }
 
   Future<void> addTrackChecked(String trackId) async {
@@ -286,7 +288,7 @@ class StatsManager {
       );
 
       await _saveLocalAllStatsToSharedPrefs();
-      unawaited(statsService.postUpdatedStats(_allStats!));
+      await _statsService.postStats(_allStats!);
     }
   }
 
@@ -303,7 +305,7 @@ class StatsManager {
       );
 
       await _saveLocalAllStatsToSharedPrefs();
-      unawaited(statsService.postUpdatedStats(_allStats!));
+      await _statsService.postStats(_allStats!);
     }
   }
 

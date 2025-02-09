@@ -1,5 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/maintenance/maintenance_model.dart';
-import 'package:medito/services/network/maintenance_dio_api_service.dart';
+import 'package:medito/services/network/maintenance_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'maintenance_repository.g.dart';
@@ -9,7 +10,6 @@ abstract class MaintenanceRepository {
 }
 
 class MaintenanceRepositoryImpl extends MaintenanceRepository {
-  final MaintenanceDioApiService client;
 
   MaintenanceRepositoryImpl({required this.client});
 
@@ -30,8 +30,6 @@ class MaintenanceRepositoryImpl extends MaintenanceRepository {
 }
 
 @riverpod
-MaintenanceRepositoryImpl maintenanceRepository(
-  AutoDisposeProviderRef<MaintenanceRepositoryImpl> _,
-) {
-  return MaintenanceRepositoryImpl(client: MaintenanceDioApiService());
+MaintenanceRepository maintenanceRepository(Ref _) {
+  return MaintenanceRepositoryImpl(client: MaintenanceApiService());
 }

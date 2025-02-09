@@ -1,5 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'events_repository.g.dart';
@@ -17,7 +18,7 @@ abstract class EventsRepository {
 }
 
 class EventsRepositoryImpl extends EventsRepository {
-  final DioApiService client;
+  final HttpApiService client;
 
   EventsRepositoryImpl({required this.client});
 
@@ -54,5 +55,5 @@ class EventsRepositoryImpl extends EventsRepository {
 }
 
 @riverpod
-EventsRepository eventsRepository(EventsRepositoryRef _) =>
-    EventsRepositoryImpl(client: DioApiService());
+EventsRepository eventsRepository(Ref _) =>
+    EventsRepositoryImpl(client: HttpApiService());

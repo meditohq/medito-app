@@ -1,12 +1,12 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 
-class DioHeaderService {
+class HeaderService {
   final DeviceAndAppInfoModel deviceInfo;
   String? _fcmToken;
 
-  DioHeaderService(this.deviceInfo) {
+  HeaderService(this.deviceInfo) {
     _initFcmTokenListener();
   }
 
@@ -24,12 +24,10 @@ class DioHeaderService {
 
   void _updateHeaders() {
     var customHeaders = _createCustomHeaders();
-    for (var key in customHeaders.keys) {
-      DioApiService().dio.options.headers[key] = customHeaders[key];
-    }
+    HttpApiService().updateHeaders(customHeaders);
   }
 
-  Map<String, dynamic> _createCustomHeaders() {
+  Map<String, String> _createCustomHeaders() {
     return {
       'device-os': deviceInfo.os,
       'device-language': deviceInfo.languageCode,
@@ -41,4 +39,4 @@ class DioHeaderService {
       'currency-name': deviceInfo.currencyName,
     };
   }
-}
+} 

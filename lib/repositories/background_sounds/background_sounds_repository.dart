@@ -5,9 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:medito/models/background_sounds/background_sounds_model.dart';
 
 part 'background_sounds_repository.g.dart';
 
@@ -30,7 +31,7 @@ abstract class BackgroundSoundsRepository {
 }
 
 class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
-  final DioApiService client;
+  final HttpApiService client;
   final Ref ref;
 
   BackgroundSoundsRepositoryImpl({required this.client, required this.ref});
@@ -40,6 +41,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
     var response = await client.getRequest(HTTPConstants.backgroundSounds);
     var tempResponse = response as List;
     var bgSoundList = <BackgroundSoundsModel>[];
+
     const noneBgSound = BackgroundSoundsModel(
       id: '0',
       title: StringConstants.none,
@@ -47,9 +49,9 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
       path: '',
     );
     bgSoundList.add(noneBgSound);
+
     var parsedResponseList =
         tempResponse.map((x) => BackgroundSoundsModel.fromJson(x)).toList();
-
     bgSoundList.addAll(parsedResponseList);
 
     return bgSoundList;
@@ -158,11 +160,6 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 }
 
 @riverpod
-BackgroundSoundsRepositoryImpl backgroundSoundsRepository(
-  BackgroundSoundsRepositoryRef ref,
-) {
-  return BackgroundSoundsRepositoryImpl(
-    client: DioApiService(),
-    ref: ref,
-  );
+BackgroundSoundsRepository backgroundSoundsRepository(Ref ref) {
+  return BackgroundSoundsRepositoryImpl(client: HttpApiService(), ref: ref);
 }

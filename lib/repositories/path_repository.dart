@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/path/path_result.dart';
 import '../models/path/path_dto.dart';
 import '../mappers/path_mapper.dart';
 import '../providers/shared_preference/shared_preference_provider.dart';
-import '../services/network/dio_api_service.dart';
 import '../constants/constants.dart';
 
 part 'path_repository.g.dart';
@@ -20,7 +20,7 @@ PathMapper pathMapper(Ref ref) => PathMapper();
 class PathRepository {
   final SharedPreferences _prefs;
   final PathMapper _pathMapper;
-  final DioApiService _client;
+  final HttpApiService _client;
   final AsyncValue<LocalAllStats> _stats;
 
   PathRepository(this._prefs, this._pathMapper, this._client, this._stats);
@@ -29,15 +29,16 @@ class PathRepository {
 
   Future<bool> isTrackCompleted(String trackId) async {
     return _stats.valueOrNull?.audioCompleted
-        ?.map((e) => e.id)
-        .contains(trackId) ?? false;
+            ?.map((e) => e.id)
+            .contains(trackId) ??
+        false;
   }
 
   Future<JourneyResult> fetchPathData() async {
     try {
       final response = await _client.getRequest('${HTTPConstants.journeys}/1');
       final pathDto = PathDTO.fromJson(response);
-      
+
       await _cachePathData(json.encode(pathDto.toJson()));
 
       return _pathMapper.mapDtoToResult(pathDto);
@@ -53,16 +54,15 @@ class PathRepository {
     try {
       final response = await _client.postRequest(
         '${HTTPConstants.journeys}/1/tasks/$taskId',
-        data:
-        {
+        data: {
           'isCompleted': isCompleted,
           'lastUpdated': DateTime.now().millisecondsSinceEpoch,
         },
       );
-      
+
       final updatedPathDto = PathDTO.fromJson(response);
       await _cachePathData(json.encode(response));
-      
+
       return _pathMapper.mapDtoToResult(updatedPathDto);
     } catch (e) {
       debugPrint(e.toString());
@@ -85,10 +85,10 @@ class PathRepository {
           'lastUpdated': DateTime.now().millisecondsSinceEpoch,
         },
       );
-      
+
       final updatedPathDto = PathDTO.fromJson(response);
       await _cachePathData(json.encode(response));
-      
+
       return _pathMapper.mapDtoToResult(updatedPathDto);
     } catch (e) {
       debugPrint(e.toString());
@@ -101,9 +101,10 @@ class PathRepository {
     await _prefs.setString(_cacheKey, data);
   }
 
-  Future<void> updateTaskProgress(String journeyId, TaskUpdatePayload payload) async {
+  Future<void> updateTaskProgress(
+      String journeyId, TaskUpdatePayload payload) async {
     final url = '$contentBaseUrl}/journeys/$journeyId/progress';
-    
+
     try {
       await _client.postRequest(
         url,
@@ -120,7 +121,7 @@ PathRepository pathRepository(Ref ref) {
   return PathRepository(
     ref.watch(sharedPreferencesProvider),
     ref.watch(pathMapperProvider),
-    DioApiService(),
+    HttpApiService(),
     ref.watch(statsProvider),
   );
 }

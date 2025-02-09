@@ -9,8 +9,8 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/network/dio_api_service.dart';
-import 'package:medito/services/network/dio_header_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/network/header_service.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/fade_page_route.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -62,9 +62,9 @@ class SplashViewState extends ConsumerState<SplashView> {
     } catch (e) {
       dev.log('Failed to initialize Supabase', error: e);
       if (!mounted) return;
-      
+
       showSnackBar(context, StringConstants.offlineMode);
-      
+
       await Navigator.of(context).pushReplacement(
         FadePageRoute(
           builder: (context) => const DownloadsView(),
@@ -92,9 +92,9 @@ class SplashViewState extends ConsumerState<SplashView> {
     } catch (e) {
       dev.log('Failed to initialize user', error: e);
       if (!mounted) return;
-      
+
       showSnackBar(context, StringConstants.offlineMode);
-      
+
       await Navigator.of(context).pushReplacement(
         FadePageRoute(
           builder: (context) => const DownloadsView(),
@@ -104,7 +104,7 @@ class SplashViewState extends ConsumerState<SplashView> {
   }
 
   Future<void> _initializeServices() async {
-    DioApiService().initializeAuth();
+    HttpApiService().initializeAuth();
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
     await _initializeDioHeaderService();
@@ -122,7 +122,7 @@ class SplashViewState extends ConsumerState<SplashView> {
 
   Future<void> _initializeDioHeaderService() async {
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-    DioHeaderService(deviceInfo).initialise();
+    HeaderService(deviceInfo).initialise();
   }
 
   void _initializeFirebaseMessaging() {
@@ -164,11 +164,14 @@ class SplashViewState extends ConsumerState<SplashView> {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).push(
+                          onPressed: () => Navigator.of(context)
+                              .push(
                             MaterialPageRoute(
-                              builder: (context) => const SignUpLogInPage(initialTabIndex: 0),
+                              builder: (context) =>
+                                  const SignUpLogInPage(initialTabIndex: 0),
                             ),
-                          ).then((value) {
+                          )
+                              .then((value) {
                             if (value == true) {
                               _checkAuthAndInitialize();
                             }
@@ -177,7 +180,8 @@ class SplashViewState extends ConsumerState<SplashView> {
                             backgroundColor: ColorConstants.lightPurple,
                             foregroundColor: ColorConstants.white,
                           ),
-                          child: const Text(StringConstants.createAccountButtonText),
+                          child: const Text(
+                              StringConstants.createAccountButtonText),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -185,11 +189,14 @@ class SplashViewState extends ConsumerState<SplashView> {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).push(
+                          onPressed: () => Navigator.of(context)
+                              .push(
                             MaterialPageRoute(
-                              builder: (context) => const SignUpLogInPage(initialTabIndex: 1),
+                              builder: (context) =>
+                                  const SignUpLogInPage(initialTabIndex: 1),
                             ),
-                          ).then((value) {
+                          )
+                              .then((value) {
                             if (value == true) {
                               _checkAuthAndInitialize();
                             }
@@ -208,7 +215,8 @@ class SplashViewState extends ConsumerState<SplashView> {
                         child: OutlinedButton(
                           onPressed: _handleAnonymousSignIn,
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: ColorConstants.lightPurple),
+                            side: const BorderSide(
+                                color: ColorConstants.lightPurple),
                           ),
                           child: const Text(
                             StringConstants.continueAsGuest,

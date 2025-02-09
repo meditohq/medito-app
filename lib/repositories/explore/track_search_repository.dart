@@ -1,9 +1,9 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/pack/pack_model.dart';
-import 'package:medito/services/network/dio_api_service.dart';
+import 'package:medito/services/network/http_api_service.dart';
 
 class TrackSearchRepository {
-  final DioApiService _apiService;
+  final HttpApiService _apiService;
 
   TrackSearchRepository(this._apiService);
 
