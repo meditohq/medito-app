@@ -316,4 +316,10 @@ class StatsManager {
   }
 
   bool get isInitialized => _isInitialized;
+
+  Future<bool> hasLocalStats() async {
+    _allStats ??= await _loadLocalAllStats();
+
+    return _allStats?.audioCompleted?.isNotEmpty == true;
+  }
 }

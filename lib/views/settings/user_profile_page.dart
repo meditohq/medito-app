@@ -5,6 +5,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
+import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 
@@ -18,16 +19,10 @@ class UserProfilePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          StringConstants.userProfileTitle,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+      bottomNavigationBar: SingleBackButtonActionBar( 
+      onBackPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(

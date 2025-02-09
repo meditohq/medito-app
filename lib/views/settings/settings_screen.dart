@@ -77,7 +77,9 @@ class SettingsScreen extends ConsumerWidget {
     final List<SettingsItem> settingsItems = [
       SettingsItem(
         type: 'account',
-        title: StringConstants.accountTitle,
+        title: user?.email != null && user?.email != ''
+            ? StringConstants.accountTitle
+            : 'Sign in/Sign up',
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedUserAccount,
             color: ColorConstants.white),
@@ -207,11 +209,12 @@ class SettingsScreen extends ConsumerWidget {
     final user = authRepository.currentUser;
     final isAccountItem = item.type == 'account';
     final userEmail = user?.email;
+    final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
 
     return RowItemWidget(
       icon: item.icon,
       title: item.title,
-      subTitle: isAccountItem && userEmail != null ? userEmail : null,
+      subTitle: isAccountItem && hasValidEmail ? userEmail : null,
       hasUnderline: true,
       onTap: () => handleItemPress(context, ref, item),
     );

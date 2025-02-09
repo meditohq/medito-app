@@ -7,16 +7,16 @@ class GuideNamePreferenceNotifier extends AsyncNotifier<String?> {
   Future<String?> build() async {
     var prefs = ref.watch(sharedPreferencesProvider);
 
-    return prefs!.getString(SharedPreferenceConstants.lastSelectedGuideName);
+    return prefs.getString(SharedPreferenceConstants.lastSelectedGuideName);
   }
 
   Future<void> setGuideName(String? guideName) async {
     var prefs = ref.read(sharedPreferencesProvider);
     if (guideName != null) {
-      await prefs!.setString(
+      await prefs.setString(
           SharedPreferenceConstants.lastSelectedGuideName, guideName);
     } else {
-      await prefs!.remove(SharedPreferenceConstants.lastSelectedGuideName);
+      await prefs.remove(SharedPreferenceConstants.lastSelectedGuideName);
     }
 
     state = AsyncValue.data(guideName);

@@ -132,7 +132,7 @@ class StringConstants {
   static const String emailLabel = 'Email';
   static const String invalidEmailError = 'Please enter a valid email';
   static const String createAccountButtonText = 'Create Account';
-  static const String createAccountLogInButtonText = 'Continue with email';
+  static const String createAccountLogInButtonText = 'Sign in or Sign up';
   static const String sendMeMyPasswordText = 'Continue';
   static const String logInButtonText = 'Sign In';
   static const String authenticationFailed = 'Authentication failed';
@@ -148,14 +148,19 @@ class StringConstants {
   static const String loginBenefits = '• Download your previously saved data'
       '\n• Continue your meditation journey from where you left off';
 
-  static const String accountTransitionWarningTitle = 'Save Your Progress';
-  static const String loginWarningMessage =
-      'Do you currently have unsaved progress? '
-      'Logging in to an existing account will download your previously saved data, '
-      'but may overwrite any current unsaved progress.';
+  static const String accountTransitionWarningTitle = 'Wait!';
+  static const String loginWarningQuestion =
+      'Do you want to continue with this email?';
+  static const String loginWarningExplanation =
+      'If you already have a Medito account:\n'
+      '• Your previous meditation data will be downloaded\n'
+      '• Your current unsaved progress will be lost\n\n'
+      'If you\'re new to Medito:\n'
+      '• A new account will be created\n'
+      '• Your current progress will be saved to this account';
 
   static const String createNewAccount = 'Create New Account';
-  static const String continueLogin = 'Continue Login';
+  static const String continueLogin = 'Yes, continue';
   static const String cancelAction = 'Cancel';
   static const String goBack = 'Go Back';
 
@@ -336,4 +341,9 @@ class StringConstants {
   static const String otpInstructions = 'Enter the code we just sent to';
   static const String resendCode = 'Didn\'t get the code? Resend it';
   static const String verifyOtpButtonText = 'Continue';
+
+  static const String warningTitle = 'Warning';
+  static const String localStatsWarning =
+      'Signing into a new account will result in the loss of your current local stats. Do you wish to proceed?';
+  static const String proceed = 'Proceed';
 }

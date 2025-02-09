@@ -110,7 +110,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   String _generateClientId() {
     var date = DateFormat('ddMMyy_HHmmss_').format(DateTime.now());
-    
+
     return '$date${const Uuid().v4()}';
   }
 
@@ -165,7 +165,8 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   Future<bool> requestOtp(String email) async {
     return retryOperation(
       operation: () async {
-        var clientId = await getClientIdFromSharedPreference() ?? _generateClientId();
+        var clientId =
+            await getClientIdFromSharedPreference() ?? _generateClientId();
         dev.log('[AUTH] Using client ID for OTP request: $clientId');
 
         await Supabase.instance.client.auth.signInWithOtp(

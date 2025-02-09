@@ -12,7 +12,6 @@ import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
-import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
@@ -80,6 +79,44 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       _isEmailValid && (_hasRequestedOtp ? _isOtpValid : true);
 
   Future<void> _requestOtp() async {
+    final hasLocalStats = await StatsManager().hasLocalStats();
+
+    if (hasLocalStats) {
+      final proceed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: ColorConstants.ebony,
+              title: const Text(
+                StringConstants.accountTransitionWarningTitle,
+                style: TextStyle(color: Colors.white),
+              ),
+              content: Text(
+                StringConstants.loginWarningExplanation,
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    StringConstants.cancelAction,
+                    style: TextStyle(color: ColorConstants.brightSky),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    StringConstants.continueLogin,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+
+      if (!proceed) return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -349,10 +386,6 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       keyboardType: TextInputType.number,
       maxLength: 6,
     );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return const SizedBox.shrink();
   }
 
   Widget _buildPrivacyPolicyLink() {
