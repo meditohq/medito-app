@@ -454,7 +454,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Widget _buildBenefitsText(String text) {
     return Text(
       text,
-      textAlign: TextAlign.center,
+      textAlign: TextAlign.start,
       style: const TextStyle(
         color: Colors.white,
         fontSize: 20,

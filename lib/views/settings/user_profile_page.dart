@@ -17,110 +17,156 @@ class UserProfilePage extends ConsumerWidget {
     final user = authRepository.currentUser;
 
     return Scaffold(
-      backgroundColor: ColorConstants.onyx,
-      appBar: const MeditoAppBarSmall(
-        title: StringConstants.userProfileTitle,
+      backgroundColor: ColorConstants.ebony,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          StringConstants.userProfileTitle,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
-      bottomNavigationBar: SingleBackButtonActionBar(onBackPressed: () {
-        Navigator.of(context).pop();
-      }),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${StringConstants.userProfileEmailLabel} ${user?.email}',
-              style: const TextStyle(color: Colors.white),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  kToolbarHeight -
+                  MediaQuery.of(context).viewInsets.bottom,
             ),
-            const SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: () async {
-                try {
-                  await authRepository.signOut();
-                  await StatsManager().clearAllStats();
-                  ref.read(statsProvider.notifier).refresh();
-                  ref.invalidate(packProvider);
-
-                  Navigator.of(context).pop(true);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(StringConstants.signOutSuccessMessage)),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(StringConstants.signOutErrorMessage)),
-                  );
-                }
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: ColorConstants.brightSky,
-                side: const BorderSide(color: ColorConstants.brightSky),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  user?.email ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                minimumSize: const Size(double.infinity, 48),
-              ),
-              child: const Text(StringConstants.signOutButtonText),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text(StringConstants.deleteAccountTitle),
-                        content: const Text(
-                            StringConstants.deleteAccountConfirmation),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text(StringConstants.cancel),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text(StringConstants.delete),
-                          ),
-                        ],
-                      ),
-                    ) ??
-                    false;
-
-                if (confirmed) {
-                  try {
-                    final success =
-                        await authRepository.markAccountForDeletion();
-                    if (success) {
+                height64,
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
                       await authRepository.signOut();
+                      await StatsManager().clearAllStats();
+                      ref.read(statsProvider.notifier).refresh();
+                      ref.invalidate(packProvider);
+
                       Navigator.of(context).pop(true);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content:
-                                Text(StringConstants.accountMarkedForDeletion)),
+                          content: Text(StringConstants.signOutSuccessMessage),
+                        ),
                       );
-                    } else {
-                      throw Exception('Failed to mark account for deletion');
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(StringConstants.signOutErrorMessage),
+                        ),
+                      );
                     }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(StringConstants.deleteAccountError)),
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: ColorConstants.onyx,
+                    backgroundColor: ColorConstants.lightPurple,
+                    disabledForegroundColor: Colors.white60,
+                    disabledBackgroundColor:
+                        ColorConstants.lightPurple.withOpacity(0.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                  child: const Text(StringConstants.signOutButtonText),
                 ),
-                minimumSize: const Size(double.infinity, 48),
-              ),
-              child: const Text(StringConstants.deleteAccountButtonText),
+                height16,
+                ElevatedButton(
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: ColorConstants.ebony,
+                            title: const Text(
+                              StringConstants.deleteAccountTitle,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            content: const Text(
+                              StringConstants.deleteAccountConfirmation,
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text(
+                                  StringConstants.cancel,
+                                  style: TextStyle(
+                                      color: ColorConstants.brightSky),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text(
+                                  StringConstants.delete,
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ) ??
+                        false;
+
+                    if (confirmed) {
+                      try {
+                        final success =
+                            await authRepository.markAccountForDeletion();
+                        if (success) {
+                          await authRepository.signOut();
+                          Navigator.of(context).pop(true);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  StringConstants.accountMarkedForDeletion),
+                            ),
+                          );
+                        } else {
+                          throw Exception(
+                              'Failed to mark account for deletion');
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(StringConstants.deleteAccountError),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                  child: const Text(StringConstants.deleteAccountButtonText),
+                ),
+                const SizedBox.square(dimension: 100),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

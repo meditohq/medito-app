@@ -71,6 +71,8 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final clientIdSync = ref.watch(userIdProvider);
     final deviceInfoAsyncValue = ref.watch(deviceAndAppInfoProvider);
+    final authRepository = ref.watch(authRepositoryProvider);
+    final user = authRepository.currentUser;
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
@@ -201,9 +203,15 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref,
     SettingsItem item,
   ) {
+    final authRepository = ref.watch(authRepositoryProvider);
+    final user = authRepository.currentUser;
+    final isAccountItem = item.type == 'account';
+    final userEmail = user?.email;
+
     return RowItemWidget(
       icon: item.icon,
       title: item.title,
+      subTitle: isAccountItem && userEmail != null ? userEmail : null,
       hasUnderline: true,
       onTap: () => handleItemPress(context, ref, item),
     );
