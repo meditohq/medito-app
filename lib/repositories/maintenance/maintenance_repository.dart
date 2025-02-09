@@ -10,6 +10,7 @@ abstract class MaintenanceRepository {
 }
 
 class MaintenanceRepositoryImpl extends MaintenanceRepository {
+  final MaintenanceApiService client;
 
   MaintenanceRepositoryImpl({required this.client});
 
