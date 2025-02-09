@@ -68,7 +68,7 @@ class HTTPConstants {
   static const String backgroundSounds = 'backgroundsounds';
   static const String home = 'home';
   static const String latestAnnouncement = 'announcements?latest=true';
-  static const String allStats = '/stats';
+  static const String allStats = 'stats';
   static const String me = 'me';
   static const String searchTracks = 'search/tracks';
   static const String journeys = 'journeys';
