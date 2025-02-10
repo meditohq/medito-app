@@ -48,6 +48,7 @@ class StringConstants {
   static const String fieldRequired = 'Field is Required';
   static const String invalidInput = 'Invalid Input';
   static const String connectionTimeout = 'Error connection timeout';
+  static const String noInternetConnection = 'No internet connection';
   static const String badRequest = 'Bad request';
   static const String unauthorizedRequest = 'Unauthorized request';
   static const String accessForbidden = 'Access forbidden';

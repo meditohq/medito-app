@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:medito/constants/constants.dart';
 import 'package:medito/utils/retry_mixin.dart';
@@ -55,9 +56,17 @@ class HttpApiService with RetryMixin {
               .map((key, value) => MapEntry(key, value.toString())));
     }
 
-    final response = await _client.get(url, headers: _headers);
-    _handleResponse(response);
-    return jsonDecode(response.body);
+    try {
+      final response = await _client
+          .get(url, headers: _headers)
+          .timeout(const Duration(seconds: 30));
+      _handleResponse(response);
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } on TimeoutException {
+      throw FetchDataException(408, StringConstants.connectionTimeout);
+    } on SocketException {
+      throw FetchDataException(null, StringConstants.noInternetConnection);
+    }
   }
 
   Future<dynamic> postRequest(
@@ -73,13 +82,21 @@ class HttpApiService with RetryMixin {
               .map((key, value) => MapEntry(key, value.toString())));
     }
 
-    final response = await _client.post(
-      url,
-      headers: _headers,
-      body: data != null ? jsonEncode(data) : null,
-    );
-    _handleResponse(response);
-    return jsonDecode(response.body);
+    try {
+      final response = await _client
+          .post(
+            url,
+            headers: _headers,
+            body: data != null ? jsonEncode(data) : null,
+          )
+          .timeout(const Duration(seconds: 30));
+      _handleResponse(response);
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } on TimeoutException {
+      throw FetchDataException(408, StringConstants.connectionTimeout);
+    } on SocketException {
+      throw FetchDataException(null, StringConstants.noInternetConnection);
+    }
   }
 
   Future<dynamic> deleteRequest(
@@ -95,13 +112,21 @@ class HttpApiService with RetryMixin {
               .map((key, value) => MapEntry(key, value.toString())));
     }
 
-    final response = await _client.delete(
-      url,
-      headers: _headers,
-      body: data != null ? jsonEncode(data) : null,
-    );
-    _handleResponse(response);
-    return jsonDecode(response.body);
+    try {
+      final response = await _client
+          .delete(
+            url,
+            headers: _headers,
+            body: data != null ? jsonEncode(data) : null,
+          )
+          .timeout(const Duration(seconds: 30));
+      _handleResponse(response);
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } on TimeoutException {
+      throw FetchDataException(408, StringConstants.connectionTimeout);
+    } on SocketException {
+      throw FetchDataException(null, StringConstants.noInternetConnection);
+    }
   }
 
   void _handleResponse(http.Response response) {

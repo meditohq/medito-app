@@ -74,7 +74,7 @@ class QuoteWidget extends ConsumerWidget {
                   valueListenable: isCapturing,
                   builder: (context, capturing, child) {
                     if (capturing) return const SizedBox.shrink();
-                    
+
                     return Positioned(
                       right: -12,
                       bottom: -12,
@@ -82,7 +82,9 @@ class QuoteWidget extends ConsumerWidget {
                         padding: EdgeInsets.zero,
                         onPressed: () => _handleShare(context, globalKey),
                         icon: HugeIcon(
-                          icon: Platform.isIOS ? HugeIcons.solidRoundedShare03 : HugeIcons.solidRoundedShare08,
+                          icon: Platform.isIOS
+                              ? HugeIcons.solidRoundedShare03
+                              : HugeIcons.solidRoundedShare08,
                           color: Colors.white.withOpacity(0.6),
                           size: 16,
                         ),
@@ -103,11 +105,12 @@ class QuoteWidget extends ConsumerWidget {
       isCapturing.value = true;
       // Add setState call to ensure widget updates
       await Future.microtask(() {});
-      
+
       var file = await capturePng(context, key);
       if (file != null) {
-        var shareText = '${data?.quote}\n- ${data?.author}\n\n${StringConstants.shareStatsText}';
-        
+        var shareText =
+            '${data?.quote}\n- ${data?.author}\n\n${StringConstants.shareStatsText}';
+
         await Share.shareXFiles(
           [XFile(file.path)],
           text: shareText,
