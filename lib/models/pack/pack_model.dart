@@ -8,10 +8,10 @@ class PackModel with _$PackModel {
   const factory PackModel({
     required String id,
     required String title,
-    required String subtitle,
-    required String coverUrl,
+    String? subtitle,
+    String? coverUrl,
     required String path,
-    required String description,
+    String? description,
     @Default(false) bool isPublished,
     @Default(<PackItemsModel>[]) List<PackItemsModel> items,
   }) = _PackModel;

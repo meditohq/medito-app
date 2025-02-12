@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/models/models.dart';
+import 'package:medito/models/pack/pack_model.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -20,9 +20,27 @@ class PackRepositoryImpl extends PacksRepository {
   @override
   Future<List<PackModel>> fetchAllPacks() async {
     final response = await client.getRequest(HTTPConstants.packs);
+    print('Packs API response: $response');
 
-    return (response as List)
-        .map((item) => PackModel.fromJson(item as Map<String, dynamic>))
+    // Handle null response
+    if (response == null) {
+      throw FormatException('Packs API returned null response');
+    }
+
+    // Handle different response structures
+    dynamic responseData = response;
+    responseData = response['data'] ?? response['results'] ?? response;
+  
+    // Verify final data format
+    if (responseData is! List) {
+      throw FormatException(
+          '''Expected array of packs, got ${responseData.runtimeType}.
+        Full response: ${response.toString()}''');
+    }
+
+    return (responseData)
+        .map<PackModel>(
+            (json) => PackModel.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

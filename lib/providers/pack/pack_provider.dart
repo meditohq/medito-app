@@ -6,7 +6,6 @@ import 'package:medito/models/models.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/exceptions/app_exceptions.dart';
 
 part 'pack_provider.g.dart';

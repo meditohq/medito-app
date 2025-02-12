@@ -19,7 +19,7 @@ final _api = MeditoAudioServiceApi();
 final iosBackgroundPlayer = AudioPlayer()..setLoopMode(LoopMode.all);
 
 @riverpod
-Future<List<BackgroundSoundsModel>> backgroundSounds(BackgroundSoundsRef ref) {
+Future<List<BackgroundSoundsModel>> backgroundSounds(Ref ref) {
   final backgroundSoundsRepository =
       ref.watch(backgroundSoundsRepositoryProvider);
   ref.keepAlive();

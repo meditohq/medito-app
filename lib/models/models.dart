@@ -1,3 +1,5 @@
+import 'package:medito/models/pack/pack_model.dart';
+
 export 'background_sounds/background_sounds_model.dart';
 export 'device_info/device_and_app_info_model.dart';
 export 'events/feedback/feedback_tapped_model.dart';

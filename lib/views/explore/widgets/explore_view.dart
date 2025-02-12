@@ -41,7 +41,7 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         _searchQuery = value;
-        if (_searchQuery.isEmpty) ref.invalidate(exploreListProvider(''));
+        if (_searchQuery.isEmpty) ref.invalidate(explorePacksProvider);
       });
     });
   }
@@ -50,12 +50,16 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(exploreListProvider(''));
+      ref.invalidate(explorePacksProvider);
     });
   }
 
   Future<void> _refreshExploreList() async {
-    ref.invalidate(exploreListProvider(_searchQuery));
+    if (_searchQuery.isEmpty) {
+      ref.invalidate(explorePacksProvider);
+    } else {
+      ref.invalidate(searchTracksProvider(_searchQuery));
+    }
   }
 
   @override
@@ -127,39 +131,38 @@ class ExploreContentWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var exploreItems = ref.watch(exploreListProvider(searchQuery));
-
-    return exploreItems.when(
-      data: (data) => _buildContent(context, ref, data),
-      error: (err, stack) => Container(),
-      //  MeditoErrorWidget(
-
-      //   message: err.toString(),
-      //   isScaffold: false,
-      //   onTap: () => ref.invalidate(exploreListProvider(searchQuery)),
-      // ),
-      loading: () => const SizedBox(
-        height: 100,
-        child: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
-          ),
+    if (searchQuery.isEmpty) {
+      final explorePacks = ref.watch(explorePacksProvider);
+      return explorePacks.when(
+        data: (packs) => packs.isEmpty
+            ? const Center(child: Text('No packs available'))
+            : _buildPackList(context, ref, packs),
+        error: (err, stack) => MeditoErrorWidget(
+          message: err.toString(),
+          isScaffold: false,
+          onTap: () => ref.invalidate(explorePacksProvider),
         ),
-      ),
-    );
+        loading: () => const LoadingWidget(),
+      );
+    } else {
+      final searchResults = ref.watch(searchTracksProvider(searchQuery));
+      return searchResults.when(
+        data: (tracks) => _buildTrackList(context, ref, tracks),
+        error: (err, stack) => Container(),
+        loading: () => const LoadingWidget(),
+      );
+    }
   }
 
-  Widget _buildContent(
-      BuildContext context, WidgetRef ref, List<ExploreListItem> items) {
-    var packItems = items.whereType<PackItem>().toList();
-    var trackItems = items.whereType<TrackItem>().toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (packItems.isNotEmpty) _buildPackList(context, ref, packItems),
-        if (trackItems.isNotEmpty) _buildExploreList(context, ref, trackItems),
-      ],
+  Widget _buildTrackList(
+      BuildContext context, WidgetRef ref, List<TrackItem> tracks) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWideScreen = MediaQuery.of(context).size.shortestSide >= 600;
+        return isWideScreen
+            ? _buildGridView(ref, context, tracks, constraints)
+            : _buildListView(ref, context, tracks);
+      },
     );
   }
 
@@ -210,51 +213,8 @@ class ExploreContentWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildExploreList(
-      BuildContext context, WidgetRef ref, List<ExploreListItem> items) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWideScreen =
-            MediaQuery.of(context).orientation == Orientation.landscape ||
-                MediaQuery.of(context).size.shortestSide >= 600;
-
-        return isWideScreen
-            ? _buildGridView(context, items, ref, constraints)
-            : _buildListView(context, items, ref);
-      },
-    );
-  }
-
-  Widget _buildListView(
-      BuildContext context, List<ExploreListItem> items, WidgetRef ref) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(padding16),
-      itemCount: items.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        var item = items[index];
-        return TrackCardWidget(
-          title: item.title,
-          subTitle: item.subtitle,
-          coverUrlPath: item.coverUrl,
-          onTap: () {
-            onPackTapped();
-            handleNavigation(
-              TypeConstants.track,
-              [item.id, item.path],
-              context,
-              ref: ref,
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildGridView(BuildContext context, List<ExploreListItem> items,
-      WidgetRef ref, BoxConstraints constraints) {
+  Widget _buildGridView(WidgetRef ref, BuildContext context,
+      List<TrackItem> items, BoxConstraints constraints) {
     var itemWidth = (constraints.maxWidth - padding16) / 2;
 
     return Wrap(
@@ -282,6 +242,37 @@ class ExploreContentWidget extends ConsumerWidget {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildListView(
+    WidgetRef ref,
+    BuildContext context,
+    List<TrackItem> items,
+  ) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(padding16),
+      itemCount: items.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        var item = items[index];
+        return TrackCardWidget(
+          title: item.title,
+          subTitle: item.subtitle,
+          coverUrlPath: item.coverUrl,
+          onTap: () {
+            onPackTapped();
+            handleNavigation(
+              TypeConstants.track,
+              [item.id, item.path],
+              context,
+              ref: ref,
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -317,6 +308,22 @@ class SearchBox extends StatelessWidget {
       ),
       style: const TextStyle(color: ColorConstants.white),
       onChanged: onChanged,
+    );
+  }
+}
+
+class LoadingWidget extends StatelessWidget {
+  const LoadingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 100,
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+        ),
+      ),
     );
   }
 }
