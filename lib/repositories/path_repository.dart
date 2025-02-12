@@ -54,7 +54,7 @@ class PathRepository {
     try {
       final response = await _client.postRequest(
         '${HTTPConstants.journeys}/1/tasks/$taskId',
-        data: {
+        body: {
           'isCompleted': isCompleted,
           'lastUpdated': DateTime.now().millisecondsSinceEpoch,
         },
@@ -79,7 +79,7 @@ class PathRepository {
     try {
       final response = await _client.postRequest(
         '${HTTPConstants.journeys}/1/tasks/$taskId',
-        data: {
+        body: {
           'data': {'entryText': entryText},
           'isCompleted': markAsCompleted,
           'lastUpdated': DateTime.now().millisecondsSinceEpoch,
@@ -108,7 +108,7 @@ class PathRepository {
     try {
       await _client.postRequest(
         url,
-        data: payload.toJson(),
+        body: payload.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to update task progress: $e');

@@ -1,5 +1,5 @@
 import 'package:medito/constants/constants.dart';
-import 'package:medito/models/pack/pack_model.dart';
+import 'package:medito/models/explore/track_search_model.dart';
 import 'package:medito/services/network/http_api_service.dart';
 
 class TrackSearchRepository {
@@ -7,14 +7,14 @@ class TrackSearchRepository {
 
   TrackSearchRepository(this._apiService);
 
-  Future<List<PackItemsModel>> searchTracks(String query) async {
+  Future<List<TrackSearchModel>> searchTracks(String query) async {
     final response = await _apiService.postRequest(
       HTTPConstants.searchTracks,
-      data: {'query': query},
+      body: {'query': query},
     );
 
-    return (response as List)
-        .map((item) => PackItemsModel.fromJson(item))
+    return (response['results'] as List)
+        .map((item) => TrackSearchModel.fromJson(item))
         .toList();
   }
 }

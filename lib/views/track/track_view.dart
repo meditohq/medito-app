@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_exceptions.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
@@ -6,6 +7,7 @@ import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
@@ -93,6 +95,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
                     onTap: () =>
                         ref.refresh(tracksProvider(trackId: widget.trackId)),
                     isScaffold: false,
+                    isSessionExpired: err is SessionExpiredException,
                   ),
                 ),
               ),
@@ -181,6 +184,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
                   onTap: () =>
                       ref.refresh(tracksProvider(trackId: widget.trackId)),
                   isScaffold: false,
+                  isSessionExpired: err is SessionExpiredException,
                 ),
               ),
             ),
@@ -236,6 +240,7 @@ class _TrackViewState extends ConsumerState<TrackView> {
         message: err.toString(),
         onTap: () => ref.refresh(tracksProvider(trackId: widget.trackId)),
         isScaffold: false,
+        isSessionExpired: err is SessionExpiredException,
       ),
       loading: () => _buildLoadingWidget(),
     );

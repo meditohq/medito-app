@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/events/donation/donation_page_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -7,7 +8,7 @@ part 'donation_page_provider.g.dart';
 
 @riverpod
 Future<DonationPageModel> fetchDonationPage(
-  FetchDonationPageRef ref,
+  Ref ref,
 ) {
   final donationPageRepository = ref.watch(donationPageRepositoryProvider);
   ref.keepAlive();

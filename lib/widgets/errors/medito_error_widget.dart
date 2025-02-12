@@ -1,26 +1,31 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/utils/stats_manager.dart';
+import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../views/downloads/downloads_view.dart';
 
 class MeditoErrorWidget extends ConsumerWidget {
   const MeditoErrorWidget({
-    Key? key,
+    super.key,
     required this.onTap,
     required this.message,
     this.isLoading = false,
     this.shouldShowCheckDownloadButton = false,
     this.isScaffold = true,
-  }) : super(key: key);
+    this.isSessionExpired = false,
+  });
   final void Function() onTap;
   final String message;
   final bool isLoading;
   final bool shouldShowCheckDownloadButton;
   final bool isScaffold;
+  final bool isSessionExpired;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,13 +102,31 @@ class MeditoErrorWidget extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             height16,
-            LoadingButtonWidget(
-              btnText: StringConstants.retry,
-              onPressed: onTap,
-              isLoading: isLoading,
-              bgColor: ColorConstants.white,
-              textColor: ColorConstants.onyx,
-            ),
+            if (isSessionExpired)
+              LoadingButtonWidget(
+                btnText: StringConstants.signInAgain,
+                onPressed: () async {
+                  await Supabase.instance.client.auth.signOut();
+                  await StatsManager().clearAllStats();
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const SignUpLogInPage(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                isLoading: isLoading,
+                bgColor: ColorConstants.lightPurple,
+                textColor: ColorConstants.onyx,
+              )
+            else
+              LoadingButtonWidget(
+                btnText: StringConstants.retry,
+                onPressed: onTap,
+                isLoading: isLoading,
+                bgColor: ColorConstants.white,
+                textColor: ColorConstants.onyx,
+              ),
           ],
         ),
       ),

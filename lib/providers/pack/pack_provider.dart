@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:medito/models/models.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/exceptions/app_exceptions.dart';
 
 part 'pack_provider.g.dart';
 
@@ -16,7 +20,6 @@ class Pack extends _$Pack {
   @override
   AsyncValue<PackModel> build({required String packId}) {
     fetchPacks(packId: packId);
-
     return const AsyncLoading();
   }
 
@@ -26,7 +29,7 @@ class Pack extends _$Pack {
 
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(() async {
+    try {
       var pack = await packRepository.fetchPacks(packId);
       var localStats = await statsManager.localAllStats;
       var tracksChecked = localStats.tracksChecked ?? [];
@@ -35,8 +38,15 @@ class Pack extends _$Pack {
         return item.copyWith(isCompleted: tracksChecked.contains(item.id));
       }).toList();
 
-      return pack.copyWith(items: updatedItems);
-    });
+      state = AsyncData(pack.copyWith(items: updatedItems));
+    } on AppHttpException catch (e) {
+      if (e.statusCode == HttpStatus.unauthorized) {
+        throw const SessionExpiredException();
+      }
+      rethrow;
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
 
     ref.keepAlive();
   }

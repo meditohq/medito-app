@@ -50,7 +50,8 @@ class StringConstants {
   static const String connectionTimeout = 'Error connection timeout';
   static const String noInternetConnection = 'No internet connection';
   static const String badRequest = 'Bad request';
-  static const String unauthorizedRequest = 'Unauthorized request';
+  static const String unauthorizedRequest =
+      'Session expired - please sign in again';
   static const String accessForbidden = 'Access forbidden';
   static const String apiNotFound = 'Api not found';
   static const String anErrorOccurred =
@@ -129,7 +130,7 @@ class StringConstants {
 
   static const String signUpLogInTitle = 'Sign in to Medito';
   static const String createAccountTitle = 'Create account';
-  static const String loginTitle = 'Sign in';
+  static const String signInAgain = 'Sign in again';
   static const String emailLabel = 'Email';
   static const String invalidEmailError = 'Please enter a valid email';
   static const String createAccountButtonText = 'Create Account';
@@ -347,4 +348,6 @@ class StringConstants {
   static const String localStatsWarning =
       'Signing into a new account will result in the loss of your current local stats. Do you wish to proceed?';
   static const String proceed = 'Proceed';
+
+  static const errorNotFound = 'Resource not found';
 }

@@ -18,6 +18,7 @@ import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});

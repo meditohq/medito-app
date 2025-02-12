@@ -1,184 +1,183 @@
+import 'dart:developer' as dev;
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:async';
-import 'package:http/http.dart' as http;
 import 'package:medito/constants/constants.dart';
-import 'package:medito/utils/retry_mixin.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HttpApiService with RetryMixin {
-  static final HttpApiService _instance = HttpApiService._internal();
-  final _client = http.Client();
-  bool _isInitialized = false;
-  Map<String, String> _headers = {};
+final _timeoutDuration = const Duration(seconds: 30);
 
-  factory HttpApiService() {
-    return _instance;
-  }
+class HttpApiService {
+  static final HttpApiService _instance = HttpApiService._internal();
+  final _client = HttpClient();
+  final _headers = {
+    HttpHeaders.contentTypeHeader: ContentType.json.value,
+  };
+  var _retryCount = 0;
+  final _maxRetries = 3;
+
+  factory HttpApiService() => _instance;
 
   HttpApiService._internal() {
-    _initializeWithoutAuth();
-  }
-
-  void _initializeWithoutAuth() {
-    _headers = {
-      'Content-Type': 'application/json',
-    };
+    _client.connectionTimeout = _timeoutDuration;
   }
 
   void initializeAuth() {
-    if (!_isInitialized) {
-      _updateAuthHeaders();
-      _isInitialized = true;
-    }
-  }
-
-  void _updateAuthHeaders() {
-    var token = Supabase.instance.client.auth.currentSession?.accessToken;
+    final token = Supabase.instance.client.auth.currentSession?.accessToken;
+    dev.log('Initializing auth headers - token exists: ${token != null}');
     if (token != null) {
       _headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
     }
   }
 
-  void updateHeaders(Map<String, String> headers) {
+  void clearAuthHeaders() {
+    _headers.remove(HttpHeaders.authorizationHeader);
+  }
+
+  Future<Map<String, dynamic>> getRequest(
+    String path, {
+    Map<String, dynamic>? queryParams,
+  }) async =>
+      _handleRequest(
+        () async => _client.getUrl(_buildUri(path, queryParams)),
+      );
+
+  Future<Map<String, dynamic>> postRequest(
+    String path, {
+    dynamic body,
+  }) async =>
+      _handleRequest(
+        () async => _client.postUrl(_buildUri(path)),
+        body: body,
+      );
+
+  Future<Map<String, dynamic>> deleteRequest(
+    String path,
+  ) async =>
+      _handleRequest(
+        () async => _client.deleteUrl(_buildUri(path)),
+      );
+
+  Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) =>
+      Uri.parse('$contentBaseUrl$path').replace(queryParameters: queryParams);
+
+  Future<Map<String, dynamic>> _handleRequest(
+    Future<HttpClientRequest> Function() requestBuilder, {
+    dynamic body,
+  }) async {
+    try {
+      final request = await requestBuilder();
+      _headers.forEach(request.headers.set);
+
+      dev.log('Making ${request.method} request to ${request.uri}');
+      dev.log('Request headers: ${request.headers}');
+
+      if (body != null) {
+        final encodedBody = jsonEncode(body);
+        dev.log('Request body: $encodedBody');
+        request.write(encodedBody);
+      }
+
+      final response = await request.close().timeout(_timeoutDuration);
+      return await _handleResponse(response, requestBuilder, body);
+    } on SocketException {
+      throw const AppHttpException(StringConstants.noInternetConnection);
+    } on TimeoutException {
+      throw const AppHttpException(StringConstants.connectionTimeout);
+    }
+  }
+
+  Future<Map<String, dynamic>> _handleResponse(
+    HttpClientResponse response,
+    Future<HttpClientRequest> Function() requestBuilder,
+    dynamic body,
+  ) async {
+    dev.log('Response status: ${response.statusCode}');
+    dev.log('Response headers: ${response.headers}');
+    final content = await utf8.decodeStream(response);
+    dev.log('Response content length: ${content.length} bytes');
+
+    if (response.statusCode >= 400) {
+      dev.log('HTTP Error ${response.statusCode}: $content', level: 900);
+      if (response.statusCode == HttpStatus.unauthorized) {
+        return _handleUnauthorized(response, requestBuilder, body);
+      } else if (response.statusCode == HttpStatus.notFound) {
+        throw AppHttpException(StringConstants.errorNotFound);
+      }
+      throw AppHttpException(
+        content.isNotEmpty ? content : 'HTTP ${response.statusCode}',
+        statusCode: response.statusCode,
+      );
+    }
+
+    _retryCount = 0;
+
+    if (content.isEmpty) return {};
+
+    final decoded = jsonDecode(content);
+    return decoded is Map<String, dynamic> ? decoded : {'results': decoded};
+  }
+
+  Future<Map<String, dynamic>> _handleUnauthorized(
+    HttpClientResponse response,
+    Future<HttpClientRequest> Function() requestBuilder,
+    dynamic body,
+  ) async {
+    dev.log('Unauthorized response - retry count: $_retryCount');
+    if (_retryCount >= _maxRetries) {
+      dev.log('Max retries reached - forcing logout');
+      await _forceLogout();
+      throw const AppHttpException(StringConstants.unauthorizedRequest);
+    }
+
+    try {
+      dev.log('Attempting session refresh...');
+      final currentSession = Supabase.instance.client.auth.currentSession;
+      if (currentSession == null) {
+        throw const AppHttpException(StringConstants.unauthorizedRequest);
+      }
+
+      final refreshToken = currentSession.refreshToken;
+      if (refreshToken == null) {
+        throw const AppHttpException(StringConstants.unauthorizedRequest);
+      }
+
+      final response = await Supabase.instance.client.auth.setSession(
+        refreshToken,
+      );
+
+      if (response.session != null) {
+        dev.log('Session refresh successful');
+        _retryCount++;
+        initializeAuth();
+        return _handleRequest(requestBuilder, body: body);
+      }
+      throw const AppHttpException(StringConstants.unauthorizedRequest);
+    } catch (e) {
+      dev.log('Session refresh failed', error: e);
+      await _forceLogout();
+      rethrow;
+    }
+  }
+
+  Future<void> _forceLogout() async {
+    dev.log('Force logout initiated');
+    _retryCount = 0;
+    await StatsManager().clearAllStats();
+  }
+
+  void addDeviceHeaders(Map<String, String> headers) {
     _headers.addAll(headers);
   }
-
-  Future<dynamic> getRequest(
-    String uri, {
-    Map<String, dynamic>? queryParameters,
-  }) async {
-    _updateAuthHeaders();
-    var url = Uri.parse(contentBaseUrl + uri);
-    if (queryParameters != null) {
-      url = url.replace(
-          queryParameters: queryParameters
-              .map((key, value) => MapEntry(key, value.toString())));
-    }
-
-    try {
-      final response = await _client
-          .get(url, headers: _headers)
-          .timeout(const Duration(seconds: 30));
-      _handleResponse(response);
-      return jsonDecode(utf8.decode(response.bodyBytes));
-    } on TimeoutException {
-      throw FetchDataException(408, StringConstants.connectionTimeout);
-    } on SocketException {
-      throw FetchDataException(null, StringConstants.noInternetConnection);
-    }
-  }
-
-  Future<dynamic> postRequest(
-    String uri, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-  }) async {
-    _updateAuthHeaders();
-    var url = Uri.parse(contentBaseUrl + uri);
-    if (queryParameters != null) {
-      url = url.replace(
-          queryParameters: queryParameters
-              .map((key, value) => MapEntry(key, value.toString())));
-    }
-
-    try {
-      final response = await _client
-          .post(
-            url,
-            headers: _headers,
-            body: data != null ? jsonEncode(data) : null,
-          )
-          .timeout(const Duration(seconds: 30));
-      _handleResponse(response);
-      return jsonDecode(utf8.decode(response.bodyBytes));
-    } on TimeoutException {
-      throw FetchDataException(408, StringConstants.connectionTimeout);
-    } on SocketException {
-      throw FetchDataException(null, StringConstants.noInternetConnection);
-    }
-  }
-
-  Future<dynamic> deleteRequest(
-    String uri, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-  }) async {
-    _updateAuthHeaders();
-    var url = Uri.parse(contentBaseUrl + uri);
-    if (queryParameters != null) {
-      url = url.replace(
-          queryParameters: queryParameters
-              .map((key, value) => MapEntry(key, value.toString())));
-    }
-
-    try {
-      final response = await _client
-          .delete(
-            url,
-            headers: _headers,
-            body: data != null ? jsonEncode(data) : null,
-          )
-          .timeout(const Duration(seconds: 30));
-      _handleResponse(response);
-      return jsonDecode(utf8.decode(response.bodyBytes));
-    } on TimeoutException {
-      throw FetchDataException(408, StringConstants.connectionTimeout);
-    } on SocketException {
-      throw FetchDataException(null, StringConstants.noInternetConnection);
-    }
-  }
-
-  void _handleResponse(http.Response response) {
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      return;
-    }
-
-    switch (response.statusCode) {
-      case 400:
-        throw BadRequestException(response.statusCode, response.body);
-      case 401:
-      case 403:
-        throw UnauthorizedException(response.statusCode, response.body);
-      case 422:
-        throw InvalidInputException(response.statusCode, response.body);
-      default:
-        throw FetchDataException(
-          response.statusCode,
-          'Error occurred while communicating with server',
-        );
-    }
-  }
-
-  void dispose() {
-    _client.close();
-  }
 }
 
-sealed class CustomException implements Exception {
+class AppHttpException implements Exception {
+  final String message;
   final int? statusCode;
-  final String? message;
 
-  CustomException([this.statusCode, this.message]);
+  const AppHttpException(this.message, {this.statusCode});
 
   @override
-  String toString() {
-    return '$message${statusCode != null ? ': $statusCode' : ''}';
-  }
-}
-
-class FetchDataException extends CustomException {
-  FetchDataException([super.statusCode, super.message]);
-}
-
-class BadRequestException extends CustomException {
-  BadRequestException([super.statusCode, super.message]);
-}
-
-class UnauthorizedException extends CustomException {
-  UnauthorizedException([super.statusCode, super.message]);
-}
-
-class InvalidInputException extends CustomException {
-  InvalidInputException([super.statusCode, super.message]);
+  String toString() => 'HTTP Error ${statusCode ?? ''}: $message'.trim();
 }

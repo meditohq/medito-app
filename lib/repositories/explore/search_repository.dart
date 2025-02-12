@@ -10,7 +10,7 @@ class SearchRepository {
   Future<List<PackItemsModel>> searchPacks(String query) async {
     var response = await _apiService.postRequest(
       HTTPConstants.searchTracks,
-      data: {'query': query},
+      body: {'query': query},
     );
     var tempResponse = response as List;
 

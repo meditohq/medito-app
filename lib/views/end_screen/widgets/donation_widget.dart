@@ -15,12 +15,18 @@ class DonationWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final donationPage = ref.watch(fetchDonationPageProvider);
 
+    debugPrint('Donation widget state: ${donationPage.toString()}');
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: donationPage.when(
         loading: () => _buildLoadingWidget(),
-        error: (err, _) => _buildErrorWidget(err.toString()),
+        error: (err, _) {
+          debugPrint('Donation page error: $err');
+          return _buildErrorWidget(err.toString());
+        },
         data: (DonationPageModel donationPageModel) {
+          debugPrint('Donation page data: ${donationPageModel.toString()}');
           return _buildDonationWidget(context, donationPageModel);
         },
       ),
@@ -37,7 +43,15 @@ class DonationWidget extends ConsumerWidget {
   Widget _buildErrorWidget(String err) {
     return SizedBox(
       height: 200,
-      child: Center(child: Text(err)),
+      child: Center(
+        child: Text(
+          "StringConstants.donationError",
+          style: TextStyle(
+            fontSize: 16,
+            color: ColorConstants.white,
+          ),
+        ),
+      ),
     );
   }
 
@@ -45,7 +59,6 @@ class DonationWidget extends ConsumerWidget {
     BuildContext context,
     DonationPageModel donationPageModel,
   ) {
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),

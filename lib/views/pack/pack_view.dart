@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_exceptions.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
@@ -9,6 +10,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/services/network/http_api_service.dart';
 
 import '../../widgets/headers/description_widget.dart';
 
@@ -53,6 +55,7 @@ class _PackViewState extends ConsumerState<PackView>
           message: err.toString(),
           onTap: () => ref.refresh(packProvider(packId: widget.id)),
           isLoading: packs.isLoading,
+          isSessionExpired: err is SessionExpiredException,
         ),
         loading: () => const FolderShimmerWidget(),
       ),

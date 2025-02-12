@@ -15,6 +15,8 @@ import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
+import '../../services/network/http_api_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
   const SignUpLogInPage({super.key});
@@ -157,6 +159,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         if (!mounted) return;
         showSnackBar(context, StringConstants.signInSuccess);
         ref.invalidate(meProvider);
+
+        HttpApiService().initializeAuth();
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(

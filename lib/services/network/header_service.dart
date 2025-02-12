@@ -24,7 +24,7 @@ class HeaderService {
 
   void _updateHeaders() {
     var customHeaders = _createCustomHeaders();
-    HttpApiService().updateHeaders(customHeaders);
+    HttpApiService().addDeviceHeaders(customHeaders);
   }
 
   Map<String, String> _createCustomHeaders() {
@@ -39,4 +39,4 @@ class HeaderService {
       'currency-name': deviceInfo.currencyName,
     };
   }
-} 
+}

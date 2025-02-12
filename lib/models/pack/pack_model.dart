@@ -4,22 +4,23 @@ part 'pack_model.freezed.dart';
 part 'pack_model.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
-abstract class PackModel with _$PackModel {
+class PackModel with _$PackModel {
   const factory PackModel({
     required String id,
     required String title,
-    required String description,
+    required String subtitle,
     required String coverUrl,
-    required bool isPublished,
+    required String path,
+    @Default(false) bool isPublished,
     @Default(<PackItemsModel>[]) List<PackItemsModel> items,
   }) = _PackModel;
 
-  factory PackModel.fromJson(Map<String, Object?> json) =>
+  factory PackModel.fromJson(Map<String, dynamic> json) =>
       _$PackModelFromJson(json);
 }
 
 @Freezed(makeCollectionsUnmodifiable: false)
-abstract class PackItemsModel with _$PackItemsModel {
+class PackItemsModel with _$PackItemsModel {
   const factory PackItemsModel({
     required String type,
     required String id,
@@ -30,6 +31,6 @@ abstract class PackItemsModel with _$PackItemsModel {
     bool? isCompleted,
   }) = _PackItemsModel;
 
-  factory PackItemsModel.fromJson(Map<String, Object?> json) =>
+  factory PackItemsModel.fromJson(Map<String, dynamic> json) =>
       _$PackItemsModelFromJson(json);
 }

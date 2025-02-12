@@ -5,9 +5,8 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
-import 'package:medito/widgets/headers/medito_app_bar_small.dart';
+import 'package:medito/services/network/http_api_service.dart';
 
 class UserProfilePage extends ConsumerWidget {
   const UserProfilePage({super.key});
@@ -19,8 +18,8 @@ class UserProfilePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
-      bottomNavigationBar: SingleBackButtonActionBar( 
-      onBackPressed: () {
+      bottomNavigationBar: SingleBackButtonActionBar(
+        onBackPressed: () {
           Navigator.pop(context);
         },
       ),
@@ -53,6 +52,7 @@ class UserProfilePage extends ConsumerWidget {
                   onPressed: () async {
                     try {
                       await authRepository.signOut();
+                      HttpApiService().clearAuthHeaders();
                       await StatsManager().clearAllStats();
                       ref.read(statsProvider.notifier).refresh();
                       ref.invalidate(packProvider);

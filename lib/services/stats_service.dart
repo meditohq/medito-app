@@ -39,7 +39,7 @@ class StatsService {
     try {
       await _httpApiService.postRequest(
         HTTPConstants.allStats,
-        data: stats.toAllStats().toJson(),
+        body: stats.toAllStats().toJson(),
       );
       dev.log('StatsManager: Successfully posted stats');
     } catch (e) {

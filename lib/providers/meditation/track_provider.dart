@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:medito/providers/events/events_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
+import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/track/track_model.dart';
 import '../../repositories/track/track_repository.dart';
+import '../../exceptions/app_exceptions.dart';
 
 part 'track_provider.g.dart';
 
@@ -12,8 +16,17 @@ class Tracks extends _$Tracks {
   @override
   Future<TrackModel> build({required String trackId}) async {
     final trackRepository = ref.watch(trackRepositoryProvider);
-    final track = await trackRepository.fetchTrack(trackId);
-    return track;
+    try {
+      final track = await trackRepository.fetchTrack(trackId);
+      return track;
+    } on AppHttpException catch (e) {
+      if (e.statusCode == HttpStatus.unauthorized) {
+        throw const SessionExpiredException();
+      }
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> toggleFavorite(bool newLikedState) async {

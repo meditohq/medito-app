@@ -41,7 +41,16 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         _searchQuery = value;
+        if (_searchQuery.isEmpty) ref.invalidate(exploreListProvider(''));
       });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(exploreListProvider(''));
     });
   }
 
@@ -72,7 +81,8 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const HomeHeaderWidget(greeting: StringConstants.explore),
+                        const HomeHeaderWidget(
+                            greeting: StringConstants.explore),
                         const SizedBox(height: 18.0),
                         SearchBox(
                           controller: _searchController,
@@ -121,10 +131,13 @@ class ExploreContentWidget extends ConsumerWidget {
 
     return exploreItems.when(
       data: (data) => _buildContent(context, ref, data),
-      error: (err, stack) => MeditoErrorWidget(
-        message: err.toString(),
-        onTap: () => ref.invalidate(exploreListProvider(searchQuery)),
-      ),
+      error: (err, stack) => Container(),
+      //  MeditoErrorWidget(
+
+      //   message: err.toString(),
+      //   isScaffold: false,
+      //   onTap: () => ref.invalidate(exploreListProvider(searchQuery)),
+      // ),
       loading: () => const SizedBox(
         height: 100,
         child: Center(

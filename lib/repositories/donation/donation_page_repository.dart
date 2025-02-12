@@ -11,23 +11,24 @@ abstract class DonationPageRepository {
   Future<DonationPageModel> fetchDonationPage();
 }
 
-class DonationPageRepositoryImpl extends DonationPageRepository {
-  final HttpApiService client;
+class DonationPageRepositoryImpl implements DonationPageRepository {
   final Ref ref;
+  final HttpApiService client;
 
   DonationPageRepositoryImpl({required this.ref, required this.client});
 
   @override
   Future<DonationPageModel> fetchDonationPage() async {
-    return client.getRequest(HTTPConstants.donate).then((response) {
+    try {
+      final response = await client.getRequest(HTTPConstants.donate);
       return DonationPageModel.fromJson(response);
-    });
+    } catch (e) {
+      throw Exception('Failed to fetch donation page: ${e.toString()}');
+    }
   }
 }
 
 @riverpod
-DonationPageRepositoryImpl donationPageRepository(
-  Ref ref,
-) {
+DonationPageRepository donationPageRepository(Ref ref) {
   return DonationPageRepositoryImpl(ref: ref, client: HttpApiService());
 }

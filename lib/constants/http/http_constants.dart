@@ -84,6 +84,5 @@ class HTTPConstants {
   static const String firebaseEvent = '/fcm';
   static const String rate = '/rate';
   static const String favorite = '/favorite';
-  static const String donate = '/donations/asks?random=true';
-
+  static const String donate = 'donations/asks?random=true';
 }

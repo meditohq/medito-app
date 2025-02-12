@@ -30,13 +30,13 @@ class EventsRepositoryImpl extends EventsRepository {
   Future<void> saveFirebaseToken(
     Map<String, dynamic> event,
   ) =>
-      client.postRequest(HTTPConstants.firebaseEvent, data: event);
+      client.postRequest(HTTPConstants.firebaseEvent, body: event);
 
   @override
   Future<void> feedbackEvent(String trackId, Map<String, dynamic> event) =>
       client.postRequest(
         '${HTTPConstants.tracks}/$trackId${HTTPConstants.rate}',
-        data: event,
+        body: event,
       );
 
   @override
