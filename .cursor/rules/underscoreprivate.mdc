@@ -1,0 +1,9 @@
+---
+description: String constant usage
+globs: 
+---
+
+
+- [string_constants.dart](mdc:lib/constants/strings/string_constants.dart)
+- When making a new string in the UI, add it to [string_constants.dart](mdc:lib/constants/strings/string_constants.dart). Add a comment about what the string is used for, so that in the future AI can accurately translate them.
+- When using it in a view, don't forget to import [string_constants.dart](mdc:lib/constants/strings/string_constants.dart)
