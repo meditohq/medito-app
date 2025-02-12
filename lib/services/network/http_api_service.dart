@@ -3,37 +3,34 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/network_constants.dart';
+import 'package:medito/exceptions/exceptions.dart';
+import 'package:medito/services/network/handlers/token_refresh_handler.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-final _timeoutDuration = const Duration(seconds: 30);
 
 class HttpApiService {
   static final HttpApiService _instance = HttpApiService._internal();
   final _client = HttpClient();
-  final _headers = {
-    HttpHeaders.contentTypeHeader: ContentType.json.value,
-  };
+  final _headers = <String, String>{kContentTypeHeader: ContentType.json.value};
   var _retryCount = 0;
-  final _maxRetries = 3;
+  final _tokenRefreshHandler = const TokenRefreshHandler();
 
   factory HttpApiService() => _instance;
 
   HttpApiService._internal() {
-    _client.connectionTimeout = _timeoutDuration;
+    _client.connectionTimeout = kTimeoutDuration;
   }
 
   void initializeAuth() {
     final token = Supabase.instance.client.auth.currentSession?.accessToken;
     dev.log('Initializing auth headers - token exists: ${token != null}');
     if (token != null) {
-      _headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+      _headers[kAuthorizationHeader] = 'Bearer $token';
     }
   }
 
-  void clearAuthHeaders() {
-    _headers.remove(HttpHeaders.authorizationHeader);
-  }
+  void clearAuthHeaders() => _headers.remove(kAuthorizationHeader);
 
   Future<Map<String, dynamic>> getRequest(
     String path, {
@@ -67,6 +64,7 @@ class HttpApiService {
     dynamic body,
   }) async {
     try {
+      initializeAuth();
       final request = await requestBuilder();
       _headers.forEach(request.headers.set);
 
@@ -79,8 +77,13 @@ class HttpApiService {
         request.write(encodedBody);
       }
 
-      final response = await request.close().timeout(_timeoutDuration);
-      return await _handleResponse(response, requestBuilder, body);
+      final response = await request.close().timeout(kTimeoutDuration);
+
+      if (response.statusCode == HttpStatus.unauthorized) {
+        return _handleUnauthorizedResponse(response, requestBuilder, body);
+      }
+
+      return _handleResponse(response);
     } on SocketException {
       throw const AppHttpException(StringConstants.noInternetConnection);
     } on TimeoutException {
@@ -89,73 +92,61 @@ class HttpApiService {
   }
 
   Future<Map<String, dynamic>> _handleResponse(
-    HttpClientResponse response,
-    Future<HttpClientRequest> Function() requestBuilder,
-    dynamic body,
-  ) async {
+      HttpClientResponse response) async {
     dev.log('Response status: ${response.statusCode}');
     dev.log('Response headers: ${response.headers}');
     final content = await utf8.decodeStream(response);
     dev.log('Response content length: ${content.length} bytes');
 
-    if (response.statusCode >= 400) {
-      dev.log('HTTP Error ${response.statusCode}: $content', level: 900);
-      if (response.statusCode == HttpStatus.unauthorized) {
-        return _handleUnauthorized(response, requestBuilder, body);
-      } else if (response.statusCode == HttpStatus.notFound) {
-        throw AppHttpException(StringConstants.errorNotFound);
-      }
-      throw AppHttpException(
-        content.isNotEmpty ? content : 'HTTP ${response.statusCode}',
-        statusCode: response.statusCode,
-      );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw _handleErrorResponse(response, content);
     }
 
     _retryCount = 0;
+    return content.isEmpty ? {} : _parseResponseContent(content);
+  }
 
-    if (content.isEmpty) return {};
+  AppHttpException _handleErrorResponse(
+      HttpClientResponse response, String content) {
+    dev.log('HTTP Error ${response.statusCode}: $content', level: 900);
+    if (response.statusCode == HttpStatus.notFound) {
+      return AppHttpException(StringConstants.errorNotFound);
+    }
 
+    return AppHttpException(
+      content.isNotEmpty ? content : 'HTTP ${response.statusCode}',
+      statusCode: response.statusCode,
+    );
+  }
+
+  Map<String, dynamic> _parseResponseContent(String content) {
     final decoded = jsonDecode(content);
     return decoded is Map<String, dynamic> ? decoded : {'results': decoded};
   }
 
-  Future<Map<String, dynamic>> _handleUnauthorized(
+  Future<Map<String, dynamic>> _handleUnauthorizedResponse(
     HttpClientResponse response,
     Future<HttpClientRequest> Function() requestBuilder,
     dynamic body,
   ) async {
     dev.log('Unauthorized response - retry count: $_retryCount');
-    if (_retryCount >= _maxRetries) {
+    if (_retryCount >= kMaxRetries) {
       dev.log('Max retries reached - forcing logout');
       await _forceLogout();
       throw const AppHttpException(StringConstants.unauthorizedRequest);
     }
 
     try {
-      dev.log('Attempting session refresh...');
-      final currentSession = Supabase.instance.client.auth.currentSession;
-      if (currentSession == null) {
-        throw const AppHttpException(StringConstants.unauthorizedRequest);
-      }
-
-      final refreshToken = currentSession.refreshToken;
-      if (refreshToken == null) {
-        throw const AppHttpException(StringConstants.unauthorizedRequest);
-      }
-
-      final response = await Supabase.instance.client.auth.setSession(
-        refreshToken,
+      dev.log('Attempting token refresh...');
+      await _tokenRefreshHandler.handleRefresh(
+        updateAuthHeader: (token) => _headers[kAuthorizationHeader] = token,
+        forceLogout: _forceLogout,
       );
 
-      if (response.session != null) {
-        dev.log('Session refresh successful');
-        _retryCount++;
-        initializeAuth();
-        return _handleRequest(requestBuilder, body: body);
-      }
-      throw const AppHttpException(StringConstants.unauthorizedRequest);
+      _retryCount++;
+      return _handleRequest(requestBuilder, body: body);
     } catch (e) {
-      dev.log('Session refresh failed', error: e);
+      dev.log('Token refresh failed', error: e);
       await _forceLogout();
       rethrow;
     }
@@ -167,17 +158,6 @@ class HttpApiService {
     await StatsManager().clearAllStats();
   }
 
-  void addDeviceHeaders(Map<String, String> headers) {
-    _headers.addAll(headers);
-  }
-}
-
-class AppHttpException implements Exception {
-  final String message;
-  final int? statusCode;
-
-  const AppHttpException(this.message, {this.statusCode});
-
-  @override
-  String toString() => 'HTTP Error ${statusCode ?? ''}: $message'.trim();
+  void addDeviceHeaders(Map<String, String> headers) =>
+      _headers.addAll(headers);
 }

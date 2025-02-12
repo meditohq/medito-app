@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:medito/exceptions/exceptions.dart';
 import 'package:medito/providers/events/events_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/services/network/http_api_service.dart';

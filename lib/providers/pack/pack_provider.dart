@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/exceptions/exceptions.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -10,9 +12,11 @@ import 'package:medito/exceptions/app_exceptions.dart';
 part 'pack_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-Future<List<PackItemsModel>> fetchAllPacks(FetchAllPacksRef ref) {
+Future<List<PackItemsModel>> fetchAllPacks(Ref ref) {
   var packRepository = ref.watch(packRepositoryProvider);
-  return packRepository.fetchAllPacks();
+  return packRepository
+      .fetchAllPacks()
+      .then((packs) => packs.expand((pack) => pack.items).toList());
 }
 
 @riverpod

@@ -20,7 +20,7 @@ class PackRepositoryImpl extends PacksRepository {
   @override
   Future<List<PackModel>> fetchAllPacks() async {
     final response = await client.getRequest(HTTPConstants.packs);
-    
+
     return (response as List)
         .map((item) => PackModel.fromJson(item as Map<String, dynamic>))
         .toList();

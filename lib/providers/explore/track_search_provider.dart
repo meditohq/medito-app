@@ -41,12 +41,13 @@ final exploreListProvider =
       final packRepo = ref.read(packRepositoryProvider);
       final packs = await packRepo.fetchAllPacks();
       return packs
-          .map((pack) => ExploreListItem.pack(
-                id: pack.id.toString(),
-                title: pack.title,
-                subtitle: pack.subtitle ?? '',
-                coverUrl: pack.coverUrl ?? '',
-                path: pack.path,
+          .expand((pack) => pack.items)
+          .map((item) => ExploreListItem.pack(
+                id: item.id,
+                title: item.title,
+                subtitle: item.subtitle ?? '',
+                coverUrl: item.coverUrl ?? '',
+                path: item.path,
               ))
           .toList();
     } else {

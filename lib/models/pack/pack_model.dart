@@ -11,6 +11,7 @@ class PackModel with _$PackModel {
     required String subtitle,
     required String coverUrl,
     required String path,
+    required String description,
     @Default(false) bool isPublished,
     @Default(<PackItemsModel>[]) List<PackItemsModel> items,
   }) = _PackModel;
