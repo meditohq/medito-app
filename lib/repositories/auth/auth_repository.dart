@@ -199,7 +199,15 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
           }
 
           var clientId = response.user?.userMetadata?['client_id'] as String?;
-          clientId ??= _generateClientId();
+          clientId ??=
+              await getClientIdFromSharedPreference() ?? _generateClientId();
+
+          if (response.user?.userMetadata?['client_id'] == null) {
+            await Supabase.instance.client.auth.updateUser(
+              UserAttributes(data: {'client_id': clientId}),
+            );
+          }
+
           await saveClientIdToSharedPreference(clientId);
 
           return true;
