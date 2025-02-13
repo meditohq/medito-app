@@ -74,6 +74,10 @@ class SettingsScreen extends ConsumerWidget {
     final authRepository = ref.watch(authRepositoryProvider);
     final user = authRepository.currentUser;
 
+    ref.listen(authRepositoryProvider, (previous, next) {
+      // No need to do anything here, just listening for changes
+    });
+
     final List<SettingsItem> settingsItems = [
       SettingsItem(
         type: 'account',

@@ -56,6 +56,7 @@ class UserProfilePage extends ConsumerWidget {
                       await StatsManager().clearAllStats();
                       ref.read(statsProvider.notifier).refresh();
                       ref.invalidate(packProvider);
+                      ref.invalidate(authRepositoryProvider);
 
                       Navigator.of(context).pop(true);
                       ScaffoldMessenger.of(context).showSnackBar(

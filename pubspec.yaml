@@ -17,7 +17,6 @@ dependencies:
   audio_service: ^0.18.15
   cached_network_image: ^3.2.3
   device_info_plus: ^10.1.2
-  dio: ^5.4.0
   email_validator: ^3.0.0
   equatable: ^2.0.5
   firebase_core: ^3.10.1
