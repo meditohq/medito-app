@@ -39,22 +39,35 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   @override
   Future<List<BackgroundSoundsModel>> fetchBackgroundSounds() async {
     var response = await client.getRequest(HTTPConstants.backgroundSounds);
-    var tempResponse = response as List;
-    var bgSoundList = <BackgroundSoundsModel>[];
+    debugPrint('Background sounds response: $response');
 
-    const noneBgSound = BackgroundSoundsModel(
-      id: '0',
-      title: StringConstants.none,
-      duration: 0,
-      path: '',
-    );
-    bgSoundList.add(noneBgSound);
+    List<dynamic> rawList = [];
+    if (response is Map<String, dynamic>) {
+      if (response['results'] is List) {
+        rawList = response['results'] as List<dynamic>;
+      }
+    }
+    debugPrint('Parsed raw list: $rawList');
 
-    var parsedResponseList =
-        tempResponse.map((x) => BackgroundSoundsModel.fromJson(x)).toList();
-    bgSoundList.addAll(parsedResponseList);
+    final sounds = [
+      const BackgroundSoundsModel(
+        id: '0',
+        title: StringConstants.none,
+        duration: 0,
+        path: '',
+      ),
+      ...rawList.map((item) {
+        final map = Map<String, dynamic>.fromEntries(
+            (item as Map<dynamic, dynamic>)
+                .entries
+                .map((e) => MapEntry(e.key.toString(), e.value)));
+        return BackgroundSoundsModel.fromJson(map);
+      })
+    ];
 
-    return bgSoundList;
+    debugPrint('Final sounds list: $sounds');
+    
+    return sounds;
   }
 
   @override

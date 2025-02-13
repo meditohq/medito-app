@@ -29,7 +29,7 @@ Future<List<BackgroundSoundsModel>> backgroundSounds(Ref ref) {
 
 @riverpod
 Future<List<BackgroundSoundsModel>?> fetchLocallySavedBackgroundSounds(
-  FetchLocallySavedBackgroundSoundsRef ref,
+  Ref ref,
 ) {
   final backgroundSoundsRepository =
       ref.watch(backgroundSoundsRepositoryProvider);
