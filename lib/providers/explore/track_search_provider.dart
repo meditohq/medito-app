@@ -20,7 +20,7 @@ final explorePacksProvider =
             title: pack.title,
             subtitle: pack.subtitle ?? '',
             coverUrl: pack.coverUrl ?? '',
-            path: pack.path,
+            path: pack.path ?? '',
           ))
       .toList();
 });

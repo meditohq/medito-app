@@ -10,7 +10,7 @@ class PackModel with _$PackModel {
     required String title,
     String? subtitle,
     String? coverUrl,
-    required String path,
+    String? path,
     String? description,
     @Default(false) bool isPublished,
     @Default(<PackItemsModel>[]) List<PackItemsModel> items,

@@ -30,7 +30,7 @@ class PackRepositoryImpl extends PacksRepository {
     // Handle different response structures
     dynamic responseData = response;
     responseData = response['data'] ?? response['results'] ?? response;
-  
+
     // Verify final data format
     if (responseData is! List) {
       throw FormatException(
