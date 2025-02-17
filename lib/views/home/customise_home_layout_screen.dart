@@ -15,6 +15,7 @@ class CustomiseHomeLayoutScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: ColorConstants.ebony,
         elevation: 0,
       ),

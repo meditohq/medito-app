@@ -12,7 +12,6 @@ import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
-import 'widgets/bottom_sheet/customise_home_layout_bottom_sheet.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});

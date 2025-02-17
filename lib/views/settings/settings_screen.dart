@@ -11,7 +11,6 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/views/home/widgets/bottom_sheet/customise_home_layout_bottom_sheet.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
@@ -216,23 +215,19 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             _buildDailyNotificationTile(context, ref),
             if (_isHealthSyncAvailable) const HealthSyncTile(),
-
             _buildSectionTitle(context, StringConstants.account),
             ..._getItemsBySection(settingsItems, StringConstants.account)
                 .map((item) => _buildMenuItemTile(context, ref, item)),
-
             _buildSectionTitle(context, StringConstants.supportCommunity),
-            ..._getItemsBySection(settingsItems, StringConstants.supportCommunity)
+            ..._getItemsBySection(
+                    settingsItems, StringConstants.supportCommunity)
                 .map((item) => _buildMenuItemTile(context, ref, item)),
-
             _buildSectionTitle(context, StringConstants.appearance),
             ..._getItemsBySection(settingsItems, StringConstants.appearance)
                 .map((item) => _buildMenuItemTile(context, ref, item)),
-
             _buildSectionTitle(context, StringConstants.helpLegal),
             ..._getItemsBySection(settingsItems, StringConstants.helpLegal)
                 .map((item) => _buildMenuItemTile(context, ref, item)),
-
             _buildSectionTitle(context, StringConstants.advanced),
             _buildDebugTile(context, ref),
           ],
@@ -397,7 +392,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  List<SettingsItem> _getItemsBySection(List<SettingsItem> items, String section) {
+  List<SettingsItem> _getItemsBySection(
+      List<SettingsItem> items, String section) {
     return items.where((item) => item.section == section).toList();
   }
 
@@ -407,9 +403,9 @@ class SettingsScreen extends ConsumerWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: ColorConstants.white,
-          fontWeight: FontWeight.w600,
-        ),
+              color: ColorConstants.white,
+              fontWeight: FontWeight.w600,
+            ),
       ),
     );
   }
