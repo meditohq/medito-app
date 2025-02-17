@@ -17,6 +17,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
@@ -225,7 +226,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _onAppForegrounded() {
-    ref.read(reminderProvider).clearBadge();
+    ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
     ref.read(pathNotifierProvider.notifier).syncPendingUpdates();
   }

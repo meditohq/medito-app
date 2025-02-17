@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/firebase_options.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -15,21 +17,24 @@ import '../../routes/routes.dart';
 import '../../views/bottom_navigation/bottom_navigation_bar_view.dart';
 
 final firebaseMessagingProvider = Provider<FirebaseMessagingHandler>((ref) {
-  return FirebaseMessagingHandler();
+  return FirebaseMessagingHandler(ref);
 });
 
 class FirebaseMessagingHandler {
+  final Ref ref;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  FirebaseMessagingHandler(this.ref);
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     try {
       _configureFirebaseMessaging(context, ref);
       _initializeLocalNotifications(context, ref);
     } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }  
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -67,11 +72,11 @@ class FirebaseMessagingHandler {
     );
   }
 
-  void _handleForegroundMessage(
+  Future<void> _handleForegroundMessage(
     RemoteMessage message,
     BuildContext context,
     WidgetRef ref,
-  ) {
+  ) async {
     final snackBar = SnackBar(
       content: Text(message.notification?.body ?? 'New message'),
       action: SnackBarAction(
@@ -83,6 +88,7 @@ class FirebaseMessagingHandler {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    await ref.read(reminderProvider).clearBadge();
   }
 
   Future<void> _showBackgroundNotification(RemoteMessage message) async {
@@ -102,14 +108,30 @@ class FirebaseMessagingHandler {
       platformChannelSpecifics,
       payload: json.encode(message.data),
     );
+
+    if (Platform.isIOS) {
+      const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
+        badgeNumber: 0,
+        presentAlert: false,
+        presentBadge: false,
+        presentSound: false,
+      );
+      await _flutterLocalNotificationsPlugin.show(
+        0,
+        null,
+        null,
+        const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+      );
+    }
   }
 
-  void _handleMessageOpenedApp(
+  Future<void> _handleMessageOpenedApp(
     RemoteMessage message,
     BuildContext context,
     WidgetRef ref,
-  ) {
+  ) async {
     _navigate(context, ref, message.data);
+    await ref.read(reminderProvider).clearBadge();
   }
 
   void _navigate(
@@ -143,6 +165,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
-  final handler = FirebaseMessagingHandler();
+  final container = ProviderContainer();
+  final handler = container.read(firebaseMessagingProvider);
   await handler._showBackgroundNotification(message);
 }
