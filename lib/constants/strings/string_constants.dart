@@ -352,7 +352,7 @@ class StringConstants {
   static const errorNotFound = 'Resource not found';
 
   static const String shortcutsTitle = 'Shortcuts';
-  static const String carouselTitle = 'Carousel';
+  static const String carouselTitle = 'Featured';
   static const String quoteTitle = 'Daily Quote';
 
   static const String customiseHomeLayout = 'Organise Home Layout';
