@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
+import 'widgets/bottom_sheet/customise_home_layout_bottom_sheet.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -20,9 +22,7 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView>
-    with
-        AutomaticKeepAliveClientMixin,
-        WidgetsBindingObserver {
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -51,6 +51,8 @@ class _HomeViewState extends ConsumerState<HomeView>
         );
       },
       data: (HomeModel homeData) {
+        final widgetOrder = ref.watch(homeWidgetOrderProvider);
+
         return Scaffold(
           appBar: AppBar(
             toolbarHeight: 56.0,
@@ -67,15 +69,30 @@ class _HomeViewState extends ConsumerState<HomeView>
                 parent: BouncingScrollPhysics(),
               ),
               child: Column(
+                spacing: 20,
                 children: [
                   _getAnnouncementBanner(),
-                  height20,
-                  ShortcutsItemsWidget(data: homeData.shortcuts),
-                  height20,
-                  CarouselWidget(carouselItems: homeData.carousel),
-                  height20,
-                  QuoteWidget(data: homeData.todayQuote),
-                  height20,
+                  ...widgetOrder.map((type) {
+                    switch (type) {
+                      case 'shortcuts':
+                        return ShortcutsItemsWidget(
+                          key: const ValueKey('shortcuts'),
+                          data: homeData.shortcuts,
+                        );
+                      case 'carousel':
+                        return CarouselWidget(
+                          key: const ValueKey('carousel'),
+                          carouselItems: homeData.carousel,
+                        );
+                      case 'quote':
+                        return QuoteWidget(
+                          key: const ValueKey('quote'),
+                          data: homeData.todayQuote,
+                        );
+                      default:
+                        return const SizedBox.shrink();
+                    }
+                  }).toList(),
                 ],
               ),
             ),
@@ -92,7 +109,9 @@ class _HomeViewState extends ConsumerState<HomeView>
       loading: () => Container(),
       error: (err, stack) => Container(),
       data: (announcement) {
-        if (announcement == null || announcement.text == null || announcement.text == '') {
+        if (announcement == null ||
+            announcement.text == null ||
+            announcement.text == '') {
           return Container();
         }
 

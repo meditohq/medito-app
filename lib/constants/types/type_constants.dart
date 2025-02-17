@@ -12,6 +12,8 @@ class TypeConstants {
   static const String durationIdKey = 'duration';
   static const String account = 'account';
   static const String downloads = 'downloads';
+  static const String customiseHomeLayout = 'customise_home_layout';
+  static const String route = 'route';
 
   // New constants for path view
   static const String article = 'article';

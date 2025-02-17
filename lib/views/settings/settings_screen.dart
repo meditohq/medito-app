@@ -11,6 +11,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/views/home/widgets/bottom_sheet/customise_home_layout_bottom_sheet.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
@@ -49,12 +50,14 @@ final bearerTokenProvider = FutureProvider<String>((ref) async {
 });
 
 class SettingsItem {
+  final String section;
   final String type;
   final String title;
   final Widget icon;
   final String path;
 
   const SettingsItem({
+    required this.section,
     required this.type,
     required this.title,
     required this.icon,
@@ -80,6 +83,7 @@ class SettingsScreen extends ConsumerWidget {
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
+        section: StringConstants.account,
         type: 'account',
         title: user?.email != null && user?.email != ''
             ? StringConstants.accountTitle
@@ -90,6 +94,7 @@ class SettingsScreen extends ConsumerWidget {
         path: 'account',
       ),
       SettingsItem(
+        section: StringConstants.supportCommunity,
         type: 'url',
         title: StringConstants.donateTitle,
         icon: HugeIcon(
@@ -97,6 +102,7 @@ class SettingsScreen extends ConsumerWidget {
         path: 'https://donate.meditofoundation.org',
       ),
       SettingsItem(
+        section: StringConstants.helpLegal,
         type: 'url',
         title: StringConstants.faqTitle,
         icon: HugeIcon(
@@ -105,6 +111,7 @@ class SettingsScreen extends ConsumerWidget {
             'https://medito.notion.site/FAQ-3edb3f0a4b984c069b9c401308d874bc?pvs=4',
       ),
       SettingsItem(
+        section: StringConstants.helpLegal,
         type: 'url',
         title: StringConstants.editStatsTitle,
         icon: HugeIcon(
@@ -114,6 +121,7 @@ class SettingsScreen extends ConsumerWidget {
         path: ref.watch(editStatsUrlProvider),
       ),
       SettingsItem(
+        section: StringConstants.supportCommunity,
         type: 'url',
         title: StringConstants.telegramTitle,
         icon: HugeIcon(
@@ -121,6 +129,7 @@ class SettingsScreen extends ConsumerWidget {
         path: 'https://t.me/meditoapp',
       ),
       SettingsItem(
+        section: StringConstants.helpLegal,
         type: 'url',
         title: StringConstants.contactUsTitle,
         icon: HugeIcon(
@@ -144,6 +153,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       SettingsItem(
+        section: StringConstants.helpLegal,
         type: 'url',
         title: StringConstants.termsOfService,
         icon: HugeIcon(
@@ -152,11 +162,22 @@ class SettingsScreen extends ConsumerWidget {
         path: 'https://meditofoundation.org/terms-of-service',
       ),
       SettingsItem(
+        section: StringConstants.helpLegal,
         type: 'url',
         title: StringConstants.privacyPolicy,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedShield01, color: ColorConstants.white),
         path: 'https://meditofoundation.org/privacy',
+      ),
+      SettingsItem(
+        section: StringConstants.appearance,
+        type: TypeConstants.route,
+        title: StringConstants.customiseHomeLayout,
+        icon: HugeIcon(
+          icon: HugeIcons.solidSharpEdit02,
+          color: ColorConstants.white,
+        ),
+        path: TypeConstants.customiseHomeLayout,
       ),
     ];
 
@@ -195,8 +216,24 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             _buildDailyNotificationTile(context, ref),
             if (_isHealthSyncAvailable) const HealthSyncTile(),
-            ...settingsItems
+
+            _buildSectionTitle(context, StringConstants.account),
+            ..._getItemsBySection(settingsItems, StringConstants.account)
                 .map((item) => _buildMenuItemTile(context, ref, item)),
+
+            _buildSectionTitle(context, StringConstants.supportCommunity),
+            ..._getItemsBySection(settingsItems, StringConstants.supportCommunity)
+                .map((item) => _buildMenuItemTile(context, ref, item)),
+
+            _buildSectionTitle(context, StringConstants.appearance),
+            ..._getItemsBySection(settingsItems, StringConstants.appearance)
+                .map((item) => _buildMenuItemTile(context, ref, item)),
+
+            _buildSectionTitle(context, StringConstants.helpLegal),
+            ..._getItemsBySection(settingsItems, StringConstants.helpLegal)
+                .map((item) => _buildMenuItemTile(context, ref, item)),
+
+            _buildSectionTitle(context, StringConstants.advanced),
             _buildDebugTile(context, ref),
           ],
         ),
@@ -357,6 +394,23 @@ class SettingsScreen extends ConsumerWidget {
       ),
       context: context,
       builder: (context) => const DebugBottomSheetWidget(),
+    );
+  }
+
+  List<SettingsItem> _getItemsBySection(List<SettingsItem> items, String section) {
+    return items.where((item) => item.section == section).toList();
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: ColorConstants.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

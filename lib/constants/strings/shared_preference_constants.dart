@@ -16,4 +16,6 @@ class SharedPreferenceConstants {
 
   // New constants for stats
   static const String localAllStatsKey = 'local_all_stats';
+
+  static const String homeWidgetOrder = 'homeWidgetOrder';
 }

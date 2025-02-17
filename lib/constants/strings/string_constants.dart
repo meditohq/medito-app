@@ -350,4 +350,18 @@ class StringConstants {
   static const String proceed = 'Proceed';
 
   static const errorNotFound = 'Resource not found';
+
+  static const String shortcutsTitle = 'Shortcuts';
+  static const String carouselTitle = 'Carousel';
+  static const String quoteTitle = 'Daily Quote';
+
+  static const String customiseHomeLayout = 'Organise Home Layout';
+
+  // Section Titles
+  static const featuresIntegrations = 'Features & Integrations';
+  static const account = 'Account';
+  static const supportCommunity = 'Support & Community';
+  static const helpLegal = 'Help & Legal';
+  static const appearance = 'Appearance';
+  static const advanced = 'Advanced';
 }

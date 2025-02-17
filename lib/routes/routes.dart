@@ -12,6 +12,7 @@ import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:medito/views/home/customise_home_layout_screen.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -69,6 +70,9 @@ Future<void> handleNavigation(
           initialText: content,
         ),
         ref);
+  } else if (type == TypeConstants.route &&
+      ids.contains(TypeConstants.customiseHomeLayout)) {
+    await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   }
 }
 
