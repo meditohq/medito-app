@@ -53,16 +53,13 @@ class BottomActionBar extends StatelessWidget {
 
       case BottomActionBarLayout.homePage:
         return [
-          const Spacer(),
           _buildItem(leftItem),
-          const Spacer(),
+          _buildItem(leftCenterItem),
           _buildItem(rightCenterItem),
-          const Spacer(),
           _buildItem(rightItem),
-          const Spacer(),
         ];
-        
-         case BottomActionBarLayout.evenlySpaced:
+
+      case BottomActionBarLayout.evenlySpaced:
         return [
           _buildItem(leftItem),
           _buildItem(leftCenterItem),
@@ -92,7 +89,8 @@ class BottomActionBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
-          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced
+          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced ||
+                  layout == BottomActionBarLayout.homePage
               ? MainAxisAlignment.spaceEvenly
               : MainAxisAlignment.start,
           children: _buildLayoutChildren(),

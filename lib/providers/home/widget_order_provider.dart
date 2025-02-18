@@ -11,7 +11,7 @@ class HomeWidgetOrderNotifier extends Notifier<List<String>> {
   @override
   List<String> build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    return prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder) ?? 
+    return prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder) ??
         const ['shortcuts', 'carousel', 'quote'];
   }
 

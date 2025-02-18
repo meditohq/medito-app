@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../controllers/path_notifier.dart';
 import '../../constants/strings/string_constants.dart';
 
 class JournalEntryView extends ConsumerStatefulWidget {
@@ -69,20 +68,7 @@ class JournalEntryViewState extends ConsumerState<JournalEntryView> {
       _isSaving = true;
     });
 
-    var entryText = _controller.text;
-    await ref.read(pathNotifierProvider.notifier).updateJournalEntry(
-          widget.taskId,
-          entryText,
-          entryText.isNotEmpty,
-        );
-
-    if (entryText.isNotEmpty) {
-      await ref.read(pathNotifierProvider.notifier).updateTaskCompletion(
-            widget.taskId,
-            true,
-          );
-    }
-
+   
     setState(() {
       _isSaving = false;
     });

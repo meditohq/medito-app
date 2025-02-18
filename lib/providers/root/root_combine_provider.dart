@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:medito/models/path/path_result.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,7 +11,6 @@ import '../../constants/types/type_constants.dart';
 import '../../utils/stats_updater.dart';
 import '../../views/maintenance/maintenance_view.dart';
 import '../maintenance/maintenance_provider.dart';
-import '../../controllers/path_notifier.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
@@ -38,9 +36,6 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
           };
 
           await handleStats(payload);
-
-          // Update path task completion if this track is part of a path
-          await _updatePathTaskIfNeeded(ref, trackId);
         }
       });
     }
@@ -74,22 +69,4 @@ void checkMaintenance(Ref<void> ref, BuildContext context) {
       );
     },
   );
-}
-
-Future<void> _updatePathTaskIfNeeded(Ref ref, String trackId) async {
-  final pathState = ref.read(pathNotifierProvider);
-
-  if (pathState is AsyncData<List<JourneyStep>>) {
-    for (final step in pathState.value) {
-      for (final task in step.tasks) {
-        final taskData = task.data;
-        if (task.type == TaskType.track && taskData.id == trackId) {
-          await ref
-              .read(pathNotifierProvider.notifier)
-              .updateTaskCompletion(task.id, true);
-          break;
-        }
-      }
-    }
-  }
 }

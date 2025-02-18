@@ -71,7 +71,6 @@ class HTTPConstants {
   static const String allStats = 'stats';
   static const String me = 'me';
   static const String searchTracks = 'search/tracks';
-  static const String journeys = 'journeys';
 
   // MAINTENANCE END POINTS
   static String maintenance = '${contentBaseUrl}maintenance';

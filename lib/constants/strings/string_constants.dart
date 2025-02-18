@@ -126,7 +126,7 @@ class StringConstants {
   static const String totalTimeListened = 'Total Time Listened';
   static const String days = 'days';
   static const String hours = 'h';
-  static const String minutes = 'min';
+  static const String minutes = 'minutes';
 
   static const String signUpLogInTitle = 'Sign in to Medito';
   static const String createAccountTitle = 'Create account';

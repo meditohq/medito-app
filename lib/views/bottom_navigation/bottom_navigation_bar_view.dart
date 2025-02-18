@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
   const BottomNavigationBarView({super.key});
@@ -53,15 +54,15 @@ class _BottomNavigationBarViewState
         bottomNavigationBar: BottomActionBar(
           layout: BottomActionBarLayout.homePage,
           leftItem: BottomActionBarItem(
-            child: MeditoHugeIcon(
-              icon: _currentPageIndex == 0 ? 'filledhome' : 'duohome',
-              color: _currentPageIndex == 0
-                  ? ColorConstants.lightPurple
+            child: HugeIcon(
+              icon: HugeIcons.solidRoundedHome01,
+              color: _currentPageIndex == 0 
+                  ? ColorConstants.lightPurple 
                   : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(0),
           ),
-          rightCenterItem: BottomActionBarItem(
+          leftCenterItem: BottomActionBarItem(
             child: GestureDetector(
               onDoubleTap: () {
                 if (_currentPageIndex == 1) {
@@ -73,29 +74,29 @@ class _BottomNavigationBarViewState
                   });
                 }
               },
-              child: MeditoHugeIcon(
-                icon: _currentPageIndex == 1 ? 'filledSearch' : 'duoSearch',
-                color: _currentPageIndex == 1
-                    ? ColorConstants.lightPurple
+              child: HugeIcon(
+                icon: HugeIcons.solidRoundedSearch01,
+                color: _currentPageIndex == 1 
+                    ? ColorConstants.lightPurple 
                     : ColorConstants.white,
               ),
             ),
             onTap: () => _onDestinationSelected(1),
           ),
-          // rightCenterItem: BottomActionBarItem(
-          //   child: MeditoHugeIcon(
-          //     icon: _currentPageIndex == 2 ? 'filledSettings' : 'duoSettings',
-          //     color: _currentPageIndex == 2
-          //         ? ColorConstants.lightPurple
-          //         : ColorConstants.white,
-          //   ),
-          //   onTap: () => _onDestinationSelected(2),
-          // ),
+          rightCenterItem: BottomActionBarItem(
+            child: HugeIcon(
+              icon: HugeIcons.solidRoundedRoad02,
+              color: _currentPageIndex == 2 
+                  ? ColorConstants.lightPurple 
+                  : ColorConstants.white,
+            ),
+            onTap: () => _onDestinationSelected(2),
+          ),
           rightItem: BottomActionBarItem(
-            child: MeditoHugeIcon(
-              icon: _currentPageIndex == 3 ? 'filledSettings' : 'duoSettings',
-              color: _currentPageIndex == 3
-                  ? ColorConstants.lightPurple
+            child: HugeIcon(
+              icon: HugeIcons.solidRoundedSettings01,
+              color: _currentPageIndex == 3 
+                  ? ColorConstants.lightPurple 
                   : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(3),
