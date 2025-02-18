@@ -56,8 +56,8 @@ class _BottomNavigationBarViewState
           leftItem: BottomActionBarItem(
             child: HugeIcon(
               icon: HugeIcons.solidRoundedHome01,
-              color: _currentPageIndex == 0 
-                  ? ColorConstants.lightPurple 
+              color: _currentPageIndex == 0
+                  ? ColorConstants.lightPurple
                   : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(0),
@@ -76,8 +76,8 @@ class _BottomNavigationBarViewState
               },
               child: HugeIcon(
                 icon: HugeIcons.solidRoundedSearch01,
-                color: _currentPageIndex == 1 
-                    ? ColorConstants.lightPurple 
+                color: _currentPageIndex == 1
+                    ? ColorConstants.lightPurple
                     : ColorConstants.white,
               ),
             ),
@@ -86,8 +86,8 @@ class _BottomNavigationBarViewState
           rightCenterItem: BottomActionBarItem(
             child: HugeIcon(
               icon: HugeIcons.solidRoundedRoad02,
-              color: _currentPageIndex == 2 
-                  ? ColorConstants.lightPurple 
+              color: _currentPageIndex == 2
+                  ? ColorConstants.lightPurple
                   : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(2),
@@ -95,8 +95,8 @@ class _BottomNavigationBarViewState
           rightItem: BottomActionBarItem(
             child: HugeIcon(
               icon: HugeIcons.solidRoundedSettings01,
-              color: _currentPageIndex == 3 
-                  ? ColorConstants.lightPurple 
+              color: _currentPageIndex == 3
+                  ? ColorConstants.lightPurple
                   : ColorConstants.white,
             ),
             onTap: () => _onDestinationSelected(3),
