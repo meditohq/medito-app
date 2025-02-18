@@ -73,7 +73,17 @@ class _JourneyViewState extends ConsumerState<JourneyView>
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _TrackItem(item: pack.items[index]),
+                (context, index) {
+                  final firstUncompletedIndex = pack.items.indexWhere(
+                    (item) => !(item.isCompleted ?? false),
+                  );
+
+                  return _TrackItem(
+                    item: pack.items[index],
+                    index: index,
+                    isFirstUncompleted: index == firstUncompletedIndex,
+                  );
+                },
                 childCount: pack.items.length,
               ),
             ),
@@ -91,29 +101,58 @@ class _JourneyViewState extends ConsumerState<JourneyView>
 
 class _TrackItem extends ConsumerWidget {
   final PackItemsModel item;
+  final int index;
+  final bool isFirstUncompleted;
 
-  const _TrackItem({required this.item});
+  const _TrackItem({
+    required this.item,
+    required this.index,
+    required this.isFirstUncompleted,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        ListTile(
-          leading: HugeIcon(
-            icon: HugeIcons.strokeRoundedHeadphones,
-            color: ColorConstants.white,
+    final isCompleted = item.isCompleted ?? false;
+    final backgroundColor = isCompleted
+        ? ColorConstants.lightPurple
+        : isFirstUncompleted
+            ? ColorConstants.amber
+            : Colors.grey[800];
+    final textColor =
+        isCompleted || isFirstUncompleted ? Colors.white : Colors.grey;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Card(
+        color: backgroundColor,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: isFirstUncompleted
+              ? const BorderSide(color: ColorConstants.white, width: 0.5)
+              : BorderSide.none,
+        ),
+        child: ListTile(
+          title: Text(
+            item.title,
+            style: TextStyle(
+              color: textColor,
+              fontWeight:
+                  isFirstUncompleted ? FontWeight.bold : FontWeight.normal,
+              fontSize: isFirstUncompleted ? 16 : 14,
+            ),
           ),
-          title: Text(item.title),
-          trailing: item.isCompleted ?? false
+          trailing: isCompleted
               ? HugeIcon(
-                  icon: HugeIcons.solidSharpCheckmarkCircle02,
-                  color: Colors.green,
+                  icon: HugeIcons.strokeStandardTick02,
+                  color: Colors.white,
                 )
               : null,
-          onTap: () => handleNavigation('track', [item.id], context, ref: ref),
+          onTap: isCompleted || isFirstUncompleted
+              ? () => handleNavigation('track', [item.id], context, ref: ref)
+              : null,
         ),
-        const Divider(height: 1, color: Colors.grey),
-      ],
+      ),
     );
   }
 }

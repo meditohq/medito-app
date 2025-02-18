@@ -14,6 +14,7 @@ class ColorConstants {
   static const moon = Color(0xFF4F4F66);
 
   static const lightPurple = Color(0xFF917DF0);
+  static const amber = Color(0xffef5e55);
   static const amsterdamSummer = Color(0xFF211F26);
   static const onyx = Color(0xFF2A2A32);
   static const brightSky = Color(0xFFD4EDF7);
