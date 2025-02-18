@@ -93,7 +93,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
       '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
-
   Future<void> seekToPosition(int position) async {
     if (Platform.isAndroid) {
       await _api.seekToPosition(position);
@@ -148,6 +147,12 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         iosAudioHandler.play();
       }
     }
+  }
+
+  void cacheTrackData(
+      {required TrackModel track, required TrackFilesModel file}) {
+    if (state?.id == track.id) return;
+    state = track.customCopyWith()..audio = [track.audio.first];
   }
 }
 
