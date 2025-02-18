@@ -11,15 +11,13 @@ class HomeWidgetOrderNotifier extends Notifier<List<String>> {
   @override
   List<String> build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    final order =
-        prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder);
-    return order ?? ['shortcuts', 'carousel', 'quote'];
+    return prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder) ?? 
+        const ['shortcuts', 'carousel', 'quote'];
   }
 
   Future<void> updateOrder(List<String> newOrder) async {
-    state = newOrder;
+    state = [...newOrder];
     await _saveOrderToPrefs(newOrder);
-    ref.invalidate(homeWidgetOrderProvider);
   }
 
   Future<void> _saveOrderToPrefs(List<String> order) async {
