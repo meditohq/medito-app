@@ -7,7 +7,6 @@ import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
   const BottomNavigationBarView({super.key});
