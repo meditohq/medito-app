@@ -65,7 +65,8 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
               visible: MediaQuery.of(context).size.height > 500 &&
                   MediaQuery.of(context).orientation == Orientation.portrait,
               child: SizedBox(
-                height: 300,
+                height: MediaQuery.of(context).size.height * 0.3,
+                width: double.infinity,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   transitionBuilder:
@@ -85,7 +86,7 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
               ),
             ),
             const SizedBox(
-              height: 50,
+              height: 24,
             ),
             Expanded(
               child: PageView.builder(

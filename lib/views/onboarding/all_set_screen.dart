@@ -49,7 +49,7 @@ class AllSetScreen extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: ColorConstants.lightPurple,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

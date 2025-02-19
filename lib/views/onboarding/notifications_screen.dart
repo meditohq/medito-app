@@ -23,111 +23,67 @@ class NotificationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Stack(
-              children: [
-                SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: screenHeight < 700 ? 16 : 32,
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    StringConstants.enableNotificationsTitle,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Image/Content Section
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: screenHeight * 0.5,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                StringConstants.enableNotificationsTitle,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: screenHeight < 700 ? 20 : 24,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                StringConstants.enableNotificationsBody,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: screenHeight < 700 ? 14 : 16,
-                                  height: 1.5,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Buttons Section
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: screenHeight < 700 ? 24 : 32),
-                          child: Column(
-                            children: [
-                              _buildActionButton(
-                                text: StringConstants.enableNotificationsCta,
-                                onPressed: () => _handleNotificationsPermission(
-                                    context, ref),
-                              ),
-                              const SizedBox(height: 12),
-                              SizedBox(
-                                width: double.infinity,
-                                child: TextButton(
-                                  onPressed: () => _navigateNext(context),
-                                  style: TextButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    StringConstants.skipForNow,
-                                    style: const TextStyle(
-                                      color: ColorConstants.lightPurple,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                  child: IgnorePointer(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.transparent, ColorConstants.ebony],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                  const SizedBox(height: 24),
+                  Text(
+                    StringConstants.enableNotificationsBody,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  _buildActionButton(
+                    text: StringConstants.enableNotificationsCta,
+                    onPressed: () =>
+                        _handleNotificationsPermission(context, ref),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => _navigateNext(context),
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        StringConstants.skipForNow,
+                        style: const TextStyle(
+                          color: ColorConstants.lightPurple,
+                          fontSize: 16,
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -142,7 +98,7 @@ class NotificationsScreen extends ConsumerWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: ColorConstants.lightPurple,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
