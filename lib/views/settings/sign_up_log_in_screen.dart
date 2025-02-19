@@ -12,6 +12,8 @@ import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:medito/views/onboarding/notifications_screen.dart';
+import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
@@ -164,9 +166,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const RootPageView(
-              firstChild: BottomNavigationBarView(),
-            ),
+            builder: (context) => const OnboardingPagerScreen(),
           ),
           (route) => false,
         );

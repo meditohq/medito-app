@@ -70,7 +70,6 @@ class StringConstants {
   static const String didYouKnow = 'Did you know?';
   static const String meditoReliesOnYourDonationsToSurvive =
       'Medito relies only on your donations to survive. We produce free content to help humanity.';
-  static const String donateNow = 'Donate now';
   static const String reminderNotificationBody =
       'It\'s time for your daily meditation. Take a moment to relax and focus.';
   static const String reminderNotificationTitle = 'Daily Meditation Reminder';
@@ -364,4 +363,19 @@ class StringConstants {
   static const helpLegal = 'Help & Legal';
   static const appearance = 'Appearance';
   static const advanced = 'Advanced';
+
+  static const enableNotificationsTitle =
+      'Stay on Track with Meditation Reminders';
+  static const enableNotificationsBody =
+      'Enable notifications so you never miss a session.';
+  static const enableNotificationsCta = 'Enable Notifications';
+  static const skipForNow = 'Skip for Now';
+  static const donationTitle = 'Help Keep Medito Free';
+  static const donationBody =
+      'We\'re a nonprofit initiative. If you\'d like to contribute, you can donate any amount—no pressure!';
+  static const donateNow = 'Donate Now';
+  static const next = 'Next';
+  static const remindLater = 'Remind Me Later';
+  static const allSetTitle = 'You\'re All Set!';
+  static const startMeditating = 'Start Meditating';
 }

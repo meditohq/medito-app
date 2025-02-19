@@ -18,7 +18,8 @@ import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medito/views/onboarding/notifications_screen.dart';
+import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
@@ -84,9 +85,7 @@ class SplashViewState extends ConsumerState<SplashView> {
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const RootPageView(
-            firstChild: BottomNavigationBarView(),
-          ),
+          builder: (context) => const OnboardingPagerScreen(),
         ),
       );
     } catch (e) {
@@ -183,7 +182,8 @@ class SplashViewState extends ConsumerState<SplashView> {
                             ),
                           ),
                           child: const Text(
-                              StringConstants.createAccountLogInButtonText),
+                            StringConstants.createAccountLogInButtonText,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
