@@ -60,14 +60,22 @@ class DonationScreen extends StatelessWidget {
                     text: StringConstants.donateNow,
                     onPressed: () => _handleDonationAction(context, true),
                   ),
-                  const SizedBox(height: 24),
-                  TextButton(
-                    onPressed: _handleNextAction,
-                    child: Text(
-                      StringConstants.next,
-                      style: const TextStyle(
-                        color: ColorConstants.lightPurple,
-                        fontSize: 16,
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: _handleNextAction,
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        StringConstants.noThanks,
+                        style: const TextStyle(
+                          color: ColorConstants.lightPurple,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),

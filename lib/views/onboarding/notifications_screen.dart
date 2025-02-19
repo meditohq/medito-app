@@ -61,14 +61,22 @@ class NotificationsScreen extends ConsumerWidget {
                     onPressed: () =>
                         _handleNotificationsPermission(context, ref),
                   ),
-                  const SizedBox(height: 24),
-                  TextButton(
-                    onPressed: () => _navigateNext(context),
-                    child: Text(
-                      StringConstants.skipForNow,
-                      style: const TextStyle(
-                        color: ColorConstants.lightPurple,
-                        fontSize: 16,
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => _navigateNext(context),
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        StringConstants.skipForNow,
+                        style: const TextStyle(
+                          color: ColorConstants.lightPurple,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),

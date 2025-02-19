@@ -372,8 +372,9 @@ class StringConstants {
   static const skipForNow = 'Skip for Now';
   static const donationTitle = 'Help Keep Medito Free';
   static const donationBody =
-      'We\'re a nonprofit initiative. If you\'d like to contribute, you can donate any amount—no pressure!';
+      'We\'re a nonprofit initiative.\n\nWe rely on donations to remain free and ad-free.\n\nIf you\'d like to contribute, you can donate any amount. No pressure!';
   static const donateNow = 'Donate Now';
+  static const noThanks = 'No thanks';
   static const next = 'Next';
   static const remindLater = 'Remind Me Later';
   static const allSetTitle = 'You\'re All Set!';

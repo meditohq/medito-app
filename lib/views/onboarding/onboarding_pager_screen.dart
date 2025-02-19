@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/all_set_screen.dart';
 import 'package:medito/views/onboarding/donation_screen.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
@@ -43,7 +44,13 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
           );
         },
       ),
-      const AllSetScreen(),
+      AllSetScreen(
+        onComplete: () => Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const BottomNavigationBarView(),
+          ),
+        ),
+      ),
     ];
   }
 
@@ -55,13 +62,14 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
         child: Column(
           children: [
             Visibility(
-              visible: MediaQuery.of(context).size.height > 500 && 
-                      MediaQuery.of(context).orientation == Orientation.portrait,
+              visible: MediaQuery.of(context).size.height > 500 &&
+                  MediaQuery.of(context).orientation == Orientation.portrait,
               child: SizedBox(
                 height: 300,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
                     return FadeTransition(
                       opacity: animation,
                       child: child,
