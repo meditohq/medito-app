@@ -23,66 +23,111 @@ class DonationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    StringConstants.donationTitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: screenHeight < 700 ? 16 : 32,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    StringConstants.donationBody,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      height: 1.5,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Content Section
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: screenHeight * 0.5,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                StringConstants.donationTitle,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: screenHeight < 700 ? 20 : 24,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                StringConstants.donationBody,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: screenHeight < 700 ? 14 : 16,
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Buttons Section
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: screenHeight < 700 ? 24 : 32),
+                          child: Column(
+                            children: [
+                              _buildActionButton(
+                                text: StringConstants.donateNow,
+                                onPressed: () =>
+                                    _handleDonationAction(context, true),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                child: TextButton(
+                                  onPressed: _handleNextAction,
+                                  style: TextButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    StringConstants.noThanks,
+                                    style: const TextStyle(
+                                      color: ColorConstants.lightPurple,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ],
-              ),
-              Column(
-                children: [
-                  _buildActionButton(
-                    text: StringConstants.donateNow,
-                    onPressed: () => _handleDonationAction(context, true),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextButton(
-                      onPressed: _handleNextAction,
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 100,
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.transparent, ColorConstants.ebony],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
                       ),
-                      child: Text(
-                        StringConstants.noThanks,
-                        style: const TextStyle(
-                          color: ColorConstants.lightPurple,
-                          fontSize: 16,
-                        ),
-                      ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

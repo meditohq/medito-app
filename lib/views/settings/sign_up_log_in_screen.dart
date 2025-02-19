@@ -10,15 +10,11 @@ import 'package:email_validator/email_validator.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
-import 'package:medito/views/root/root_page_view.dart';
-import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
-import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
 import '../../services/network/http_api_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
   const SignUpLogInPage({super.key});
