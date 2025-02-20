@@ -6,9 +6,9 @@ part 'me_model.g.dart';
 @freezed
 abstract class MeModel with _$MeModel {
   const factory MeModel({
-    required String id,
-    required bool isMonthlyDonor,
     String? email,
+    required String id,
+    @Default(false) bool isMonthlyDonor,
   }) = _MeModel;
 
   factory MeModel.fromJson(Map<String, Object?> json) =>

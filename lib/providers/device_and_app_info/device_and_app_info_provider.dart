@@ -81,7 +81,7 @@ Future<String> _formatString(
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
   var env = '${StringConstants.env}: $isProdString';
   var id = '${StringConstants.id}: ${me?.id ?? ''}';
-  var clientId = '${StringConstants.id} from sp: $clientIdFromSupabase';
+  var clientId = '${StringConstants.id} from SB: $clientIdFromSupabase';
   var email = '${StringConstants.email}: ${emailAddress ?? ''}';
   var appVersion =
       '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
