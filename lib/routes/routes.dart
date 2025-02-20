@@ -58,7 +58,7 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    _pushRoute(const SignUpLogInPage(), ref);
+    _pushRoute(const SignUpLogInPage(fromSettings: true), ref);
   } else if (type == TypeConstants.journalEntry) {
     var id = ids.first ?? '';
     var content = ids.length > 1 ? ids[1] ?? '' : '';

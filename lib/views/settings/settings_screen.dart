@@ -84,7 +84,7 @@ class SettingsScreen extends ConsumerWidget {
     final List<SettingsItem> settingsItems = [
       SettingsItem(
         section: StringConstants.account,
-        type: 'account',
+        type: TypeConstants.account,
         title: user?.email != null && user?.email != ''
             ? StringConstants.accountTitle
             : 'Sign in/Sign up',

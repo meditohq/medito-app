@@ -17,7 +17,12 @@ import '../../providers/pack/pack_provider.dart';
 import '../../services/network/http_api_service.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
-  const SignUpLogInPage({super.key});
+  const SignUpLogInPage({
+    super.key,
+    this.fromSettings = false,
+  });
+
+  final bool fromSettings;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,13 +32,18 @@ class SignUpLogInPage extends ConsumerWidget {
     if (user?.email != null && user?.email?.isNotEmpty == true) {
       return const UserProfilePage();
     } else {
-      return const SignUpLogInForm();
+      return SignUpLogInForm(fromSettings: fromSettings);
     }
   }
 }
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
-  const SignUpLogInForm({super.key});
+  const SignUpLogInForm({
+    super.key,
+    required this.fromSettings,
+  });
+
+  final bool fromSettings;
 
   @override
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();
@@ -155,17 +165,17 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         ref.invalidate(packProvider);
 
         if (!mounted) return;
-        showSnackBar(context, StringConstants.signInSuccess);
-        ref.invalidate(meProvider);
 
-        HttpApiService().initializeAuth();
-
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => const OnboardingPagerScreen(),
-          ),
-          (route) => false,
-        );
+        if (widget.fromSettings) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const OnboardingPagerScreen(),
+            ),
+            (route) => false,
+          );
+        }
       } else {
         showSnackBar(context, 'Authentication failed');
       }
