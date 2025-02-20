@@ -329,7 +329,7 @@ class StringConstants {
 
   static const noConnection = 'No connection';
 
-  static const continueAsGuest = 'Skip';
+  static const continueAsGuest = 'Continue';
 
   // For logging on debug bottomsheet
   static const isMonthlyDonor = 'Donor';
