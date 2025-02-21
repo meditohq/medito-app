@@ -55,7 +55,7 @@ class BottomActionBar extends StatelessWidget {
         return [
           _buildItem(leftItem),
           _buildItem(leftCenterItem),
-          _buildItem(rightCenterItem),
+          // _buildItem(rightCenterItem),
           _buildItem(rightItem),
         ];
 
