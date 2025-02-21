@@ -120,31 +120,33 @@ class _DonationScreenState extends ConsumerState<DonationScreen>
                 children: [
                   _buildActionButton(
                     text: isDonor
-                        ? StringConstants.donationVisitFoundation
+                        ? StringConstants.donationContinue
                         : StringConstants.donateNow,
-                    onPressed: () => _handleDonationAction(context, true),
+                    onPressed: isDonor
+                        ? _handleNextAction
+                        : () => _handleDonationAction(context, true),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextButton(
-                      onPressed: _handleNextAction,
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  if (!isDonor) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: _handleNextAction,
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        isDonor
-                            ? StringConstants.donationContinue
-                            : StringConstants.noThanks,
-                        style: const TextStyle(
-                          color: ColorConstants.lightPurple,
-                          fontSize: 16,
+                        child: Text(
+                          StringConstants.noThanks,
+                          style: const TextStyle(
+                            color: ColorConstants.lightPurple,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ],
