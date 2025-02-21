@@ -77,12 +77,9 @@ Future<String> _formatString(
   String? emailAddress,
   Ref ref,
 ) async {
-  var clientIdFromSupabase = await ref.read(userIdProvider.future);
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
   var env = '${StringConstants.env}: $isProdString';
   var id = '${StringConstants.id}: ${me?.id ?? ''}';
-  var clientId = '${StringConstants.id} from SB: $clientIdFromSupabase';
-  var email = '${StringConstants.email}: ${emailAddress ?? ''}';
   var appVersion =
       '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
   var buildNumber =
@@ -92,9 +89,10 @@ Future<String> _formatString(
       '${StringConstants.deviceModel}: ${deviceInfo?.model ?? ''}';
   var devicePlatform =
       '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
+  var email = '${StringConstants.email}: ${emailAddress ?? ''}';
 
   var formattedString =
-      '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$clientId';
+      '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
 
   if (kDebugMode) {
     var isMonthlyDonorString = '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';

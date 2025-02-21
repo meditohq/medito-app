@@ -336,7 +336,7 @@ class StringConstants {
   static const continueAsGuest = 'Continue';
 
   // For logging on debug bottomsheet
-  static const isMonthlyDonor = 'Donor';
+  static const isMonthlyDonor = 'd';
 
   // OTP Authentication
   static const String otpLabel = 'Enter verification code';
