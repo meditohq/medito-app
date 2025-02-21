@@ -90,8 +90,10 @@ class SplashView extends ConsumerStatefulWidget {
 
 class SplashViewState extends ConsumerState<SplashView> {
   var _showAccountButtons = false;
+  var _isLoading = true;
   final _pageController = PageController();
   var _currentPageIndex = 0;
+  var _isSigningIn = false;
 
   @override
   void initState() {
@@ -120,6 +122,7 @@ class SplashViewState extends ConsumerState<SplashView> {
         if (!mounted) return;
         setState(() {
           _showAccountButtons = true;
+          _isLoading = false;
         });
       }
     } catch (e) {
@@ -137,6 +140,7 @@ class SplashViewState extends ConsumerState<SplashView> {
   }
 
   Future<void> _handleAnonymousSignIn() async {
+    setState(() => _isSigningIn = true);
     var auth = ref.read(authRepositoryProvider);
 
     try {
@@ -161,6 +165,10 @@ class SplashViewState extends ConsumerState<SplashView> {
           builder: (context) => const DownloadsView(),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() => _isSigningIn = false);
+      }
     }
   }
 
@@ -184,7 +192,7 @@ class SplashViewState extends ConsumerState<SplashView> {
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     HeaderService(deviceInfo).initialise();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -195,197 +203,222 @@ class SplashViewState extends ConsumerState<SplashView> {
       },
       child: Scaffold(
         extendBody: true,
-        backgroundColor: Colors.transparent,
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return Stack(
-              children: [
-                Positioned(
-                  bottom: -50,
-                  left: 0,
-                  right: 0,
-                  child: ClipPath(
-                    clipper: TopCurvedClipper(),
-                    child: SizedBox(
-                      height: 400,
-                      child: Image.asset(
-                        AssetConstants.splashBackground,
-                        fit: BoxFit.cover,
-                        alignment: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ),
-                SafeArea(
-                  bottom: false,
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      height: constraints.maxHeight,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16, top: 16),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                SvgPicture.asset(
-                                  AssetConstants.icLogo,
-                                  width: 40,
-                                ),
-                                const SizedBox(width: 16),
-                                const Text(
-                                  StringConstants.appName,
-                                  style: TextStyle(
-                                    color: ColorConstants.white,
-                                    fontSize: 24,
-                                  ),
-                                ),
-                              ],
+        backgroundColor: _isLoading ? ColorConstants.black : Colors.transparent,
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  return Stack(
+                    children: [
+                      Positioned(
+                        bottom: -50,
+                        left: 0,
+                        right: 0,
+                        child: ClipPath(
+                          clipper: TopCurvedClipper(),
+                          child: SizedBox(
+                            height: 400,
+                            child: Image.asset(
+                              AssetConstants.splashBackground,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.bottomCenter,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(32, 40, 32, 0),
+                        ),
+                      ),
+                      SafeArea(
+                        bottom: false,
+                        child: SingleChildScrollView(
+                          child: SizedBox(
+                            height: constraints.maxHeight,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                const Text(
-                                  StringConstants.splashHeadline,
-                                  style: TextStyle(
-                                    color: ColorConstants.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.2,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: _carouselHeight,
-                                  child: Column(
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 16, top: 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      Expanded(
-                                        child: PageView.builder(
-                                          controller: _pageController,
-                                          onPageChanged: (index) => setState(
-                                              () => _currentPageIndex = index),
-                                          itemCount: 3,
-                                          itemBuilder: (context, index) =>
-                                              Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                _getBenefitTitle(index),
-                                                style: const TextStyle(
-                                                  color: ColorConstants.white,
-                                                  fontSize: 28,
-                                                  fontWeight: FontWeight.bold,
-                                                  height: 1.3,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 16),
-                                              Text(
-                                                _getBenefitSubtitle(index),
-                                                style: const TextStyle(
-                                                  color:
-                                                      ColorConstants.graphite,
-                                                  fontSize: 20,
-                                                  height: 1.4,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                      SvgPicture.asset(
+                                        AssetConstants.icLogo,
+                                        width: 40,
                                       ),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: List.generate(
-                                          3,
-                                          (index) => _buildDotIndicator(index),
+                                      const SizedBox(width: 16),
+                                      const Text(
+                                        StringConstants.appName,
+                                        style: TextStyle(
+                                          color: ColorConstants.white,
+                                          fontSize: 24,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 60),
-                          if (_showAccountButtons) ...[
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 48,
-                                    child: ElevatedButton(
-                                      onPressed: () => Navigator.of(context)
-                                          .push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SignUpLogInPage(),
-                                        ),
-                                      )
-                                          .then((value) {
-                                        if (value == true) {
-                                          _checkAuthAndInitialize();
-                                        }
-                                      }),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            ColorConstants.lightPurple,
-                                        foregroundColor: ColorConstants.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        StringConstants
-                                            .createAccountLogInButtonText,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 48,
-                                    child: OutlinedButton(
-                                      onPressed: _handleAnonymousSignIn,
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: ColorConstants.black,
-                                        side: const BorderSide(
-                                            color: ColorConstants.lightPurple),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        StringConstants.continueAsGuest,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(32, 40, 32, 0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        StringConstants.splashHeadline,
                                         style: TextStyle(
-                                            color: ColorConstants.lightPurple),
+                                          color: ColorConstants.white,
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.2,
+                                        ),
                                       ),
+                                      SizedBox(
+                                        height: _carouselHeight,
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: PageView.builder(
+                                                controller: _pageController,
+                                                onPageChanged: (index) =>
+                                                    setState(() =>
+                                                        _currentPageIndex =
+                                                            index),
+                                                itemCount: 3,
+                                                itemBuilder: (context, index) =>
+                                                    Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      _getBenefitTitle(index),
+                                                      style: const TextStyle(
+                                                        color: ColorConstants
+                                                            .white,
+                                                        fontSize: 28,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        height: 1.3,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 16),
+                                                    Text(
+                                                      _getBenefitSubtitle(
+                                                          index),
+                                                      style: const TextStyle(
+                                                        color: ColorConstants
+                                                            .graphite,
+                                                        fontSize: 20,
+                                                        height: 1.4,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: List.generate(
+                                                3,
+                                                (index) =>
+                                                    _buildDotIndicator(index),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 60),
+                                if (_showAccountButtons) ...[
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        32, 0, 32, 24),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 48,
+                                          child: ElevatedButton(
+                                            onPressed: () =>
+                                                Navigator.of(context)
+                                                    .push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const SignUpLogInPage(),
+                                              ),
+                                            )
+                                                    .then((value) {
+                                              if (value == true) {
+                                                _checkAuthAndInitialize();
+                                              }
+                                            }),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  ColorConstants.lightPurple,
+                                              foregroundColor:
+                                                  ColorConstants.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              StringConstants
+                                                  .createAccountLogInButtonText,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 48,
+                                          child: OutlinedButton(
+                                            onPressed: _isSigningIn ? null : _handleAnonymousSignIn,
+                                            style: OutlinedButton.styleFrom(
+                                              backgroundColor:
+                                                  ColorConstants.black,
+                                              side: const BorderSide(
+                                                  color: ColorConstants
+                                                      .lightPurple),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: _isSigningIn
+                                                ? const SizedBox(
+                                                    width: 20,
+                                                    height: 20,
+                                                    child: CircularProgressIndicator(
+                                                      color: ColorConstants.lightPurple,
+                                                      strokeWidth: 2,
+                                                    ),
+                                                  )
+                                                : const Text(
+                                                    StringConstants.continueAsGuest,
+                                                    style: TextStyle(
+                                                        color: ColorConstants
+                                                            .lightPurple),
+                                                  ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
-                          ],
-                        ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                    ],
+                  );
+                },
+              ),
       ),
     );
   }
