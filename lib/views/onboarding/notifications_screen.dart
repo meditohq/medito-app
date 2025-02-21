@@ -3,31 +3,80 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/utils/permission_handler.dart';
+import 'package:medito/views/settings/settings_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NotificationsScreen extends ConsumerWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key, this.onNext});
 
   final VoidCallback? onNext;
 
-  void _handleNotificationsPermission(
-      BuildContext context, WidgetRef ref) async {
+  @override
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  bool _notificationsGranted = false;
+  bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationPermission();
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (mounted) {
+      setState(() => _notificationsGranted = status.isGranted);
+    }
+  }
+
+  void _handleNotificationsPermission() async {
+    setState(() => _isProcessing = true);
     final status = await Permission.notification.request();
 
     if (status.isGranted) {
       final handler = ref.read(firebaseMessagingProvider);
       await handler.initialize(context, ref);
-      _navigateNext(context);
+      if (mounted) setState(() => _notificationsGranted = true);
+    }
+    setState(() => _isProcessing = false);
+  }
+
+  Future<void> _handleSetReminder() async {
+    final accepted = await PermissionHandler.requestAlarmPermission(context);
+    if (!accepted || !mounted) return;
+
+    final reminders = ref.read(reminderProvider);
+    final prefs = await SharedPreferences.getInstance();
+    final initialTime = ref.read(reminderTimeProvider) ?? TimeOfDay.now();
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      helpText: StringConstants.pickTimeHelpText,
+    );
+
+    if (pickedTime != null && mounted) {
+      await reminders.scheduleDailyNotification(pickedTime);
+      await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
+      await prefs.setInt(SharedPreferenceConstants.savedMinutes, pickedTime.minute);
+      ref.read(reminderTimeProvider.notifier).state = pickedTime;
+      _navigateNext();
     }
   }
 
-  void _navigateNext(BuildContext context) {
-    onNext?.call();
-  }
+  void _navigateNext() => widget.onNext?.call();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final reminderTime = ref.watch(reminderTimeProvider);
+
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
@@ -61,16 +110,23 @@ class NotificationsScreen extends ConsumerWidget {
               ),
               Column(
                 children: [
-                  _buildActionButton(
-                    text: StringConstants.enableNotificationsCta,
-                    onPressed: () =>
-                        _handleNotificationsPermission(context, ref),
-                  ),
+                  if (reminderTime != null)
+                    _buildTimeButton(reminderTime)
+                  else if (_notificationsGranted)
+                    _buildActionButton(
+                      text: StringConstants.setReminder,
+                      onPressed: _handleSetReminder,
+                    )
+                  else
+                    _buildActionButton(
+                      text: StringConstants.enableNotificationsCta,
+                      onPressed: _isProcessing ? null : _handleNotificationsPermission,
+                    ),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
-                      onPressed: () => _navigateNext(context),
+                      onPressed: _navigateNext,
                       style: TextButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -94,8 +150,30 @@ class NotificationsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButton(
-      {required String text, required VoidCallback onPressed}) {
+  Widget _buildTimeButton(TimeOfDay reminderTime) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _navigateNext,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorConstants.lightPurple,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          '${StringConstants.setFor} ${reminderTime.format(context)}',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required String text,
+    required VoidCallback? onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(

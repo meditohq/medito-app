@@ -74,7 +74,7 @@ class StringConstants {
   static const String reminderNotificationBody =
       'It\'s time for your daily meditation. Take a moment to relax and focus.';
   static const String reminderNotificationTitle = 'Daily Meditation Reminder';
-  static const String pickTimeHelpText = 'Pick a time for your reminder';
+  static const String pickTimeHelpText = 'Select your daily reminder time';
   static const String reminderNotificationScheduled =
       'Reminder notification scheduled at';
   static const String dailyReminderTitle = 'Daily Reminder';
@@ -396,4 +396,6 @@ class StringConstants {
       'Donations keep us going so everyone can access mindfulness—no ads needed.';
 
   static const String continueText = 'Continue';
+
+  static const String setReminder = 'Set Reminder';
 }
