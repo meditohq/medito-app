@@ -29,8 +29,20 @@ class FirebaseMessagingHandler {
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     try {
+      // Only initialize Firebase if not already initialized
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+
       _configureFirebaseMessaging(context, ref);
       _initializeLocalNotifications(context, ref);
+
+      // Explicitly enable after permission granted
+      if (Platform.isIOS) {
+        await FirebaseMessaging.instance.setAutoInitEnabled(true);
+      }
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -160,11 +172,6 @@ class FirebaseMessagingHandler {
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (!Firebase.apps.isNotEmpty) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
   final container = ProviderContainer();
   final handler = container.read(firebaseMessagingProvider);
   await handler._showBackgroundNotification(message);

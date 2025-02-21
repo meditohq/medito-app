@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NotificationsScreen extends ConsumerWidget {
@@ -10,9 +13,11 @@ class NotificationsScreen extends ConsumerWidget {
 
   void _handleNotificationsPermission(
       BuildContext context, WidgetRef ref) async {
-    var status = await Permission.notification.request();
+    final status = await Permission.notification.request();
 
     if (status.isGranted) {
+      final handler = ref.read(firebaseMessagingProvider);
+      await handler.initialize(context, ref);
       _navigateNext(context);
     }
   }

@@ -19,9 +19,9 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
 
   List<Widget> _pages = [];
   final List<String> _images = [
-    'assets/images/open_awareness.png',
-    'assets/images/relationships.png',
-    'assets/images/palouse_mindfulness_small.png',
+    AssetConstants.onboardingImage1,
+    AssetConstants.onboardingImage2,
+    AssetConstants.onboardingImage3,
   ];
 
   @override

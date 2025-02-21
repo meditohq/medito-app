@@ -1,4 +1,5 @@
 class StringConstants {
+  static const appName = 'Medito';
   static const privacyPolicyTitle = 'Privacy Policy';
   static const unableToOpenPrivacyPolicy = 'Unable to open privacy policy';
   static const String meditoUrl = 'https://meditofoundation.org/';
@@ -379,4 +380,17 @@ class StringConstants {
   static const remindLater = 'Remind Me Later';
   static const allSetTitle = 'You\'re All Set!';
   static const startMeditating = 'Start Meditating';
+
+  static const splashHeadline = 'Meditation Made Simple';
+  static const splashBenefit1Title = 'Free Forever, For Everyone';
+  static const splashBenefit1Subtitle =
+      'Explore 100s of hrs of guided sessions, advanced courses, and more. No paywall.';
+  static const splashBenefit2Title = 'Challenges & Reminders';
+  static const splashBenefit2Subtitle =
+      'Stay motivated daily, track progress, and build lasting habits.';
+  static const splashBenefit3Title = 'Nonprofit & Ad-Free';
+  static const splashBenefit3Subtitle =
+      'Donations keep us going so everyone can access mindfulness—no ads needed.';
+
+  static const String continueText = 'Continue';
 }

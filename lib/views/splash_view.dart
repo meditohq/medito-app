@@ -49,16 +49,32 @@ class TopCurvedClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(0, size.height * 0.2); // Start 20% from top
-    path.quadraticBezierTo(
-      size.width / 2,
-      -size.height * 0.1, // Creates upward curve
-      size.width,
-      size.height * 0.2,
-    );
+    final waveHeight = 25.0;
+    final waveLength = size.width / 3; // Creates 3 full waves
+    final initialY = size.height * 0.2;
+
+    path.moveTo(0, initialY);
+
+    // Create continuous waves across full width
+    for (double x = 0; x < size.width; x += waveLength) {
+      final endX = x + waveLength;
+      final controlX = x + waveLength / 2;
+      // Alternate wave direction
+      final controlY =
+          initialY + ((x / waveLength) % 2 < 1 ? -waveHeight : waveHeight);
+
+      path.quadraticBezierTo(
+        controlX,
+        controlY,
+        endX > size.width ? size.width : endX, // Clamp to width
+        initialY,
+      );
+    }
+
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
+
     return path;
   }
 
@@ -155,7 +171,6 @@ class SplashViewState extends ConsumerState<SplashView> {
         options: DefaultFirebaseOptions.currentPlatform);
     await _initializeDioHeaderService();
     ref.read(rootCombineProvider(context));
-    _initializeFirebaseMessaging();
 
     try {
       await StatsManager().initialize();
@@ -171,12 +186,7 @@ class SplashViewState extends ConsumerState<SplashView> {
     HeaderService(deviceInfo).initialise();
   }
 
-  void _initializeFirebaseMessaging() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final firebaseMessaging = ref.read(firebaseMessagingProvider);
-      firebaseMessaging.initialize(context, ref);
-    });
-  }
+  void _initializeFirebaseMessaging() {}
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +210,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                   child: ClipPath(
                     clipper: TopCurvedClipper(),
                     child: SizedBox(
-                      height: 300,
+                      height: 400,
                       child: Image.asset(
                         AssetConstants.splashBackground,
                         fit: BoxFit.cover,
@@ -228,7 +238,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                                 ),
                                 const SizedBox(width: 16),
                                 const Text(
-                                  'Medito',
+                                  StringConstants.appName,
                                   style: TextStyle(
                                     color: ColorConstants.white,
                                     fontSize: 24,
@@ -243,10 +253,10 @@ class SplashViewState extends ConsumerState<SplashView> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Meditation Made Simple',
+                                  StringConstants.splashHeadline,
                                   style: TextStyle(
                                     color: ColorConstants.white,
-                                    fontSize: 50,
+                                    fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     height: 1.2,
                                   ),
@@ -283,7 +293,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                                                 style: const TextStyle(
                                                   color:
                                                       ColorConstants.graphite,
-                                                  fontSize: 16,
+                                                  fontSize: 20,
                                                   height: 1.4,
                                                 ),
                                               ),
@@ -351,6 +361,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                                     child: OutlinedButton(
                                       onPressed: _handleAnonymousSignIn,
                                       style: OutlinedButton.styleFrom(
+                                        backgroundColor: ColorConstants.black,
                                         side: const BorderSide(
                                             color: ColorConstants.lightPurple),
                                         shape: RoundedRectangleBorder(
@@ -385,11 +396,11 @@ class SplashViewState extends ConsumerState<SplashView> {
   String _getBenefitTitle(int index) {
     switch (index) {
       case 0:
-        return 'Free Forever, For Everyone';
+        return StringConstants.splashBenefit1Title;
       case 1:
-        return 'Challenges & Reminders';
+        return StringConstants.splashBenefit2Title;
       case 2:
-        return 'Nonprofit & Ad-Free';
+        return StringConstants.splashBenefit3Title;
       default:
         return '';
     }
@@ -398,11 +409,11 @@ class SplashViewState extends ConsumerState<SplashView> {
   String _getBenefitSubtitle(int index) {
     switch (index) {
       case 0:
-        return 'Explore 100s of hrs of guided sessions, advanced courses, and more. No paywall.';
+        return StringConstants.splashBenefit1Subtitle;
       case 1:
-        return 'Stay motivated daily, track progress, and build lasting habits.';
+        return StringConstants.splashBenefit2Subtitle;
       case 2:
-        return 'Donations keep us going so everyone can access mindfulness—no ads needed.';
+        return StringConstants.splashBenefit3Subtitle;
       default:
         return '';
     }
