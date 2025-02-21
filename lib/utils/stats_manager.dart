@@ -24,15 +24,16 @@ class StatsManager {
   StatsManager._internal();
 
   Future<bool> _acquireLock() async {
-    final prefs = await SharedPreferences.getInstance();
-    final lastLockTime = prefs.getInt(_syncLockKey) ?? 0;
-    final now = DateTime.now().millisecondsSinceEpoch;
+    var prefs = await SharedPreferences.getInstance();
+    var lastLockTime = prefs.getInt(_syncLockKey) ?? 0;
+    var now = DateTime.now().millisecondsSinceEpoch;
 
-    // Atomic check-and-set using setInt's return value
     if (now - lastLockTime > _syncLockTimeout.inMilliseconds) {
-      // This is atomic on most platforms but not guaranteed across all implementations
-      final success = await prefs.setInt(_syncLockKey, now);
-      return success;
+      var success = await prefs.setInt(_syncLockKey, now);
+      if (!success) return false;
+
+      var checkLock = prefs.getInt(_syncLockKey);
+      return checkLock == now;
     }
     return false;
   }
@@ -74,40 +75,30 @@ class StatsManager {
   }
 
   Future<void> _doSync() async {
-    dev.log('StatsManager: Starting sync process');
-    final originalStats = _allStats; // Preserve current state
+    dev.log('StatsManager: Fetching remote stats');
+    var remoteStats = await _statsService.fetchAllStats();
+    dev.log(
+        'StatsManager: Remote stats received: ${remoteStats.totalTracksCompleted}');
+    _allStats = remoteStats;
 
-    try {
-      dev.log('StatsManager: Fetching remote stats');
-      final remoteStats = await _statsService.fetchAllStats();
-      dev.log(
-          'StatsManager: Remote stats received: ${remoteStats.totalTracksCompleted}');
-      _allStats = remoteStats;
+    dev.log('StatsManager: Merging stats');
+    await _merge();
 
-      dev.log('StatsManager: Merging stats');
-      await _merge();
+    dev.log(
+        'StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
 
-      dev.log(
-          'StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
+    if (_allStats != null) {
+      dev.log('StatsManager: Calculating streak');
+      _allStats = calculateStreak(_allStats!);
 
-      if (_allStats != null) {
-        dev.log('StatsManager: Calculating streak');
-        _allStats = calculateStreak(_allStats!);
+      await _saveLocalAllStatsToSharedPrefs();
 
-        await _saveLocalAllStatsToSharedPrefs();
-
-        await _statsService.postStats(_allStats!);
-      } else {
-        throw Exception('Stats are null after merge');
-      }
-
-      dev.log('StatsManager: Sync completed successfully');
-    } catch (e, stackTrace) {
-      dev.log('StatsManager: Sync aborted - preserving local stats',
-          error: e, stackTrace: stackTrace);
-      _allStats = originalStats; // Restore original stats on error
-      return; // Abort without further processing
+      await _statsService.postStats(_allStats!);
+    } else {
+      throw Exception("Stats are null");
     }
+
+    dev.log('StatsManager: Sync completed');
   }
 
   Future<LocalAllStats> get localAllStats async {
@@ -259,45 +250,46 @@ class StatsManager {
     LocalAudioCompleted audioCompleted,
     int duration,
   ) async {
-    await sync();
-    final currentStats = _allStats ?? await _loadLocalAllStats();
+    final newDuration = duration + (_allStats?.totalTimeListened ?? 0);
+    final newTotalTracks = 1 + (_allStats?.totalTracksCompleted ?? 0);
 
-    // Preserve duplicate check
-    final updatedTracks = [...?currentStats.tracksChecked];
-    if (!updatedTracks.contains(audioCompleted.id)) {
-      updatedTracks.add(audioCompleted.id);
+    var updatedTracksCompleted = _allStats?.tracksChecked ?? [];
+    if (!updatedTracksCompleted.contains(audioCompleted.id)) {
+      updatedTracksCompleted.add(audioCompleted.id);
     }
 
-    final modifiedStats = currentStats.copyWith(
-      tracksChecked: updatedTracks,
-      audioCompleted: [...?currentStats.audioCompleted, audioCompleted],
-      totalTracksCompleted: (currentStats.totalTracksCompleted) + 1,
-      totalTimeListened: (currentStats.totalTimeListened) + duration,
-      updated: DateTime.now().millisecondsSinceEpoch,
+    _allStats = _allStats?.copyWith(
+      tracksChecked: updatedTracksCompleted,
+      audioCompleted: [...?_allStats?.audioCompleted, audioCompleted],
+      totalTracksCompleted: newTotalTracks,
+      updated: DateTime.now().toUtc().millisecondsSinceEpoch,
+      totalTimeListened: newDuration,
     );
 
-    await _saveLocalStats(modifiedStats);
-    unawaited(sync());
-  }
-
-  Future<void> _saveLocalStats(LocalAllStats stats) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      SharedPreferenceConstants.localAllStatsKey,
-      jsonEncode(stats.toJson()),
-    );
-    _allStats = stats;
+    if (_allStats != null) {
+      _allStats = calculateStreak(_allStats!);
+    }
+    await _saveLocalAllStatsToSharedPrefs();
+    await _statsService.postStats(_allStats!);
   }
 
   Future<void> addTrackChecked(String trackId) async {
-    await sync();
-    final currentStats = _allStats ?? await _loadLocalAllStats();
-    final modifiedStats = currentStats.copyWith(
-      tracksChecked: [...?currentStats.tracksChecked, trackId],
-      updated: DateTime.now().millisecondsSinceEpoch,
-    );
-    await _saveLocalStats(modifiedStats);
-    unawaited(sync());
+    if (_allStats == null) {
+      await sync();
+    }
+
+    var updatedTracksChecked = _allStats?.tracksChecked ?? [];
+    if (!updatedTracksChecked.contains(trackId)) {
+      updatedTracksChecked.add(trackId);
+
+      _allStats = _allStats?.copyWith(
+        tracksChecked: updatedTracksChecked,
+        updated: DateTime.now().toUtc().millisecondsSinceEpoch,
+      );
+
+      await _saveLocalAllStatsToSharedPrefs();
+      await _statsService.postStats(_allStats!);
+    }
   }
 
   Future<void> removeTrackChecked(String trackId) async {

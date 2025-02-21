@@ -1,5 +1,4 @@
 import 'dart:developer' as dev;
-import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
@@ -29,18 +28,10 @@ class StatsService {
     var now = DateTime.now().millisecondsSinceEpoch;
     await _prefs.setInt(_lastSyncKey, now);
 
-    try {
-      final response = await _httpApiService.getRequest(HTTPConstants.allStats);
-      final serverStats = AllStats.fromJson(response);
-      return LocalAllStats.fromAllStats(serverStats);
-    } on HttpException catch (e) {
-      dev.log('StatsService: HTTP error', error: e);
-      rethrow;
-    } catch (e, stackTrace) {
-      dev.log('StatsService: Failed to fetch stats',
-          error: e, stackTrace: stackTrace);
-      rethrow;
-    }
+    var response = await _httpApiService.getRequest(HTTPConstants.allStats);
+    var serverStats = AllStats.fromJson(response);
+
+    return LocalAllStats.fromAllStats(serverStats);
   }
 
   Future<void> postStats(LocalAllStats stats) async {

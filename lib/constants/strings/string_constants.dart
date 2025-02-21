@@ -382,13 +382,13 @@ class StringConstants {
   static const startMeditating = 'Start Meditating';
 
   static const splashHeadline = 'Meditation Made Simple';
-  static const splashBenefit1Title = 'Free Forever, For Everyone';
+  static const splashBenefit1Title = 'Free for Everyone, Forever';
   static const splashBenefit1Subtitle =
-      'Explore 100s of hrs of guided sessions, advanced courses, and more. No paywall.';
+      'Explore hours of guided meditations, advanced courses, and more. No paywall.';
   static const splashBenefit2Title = 'Challenges & Reminders';
   static const splashBenefit2Subtitle =
       'Stay motivated daily, track progress, and build lasting habits.';
-  static const splashBenefit3Title = 'Nonprofit & Ad-Free';
+  static const splashBenefit3Title = 'Not-for-profit & Ad-Free';
   static const splashBenefit3Subtitle =
       'Donations keep us going so everyone can access mindfulness—no ads needed.';
 
