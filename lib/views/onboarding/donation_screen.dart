@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -77,6 +78,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final meAsync = ref.watch(meProvider);
+    final isDonor = meAsync.value?.hasActiveSubscription ?? false;
+
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
@@ -88,7 +92,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen>
               Column(
                 children: [
                   Text(
-                    StringConstants.donationTitle,
+                    isDonor
+                        ? StringConstants.donationThankYouTitle
+                        : StringConstants.donationTitle,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -98,7 +104,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen>
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    StringConstants.donationBody,
+                    isDonor
+                        ? StringConstants.donationThankYouBody
+                        : StringConstants.donationBody,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -111,7 +119,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen>
               Column(
                 children: [
                   _buildActionButton(
-                    text: StringConstants.donateNow,
+                    text: isDonor
+                        ? StringConstants.donationVisitFoundation
+                        : StringConstants.donateNow,
                     onPressed: () => _handleDonationAction(context, true),
                   ),
                   const SizedBox(height: 12),
@@ -125,7 +135,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen>
                         ),
                       ),
                       child: Text(
-                        StringConstants.noThanks,
+                        isDonor
+                            ? StringConstants.donationContinue
+                            : StringConstants.noThanks,
                         style: const TextStyle(
                           color: ColorConstants.lightPurple,
                           fontSize: 16,

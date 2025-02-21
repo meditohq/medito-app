@@ -8,7 +8,10 @@ abstract class MeModel with _$MeModel {
   const factory MeModel({
     String? email,
     required String id,
-    @Default(false) bool hasActiveSubscription,
+    @Default(false)
+    // ignore: invalid_annotation_target
+    @JsonKey(name: 'has_active_subscription')
+    bool hasActiveSubscription,
   }) = _MeModel;
 
   factory MeModel.fromJson(Map<String, Object?> json) =>

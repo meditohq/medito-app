@@ -398,4 +398,9 @@ class StringConstants {
   static const String continueText = 'Continue';
 
   static const String setReminder = 'Set Reminder';
+
+  static const String donationThankYouTitle = 'Thank You for Your Support!';
+  static const String donationThankYouBody = 'Your generosity helps keep Medito free and accessible to everyone. We\'re deeply grateful for your contribution to spreading mindfulness worldwide.';
+  static const String donationVisitFoundation = 'Visit Medito Foundation';
+  static const String donationContinue = 'Continue';
 }
