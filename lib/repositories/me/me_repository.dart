@@ -14,12 +14,15 @@ class MeRepositoryImpl extends MeRepository {
   final HttpApiService client;
 
   MeRepositoryImpl({required this.client});
-
   @override
   Future<MeModel> fetchMe() async {
-    var response = await client.getRequest(HTTPConstants.me);
+    try {
+      var response = await client.getRequest(HTTPConstants.me);
 
-    return MeModel.fromJson(response);
+      return MeModel.fromJson(response);
+    } catch (e) {
+      throw Exception('Error parsing MeModel from JSON: $e');
+    }
   }
 }
 

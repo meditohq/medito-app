@@ -8,7 +8,7 @@ abstract class MeModel with _$MeModel {
   const factory MeModel({
     String? email,
     required String id,
-    @Default(false) bool isMonthlyDonor,
+    @Default(false) bool hasActiveSubscription,
   }) = _MeModel;
 
   factory MeModel.fromJson(Map<String, Object?> json) =>

@@ -97,7 +97,7 @@ Future<String> _formatString(
       '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$clientId';
 
   if (kDebugMode) {
-    var isMonthlyDonorString = '${StringConstants.isMonthlyDonor}: ${me?.isMonthlyDonor ?? false}';
+    var isMonthlyDonorString = '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
     formattedString += '\n$isMonthlyDonorString';
   }
 
