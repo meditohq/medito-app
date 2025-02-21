@@ -11,7 +11,6 @@ import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/header_service.dart';
-import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -185,9 +184,7 @@ class SplashViewState extends ConsumerState<SplashView> {
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     HeaderService(deviceInfo).initialise();
   }
-
-  void _initializeFirebaseMessaging() {}
-
+  
   @override
   Widget build(BuildContext context) {
     return PopScope(

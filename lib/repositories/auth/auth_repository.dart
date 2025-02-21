@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:medito/utils/retry_mixin.dart';
 import 'dart:developer' as dev;
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 enum AuthException {
   accountMarkedForDeletion,
@@ -224,6 +225,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   @override
   Future<bool> signOut() async {
+    await FirebaseMessaging.instance.deleteToken();
     var supabase = Supabase.instance.client;
 
     final sharedPreferences = await SharedPreferences.getInstance();

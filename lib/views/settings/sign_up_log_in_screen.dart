@@ -4,6 +4,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/user_profile_page.dart';
 import 'package:email_validator/email_validator.dart';
@@ -194,6 +195,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   Future<void> _refreshUserInfo() async {
     ref.invalidate(deviceAppAndUserInfoProvider);
+    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+    HeaderService(deviceInfo).initialise();
   }
 
   @override
