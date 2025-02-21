@@ -98,6 +98,16 @@ class SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     super.initState();
+    _initialiseApp();
+  }
+
+  Future<void> _initialiseApp() async {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+    
     _checkAuthAndInitialize();
   }
 
@@ -174,8 +184,6 @@ class SplashViewState extends ConsumerState<SplashView> {
 
   Future<void> _initializeServices() async {
     HttpApiService().initializeAuth();
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
     await _initializeDioHeaderService();
     ref.read(rootCombineProvider(context));
 
@@ -377,7 +385,9 @@ class SplashViewState extends ConsumerState<SplashView> {
                                           width: double.infinity,
                                           height: 48,
                                           child: OutlinedButton(
-                                            onPressed: _isSigningIn ? null : _handleAnonymousSignIn,
+                                            onPressed: _isSigningIn
+                                                ? null
+                                                : _handleAnonymousSignIn,
                                             style: OutlinedButton.styleFrom(
                                               backgroundColor:
                                                   ColorConstants.black,
@@ -393,13 +403,16 @@ class SplashViewState extends ConsumerState<SplashView> {
                                                 ? const SizedBox(
                                                     width: 20,
                                                     height: 20,
-                                                    child: CircularProgressIndicator(
-                                                      color: ColorConstants.lightPurple,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      color: ColorConstants
+                                                          .lightPurple,
                                                       strokeWidth: 2,
                                                     ),
                                                   )
                                                 : const Text(
-                                                    StringConstants.continueAsGuest,
+                                                    StringConstants
+                                                        .continueAsGuest,
                                                     style: TextStyle(
                                                         color: ColorConstants
                                                             .lightPurple),
