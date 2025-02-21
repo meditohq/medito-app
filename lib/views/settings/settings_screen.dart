@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -231,7 +232,7 @@ class SettingsScreen extends ConsumerWidget {
                 .map((item) => _buildMenuItemTile(context, ref, item)),
             _buildSectionTitle(context, StringConstants.advanced),
             _buildDebugTile(context, ref),
-            _buildOnboardingTile(context, ref),
+            if(kDebugMode) _buildOnboardingTile(context, ref),
           ],
         ),
       ),

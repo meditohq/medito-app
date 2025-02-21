@@ -121,9 +121,9 @@ class AudioDownloadWidget extends ConsumerWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(StringConstants.confirmDeletionTitle),
+          title: const Text(StringConstants.confirmDeletionFromPlayerTitle),
           content: Text(
-            '${StringConstants.confirmDeletionMessage} "${trackModel.title}"?',
+            '${StringConstants.confirmDeletionFromPlayerMessage} "${trackModel.title}"?',
           ),
           actions: <Widget>[
             TextButton(

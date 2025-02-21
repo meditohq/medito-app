@@ -99,6 +99,9 @@ class StringConstants {
       'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito';
 
   static const String confirmDeletionTitle = 'Confirm Deletion';
+  static const String confirmDeletionFromPlayerTitle = 'Already Downloaded';
+  static const String confirmDeletionFromPlayerMessage =
+      'This meditation is already in your downloads. Do you want to delete it?';
   static const String confirmDeletionMessage =
       'Are you sure you want to delete';
   static const String delete = 'Delete';
