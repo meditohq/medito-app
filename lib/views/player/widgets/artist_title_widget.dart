@@ -29,16 +29,12 @@ class ArtistTitleWidget extends ConsumerWidget {
     return Column(
       children: [
         _title(context),
-        if (artistUrlPath.isNotNullAndNotEmpty()) _subtitle(context),
+        _subtitle(context),
       ],
     );
   }
 
   Widget _title(BuildContext context) {
-    if (trackTitle?.isEmpty == true || trackTitle == null) {
-      return SizedBox(height: titleHeight);
-    }
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Text(
