@@ -13,6 +13,9 @@ class LocalAllStats {
   final List<String>? tracksChecked;
   final List<LocalAudioCompleted>? audioCompleted;
   final int updated;
+  final int? streakFreezes;
+  final int? maxStreakFreezes;
+  final List<int>? freezeUsageDates;
 
   LocalAllStats({
     required this.streakCurrent,
@@ -22,6 +25,9 @@ class LocalAllStats {
     required this.tracksChecked,
     required this.audioCompleted,
     required this.updated,
+    this.streakFreezes = 0,
+    this.maxStreakFreezes = 0,
+    this.freezeUsageDates = const [],
   });
 
   factory LocalAllStats.empty() {
@@ -33,6 +39,9 @@ class LocalAllStats {
       tracksChecked: [],
       audioCompleted: [],
       updated: 0,
+      streakFreezes: 0,
+      maxStreakFreezes: 0,
+      freezeUsageDates: [],
     );
   }
 
@@ -48,6 +57,9 @@ class LocalAllStats {
               .toList() ??
           [],
       updated: stats.updated,
+      streakFreezes: stats.streakFreezes,
+      maxStreakFreezes: stats.maxStreakFreezes,
+      freezeUsageDates: stats.freezeUsageDates,
     );
   }
 
@@ -59,6 +71,9 @@ class LocalAllStats {
       tracksChecked: tracksChecked,
       audioCompleted: audioCompleted?.map((e) => e.toAudioCompleted()).toList(),
       updated: updated,
+      streakFreezes: streakFreezes ?? 0,
+      maxStreakFreezes: maxStreakFreezes ?? 0,
+      freezeUsageDates: freezeUsageDates ?? [],
     );
   }
 
@@ -75,6 +90,9 @@ class LocalAllStats {
     List<String>? tracksChecked,
     List<LocalAudioCompleted>? audioCompleted,
     int? updated,
+    int? streakFreezes,
+    int? maxStreakFreezes,
+    List<int>? freezeUsageDates,
   }) {
     return LocalAllStats(
       streakCurrent: streakCurrent ?? this.streakCurrent,
@@ -84,6 +102,9 @@ class LocalAllStats {
       tracksChecked: tracksChecked ?? this.tracksChecked,
       audioCompleted: audioCompleted ?? this.audioCompleted,
       updated: updated ?? this.updated,
+      streakFreezes: streakFreezes ?? this.streakFreezes,
+      maxStreakFreezes: maxStreakFreezes ?? this.maxStreakFreezes,
+      freezeUsageDates: freezeUsageDates ?? this.freezeUsageDates,
     );
   }
 }

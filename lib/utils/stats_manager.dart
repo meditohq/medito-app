@@ -46,8 +46,8 @@ class StatsManager {
   Future<void> initialize() async {
     if (!_isInitialized) {
       _statsService = StatsService(
-        HttpApiService(),
-        await SharedPreferences.getInstance(),
+        httpApiService: HttpApiService(),
+        prefs: await SharedPreferences.getInstance(),
       );
       _isInitialized = true;
     }

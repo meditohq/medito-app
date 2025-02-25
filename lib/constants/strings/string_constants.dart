@@ -404,4 +404,8 @@ class StringConstants {
       'Your generosity helps keep Medito free and accessible to everyone. We\'re deeply grateful for your contribution to spreading mindfulness worldwide.';
   static const String donationVisitFoundation = 'Visit Medito Foundation';
   static const String donationContinue = 'Continue';
+
+  static const streakFreezesAvailable = 'Streak Freezes Available';
+  static const freezeUsedMessage =
+      'A streak freeze was used to maintain your streak!';
 }

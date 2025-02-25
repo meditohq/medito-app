@@ -2,9 +2,53 @@ import 'dart:developer' as dev;
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class MockStatsBackend {
+  static LocalAllStats? _mockStorage = LocalAllStats(
+    streakCurrent: 0,
+    streakLongest: 20,
+    totalTracksCompleted: 0,
+    totalTimeListened: 0,
+    tracksChecked: [],
+    audioCompleted: [
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 24).millisecondsSinceEpoch, id: '3'),
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 23).millisecondsSinceEpoch, id: '3'),
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 22).millisecondsSinceEpoch, id: '3'),
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 21).millisecondsSinceEpoch, id: '3'),
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 20).millisecondsSinceEpoch, id: '4'),
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 17).millisecondsSinceEpoch, id: '5'),
+    ],
+    updated: 0,
+    streakFreezes: 2,
+    maxStreakFreezes: 2,
+    freezeUsageDates: [
+      DateTime(2025, 2, 19).millisecondsSinceEpoch,
+      DateTime(2025, 2, 18).millisecondsSinceEpoch,
+    ],
+  );
+
+  static Future<void> saveStats(LocalAllStats stats) async {
+    _mockStorage = stats;
+    await Future.delayed(
+        const Duration(milliseconds: 100)); // Simulate network delay
+  }
+
+  static Future<LocalAllStats?> getStats() async {
+    await Future.delayed(
+        const Duration(milliseconds: 50)); // Simulate network delay
+    return _mockStorage;
+  }
+}
 
 class StatsService {
   final HttpApiService _httpApiService;
@@ -12,7 +56,14 @@ class StatsService {
   static const _lastSyncKey = 'last_stats_sync';
   static const _minTimeBetweenRequests = 2000; // 2 seconds
 
-  StatsService(this._httpApiService, this._prefs);
+  // Use this flag to toggle between real and mock backend
+  static const useMockBackend = true;
+
+  StatsService({
+    required HttpApiService httpApiService,
+    required SharedPreferences prefs,
+  })  : _httpApiService = httpApiService,
+        _prefs = prefs;
 
   Future<bool> hasRecentlySync() async {
     var lastSync = _prefs.getInt(_lastSyncKey);
@@ -23,6 +74,10 @@ class StatsService {
   }
 
   Future<LocalAllStats> fetchAllStats() async {
+    if (useMockBackend) {
+      return await MockStatsBackend.getStats() ?? LocalAllStats.empty();
+    }
+
     dev.log('StatsService: Attempting to fetch stats');
 
     var now = DateTime.now().millisecondsSinceEpoch;
@@ -35,7 +90,12 @@ class StatsService {
   }
 
   Future<void> postStats(LocalAllStats stats) async {
-    dev.log('StatsManager: Posting updated stats');
+    if (useMockBackend) {
+      await MockStatsBackend.saveStats(stats);
+      dev.log('MockStatsService: Saved stats locally');
+      return;
+    }
+
     try {
       await _httpApiService.postRequest(
         HTTPConstants.allStats,
