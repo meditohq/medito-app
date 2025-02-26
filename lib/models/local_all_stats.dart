@@ -15,7 +15,7 @@ class LocalAllStats {
   final int updated;
   final int? streakFreezes;
   final int? maxStreakFreezes;
-  final List<int>? freezeUsageDates;
+  final List<int> freezeUsageDates;
 
   LocalAllStats({
     required this.streakCurrent,
@@ -27,7 +27,7 @@ class LocalAllStats {
     required this.updated,
     this.streakFreezes = 0,
     this.maxStreakFreezes = 0,
-    this.freezeUsageDates = const [],
+    required this.freezeUsageDates,
   });
 
   factory LocalAllStats.empty() {

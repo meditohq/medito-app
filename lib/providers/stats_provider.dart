@@ -6,6 +6,7 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/settings_screen.dart';
+import 'package:flutter/material.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
 

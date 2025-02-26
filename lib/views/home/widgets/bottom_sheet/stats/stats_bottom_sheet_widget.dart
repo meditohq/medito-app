@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/widgets.dart';
 
@@ -47,7 +49,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                         color: ColorConstants.white),
                   ),
                 ),
-                data: (stats) => _statsList(context, globalKey, stats),
+                data: (stats) => _statsList(context, globalKey, stats, ref),
               ),
             ],
           ),
@@ -88,6 +90,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     BuildContext context,
     GlobalKey key,
     LocalAllStats stats,
+    WidgetRef ref,
   ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -106,6 +109,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                     '${stats.totalTracksCompleted}'),
                 _buildStatRow(context, StringConstants.totalTimeListened,
                     _formatTotalTimeListened(stats.totalTimeListened)),
+                _buildFreezeInfo(stats, context, ref),
               ],
             ),
           ),
@@ -116,5 +120,81 @@ class StatsBottomSheetWidget extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildFreezeInfo(
+    LocalAllStats stats,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final isDonor =
+        ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
+
+    if (!isDonor) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text(
+            '${stats.streakFreezes}/${stats.maxStreakFreezes} ${StringConstants.streakFreezesAvailable}',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: ColorConstants.lightPurple,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+        if (_canUseStreakFreeze(stats))
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: ElevatedButton(
+              onPressed: () => _useStreakFreeze(context, ref),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstants.lightPurple,
+                foregroundColor: ColorConstants.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+              child: Text(StringConstants.useStreakFreeze),
+            ),
+          ),
+      ],
+    );
+  }
+
+  bool _canUseStreakFreeze(LocalAllStats stats) {
+    // Check if user has streak freezes available and needs one
+    if ((stats.streakFreezes ?? 0) <= 0) return false;
+
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    // Check if there was activity yesterday
+    final hasActivityYesterday = stats.audioCompleted?.any((audio) {
+          final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+          return date.year == yesterday.year &&
+              date.month == yesterday.month &&
+              date.day == yesterday.day;
+        }) ??
+        false;
+
+    // Check if a freeze was already used for yesterday
+    final freezeUsedYesterday = stats.freezeUsageDates.any((timestamp) {
+      final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      return date.year == yesterday.year &&
+          date.month == yesterday.month &&
+          date.day == yesterday.day;
+    });
+
+    // Can use a freeze if no activity yesterday and no freeze already used
+    return !hasActivityYesterday &&
+        !freezeUsedYesterday &&
+        stats.streakCurrent > 0;
+  }
+
+  void _useStreakFreeze(BuildContext context, WidgetRef ref) {
+    ref.read(streakFreezeSuggestionProvider.notifier).useStreakFreeze();
+    // Show a confirmation message
+    showSnackBar(context, StringConstants.freezeUsedMessage);
   }
 }

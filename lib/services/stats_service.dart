@@ -9,15 +9,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MockStatsBackend {
   static LocalAllStats? _mockStorage = LocalAllStats(
-    streakCurrent: 0,
+    streakCurrent: 5,
     streakLongest: 20,
-    totalTracksCompleted: 0,
-    totalTimeListened: 0,
+    totalTracksCompleted: 15,
+    totalTimeListened: 3600,
     tracksChecked: [],
     audioCompleted: [
       LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 24).millisecondsSinceEpoch, id: '3'),
-      LocalAudioCompleted(
+          LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 23).millisecondsSinceEpoch, id: '3'),
       LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 22).millisecondsSinceEpoch, id: '3'),
@@ -25,15 +25,12 @@ class MockStatsBackend {
           timestamp: DateTime.utc(2025, 2, 21).millisecondsSinceEpoch, id: '3'),
       LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 20).millisecondsSinceEpoch, id: '4'),
-      LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 17).millisecondsSinceEpoch, id: '5'),
     ],
-    updated: 0,
-    streakFreezes: 2,
+    updated: DateTime.now().millisecondsSinceEpoch,
+    streakFreezes: 1,
     maxStreakFreezes: 2,
     freezeUsageDates: [
       DateTime(2025, 2, 19).millisecondsSinceEpoch,
-      DateTime(2025, 2, 18).millisecondsSinceEpoch,
     ],
   );
 

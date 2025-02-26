@@ -12,14 +12,20 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/constants/types/type_constants.dart';
+import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/services/stats_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/views/home/widgets/bottom_sheet/stats/streak_freeze_suggestion_widget.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/theme/app_theme.dart';
 
@@ -93,6 +99,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinks();
+
+    // Check for streak freeze suggestion after a short delay
+    Future.delayed(const Duration(seconds: 1), () {
+      ref
+          .read(streakFreezeSuggestionProvider.notifier)
+          .checkForStreakFreezeSuggestion();
+    });
   }
 
   void _setUpSystemUi() {
@@ -192,6 +205,26 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Widget build(BuildContext context) {
     var connectionStatus = ref.watch(internetConnectionProvider);
 
+    // Listen to streak freeze suggestion state
+    ref.listen<StreakFreezeSuggestionState>(
+      streakFreezeSuggestionProvider,
+      (previous, current) {
+        if (current.shouldShowSuggestion &&
+            current.stats != null &&
+            (previous == null || !previous.shouldShowSuggestion)) {
+          // Show the suggestion bottom sheet
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showStreakFreezeSuggestion(context, current.stats!);
+
+            // Mark as handled after showing
+            ref
+                .read(streakFreezeSuggestionProvider.notifier)
+                .markSuggestionAsHandled();
+          });
+        }
+      },
+    );
+
     connectionStatus.whenData((status) {
       if (status == InternetConnectionStatus.disconnected) {
         showSnackBar(
@@ -205,6 +238,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         );
       }
     });
+
+    _checkForFreezeUsage(ref);
 
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
@@ -227,5 +262,66 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _onAppForegrounded() {
     ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
+  }
+
+  void _checkForFreezeUsage(WidgetRef ref) {
+    final stats = ref.watch(statsProvider).valueOrNull;
+    final isDonor =
+        ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
+
+    if (stats != null && isDonor && stats.freezeUsageDates.isNotEmpty == true) {
+      final lastFreezeUse = stats.freezeUsageDates.last;
+      _hasShownFreezeAlert(lastFreezeUse).then((hasShown) {
+        if (!hasShown) {
+          _showFreezeUsedAlert(context);
+          _markFreezeAlertShown(lastFreezeUse);
+        }
+      });
+    }
+  }
+
+  Future<bool> _hasShownFreezeAlert(int timestamp) async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getInt('last_freeze_alert') ?? 0) >= timestamp;
+  }
+
+  Future<void> _markFreezeAlertShown(int timestamp) async {
+    await SharedPreferences.getInstance()
+        .then((prefs) => prefs.setInt('last_freeze_alert', timestamp));
+  }
+
+  void _showFreezeUsedAlert(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          StringConstants.freezeUsedMessage,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ),
+    );
+  }
+
+  void showStreakFreezeSuggestion(BuildContext context, LocalAllStats stats) {
+    // Use navigatorKey.currentContext to ensure we have a valid context
+    final ctx = navigatorKey.currentContext ?? context;
+
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: ctx,
+      isScrollControlled: true, // Make it adaptable to content
+      backgroundColor: Theme.of(ctx).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => StreakFreezeSuggestionWidget(
+        stats: stats,
+        onUseFreeze: () async {
+          await ref.read(streakFreezeSuggestionProvider.notifier).useStreakFreeze();
+        },
+      ),
+    );
   }
 }

@@ -76,10 +76,8 @@ class HTTPConstants {
   static String maintenance = '${contentBaseUrl}maintenance';
 
   // EVENT END POINTS
-  static const String audio = '/audio';
   static const String announcementEvent = '/announcements';
   static const String announcementDismissEvent = '/dismiss';
-  static const String completeEvent = '/complete';
   static const String firebaseEvent = '/fcm';
   static const String rate = '/rate';
   static const String favorite = '/favorite';
