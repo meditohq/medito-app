@@ -24,7 +24,7 @@ class EventsRepositoryImpl extends EventsRepository {
 
   @override
   Future<void> trackAnnouncementDismissEvent(String id) => client.postRequest(
-      '${HTTPConstants.announcementEvent}/$id${HTTPConstants.announcementDismissEvent}');
+      '${HTTPConstants.announcementEvent}$id${HTTPConstants.announcementDismissEvent}');
 
   @override
   Future<void> saveFirebaseToken(
