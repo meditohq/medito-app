@@ -7,10 +7,10 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
   final VoidCallback onUseFreeze;
 
   const StreakFreezeSuggestionWidget({
-    Key? key,
+    super.key,
     required this.stats,
     required this.onUseFreeze,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

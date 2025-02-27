@@ -190,31 +190,43 @@ class StatsManager {
 
     // If both exist, merge them properly
     if (localAllStats != null) {
-      print('DEBUG - MERGING:');
-      print(
+      dev.log('DEBUG - MERGING:');
+      dev.log(
           'Local audio: ${localAllStats.audioCompleted?.map((a) => a.id).toList()}');
-      print(
+      dev.log(
           'Remote audio: ${remoteStats.audioCompleted?.map((a) => a.id).toList()}');
-
-      // Simply combine all audio entries from both sources without deduplication
-      var combinedAudioCompleted = <LocalAudioCompleted>[
-        ...localAllStats.audioCompleted ?? [],
-        ...remoteStats.audioCompleted ?? [],
-      ];
-
-      print(
-          'Combined audio: ${combinedAudioCompleted.map((a) => a.id).toList()}');
-
-      // Create a combined list of freeze usage dates
-      var combinedFreezeUsageDates = {
-        ...localAllStats.freezeUsageDates,
-        ...remoteStats.freezeUsageDates
-      }.toList();
 
       // Create a combined list of tracks checked
       var combinedTracksChecked = {
         ...localAllStats.tracksChecked ?? [],
         ...remoteStats.tracksChecked ?? []
+      }.toList();
+
+      // Deduplicate audio completed entries by ID and timestamp
+      final audioCompletedMap = <String, LocalAudioCompleted>{};
+
+      // Process local entries first
+      for (final audio in localAllStats.audioCompleted ?? []) {
+        final key = '${audio.id}_${audio.timestamp}';
+        audioCompletedMap[key] = audio;
+      }
+
+      // Process remote entries, overwriting local entries if they exist
+      for (final audio in remoteStats.audioCompleted ?? []) {
+        final key = '${audio.id}_${audio.timestamp}';
+        audioCompletedMap[key] = audio;
+      }
+
+      // Convert back to list
+      final deduplicatedAudioCompleted = audioCompletedMap.values.toList();
+
+      dev.log(
+          'Deduplicated audio: ${deduplicatedAudioCompleted.map((a) => a.id).toList()}');
+
+      // Create a combined list of freeze usage dates, removing duplicates
+      var deduplicatedFreezeUsageDates = {
+        ...localAllStats.freezeUsageDates,
+        ...remoteStats.freezeUsageDates
       }.toList();
 
       // Determine which base to use for other properties
@@ -223,8 +235,8 @@ class StatsManager {
 
       // Update with combined data
       _allStats = baseStats.copyWith(
-        audioCompleted: combinedAudioCompleted,
-        freezeUsageDates: combinedFreezeUsageDates,
+        audioCompleted: deduplicatedAudioCompleted,
+        freezeUsageDates: deduplicatedFreezeUsageDates,
         tracksChecked: combinedTracksChecked,
         updated: DateTime.now().millisecondsSinceEpoch,
       );
@@ -238,14 +250,13 @@ class StatsManager {
     var today = DateTime(now.year, now.month, now.day);
     var longestStreak = allStats.streakLongest;
 
-    // Add debug output
-    print('===== STREAK CALCULATION DEBUG =====');
-    print('Current date for calculation: ${today.toIso8601String()}');
-    print('Initial longest streak: $longestStreak');
+    dev.log('===== STREAK CALCULATION DEBUG =====');
+    dev.log('Current date for calculation: ${today.toIso8601String()}');
+    dev.log('Initial longest streak: $longestStreak');
 
     // Early return for empty audio completed list
     if (allStats.audioCompleted == null || allStats.audioCompleted!.isEmpty) {
-      print('No audio entries, returning zero streak');
+      dev.log('No audio entries, returning zero streak');
       return allStats.copyWith(
         streakCurrent: 0,
         streakLongest: longestStreak,
@@ -253,10 +264,10 @@ class StatsManager {
     }
 
     // Debug output for audio entries
-    print('Raw audio entries:');
+    dev.log('Raw audio entries:');
     for (var audio in allStats.audioCompleted!) {
       var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      print('  ID: ${audio.id}, Date: ${date.toIso8601String()}');
+      dev.log('  ID: ${audio.id}, Date: ${date.toIso8601String()}');
     }
 
     // Convert audio completed to dates (year-month-day format)
@@ -272,26 +283,26 @@ class StatsManager {
     }).toList();
 
     // Debug output for freeze dates
-    print('Raw freeze dates:');
+    dev.log('Raw freeze dates:');
     for (var timestamp in allStats.freezeUsageDates) {
       var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      print('  Date: ${date.toIso8601String()}');
+      dev.log('  Date: ${date.toIso8601String()}');
     }
 
     // Remove duplicate dates
     audioDates = audioDates.toSet().toList();
-    print(
+    dev.log(
         'Unique audio dates: ${audioDates.map((d) => d.toIso8601String()).toList()}');
 
     freezeDates = freezeDates.toSet().toList();
-    print(
+    dev.log(
         'Unique freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
 
     // Only use freeze dates that don't already have activity and aren't in the future
     freezeDates = freezeDates
         .where((date) => !audioDates.contains(date) && !date.isAfter(today))
         .toList();
-    print(
+    dev.log(
         'Filtered freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
 
     // Combine all activity dates and freeze dates
@@ -299,43 +310,59 @@ class StatsManager {
 
     // Sort dates in descending order (newest first)
     allActivityDates.sort((a, b) => b.compareTo(a));
-    print(
+    dev.log(
         'All activity dates (sorted): ${allActivityDates.map((d) => d.toIso8601String()).toList()}');
 
     // No dates at all
     if (allActivityDates.isEmpty) {
-      print('No activity dates, returning zero streak');
+      dev.log('No activity dates, returning zero streak');
       return allStats.copyWith(
         streakCurrent: 0,
         streakLongest: longestStreak,
       );
     }
 
-    // Start with a streak of 1 for today
-    var streak = 1;
+    // Check if there's activity on today
+    var hasActivityToday = allActivityDates.any((date) =>
+        date.year == today.year &&
+        date.month == today.month &&
+        date.day == today.day);
 
-    // If there's no activity directly preceding today, check if there was a gap
+    // Check yesterday's activity
     var yesterday = today.subtract(const Duration(days: 1));
-    print('Checking for activity on yesterday: ${yesterday.toIso8601String()}');
+    dev.log(
+        'Checking for activity on yesterday: ${yesterday.toIso8601String()}');
 
     var hasActivityYesterday = allActivityDates.any((date) =>
         date.year == yesterday.year &&
         date.month == yesterday.month &&
         date.day == yesterday.day);
-    print('Has activity yesterday: $hasActivityYesterday');
+    dev.log('Has activity yesterday: $hasActivityYesterday');
 
-    // If there was no activity yesterday, the streak resets to just today (1)
-    if (!hasActivityYesterday) {
-      print('No activity yesterday, returning streak = 1');
+    // If there's no activity today or yesterday, streak is 0
+    if (!hasActivityToday && !hasActivityYesterday) {
+      dev.log('No activity today or yesterday, returning streak = 0');
+      return allStats.copyWith(
+        streakCurrent: 0,
+        streakLongest: longestStreak,
+      );
+    }
+
+    // If there's activity today but not yesterday, streak is 1
+    if (hasActivityToday && !hasActivityYesterday) {
+      dev.log('Activity today but not yesterday, returning streak = 1');
       return allStats.copyWith(
         streakCurrent: 1,
         streakLongest: longestStreak > 1 ? longestStreak : 1,
       );
     }
 
+    // Start with a streak of 1 if we have activity today, or 0 otherwise
+    var streak = hasActivityToday ? 1 : 0;
+
     // Count consecutive days starting from yesterday
     var checkDate = yesterday;
-    print('Starting to count consecutive days from yesterday');
+    dev.log('Starting to count consecutive days from yesterday');
 
     while (true) {
       var hasActivityOnDate = allActivityDates.any((date) =>
@@ -345,24 +372,26 @@ class StatsManager {
 
       if (hasActivityOnDate) {
         streak++;
-        print(
+        dev.log(
             'Found activity on ${checkDate.toIso8601String()}, streak = $streak');
         checkDate = checkDate.subtract(const Duration(days: 1));
       } else {
         // No activity on this date, break the streak
-        print('No activity on ${checkDate.toIso8601String()}, breaking streak');
+        dev.log(
+            'No activity on ${checkDate.toIso8601String()}, breaking streak');
         break;
       }
     }
 
     // Update longest streak if necessary
     if (streak > longestStreak) {
-      print('New longest streak: $streak (was $longestStreak)');
+      dev.log('New longest streak: $streak (was $longestStreak)');
       longestStreak = streak;
     }
 
-    print('Final streak calculation: current=$streak, longest=$longestStreak');
-    print('===== END STREAK CALCULATION =====');
+    dev.log(
+        'Final streak calculation: current=$streak, longest=$longestStreak');
+    dev.log('===== END STREAK CALCULATION =====');
 
     return allStats.copyWith(
       streakCurrent: streak,
@@ -394,7 +423,7 @@ class StatsManager {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error loading local stats: $e');
+        dev.log('Error loading local stats: $e');
       }
     }
     return LocalAllStats.empty();

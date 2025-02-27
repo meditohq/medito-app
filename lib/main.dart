@@ -99,13 +99,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinks();
-
-    // Check for streak freeze suggestion after a short delay
-    Future.delayed(const Duration(seconds: 1), () {
-      ref
-          .read(streakFreezeSuggestionProvider.notifier)
-          .checkForStreakFreezeSuggestion();
-    });
   }
 
   void _setUpSystemUi() {
@@ -205,26 +198,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Widget build(BuildContext context) {
     var connectionStatus = ref.watch(internetConnectionProvider);
 
-    // Listen to streak freeze suggestion state
-    ref.listen<StreakFreezeSuggestionState>(
-      streakFreezeSuggestionProvider,
-      (previous, current) {
-        if (current.shouldShowSuggestion &&
-            current.stats != null &&
-            (previous == null || !previous.shouldShowSuggestion)) {
-          // Show the suggestion bottom sheet
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showStreakFreezeSuggestion(context, current.stats!);
-
-            // Mark as handled after showing
-            ref
-                .read(streakFreezeSuggestionProvider.notifier)
-                .markSuggestionAsHandled();
-          });
-        }
-      },
-    );
-
     connectionStatus.whenData((status) {
       if (status == InternetConnectionStatus.disconnected) {
         showSnackBar(
@@ -299,28 +272,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           StringConstants.freezeUsedMessage,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-      ),
-    );
-  }
-
-  void showStreakFreezeSuggestion(BuildContext context, LocalAllStats stats) {
-    // Use navigatorKey.currentContext to ensure we have a valid context
-    final ctx = navigatorKey.currentContext ?? context;
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: ctx,
-      isScrollControlled: true, // Make it adaptable to content
-      backgroundColor: Theme.of(ctx).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => StreakFreezeSuggestionWidget(
-        stats: stats,
-        onUseFreeze: () async {
-          await ref.read(streakFreezeSuggestionProvider.notifier).useStreakFreeze();
-        },
       ),
     );
   }

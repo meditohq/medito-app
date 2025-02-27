@@ -9,25 +9,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MockStatsBackend {
   static LocalAllStats? _mockStorage = LocalAllStats(
-    streakCurrent: 5,
+    streakCurrent: 0,
     streakLongest: 20,
     totalTracksCompleted: 15,
     totalTimeListened: 3600,
     tracksChecked: [],
     audioCompleted: [
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 24).millisecondsSinceEpoch, id: '3'),
+          timestamp: DateTime.utc(2025, 2, 24,).millisecondsSinceEpoch, id: '1',),
+     LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 24,).millisecondsSinceEpoch, id: '2',),
           LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 23).millisecondsSinceEpoch, id: '3'),
+          timestamp: DateTime.utc(2025, 2, 23,).millisecondsSinceEpoch, id: '3',),
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 22).millisecondsSinceEpoch, id: '3'),
+          timestamp: DateTime.utc(2025, 2, 22,).millisecondsSinceEpoch, id: '4',),
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 21).millisecondsSinceEpoch, id: '3'),
+          timestamp: DateTime.utc(2025, 2, 21,).millisecondsSinceEpoch, id: '5', ),
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 20).millisecondsSinceEpoch, id: '4'),
+          timestamp: DateTime.utc(2025, 2, 20,).millisecondsSinceEpoch,id: '6'),
     ],
     updated: DateTime.now().millisecondsSinceEpoch,
-    streakFreezes: 1,
+    streakFreezes: 2,
     maxStreakFreezes: 2,
     freezeUsageDates: [
       DateTime(2025, 2, 19).millisecondsSinceEpoch,
@@ -37,12 +39,12 @@ class MockStatsBackend {
   static Future<void> saveStats(LocalAllStats stats) async {
     _mockStorage = stats;
     await Future.delayed(
-        const Duration(milliseconds: 100)); // Simulate network delay
+        const Duration(milliseconds: 100));
   }
 
   static Future<LocalAllStats?> getStats() async {
     await Future.delayed(
-        const Duration(milliseconds: 50)); // Simulate network delay
+        const Duration(milliseconds: 50));
     return _mockStorage;
   }
 }

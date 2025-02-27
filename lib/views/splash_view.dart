@@ -107,7 +107,7 @@ class SplashViewState extends ConsumerState<SplashView> {
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
-    
+
     _checkAuthAndInitialize();
   }
 
@@ -186,14 +186,6 @@ class SplashViewState extends ConsumerState<SplashView> {
     HttpApiService().initializeAuth();
     await _initializeDioHeaderService();
     ref.read(rootCombineProvider(context));
-
-    try {
-      await StatsManager().initialize();
-    } catch (e) {
-      dev.log('Stats initialization failed', error: e);
-      if (!mounted) return;
-      showSnackBar(context, StringConstants.statsInitError);
-    }
   }
 
   Future<void> _initializeDioHeaderService() async {

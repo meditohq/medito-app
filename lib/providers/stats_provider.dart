@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/settings_screen.dart';
-import 'package:flutter/material.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
 
@@ -53,12 +53,17 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   }
 
   Future<LocalAllStats> _fetchStats() async {
-    dev.log('StatsNotifier: Starting fetch');
     var statsManager = ref.read(statsManagerProvider);
 
     try {
-      await statsManager.initialize();
-      await statsManager.sync();
+      var authRepository = ref.read(authRepositoryProvider);
+      if (authRepository.currentUser != null) {
+        dev.log('StatsNotifier: Starting fetch');
+        await statsManager.initialize();
+        await statsManager.sync();
+      } else {
+        dev.log('StatsNotifier: User not signed in, skipping stats sync');
+      }
 
       return await statsManager.localAllStats;
     } catch (e, stackTrace) {

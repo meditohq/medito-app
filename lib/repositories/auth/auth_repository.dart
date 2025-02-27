@@ -221,7 +221,12 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   }
 
   @override
-  User? get currentUser => Supabase.instance.client.auth.currentUser;
+  User? get currentUser {
+    if (!AuthRepositoryImpl._hasInitialized) {
+      return null;
+    }
+    return Supabase.instance.client.auth.currentUser;
+  }
 
   @override
   Future<bool> signOut() async {
