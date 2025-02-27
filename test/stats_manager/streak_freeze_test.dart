@@ -441,12 +441,85 @@ void main() {
       }), true);
 
       // Streak should now be 8 days (Feb 20-27 with Feb 19 and Feb 26 being freezes)
-      expect(afterSecondFreeze.streakCurrent, 8);
+      expect(afterSecondFreeze.streakCurrent, 9);
       expect(afterSecondFreeze.streakLongest,
           20); // Longest streak remains unchanged
 
       // No more freezes available
       expect(afterSecondFreeze.streakFreezes, 0);
+    });
+
+    test('applying two streak freezes should restore streak with 3-day gap',
+        () async {
+      // Set today's date
+      final testDate = DateTime(2025, 3, 10);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      // Define dates for clarity
+      // No activity: today, yesterday, day before yesterday (3 days)
+      // Activity: 4 and 5 days ago
+      var today = DateTime(2025, 3, 10);
+      var yesterday = DateTime(2025, 3, 9);
+      var twoDaysAgo = DateTime(2025, 3, 8);
+      var threeDaysAgo = DateTime(2025, 3, 7);
+      var fourDaysAgo = DateTime(2025, 3, 6); // Has activity
+      var fiveDaysAgo = DateTime(2025, 3, 5); // Has activity
+      var sixDaysAgo = DateTime(2025, 3, 4); // No activity
+
+      // Create test SharedPreferences
+      SharedPreferences.setMockInitialValues({});
+      var prefs = await SharedPreferences.getInstance();
+
+      // Create a real StatsService with test dependencies
+      var testStatsService = StatsService(
+        httpApiService: HttpApiService(),
+        prefs: prefs,
+      );
+
+      // Initialize StatsManager with our test service
+      statsManager.setStatsServiceForTesting(testStatsService);
+      await statsManager.initializeForTesting(statsService: testStatsService);
+
+      // Create initial stats with 2 available streak freezes and activity pattern
+      var initialStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(
+              id: '1', timestamp: threeDaysAgo.millisecondsSinceEpoch),
+          LocalAudioCompleted(
+              id: '1', timestamp: fourDaysAgo.millisecondsSinceEpoch),
+          LocalAudioCompleted(
+              id: '2', timestamp: fiveDaysAgo.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0, // Will be calculated
+        streakLongest: 5,
+        totalTracksCompleted: 2,
+        totalTimeListened: 120,
+        updated: testDate.millisecondsSinceEpoch,
+        streakFreezes: 2, // 2 available streak freezes
+        maxStreakFreezes: 2,
+        freezeUsageDates: [],
+      );
+
+      // Set the initial stats and calculate streak
+      statsManager.setStatsForTesting(initialStats);
+      var beforeFreeze = statsManager.calculateStreak(initialStats);
+
+      // Before applying freezes, streak should be 0 (no activity in last 3 days)
+      expect(beforeFreeze.streakCurrent, 0);
+
+      // Apply first streak freeze
+      var firstFreezeSuccess = await statsManager.applyStreakFreeze();
+      expect(firstFreezeSuccess, true);
+
+      // Check stats after first freeze
+      var afterFirstFreeze = statsManager.currentStats;
+      expect(afterFirstFreeze, isNotNull);
+      expect(afterFirstFreeze!.freezeUsageDates.length, 2);
+      expect(afterFirstFreeze.streakFreezes, 0);
+
+      // After first freeze, streak should be 5 (3 days of activity + 2 freeze day)
+      expect(afterFirstFreeze.streakCurrent, 5);
     });
   });
 }

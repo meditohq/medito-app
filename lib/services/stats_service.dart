@@ -16,7 +16,7 @@ class MockStatsBackend {
     tracksChecked: [],
     audioCompleted: [
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 24,).millisecondsSinceEpoch, id: '1',),
+          timestamp: DateTime.utc(2025, 2, 25,).millisecondsSinceEpoch, id: '1',),
      LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 24,).millisecondsSinceEpoch, id: '2',),
           LocalAudioCompleted(
@@ -24,15 +24,12 @@ class MockStatsBackend {
       LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 22,).millisecondsSinceEpoch, id: '4',),
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 21,).millisecondsSinceEpoch, id: '5', ),
-      LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 20,).millisecondsSinceEpoch,id: '6'),
     ],
     updated: DateTime.now().millisecondsSinceEpoch,
     streakFreezes: 2,
     maxStreakFreezes: 2,
     freezeUsageDates: [
-      DateTime(2025, 2, 19).millisecondsSinceEpoch,
     ],
   );
 

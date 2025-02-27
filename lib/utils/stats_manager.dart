@@ -24,6 +24,7 @@ import 'package:medito/models/local_audio_completed.dart';
 // 	4.	The app only suggests a streak restoration if the user has enough streak freezes. If a user misses multiple days but does not have enough streak freezes to cover all of them, the app does not offer a partial restoration.
 // 	5.	Streak freezes do not apply automatically. Users must choose to use them when they open the app after missing a day.
 // 	6.	After using a streak freeze, meditating that day continues the streak. If a streak freeze is applied and the user meditates, the streak progresses as if no days were missed.
+//  7. The streak applies to the days before today. The user can use multiple streak freezes to cover multiple days, but it will never restore a previously broken streak, only the current streak can be restored.
 
 class StatsManager {
   static final StatsManager _instance = StatsManager._internal();
@@ -513,72 +514,177 @@ class StatsManager {
     }
 
     final stats = _allStats!;
-    final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final now = _getCurrentDate();
+    final today = DateTime(now.year, now.month, now.day);
 
     // Only check if there's a streak to preserve and user has streak freezes
     if ((stats.audioCompleted?.length ?? 0) > 0 &&
         (stats.streakFreezes ?? 0) > 0) {
-      // Check if there was activity yesterday
-      final hasActivityYesterday = stats.audioCompleted?.any((audio) {
-            final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-            return date.year == yesterday.year &&
-                date.month == yesterday.month &&
-                date.day == yesterday.day;
-          }) ??
-          false;
+      // Convert audio completed dates to DateTime objects
+      var audioDates = stats.audioCompleted
+              ?.map((audio) {
+                var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+                return DateTime(date.year, date.month, date.day);
+              })
+              .toSet()
+              .toList() ??
+          [];
 
-      // Check if a freeze was already used for yesterday
-      final freezeUsedYesterday = stats.freezeUsageDates.any((timestamp) {
-        final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-        return date.year == yesterday.year &&
-            date.month == yesterday.month &&
-            date.day == yesterday.day;
-      });
+      // Convert existing freeze dates to DateTime objects
+      var freezeDates = stats.freezeUsageDates
+          .map((timestamp) {
+            var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+            return DateTime(date.year, date.month, date.day);
+          })
+          .toSet()
+          .toList();
 
-      // Should suggest if no activity and no freeze used for yesterday
-      return !hasActivityYesterday && !freezeUsedYesterday;
+      // Combine all activity dates
+      var allActivityDates = {...audioDates, ...freezeDates}.toList();
+
+      // Check if there's recent activity (including today)
+      var hasRecentActivity = allActivityDates.any(
+          (date) => !date.isBefore(today.subtract(const Duration(days: 7))));
+
+      if (!hasRecentActivity) {
+        // No recent activity, so no streak to preserve
+        return false;
+      }
+
+      // Check if yesterday has activity
+      var yesterday = today.subtract(const Duration(days: 1));
+      var hasActivityYesterday = allActivityDates.any((date) =>
+          date.year == yesterday.year &&
+          date.month == yesterday.month &&
+          date.day == yesterday.day);
+
+      // If there's no activity yesterday and we haven't used a freeze for it,
+      // we should suggest a streak freeze
+      if (!hasActivityYesterday) {
+        return true;
+      }
     }
 
     return false;
   }
 
   Future<bool> applyStreakFreeze() async {
-    if (_allStats == null || (_allStats!.streakFreezes ?? 0) <= 0) {
+    if (_allStats == null) {
+      await sync();
+    }
+
+    if (_allStats == null) {
       return false;
     }
 
-    // Apply freeze to yesterday instead of today
-    var now = _getCurrentDate();
-    var yesterday = DateTime(now.year, now.month, now.day - 1);
-
-    // Check if a streak freeze has already been used for yesterday
-    final yesterdayStartOfDay = yesterday.millisecondsSinceEpoch;
-    final freezeUsedYesterday = _allStats!.freezeUsageDates.any((timestamp) {
-      final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      final startOfDay =
-          DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
-      return startOfDay == yesterdayStartOfDay;
-    });
-
-    if (freezeUsedYesterday) {
+    var availableStreakFreezes = _allStats!.streakFreezes ?? 0;
+    if (availableStreakFreezes <= 0) {
+      dev.log('No streak freezes available');
       return false;
     }
 
+    if (_allStats!.audioCompleted?.isEmpty == true) return false;
+
+    // Convert _currentDate to midnight for consistent date comparisons
+    var today = DateTime(
+        _getCurrentDate().year, _getCurrentDate().month, _getCurrentDate().day);
+    var yesterday = today.subtract(const Duration(days: 1));
+
+    // Sort activities by timestamp to ensure proper order
+    var audioActivities = [...?_allStats!.audioCompleted];
+    audioActivities.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    // Convert timestamps to DateTime objects for easier comparison
+    var audioDates = audioActivities
+        .map((activity) =>
+            DateTime.fromMillisecondsSinceEpoch(activity.timestamp))
+        .map((date) => DateTime(date.year, date.month, date.day))
+        .toList();
+
+    // Get existing freeze usage dates as DateTime objects for easier comparison
+    var existingFreezeDates = _allStats!.freezeUsageDates
+        .map((timestamp) => DateTime.fromMillisecondsSinceEpoch(timestamp))
+        .map((date) => DateTime(date.year, date.month, date.day))
+        .toList();
+
+    // If yesterday already has a freeze, we should return false
+    var yesterdayHasFreeze = existingFreezeDates.any((date) =>
+        date.year == yesterday.year &&
+        date.month == yesterday.month &&
+        date.day == yesterday.day);
+
+    if (yesterdayHasFreeze) {
+      return false;
+    }
+
+    // Find consecutive missed days that need freezes
+    var missedDays = <DateTime>[];
+
+    // Start with yesterday and look backwards for gaps
+    for (var i = 1; missedDays.length < availableStreakFreezes && i <= 7; i++) {
+      var dayToCheck = today.subtract(Duration(days: i));
+
+      // Check if this day already has activity or a freeze
+      var hasAudioActivity = audioDates.any((date) =>
+          date.year == dayToCheck.year &&
+          date.month == dayToCheck.month &&
+          date.day == dayToCheck.day);
+
+      var hasFreeze = existingFreezeDates.any((date) =>
+          date.year == dayToCheck.year &&
+          date.month == dayToCheck.month &&
+          date.day == dayToCheck.day);
+
+      if (!hasAudioActivity && !hasFreeze) {
+        // This is a missed day - add it to our list
+        missedDays.add(dayToCheck);
+      } else if (missedDays.isEmpty) {
+        // If we find a day with activity/freeze but haven't found gaps yet,
+        // continue looking for gaps
+        continue;
+      } else if (hasAudioActivity || hasFreeze) {
+        // If we've already found gaps and now found activity,
+        // we've found all consecutive gaps to fill
+        break;
+      }
+    }
+
+    // If we didn't find any days to freeze, return false
+    if (missedDays.isEmpty) {
+      return false;
+    }
+
+    // Limit to available freezes
+    if (missedDays.length > availableStreakFreezes) {
+      missedDays = missedDays.sublist(0, availableStreakFreezes);
+    }
+
+    // Apply freezes to the missed days
+    var newFreezeUsageDates = [..._allStats!.freezeUsageDates];
+
+    for (var missedDay in missedDays) {
+      newFreezeUsageDates.add(missedDay.millisecondsSinceEpoch);
+    }
+
+    // Update stats and calculate new streak
     var updatedStats = _allStats!.copyWith(
-      streakFreezes: (_allStats!.streakFreezes ?? 0) - 1,
-      freezeUsageDates: [
-        ..._allStats!.freezeUsageDates,
-        yesterday.millisecondsSinceEpoch
-      ],
-      updated: DateTime.now().millisecondsSinceEpoch,
+      streakFreezes: availableStreakFreezes - missedDays.length,
+      freezeUsageDates: newFreezeUsageDates,
+      updated: _getCurrentDate().millisecondsSinceEpoch,
     );
 
     _allStats = updatedStats;
-    // Recalculate streak after applying freeze
+
+    // Calculate the new streak with freezes applied
     _allStats = calculateStreak(_allStats!);
+
+
     await _saveLocalAllStatsToSharedPrefs();
     await _statsService.postStats(_allStats!);
+
+    dev.log(
+        'Applied ${missedDays.length} streak freezes to: ${missedDays.map((d) => d.toIso8601String()).join(", ")}');
+
     return true;
   }
 
