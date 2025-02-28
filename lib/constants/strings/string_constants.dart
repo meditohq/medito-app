@@ -497,4 +497,43 @@ class StringConstants {
   /// Message shown when battery optimization is already disabled
   static const String batteryOptimizationAlreadyDisabled =
       'Battery optimization is already disabled for Medito';
+
+  // Donation retention dialog strings
+  /// Title for the dialog shown when users attempt to cancel their donation
+  static const String donationRetentionTitle = 'Please Reconsider';
+
+  /// Main message in the donation retention dialog
+  static const String donationRetentionMainMessage =
+      'Millions of people rely on Medito, and we operate solely on donations.';
+
+  /// Support benefits heading in the donation retention dialog
+  static const String donationRetentionBenefitsHeading =
+      'Your support helps us:';
+
+  /// First bullet point about what donations enable
+  static const String donationRetentionBenefit1 =
+      'Add new meditation content regularly';
+
+  /// Second bullet point about what donations enable
+  static const String donationRetentionBenefit2 =
+      'Develop new features to improve your experience';
+
+  /// Third bullet point about what donations enable
+  static const String donationRetentionBenefit3 =
+      'Keep Medito free and accessible for everyone';
+
+  /// Message acknowledging financial difficulties in the donation retention dialog
+  static const String donationRetentionFinancialMessage =
+      'If you\'re experiencing financial difficulties, we understand. But if you can continue your support, even at a reduced amount, it would make a significant difference.';
+
+  /// Text for the button to stay as a donor
+  static const String stayAsDonorButtonText = 'Stay as a donor';
+
+  /// Text for the button to continue to cancellation
+  static const String continueToCancellationButtonText =
+      'Continue to cancellation';
+
+  /// Thank you message shown when users choose to stay as donors
+  static const String donationRetentionThankYouMessage =
+      'Thank you! Your continued support means the world to us and helps millions of people access meditation.';
 }

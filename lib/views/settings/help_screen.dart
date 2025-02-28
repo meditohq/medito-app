@@ -143,6 +143,105 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     }
   }
 
+  Future<void> _showDonationRetentionDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: ColorConstants.onyx,
+        title: const Text(
+          StringConstants.donationRetentionTitle,
+          style: TextStyle(
+            color: ColorConstants.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              StringConstants.donationRetentionMainMessage,
+              style: TextStyle(color: ColorConstants.white, height: 1.5),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              StringConstants.donationRetentionBenefitsHeading,
+              style: TextStyle(color: ColorConstants.white, height: 1.5),
+            ),
+            const SizedBox(height: 8),
+            _buildBulletPoint(StringConstants.donationRetentionBenefit1),
+            _buildBulletPoint(StringConstants.donationRetentionBenefit2),
+            _buildBulletPoint(StringConstants.donationRetentionBenefit3),
+            const SizedBox(height: 12),
+            const Text(
+              StringConstants.donationRetentionFinancialMessage,
+              style: TextStyle(color: ColorConstants.white, height: 1.5),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+                showSnackBar(
+                  context,
+                  StringConstants.donationRetentionThankYouMessage,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstants.lightPurple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(StringConstants.stayAsDonorButtonText),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white70,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(StringConstants.continueToCancellationButtonText),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await _launchUrl(StringConstants.donationPortalUrl);
+    }
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(color: ColorConstants.white)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(color: ColorConstants.white, height: 1.5),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -247,10 +346,18 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
             .toList(),
       );
     } else if (item.actionText != null && item.onActionPressed != null) {
-      return _buildActionButton(
-        item.actionText!,
-        item.onActionPressed!,
-      );
+      // Special handling for donation cancellation
+      if (item.title == StringConstants.stopDonationTitle) {
+        return _buildActionButton(
+          item.actionText!,
+          () => _showDonationRetentionDialog(),
+        );
+      } else {
+        return _buildActionButton(
+          item.actionText!,
+          item.onActionPressed!,
+        );
+      }
     }
 
     return const SizedBox.shrink();
