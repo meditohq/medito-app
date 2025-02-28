@@ -484,4 +484,17 @@ class StringConstants {
 
   /// URL for the contact form
   static const String contactFormBaseUrl = 'https://tally.so/r/wLGBaO';
+
+  // Battery optimization strings
+  static const String batteryOptimizationTitle =
+      'Your device has additional battery optimization';
+  static const String batteryOptimizationDescription =
+      'Follow the steps and disable the optimizations to allow smooth functioning of this app';
+  static const String autoStartTitle = 'Enable Auto Start';
+  static const String autoStartDescription =
+      'Follow the steps and enable the auto start of this app';
+
+  /// Message shown when battery optimization is already disabled
+  static const String batteryOptimizationAlreadyDisabled =
+      'Battery optimization is already disabled for Medito';
 }

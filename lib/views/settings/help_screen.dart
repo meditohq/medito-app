@@ -6,10 +6,13 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/repositories/me/me_repository.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 
 class HelpScreen extends ConsumerStatefulWidget {
   const HelpScreen({super.key});
@@ -21,54 +24,101 @@ class HelpScreen extends ConsumerStatefulWidget {
 class HelpScreenState extends ConsumerState<HelpScreen> {
   late List<HelpItem> _helpItems;
   final List<bool> _expandedItems = [];
+  bool _isLoading = true;
+  bool _isSubscriber = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeHelpItems();
-    _expandedItems.addAll(List.generate(_helpItems.length, (_) => false));
+    _checkSubscriptionStatus();
+  }
+
+  Future<void> _checkSubscriptionStatus() async {
+    try {
+      final meRepository = ref.read(meRepositoryProvider);
+      final meData = await meRepository.fetchMe();
+      setState(() {
+        _isSubscriber = meData.hasActiveSubscription;
+        _initializeHelpItems();
+        _expandedItems.addAll(List.generate(_helpItems.length, (_) => false));
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isSubscriber = false;
+        _initializeHelpItems();
+        _expandedItems.addAll(List.generate(_helpItems.length, (_) => false));
+        _isLoading = false;
+      });
+    }
   }
 
   void _initializeHelpItems() {
-    _helpItems = [
-      HelpItem(
-        title: StringConstants.meditationInterruptionTitle,
-        content: StringConstants.meditationInterruptionContent,
-        actionText: StringConstants.openBatterySettingsText,
-        onActionPressed: _openBatterySettings,
-        icon: HugeIcons.solidRoundedVolumeMute02,
-      ),
+    _helpItems = [];
+
+    // Only add battery optimization item for Android
+    if (Platform.isAndroid) {
+      _helpItems.add(
+        HelpItem(
+          title: StringConstants.meditationInterruptionTitle,
+          content: StringConstants.meditationInterruptionContent,
+          actionText: StringConstants.openBatterySettingsText,
+          onActionPressed: _handleBatteryOptimization,
+          icon: HugeIcons.solidRoundedVolumeMute02,
+        ),
+      );
+    }
+
+    // Add the rest of the help items
+    _helpItems.add(
       HelpItem(
         title: StringConstants.downloadTracksTitle,
         content: StringConstants.downloadTracksContent,
         icon: HugeIcons.solidRoundedDownloadSquare02,
       ),
-      HelpItem(
-        title: StringConstants.supportTitle,
-        content: StringConstants.supportContent,
-        icon: HugeIcons.solidSharpFavourite,
-        multipleActions: [
-          ActionButton(
-            text: StringConstants.donateViaDonationFormText,
-            onPressed: () => _launchUrl(StringConstants.donationFormUrl),
-          ),
-          ActionButton(
-            text: StringConstants.donateViaPayPalText,
-            onPressed: () => _launchUrl(StringConstants.payPalDonationUrl),
-          ),
-          ActionButton(
-            text: StringConstants.donateViaBankTransferText,
-            onPressed: () => _launchUrl(StringConstants.bankTransferDetailsUrl),
-          ),
-        ],
-      ),
-      HelpItem(
-        title: StringConstants.stopDonationTitle,
-        content: StringConstants.stopDonationContent,
-        actionText: StringConstants.goToDonationPortalText,
-        onActionPressed: () => _launchUrl(StringConstants.donationPortalUrl),
-        icon: HugeIcons.solidRoundedHeartbreak,
-      ),
+    );
+
+    // Only show donation option if user is not a subscriber
+    if (!_isSubscriber) {
+      _helpItems.add(
+        HelpItem(
+          title: StringConstants.supportTitle,
+          content: StringConstants.supportContent,
+          icon: HugeIcons.solidSharpFavourite,
+          multipleActions: [
+            ActionButton(
+              text: StringConstants.donateViaDonationFormText,
+              onPressed: () => _launchUrl(StringConstants.donationFormUrl),
+            ),
+            ActionButton(
+              text: StringConstants.donateViaPayPalText,
+              onPressed: () => _launchUrl(StringConstants.payPalDonationUrl),
+            ),
+            ActionButton(
+              text: StringConstants.donateViaBankTransferText,
+              onPressed: () =>
+                  _launchUrl(StringConstants.bankTransferDetailsUrl),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Only show cancel donation option if user is a subscriber
+    if (_isSubscriber) {
+      _helpItems.add(
+        HelpItem(
+          title: StringConstants.stopDonationTitle,
+          content: StringConstants.stopDonationContent,
+          actionText: StringConstants.goToDonationPortalText,
+          onActionPressed: () => _launchUrl(StringConstants.donationPortalUrl),
+          icon: HugeIcons.solidRoundedHeartbreak,
+        ),
+      );
+    }
+
+    // Add the remaining help items
+    _helpItems.addAll([
       HelpItem(
         title: StringConstants.statsWrongTitle,
         content: StringConstants.statsWrongContent,
@@ -83,7 +133,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         onActionPressed: _openContactForm,
         icon: HugeIcons.solidRoundedQuestion,
       ),
-    ];
+    ]);
   }
 
   Future<void> _launchUrl(String urlString) async {
@@ -105,49 +155,51 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         elevation: 0.0,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(
-            vertical: padding16,
-            horizontal: padding16,
-          ),
-          child: ExpansionPanelList(
-            expandedHeaderPadding: EdgeInsets.zero,
-            dividerColor: Colors.transparent,
-            elevation: 0,
-            expansionCallback: (index, isExpanded) {
-              setState(() {
-                _expandedItems[index] = !_expandedItems[index];
-              });
-            },
-            children: List.generate(
-              _helpItems.length,
-              (index) => ExpansionPanel(
-                backgroundColor: ColorConstants.onyx,
-                headerBuilder: (context, isExpanded) => ListTile(
-                  leading: _helpItems[index].icon != null
-                      ? HugeIcon(
-                          icon: _helpItems[index].icon!,
-                          color: ColorConstants.white,
-                          size: 24,
-                        )
-                      : null,
-                  title: Text(
-                    _helpItems[index].title,
-                    style: const TextStyle(
-                      color: ColorConstants.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: padding16,
+                  horizontal: padding16,
+                ),
+                child: ExpansionPanelList(
+                  expandedHeaderPadding: EdgeInsets.zero,
+                  dividerColor: Colors.transparent,
+                  elevation: 0,
+                  expansionCallback: (index, isExpanded) {
+                    setState(() {
+                      _expandedItems[index] = !_expandedItems[index];
+                    });
+                  },
+                  children: List.generate(
+                    _helpItems.length,
+                    (index) => ExpansionPanel(
+                      backgroundColor: ColorConstants.onyx,
+                      headerBuilder: (context, isExpanded) => ListTile(
+                        leading: _helpItems[index].icon != null
+                            ? HugeIcon(
+                                icon: _helpItems[index].icon!,
+                                color: ColorConstants.white,
+                                size: 24,
+                              )
+                            : null,
+                        title: Text(
+                          _helpItems[index].title,
+                          style: const TextStyle(
+                            color: ColorConstants.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      body: _buildPanelBody(_helpItems[index]),
+                      isExpanded: _expandedItems[index],
+                      canTapOnHeader: true,
                     ),
                   ),
                 ),
-                body: _buildPanelBody(_helpItems[index]),
-                isExpanded: _expandedItems[index],
-                canTapOnHeader: true,
               ),
-            ),
-          ),
-        ),
       ),
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.of(context).pop(),
@@ -252,23 +304,64 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     await _launchUrl(statsUrl);
   }
 
-  static Future<void> _openBatterySettings() async {
-    final urlString = Platform.isAndroid
-        ? 'package:com.android.settings'
-        : Platform.isIOS
-            ? 'App-prefs:Battery'
-            : null;
+  Future<void> _handleBatteryOptimization() async {
+    if (!Platform.isAndroid) return;
 
-    if (urlString == null) return;
+    // Check if all battery optimizations are already disabled
+    var isAllBatteryOptimizationDisabled =
+        await DisableBatteryOptimization.isAllBatteryOptimizationDisabled;
 
-    final url = Uri.parse(urlString);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      // Fallback to general settings
-      final generalSettings = Uri.parse(
-          Platform.isAndroid ? 'package:com.android.settings' : 'App-prefs:');
-      await launchUrl(generalSettings);
+    if (isAllBatteryOptimizationDisabled != null &&
+        isAllBatteryOptimizationDisabled) {
+      // If all optimizations are already disabled, show a different action
+      showSnackBar(context, StringConstants.batteryOptimizationAlreadyDisabled);
+      return;
+    }
+
+    // Show the comprehensive settings to disable all optimizations
+    await DisableBatteryOptimization.showDisableAllOptimizationsSettings(
+      StringConstants.batteryOptimizationTitle,
+      StringConstants.batteryOptimizationDescription,
+      StringConstants.cancel,
+      StringConstants.requestPermission,
+    );
+
+    // If not all optimizations were handled by the above method,
+    // fall back to individual checks
+
+    // Check if battery optimization is already disabled
+    var isBatteryOptimizationDisabled =
+        await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+
+    if (isBatteryOptimizationDisabled != null &&
+        !isBatteryOptimizationDisabled) {
+      // Show the system dialog to disable battery optimization
+      await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+    }
+
+    // Check for manufacturer-specific optimizations
+    var isManufacturerOptimizationDisabled = await DisableBatteryOptimization
+        .isManufacturerBatteryOptimizationDisabled;
+
+    if (isManufacturerOptimizationDisabled != null &&
+        !isManufacturerOptimizationDisabled) {
+      // Show manufacturer-specific optimization settings
+      await DisableBatteryOptimization
+          .showDisableManufacturerBatteryOptimizationSettings(
+        StringConstants.batteryOptimizationTitle,
+        StringConstants.batteryOptimizationDescription,
+      );
+    }
+
+    // Check for auto-start settings (important for some devices)
+    var isAutoStartEnabled =
+        await DisableBatteryOptimization.isAutoStartEnabled;
+
+    if (isAutoStartEnabled != null && !isAutoStartEnabled) {
+      await DisableBatteryOptimization.showEnableAutoStartSettings(
+        StringConstants.autoStartTitle,
+        StringConstants.autoStartDescription,
+      );
     }
   }
 }
