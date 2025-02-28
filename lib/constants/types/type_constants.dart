@@ -21,3 +21,7 @@ class TypeConstants {
   static const String journalEntry = 'journal';
   static const String meditationOutsideApp = 'meditation_outside_app';
 }
+
+class RouteConstants {
+  static const String help = 'help';
+}

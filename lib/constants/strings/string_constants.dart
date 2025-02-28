@@ -417,4 +417,71 @@ class StringConstants {
       'You have {count} streak freezes available. Would you like to use one to protect your current streak?';
   static const String useStreakFreeze = 'Use Streak Freeze';
   static const String notNow = 'Not Now';
+
+  static const String helpTitle = 'Help';
+
+  static const String meditationInterruptionTitle =
+      'Meditations stop unexpectedly';
+  static const String meditationInterruptionContent =
+      'This is likely due to your phone\'s battery saver mode. Allow Medito to run in the background in your device\'s battery performance settings.';
+
+  static const String supportTitle = 'I want to support you';
+  static const String supportContent =
+      'You can support Medito Foundation through several methods';
+
+  static const String stopDonationTitle = 'I want to stop my monthly donation';
+  static const String stopDonationContent =
+      'Go to the donation portal. You need the email address you used to set them up';
+
+  static const String statsWrongTitle = 'My stats are wrong';
+  static const String statsWrongContent =
+      'You can edit them at the dedicated stats editing page.';
+
+  /// Content text for the Contact Us section in the Help screen
+  static const String contactUsContent =
+      'If you have any questions not addressed on this page, any feedback, or if you need assistance, please reach out to us. We\'re here to help!';
+
+  /// Action button text for the Contact Us section in the Help screen
+  static const String contactUsActionText = 'Contact Us';
+
+  /// Title for the Download Tracks section in the Help screen
+  static const String downloadTracksTitle = 'How to download tracks';
+
+  /// Content text for the Download Tracks section in the Help screen
+  static const String downloadTracksContent =
+      'To download a track, start playing it and then look for the download icon (a down arrow) at the bottom of the player screen—it\'s the second icon.\n\nOnce downloaded, you can access your tracks by tapping the "Downloads" tile on the home screen.';
+
+  /// Action button text for the Battery Settings section in the Help screen
+  static const String openBatterySettingsText = 'Open Battery Settings';
+
+  /// Action button text for the Donation Portal in the Help screen
+  static const String goToDonationPortalText = 'Go to Donation Portal';
+
+  /// Action button text for the Edit Stats section in the Help screen
+  static const String editStatsActionText = 'Edit Stats';
+
+  /// Text for the Donate via donation form button in the Help screen
+  static const String donateViaDonationFormText = 'Donate via Donation Form';
+
+  /// Text for the Donate via PayPal button in the Help screen
+  static const String donateViaPayPalText = 'Donate via PayPal';
+
+  /// Text for the Donate via Bank transfer button in the Help screen
+  static const String donateViaBankTransferText = 'Donate via Bank Transfer';
+
+  /// URL for the Medito Foundation donation page
+  static const String donationFormUrl = 'https://meditofoundation.org/donate';
+
+  /// URL for the PayPal donation page
+  static const String payPalDonationUrl = 'https://paypal.me/meditofoundation';
+
+  /// URL for the bank transfer details page
+  static const String bankTransferDetailsUrl =
+      'https://meditofoundation.org/about/bank-details';
+
+  /// URL for the donation portal to manage recurring donations
+  static const String donationPortalUrl = 'https://bit.ly/3yFqVbM';
+
+  /// URL for the contact form
+  static const String contactFormBaseUrl = 'https://tally.so/r/wLGBaO';
 }

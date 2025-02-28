@@ -84,6 +84,15 @@ class SettingsScreen extends ConsumerWidget {
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
+        section: StringConstants.helpLegal,
+        type: TypeConstants.route,
+        title: StringConstants.helpTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedHelpCircle,
+            color: ColorConstants.white),
+        path: RouteConstants.help,
+      ),
+      SettingsItem(
         section: StringConstants.account,
         type: TypeConstants.account,
         title: user?.email != null && user?.email != ''
@@ -132,30 +141,6 @@ class SettingsScreen extends ConsumerWidget {
       SettingsItem(
         section: StringConstants.helpLegal,
         type: 'url',
-        title: StringConstants.contactUsTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedMessage01, color: ColorConstants.white),
-        path: clientIdSync.when(
-          data: (userId) => deviceInfoAsyncValue.when(
-            data: (deviceInfo) {
-              final platform = Uri.encodeComponent(deviceInfo.platform);
-              final language = Uri.encodeComponent(deviceInfo.languageCode);
-              final model = Uri.encodeComponent(deviceInfo.model);
-              final appVersion = Uri.encodeComponent(deviceInfo.appVersion);
-              final os = Uri.encodeComponent(deviceInfo.os);
-
-              return 'https://tally.so/r/wLGBaO?userId=$userId&platform=$platform&language=$language&model=$model&appVersion=$appVersion&os=$os';
-            },
-            loading: () => 'https://tally.so/r/wLGBaO?userId=$userId',
-            error: (_, __) => 'https://tally.so/r/wLGBaO?userId=$userId',
-          ),
-          loading: () => 'https://tally.so/r/wLGBaO',
-          error: (_, __) => 'https://tally.so/r/wLGBaO',
-        ),
-      ),
-      SettingsItem(
-        section: StringConstants.helpLegal,
-        type: 'url',
         title: StringConstants.termsOfService,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedDocumentAttachment,
@@ -179,7 +164,7 @@ class SettingsScreen extends ConsumerWidget {
           color: ColorConstants.white,
         ),
         path: TypeConstants.customiseHomeLayout,
-      ),
+      )
     ];
 
     return Scaffold(
@@ -232,7 +217,7 @@ class SettingsScreen extends ConsumerWidget {
                 .map((item) => _buildMenuItemTile(context, ref, item)),
             _buildSectionTitle(context, StringConstants.advanced),
             _buildDebugTile(context, ref),
-            if(kDebugMode) _buildOnboardingTile(context, ref),
+            if (kDebugMode) _buildOnboardingTile(context, ref),
           ],
         ),
       ),

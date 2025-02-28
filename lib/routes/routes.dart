@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -13,6 +12,7 @@ import 'package:medito/views/track/track_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
+import 'package:medito/views/settings/help_screen.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -58,7 +58,11 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    _pushRoute(const SignUpLogInPage(fromSettings: true), ref);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignUpLogInPage(),
+      ),
+    );
   } else if (type == TypeConstants.journalEntry) {
     var id = ids.first ?? '';
     var content = ids.length > 1 ? ids[1] ?? '' : '';
@@ -73,6 +77,8 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.route &&
       ids.contains(TypeConstants.customiseHomeLayout)) {
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
+  } else if (type == TypeConstants.route && ids.contains(RouteConstants.help)) {
+    await _pushRoute(const HelpScreen(), ref);
   }
 }
 
