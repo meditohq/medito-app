@@ -1,12 +1,12 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/models/local_audio_completed.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/views/settings/settings_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
@@ -67,14 +67,16 @@ Future<String> deviceAppAndUserInfo(Ref ref) async {
   var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
   var auth = ref.read(authRepositoryProvider);
   var email = auth.getUserEmail();
+  var stats = await ref.watch(statsProvider.future);
 
-  return await _formatString(me, deviceInfo, email, ref);
+  return await _formatString(me, deviceInfo, email, stats, ref);
 }
 
 Future<String> _formatString(
   MeModel? me,
   DeviceAndAppInfoModel? deviceInfo,
   String? emailAddress,
+  dynamic stats,
   Ref ref,
 ) async {
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
@@ -95,8 +97,25 @@ Future<String> _formatString(
       '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
 
   if (kDebugMode) {
-    var isMonthlyDonorString = '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
+    var isMonthlyDonorString =
+        '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
     formattedString += '\n$isMonthlyDonorString';
+  }
+
+  // Add audio completion timestamps if available
+  try {
+    if (stats?.audioCompleted != null && stats.audioCompleted.isNotEmpty) {
+      formattedString += '\n\nact:';
+
+      // Take the most recent 10 sessions (or fewer if less are available)
+      List<LocalAudioCompleted> recentSessions = stats.audioCompleted.take(10).toList();
+
+      for (var session in recentSessions) {
+        formattedString += '\n${session.timestamp} ';
+      }
+    }
+  } catch (e) {
+    formattedString += '\n\nError retrieving audio completion data: $e';
   }
 
   return formattedString;

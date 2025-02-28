@@ -389,12 +389,12 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
 
     final params = {
-      'userId': clientId ?? '',
-      'platform': deviceInfo?.platform ?? '',
-      'language': deviceInfo?.languageCode ?? '',
-      'model': deviceInfo?.model ?? '',
-      'appVersion': deviceInfo?.appVersion ?? '',
-      'os': deviceInfo?.os ?? '',
+      'userId': clientId,
+      'platform': deviceInfo.platform,
+      'language': deviceInfo.languageCode,
+      'model': deviceInfo.model,
+      'appVersion': deviceInfo.appVersion,
+      'os': deviceInfo.os,
     };
 
     final queryString = params.entries

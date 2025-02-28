@@ -12,6 +12,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
@@ -385,15 +386,12 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showDebugBottomSheet(BuildContext context, WidgetRef ref) {
     ref.invalidate(meProvider);
-    showModalBottomSheet(
-      showDragHandle: true,
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const DebugInfoScreen(),
       ),
-      context: context,
-      builder: (context) => const DebugBottomSheetWidget(),
     );
+
   }
 
   List<SettingsItem> _getItemsBySection(
