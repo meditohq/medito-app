@@ -71,12 +71,12 @@ class HTTPConstants {
   static const String allStats = 'stats';
   static const String me = 'me';
   static const String searchTracks = 'search/tracks';
+  static const String announcementEvent = 'announcements';
 
   // MAINTENANCE END POINTS
   static String maintenance = '${contentBaseUrl}maintenance';
 
   // EVENT END POINTS
-  static const String announcementEvent = '/announcements';
   static const String announcementDismissEvent = '/dismiss';
   static const String firebaseEvent = '/fcm';
   static const String rate = '/rate';

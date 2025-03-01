@@ -1564,5 +1564,209 @@ void main() {
             true); // Empty string should be added
       });
     });
+
+    group('StatsManager with Specific Timestamps Tests', () {
+      test('calculateStreak - specific timestamp sequence with gaps', () {
+        // Set "today" as March 1
+        final testDate = DateTime(2025, 3, 1);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        // Create activity with the specific timestamps provided
+        // Notice gaps on Feb 21 and Feb 26
+        var stats = LocalAllStats.empty().copyWith(
+          audioCompleted: [
+            // Feb 28 - Today
+            LocalAudioCompleted(id: '7', timestamp: 1740731266284),
+            // Feb 27
+            LocalAudioCompleted(id: '6', timestamp: 1740675815221),
+            // GAP on Feb 26
+            // Feb 25
+            LocalAudioCompleted(id: '5', timestamp: 1740441600000),
+            // Feb 24
+            LocalAudioCompleted(id: '4', timestamp: 1740355200000),
+            // Feb 23
+            LocalAudioCompleted(id: '3', timestamp: 1740268800000),
+            // Feb 22
+            LocalAudioCompleted(id: '2', timestamp: 1740182400000),
+            // GAP on Feb 21
+            // Feb 20
+            LocalAudioCompleted(id: '1', timestamp: 1740009600000),
+          ],
+        );
+
+        // Act - Calculate streak with no freezes
+        var result = statsManager.calculateStreak(stats);
+
+        // Assert
+        // Should have a streak of 2 (Feb 27-28) because there's a gap on Feb 26
+        expect(result.streakCurrent, 2);
+        expect(result.streakLongest, 2);
+      });
+
+      test('calculateStreak - with freeze on Feb 26', () {
+        // Set "today" as February 28, 2025
+        final testDate = DateTime(2025, 2, 28);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        // Date for Feb 26 (the gap day)
+        final feb26 = DateTime(2025, 2, 26);
+
+        // Create activity with the specific timestamps provided
+        // Apply a streak freeze for Feb 26
+        var stats = LocalAllStats.empty().copyWith(
+          audioCompleted: [
+            // Feb 28 - Today
+            LocalAudioCompleted(id: '7', timestamp: 1740731266284),
+            // Feb 27
+            LocalAudioCompleted(id: '6', timestamp: 1740675815221),
+            // GAP on Feb 26 (with freeze)
+            // Feb 25
+            LocalAudioCompleted(id: '5', timestamp: 1740441600000),
+            // Feb 24
+            LocalAudioCompleted(id: '4', timestamp: 1740355200000),
+            // Feb 23
+            LocalAudioCompleted(id: '3', timestamp: 1740268800000),
+            // Feb 22
+            LocalAudioCompleted(id: '2', timestamp: 1740182400000),
+            // GAP on Feb 21
+            // Feb 20
+            LocalAudioCompleted(id: '1', timestamp: 1740009600000),
+          ],
+          freezeUsageDates: [feb26.millisecondsSinceEpoch],
+          streakFreezes: 0,
+          maxStreakFreezes: 1,
+        );
+
+        // Act
+        var result = statsManager.calculateStreak(stats);
+
+        // Assert
+        // Should have a streak of 6 (Feb 22-28) because freeze covers the gap on Feb 26
+        // The streak breaks at Feb 21 (between Feb 20 and Feb 22)
+        expect(result.streakCurrent, 7);
+        expect(result.streakLongest, 7);
+      });
+
+      test('calculateStreak - with freezes on both Feb 21 and Feb 26', () {
+        // Set "today" as February 28, 2025
+        final testDate = DateTime(2025, 2, 28);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        // Dates for the two gap days
+        final feb21 = DateTime(2025, 2, 21);
+        final feb26 = DateTime(2025, 2, 26);
+
+        // Create activity with the specific timestamps provided
+        // Apply streak freezes for both gap days
+        var stats = LocalAllStats.empty().copyWith(
+          audioCompleted: [
+            // Feb 28 - Today
+            LocalAudioCompleted(id: '7', timestamp: 1740731266284),
+            // Feb 27
+            LocalAudioCompleted(id: '6', timestamp: 1740675815221),
+            // GAP on Feb 26 (with freeze)
+            // Feb 25
+            LocalAudioCompleted(id: '5', timestamp: 1740441600000),
+            // Feb 24
+            LocalAudioCompleted(id: '4', timestamp: 1740355200000),
+            // Feb 23
+            LocalAudioCompleted(id: '3', timestamp: 1740268800000),
+            // Feb 22
+            LocalAudioCompleted(id: '2', timestamp: 1740182400000),
+            // GAP on Feb 21 (with freeze)
+            // Feb 20
+            LocalAudioCompleted(id: '1', timestamp: 1740009600000),
+          ],
+          freezeUsageDates: [
+            feb21.millisecondsSinceEpoch,
+            feb26.millisecondsSinceEpoch,
+          ],
+          streakFreezes: 0,
+          maxStreakFreezes: 2,
+        );
+
+        // Act
+        var result = statsManager.calculateStreak(stats);
+
+        // Assert
+        // Should have a streak of 9 (Feb 20-28) because freezes cover both gaps
+        expect(result.streakCurrent, 9);
+        expect(result.streakLongest, 9);
+      });
+
+      test('shouldSuggestStreakFreeze - suggests freeze for gap on Feb 26',
+          () async {
+        // Set "today" as February 27, 2025
+        final testDate = DateTime(2025, 2, 27);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        // Create activity with timestamps up to Feb 25 (missing Feb 26)
+        var stats = LocalAllStats.empty().copyWith(
+          audioCompleted: [
+            // Feb 27 - Today
+            LocalAudioCompleted(id: '6', timestamp: 1740675815221),
+            // GAP on Feb 26
+            // Feb 25
+            LocalAudioCompleted(id: '5', timestamp: 1740441600000),
+            // Feb 24
+            LocalAudioCompleted(id: '4', timestamp: 1740355200000),
+            // Feb 23
+            LocalAudioCompleted(id: '3', timestamp: 1740268800000),
+            // Feb 22
+            LocalAudioCompleted(id: '2', timestamp: 1740182400000),
+            // GAP on Feb 21
+            // Feb 20
+            LocalAudioCompleted(id: '1', timestamp: 1740009600000),
+          ],
+          streakFreezes: 1,
+        );
+
+        statsManager.setStatsForTesting(stats);
+
+        // Act
+        var result = await statsManager.shouldSuggestStreakFreeze();
+
+        // Assert
+        // Should suggest a freeze because yesterday (Feb 26) has no activity
+        expect(result, true);
+      });
+
+      test('shouldSuggestStreakFreeze - no suggestion when all days covered',
+          () async {
+        // Set "today" as February 28, 2025
+        final testDate = DateTime(2025, 2, 28);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        // Create activity with timestamps for all recent days including yesterday
+        var stats = LocalAllStats.empty().copyWith(
+          audioCompleted: [
+            // Feb 28 - Today
+            LocalAudioCompleted(id: '7', timestamp: 1740731266284),
+            // Feb 27 - Yesterday
+            LocalAudioCompleted(id: '6', timestamp: 1740675815221),
+            // Feb 25
+            LocalAudioCompleted(id: '5', timestamp: 1740441600000),
+            // Feb 24
+            LocalAudioCompleted(id: '4', timestamp: 1740355200000),
+            // Feb 23
+            LocalAudioCompleted(id: '3', timestamp: 1740268800000),
+            // Feb 22
+            LocalAudioCompleted(id: '2', timestamp: 1740182400000),
+            // Feb 20
+            LocalAudioCompleted(id: '1', timestamp: 1740009600000),
+          ],
+          streakFreezes: 1,
+        );
+
+        statsManager.setStatsForTesting(stats);
+
+        // Act
+        var result = await statsManager.shouldSuggestStreakFreeze();
+
+        // Assert
+        // Should not suggest a freeze because yesterday (Feb 27) has activity
+        expect(result, false);
+      });
+    });
   });
 }

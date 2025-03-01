@@ -18,6 +18,7 @@ import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
+import 'package:medito/providers/me/me_provider.dart';
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -156,6 +157,7 @@ class SplashViewState extends ConsumerState<SplashView> {
     try {
       await auth.initializeUser();
       await _initializeServices();
+      ref.read(meRefreshProvider)();
 
       if (!mounted) return;
 

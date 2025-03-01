@@ -7,6 +7,7 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/providers/me/me_provider.dart';
 
 class UserProfilePage extends ConsumerWidget {
   const UserProfilePage({super.key});
@@ -54,6 +55,7 @@ class UserProfilePage extends ConsumerWidget {
                       await authRepository.signOut();
                       HttpApiService().clearAuthHeaders();
                       await StatsManager().clearAllStats();
+                      ref.read(meRefreshProvider)();
                       ref.read(statsProvider.notifier).refresh();
                       ref.invalidate(packProvider);
                       ref.invalidate(authRepositoryProvider);

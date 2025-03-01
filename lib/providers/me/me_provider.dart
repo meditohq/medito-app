@@ -12,3 +12,10 @@ Future<MeModel> me(Ref ref) {
 
   return ref.watch(meRepositoryProvider).fetchMe();
 }
+
+/// Provider to refresh the me provider
+final meRefreshProvider = Provider<void Function()>((ref) {
+  return () {
+    ref.invalidate(meProvider);
+  };
+});

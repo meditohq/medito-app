@@ -19,7 +19,7 @@ class MeRepositoryImpl extends MeRepository {
     try {
       var response = await client.getRequest(HTTPConstants.me);
 
-      return MeModel.fromJson(response).copyWith(hasActiveSubscription: true);
+      return MeModel.fromJson(response);
     } catch (e) {
       throw Exception('Error parsing MeModel from JSON: $e');
     }

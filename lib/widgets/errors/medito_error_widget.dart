@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medito/providers/me/me_provider.dart';
 
 import '../../views/downloads/downloads_view.dart';
 
@@ -108,12 +109,22 @@ class MeditoErrorWidget extends ConsumerWidget {
                 onPressed: () async {
                   await Supabase.instance.client.auth.signOut();
                   await StatsManager().clearAllStats();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const SignUpLogInPage(),
-                    ),
-                    (route) => false,
-                  );
+                  if (context.mounted) {
+                    final ref = ProviderScope.containerOf(context);
+                    ref.read(meRefreshProvider)();
+
+                    // Add a small delay to let the me provider refresh before navigation
+                    await Future.delayed(const Duration(milliseconds: 100));
+
+                    if (context.mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpLogInPage(),
+                        ),
+                        (route) => false,
+                      );
+                    }
+                  }
                 },
                 isLoading: isLoading,
                 bgColor: ColorConstants.lightPurple,

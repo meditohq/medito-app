@@ -15,12 +15,12 @@ class MockStatsBackend {
     totalTimeListened: 3600,
     tracksChecked: [],
     audioCompleted: [
-      LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 25,).millisecondsSinceEpoch, id: '1',),
+           LocalAudioCompleted(
+          timestamp: DateTime.utc(2025, 2, 27,).millisecondsSinceEpoch, id: '1',),
      LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 24,).millisecondsSinceEpoch, id: '2',),
+          timestamp: DateTime.utc(2025, 2, 26,).millisecondsSinceEpoch, id: '2',),
           LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 23,).millisecondsSinceEpoch, id: '3',),
+          timestamp: DateTime.utc(2025, 2, 25,).millisecondsSinceEpoch, id: '3',),
       LocalAudioCompleted(
           timestamp: DateTime.utc(2025, 2, 22,).millisecondsSinceEpoch, id: '4',),
       LocalAudioCompleted(
