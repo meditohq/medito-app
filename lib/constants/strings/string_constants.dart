@@ -121,6 +121,7 @@ class StringConstants {
   static const String statsLoadError =
       'Unable to load stats. Please try again later.';
   static const String statsLoading = 'Loading stats...';
+  static const String loading = 'Loading...';
   static const String statsErrorRetry = 'Retry';
 
   static const String currentStreak = 'Current Streak';
@@ -410,11 +411,11 @@ class StringConstants {
       'A streak freeze was used to maintain your streak!';
 
   // Streak Freeze
-  static const String streakAtRisk = 'Your meditation streak is at risk!';
+  static const String streakAtRisk = 'You missed a day';
   static const String streakFreezeAvailable =
       'You have 1 streak freeze available. Would you like to use it to protect your current streak?';
   static const String streakFreezesAvailableMessage =
-      'You have {count} streak freezes available. Would you like to use one to protect your current streak?';
+      'But it\'s OK! You have {count} streak freezes available. Would you like to use one to protect your current streak?';
   static const String useStreakFreeze = 'Use Streak Freeze';
   static const String notNow = 'Not Now';
 
