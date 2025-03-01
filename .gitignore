@@ -104,3 +104,4 @@ lib/firebase_options.dart
 .prod.json
 .staging.json
 configure_fingerprint.bin
+*.bin
