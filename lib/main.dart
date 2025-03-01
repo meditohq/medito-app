@@ -249,13 +249,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   Future<bool> _hasShownFreezeAlert(int timestamp) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = ref.read(sharedPreferencesProvider);
     return (prefs.getInt('last_freeze_alert') ?? 0) >= timestamp;
   }
 
   Future<void> _markFreezeAlertShown(int timestamp) async {
-    await SharedPreferences.getInstance()
-        .then((prefs) => prefs.setInt('last_freeze_alert', timestamp));
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setInt('last_freeze_alert', timestamp);
   }
 
   void _showFreezeUsedAlert(BuildContext context) {
