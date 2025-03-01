@@ -3,7 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 
-class StreakFreezeSuggestionWidget extends StatelessWidget {
+class StreakFreezeSuggestionWidget extends StatefulWidget {
   final LocalAllStats stats;
   final VoidCallback onUseFreeze;
 
@@ -14,16 +14,56 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
   });
 
   @override
+  State<StreakFreezeSuggestionWidget> createState() =>
+      StreakFreezeSuggestionWidgetState();
+}
+
+class StreakFreezeSuggestionWidgetState
+    extends State<StreakFreezeSuggestionWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late int _animatingIconIndex = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        widget.onUseFreeze();
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _animateAndUseFreeze(int index) {
+    setState(() {
+      _animatingIconIndex = index;
+    });
+    _animationController.forward();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final availableCount = stats.streakFreezes ?? 0;
-    final maxCount = stats.maxStreakFreezes ?? 0;
+    final availableCount = widget.stats.streakFreezes ?? 0;
+    final maxCount = widget.stats.maxStreakFreezes ?? 0;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -33,7 +73,7 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
             StringConstants.streakAtRisk,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: ColorConstants.white,
-              fontSize: 32,
+              fontSize: 28,
             ),
           ),
           const SizedBox(height: 16),
@@ -55,15 +95,7 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
                 for (var i = 0; i < maxCount; i++)
                   Padding(
                     padding: const EdgeInsets.only(right: 12),
-                    child: Icon(
-                      i < availableCount
-                          ? HugeIcons.solidRoundedSnow
-                          : HugeIcons.solidSharpCircle,
-                      size: 50,
-                      color: i < availableCount
-                          ? ColorConstants.lightPurple
-                          : theme.colorScheme.onSurface.withOpacity(0.4),
-                    ),
+                    child: _buildAnimatedIcon(i, availableCount),
                   ),
               ],
             ),
@@ -75,8 +107,11 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: availableCount > 0
                       ? () {
-                          onUseFreeze();
-                          Navigator.of(context).pop();
+                          // Find the first available freeze to animate
+                          final indexToAnimate = availableCount - 1;
+                          if (indexToAnimate >= 0) {
+                            _animateAndUseFreeze(indexToAnimate);
+                          }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -86,6 +121,9 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
                         theme.colorScheme.onSurface.withOpacity(0.2),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: Text(StringConstants.useStreakFreeze),
                 ),
@@ -95,6 +133,102 @@ class StreakFreezeSuggestionWidget extends StatelessWidget {
           const SizedBox(height: 16),
         ],
       ),
+    );
+  }
+
+  Widget _buildAnimatedIcon(int index, int availableCount) {
+    final theme = Theme.of(context);
+
+    // If this is not an available freeze or not the animating one
+    if (index >= availableCount || index != _animatingIconIndex) {
+      return Icon(
+        index < availableCount
+            ? HugeIcons.solidRoundedSnow
+            : HugeIcons.solidSharpCircle,
+        size: 50,
+        color: index < availableCount
+            ? ColorConstants.lightPurple
+            : theme.colorScheme.onSurface.withOpacity(0.4),
+      );
+    }
+
+    // This is the animating icon
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        // Use a series of animations for a fun effect
+        final bounce = CurvedAnimation(
+          parent: _animationController,
+          curve: Curves.bounceOut,
+        );
+
+        // First half: rotate and scale up
+        final rotateAnimation =
+            Tween<double>(begin: 0, end: 2 * 3.14159).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.0, 0.6, curve: Curves.elasticInOut),
+          ),
+        );
+
+        // Second half: fade between icons
+        final iconTransition = CurvedAnimation(
+          parent: _animationController,
+          curve: const Interval(0.4, 0.8, curve: Curves.easeInOut),
+        );
+
+        // Scale animation throughout
+        final scaleAnimation = TweenSequence<double>([
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 1.0, end: 1.3),
+            weight: 0.3,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 1.3, end: 0.8),
+            weight: 0.2,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 0.8, end: 1.0),
+            weight: 0.5,
+          ),
+        ]).animate(bounce);
+
+        // Color transition
+        final colorAnimation = ColorTween(
+          begin: ColorConstants.lightPurple,
+          end: theme.colorScheme.onSurface.withOpacity(0.4),
+        ).animate(iconTransition);
+
+        return Transform.scale(
+          scale: scaleAnimation.value,
+          child: Transform.rotate(
+            angle: rotateAnimation.value,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Fading out snow icon
+                Opacity(
+                  opacity: 1 - iconTransition.value,
+                  child: Icon(
+                    HugeIcons.solidRoundedSnow,
+                    size: 50,
+                    color: colorAnimation.value,
+                  ),
+                ),
+                // Fading in circle icon
+                Opacity(
+                  opacity: iconTransition.value,
+                  child: Icon(
+                    HugeIcons.solidSharpCircle,
+                    size: 50,
+                    color: colorAnimation.value,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
