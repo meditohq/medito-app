@@ -12,7 +12,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:disable_battery_optimization/disable_battery_optimization.dart';
+import 'package:disable_battery_optimizations_latest/disable_battery_optimizations_latest.dart';
 
 class HelpScreen extends ConsumerStatefulWidget {
   const HelpScreen({super.key});
@@ -416,7 +416,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
 
     // Check if all battery optimizations are already disabled
     var isAllBatteryOptimizationDisabled =
-        await DisableBatteryOptimization.isAllBatteryOptimizationDisabled;
+        await DisableBatteryOptimizationLatest.isAllBatteryOptimizationDisabled;
 
     if (isAllBatteryOptimizationDisabled != null &&
         isAllBatteryOptimizationDisabled) {
@@ -426,7 +426,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     }
 
     // Show the comprehensive settings to disable all optimizations
-    await DisableBatteryOptimization.showDisableAllOptimizationsSettings(
+    await DisableBatteryOptimizationLatest.showDisableAllOptimizationsSettings(
       StringConstants.batteryOptimizationTitle,
       StringConstants.batteryOptimizationDescription,
       StringConstants.cancel,
@@ -438,22 +438,24 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
 
     // Check if battery optimization is already disabled
     var isBatteryOptimizationDisabled =
-        await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+        await DisableBatteryOptimizationLatest.isBatteryOptimizationDisabled;
 
     if (isBatteryOptimizationDisabled != null &&
         !isBatteryOptimizationDisabled) {
       // Show the system dialog to disable battery optimization
-      await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+      await DisableBatteryOptimizationLatest
+          .showDisableBatteryOptimizationSettings();
     }
 
     // Check for manufacturer-specific optimizations
-    var isManufacturerOptimizationDisabled = await DisableBatteryOptimization
-        .isManufacturerBatteryOptimizationDisabled;
+    var isManufacturerOptimizationDisabled =
+        await DisableBatteryOptimizationLatest
+            .isManufacturerBatteryOptimizationDisabled;
 
     if (isManufacturerOptimizationDisabled != null &&
         !isManufacturerOptimizationDisabled) {
       // Show manufacturer-specific optimization settings
-      await DisableBatteryOptimization
+      await DisableBatteryOptimizationLatest
           .showDisableManufacturerBatteryOptimizationSettings(
         StringConstants.batteryOptimizationTitle,
         StringConstants.batteryOptimizationDescription,
@@ -462,10 +464,10 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
 
     // Check for auto-start settings (important for some devices)
     var isAutoStartEnabled =
-        await DisableBatteryOptimization.isAutoStartEnabled;
+        await DisableBatteryOptimizationLatest.isAutoStartEnabled;
 
     if (isAutoStartEnabled != null && !isAutoStartEnabled) {
-      await DisableBatteryOptimization.showEnableAutoStartSettings(
+      await DisableBatteryOptimizationLatest.showEnableAutoStartSettings(
         StringConstants.autoStartTitle,
         StringConstants.autoStartDescription,
       );

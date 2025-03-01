@@ -1,0 +1,2 @@
+/Users/mike/Projects/Medito/medito_new/android/app/.cxx/Debug/5f6u69w5/x86_64/CMakeFiles/edit_cache.dir
+/Users/mike/Projects/Medito/medito_new/android/app/.cxx/Debug/5f6u69w5/x86_64/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/mike/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/mike/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/mike/Projects/Medito/medito_new/android/app/.cxx/Debug/5f6u69w5/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/mike/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/mike/Projects/Medito/medito_new/android/app/.cxx/Debug/5f6u69w5/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

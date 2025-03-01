@@ -50,7 +50,7 @@ dependencies:
   app_links: ^6.3.2
   supabase_flutter: ^2.0.0
   internet_connection_checker: ^3.0.1
-  disable_battery_optimization: ^1.1.1
+  disable_battery_optimizations_latest: ^1.0.0
 
 dev_dependencies:
   flutter_test:
