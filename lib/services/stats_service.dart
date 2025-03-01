@@ -53,7 +53,7 @@ class StatsService {
   static const _minTimeBetweenRequests = 2000; // 2 seconds
 
   // Use this flag to toggle between real and mock backend
-  static const useMockBackend = false;
+  static const useMockBackend = true;
 
   StatsService({
     required HttpApiService httpApiService,

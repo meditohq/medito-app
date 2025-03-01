@@ -387,6 +387,24 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
   void _openContactForm() async {
     final clientId = await ref.read(userIdProvider.future);
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+    final stats = await ref.read(statsProvider.future);
+    var recentSessions = '';
+    
+    try {
+      if (stats.audioCompleted != null && stats.audioCompleted?.isNotEmpty == true) {
+        // Take the most recent 10 sessions (or fewer if less are available)
+        final recent = stats.audioCompleted?.take(10).toList();
+        for (var session in recent ?? []) {
+          recentSessions += '${session.timestamp},';
+        }
+        // Remove trailing comma
+        if (recentSessions.isNotEmpty) {
+          recentSessions = recentSessions.substring(0, recentSessions.length - 1);
+        }
+      }
+    } catch (e) {
+      // Silently handle any errors
+    }
 
     final params = {
       'userId': clientId,
@@ -395,6 +413,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
       'model': deviceInfo.model,
       'appVersion': deviceInfo.appVersion,
       'os': deviceInfo.os,
+      'recentSessions': recentSessions,
     };
 
     final queryString = params.entries
