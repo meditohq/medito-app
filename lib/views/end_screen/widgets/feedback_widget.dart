@@ -1,9 +1,6 @@
 import 'package:medito/constants/constants.dart';
-import 'package:medito/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../providers/events/events_provider.dart';
 
 class FeedbackWidget extends ConsumerStatefulWidget {
   const FeedbackWidget({
@@ -32,17 +29,6 @@ class _FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
       isLoading = true;
     });
     try {
-      await ref.read(
-        feedbackProvider(
-          trackId: widget.trackId,
-          feedbackEvent: {
-            'rating': feedback,
-            'audioFileDuration': widget.audioFileDuration.toString(),
-            'audioFileGuide': widget.audioFileGuide.toString(),
-            'audioFileId': widget.audioFileId,
-          },
-        ).future,
-      );
       setState(() {
         isLoading = false;
         isFeedbackAdded = true;

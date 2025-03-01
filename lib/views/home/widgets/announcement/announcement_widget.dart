@@ -53,7 +53,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
   void _handleDismiss() {
     _animationController.reverse().then((_) {
       widget.onPressedDismiss?.call();
-      _handleTrackEvent();
     });
   }
 
@@ -169,14 +168,4 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
     );
   }
 
-  void _handleTrackEvent() {
-    var id = widget.announcement.id;
-    if (id.isNotNullAndNotEmpty()) {
-      ref.read(
-        announcementDismissEventProvider(
-          id: id!,
-        ),
-      );
-    }
-  }
 }
