@@ -12,7 +12,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:disable_battery_optimizations_latest/disable_battery_optimizations_latest.dart';
+// import 'package:disable_battery_optimizations_latest/disable_battery_optimizations_latest.dart';
 
 class HelpScreen extends ConsumerStatefulWidget {
   const HelpScreen({super.key});
@@ -389,9 +389,10 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     final stats = await ref.read(statsProvider.future);
     var recentSessions = '';
-    
+
     try {
-      if (stats.audioCompleted != null && stats.audioCompleted?.isNotEmpty == true) {
+      if (stats.audioCompleted != null &&
+          stats.audioCompleted?.isNotEmpty == true) {
         // Take the most recent 10 sessions (or fewer if less are available)
         final recent = stats.audioCompleted?.take(10).toList();
         for (var session in recent ?? []) {
@@ -399,7 +400,8 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         }
         // Remove trailing comma
         if (recentSessions.isNotEmpty) {
-          recentSessions = recentSessions.substring(0, recentSessions.length - 1);
+          recentSessions =
+              recentSessions.substring(0, recentSessions.length - 1);
         }
       }
     } catch (e) {
@@ -431,66 +433,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
   }
 
   Future<void> _handleBatteryOptimization() async {
-    if (!Platform.isAndroid) return;
-
-    // Check if all battery optimizations are already disabled
-    var isAllBatteryOptimizationDisabled =
-        await DisableBatteryOptimizationLatest.isAllBatteryOptimizationDisabled;
-
-    if (isAllBatteryOptimizationDisabled != null &&
-        isAllBatteryOptimizationDisabled) {
-      // If all optimizations are already disabled, show a different action
-      showSnackBar(context, StringConstants.batteryOptimizationAlreadyDisabled);
-      return;
-    }
-
-    // Show the comprehensive settings to disable all optimizations
-    await DisableBatteryOptimizationLatest.showDisableAllOptimizationsSettings(
-      StringConstants.batteryOptimizationTitle,
-      StringConstants.batteryOptimizationDescription,
-      StringConstants.cancel,
-      StringConstants.requestPermission,
-    );
-
-    // If not all optimizations were handled by the above method,
-    // fall back to individual checks
-
-    // Check if battery optimization is already disabled
-    var isBatteryOptimizationDisabled =
-        await DisableBatteryOptimizationLatest.isBatteryOptimizationDisabled;
-
-    if (isBatteryOptimizationDisabled != null &&
-        !isBatteryOptimizationDisabled) {
-      // Show the system dialog to disable battery optimization
-      await DisableBatteryOptimizationLatest
-          .showDisableBatteryOptimizationSettings();
-    }
-
-    // Check for manufacturer-specific optimizations
-    var isManufacturerOptimizationDisabled =
-        await DisableBatteryOptimizationLatest
-            .isManufacturerBatteryOptimizationDisabled;
-
-    if (isManufacturerOptimizationDisabled != null &&
-        !isManufacturerOptimizationDisabled) {
-      // Show manufacturer-specific optimization settings
-      await DisableBatteryOptimizationLatest
-          .showDisableManufacturerBatteryOptimizationSettings(
-        StringConstants.batteryOptimizationTitle,
-        StringConstants.batteryOptimizationDescription,
-      );
-    }
-
-    // Check for auto-start settings (important for some devices)
-    var isAutoStartEnabled =
-        await DisableBatteryOptimizationLatest.isAutoStartEnabled;
-
-    if (isAutoStartEnabled != null && !isAutoStartEnabled) {
-      await DisableBatteryOptimizationLatest.showEnableAutoStartSettings(
-        StringConstants.autoStartTitle,
-        StringConstants.autoStartDescription,
-      );
-    }
+    await _launchUrl(StringConstants.dontKillMyAppUrl);
   }
 }
 
