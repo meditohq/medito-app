@@ -123,7 +123,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           trackModel: currentlyPlayingTrack,
           file: file,
           isBackgroundSoundSelected: _isBackgroundSoundSelected(),
-          onSpeedChanged: (speed) => ref.read(playerProvider.notifier).setSpeed(speed),
+          onSpeedChanged: (speed) =>
+              ref.read(playerProvider.notifier).setSpeed(speed),
           onClosePressed: () => _handleClose(),
         ),
       ),
@@ -136,8 +137,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: playbackState.track.title,
-          artistName: playbackState.track.artist,
+          trackTitle: playbackState.track.title?.isNotEmpty == true
+              ? playbackState.track.title
+              : '',
+          artistName: playbackState.track.artist?.isNotEmpty == true
+              ? playbackState.track.artist
+              : '',
           artistUrlPath: playbackState.track.artistUrl,
           isPlayerScreen: true,
         ),
@@ -168,8 +173,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: playbackState.track.title,
-          artistName: playbackState.track.artist,
+          trackTitle: playbackState.track.title?.isNotEmpty == true
+              ? playbackState.track.title
+              : '',
+          artistName: playbackState.track.artist?.isNotEmpty == true
+              ? playbackState.track.artist
+              : '',
           artistUrlPath: playbackState.track.artistUrl,
           isPlayerScreen: true,
         ),

@@ -35,22 +35,27 @@ class ArtistTitleWidget extends ConsumerWidget {
   }
 
   Widget _title(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Text(
-        trackTitle ?? '',
-        textAlign: TextAlign.center,
-        style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-              fontFamily: sourceSerif,
-              color: ColorConstants.white,
-              fontSize: trackTitleFontSize,
-              letterSpacing: 0.2,
-            ),
+    return SizedBox(
+      height: titleHeight * 2, // Fixed height for title
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Text(
+            trackTitle ?? '',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+                  fontFamily: sourceSerif,
+                  color: ColorConstants.white,
+                  fontSize: trackTitleFontSize,
+                  letterSpacing: 0.2,
+                ),
+          ),
+        ),
       ),
     );
   }
 
-  InkWell _subtitle(BuildContext context) {
+  Widget _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
           fontFamily: dmMono,
           fontSize: artistNameFontSize,
@@ -58,11 +63,16 @@ class ArtistTitleWidget extends ConsumerWidget {
           color: ColorConstants.graphite,
         );
 
-    return InkWell(
-      onTap: () => _handleArtistNameTap(),
-      child: Text(
-        artistName ?? '',
-        style: style,
+    return SizedBox(
+      height: 30, // Fixed height for subtitle
+      child: InkWell(
+        onTap: () => _handleArtistNameTap(),
+        child: Center(
+          child: Text(
+            artistName ?? '',
+            style: style,
+          ),
+        ),
       ),
     );
   }
