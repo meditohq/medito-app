@@ -13,19 +13,32 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
-import 'package:medito/views/home/widgets/bottom_sheet/debug/debug_bottom_sheet_widget.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
-import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
+import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
+final bearerTokenProvider = FutureProvider<String>((ref) async {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final bearerToken = await authRepository.getToken();
+
+  return bearerToken;
+});
+
 final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
 
   return _getReminderTimeFromPrefs(prefs);
+});
+
+final userIdProvider = FutureProvider<String>((ref) async {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final userId = await authRepository.getClientIdFromSharedPreference();
+
+  return userId ?? '';
 });
 
 TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
@@ -36,20 +49,6 @@ TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
       ? TimeOfDay(hour: savedHour, minute: savedMinute)
       : null;
 }
-
-final userIdProvider = FutureProvider<String>((ref) async {
-  final authRepository = ref.watch(authRepositoryProvider);
-  final userId = await authRepository.getClientIdFromSharedPreference();
-
-  return userId ?? '';
-});
-
-final bearerTokenProvider = FutureProvider<String>((ref) async {
-  final authRepository = ref.watch(authRepositoryProvider);
-  final bearerToken = await authRepository.getToken();
-
-  return bearerToken;
-});
 
 class SettingsItem {
   final String section;
@@ -68,9 +67,9 @@ class SettingsItem {
 }
 
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({super.key});
-
   static final _isHealthSyncAvailable = Platform.isIOS;
+
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -184,9 +183,117 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  void handleItemPress(
+    BuildContext context,
+    WidgetRef ref,
+    SettingsItem item,
+  ) async {
+    await handleNavigation(
+      item.type,
+      [item.path.toString().getIdFromPath(), item.path],
+      context,
+      ref: ref,
+    );
+  }
+
+  Widget _buildDailyNotificationTile(BuildContext context, WidgetRef ref) {
+    final reminderTime = ref.watch(reminderTimeProvider);
+
+    return Card(
+      borderOnForeground: true,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      color: ColorConstants.onyx,
+      child: RowItemWidget(
+        icon: HugeIcon(
+          icon: HugeIcons.solidRoundedNotification03,
+          size: 24,
+          color: Colors.white,
+        ),
+        title: StringConstants.dailyReminderTitle,
+        subTitle: reminderTime != null
+            ? ('${StringConstants.setFor} ${reminderTime.format(context)}')
+            : null,
+        hasUnderline: true,
+        isSwitch: true,
+        onTap: () {
+          _selectTime(context, ref);
+        },
+        switchValue: reminderTime != null,
+        onSwitchChanged: (value) {
+          if (value) {
+            _selectTime(context, ref);
+          } else {
+            _clearReminder(context, ref);
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
+    return RowItemWidget(
+      icon: HugeIcon(
+          icon: HugeIcons.strokeRoundedHelpCircle,
+          size: 24,
+          color: Colors.white),
+      title: StringConstants.debugInfo,
+      hasUnderline: true,
+      onTap: () => _showDebugBottomSheet(context, ref),
+    );
+  }
+
   Widget _buildMain(
       BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
     return _buildSettingsList(context, ref, settingsItems);
+  }
+
+  Widget _buildMenuItemTile(
+    BuildContext context,
+    WidgetRef ref,
+    SettingsItem item,
+  ) {
+    final authRepository = ref.watch(authRepositoryProvider);
+    final user = authRepository.currentUser;
+    final isAccountItem = item.type == 'account';
+    final userEmail = user?.email;
+    final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
+
+    return RowItemWidget(
+      icon: item.icon,
+      title: item.title,
+      subTitle: isAccountItem && hasValidEmail ? userEmail : null,
+      hasUnderline: true,
+      onTap: () => handleItemPress(context, ref, item),
+    );
+  }
+
+  Widget _buildOnboardingTile(BuildContext context, WidgetRef ref) {
+    return RowItemWidget(
+      icon: HugeIcon(
+          icon: HugeIcons.strokeRoundedHelpCircle,
+          size: 24,
+          color: Colors.white),
+      title: 'Onboarding',
+      hasUnderline: true,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const OnboardingPagerScreen(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: ColorConstants.white,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
   }
 
   Widget _buildSettingsList(
@@ -225,101 +332,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMenuItemTile(
-    BuildContext context,
-    WidgetRef ref,
-    SettingsItem item,
-  ) {
-    final authRepository = ref.watch(authRepositoryProvider);
-    final user = authRepository.currentUser;
-    final isAccountItem = item.type == 'account';
-    final userEmail = user?.email;
-    final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
-
-    return RowItemWidget(
-      icon: item.icon,
-      title: item.title,
-      subTitle: isAccountItem && hasValidEmail ? userEmail : null,
-      hasUnderline: true,
-      onTap: () => handleItemPress(context, ref, item),
-    );
-  }
-
-  Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
-    return RowItemWidget(
-      icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedHelpCircle,
-          size: 24,
-          color: Colors.white),
-      title: StringConstants.debugInfo,
-      hasUnderline: true,
-      onTap: () => _showDebugBottomSheet(context, ref),
-    );
-  }
-
-  Widget _buildOnboardingTile(BuildContext context, WidgetRef ref) {
-    return RowItemWidget(
-      icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedHelpCircle,
-          size: 24,
-          color: Colors.white),
-      title: 'Onboarding',
-      hasUnderline: true,
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const OnboardingPagerScreen(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDailyNotificationTile(BuildContext context, WidgetRef ref) {
-    final reminderTime = ref.watch(reminderTimeProvider);
-
-    return Card(
-      borderOnForeground: true,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      color: ColorConstants.onyx,
-      child: RowItemWidget(
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedNotification03,
-          size: 24,
-          color: Colors.white,
-        ),
-        title: StringConstants.dailyReminderTitle,
-        subTitle: reminderTime != null
-            ? ('${StringConstants.setFor} ${reminderTime.format(context)}')
-            : null,
-        hasUnderline: true,
-        isSwitch: true,
-        onTap: () {
-          _selectTime(context, ref);
-        },
-        switchValue: reminderTime != null,
-        onSwitchChanged: (value) {
-          if (value) {
-            _selectTime(context, ref);
-          } else {
-            _clearReminder(context, ref);
-          }
-        },
-      ),
-    );
-  }
-
-  void handleItemPress(
-    BuildContext context,
-    WidgetRef ref,
-    SettingsItem item,
-  ) async {
-    await handleNavigation(
-      item.type,
-      [item.path.toString().getIdFromPath(), item.path],
-      context,
-      ref: ref,
-    );
-  }
-
   void _clearReminder(BuildContext context, WidgetRef ref) async {
     final reminders = ref.read(reminderProvider);
     final prefs = ref.read(sharedPreferencesProvider);
@@ -335,8 +347,20 @@ class SettingsScreen extends ConsumerWidget {
     await prefs.remove(SharedPreferenceConstants.savedMinutes);
   }
 
-  void _showClearReminderSnackBar(BuildContext context) {
-    showSnackBar(context, StringConstants.reminderNotificationCleared);
+  List<SettingsItem> _getItemsBySection(
+      List<SettingsItem> items, String section) {
+    return items.where((item) => item.section == section).toList();
+  }
+
+  Future<void> _savePickedTime(
+    SharedPreferences prefs,
+    TimeOfDay pickedTime,
+  ) async {
+    await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
+    await prefs.setInt(
+      SharedPreferenceConstants.savedMinutes,
+      pickedTime.minute,
+    );
   }
 
   Future<void> _selectTime(BuildContext context, WidgetRef ref) async {
@@ -363,25 +387,8 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _savePickedTime(
-    SharedPreferences prefs,
-    TimeOfDay pickedTime,
-  ) async {
-    await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
-    await prefs.setInt(
-      SharedPreferenceConstants.savedMinutes,
-      pickedTime.minute,
-    );
-  }
-
-  void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${StringConstants.reminderNotificationScheduled} ${pickedTime.format(context)}',
-        ),
-      ),
-    );
+  void _showClearReminderSnackBar(BuildContext context) {
+    showSnackBar(context, StringConstants.reminderNotificationCleared);
   }
 
   void _showDebugBottomSheet(BuildContext context, WidgetRef ref) {
@@ -391,23 +398,14 @@ class SettingsScreen extends ConsumerWidget {
         builder: (context) => const DebugInfoScreen(),
       ),
     );
-
   }
 
-  List<SettingsItem> _getItemsBySection(
-      List<SettingsItem> items, String section) {
-    return items.where((item) => item.section == section).toList();
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 8.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: ColorConstants.white,
-              fontWeight: FontWeight.w600,
-            ),
+  void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${StringConstants.reminderNotificationScheduled} ${pickedTime.format(context)}',
+        ),
       ),
     );
   }

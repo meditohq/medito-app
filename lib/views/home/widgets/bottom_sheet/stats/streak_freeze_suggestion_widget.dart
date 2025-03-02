@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/providers/feature_flags_provider.dart';
 
-class StreakFreezeSuggestionWidget extends StatefulWidget {
+class StreakFreezeSuggestionWidget extends ConsumerStatefulWidget {
   final LocalAllStats stats;
   final VoidCallback onUseFreeze;
 
@@ -14,12 +16,12 @@ class StreakFreezeSuggestionWidget extends StatefulWidget {
   });
 
   @override
-  State<StreakFreezeSuggestionWidget> createState() =>
+  ConsumerState<StreakFreezeSuggestionWidget> createState() =>
       StreakFreezeSuggestionWidgetState();
 }
 
 class StreakFreezeSuggestionWidgetState
-    extends State<StreakFreezeSuggestionWidget>
+    extends ConsumerState<StreakFreezeSuggestionWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late int _animatingIconIndex = -1;
@@ -47,6 +49,16 @@ class StreakFreezeSuggestionWidgetState
   }
 
   void _animateAndUseFreeze(int index) {
+    // Check if streak freeze feature is enabled
+    final isStreakFreezeEnabled =
+        ref.read(featureFlagsProvider).isStreakFreezeEnabled;
+
+    // Don't use streak freeze if feature is disabled
+    if (!isStreakFreezeEnabled) {
+      Navigator.of(context).pop();
+      return;
+    }
+
     setState(() {
       _animatingIconIndex = index;
     });
@@ -55,6 +67,19 @@ class StreakFreezeSuggestionWidgetState
 
   @override
   Widget build(BuildContext context) {
+    // Check if streak freeze feature is enabled
+    final isStreakFreezeEnabled =
+        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
+
+    // Don't show the UI if feature is disabled
+    if (!isStreakFreezeEnabled) {
+      // Close the bottom sheet on the next frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
     final availableCount = widget.stats.streakFreezes ?? 0;
     final maxCount = widget.stats.maxStreakFreezes ?? 0;

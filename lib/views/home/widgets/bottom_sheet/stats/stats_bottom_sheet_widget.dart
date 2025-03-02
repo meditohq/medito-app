@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
@@ -130,7 +131,12 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     final isDonor =
         ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
 
-    if (!isDonor) return const SizedBox.shrink();
+    // Check if streak freeze feature is enabled
+    final isStreakFreezeEnabled =
+        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
+
+    // Don't show streak freeze UI if feature is disabled or user is not a donor
+    if (!isDonor || !isStreakFreezeEnabled) return const SizedBox.shrink();
 
     return Column(
       children: [
@@ -193,6 +199,13 @@ class StatsBottomSheetWidget extends ConsumerWidget {
   }
 
   void _useStreakFreeze(BuildContext context, WidgetRef ref) {
+    // Check if streak freeze feature is enabled
+    final isStreakFreezeEnabled =
+        ref.read(featureFlagsProvider).isStreakFreezeEnabled;
+
+    // Don't use streak freeze if feature is disabled
+    if (!isStreakFreezeEnabled) return;
+
     ref.read(streakFreezeSuggestionProvider.notifier).useStreakFreeze();
     // Show a confirmation message
     showSnackBar(context, StringConstants.freezeUsedMessage);

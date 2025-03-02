@@ -11,6 +11,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/stats/streak_freeze_sugge
 import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
+import 'package:medito/providers/feature_flags_provider.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
   const BottomNavigationBarView({super.key});
@@ -62,7 +63,12 @@ class _BottomNavigationBarViewState
     ref.listen<StreakFreezeSuggestionState>(
       streakFreezeSuggestionProvider,
       (previous, current) {
-        if (current.shouldShowSuggestion &&
+        // Check if streak freeze feature is enabled
+        final isStreakFreezeEnabled =
+            ref.read(featureFlagsProvider).isStreakFreezeEnabled;
+
+        if (isStreakFreezeEnabled &&
+            current.shouldShowSuggestion &&
             current.stats != null &&
             (previous == null || !previous.shouldShowSuggestion)) {
           // Show the suggestion bottom sheet
