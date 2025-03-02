@@ -9,6 +9,9 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
+import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:medito/views/root/root_page_view.dart';
 
 import 'widgets/donation_widget.dart';
 
@@ -37,12 +40,44 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
     });
   }
 
+  void _navigateToHome() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const RootPageView(
+          firstChild: BottomNavigationBarView(),
+        ),
+      ),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: SingleBackButtonActionBar(
-        showCloseIcon: true,
-        onBackPressed: () => Navigator.pop(context),
+      bottomNavigationBar: BottomActionBar(
+        leftItem: BottomActionBarItem(
+          child: HugeIcon(
+            icon: HugeIcons.solidSharpMultiplicationSign,
+            color: ColorConstants.white,
+          ),
+          onTap: () => Navigator.pop(context),
+        ),
+        leftCenterItem: BottomActionBarItem(
+          child: const SizedBox.shrink(),
+          onTap: null,
+        ),
+        rightCenterItem: BottomActionBarItem(
+          child: const SizedBox.shrink(),
+          onTap: null,
+        ),
+        rightItem: BottomActionBarItem(
+          child: HugeIcon(
+            icon: HugeIcons.solidSharpHome01,
+            color: ColorConstants.white,
+          ),
+          onTap: _navigateToHome,
+        ),
+        layout: BottomActionBarLayout.edgeAligned,
       ),
       body: SingleChildScrollView(
         child: SafeArea(
@@ -179,22 +214,20 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
 
   List<String> _getDaysWithStreakFreeze(LocalAllStats stats) {
     return stats.freezeUsageDates
-            .map((timestamp) =>
-                DateTime.fromMillisecondsSinceEpoch(timestamp)
-                    .toIso8601String()
-                    .split('T')[0])
-            .toList();
+        .map((timestamp) => DateTime.fromMillisecondsSinceEpoch(timestamp)
+            .toIso8601String()
+            .split('T')[0])
+        .toList();
   }
 
   Widget _buildDayLettersAndIcons(
       List<DateTime> lastFiveDays, List<String> daysMeditated,
       {Key? key}) {
     lastFiveDays = lastFiveDays.reversed.toList();
-    
+
     var statsData = ref.watch(statsProvider).valueOrNull;
-    var daysWithFreeze = statsData != null 
-        ? _getDaysWithStreakFreeze(statsData) 
-        : <String>[];
+    var daysWithFreeze =
+        statsData != null ? _getDaysWithStreakFreeze(statsData) : <String>[];
 
     var dayLetters = lastFiveDays.map((day) {
       switch (day.weekday) {
@@ -229,18 +262,18 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         var isConsecutive = (isMeditated || isFreeze) &&
             (index > 0 &&
                     (daysMeditated.contains(lastFiveDays[index - 1]
-                        .toIso8601String()
-                        .split('T')[0]) ||
-                    daysWithFreeze.contains(lastFiveDays[index - 1]
-                        .toIso8601String()
-                        .split('T')[0])) ||
+                            .toIso8601String()
+                            .split('T')[0]) ||
+                        daysWithFreeze.contains(lastFiveDays[index - 1]
+                            .toIso8601String()
+                            .split('T')[0])) ||
                 index < dayLetters.length - 1 &&
                     (daysMeditated.contains(lastFiveDays[index + 1]
-                        .toIso8601String()
-                        .split('T')[0]) ||
-                    daysWithFreeze.contains(lastFiveDays[index + 1]
-                        .toIso8601String()
-                        .split('T')[0])));
+                            .toIso8601String()
+                            .split('T')[0]) ||
+                        daysWithFreeze.contains(lastFiveDays[index + 1]
+                            .toIso8601String()
+                            .split('T')[0])));
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -252,10 +285,12 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 style: TextStyle(
                   fontFamily: teachers,
                   fontSize: 14,
-                  fontWeight: (isMeditated || isFreeze) ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: (isMeditated || isFreeze)
+                      ? FontWeight.w600
+                      : FontWeight.w500,
                   height: 1.2,
-                  color: isFreeze 
-                      ? ColorConstants.graphite 
+                  color: isFreeze
+                      ? ColorConstants.graphite
                       : isMeditated
                           ? ColorConstants.lightPurple
                           : ColorConstants.moon,
@@ -273,19 +308,19 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                     ),
                   if (isFreeze)
                     HugeIcon(
-                      size: 32,
-                      icon: HugeIcons.solidRoundedSnow,
-                      color: ColorConstants.graphite)
+                        size: 32,
+                        icon: HugeIcons.solidRoundedSnow,
+                        color: ColorConstants.graphite)
                   else if (isMeditated)
                     HugeIcon(
-                      size: 32,
-                      icon: HugeIcons.solidSharpCheckmarkCircle02,
-                      color: ColorConstants.lightPurple)
+                        size: 32,
+                        icon: HugeIcons.solidSharpCheckmarkCircle02,
+                        color: ColorConstants.lightPurple)
                   else
                     HugeIcon(
-                      size: 32,
-                      icon: HugeIcons.solidSharpCircle,
-                      color: ColorConstants.moon),
+                        size: 32,
+                        icon: HugeIcons.solidSharpCircle,
+                        color: ColorConstants.moon),
                 ],
               ),
             ],
