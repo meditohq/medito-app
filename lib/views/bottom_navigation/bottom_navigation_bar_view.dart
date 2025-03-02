@@ -4,7 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/stats_provider.dart';
-// import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
+import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/streak_freeze_suggestion_widget.dart';
@@ -44,10 +44,10 @@ class _BottomNavigationBarViewState
     // First refresh stats
     await ref.read(statsProvider.notifier).refresh();
 
-    // COMMENTED OUT: Only check for streak freeze suggestions after stats are loaded
-    // ref
-    //     .read(streakFreezeSuggestionProvider.notifier)
-    //     .checkForStreakFreezeSuggestion();
+    // Only check for streak freeze suggestions after stats are loaded
+    ref
+        .read(streakFreezeSuggestionProvider.notifier)
+        .checkForStreakFreezeSuggestion();
   }
 
   @override
@@ -58,25 +58,25 @@ class _BottomNavigationBarViewState
 
   @override
   Widget build(BuildContext context) {
-    // COMMENTED OUT: Listen for streak freeze suggestions
-    // ref.listen<StreakFreezeSuggestionState>(
-    //   streakFreezeSuggestionProvider,
-    //   (previous, current) {
-    //     if (current.shouldShowSuggestion &&
-    //         current.stats != null &&
-    //         (previous == null || !previous.shouldShowSuggestion)) {
-    //       // Show the suggestion bottom sheet
-    //       WidgetsBinding.instance.addPostFrameCallback((_) {
-    //         _showStreakFreezeSuggestion(context, current.stats!);
-    //
-    //         // Mark as handled after showing
-    //         ref
-    //             .read(streakFreezeSuggestionProvider.notifier)
-    //             .markSuggestionAsHandled();
-    //       });
-    //     }
-    //   },
-    // );
+    // Listen for streak freeze suggestions
+    ref.listen<StreakFreezeSuggestionState>(
+      streakFreezeSuggestionProvider,
+      (previous, current) {
+        if (current.shouldShowSuggestion &&
+            current.stats != null &&
+            (previous == null || !previous.shouldShowSuggestion)) {
+          // Show the suggestion bottom sheet
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showStreakFreezeSuggestion(context, current.stats!);
+
+            // Mark as handled after showing
+            ref
+                .read(streakFreezeSuggestionProvider.notifier)
+                .markSuggestionAsHandled();
+          });
+        }
+      },
+    );
 
     return PopScope(
       canPop: _currentPageIndex == 0,
@@ -86,13 +86,6 @@ class _BottomNavigationBarViewState
       },
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        // ADD TEST FAB to show the test bottom sheet
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'test_streak_freeze',
-          backgroundColor: ColorConstants.lightPurple,
-          onPressed: () => _showTestStreakFreezeSuggestion(context),
-          child: const Icon(HugeIcons.solidRoundedSnow, color: Colors.white),
-        ),
         bottomNavigationBar: BottomActionBar(
           layout: BottomActionBarLayout.homePage,
           leftItem: BottomActionBarItem(
@@ -161,73 +154,21 @@ class _BottomNavigationBarViewState
     });
   }
 
-  // New method for testing with different test data
-  void _showTestStreakFreezeSuggestion(BuildContext context) {
+  void _showStreakFreezeSuggestion(BuildContext context, LocalAllStats stats) {
     if (!mounted) return;
-
-    // Create test data with different freeze configurations
-    final testStats = LocalAllStats(
-      streakCurrent: 7,
-      streakLongest: 14,
-      totalTracksCompleted: 42,
-      totalTimeListened: 12600,
-      tracksChecked: [],
-      audioCompleted: [],
-      updated: DateTime.now().millisecondsSinceEpoch,
-      streakFreezes: 2, // Available freezes
-      maxStreakFreezes: 3, // Maximum freezes
-      freezeUsageDates: [
-        DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch
-      ],
-    );
-
-    // Initially show a loading state by using a separate variable
-    var isLoading = false;
 
     showModalBottomSheet(
       context: context,
-      showDragHandle: true,
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (context) => StreakFreezeSuggestionWidget(
-        stats: testStats,
+        stats: stats,
         onUseFreeze: () async {
-          // Just show a snackbar for testing
-          if (mounted) {
-            // Simulate loading for 1.5 seconds to demonstrate the spinner
-            await Future.delayed(const Duration(milliseconds: 1500));
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Streak freeze used (test)'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-          // await ref
-          //     .read(streakFreezeSuggestionProvider.notifier)
-          //     .useStreakFreeze();
+          await ref
+              .read(streakFreezeSuggestionProvider.notifier)
+              .useStreakFreeze();
         },
       ),
     );
   }
-
-  // Original method (commented out)
-  // void _showStreakFreezeSuggestion(BuildContext context, LocalAllStats stats) {
-  //   if (!mounted) return;
-  //
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Theme.of(context).colorScheme.surface,
-  //     builder: (context) => StreakFreezeSuggestionWidget(
-  //       stats: stats,
-  //       onUseFreeze: () async {
-  //         await ref
-  //             .read(streakFreezeSuggestionProvider.notifier)
-  //             .useStreakFreeze();
-  //       },
-  //     ),
-  //   );
-  // }
 }
