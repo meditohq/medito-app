@@ -40,7 +40,8 @@ class NetworkImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var scaledImageUrl = url.startsWith('http') ? url : _getWebPImageUrl(context, url);
+    var scaledImageUrl =
+        url.startsWith('http') ? url : _getWebPImageUrl(context, url);
     var originalImageUrl = url.startsWith('http') ? url : '$contentBaseUrl$url';
 
     return scaledImageUrl.endsWith('.svg')
@@ -84,7 +85,9 @@ class NetworkImageWidget extends ConsumerWidget {
           foregroundDecoration: BoxDecoration(gradient: gradient),
         ),
         placeholder: (_, __) => _shimmerLoading(),
-        errorWidget: (_, __, ___) => errorWidget ?? Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
+        errorWidget: (_, __, ___) =>
+            errorWidget ??
+            Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
       ),
     );
   }
@@ -109,7 +112,8 @@ class NetworkImageWidget extends ConsumerWidget {
         loadingBuilder: (_, child, loadingProgress) =>
             loadingProgress == null ? child : _shimmerLoading(),
         errorBuilder: (_, __, ___) =>
-            errorWidget ?? Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
+            errorWidget ??
+            Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
       ),
     );
   }
