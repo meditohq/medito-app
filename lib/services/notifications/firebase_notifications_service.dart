@@ -25,20 +25,84 @@ class FirebaseMessagingHandler {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  // Track if notifications are initialized
+  static bool _isFlutterLocalNotificationsInitialized = false;
+
+  // Create a channel for Android notifications
+  static AndroidNotificationChannel? _channel;
+
   FirebaseMessagingHandler(this.ref);
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     try {
+      await _setupFlutterNotifications();
       _configureFirebaseMessaging(context, ref);
       _initializeLocalNotifications(context, ref);
+
+      // Enable headless notification presentation for all platforms, but disable badges
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: false, // Never show badges
+        sound: true,
+      );
+
+      if (kDebugMode) {
+        print(
+            "Firebase Messaging initialized with foreground presentation enabled (badges disabled)");
+      }
+
+      // Request permission explicitly to ensure notifications can show
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: false, // Never request badge permission
+        sound: true,
+        provisional: false,
+      );
+
+      if (kDebugMode) {
+        print(
+            "Firebase Messaging permission status: ${settings.authorizationStatus}");
+      }
 
       if (Platform.isIOS) {
         await FirebaseMessaging.instance.setAutoInitEnabled(true);
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print("Error initializing Firebase Messaging: $e");
       }
+    }
+  }
+
+  Future<void> _setupFlutterNotifications() async {
+    if (_isFlutterLocalNotificationsInitialized) {
+      return;
+    }
+
+    _channel = const AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'Medito Notifications', // title
+      description: 'Stay up-to-date with the latest from Medito', // description
+      importance: Importance.high,
+    );
+
+    // Check if the channel already exists (it might have been created in the native code)
+    final androidImplementation =
+        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    final channelExists =
+        await androidImplementation?.areNotificationsEnabled() ?? false;
+    if (!channelExists) {
+      // Only create the channel if needed
+      await androidImplementation?.createNotificationChannel(_channel!);
+    }
+
+    _isFlutterLocalNotificationsInitialized = true;
+
+    if (kDebugMode) {
+      print("Flutter notifications setup complete");
     }
   }
 
@@ -57,8 +121,16 @@ class FirebaseMessagingHandler {
     BuildContext context,
     WidgetRef ref,
   ) {
+    // Match the Firebase example approach
     const initializationSettingsAndroid = AndroidInitializationSettings('logo');
-    const initializationSettingsIOS = DarwinInitializationSettings();
+
+    // For iOS, initialize with proper settings but disable badges
+    const initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: false, // Never request badge permission
+      requestSoundPermission: true,
+    );
+
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
@@ -68,12 +140,22 @@ class FirebaseMessagingHandler {
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         final payload = response.payload;
-        if (payload != null) {
-          final data = json.decode(payload);
-          _navigate(context, ref, data);
+        if (payload != null && payload.isNotEmpty) {
+          try {
+            final data = json.decode(payload);
+            _navigate(context, ref, data);
+          } catch (e) {
+            if (kDebugMode) {
+              print("Error decoding notification payload: $e");
+            }
+          }
         }
       },
     );
+
+    if (kDebugMode) {
+      print("Local notifications initialized");
+    }
   }
 
   Future<void> _handleForegroundMessage(
@@ -81,50 +163,59 @@ class FirebaseMessagingHandler {
     BuildContext context,
     WidgetRef ref,
   ) async {
-    final snackBar = SnackBar(
-      content: Text(message.notification?.body ?? 'New message'),
-      action: SnackBarAction(
-        label: 'View',
-        onPressed: () {
-          _navigate(context, ref, message.data);
-        },
-      ),
-    );
+    // Debug log
+    if (kDebugMode) {
+      print(
+          "Received foreground message: ${message.notification?.title} / ${message.notification?.body}");
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    // Only show notification manually when the app is in foreground
+    // When in background, let the system handle it to avoid duplicates
+    if (AppLifecycleState.resumed == WidgetsBinding.instance.lifecycleState) {
+      showNotification(message);
+    }
+
+    // Still show snackbar for in-app UX, but make sure the context is valid
+    if (context.mounted) {
+      final snackBar = SnackBar(
+        content: Text(message.notification?.body ?? 'New message'),
+        action: SnackBarAction(
+          label: 'View',
+          onPressed: () {
+            _navigate(context, ref, message.data);
+          },
+        ),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
     await ref.read(reminderProvider).clearBadge();
   }
 
-  Future<void> _showBackgroundNotification(RemoteMessage message) async {
-    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'firebase_messaging_channel',
-      'Firebase Messaging',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    const platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+  void showNotification(RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
 
-    await _flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      message.notification?.title,
-      message.notification?.body,
-      platformChannelSpecifics,
-      payload: json.encode(message.data),
-    );
-
-    if (Platform.isIOS) {
-      const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
-        badgeNumber: 0,
-        presentAlert: false,
-        presentBadge: false,
-        presentSound: false,
-      );
-      await _flutterLocalNotificationsPlugin.show(
-        0,
-        null,
-        null,
-        const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+    if (notification != null &&
+        android != null &&
+        _channel != null &&
+        !kIsWeb) {
+      _flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channel!.id,
+            _channel!.name,
+            channelDescription: _channel!.description,
+            // Using the app logo for notifications
+            icon: 'logo',
+            channelShowBadge: false, // Disable badges for this channel
+          ),
+        ),
+        payload: json.encode(message.data),
       );
     }
   }
@@ -160,11 +251,51 @@ class FirebaseMessagingHandler {
       );
     }
   }
+
+  Future<void> _clearIOSBadge() async {
+    if (Platform.isIOS) {
+      // Clear any badge notifications
+      const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
+        badgeNumber: 0,
+        presentAlert: false,
+        presentBadge: false,
+        presentSound: false,
+      );
+
+      // This approach ensures the badge is cleared
+      await _flutterLocalNotificationsPlugin.show(
+        0,
+        null,
+        null,
+        const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+      );
+    }
+  }
 }
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  final container = ProviderContainer();
-  final handler = container.read(firebaseMessagingProvider);
-  await handler._showBackgroundNotification(message);
+  // Initialize Firebase if needed (for background isolates)
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    // Firebase might already be initialized
+    if (kDebugMode) {
+      print('Error initializing Firebase in background handler: $e');
+    }
+  }
+
+  // We don't need to manually show notifications in the background
+  // The system will handle it based on the AndroidManifest.xml configuration
+  // This prevents duplicate notifications
+
+  // Handle iOS badge count
+  if (Platform.isIOS) {
+    final container = ProviderContainer();
+    final handler = container.read(firebaseMessagingProvider);
+    await handler._clearIOSBadge();
+  }
+
+  print('Handling a background message ${message.messageId}');
 }

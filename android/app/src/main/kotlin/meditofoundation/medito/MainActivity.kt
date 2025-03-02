@@ -44,6 +44,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         createAudioServiceNotificationChannel()
         createReminderNotificationChannel()
         createNewsNotificationChannel()
+        createFirebaseNotificationChannel()
     }
 
     private fun createAudioServiceNotificationChannel() {
@@ -82,6 +83,21 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         notificationManager.createNotificationChannel(channel)
     }
 
+    private fun createFirebaseNotificationChannel() {
+        val channelName = "Medito Notifications"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel("high_importance_channel", channelName, importance).apply {
+            description = "Stay up-to-date with the latest from Medito"
+            enableLights(true)
+            enableVibration(true)
+            setShowBadge(false)
+        }
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
     override fun startService() {
         val intent = Intent(this, AudioPlayerService::class.java)
         startForegroundService(intent)
@@ -107,5 +123,6 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         const val ENGINE_ID = "medito_flutter_engine"
         const val REMINDER_CHANNEL_ID = "medito_reminder_channel"
         const val NEWS_CHANNEL_ID = "medito_news_channel"
+        const val FIREBASE_CHANNEL_ID = "high_importance_channel"
     }
 }
