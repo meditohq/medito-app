@@ -424,7 +424,7 @@ class StringConstants {
   static const String meditationInterruptionTitle =
       'Meditations stop unexpectedly';
   static const String meditationInterruptionContent =
-      'This is likely due to your phone\'s battery saver mode. Allow Medito to run in the background in your device\'s battery performance settings.';
+      'This is likely due to your phone\'s battery optimization settings. Visit DontKillMyApp.com for specific instructions on how to allow Medito to run properly in the background on your device.';
 
   static const String supportTitle = 'I want to support you';
   static const String supportContent =
@@ -453,7 +453,10 @@ class StringConstants {
       'To download a track, start playing it and then look for the download icon (a down arrow) at the bottom of the player screen—it\'s the second icon.\n\nOnce downloaded, you can access your tracks by tapping the "Downloads" tile on the home screen.';
 
   /// Action button text for the Battery Settings section in the Help screen
-  static const String openBatterySettingsText = 'Open Battery Settings';
+  static const String openBatterySettingsText = 'Visit DontKillMyApp.com';
+
+  /// URL for dontkillmyapp.com website with battery optimization instructions
+  static const String dontKillMyAppUrl = 'https://dontkillmyapp.com';
 
   /// Action button text for the Donation Portal in the Help screen
   static const String goToDonationPortalText = 'Go to Donation Portal';
