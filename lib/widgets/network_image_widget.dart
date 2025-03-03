@@ -11,7 +11,6 @@ class NetworkImageWidget extends ConsumerWidget {
   final bool shouldCache;
   final Gradient? gradient;
   final Widget? errorWidget;
-
   const NetworkImageWidget({
     super.key,
     required this.url,

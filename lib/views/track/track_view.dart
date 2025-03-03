@@ -7,7 +7,6 @@ import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/routes/routes.dart';
-import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';

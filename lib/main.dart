@@ -11,15 +11,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/constants/strings/string_constants.dart';
-import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/widgets.dart';
 
