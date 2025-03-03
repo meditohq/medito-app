@@ -96,11 +96,9 @@ Future<String> _formatString(
   var formattedString =
       '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
 
-  if (kDebugMode) {
     var isMonthlyDonorString =
         '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
     formattedString += '\n$isMonthlyDonorString';
-  }
 
   // Add audio completion timestamps if available
   try {
