@@ -205,7 +205,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       }
     });
 
-    _checkForFreezeUsage(ref);
+    final featureFlags = ref.watch(featureFlagsProvider);
+    if (featureFlags.isStreakFreezeEnabled) {
+      _checkForFreezeUsage(ref);
+    }
 
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
