@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';

@@ -187,11 +187,12 @@ class SplashViewState extends ConsumerState<SplashView> {
   Future<void> _initializeServices() async {
     HttpApiService().initializeAuth();
     await _initializeDioHeaderService();
+    ref.read(meRefreshProvider)();
     ref.read(rootCombineProvider(context));
   }
 
   Future<void> _initializeDioHeaderService() async {
-    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+    final deviceInfo = await ref.read(deviceAndAppInfoProvider .future);
     HeaderService(deviceInfo).initialise();
   }
 

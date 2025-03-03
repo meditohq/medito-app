@@ -14,7 +14,7 @@ import '../maintenance/maintenance_provider.dart';
 
 final rootCombineProvider = Provider.family<void, BuildContext>(
   (ref, context) {
-    checkMaintenance(ref, context);
+    _checkMaintenance(ref, context);
 
     if (Platform.isIOS) {
       var streamEvent = iosAudioHandler.iosStateStream
@@ -22,7 +22,7 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
           .distinct();
       streamEvent.forEach((element) async {
         if (element == ProcessingState.completed) {
-          var userToken = await getUserToken();
+          var userToken = await _getUserToken();
           var mediaItem = iosAudioHandler.mediaItem.value;
           var trackId = iosAudioHandler.trackState.id;
           var payload = {
@@ -42,13 +42,13 @@ final rootCombineProvider = Provider.family<void, BuildContext>(
   },
 );
 
-Future<String?> getUserToken() async {
+Future<String?> _getUserToken() async {
   var supabase = Supabase.instance.client;
   var user = supabase.auth.currentUser;
   return user?.userMetadata?['userToken'] as String?;
 }
 
-void checkMaintenance(Ref<void> ref, BuildContext context) {
+void _checkMaintenance(Ref<void> ref, BuildContext context) {
   ref.read(fetchMaintenanceProvider.future).then(
     (maintenanceData) {
       ref.read(deviceAndAppInfoProvider.future).then(

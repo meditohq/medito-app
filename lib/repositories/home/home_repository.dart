@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/http_api_service.dart';

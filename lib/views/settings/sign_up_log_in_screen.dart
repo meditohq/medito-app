@@ -15,7 +15,6 @@ import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
-import '../../services/network/http_api_service.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
   const SignUpLogInPage({
@@ -194,10 +193,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Future<void> _refreshUserInfo() async {
-    ref.read(meRefreshProvider)();
     ref.invalidate(deviceAppAndUserInfoProvider);
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     HeaderService(deviceInfo).initialise();
+    ref.read(meRefreshProvider)();
   }
 
   @override
