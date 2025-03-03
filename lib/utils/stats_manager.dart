@@ -114,10 +114,10 @@ class StatsManager {
       var longestStreak = _allStats!.streakLongest;
 
       // Only recalculate streak in production, not during tests
-      if (!kDebugMode || _testDate != null) {
+      try {
         dev.log('StatsManager: Calculating streak');
         _allStats = calculateStreak(_allStats!);
-      } else {
+      } catch (_) {
         // For tests, preserve the streak values from the merge
         dev.log('StatsManager: Preserving streak values from merge');
         _allStats = _allStats!.copyWith(

@@ -48,7 +48,11 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     override fun onCreate() {
         super.onCreate()
+        
+        // Start foreground immediately
+        startForeground(NOTIFICATION_ID, createPlaceholderNotification())
 
+        // Initialize players and session
         primaryPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, false)
             .setHandleAudioBecomingNoisy(true)
@@ -151,16 +155,26 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return true
     }
 
+    private fun createPlaceholderNotification(): Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Medito audio starting")
+            .setContentText("Preparing...")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSilent(true)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .build()
+    }
+
     private fun createMediaNotification(artworkBitmap: Bitmap?): Notification {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setLargeIcon(artworkBitmap)
             .setSilent(true)
-            .setStyle(primaryMediaSession?.let { MediaStyleNotificationHelper.MediaStyle(it) })
-
-        return builder.build()
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setStyle(MediaStyleNotificationHelper.MediaStyle(primaryMediaSession!!))
+            .build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -169,20 +183,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
             meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
         }
-
-        notification = createPlaceholderNotification()
-        startForeground(NOTIFICATION_ID, notification)
         return START_STICKY
-    }
-
-    private fun createPlaceholderNotification(): Notification {
-        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Medito audio starting")
-            .setContentText("Preparing...")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setSilent(true)
-            .setStyle(primaryMediaSession?.let { MediaStyleNotificationHelper.MediaStyle(it) })
-        return notificationBuilder.build()
     }
 
     private fun updateNotification() {

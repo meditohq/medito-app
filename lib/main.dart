@@ -44,7 +44,7 @@ Future<void> initializeApp() async {
 }
 
 void setupAudioCallback() {
-  MeditoAudioServiceCallbackApi.setup(AudioStateProvider(audioStateNotifier));
+  MeditoAudioServiceCallbackApi.setUp(AudioStateProvider(audioStateNotifier));
 }
 
 Future<void> initializeAudioService() async {

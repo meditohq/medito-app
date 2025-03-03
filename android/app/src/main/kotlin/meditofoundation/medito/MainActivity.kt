@@ -99,6 +99,8 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     }
 
     override fun startService() {
+        // Ensure notification channel exists before starting service
+        createAudioServiceNotificationChannel()
         val intent = Intent(this, AudioPlayerService::class.java)
         startForegroundService(intent)
     }
