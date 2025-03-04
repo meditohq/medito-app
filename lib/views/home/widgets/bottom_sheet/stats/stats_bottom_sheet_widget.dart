@@ -115,9 +115,12 @@ class StatsBottomSheetWidget extends ConsumerWidget {
             ),
           ),
         ),
-        ShareBtnWidget(
-          globalKey: key,
-          shareText: StringConstants.shareStatsText,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ShareBtnWidget(
+            globalKey: key,
+            shareText: StringConstants.shareStatsText,
+          ),
         ),
       ],
     );

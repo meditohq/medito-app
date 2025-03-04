@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -131,12 +132,34 @@ class MeditoErrorWidget extends ConsumerWidget {
                 textColor: ColorConstants.onyx,
               )
             else
-              LoadingButtonWidget(
-                btnText: StringConstants.retry,
-                onPressed: onTap,
-                isLoading: isLoading,
-                bgColor: ColorConstants.white,
-                textColor: ColorConstants.onyx,
+              Row(
+                spacing: 8,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LoadingButtonWidget(
+                    btnText: StringConstants.retry,
+                    onPressed: onTap,
+                    isLoading: isLoading,
+                    bgColor: ColorConstants.white,
+                    textColor: ColorConstants.onyx,
+                  ),
+                  height16,
+                  OutlinedButton(
+                    onPressed: () {
+                      handleNavigation(
+                        TypeConstants.flow, 
+                        [TypeConstants.downloads], 
+                        context,
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(StringConstants.downloads),
+                  ),
+                ],
               ),
           ],
         ),

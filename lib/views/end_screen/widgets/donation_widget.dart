@@ -127,19 +127,27 @@ class DonationWidget extends ConsumerWidget {
       return Row(
         children: [
           Expanded(
-            child: LoadingButtonWidget(
+            child: ElevatedButton(
               onPressed: () => handleNavigation(
                 button.type,
                 [button.path],
                 context,
               ),
-              btnText: button.title ?? StringConstants.donateNow,
-              bgColor: parseColor(button.backgroundColor),
-              textColor: parseColor(button.textColor),
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              isLoading: false,
-              borderRadius: 24,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: parseColor(button.backgroundColor),
+                foregroundColor: parseColor(button.textColor),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              child: Text(
+                button.title ?? StringConstants.donateNow,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ],

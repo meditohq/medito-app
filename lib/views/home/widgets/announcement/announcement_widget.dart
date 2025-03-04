@@ -20,7 +20,8 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
 
-class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with SingleTickerProviderStateMixin {
+class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _sizeAnimation;
   late Animation<double> _fadeAnimation;
@@ -70,13 +71,18 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Padding(
-          padding: const EdgeInsets.only(top: padding8, left: padding16, right: padding16),
+          padding: const EdgeInsets.only(
+              top: padding8, left: padding16, right: padding16),
           child: Container(
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(14),
             ),
-            padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16, top: padding24),
+            padding: const EdgeInsets.only(
+                left: padding16,
+                right: padding16,
+                bottom: padding12,
+                top: padding24),
             child: Column(
               children: [
                 Row(
@@ -106,23 +112,45 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
     );
 
     var actionWidgets = <Widget>[
-      LoadingButtonWidget(
+      TextButton(
         onPressed: _handleDismiss,
-        btnText: StringConstants.dismiss,
-        bgColor: bgColor,
-        textColor: textColor,
-        elevation: 0,
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          StringConstants.dismiss,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 16,
+          ),
+        ),
       ),
       width4,
     ];
 
     if (widget.announcement.ctaPath != null) {
-      actionWidgets.add(LoadingButtonWidget(
-        onPressed: () => _handleCtaTitlePress(context),
-        btnText: widget.announcement.ctaTitle ?? '',
-        bgColor: textColor,
-        textColor: bgColor,
-      ));
+      actionWidgets.add(
+        ElevatedButton(
+          onPressed: () => _handleCtaTitlePress(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: textColor,
+            foregroundColor: bgColor,
+            elevation: 0,
+            padding: const EdgeInsets.all(8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            widget.announcement.ctaTitle ?? '',
+            style: const TextStyle(
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
     }
 
     return Row(
@@ -166,5 +194,4 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
       ref: ref,
     );
   }
-
 }

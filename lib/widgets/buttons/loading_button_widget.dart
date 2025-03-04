@@ -11,8 +11,8 @@ class LoadingButtonWidget extends StatelessWidget {
     this.isLoading = false,
     this.elevation = 0,
     this.fontWeight = FontWeight.w700,
-    this.fontSize = 14,
-    this.borderRadius = 15,
+    this.fontSize = 16,
+    this.borderRadius = 8,
   });
 
   final void Function()? onPressed;
@@ -27,41 +27,42 @@ class LoadingButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
-      elevation: elevation,
-      disabledColor: bgColor.withOpacity(0.7),
-      color: bgColor,
-      splashColor: ColorConstants.transparent,
-      padding: const EdgeInsets.symmetric(
-        vertical: padding12,
-        horizontal: padding16,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: bgColor,
+        foregroundColor: textColor,
+        disabledBackgroundColor: bgColor.withOpacity(0.7),
+        elevation: elevation,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
+      child: Row(
         children: [
-          Text(
-            btnText,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: isLoading ? ColorConstants.transparent : textColor,
-                  fontFamily: dmSans,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Text(
+                btnText,
+                style: TextStyle(
+                  color: isLoading ? Colors.transparent : textColor,
                   fontSize: fontSize,
                   fontWeight: fontWeight,
                 ),
-          ),
-          if (isLoading)
-            SizedBox(
-              height: 16,
-              width: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: textColor,
               ),
-            ),
+              if (isLoading)
+                SizedBox(
+                  height: 16,
+                  width: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: textColor,
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );

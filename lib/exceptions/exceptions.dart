@@ -5,5 +5,5 @@ class AppHttpException implements Exception {
   const AppHttpException(this.message, {this.statusCode});
 
   @override
-  String toString() => 'HTTP Error ${statusCode ?? ''}: $message'.trim();
+  String toString() => '${statusCode ?? ''} $message'.trim();
 } 

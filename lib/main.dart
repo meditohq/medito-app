@@ -189,10 +189,12 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = ref.watch(internetConnectionProvider);
+    var connectionState = ref.watch(connectionNotifierProvider);
 
-    connectionStatus.whenData((status) {
-      if (status == InternetConnectionStatus.disconnected) {
+    connectionState.whenData((state) {
+      if (state.status == InternetConnectionStatus.disconnected &&
+          state.shouldShowMessage &&
+          mounted) {
         showSnackBar(
           context,
           StringConstants.noConnection,
