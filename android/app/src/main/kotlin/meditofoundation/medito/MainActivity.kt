@@ -49,9 +49,12 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
 
     private fun createAudioServiceNotificationChannel() {
         val channelName = "Meditation audio"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val importance = NotificationManager.IMPORTANCE_LOW
         val channel = NotificationChannel(AudioPlayerService.CHANNEL_ID, channelName, importance).apply {
             description = "Notification for media control of meditation audio"
+            setShowBadge(false)
+            enableLights(false)
+            enableVibration(false)
         }
 
         val notificationManager: NotificationManager =

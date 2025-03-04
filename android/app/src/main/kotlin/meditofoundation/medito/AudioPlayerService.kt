@@ -49,7 +49,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onCreate() {
         super.onCreate()
         
-        // Start foreground immediately
+        // Start foreground immediately with a placeholder notification
         startForeground(NOTIFICATION_ID, createPlaceholderNotification())
 
         // Initialize players and session
@@ -155,14 +155,51 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return true
     }
 
-    private fun createPlaceholderNotification(): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Medito audio starting")
-            .setContentText("Preparing...")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setSilent(true)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .build()
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        
+        // Ensure we start in foreground immediately
+        if (!::notification.isInitialized) {
+            notification = createPlaceholderNotification()
+        }
+        startForeground(NOTIFICATION_ID, notification)
+        
+        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
+            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
+            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
+        }
+        return START_STICKY
+    }
+
+    private fun updateNotification() {
+        // Update notification immediately with current state before loading artwork
+        notification = createMediaNotification(null)
+        NotificationUtil.setNotification(
+            this@AudioPlayerService,
+            NOTIFICATION_ID,
+            notification
+        )
+
+        // Then load artwork asynchronously
+        CoroutineScope(Dispatchers.Main).launch {
+            val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
+            val artworkBitmap = withContext(Dispatchers.IO) {
+                artworkUri?.let { downloadBitmap(it) }
+            }
+            // Only update if artwork was loaded successfully
+            if (artworkBitmap != null) {
+                notification = createMediaNotification(artworkBitmap)
+                try {
+                    NotificationUtil.setNotification(
+                        this@AudioPlayerService,
+                        NOTIFICATION_ID,
+                        notification
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     private fun createMediaNotification(artworkBitmap: Bitmap?): Notification {
@@ -172,37 +209,24 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setLargeIcon(artworkBitmap)
             .setSilent(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOngoing(true)
             .setStyle(MediaStyleNotificationHelper.MediaStyle(primaryMediaSession!!))
             .build()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
-            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
-            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
-        }
-        return START_STICKY
-    }
-
-    private fun updateNotification() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
-            val artworkBitmap = withContext(Dispatchers.IO) {
-                artworkUri?.let { downloadBitmap(it) }
-            }
-            notification = createMediaNotification(artworkBitmap)
-            try {
-                NotificationUtil.setNotification(
-                    this@AudioPlayerService,
-                    NOTIFICATION_ID,
-                    notification
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    private fun createPlaceholderNotification(): Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Medito audio starting")
+            .setContentText("Preparing...")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSilent(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
     }
 
     private suspend fun downloadBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
