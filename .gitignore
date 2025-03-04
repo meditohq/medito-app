@@ -106,3 +106,5 @@ lib/firebase_options.dart
 **/app/.cxx/**/*configure_fingerprint.bin
 *.bin
 /android/app/.cxx
+/ios/build
+/android/app/.cxx
