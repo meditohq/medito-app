@@ -40,7 +40,7 @@ class StringConstants {
   static const String writeBelowThisLine = '--- Write below this line ---';
   static const String explore = 'Explore';
   static const String welcome = '👋 Welcome';
-  static const String thanksForSharing = 'Thanks for sharing 💜';
+  static const String thanksForSharing = 'Thanks for sharing  💜';
   static const String min = 'min';
   static const String hey = '👋 Hey';
 

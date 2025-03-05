@@ -93,16 +93,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
   }
 
   Padding _buildCard() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: padding16),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 20),
-            child: DonationWidget(),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
+      child: DonationWidget(),
     );
   }
 
