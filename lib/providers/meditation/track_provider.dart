@@ -1,14 +1,11 @@
-import 'dart:io';
 
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/events/events_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
-import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/track/track_model.dart';
 import '../../repositories/track/track_repository.dart';
-import '../../exceptions/app_exceptions.dart';
 
 part 'track_provider.g.dart';
 

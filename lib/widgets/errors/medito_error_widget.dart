@@ -46,11 +46,7 @@ class MeditoErrorWidget extends ConsumerWidget {
       MeditoErrorWidgetUIState(
           shouldShowCheckDownloadButton, _getErrorMessage()),
     ));
-    var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontSize: 16,
-          color: ColorConstants.white,
-          fontFamily: sourceSerif,
-        );
+    var textStyle = Theme.of(context).textTheme.headlineMedium;
 
     var mainBody = _mainBody(
       context,
