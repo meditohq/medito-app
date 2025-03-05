@@ -8,6 +8,7 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/path/components/track_item_widget.dart';
 import 'package:medito/widgets/errors/medito_error_widget.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/exceptions/app_error.dart';
 
 import '../../models/models.dart';
 import '../../providers/pack/pack_provider.dart';
@@ -62,10 +63,13 @@ class _JourneyViewState extends ConsumerState<JourneyView>
       ),
       body: pathState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => MeditoErrorWidget(
-          message: 'Failed to load path: $error',
-          onTap: () => ref.refresh(packProvider(packId: pathId)),
-        ),
+        error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+          return MeditoErrorWidget(
+            error: error,
+            onTap: () => ref.refresh(packProvider(packId: pathId)),
+          );
+        },
         data: (pack) {
           if (!_initialScrollDone) {
             _scrollToFirstUncompleted(pack);

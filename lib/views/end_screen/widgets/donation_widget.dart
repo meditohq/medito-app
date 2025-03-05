@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,7 @@ import '../../../providers/donation/donation_page_provider.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/utils.dart';
 import '../../../widgets/buttons/loading_button_widget.dart';
+import '../../../widgets/errors/medito_error_widget.dart';
 
 class DonationWidget extends ConsumerWidget {
   const DonationWidget({super.key});
@@ -23,7 +25,12 @@ class DonationWidget extends ConsumerWidget {
         loading: () => _buildLoadingWidget(),
         error: (err, _) {
           debugPrint('Donation page error: $err');
-          return _buildErrorWidget(err.toString());
+          final error = err is AppError ? err : const UnknownError();
+          return MeditoErrorWidget(
+            error: error,
+            onTap: () => ref.refresh(fetchDonationPageProvider),
+            isScaffold: false,
+          );
         },
         data: (DonationPageModel donationPageModel) {
           debugPrint('Donation page data: ${donationPageModel.toString()}');
@@ -37,21 +44,6 @@ class DonationWidget extends ConsumerWidget {
     return const SizedBox(
       height: 200,
       child: Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Widget _buildErrorWidget(String err) {
-    return SizedBox(
-      height: 200,
-      child: Center(
-        child: Text(
-          "StringConstants.donationError",
-          style: TextStyle(
-            fontSize: 16,
-            color: ColorConstants.white,
-          ),
-        ),
-      ),
     );
   }
 

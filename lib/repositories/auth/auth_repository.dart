@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -101,12 +102,12 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
         dev.log('[AUTH] Supabase initialization attempt failed', error: e);
         if (attempts == maxAttempts) {
           dev.log('[AUTH] $errorMessage after $maxAttempts attempts', error: e);
-          rethrow;
+          throw const ServerError();
         }
         await Future.delayed(delay * attempts);
       }
     }
-    throw Exception(errorMessage);
+    throw const ServerError();
   }
 
   String _generateClientId() {
@@ -148,9 +149,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
     if (currentSession != null) {
       var bearer = currentSession.accessToken;
 
-      return bearer.isNotEmpty
-          ? bearer
-          : throw Exception('No bearer token found');
+      return bearer.isNotEmpty ? bearer : throw const UnauthorizedError();
     }
 
     return '';
@@ -241,8 +240,11 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
       await _signInAnonymously();
 
       return true;
-    } catch (e) {
-      throw Exception('Error signing out: ${e.toString()}');
+    } catch (error) {
+      if (error is AppError) {
+        rethrow;
+      }
+      throw const ServerError();
     }
   }
 

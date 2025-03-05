@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,13 @@ class DebugBottomSheetWidget extends ConsumerWidget {
               context,
               data,
             ),
-            error: (err, stack) => MeditoErrorWidget(
-              message: err.toString(),
-              onTap: () => ref.refresh(meProvider),
-            ),
+            error: (err, stack) {
+              final error = err is AppError ? err : const UnknownError();
+              return MeditoErrorWidget(
+                error: error,
+                onTap: () => ref.refresh(meProvider),
+              );
+            },
             loading: () => const Center(
               child: Padding(
                 padding: EdgeInsets.all(40.0),

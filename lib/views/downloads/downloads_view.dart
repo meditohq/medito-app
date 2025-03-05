@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/duration_extensions.dart';
@@ -69,10 +70,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
           return _getDownloadList(data);
         },
-        error: (err, stack) => MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(downloadedTracksProvider),
-        ),
+        error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+
+          return MeditoErrorWidget(
+            error: error,
+            onTap: () => ref.refresh(downloadedTracksProvider),
+          );
+        },
         loading: () => const TrackShimmerWidget(),
       ),
     );
@@ -131,9 +136,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             children: [
               const Spacer(),
               HugeIcon(
-                icon: HugeIcons.solidSharpDelete02,
-                color: Colors.redAccent
-              ),
+                  icon: HugeIcons.solidSharpDelete02, color: Colors.redAccent),
             ],
           ),
         ),

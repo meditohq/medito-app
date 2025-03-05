@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:medito/exceptions/exceptions.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/events/events_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -20,13 +20,11 @@ class Tracks extends _$Tracks {
     try {
       final track = await trackRepository.fetchTrack(trackId);
       return track;
-    } on AppHttpException catch (e) {
-      if (e.statusCode == HttpStatus.unauthorized) {
-        throw const SessionExpiredException();
+    } catch (error) {
+      if (error is AppError) {
+        rethrow;
       }
-      rethrow;
-    } catch (e) {
-      rethrow;
+      throw const UnknownError();
     }
   }
 

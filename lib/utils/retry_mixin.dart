@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:medito/exceptions/app_error.dart';
 
 mixin RetryMixin {
   Future<T> retryOperation<T>({
@@ -15,11 +16,14 @@ mixin RetryMixin {
         attempts++;
         if (attempts == maxAttempts) {
           debugPrint('$errorMessage after $maxAttempts attempts: $e');
-          rethrow;
+          if (e is AppError) {
+            rethrow;
+          }
+          throw const ServerError();
         }
         await Future.delayed(delay * attempts);
       }
     }
-    throw Exception(errorMessage);
+    throw const ServerError();
   }
-} 
+}

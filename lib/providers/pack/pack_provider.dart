@@ -1,12 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/exceptions/exceptions.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:medito/exceptions/app_exceptions.dart';
 
 part 'pack_provider.g.dart';
 
@@ -42,13 +41,12 @@ class Pack extends _$Pack {
       }).toList();
 
       state = AsyncData(pack.copyWith(items: updatedItems));
-    } on AppHttpException catch (e) {
-      if (e.statusCode == HttpStatus.unauthorized) {
-        throw const SessionExpiredException();
-      }
-      rethrow;
     } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
+      if (error is AppError) {
+        state = AsyncError(error, stackTrace);
+      } else {
+        state = AsyncError(const UnknownError(), stackTrace);
+      }
     }
 
     ref.keepAlive();

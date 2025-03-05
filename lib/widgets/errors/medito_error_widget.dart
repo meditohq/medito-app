@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:medito/providers/me/me_provider.dart';
 
 import '../../views/downloads/downloads_view.dart';
 
@@ -16,23 +16,35 @@ class MeditoErrorWidget extends ConsumerWidget {
   const MeditoErrorWidget({
     super.key,
     required this.onTap,
-    required this.message,
+    required this.error,
     this.isLoading = false,
     this.shouldShowCheckDownloadButton = false,
     this.isScaffold = true,
-    this.isSessionExpired = false,
   });
+
   final void Function() onTap;
-  final String message;
+  final AppError error;
   final bool isLoading;
   final bool shouldShowCheckDownloadButton;
   final bool isScaffold;
-  final bool isSessionExpired;
+
+  String _getErrorMessage() {
+    return switch (error) {
+      NetworkError() => StringConstants.errorNetworkMessage,
+      NoInternetError() => StringConstants.errorNoInternetMessage,
+      TimeoutError() => StringConstants.errorTimeoutMessage,
+      UnauthorizedError() => StringConstants.errorUnauthorizedMessage,
+      NotFoundError() => StringConstants.errorNotFoundMessage,
+      ServerError() => StringConstants.errorServerMessage,
+      UnknownError() => StringConstants.errorUnknownMessage,
+    };
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var uiState = ref.watch(meditoErrorWidgetProvider(
-      MeditoErrorWidgetUIState(shouldShowCheckDownloadButton, message),
+      MeditoErrorWidgetUIState(
+          shouldShowCheckDownloadButton, _getErrorMessage()),
     ));
     var textStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontSize: 16,
@@ -104,7 +116,7 @@ class MeditoErrorWidget extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             height16,
-            if (isSessionExpired)
+            if (error is UnauthorizedError)
               LoadingButtonWidget(
                 btnText: StringConstants.signInAgain,
                 onPressed: () async {
@@ -132,32 +144,42 @@ class MeditoErrorWidget extends ConsumerWidget {
                 textColor: ColorConstants.onyx,
               )
             else
-              Row(
-                spacing: 8,
+              Column(
+                spacing: 4,
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  LoadingButtonWidget(
-                    btnText: StringConstants.retry,
-                    onPressed: onTap,
-                    isLoading: isLoading,
-                    bgColor: ColorConstants.white,
-                    textColor: ColorConstants.onyx,
-                  ),
-                  height16,
-                  OutlinedButton(
-                    onPressed: () {
-                      handleNavigation(
-                        TypeConstants.flow, 
-                        [TypeConstants.downloads], 
-                        context,
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  SizedBox(
+                    width: 300,
+                    child: OutlinedButton(
+                      onPressed: onTap,
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                      child: Text(StringConstants.retry),
                     ),
-                    child: Text(StringConstants.downloads),
+                  ),
+                  SizedBox(
+                    width: 300,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        handleNavigation(
+                          TypeConstants.flow,
+                          [TypeConstants.downloads],
+                          context,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorConstants.lightPurple,
+                        foregroundColor: ColorConstants.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(StringConstants.goToDownloads),
+                    ),
                   ),
                 ],
               ),

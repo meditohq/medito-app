@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/exceptions/app_exceptions.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
@@ -50,12 +51,14 @@ class _PackViewState extends ConsumerState<PackView>
         skipLoadingOnRefresh: false,
         skipLoadingOnReload: false,
         data: (data) => _buildScaffoldWithData(data, ref),
-        error: (err, stack) => MeditoErrorWidget(
-          message: err.toString(),
-          onTap: () => ref.refresh(packProvider(packId: widget.id)),
-          isLoading: packs.isLoading,
-          isSessionExpired: err is SessionExpiredException,
-        ),
+        error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+          return MeditoErrorWidget(
+            error: error,
+            onTap: () => ref.refresh(packProvider(packId: widget.id)),
+            isLoading: packs.isLoading,
+          );
+        },
         loading: () => const FolderShimmerWidget(),
       ),
     );

@@ -1,5 +1,5 @@
 import 'package:medito/constants/constants.dart';
-import 'package:medito/exceptions/app_exceptions.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
@@ -89,13 +89,15 @@ class _TrackViewState extends ConsumerState<TrackView> {
                       ? _buildPortraitLayout(trackAsyncValue)
                       : _buildLandscapeLayout(trackAsyncValue),
                   loading: () => _buildLoadingWidget(),
-                  error: (err, stack) => MeditoErrorWidget(
-                    message: err.toString(),
-                    onTap: () =>
-                        ref.refresh(tracksProvider(trackId: widget.trackId)),
-                    isScaffold: false,
-                    isSessionExpired: err is SessionExpiredException,
-                  ),
+                  error: (err, stack) {
+                    final error = err is AppError ? err : const UnknownError();
+                    return MeditoErrorWidget(
+                      error: error,
+                      onTap: () =>
+                          ref.refresh(tracksProvider(trackId: widget.trackId)),
+                      isScaffold: false,
+                    );
+                  },
                 ),
               ),
             );
@@ -178,13 +180,15 @@ class _TrackViewState extends ConsumerState<TrackView> {
                   ),
                 ),
                 loading: () => _buildLoadingWidget(),
-                error: (err, stack) => MeditoErrorWidget(
-                  message: err.toString(),
-                  onTap: () =>
-                      ref.refresh(tracksProvider(trackId: widget.trackId)),
-                  isScaffold: false,
-                  isSessionExpired: err is SessionExpiredException,
-                ),
+                error: (err, stack) {
+                  final error = err is AppError ? err : const UnknownError();
+                  return MeditoErrorWidget(
+                    error: error,
+                    onTap: () =>
+                        ref.refresh(tracksProvider(trackId: widget.trackId)),
+                    isScaffold: false,
+                  );
+                },
               ),
             ),
           ],
@@ -235,12 +239,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
       skipLoadingOnRefresh: false,
       data: (data) =>
           _buildContentWithData(context, data, ref, isLandscape: isLandscape),
-      error: (err, stack) => MeditoErrorWidget(
-        message: err.toString(),
-        onTap: () => ref.refresh(tracksProvider(trackId: widget.trackId)),
-        isScaffold: false,
-        isSessionExpired: err is SessionExpiredException,
-      ),
+      error: (err, stack) {
+        final error = err is AppError ? err : const UnknownError();
+        return MeditoErrorWidget(
+          error: error,
+          onTap: () => ref.refresh(tracksProvider(trackId: widget.trackId)),
+          isScaffold: false,
+        );
+      },
       loading: () => _buildLoadingWidget(),
     );
   }

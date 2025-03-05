@@ -1,6 +1,5 @@
 import 'dart:developer' as dev;
-import 'package:medito/constants/strings/string_constants.dart';
-import 'package:medito/exceptions/exceptions.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TokenRefreshHandler {
@@ -15,7 +14,7 @@ class TokenRefreshHandler {
           await Supabase.instance.client.auth.refreshSession();
 
       if (refreshedSession.session == null) {
-        throw const AppHttpException(StringConstants.unauthorizedRequest);
+        throw const UnauthorizedError();
       }
 
       dev.log('Session refresh successful');
@@ -23,7 +22,7 @@ class TokenRefreshHandler {
     } on AuthException catch (e) {
       dev.log('Refresh failed: ${e.message}');
       await forceLogout();
-      throw const AppHttpException(StringConstants.unauthorizedRequest);
+      throw const UnauthorizedError();
     }
   }
 }

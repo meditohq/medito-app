@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -61,8 +62,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final currentlyPlayingTrack = ref.watch(playerProvider);
     if (currentlyPlayingTrack == null) {
       return MeditoErrorWidget(
+        error: const UnknownError(),
         onTap: () => Navigator.pop(context),
-        message: StringConstants.unableToLoadAudio,
       );
     }
 

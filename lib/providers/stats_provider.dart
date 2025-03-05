@@ -1,12 +1,15 @@
 import 'dart:developer' as dev;
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/settings_screen.dart';
+import 'package:medito/exceptions/app_error.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'stats_provider.g.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
 
@@ -42,6 +45,7 @@ final editStatsUrlProvider = Provider<String>((ref) {
       '&model=$model';
 });
 
+@Riverpod(keepAlive: true)
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   static DateTime? _lastRefresh;
   static const _minRefreshInterval = Duration(seconds: 2);
@@ -66,11 +70,13 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       }
 
       return await statsManager.localAllStats;
-    } catch (e, stackTrace) {
-      dev.log('StatsNotifier: Error during fetch',
-          error: e, stackTrace: stackTrace);
+    } catch (error) {
+      dev.log('StatsNotifier: Error during fetch', error: error);
 
-      rethrow;
+      if (error is AppError) {
+        rethrow;
+      }
+      throw const UnknownError();
     }
   }
 

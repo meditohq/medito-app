@@ -540,4 +540,16 @@ class StringConstants {
   /// Thank you message shown when users choose to stay as donors
   static const String donationRetentionThankYouMessage =
       'Thank you! Your continued support means the world to us and helps millions of people access meditation.';
+
+  // Error Messages
+  static const String errorNetworkMessage = 'Unable to connect to server';
+  static const String errorNoInternetMessage = 'No internet connection';
+  static const String errorTimeoutMessage = 'Connection timed out';
+  static const String errorUnauthorizedMessage =
+      'Session expired, please sign in again';
+  static const String errorNotFoundMessage = 'Content not found';
+  static const String errorServerMessage =
+      'Server error, please try again later';
+  static const String errorUnknownMessage =
+      'Something went wrong, please try again';
 }

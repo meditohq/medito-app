@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/network_constants.dart';
-import 'package:medito/exceptions/exceptions.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/services/network/handlers/token_refresh_handler.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -85,9 +85,9 @@ class HttpApiService {
 
       return _handleResponse(response);
     } on SocketException {
-      throw const AppHttpException(StringConstants.noInternetConnection);
+      throw const NoInternetError();
     } on TimeoutException {
-      throw const AppHttpException(StringConstants.connectionTimeout);
+      throw const TimeoutError();
     }
   }
 
@@ -99,24 +99,22 @@ class HttpApiService {
     dev.log('Response content length: ${content.length} bytes');
 
     if (response.statusCode >= HttpStatus.badRequest) {
-      throw _handleErrorResponse(response, content);
+      throw _handleErrorResponse(response.statusCode);
     }
 
     _retryCount = 0;
     return content.isEmpty ? {} : _parseResponseContent(content);
   }
 
-  AppHttpException _handleErrorResponse(
-      HttpClientResponse response, String content) {
-    dev.log('HTTP Error ${response.statusCode}: $content', level: 900);
-    if (response.statusCode == HttpStatus.notFound) {
-      return AppHttpException(StringConstants.errorNotFound);
-    }
+  AppError _handleErrorResponse(int statusCode) {
+    dev.log('HTTP Error $statusCode', level: 900);
 
-    return AppHttpException(
-      content.isNotEmpty ? content : 'HTTP ${response.statusCode}',
-      statusCode: response.statusCode,
-    );
+    return switch (statusCode) {
+      HttpStatus.notFound => const NotFoundError(),
+      HttpStatus.unauthorized => const UnauthorizedError(),
+      >= 500 => const ServerError(),
+      _ => const UnknownError(),
+    };
   }
 
   Map<String, dynamic> _parseResponseContent(String content) {
@@ -133,7 +131,7 @@ class HttpApiService {
     if (_retryCount >= kMaxRetries) {
       dev.log('Max retries reached - forcing logout');
       await _forceLogout();
-      throw const AppHttpException(StringConstants.unauthorizedRequest);
+      throw const UnauthorizedError();
     }
 
     try {

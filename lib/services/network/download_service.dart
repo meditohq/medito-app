@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:medito/exceptions/app_error.dart';
 
 class DownloadService {
   static final DownloadService _instance = DownloadService._internal();
@@ -37,10 +38,12 @@ class DownloadService {
 
     if (response.statusCode >= 400) {
       await file.delete();
-      throw HttpException(
-        'Failed to download file: ${response.statusCode}',
-        uri: Uri.parse(url),
-      );
+      throw switch (response.statusCode) {
+        HttpStatus.notFound => const NotFoundError(),
+        HttpStatus.unauthorized => const UnauthorizedError(),
+        >= 500 => const ServerError(),
+        _ => const UnknownError(),
+      };
     }
   }
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/providers/explore/track_search_provider.dart';
 import 'package:medito/routes/routes.dart';
@@ -137,18 +138,28 @@ class ExploreContentWidget extends ConsumerWidget {
         data: (packs) => packs.isEmpty
             ? const Center(child: Text('No packs available'))
             : _buildPackList(context, ref, packs),
-        error: (err, stack) => MeditoErrorWidget(
-          message: err.toString(),
-          isScaffold: false,
-          onTap: () => ref.invalidate(explorePacksProvider),
-        ),
+        error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+          return MeditoErrorWidget(
+            error: error,
+            isScaffold: false,
+            onTap: () => ref.invalidate(explorePacksProvider),
+          );
+        },
         loading: () => const LoadingWidget(),
       );
     } else {
       final searchResults = ref.watch(searchTracksProvider(searchQuery));
       return searchResults.when(
         data: (tracks) => _buildTrackList(context, ref, tracks),
-        error: (err, stack) => Container(),
+        error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+          return MeditoErrorWidget(
+            error: error,
+            isScaffold: false,
+            onTap: () => ref.invalidate(searchTracksProvider(searchQuery)),
+          );
+        },
         loading: () => const LoadingWidget(),
       );
     }

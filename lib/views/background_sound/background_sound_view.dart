@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -52,9 +53,12 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         skipLoadingOnRefresh: false,
         data: (data) => _mainContent(data),
         error: (err, stack) {
+          final error = err is AppError ? err : const UnknownError();
+
           return MeditoErrorWidget(
-            message: err.toString(),
+            error: error,
             onTap: () => ref.refresh(backgroundSoundsProvider),
+            isScaffold: false,
           );
         },
         loading: () => const BackgroundSoundsShimmerWidget(),

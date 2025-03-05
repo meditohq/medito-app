@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -43,8 +44,10 @@ class _HomeViewState extends ConsumerState<HomeView>
     return home.when(
       loading: () => const HomeShimmerWidget(),
       error: (err, stack) {
+        final error = err is AppError ? err : const UnknownError();
+
         return MeditoErrorWidget(
-          message: home.error.toString(),
+          error: error,
           onTap: () => _onRefresh(),
           isLoading: home.isLoading,
         );

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -38,36 +39,50 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
   @override
   Future<List<BackgroundSoundsModel>> fetchBackgroundSounds() async {
-    var response = await client.getRequest(HTTPConstants.backgroundSounds);
-    debugPrint('Background sounds response: $response');
+    try {
+      final response = await client.getRequest(HTTPConstants.backgroundSounds);
 
-    List<dynamic> rawList = [];
-    if (response is Map<String, dynamic>) {
-      if (response['results'] is List) {
-        rawList = response['results'] as List<dynamic>;
+      if (response is! Map<String, dynamic>) {
+        throw const ServerError();
       }
+
+      final results = response['results'];
+      if (results is! List) {
+        throw const ServerError();
+      }
+
+      final sounds = [
+        const BackgroundSoundsModel(
+          id: '0',
+          title: StringConstants.none,
+          duration: 0,
+          path: '',
+        ),
+      ];
+
+      for (final item in results) {
+        try {
+          if (item is! Map) continue;
+
+          final map = Map<String, dynamic>.fromEntries(
+            item.entries.map((e) => MapEntry(e.key.toString(), e.value)),
+          );
+
+          final sound = BackgroundSoundsModel.fromJson(map);
+          sounds.add(sound);
+        } catch (e) {
+          debugPrint('Error parsing background sound: $e');
+          // Skip invalid items instead of failing the whole request
+          continue;
+        }
+      }
+
+      return sounds;
+    } catch (e) {
+      debugPrint('Error fetching background sounds: $e');
+      if (e is AppError) rethrow;
+      throw const ServerError();
     }
-    debugPrint('Parsed raw list: $rawList');
-
-    final sounds = [
-      const BackgroundSoundsModel(
-        id: '0',
-        title: StringConstants.none,
-        duration: 0,
-        path: '',
-      ),
-      ...rawList.map((item) {
-        final map = Map<String, dynamic>.fromEntries(
-            (item as Map<dynamic, dynamic>)
-                .entries
-                .map((e) => MapEntry(e.key.toString(), e.value)));
-        return BackgroundSoundsModel.fromJson(map);
-      })
-    ];
-
-    debugPrint('Final sounds list: $sounds');
-
-    return sounds;
   }
 
   @override
