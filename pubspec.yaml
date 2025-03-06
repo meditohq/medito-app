@@ -3,7 +3,7 @@ description: A meditation learning tool
 
 # flutter clean && flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
 # flutter clean && flutter build ios --release --dart-define-from-file=../.prod.json
-version: 3.3.10+30081
+version: 3.3.11+30082
 
 
 environment:
