@@ -108,3 +108,4 @@ lib/firebase_options.dart
 /android/app/.cxx
 /ios/build
 /android/app/.cxx
+fastlane/keys
