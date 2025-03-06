@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -67,7 +68,7 @@ Future<String> deviceAppAndUserInfo(Ref ref) async {
   var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
   var auth = ref.read(authRepositoryProvider);
   var email = auth.getUserEmail();
-  var stats = await ref.watch(statsProvider.future);
+  var stats = await ref.read(statsProvider.future);
 
   return await _formatString(me, deviceInfo, email, stats, ref);
 }
@@ -76,7 +77,7 @@ Future<String> _formatString(
   MeModel? me,
   DeviceAndAppInfoModel? deviceInfo,
   String? emailAddress,
-  dynamic stats,
+  LocalAllStats? stats,
   Ref ref,
 ) async {
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
@@ -102,11 +103,15 @@ Future<String> _formatString(
 
   // Add audio completion timestamps if available
   try {
-    if (stats?.audioCompleted != null && stats.audioCompleted.isNotEmpty) {
+    if (stats?.audioCompleted != null && (stats?.audioCompleted?.isNotEmpty ?? false)) {
       formattedString += '\n\nact:';
 
-      // Take the most recent 10 sessions (or fewer if less are available)
-      List<LocalAudioCompleted> recentSessions = stats.audioCompleted.take(10).toList();
+      // Sort by timestamp in descending order to get the most recent sessions
+      var sortedSessions = List<LocalAudioCompleted>.from(stats!.audioCompleted!)
+        ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      
+      // Take the 10 most recent sessions (or fewer if less are available)
+      var recentSessions = sortedSessions.take(10).toList();
 
       for (var session in recentSessions) {
         formattedString += '\n${session.timestamp} ';
