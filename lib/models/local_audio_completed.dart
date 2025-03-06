@@ -10,11 +10,13 @@ class LocalAudioCompleted {
 
   LocalAudioCompleted({required this.timestamp, required this.id});
 
-  factory LocalAudioCompleted.fromJson(Map<String, dynamic> json) => _$LocalAudioCompletedFromJson(json);
+  factory LocalAudioCompleted.fromJson(Map<String, dynamic> json) =>
+      _$LocalAudioCompletedFromJson(json);
   Map<String, dynamic> toJson() => _$LocalAudioCompletedToJson(this);
 
   // Convert from API model to local model
-  factory LocalAudioCompleted.fromAudioCompleted(AudioCompleted audioCompleted) {
+  factory LocalAudioCompleted.fromAudioCompleted(
+      AudioCompleted audioCompleted) {
     return LocalAudioCompleted(
       timestamp: audioCompleted.timestamp,
       id: audioCompleted.id,
@@ -26,6 +28,16 @@ class LocalAudioCompleted {
     return AudioCompleted(
       timestamp: timestamp,
       id: id,
+    );
+  }
+
+  LocalAudioCompleted copyWith({
+    int? timestamp,
+    String? id,
+  }) {
+    return LocalAudioCompleted(
+      timestamp: timestamp ?? this.timestamp,
+      id: id ?? this.id,
     );
   }
 }

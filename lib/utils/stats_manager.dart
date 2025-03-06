@@ -9,6 +9,7 @@ import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/stats_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/local_audio_completed.dart';
+import 'package:medito/utils/audio_completion_tracker.dart';
 
 // Key Rules for a Normal Streak (Without Streak Freezes)
 // 1.	Meditating every day increases the streak by 1. Each consecutive day of meditation adds to the streak.
@@ -43,7 +44,7 @@ class StatsManager {
   Future<bool> _acquireLock() async {
     var prefs = await SharedPreferences.getInstance();
     var lastLockTime = prefs.getInt(_syncLockKey) ?? 0;
-    var now = DateTime.now().millisecondsSinceEpoch;
+    var now = _getCurrentDate().millisecondsSinceEpoch;
 
     if (now - lastLockTime > _syncLockTimeout.inMilliseconds) {
       var success = await prefs.setInt(_syncLockKey, now);
@@ -173,7 +174,7 @@ class StatsManager {
       if (localAllStats != null && localAllStats.totalTracksCompleted > 0) {
         dev.log('StatsManager: Using local stats');
         _allStats = localAllStats.copyWith(
-          updated: DateTime.now().millisecondsSinceEpoch,
+          updated: _getCurrentDate().millisecondsSinceEpoch,
         );
         return;
       }
@@ -183,7 +184,7 @@ class StatsManager {
     if (localAllStats == null || localAllStats.totalTracksCompleted == 0) {
       if (remoteStats.totalTracksCompleted > 0) {
         _allStats = remoteStats.copyWith(
-          updated: DateTime.now().millisecondsSinceEpoch,
+          updated: _getCurrentDate().millisecondsSinceEpoch,
         );
         return;
       }
@@ -239,7 +240,7 @@ class StatsManager {
         audioCompleted: deduplicatedAudioCompleted,
         freezeUsageDates: deduplicatedFreezeUsageDates,
         tracksChecked: combinedTracksChecked,
-        updated: DateTime.now().millisecondsSinceEpoch,
+        updated: _getCurrentDate().millisecondsSinceEpoch,
       );
     } else {
       _allStats = remoteStats;
@@ -434,27 +435,32 @@ class StatsManager {
     LocalAudioCompleted audioCompleted,
     int duration,
   ) async {
-    final newDuration = duration + (_allStats?.totalTimeListened ?? 0);
-    final newTotalTracks = 1 + (_allStats?.totalTracksCompleted ?? 0);
-
-    var updatedTracksCompleted = _allStats?.tracksChecked ?? [];
-    if (!updatedTracksCompleted.contains(audioCompleted.id)) {
-      updatedTracksCompleted.add(audioCompleted.id);
+    if (_allStats == null) {
+      await sync();
     }
 
-    _allStats = _allStats?.copyWith(
-      tracksChecked: updatedTracksCompleted,
-      audioCompleted: [...?_allStats?.audioCompleted, audioCompleted],
-      totalTracksCompleted: newTotalTracks,
-      updated: DateTime.now().toUtc().millisecondsSinceEpoch,
-      totalTimeListened: newDuration,
+    if (AudioCompletionTracker.checkTrackCrossedMidnight(
+      endTimestamp: audioCompleted.timestamp,
+      duration: duration,
+    )) {
+      audioCompleted = audioCompleted.copyWith(
+        timestamp: audioCompleted.timestamp - duration,
+      );
+    }
+
+    // Update stats with the completed audio
+    _allStats = AudioCompletionTracker.updateStatsWithCompletedAudio(
+      stats: _allStats,
+      audioCompleted: audioCompleted,
+      duration: duration,
     );
 
+    // Calculate streak and save stats
     if (_allStats != null) {
       _allStats = calculateStreak(_allStats!);
+      await _saveLocalAllStatsToSharedPrefs();
+      await _statsService.postStats(_allStats!);
     }
-    await _saveLocalAllStatsToSharedPrefs();
-    await _statsService.postStats(_allStats!);
   }
 
   Future<void> addTrackChecked(String? id) async {
@@ -469,7 +475,7 @@ class StatsManager {
 
       _allStats = _allStats?.copyWith(
         tracksChecked: updatedTracksChecked,
-        updated: DateTime.now().toUtc().millisecondsSinceEpoch,
+        updated: _getCurrentDate().millisecondsSinceEpoch,
       );
 
       await _saveLocalAllStatsToSharedPrefs();
@@ -486,7 +492,7 @@ class StatsManager {
     if (updatedTracksChecked.remove(trackId)) {
       _allStats = _allStats?.copyWith(
         tracksChecked: updatedTracksChecked,
-        updated: DateTime.now().toUtc().millisecondsSinceEpoch,
+        updated: _getCurrentDate().millisecondsSinceEpoch,
       );
 
       await _saveLocalAllStatsToSharedPrefs();
@@ -677,7 +683,6 @@ class StatsManager {
 
     // Calculate the new streak with freezes applied
     _allStats = calculateStreak(_allStats!);
-
 
     await _saveLocalAllStatsToSharedPrefs();
     await _statsService.postStats(_allStats!);

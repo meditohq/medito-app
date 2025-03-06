@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/services/stats_service.dart';
+import 'package:medito/utils/audio_completion_tracker.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -767,16 +768,27 @@ void main() {
         var stats = LocalAllStats.empty().copyWith(
           streakFreezes: 1, // Only one freeze available
           audioCompleted: [
+            // Today has activity
             LocalAudioCompleted(
-                id: '1', timestamp: day15.millisecondsSinceEpoch),
+              id: '1',
+              timestamp: day15.millisecondsSinceEpoch,
+            ),
             LocalAudioCompleted(
-                id: '2', timestamp: day14.millisecondsSinceEpoch),
+              id: '2',
+              timestamp: day14.millisecondsSinceEpoch,
+            ),
             LocalAudioCompleted(
-                id: '3', timestamp: day12.millisecondsSinceEpoch),
+              id: '3',
+              timestamp: day12.millisecondsSinceEpoch,
+            ),
             LocalAudioCompleted(
-                id: '4', timestamp: day10.millisecondsSinceEpoch),
+              id: '4',
+              timestamp: day10.millisecondsSinceEpoch,
+            ),
             LocalAudioCompleted(
-                id: '5', timestamp: day9.millisecondsSinceEpoch),
+              id: '5',
+              timestamp: day9.millisecondsSinceEpoch,
+            ),
           ],
         );
 
@@ -1026,7 +1038,7 @@ void main() {
         // Should have 2 new freeze usage dates
         expect(afterFreezes.freezeUsageDates.length, 2);
 
-        // Convert timestamps to dates for easier verification
+        // Convert timestamps to dates for verification
         var freezeDates = afterFreezes.freezeUsageDates.map((timestamp) {
           var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
           return DateTime(date.year, date.month, date.day);
@@ -1775,6 +1787,9 @@ void main() {
         // Should not suggest a freeze because yesterday (Feb 27) has activity
         expect(result, false);
       });
+    });
+
+    group('StatsManager addAudioCompleted Tests', () {
     });
   });
 }
