@@ -35,7 +35,7 @@ platform :android do
 
   desc "Submit a new beta build to Google Play"
   lane :beta do
-    sh "flutter build appbundle --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
+    sh "flutter build apk --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
     upload_to_play_store(
       track: 'beta',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
@@ -64,7 +64,7 @@ platform :android do
 
   desc "Submit a new production build to Google Play"
   lane :production do
-    sh "flutter build appbundle --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
+    sh "flutter build apk --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
     upload_to_play_store(
       track: 'production',
       aab: '../build/app/outputs/bundle/release/app-release.aab',

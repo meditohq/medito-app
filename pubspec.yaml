@@ -1,10 +1,9 @@
 name: medito
 description: A meditation learning tool
 
-# cd android && fastlane supply --aab ../build/app/outputs/bundle/prodRelease/app-prod-release.aab --track beta --json_key ../fastlane/keys/coulisse-lang-9236ba91f86e.json --skip_upload_metadata --skip_upload_images --skip_upload_screenshots
-# For changelogs, create files in fastlane/metadata/android/en-GB/changelogs/VERSION_CODE.txt
+# flutter clean && flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
 # flutter clean && flutter build ios --release --dart-define-from-file=../.prod.json
-version: 3.3.11+30082
+version: 3.3.12+30083
 
 
 environment:
