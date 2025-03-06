@@ -50,6 +50,57 @@ platform :android do
       apk: "../build/app/outputs/flutter-apk/app-release.apk"
     )
   end
+
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Submit a new beta build to Google Play"
+  lane :beta do
+    json_key = File.read('./keys/google-play-api-key.json')
+    upload_to_play_store(
+      track: 'beta',
+      apk: '../build/app/outputs/apk/prod/release/app-prod-release.apk',
+      json_key_data: json_key,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
+      release_status: "draft",
+    )
+  end
+
+  desc "Promote beta track to prod"
+  lane :promote_to_production do
+    json_key = File.read('./keys/google-play-api-key.json')
+    upload_to_play_store(
+      track: 'beta',
+      track_promote_to: 'production',
+      json_key_data: json_key,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
+      release_status: "draft",
+    )
+  end
+
+  desc "Submit a new production build to Google Play"
+  lane :production do
+    sh "flutter build apk --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
+    json_key = File.read('./keys/google-play-api-key.json')
+    upload_to_play_store(
+      track: 'production',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      json_key_data: json_key,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
+      release_status: "draft",
+    )
+  end
 end
 
 desc "Set up temporary keychain"
