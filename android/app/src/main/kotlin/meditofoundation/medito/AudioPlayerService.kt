@@ -49,10 +49,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onCreate() {
         super.onCreate()
         
-        // Start foreground immediately with a placeholder notification
-        startForeground(NOTIFICATION_ID, createPlaceholderNotification())
-
-        // Initialize players and session
+        // Initialize players and session without starting foreground here
         primaryPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, false)
             .setHandleAudioBecomingNoisy(true)
@@ -156,13 +153,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
+        // Start foreground immediately
+        startForeground(NOTIFICATION_ID, createPlaceholderNotification())
         
-        // Ensure we start in foreground immediately
-        if (!::notification.isInitialized) {
-            notification = createPlaceholderNotification()
-        }
-        startForeground(NOTIFICATION_ID, notification)
+        super.onStartCommand(intent, flags, startId)
         
         FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
             MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
@@ -218,7 +212,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     private fun createPlaceholderNotification(): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Medito audio starting")
             .setContentText("Preparing...")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -226,7 +220,15 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOngoing(true)
             .build()
+            
+        // Initialize the notification field
+        if (!::notification.isInitialized) {
+            this.notification = notification
+        }
+        
+        return notification
     }
 
     private suspend fun downloadBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
