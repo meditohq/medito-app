@@ -359,14 +359,14 @@ class StringConstants {
   static const String carouselTitle = 'Featured';
   static const String quoteTitle = 'Daily Quote';
 
-  static const String customiseHomeLayout = 'Organise Home Layout';
+  static const customization = 'Customization';
+  static const String customiseHomeLayout = 'Organize Home Layout';
 
   // Section Titles
   static const featuresIntegrations = 'Features & Integrations';
   static const account = 'Account';
   static const supportCommunity = 'Support & Community';
   static const helpLegal = 'Help & Legal';
-  static const appearance = 'Appearance';
   static const advanced = 'Advanced';
 
   static const enableNotificationsTitle =
@@ -552,4 +552,7 @@ class StringConstants {
       'Server error, please try again later';
   static const String errorUnknownMessage =
       'Something went wrong, please try again';
+  // Used in settings to toggle Do Not Disturb mode during meditation
+  static const String enableDndDuringMeditation =
+      'Silence phone during meditation';
 }

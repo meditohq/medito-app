@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 export 'device_and_app_info/device_and_app_info_provider.dart';
 export 'events/events_provider.dart';
 export 'feature_flags_provider.dart';
@@ -12,3 +14,4 @@ export 'player/player_provider.dart';
 export 'shared_preference/shared_preference_provider.dart';
 export 'error_widget/medito_error_widget_provider.dart';
 export 'explore/explore_provider.dart';
+export 'dnd_provider.dart';

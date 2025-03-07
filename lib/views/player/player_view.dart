@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -49,6 +51,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     var healthKitManager = HealthKitManager();
     if (await healthKitManager.isHealthSyncPermitted() != true) {
       await healthKitManager.requestAuthorization();
+    }
+
+    // Only enable DND if permission is already granted and toggle is on
+    if (Platform.isAndroid) {
+      final dndNotifier = ref.read(dndProvider.notifier);
+      final hasAccess = await dndNotifier.checkNotificationPolicyAccess();
+      if (hasAccess) {
+        await dndNotifier.setDndMode(true);
+      }
     }
   }
 
@@ -223,9 +234,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
     _isClosing = true;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _resetState();
       _stopAudio();
+
+      await ref.read(dndProvider.notifier).setDndMode(false);
       _endScreenOpened = false;
 
       if (shouldPop && Navigator.canPop(context)) {
@@ -255,6 +268,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         if (currentlyPlayingTrack != null && mounted) {
           Future.delayed(const Duration(milliseconds: 500), () {
             ref.read(statsProvider.notifier).refresh();
+
+            unawaited(ref.read(dndProvider.notifier).setDndMode(false));
 
             Navigator.pushReplacement(
               context,

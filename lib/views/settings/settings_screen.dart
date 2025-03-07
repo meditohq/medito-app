@@ -20,6 +20,7 @@ import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
+import 'package:medito/providers/dnd_provider.dart';
 
 final bearerTokenProvider = FutureProvider<String>((ref) async {
   final authRepository = ref.watch(authRepositoryProvider);
@@ -105,7 +106,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: StringConstants.supportCommunity,
-        type: 'url',
+        type: TypeConstants.url,
         title: StringConstants.donateTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
@@ -113,7 +114,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: StringConstants.helpLegal,
-        type: 'url',
+        type: TypeConstants.url,
         title: StringConstants.faqTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedNews01, color: ColorConstants.white),
@@ -122,7 +123,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: StringConstants.helpLegal,
-        type: 'url',
+        type: TypeConstants.url,
         title: StringConstants.editStatsTitle,
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedQuestion,
@@ -132,7 +133,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: StringConstants.supportCommunity,
-        type: 'url',
+        type: TypeConstants.url,
         title: StringConstants.telegramTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedTelegram, color: ColorConstants.white),
@@ -140,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: StringConstants.helpLegal,
-        type: 'url',
+        type: TypeConstants.url,
         title: StringConstants.termsOfService,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedDocumentAttachment,
@@ -156,7 +157,7 @@ class SettingsScreen extends ConsumerWidget {
         path: 'https://meditofoundation.org/privacy',
       ),
       SettingsItem(
-        section: StringConstants.appearance,
+        section: StringConstants.customization,
         type: TypeConstants.route,
         title: StringConstants.customiseHomeLayout,
         icon: HugeIcon(
@@ -164,6 +165,16 @@ class SettingsScreen extends ConsumerWidget {
           color: ColorConstants.white,
         ),
         path: TypeConstants.customiseHomeLayout,
+      ),
+      SettingsItem(
+        section: StringConstants.customization,
+        type: TypeConstants.toggle,
+        title: StringConstants.enableDndDuringMeditation,
+        icon: HugeIcon(
+          icon: HugeIcons.solidRoundedMoon,
+          color: ColorConstants.white,
+        ),
+        path: 'toggle_dnd',
       )
     ];
 
@@ -257,6 +268,23 @@ class SettingsScreen extends ConsumerWidget {
     final isAccountItem = item.type == 'account';
     final userEmail = user?.email;
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
+    final isToggleItem = item.type == TypeConstants.toggle;
+    final isDndToggle = isToggleItem && item.path == 'toggle_dnd';
+
+    if (isDndToggle) {
+      final isDndEnabled = ref.watch(dndProvider);
+
+      return RowItemWidget(
+        icon: item.icon,
+        title: item.title,
+        hasUnderline: true,
+        isSwitch: true,
+        switchValue: isDndEnabled,
+        onSwitchChanged: (value) {
+          ref.read(dndProvider.notifier).toggleDnd(value);
+        },
+      );
+    }
 
     return RowItemWidget(
       icon: item.icon,
@@ -301,6 +329,12 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref,
     List<SettingsItem> settingsItems,
   ) {
+    final isDndSupported = Platform.isAndroid;
+    final customizationItems = _getItemsBySection(
+            settingsItems, StringConstants.customization)
+        .where((item) => !item.path.contains('toggle_dnd') || isDndSupported)
+        .toList();
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
@@ -317,8 +351,8 @@ class SettingsScreen extends ConsumerWidget {
             ..._getItemsBySection(
                     settingsItems, StringConstants.supportCommunity)
                 .map((item) => _buildMenuItemTile(context, ref, item)),
-            _buildSectionTitle(context, StringConstants.appearance),
-            ..._getItemsBySection(settingsItems, StringConstants.appearance)
+            _buildSectionTitle(context, StringConstants.customization),
+            ...customizationItems
                 .map((item) => _buildMenuItemTile(context, ref, item)),
             _buildSectionTitle(context, StringConstants.helpLegal),
             ..._getItemsBySection(settingsItems, StringConstants.helpLegal)
