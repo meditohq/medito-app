@@ -1,13 +1,13 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../models/home/announcement/announcement_model.dart';
 import '../../models/home/home_model.dart';
 import '../../repositories/home/home_repository.dart';
 
 part 'home_provider.g.dart';
 
 @riverpod
-Future<HomeModel> fetchHome(FetchHomeRef ref) async {
+Future<HomeModel> fetchHome(Ref ref) async {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
@@ -18,19 +18,9 @@ Future<HomeModel> fetchHome(FetchHomeRef ref) async {
   return homeModel.copyWith(shortcuts: sortedShortcuts);
 }
 
-@riverpod 
-Future<AnnouncementModel?> fetchLatestAnnouncement(
-  FetchLatestAnnouncementRef ref,
-) async {
-  final homeRepository = ref.watch(homeRepositoryProvider);
-  ref.keepAlive();
-
-  return await homeRepository.fetchLatestAnnouncement();
-}
-
 @riverpod
 Future<void> updateShortcutsIdsInPreference(
-  UpdateShortcutsIdsInPreferenceRef ref, {
+  Ref ref, {
   required List<String> ids,
 }) {
   final homeRepository = ref.watch(homeRepositoryProvider);
@@ -39,7 +29,7 @@ Future<void> updateShortcutsIdsInPreference(
 }
 
 @riverpod
-Future<void> refreshHomeAPIs(RefreshHomeAPIsRef ref) async {
+Future<void> refreshHomeAPIs(Ref ref) async {
   ref.invalidate(fetchHomeProvider);
   await ref.read(fetchHomeProvider.future);
 }

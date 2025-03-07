@@ -6,7 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'events_repository.g.dart';
 
 abstract class EventsRepository {
-  Future<void> trackAnnouncementDismissEvent(String id);
 
   Future<void> markTrackAsFavouriteEvent(String trackId);
 
@@ -17,10 +16,6 @@ class EventsRepositoryImpl extends EventsRepository {
   final HttpApiService client;
 
   EventsRepositoryImpl({required this.client});
-
-  @override
-  Future<void> trackAnnouncementDismissEvent(String id) => client.postRequest(
-      '${HTTPConstants.announcementEvent}$id${HTTPConstants.announcementDismissEvent}');
 
   @override
   Future<void> markTrackAsFavouriteEvent(String trackId) {

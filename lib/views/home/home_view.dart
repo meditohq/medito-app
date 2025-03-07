@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/home/home_provider.dart';
+import '../../providers/home/announcement_provider.dart';
 import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'widgets/editorial/carousel_widget.dart';
@@ -110,7 +112,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     return data.when(
       loading: () => Container(),
       error: (err, stack) => Container(),
-      data: (announcement) {
+      data: (AnnouncementModel? announcement) {
         if (announcement == null ||
             announcement.text == null ||
             announcement.text == '') {
@@ -120,7 +122,9 @@ class _HomeViewState extends ConsumerState<HomeView>
         return AnnouncementWidget(
           announcement: announcement,
           onPressedDismiss: () {
-            ref.invalidate(fetchLatestAnnouncementProvider);
+            ref
+                .read(dismissedAnnouncementProvider.notifier)
+                .dismissAnnouncement(announcement.id!);
           },
         );
       },
