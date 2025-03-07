@@ -23,19 +23,51 @@ part 'device_and_app_info_provider.g.dart';
 Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
   ref.keepAlive();
 
-  String? deviceModel;
-  String? deviceOS;
-  String? devicePlatform;
-  String buildNumber;
-  String appVersion;
-  var deviceInfo = DeviceInfoPlugin();
   var packageInfo = await PackageInfo.fromPlatform();
+  var deviceInfo = await _getDeviceInfo();
+  var localeInfo = _getLocaleInfo();
+
+  var data = <String, String>{
+    'model': deviceInfo.model,
+    'os': deviceInfo.os,
+    'platform': deviceInfo.platform,
+    'buildNumber': packageInfo.buildNumber,
+    'appVersion': packageInfo.version,
+    'languageCode': localeInfo.languageCode,
+    'currencyName': localeInfo.currencyName,
+  };
+
+  return DeviceAndAppInfoModel.fromJson(data);
+}
+
+class _LocaleInfo {
+  final String languageCode;
+  final String currencyName;
+
+  _LocaleInfo(this.languageCode, this.currencyName);
+}
+
+_LocaleInfo _getLocaleInfo() {
   var languageCode = PlatformDispatcher.instance.locale.languageCode;
   var currencyName =
-      NumberFormat.simpleCurrency(locale: languageCode).currencyName;
+      NumberFormat.simpleCurrency(locale: languageCode).currencyName ?? '';
 
-  appVersion = packageInfo.version;
-  buildNumber = packageInfo.buildNumber;
+  return _LocaleInfo(languageCode, currencyName);
+}
+
+class _DeviceInfo {
+  final String model;
+  final String os;
+  final String platform;
+
+  _DeviceInfo(this.model, this.os, this.platform);
+}
+
+Future<_DeviceInfo> _getDeviceInfo() async {
+  var deviceModel = '';
+  var deviceOS = '';
+  var devicePlatform = '';
+  var deviceInfo = DeviceInfoPlugin();
 
   if (Platform.isIOS) {
     var iosInfo = await deviceInfo.iosInfo;
@@ -49,17 +81,7 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
     devicePlatform = 'android';
   }
 
-  var data = {
-    'model': deviceModel,
-    'os': deviceOS,
-    'platform': devicePlatform,
-    'buildNumber': buildNumber,
-    'appVersion': appVersion,
-    'languageCode': languageCode,
-    'currencyName': currencyName,
-  };
-
-  return DeviceAndAppInfoModel.fromJson(data);
+  return _DeviceInfo(deviceModel, deviceOS, devicePlatform);
 }
 
 @riverpod
@@ -70,16 +92,17 @@ Future<String> deviceAppAndUserInfo(Ref ref) async {
   var email = auth.getUserEmail();
   var stats = await ref.read(statsProvider.future);
 
-  return await _formatString(me, deviceInfo, email, stats, ref);
+  var basicInfo = _formatBasicInfo(me, deviceInfo, email);
+  var audioCompletionInfo = await _formatAudioCompletionInfo(stats);
+
+  return '$basicInfo$audioCompletionInfo';
 }
 
-Future<String> _formatString(
+String _formatBasicInfo(
   MeModel? me,
   DeviceAndAppInfoModel? deviceInfo,
   String? emailAddress,
-  LocalAllStats? stats,
-  Ref ref,
-) async {
+) {
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
   var env = '${StringConstants.env}: $isProdString';
   var id = '${StringConstants.id}: ${me?.id ?? ''}';
@@ -93,33 +116,48 @@ Future<String> _formatString(
   var devicePlatform =
       '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
   var email = '${StringConstants.email}: ${emailAddress ?? ''}';
+  var isMonthlyDonorString =
+      '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
 
-  var formattedString =
-      '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
+  return '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$isMonthlyDonorString';
+}
 
-    var isMonthlyDonorString =
-        '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
-    formattedString += '\n$isMonthlyDonorString';
-
-  // Add audio completion timestamps if available
-  try {
-    if (stats?.audioCompleted != null && (stats?.audioCompleted?.isNotEmpty ?? false)) {
-      formattedString += '\n\nact:';
-
-      // Sort by timestamp in descending order to get the most recent sessions
-      var sortedSessions = List<LocalAudioCompleted>.from(stats!.audioCompleted!)
-        ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      
-      // Take the 10 most recent sessions (or fewer if less are available)
-      var recentSessions = sortedSessions.take(10).toList();
-
-      for (var session in recentSessions) {
-        formattedString += '\n${session.timestamp} ';
-      }
-    }
-  } catch (e) {
-    formattedString += '\n\nError retrieving audio completion data: $e';
+Future<String> _formatAudioCompletionInfo(LocalAllStats? stats) async {
+  if (stats?.audioCompleted == null ||
+      (stats?.audioCompleted?.isEmpty ?? true)) {
+    return '';
   }
 
-  return formattedString;
+  try {
+    var formattedString = '\n\nact:';
+    var recentSessions = _getRecentAudioSessions(stats!);
+
+    for (var session in recentSessions) {
+      var formattedTimestamp = _formatSessionTimestamp(session);
+      formattedString += '\n$formattedTimestamp ';
+    }
+
+    return formattedString;
+  } catch (e) {
+    return '\n\nError retrieving audio completion data: $e';
+  }
+}
+
+List<LocalAudioCompleted> _getRecentAudioSessions(LocalAllStats stats) {
+  // Sort by timestamp in descending order to get the most recent sessions
+  var sortedSessions = List<LocalAudioCompleted>.from(stats.audioCompleted!)
+    ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+  // Take the 10 most recent sessions (or fewer if less are available)
+  return sortedSessions.take(10).toList();
+}
+
+String _formatSessionTimestamp(LocalAudioCompleted session) {
+  var timestamp = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
+
+  return '${timestamp.month.toString().padLeft(2, '0')}'
+      '${timestamp.day.toString().padLeft(2, '0')}'
+      '${timestamp.hour.toString().padLeft(2, '0')}'
+      '${timestamp.minute.toString().padLeft(2, '0')}'
+      '${timestamp.second.toString().padLeft(2, '0')}';
 }
