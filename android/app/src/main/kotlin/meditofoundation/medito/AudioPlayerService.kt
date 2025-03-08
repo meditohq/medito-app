@@ -45,6 +45,92 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private var primaryMediaSession: MediaSession? = null
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
     private var isCompletionHandled = false
+    
+    private val fadeOutDurationMillis = 10000
+    private val handler = Handler(Looper.getMainLooper())
+    private val positionUpdateRunnable = object : Runnable {
+        override fun run() {
+            val currentPosition = primaryPlayer.currentPosition
+            val trackDuration = primaryPlayer.duration
+
+            applyBackgroundSoundVolume(trackDuration, currentPosition)
+
+            val state = PlaybackState(
+                isPlaying = primaryPlayer.isPlaying,
+                position = primaryPlayer.currentPosition,
+                volume = (primaryPlayer.volume).toLong(),
+                speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
+                isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                duration = primaryPlayer.duration,
+                isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
+                track = Track(
+                    id = primaryPlayer.currentMediaItem?.mediaId ?: "",
+                    title = primaryPlayer.currentMediaItem?.mediaMetadata?.title?.toString() ?: "",
+                    description = primaryPlayer.currentMediaItem?.mediaMetadata?.description?.toString() ?: "",
+                    imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri?.toString() ?: "",
+                    artist = primaryPlayer.currentMediaItem?.mediaMetadata?.artist?.toString() ?: "",
+                ),
+            )
+
+            meditoAudioApi?.updatePlaybackState(state) {
+                if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
+                    isCompletionHandled = true
+                    handleTrackCompletion(state)
+                } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
+                    handler.postDelayed(this, 250)
+                }
+            }
+        }
+
+        private fun handleTrackCompletion(state: PlaybackState) {
+            val completionData = createCompletionData(state)
+            saveAndSendCompletionData(completionData)
+        }
+
+        private fun createCompletionData(state: PlaybackState): CompletionData {
+            return CompletionData(
+                trackId = state.track.id,
+                duration = state.duration,
+                fileId = state.track.title,
+                guideId = state.track.artist,
+                timestamp = System.currentTimeMillis()
+            )
+        }
+
+        private fun saveAndSendCompletionData(completionData: CompletionData) {
+            SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                // Attempt to send data
+                meditoAudioApi?.let { api ->
+                    api.handleCompletedTrack(completionData) { result ->
+                        if (result.isSuccess) {
+                            SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
+                        }
+
+                        finishPlayback()
+                    }
+                } ?: finishPlayback() // If meditoAudioApi is null, just finish playback
+            }
+        }
+
+        private fun finishPlayback() {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+        }
+
+        private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
+            if (trackDuration - currentPosition <= fadeOutDurationMillis && trackDuration > fadeOutDurationMillis) {
+                val volumeFraction =
+                    (trackDuration - currentPosition).toFloat() / fadeOutDurationMillis
+                backgroundMusicPlayer.volume =
+                    backgroundMusicVolume * volumeFraction
+            } else {
+                backgroundMusicPlayer.volume = backgroundMusicVolume
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -197,7 +283,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     private fun createMediaNotification(artworkBitmap: Bitmap?): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -207,8 +293,13 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setOngoing(true)
-            .setStyle(MediaStyleNotificationHelper.MediaStyle(primaryMediaSession!!))
-            .build()
+            
+        // Only set the media style if primaryMediaSession is not null
+        primaryMediaSession?.let {
+            builder.setStyle(MediaStyleNotificationHelper.MediaStyle(it))
+        }
+            
+        return builder.build()
     }
 
     private fun createPlaceholderNotification(): Notification {
@@ -313,90 +404,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         } else {
             primaryPlayer.play()
             backgroundMusicPlayer.play()
-        }
-    }
-
-    private val fadeOutDurationMillis = 10000
-    private val handler = Handler(Looper.getMainLooper())
-    private val positionUpdateRunnable = object : Runnable {
-        override fun run() {
-            val currentPosition = primaryPlayer.currentPosition
-            val trackDuration = primaryPlayer.duration
-
-            applyBackgroundSoundVolume(trackDuration, currentPosition)
-
-            val state = PlaybackState(
-                isPlaying = primaryPlayer.isPlaying,
-                position = primaryPlayer.currentPosition,
-                volume = (primaryPlayer.volume).toLong(),
-                speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
-                isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                duration = primaryPlayer.duration,
-                isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
-                track = Track(
-                    id = primaryPlayer.currentMediaItem?.mediaId.toString(),
-                    title = primaryPlayer.currentMediaItem?.mediaMetadata?.title.toString(),
-                    description = primaryPlayer.currentMediaItem?.mediaMetadata?.description.toString(),
-                    imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri.toString(),
-                    artist = primaryPlayer.currentMediaItem?.mediaMetadata?.artist.toString(),
-                ),
-            )
-
-            meditoAudioApi?.updatePlaybackState(state) {
-                if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
-                    isCompletionHandled = true
-                    handleTrackCompletion(state)
-                } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
-                    handler.postDelayed(this, 250)
-                }
-            }
-        }
-
-        private fun handleTrackCompletion(state: PlaybackState) {
-            val completionData = createCompletionData(state)
-            saveAndSendCompletionData(completionData)
-        }
-
-        private fun createCompletionData(state: PlaybackState): CompletionData {
-            return CompletionData(
-                trackId = state.track.id,
-                duration = state.duration,
-                fileId = state.track.title,
-                guideId = state.track.artist,
-                timestamp = System.currentTimeMillis()
-            )
-        }
-
-        private fun saveAndSendCompletionData(completionData: CompletionData) {
-            SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
-
-            CoroutineScope(Dispatchers.Main).launch {
-                // Attempt to send data
-                meditoAudioApi?.handleCompletedTrack(completionData) { result ->
-                    if (result.isSuccess) {
-                        SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
-                    }
-
-                    finishPlayback()
-                }
-            }
-        }
-
-        private fun finishPlayback() {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
-        }
-
-        private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
-            if (trackDuration - currentPosition <= fadeOutDurationMillis && trackDuration > fadeOutDurationMillis) {
-                val volumeFraction =
-                    (trackDuration - currentPosition).toFloat() / fadeOutDurationMillis
-                backgroundMusicPlayer.volume =
-                    backgroundMusicVolume * volumeFraction
-            } else {
-                backgroundMusicPlayer.volume = backgroundMusicVolume
-            }
         }
     }
 
