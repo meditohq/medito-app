@@ -50,36 +50,42 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private val handler = Handler(Looper.getMainLooper())
     private val positionUpdateRunnable = object : Runnable {
         override fun run() {
-            val currentPosition = primaryPlayer.currentPosition
-            val trackDuration = primaryPlayer.duration
+            try {
+                val currentPosition = primaryPlayer.currentPosition
+                val trackDuration = primaryPlayer.duration
 
-            applyBackgroundSoundVolume(trackDuration, currentPosition)
+                applyBackgroundSoundVolume(trackDuration, currentPosition)
 
-            val state = PlaybackState(
-                isPlaying = primaryPlayer.isPlaying,
-                position = primaryPlayer.currentPosition,
-                volume = (primaryPlayer.volume).toLong(),
-                speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
-                isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                duration = primaryPlayer.duration,
-                isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
-                track = Track(
-                    id = primaryPlayer.currentMediaItem?.mediaId ?: "",
-                    title = primaryPlayer.currentMediaItem?.mediaMetadata?.title?.toString() ?: "",
-                    description = primaryPlayer.currentMediaItem?.mediaMetadata?.description?.toString() ?: "",
-                    imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri?.toString() ?: "",
-                    artist = primaryPlayer.currentMediaItem?.mediaMetadata?.artist?.toString() ?: "",
-                ),
-            )
+                val state = PlaybackState(
+                    isPlaying = primaryPlayer.isPlaying,
+                    position = primaryPlayer.currentPosition,
+                    volume = (primaryPlayer.volume).toLong(),
+                    speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
+                    isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                    duration = primaryPlayer.duration,
+                    isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                    isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
+                    track = Track(
+                        id = primaryPlayer.currentMediaItem?.mediaId ?: "",
+                        title = primaryPlayer.currentMediaItem?.mediaMetadata?.title?.toString() ?: "",
+                        description = primaryPlayer.currentMediaItem?.mediaMetadata?.description?.toString() ?: "",
+                        imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri?.toString() ?: "",
+                        artist = primaryPlayer.currentMediaItem?.mediaMetadata?.artist?.toString() ?: "",
+                    ),
+                )
 
-            meditoAudioApi?.updatePlaybackState(state) {
-                if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
-                    isCompletionHandled = true
-                    handleTrackCompletion(state)
-                } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
-                    handler.postDelayed(this, 250)
+                meditoAudioApi?.updatePlaybackState(state) {
+                    if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
+                        isCompletionHandled = true
+                        handleTrackCompletion(state)
+                    } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
+                        handler.postDelayed(this, 250)
+                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Ensure we reschedule even if there's an error
+                handler.postDelayed(this, 250)
             }
         }
 
@@ -121,12 +127,20 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
 
         private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
-            if (trackDuration - currentPosition <= fadeOutDurationMillis && trackDuration > fadeOutDurationMillis) {
-                val volumeFraction =
-                    (trackDuration - currentPosition).toFloat() / fadeOutDurationMillis
-                backgroundMusicPlayer.volume =
-                    backgroundMusicVolume * volumeFraction
-            } else {
+            try {
+                if (trackDuration != C.TIME_UNSET && 
+                    trackDuration - currentPosition <= fadeOutDurationMillis && 
+                    trackDuration > fadeOutDurationMillis) {
+                    val volumeFraction =
+                        (trackDuration - currentPosition).toFloat() / fadeOutDurationMillis
+                    backgroundMusicPlayer.volume =
+                        backgroundMusicVolume * volumeFraction
+                } else {
+                    backgroundMusicPlayer.volume = backgroundMusicVolume
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Default to the set volume if there's an error
                 backgroundMusicPlayer.volume = backgroundMusicVolume
             }
         }
@@ -211,6 +225,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun playAudio(audioData: AudioData): Boolean {
+        if (!::primaryPlayer.isInitialized || !::backgroundMusicPlayer.isInitialized) {
+            return false
+        }
+        
         isCompletionHandled = false
 
         val primaryMediaItem = MediaItem.Builder()
@@ -221,7 +239,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                     .setTitle(audioData.track.title)
                     .setArtist(audioData.track.artist)
                     .setDescription(audioData.track.description)
-                    .setArtworkUri(Uri.parse(audioData.track.imageUrl))
+                    .setArtworkUri(audioData.track.imageUrl?.let { Uri.parse(it) })
                     .build()
             )
             .build()
@@ -374,19 +392,28 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun skip10SecondsForward() {
-        if (primaryPlayer.currentPosition + 10000 > primaryPlayer.duration) {
-            primaryPlayer.seekTo(primaryPlayer.duration)
+        val duration = primaryPlayer.duration
+        val currentPosition = primaryPlayer.currentPosition
+        
+        if (duration == C.TIME_UNSET) {
             return
         }
-        primaryPlayer.seekTo(primaryPlayer.currentPosition + 10000)
+        
+        if (currentPosition + 10000 > duration) {
+            primaryPlayer.seekTo(duration)
+            return
+        }
+        primaryPlayer.seekTo(currentPosition + 10000)
     }
 
     override fun skip10SecondsBackward() {
-        if (primaryPlayer.duration - primaryPlayer.currentPosition < 10000) {
+        val currentPosition = primaryPlayer.currentPosition
+        
+        if (currentPosition < 10000) {
             primaryPlayer.seekTo(0)
             return
         }
-        primaryPlayer.seekTo(primaryPlayer.currentPosition - 10000)
+        primaryPlayer.seekTo(currentPosition - 10000)
     }
 
     override fun stopAudio() {
