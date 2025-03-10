@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
@@ -191,7 +192,7 @@ class SplashViewState extends ConsumerState<SplashView> {
   }
 
   Future<void> _initializeDioHeaderService() async {
-    final deviceInfo = await ref.read(deviceAndAppInfoProvider .future);
+    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     HeaderService(deviceInfo).initialise();
   }
 

@@ -101,7 +101,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           systemNavigationBarColor: Colors.transparent,
           systemNavigationBarDividerColor: Colors.transparent,
           systemNavigationBarIconBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.dark),
+          statusBarIconBrightness: Brightness.light),
     );
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,

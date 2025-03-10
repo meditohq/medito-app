@@ -59,6 +59,7 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             Visibility(
