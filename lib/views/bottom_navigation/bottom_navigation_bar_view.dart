@@ -94,60 +94,76 @@ class _BottomNavigationBarViewState
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: BottomActionBar(
           layout: BottomActionBarLayout.homePage,
-          leftItem: BottomActionBarItem(
-            child: HugeIcon(
-              icon: HugeIcons.solidRoundedHome01,
-              color: _currentPageIndex == 0
-                  ? ColorConstants.lightPurple
-                  : ColorConstants.white,
-            ),
-            onTap: () => _onDestinationSelected(0),
-          ),
-          leftCenterItem: BottomActionBarItem(
-            child: GestureDetector(
-              onDoubleTap: () {
-                if (_currentPageIndex == 1) {
-                  _searchFocusNode.requestFocus();
-                } else {
-                  _onDestinationSelected(1);
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _searchFocusNode.requestFocus();
-                  });
-                }
-              },
-              child: HugeIcon(
-                icon: HugeIcons.solidRoundedSearch01,
-                color: _currentPageIndex == 1
-                    ? ColorConstants.lightPurple
-                    : ColorConstants.white,
-              ),
-            ),
-            onTap: () => _onDestinationSelected(1),
-          ),
-          rightCenterItem: BottomActionBarItem(
-            child: HugeIcon(
-              icon: HugeIcons.solidRoundedRoad02,
-              color: _currentPageIndex == 2
-                  ? ColorConstants.lightPurple
-                  : ColorConstants.white,
-            ),
-            onTap: () => _onDestinationSelected(2),
-          ),
-          rightItem: BottomActionBarItem(
-            child: HugeIcon(
-              icon: HugeIcons.solidRoundedSettings01,
-              color: _currentPageIndex == 3
-                  ? ColorConstants.lightPurple
-                  : ColorConstants.white,
-            ),
-            onTap: () => _onDestinationSelected(3),
-          ),
+          leftItem: _buildHomeNavigationItem(),
+          leftCenterItem: _buildSearchNavigationItem(),
+          rightCenterItem: _buildJourneyNavigationItem(),
+          rightItem: _buildSettingsNavigationItem(),
         ),
         body: IndexedStack(
           index: _currentPageIndex,
           children: _pages,
         ),
       ),
+    );
+  }
+
+  BottomActionBarItem _buildHomeNavigationItem() {
+    return BottomActionBarItem(
+      child: HugeIcon(
+        icon: HugeIcons.solidRoundedHome01,
+        color: _currentPageIndex == 0
+            ? ColorConstants.lightPurple
+            : ColorConstants.white,
+      ),
+      onTap: () => _onDestinationSelected(0),
+    );
+  }
+
+  BottomActionBarItem _buildSearchNavigationItem() {
+    return BottomActionBarItem(
+      child: GestureDetector(
+        onDoubleTap: () {
+          if (_currentPageIndex == 1) {
+            _searchFocusNode.requestFocus();
+          } else {
+            _onDestinationSelected(1);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _searchFocusNode.requestFocus();
+            });
+          }
+        },
+        child: HugeIcon(
+          icon: HugeIcons.solidRoundedSearch01,
+          color: _currentPageIndex == 1
+              ? ColorConstants.lightPurple
+              : ColorConstants.white,
+        ),
+      ),
+      onTap: () => _onDestinationSelected(1),
+    );
+  }
+
+  BottomActionBarItem _buildJourneyNavigationItem() {
+    return BottomActionBarItem(
+      child: HugeIcon(
+        icon: HugeIcons.solidRoundedRoad02,
+        color: _currentPageIndex == 2
+            ? ColorConstants.lightPurple
+            : ColorConstants.white,
+      ),
+      onTap: () => _onDestinationSelected(2),
+    );
+  }
+
+  BottomActionBarItem _buildSettingsNavigationItem() {
+    return BottomActionBarItem(
+      child: HugeIcon(
+        icon: HugeIcons.solidRoundedSettings01,
+        color: _currentPageIndex == 3
+            ? ColorConstants.lightPurple
+            : ColorConstants.white,
+      ),
+      onTap: () => _onDestinationSelected(3),
     );
   }
 
