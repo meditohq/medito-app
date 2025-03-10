@@ -557,11 +557,10 @@ class StringConstants {
       'Silence phone during meditation';
 
   // Donation screen strings
-  static const String donateToMedito = 'Donate to Medito';
-  static const String donationAmount = 'Donation Amount';
+  static const String donateToMedito = 'Donate Now';
   static const String currency = 'Currency';
-  static const String custom = 'Custom';
-  static const String payWithPaypal = 'Pay with PayPal';
+  static const String custom = 'Custom Amount';
+  static const String payWithPaypal = 'Donate with PayPal';
   static const String bankTransfer = 'Bank Transfer';
   static const String changeCurrency = 'Change Currency';
   static const String chooseAmount = 'Choose an amount';
@@ -573,9 +572,34 @@ class StringConstants {
       '• Create new free meditation content\n• Maintain the app without ads\n• Make mental wellbeing accessible to all\n• Helps us keep meditation free for everyone';
 
   static const String donationSecurityInfo =
-      'Donating is securely done thanks to Stripe. We do not sell or trade your information with anyone.';
+      'We do not sell or trade your information with anyone.';
   static const String foundationRegistrationInfo =
       'Medito Foundation or in Dutch, Stichting Medito is a non-profit organisation registered in the Netherlands.';
   static const String foundationContactInfo =
       'KvK-nummer: 75284251 - RSIN: 860222627 - Email: hello@meditofoundation.org';
+
+  static const String redirectingToSecurePayment =
+      'Redirecting to a secure payment page...';
+
+  static String couldNotOpenDonationPage =
+      'Could not open the donation page.'; // Used in the donation screen when a user selects a donation amount
+
+  static const String monthlyDonation =
+      'Monthly'; // Label for the monthly donation button
+  static const String singleDonation =
+      'One-time'; // Label for the single donation button
+
+  static const String monthlyDonationImpact =
+      "£10/month can bring meditation to hundreds, helping fight depression and anxiety.";
+
+  static const String oneTimeDonationImpact =
+      "Your donation directly supports free mindfulness resources, bringing peace to thousands today.";
+
+  // String used in the ImpactCard widget to describe the global impact of Medito
+  static const String impactCardHelpMessage =
+      "Help millions worldwide access free meditation";
+
+  // String used in the ImpactCard widget for a testimonial
+  static const String impactCardTestimonial =
+      '"Medito pulled me through a seriously dark period in my life" - Medito meditator';
 }

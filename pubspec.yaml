@@ -51,6 +51,7 @@ dependencies:
   supabase_flutter: ^2.0.0
   internet_connection_checker: ^3.0.1
   do_not_disturb: ^1.0.3
+  font_awesome_flutter: ^10.1.0
 
 dev_dependencies:
   flutter_test:

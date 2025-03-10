@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
-import 'package:medito/routes/routes.dart';
-import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
-import 'package:medito/widgets/headers/medito_app_bar_small.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:medito/widgets/impact_card.dart';
 
 final _selectedCurrencyProvider = StateProvider<String>((ref) {
   final deviceInfoAsync = ref.watch(deviceAndAppInfoProvider);
@@ -28,27 +29,61 @@ String _getCurrency(String? deviceCurrency) {
   return 'USD';
 }
 
-class DonationScreen extends ConsumerWidget {
+class DonationScreen extends ConsumerStatefulWidget {
   const DonationScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DonationScreen> createState() => _DonationScreenState();
+}
+
+class _DonationScreenState extends ConsumerState<DonationScreen> {
+  bool isMonthlyDonationVisible = true;
+
+  @override
+  Widget build(BuildContext context) {
     final selectedCurrency = ref.watch(_selectedCurrencyProvider);
+
+    final currencySymbols = {
+      'USD': '\$',
+      'GBP': '£',
+      'EUR': '€',
+      'AUD': 'A\$',
+      'INR': '₹',
+      'CAD': 'C\$',
+    };
+
+    final amounts = {
+      'USD': '10',
+      'GBP': '10',
+      'EUR': '10',
+      'AUD': '16',
+      'INR': '816',
+      'CAD': '10',
+    };
+
+    final symbol = currencySymbols[selectedCurrency] ?? '\$';
+    final amount = amounts[selectedCurrency] ?? '10';
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
       appBar: AppBar(
         backgroundColor: ColorConstants.onyx,
         elevation: 0,
-        centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          StringConstants.donateToMedito,
-          style: Theme.of(context).textTheme.displayLarge,
+        title: Row(
+          children: [
+            Icon(HugeIcons.solidSharpSquareLock02,
+                color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              StringConstants.donateToMedito,
+              style: Theme.of(context).textTheme.displayLarge,
+            ),
+          ],
         ),
         actions: [
           _buildCurrencyDropdown(context, selectedCurrency, ref),
@@ -56,38 +91,121 @@ class DonationScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTrustIndicators(context),
-                const SizedBox(height: 24),
-                Text(
-                  StringConstants.donationAmount,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+          child: Column(
+            children: [
+              const ImpactCard(),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                isMonthlyDonationVisible = true;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8))),
+                              side: isMonthlyDonationVisible
+                                  ? BorderSide(
+                                      color: ColorConstants.lightPurple)
+                                  : BorderSide(color: ColorConstants.softGrey),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              StringConstants.monthlyDonation,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                isMonthlyDonationVisible = false;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8))),
+                              side: !isMonthlyDonationVisible
+                                  ? BorderSide(
+                                      color: ColorConstants.lightPurple)
+                                  : BorderSide(color: ColorConstants.softGrey),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              StringConstants.singleDonation,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isMonthlyDonationVisible
+                          ? '$symbol$amount/month can help 100 people meditate every day.'
+                          : StringConstants.oneTimeDonationImpact,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (isMonthlyDonationVisible)
+                      _buildDonationAmountOptions(
+                          context, selectedCurrency, true),
+                    if (!isMonthlyDonationVisible)
+                      _buildDonationAmountOptions(
+                          context, selectedCurrency, false),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: _buildPaymentMethodIcons(),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      StringConstants.otherPaymentMethods,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildOtherPaymentOptions(context),
+                    const SizedBox(height: 24),
+                    _buildTrustIndicators(context),
+                    const SizedBox(height: 24),
+                    _buildFoundationInfo(),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                _buildDonationAmountOptions(context, selectedCurrency),
-                const SizedBox(height: 32),
-                Text(
-                  StringConstants.otherPaymentMethods,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildOtherPaymentOptions(context),
-                const SizedBox(height: 24),
-                _buildFoundationInfo(),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -131,24 +249,6 @@ class DonationScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            StringConstants.donationImpactTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            StringConstants.donationImpactPoints,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              height: 1.5,
-            ),
-          ),
         ],
       ),
     );
@@ -174,18 +274,19 @@ class DonationScreen extends ConsumerWidget {
         children: [
           Text(
             symbol,
-            style: const TextStyle(
-              color: ColorConstants.lightPurple,
+            style: TextStyle(
+              color: Colors.white54,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(width: 2),
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: selectedCurrency,
               dropdownColor: ColorConstants.greyIsTheNewBlack,
               icon: const Icon(Icons.arrow_drop_down,
-                  color: Colors.white70, size: 20),
+                  color: Colors.white54, size: 20),
               style: const TextStyle(color: Colors.white, fontSize: 14),
               isDense: true,
               underline: Container(),
@@ -209,7 +310,8 @@ class DonationScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDonationAmountOptions(BuildContext context, String currency) {
+  Widget _buildDonationAmountOptions(
+      BuildContext context, String currency, bool isMonthly) {
     final amounts = <String, String>{};
 
     if (currency == 'USD') {
@@ -221,7 +323,6 @@ class DonationScreen extends ConsumerWidget {
       amounts[StringConstants.custom] =
           'https://donate.stripe.com/fZeg0kf25dm79Z63cx';
     }
-    ;
 
     if (currency == 'GBP') {
       amounts['4'] = 'https://buy.stripe.com/00g6pK4nr95R9Z6fZD';
@@ -284,28 +385,49 @@ class DonationScreen extends ConsumerWidget {
 
     final symbol = currencySymbols[currency] ?? '\$';
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 2.5,
-      children: amounts.entries.map((entry) {
-        final amount = entry.key;
-        final url = entry.value;
+    if (isMonthly) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 2.5,
+            children: amounts.entries
+                .where((entry) => entry.key != StringConstants.custom)
+                .toList()
+                .reversed
+                .map((entry) {
+              final amount = entry.key;
+              final url = entry.value;
 
-        final displayText = amount == StringConstants.custom
-            ? StringConstants.custom
-            : '$symbol$amount';
+              final displayText = '$symbol$amount';
 
-        return _buildDonationAmountButton(
-          context,
-          displayText,
-          () => _handleDonationAction(context, url),
-        );
-      }).toList(),
-    );
+              return _buildDonationAmountButton(
+                context,
+                displayText,
+                () => _handleDonationAction(context, url),
+              );
+            }).toList(),
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDonationAmountButton(
+            context,
+            StringConstants.custom,
+            () => _handleDonationAction(
+                context, amounts[StringConstants.custom]!),
+          ),
+        ],
+      );
+    }
   }
 
   Widget _buildOtherPaymentOptions(BuildContext context) {
@@ -335,18 +457,24 @@ class DonationScreen extends ConsumerWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(8),
       child: Container(
+        height: 50,
         decoration: BoxDecoration(
           color: ColorConstants.greyIsTheNewGrey,
           borderRadius: BorderRadius.circular(8),
         ),
         alignment: Alignment.center,
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -379,6 +507,16 @@ class DonationScreen extends ConsumerWidget {
     );
   }
 
+  List<Widget> _buildPaymentMethodIcons() {
+    return [
+      Icon(HugeIcons.solidStandardCreditCardAccept, color: Colors.white70),
+      const SizedBox(width: 16),
+      Icon(FontAwesomeIcons.applePay, color: Colors.white70),
+      const SizedBox(width: 16),
+      Icon(FontAwesomeIcons.googlePay, color: Colors.white70),
+    ];
+  }
+
   Widget _buildFoundationInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,7 +525,7 @@ class DonationScreen extends ConsumerWidget {
           StringConstants.donationSecurityInfo,
           style: TextStyle(
             color: Colors.white70,
-            fontSize: 14,
+            fontSize: 12,
             height: 1.5,
           ),
         ),
@@ -396,7 +534,7 @@ class DonationScreen extends ConsumerWidget {
           StringConstants.foundationRegistrationInfo,
           style: TextStyle(
             color: Colors.white70,
-            fontSize: 14,
+            fontSize: 12,
             height: 1.5,
           ),
         ),
@@ -405,7 +543,7 @@ class DonationScreen extends ConsumerWidget {
           StringConstants.foundationContactInfo,
           style: TextStyle(
             color: Colors.white70,
-            fontSize: 14,
+            fontSize: 12,
             height: 1.5,
           ),
         ),
@@ -414,13 +552,20 @@ class DonationScreen extends ConsumerWidget {
   }
 
   void _handleDonationAction(BuildContext context, String url) async {
+    showSnackBar(
+      context,
+      StringConstants.redirectingToSecurePayment,
+    );
+
+    await Future.delayed(Duration(milliseconds: 2));
+
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.inAppWebView);
     } else {
-      // Handle the error if the URL can't be launched
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open the donation page.')),
+      showSnackBar(
+        context,
+        StringConstants.couldNotOpenDonationPage,
       );
     }
   }

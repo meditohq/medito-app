@@ -42,35 +42,13 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
   void _handleDonationAction(BuildContext context, bool didDonate) {
     if (didDonate) {
       _didAttemptDonation = true;
-      final deviceInfo = ref.read(deviceAndAppInfoProvider);
-      final url = _getDonationUrlForCurrency(deviceInfo.value?.currencyName);
 
       handleNavigation(
-        TypeConstants.url,
-        [url],
+        TypeConstants.route,
+        [RouteConstants.donation],
         context,
       );
     }
-  }
-
-  String _getDonationUrlForCurrency(String? currencyName) {
-    const defaultUrl = 'https://meditofoundation.org/donate';
-    final urls = {
-      'USD':
-          'https://medito.notion.site/Donate-in-US-Dollars-07f19ed2f8cd416cb935ebb9422949ae',
-      'GBP':
-          'https://medito.notion.site/Donate-in-British-Pounds-f8303845086949ee8310b836e52be507',
-      'EUR':
-          'https://medito.notion.site/Donate-in-Euros-51f78f48702f41b69e6b76d8ee635a1b',
-      'AUD':
-          'https://medito.notion.site/Donate-in-Australian-Dollars-af35055553194aa48680fe52b3642ddc',
-      'INR':
-          'https://medito.notion.site/Donate-in-Indian-Rupees-505b3419fbb046f5968272a9f6cf52c9',
-      'CAD':
-          'https://medito.notion.site/Donate-in-C-Canadian-Dollars-dc2fa660a76147e7a237db2ec469d4d8',
-    };
-
-    return urls[currencyName] ?? defaultUrl;
   }
 
   void _handleNextAction() {
