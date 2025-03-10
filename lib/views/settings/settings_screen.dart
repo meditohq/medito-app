@@ -106,11 +106,11 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: StringConstants.supportCommunity,
-        type: TypeConstants.url,
+        type: TypeConstants.route,
         title: StringConstants.donateTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
-        path: 'https://donate.meditofoundation.org',
+        path: RouteConstants.donation,
       ),
       SettingsItem(
         section: StringConstants.helpLegal,

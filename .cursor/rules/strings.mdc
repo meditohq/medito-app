@@ -1,0 +1,7 @@
+---
+description: Creating and managing String constants
+globs: 
+alwaysApply: false
+---
+
+When adding a new string, put it in [string_constants.dart](mdc:lib/constants/string_constants.dart) and add a comment describing the context in which this string is used.

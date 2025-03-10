@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
 import 'package:medito/views/settings/help_screen.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
+import 'package:medito/views/donation/donation_screen.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -80,6 +81,9 @@ Future<void> handleNavigation(
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route && ids.contains(RouteConstants.help)) {
     await _pushRoute(const HelpScreen(), ref);
+  } else if (type == TypeConstants.route &&
+      ids.contains(RouteConstants.donation)) {
+    await _pushRoute(const DonationScreen(), ref);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }
