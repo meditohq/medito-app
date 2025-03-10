@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/all_set_screen.dart';
-import 'package:medito/views/onboarding/donation_screen.dart';
+import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
@@ -36,7 +36,7 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
           );
         },
       ),
-      DonationScreen(
+      OnboardingDonationScreen(
         onNext: () {
           _controller.nextPage(
             duration: const Duration(milliseconds: 300),

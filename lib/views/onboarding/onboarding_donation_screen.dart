@@ -5,16 +5,17 @@ import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DonationScreen extends ConsumerStatefulWidget {
-  const DonationScreen({super.key, this.onNext});
+class OnboardingDonationScreen extends ConsumerStatefulWidget {
+  const OnboardingDonationScreen({super.key, this.onNext});
 
   final VoidCallback? onNext;
 
   @override
-  ConsumerState<DonationScreen> createState() => _DonationScreenState();
+  ConsumerState<OnboardingDonationScreen> createState() =>
+      _DonationScreenState();
 }
 
-class _DonationScreenState extends ConsumerState<DonationScreen>
+class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
     with WidgetsBindingObserver {
   bool _didAttemptDonation = false;
 
