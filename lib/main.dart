@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -12,13 +13,17 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/player/ios_audio_handler.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/providers/player/player_provider.dart'
+    show androidNotificationChannelId, androidNotificationIcon;
 
 import 'constants/theme/app_theme.dart';
 
@@ -51,7 +56,10 @@ Future<void> initializeAudioService() async {
   if (Platform.isIOS) {
     await AudioService.init(
       builder: () => iosAudioHandler,
-      config: const AudioServiceConfig(),
+      config: AudioServiceConfig(
+        fastForwardInterval: const Duration(seconds: 10),
+        rewindInterval: const Duration(seconds: 10),
+      ),
     );
   } else if (Platform.isAndroid) {
     setupAudioCallback();
@@ -233,6 +241,15 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _onAppForegrounded() {
     ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
+
+    if (Platform.isIOS) {
+      // Process any pending track completions when app comes back to foreground
+      processPendingCompletedTracks().then((processedCount) {
+        if (processedCount > 0) {
+          debugPrint('Processed $processedCount pending tracks on foreground');
+        }
+      });
+    }
   }
 
   void _checkForFreezeUsage(WidgetRef ref) {
