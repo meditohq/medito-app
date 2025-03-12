@@ -7,7 +7,8 @@
 # For a list of all available plugins, check out
 #     https://docs.fastlane.tools/plugins/available-plugins
 
-update_fastlane
+# Disable auto-updating
+# update_fastlane
 
 default_platform(:android)
 
@@ -35,11 +36,11 @@ platform :android do
 
   desc "Submit a new beta build to Google Play"
   lane :beta do
-    sh "flutter build apk --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
+    sh "flutter build apk --flavor prod --release --dart-define-from-file=../../.prod.json"
     upload_to_play_store(
-      track: 'beta',
-      aab: '../build/app/outputs/bundle/release/app-release.aab',
-      json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
+      track: 'internal',
+      apk: '../build/app/outputs/flutter-apk/app-prod-release.apk',
+      json_key: 'fastlane/keys/google-play-api-key.json',
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
@@ -53,7 +54,7 @@ platform :android do
     upload_to_play_store(
       track: 'beta',
       track_promote_to: 'production',
-      json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
+      json_key: 'fastlane/keys/google-play-api-key.json',
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
@@ -64,11 +65,11 @@ platform :android do
 
   desc "Submit a new production build to Google Play"
   lane :production do
-    sh "flutter build apk --obfuscate --split-debug-info=./symbols --dart-define-from-file=/Users/mike/Projects/Medito/.prod.json"
+    sh "flutter build apk --flavor prod --release --dart-define-from-file=../../.prod.json"
     upload_to_play_store(
       track: 'production',
-      aab: '../build/app/outputs/bundle/release/app-release.aab',
-      json_key_data: ENV['PLAY_STORE_CONFIG_JSON'],
+      apk: '../build/app/outputs/flutter-apk/app-prod-release.apk',
+      json_key: 'fastlane/keys/google-play-api-key.json',
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,

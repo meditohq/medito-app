@@ -110,3 +110,4 @@ lib/firebase_options.dart
 /android/app/.cxx
 fastlane/keys
 android/fastlane/keys/
+android/fastlane/report.xml
