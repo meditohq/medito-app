@@ -9,7 +9,6 @@ import 'package:reorderables/reorderables.dart';
 
 import '../../../../providers/home/home_provider.dart';
 import '../../../../widgets/medito_huge_icon.dart';
-import '../animated_scale_widget.dart';
 
 class ShortcutsItemsWidget extends ConsumerStatefulWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
@@ -23,12 +22,10 @@ class ShortcutsItemsWidget extends ConsumerStatefulWidget {
 
 class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   late List<ShortcutsModel> data;
-  late List<Widget> shortcutsWidgetList = [];
 
   @override
   void didChangeDependencies() {
     data = widget.data;
-    shortcutsWidgetList = _getShortcutsItemWidgetList();
     super.didChangeDependencies();
   }
 
@@ -37,6 +34,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     WidgetRef ref,
     ShortcutsModel element,
   ) async {
+    print('Shortcut tapped: ${element.title}');
+
     await handleNavigation(
       element.type,
       [element.path.toString().getIdFromPath()],
@@ -47,7 +46,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   void _onReorder(int oldIndex, int newIndex) {
     setState(() {
-      _handleShortcutWidgetPlacement(newIndex, oldIndex);
+      final element = data.removeAt(oldIndex);
+      data.insert(newIndex, element);
       _handleShortcutItemPlacementInPreference(oldIndex, newIndex);
     });
   }
@@ -56,96 +56,75 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     int oldIndex,
     int newIndex,
   ) async {
-    var updatedData = [...data];
-    final element = updatedData.removeAt(oldIndex);
-    updatedData.insert(newIndex, element);
-    data = updatedData;
-    var ids = updatedData.map((e) => e.id).whereType<String>().toList();
+    var ids = data.map((e) => e.id).whereType<String>().toList();
     await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
-
     await ref.read(refreshHomeAPIsProvider.future);
-  }
-
-  void _handleShortcutWidgetPlacement(int newIndex, int oldIndex) {
-    shortcutsWidgetList.insert(
-      newIndex,
-      shortcutsWidgetList.removeAt(oldIndex),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    var isWideScreen = size.width > 600; 
+    var isWideScreen = size.width > 600;
+    const containerHeight = 48.0;
+    final containerWidth =
+        (size.width / (isWideScreen ? 3 : 2)) - (isWideScreen ? 16 : 19);
 
     return ReorderableWrap(
       spacing: 8.0,
       runSpacing: 8.0,
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       maxMainAxisCount: isWideScreen ? 3 : 2,
       minMainAxisCount: isWideScreen ? 3 : 2,
       onReorder: _onReorder,
-      children: shortcutsWidgetList,
+      children: data
+          .map((e) => _buildShortcutItem(e, containerWidth, containerHeight))
+          .toList(),
     );
   }
 
-  List<Widget> _getShortcutsItemWidgetList() {
-    var size = MediaQuery.of(context).size;
-    var isWideScreen = size.width > 600;
-    const containerHeight = 48.0;
-    final containerWidth = (size.width / (isWideScreen ? 3 : 2)) - (isWideScreen ? 16 : 19);
-
-    return data
-        .map((e) => AnimatedScaleWidget(
-              child: IntrinsicWidth(
-                child: InkWell(
-                  key: ValueKey(e.id),
-                  onTap: () => _handleChipPress(context, ref, e),
-                  child: Container(
-                    height: containerHeight,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: e.isHighlighted
-                          ? ColorConstants.brightSky
-                          : ColorConstants.onyx,
-                    ),
-                    padding: const EdgeInsets.all(12),
-                    constraints: BoxConstraints(
-                      maxWidth: containerWidth,
-                      minWidth: containerWidth,
-                    ),
-                    child: Row(
-                      children: [
-                        MeditoHugeIcon(
-                          icon: e.icon ?? '',
-                          size: 18,
-                          color: e.isHighlighted
-                              ? ColorConstants.onyx
-                              : ColorConstants.white,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            e.title ?? '',
-                            style: TextStyle(
-                              fontFamily: teachers,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              height: 22 / 16,
-                              color: e.isHighlighted
-                                  ? ColorConstants.onyx
-                                  : ColorConstants.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+  Widget _buildShortcutItem(ShortcutsModel e, double width, double height) {
+    return SizedBox(
+      key: ValueKey(e.id),
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        onPressed: () => _handleChipPress(context, ref, e),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.all(12),
+          backgroundColor:
+              e.isHighlighted ? ColorConstants.brightSky : ColorConstants.onyx,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        child: Row(
+          children: [
+            MeditoHugeIcon(
+              icon: e.icon ?? '',
+              size: 18,
+              color:
+                  e.isHighlighted ? ColorConstants.onyx : ColorConstants.white,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                e.title ?? '',
+                style: TextStyle(
+                  fontFamily: teachers,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  height: 22 / 16,
+                  color: e.isHighlighted
+                      ? ColorConstants.onyx
+                      : ColorConstants.white,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ))
-        .toList();
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

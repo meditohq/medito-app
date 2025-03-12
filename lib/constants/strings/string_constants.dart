@@ -41,6 +41,9 @@ class StringConstants {
   static const String explore = 'Explore';
   static const String welcome = '👋 Welcome';
   static const String thanksForSharing = 'Thanks for sharing  💜';
+  static const String thanksForSharingNeutral = 'Happy face';
+  static const String thanksForSharingHappy = 'Neutral face';
+  static const String thanksForSharingSad = 'Sad face';
   static const String min = 'min';
   static const String hey = '👋 Hey';
 

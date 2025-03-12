@@ -102,23 +102,35 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 16,
                   children: [
-                    _buildEmotionButton(
-                      context,
-                      HugeIcons.solidStandardSmile,
-                      StringConstants.thanksForSharing,
-                      _handlePositiveFeedback,
+                    Semantics(
+                      button: true,
+                      label: StringConstants.thanksForSharingHappy,
+                      child: _buildEmotionButton(
+                        context,
+                        HugeIcons.solidStandardSmile,
+                        StringConstants.thanksForSharing,
+                        _handlePositiveFeedback,
+                      ),
                     ),
-                    _buildEmotionButton(
-                      context,
-                      HugeIcons.solidStandardNeutral,
-                      StringConstants.thanksForSharing,
-                      _handleNeutralFeedback,
+                    Semantics(
+                      button: true,
+                      label: StringConstants.thanksForSharingNeutral,
+                      child: _buildEmotionButton(
+                        context,
+                        HugeIcons.solidStandardNeutral,
+                        StringConstants.thanksForSharing,
+                        _handleNeutralFeedback,
+                      ),
                     ),
-                    _buildEmotionButton(
-                      context,
-                      HugeIcons.solidStandardSad01,
-                      StringConstants.thanksForSharing,
-                      _handleNegativeFeedback,
+                    Semantics(
+                      button: true,
+                      label: StringConstants.thanksForSharingSad,
+                      child: _buildEmotionButton(
+                        context,
+                        HugeIcons.solidStandardSad01,
+                        StringConstants.thanksForSharing,
+                        _handleNegativeFeedback,
+                      ),
                     ),
                   ],
                 ),
