@@ -1789,7 +1789,420 @@ void main() {
       });
     });
 
-    group('StatsManager addAudioCompleted Tests', () {
+    group('StatsManager addAudioCompleted Tests', () {});
+  });
+
+  group('StatsManager Dummy Track Merging Tests', () {
+    test('merge - prioritizes remote stats when dummy track from today exists',
+        () async {
+      // Arrange
+      var now = DateTime.now();
+      var today = DateTime(now.year, now.month, now.day);
+      statsManager.setCurrentDateForTesting(now);
+
+      var localStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'local-track-1',
+            timestamp:
+                today.subtract(const Duration(days: 5)).millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'local-track-2',
+            timestamp:
+                today.subtract(const Duration(days: 6)).millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 2,
+        streakLongest: 5,
+      );
+
+      var remoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp: today.millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp:
+                today.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-3',
+            timestamp:
+                today.subtract(const Duration(days: 2)).millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 3,
+        streakLongest: 3,
+      );
+
+      // Set initial local stats
+      statsManager.setStatsForTesting(localStats);
+
+      // Mock the remote fetch to return our remote stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => remoteStats);
+
+      // Act
+      await statsManager.sync();
+      var result = await statsManager.localAllStats;
+
+      // Assert
+      // Should use remote stats since there's a dummy track from today
+      expect(result.audioCompleted?.length, equals(3));
+      expect(
+          result.audioCompleted?.any((a) => a.id == 'local-track-1'), isFalse);
+      expect(
+          result.audioCompleted?.any((a) => a.id == 'dummy-track-1'), isTrue);
+      expect(result.streakCurrent, equals(3));
+    });
+
+    test('merge - merges stats when dummy tracks are old', () async {
+      // Arrange
+      var now = DateTime.now();
+      var today = DateTime(now.year, now.month, now.day);
+      statsManager.setCurrentDateForTesting(now);
+
+      var localStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'local-track-1',
+            timestamp: today.millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 1,
+        streakLongest: 1,
+      );
+
+      var remoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp:
+                today.subtract(const Duration(days: 10)).millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp:
+                today.subtract(const Duration(days: 11)).millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 2,
+        streakLongest: 2,
+      );
+
+      // Set initial local stats
+      statsManager.setStatsForTesting(localStats);
+
+      // Mock the remote fetch to return our remote stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => remoteStats);
+
+      // Act
+      await statsManager.sync();
+      var result = await statsManager.localAllStats;
+
+      // Assert
+      // Should merge all audio entries since dummy tracks are old
+      expect(result.audioCompleted?.length, equals(3));
+      expect(
+          result.audioCompleted?.any((a) => a.id == 'local-track-1'), isTrue);
+      expect(
+          result.audioCompleted?.any((a) => a.id == 'dummy-track-1'), isTrue);
+    });
+
+    test('merge - handles consecutive day edits correctly', () async {
+      // First day edit
+      var firstDay = DateTime(2024, 7, 15);
+      statsManager.setCurrentDateForTesting(firstDay);
+
+      var initialLocalStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'old-track-1',
+            timestamp: firstDay
+                .subtract(const Duration(days: 10))
+                .millisecondsSinceEpoch,
+          ),
+        ],
+      );
+
+      var firstDayRemoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp: firstDay.millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp: firstDay
+                .subtract(const Duration(days: 1))
+                .millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 2,
+        streakLongest: 2,
+      );
+
+      // Set initial local stats
+      statsManager.setStatsForTesting(initialLocalStats);
+
+      // Mock the remote fetch to return our first day remote stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => firstDayRemoteStats);
+
+      // Sync on first day
+      await statsManager.sync();
+      var firstDayResult = await statsManager.localAllStats;
+
+      // First day should use remote stats only
+      expect(firstDayResult.audioCompleted?.length, equals(2));
+      expect(firstDayResult.streakCurrent, equals(2));
+
+      // Second day edit
+      var secondDay = DateTime(2024, 7, 16);
+      statsManager.setCurrentDateForTesting(secondDay);
+
+      var secondDayRemoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp: secondDay.millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp: secondDay
+                .subtract(const Duration(days: 1))
+                .millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-3',
+            timestamp: secondDay
+                .subtract(const Duration(days: 2))
+                .millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 3,
+        streakLongest: 3,
+      );
+
+      // Mock the remote fetch to return our second day remote stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => secondDayRemoteStats);
+
+      // Sync on second day
+      await statsManager.sync();
+      var secondDayResult = await statsManager.localAllStats;
+
+      // Second day should use new remote stats only
+      expect(secondDayResult.audioCompleted?.length, equals(3));
+      expect(secondDayResult.streakCurrent, equals(3));
+    });
+
+    test('merge - handles multiple edits on same day correctly', () async {
+      var today = DateTime(2024, 7, 15, 10, 0); // 10 AM
+      statsManager.setCurrentDateForTesting(today);
+
+      var initialLocalStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'original-track-1',
+            timestamp:
+                today.subtract(const Duration(days: 5)).millisecondsSinceEpoch,
+          ),
+        ],
+      );
+
+      var firstEditRemoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp: today.millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp:
+                today.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 2,
+        streakLongest: 2,
+      );
+
+      // Set initial local stats
+      statsManager.setStatsForTesting(initialLocalStats);
+
+      // Mock the remote fetch to return our first edit remote stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => firstEditRemoteStats);
+
+      // Sync after first edit
+      await statsManager.sync();
+      var firstEditResult = await statsManager.localAllStats;
+
+      // First edit should use remote stats only
+      expect(firstEditResult.audioCompleted?.length, equals(2));
+      expect(firstEditResult.streakCurrent, equals(2));
+
+      // Second edit same day
+      var laterToday = DateTime(2024, 7, 15, 15, 0); // 3 PM
+      statsManager.setCurrentDateForTesting(laterToday);
+
+      var secondEditRemoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp: laterToday.millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp: laterToday
+                .subtract(const Duration(days: 1))
+                .millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-3',
+            timestamp: laterToday
+                .subtract(const Duration(days: 2))
+                .millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-4',
+            timestamp: laterToday
+                .subtract(const Duration(days: 3))
+                .millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 4,
+        streakLongest: 4,
+      );
+
+      // Mock the remote fetch to return our second edit remote stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => secondEditRemoteStats);
+
+      // Sync after second edit
+      await statsManager.sync();
+      var secondEditResult = await statsManager.localAllStats;
+
+      // Second edit should override first edit completely
+      expect(secondEditResult.audioCompleted?.length, equals(4));
+      expect(secondEditResult.streakCurrent, equals(4));
+    });
+
+    test('merge - handles rapid consecutive edits correctly', () async {
+      var today = DateTime(2024, 7, 15, 12, 0);
+      statsManager.setCurrentDateForTesting(today);
+
+      var initialLocalStats = LocalAllStats.empty();
+      statsManager.setStatsForTesting(initialLocalStats);
+
+      // First edit
+      var firstEditRemoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp: today.millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp:
+                today.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 2,
+        streakLongest: 2,
+      );
+
+      // Second edit (moments later)
+      var secondEditRemoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'dummy-track-1',
+            timestamp:
+                today.add(const Duration(minutes: 1)).millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-2',
+            timestamp:
+                today.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+          ),
+          LocalAudioCompleted(
+            id: 'dummy-track-3',
+            timestamp:
+                today.subtract(const Duration(days: 2)).millisecondsSinceEpoch,
+          ),
+        ],
+        streakCurrent: 3,
+        streakLongest: 3,
+        updated: today.add(const Duration(minutes: 1)).millisecondsSinceEpoch,
+      );
+
+      // Setup mock to return first edit stats on first call and second edit stats on second call
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => firstEditRemoteStats);
+
+      // First sync to process first edit
+      await statsManager.sync();
+
+      // Now change mock to return second edit stats
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => secondEditRemoteStats);
+
+      // Second sync to process second edit
+      await statsManager.sync();
+
+      // Final state should reflect the most recent edit
+      var result = await statsManager.localAllStats;
+
+      // Should have the second edit's data
+      expect(result.audioCompleted?.length, equals(3));
+      expect(result.streakCurrent, equals(3));
+    });
+
+    test('merge - detects dummy tracks with proper ID prefix', () async {
+      var now = DateTime.now();
+      var today = DateTime(now.year, now.month, now.day);
+      statsManager.setCurrentDateForTesting(now);
+
+      var localStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'local-track-1',
+            timestamp: today.millisecondsSinceEpoch,
+          ),
+        ],
+      );
+
+      var remoteStats = LocalAllStats.empty().copyWith(
+        audioCompleted: [
+          // Should be detected as a dummy track
+          LocalAudioCompleted(
+            id: 'dummy-track-123',
+            timestamp: today.millisecondsSinceEpoch,
+          ),
+          // Should NOT be detected as a dummy track
+          LocalAudioCompleted(
+            id: 'not-dummy-track',
+            timestamp:
+                today.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+          ),
+        ],
+      );
+
+      statsManager.setStatsForTesting(localStats);
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => remoteStats);
+
+      await statsManager.sync();
+      var result = await statsManager.localAllStats;
+
+      // Should prioritize remote stats due to dummy track from today
+      expect(result.audioCompleted?.length, equals(2));
+      expect(
+          result.audioCompleted?.any((a) => a.id == 'local-track-1'), isFalse);
     });
   });
 }
