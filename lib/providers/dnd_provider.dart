@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:do_not_disturb/do_not_disturb.dart';
-
-const String _dndEnabledKey = 'dnd_enabled';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/providers.dart';
 
 class DndNotifier extends Notifier<bool> {
   final _dndPlugin = DoNotDisturbPlugin();
@@ -31,13 +31,13 @@ class DndNotifier extends Notifier<bool> {
   }
 
   Future<void> _loadPreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    state = prefs.getBool(_dndEnabledKey) ?? false;
+    final prefs = ref.read(sharedPreferencesProvider);
+    state = prefs.getBool(SharedPreferenceConstants.dndEnabled) ?? false;
   }
 
   Future<void> _savePreference(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_dndEnabledKey, value);
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(SharedPreferenceConstants.dndEnabled, value);
   }
 
   Future<void> toggleDnd(bool isEnabled) async {

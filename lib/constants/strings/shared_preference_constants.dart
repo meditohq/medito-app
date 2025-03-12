@@ -18,4 +18,7 @@ class SharedPreferenceConstants {
   static const String localAllStatsKey = 'local_all_stats';
 
   static const String homeWidgetOrder = 'homeWidgetOrder';
+
+  // DND settings
+  static const String dndEnabled = 'dnd_enabled';
 }

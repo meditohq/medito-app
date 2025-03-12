@@ -69,6 +69,7 @@ class SettingsItem {
 
 class SettingsScreen extends ConsumerWidget {
   static final _isHealthSyncAvailable = Platform.isIOS;
+  static final _isDndSupported = Platform.isAndroid;
 
   const SettingsScreen({super.key});
 
@@ -174,7 +175,7 @@ class SettingsScreen extends ConsumerWidget {
           icon: HugeIcons.solidRoundedMoon,
           color: ColorConstants.white,
         ),
-        path: 'toggle_dnd',
+        path: TypeConstants.toggleDnd,
       )
     ];
 
@@ -265,11 +266,11 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final authRepository = ref.watch(authRepositoryProvider);
     final user = authRepository.currentUser;
-    final isAccountItem = item.type == 'account';
+    final isAccountItem = item.type == TypeConstants.account;
     final userEmail = user?.email;
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
     final isToggleItem = item.type == TypeConstants.toggle;
-    final isDndToggle = isToggleItem && item.path == 'toggle_dnd';
+    final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
 
     if (isDndToggle) {
       final isDndEnabled = ref.watch(dndProvider);
@@ -329,11 +330,11 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref,
     List<SettingsItem> settingsItems,
   ) {
-    final isDndSupported = Platform.isAndroid;
-    final customizationItems = _getItemsBySection(
-            settingsItems, StringConstants.customization)
-        .where((item) => !item.path.contains('toggle_dnd') || isDndSupported)
-        .toList();
+    final customizationItems =
+        _getItemsBySection(settingsItems, StringConstants.customization)
+            .where((item) =>
+                !item.path.contains(TypeConstants.toggleDnd) || _isDndSupported)
+            .toList();
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

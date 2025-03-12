@@ -15,6 +15,7 @@ class TypeConstants {
   static const String customiseHomeLayout = 'customiseHomeLayout';
   static const String route = 'route';
   static const String toggle = 'toggle';
+  static const String toggleDnd = 'toggle_dnd';
 
   // New constants for path view
   static const String article = 'article';
