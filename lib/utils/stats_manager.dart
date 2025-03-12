@@ -147,6 +147,33 @@ class StatsManager {
   Future<void> _merge(LocalAllStats remoteStats) async {
     dev.log('StatsManager: Starting merge');
 
+    // Check if remote stats contain recent dummy data
+    var now = _getCurrentDate();
+    var today = DateTime(now.year, now.month, now.day);
+
+    // Check if any dummy tracks are from today
+    var hasRecentDummyTracks = remoteStats.audioCompleted?.any((audio) {
+          if (!audio.id.startsWith('dummy-track')) return false;
+
+          var trackDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+          var trackDay =
+              DateTime(trackDate.year, trackDate.month, trackDate.day);
+
+          // Consider tracks from today as recent
+          return trackDay.isAtSameMomentAs(today);
+        }) ??
+        false;
+
+    // If remote stats contain recent dummy data, prefer remote data completely
+    if (hasRecentDummyTracks) {
+      dev.log(
+          'StatsManager: Remote stats contain recent dummy data, using remote stats only');
+      _allStats = remoteStats.copyWith(
+        updated: _getCurrentDate().millisecondsSinceEpoch,
+      );
+      return;
+    }
+
     // Use the current _allStats as localAllStats if available
     LocalAllStats? localAllStats = _allStats;
 
