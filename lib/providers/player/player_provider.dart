@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/models.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../src/audio_pigeon.g.dart';
@@ -68,16 +69,28 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
 
     if (Platform.isAndroid) {
+      // Start the service and wait for it to initialize
       await _androidServiceApi.startService();
-      // wait half a sec for the service to start
       await Future.delayed(const Duration(milliseconds: 500));
 
-      await _api.playAudio(
-        AudioData(
-          url: downloadPath ?? file.path,
-          track: trackData,
-        ),
-      );
+      try {
+        await _api.playAudio(
+          AudioData(
+            url: downloadPath ?? file.path,
+            track: trackData,
+          ),
+        );
+      } catch (e) {
+        debugPrint('Error playing audio: $e');
+        // If playback fails, try once more after a delay
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _api.playAudio(
+          AudioData(
+            url: downloadPath ?? file.path,
+            track: trackData,
+          ),
+        );
+      }
     } else {
       await iosAudioHandler.setUrl(downloadPath, file, trackData);
       await iosAudioHandler.play();

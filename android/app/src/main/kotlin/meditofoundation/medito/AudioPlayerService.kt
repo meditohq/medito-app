@@ -224,6 +224,30 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return primaryMediaSession
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Start with a minimal notification to satisfy Android's foreground service requirements
+        val minimalNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Medito")
+            .setContentText("Initializing...")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSilent(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+            .build()
+            
+        startForeground(NOTIFICATION_ID, minimalNotification)
+        
+        super.onStartCommand(intent, flags, startId)
+        
+        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
+            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
+            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
+        }
+        return START_STICKY
+    }
+
     override fun playAudio(audioData: AudioData): Boolean {
         if (!::primaryPlayer.isInitialized || !::backgroundMusicPlayer.isInitialized) {
             return false
@@ -248,6 +272,14 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryPlayer.prepare()
         primaryPlayer.play()
 
+        // Update to media notification
+        notification = createMediaNotification(null)
+        NotificationUtil.setNotification(
+            this@AudioPlayerService,
+            NOTIFICATION_ID,
+            notification
+        )
+
         handler.postDelayed(positionUpdateRunnable, 500)
 
         playBackgroundSound()
@@ -256,28 +288,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return true
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Start foreground immediately
-        startForeground(NOTIFICATION_ID, createPlaceholderNotification())
-        
-        super.onStartCommand(intent, flags, startId)
-        
-        FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
-            MeditoAudioServiceApi.setUp(engine.dartExecutor.binaryMessenger, this)
-            meditoAudioApi = MeditoAudioServiceCallbackApi(engine.dartExecutor.binaryMessenger)
-        }
-        return START_STICKY
-    }
-
     private fun updateNotification() {
-        // Update notification immediately with current state before loading artwork
-        notification = createMediaNotification(null)
-        NotificationUtil.setNotification(
-            this@AudioPlayerService,
-            NOTIFICATION_ID,
-            notification
-        )
-
         // Then load artwork asynchronously
         CoroutineScope(Dispatchers.Main).launch {
             val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
@@ -318,26 +329,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
             
         return builder.build()
-    }
-
-    private fun createPlaceholderNotification(): Notification {
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Medito audio starting")
-            .setContentText("Preparing...")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setSilent(true)
-            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setOngoing(true)
-            .build()
-            
-        // Initialize the notification field
-        if (!::notification.isInitialized) {
-            this.notification = notification
-        }
-        
-        return notification
     }
 
     private suspend fun downloadBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {

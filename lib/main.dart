@@ -22,7 +22,6 @@ import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
-
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
@@ -59,8 +58,6 @@ Future<void> initializeAudioService() async {
     );
   } else if (Platform.isAndroid) {
     setupAudioCallback();
-    final manager = MeditoAndroidAudioServiceManager();
-    await manager.startService();
   }
 }
 
