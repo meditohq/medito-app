@@ -137,6 +137,8 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
             UserAttributes(data: {'client_id': clientId}),
           );
           dev.log('[AUTH] User metadata updated successfully');
+        } else {
+          dev.log('[AUTH] Anonymous sign in failed', error: response);
         }
       },
       errorMessage: 'Failed to create anonymous account',
@@ -165,13 +167,8 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   Future<bool> requestOtp(String email) async {
     return retryOperation(
       operation: () async {
-        var clientId =
-            await getClientIdFromSharedPreference() ?? _generateClientId();
-        dev.log('[AUTH] Using client ID for OTP request: $clientId');
-
         await Supabase.instance.client.auth.signInWithOtp(
           email: email,
-          data: {'client_id': clientId},
         );
 
         return true;
@@ -199,10 +196,10 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
           }
 
           var clientId = response.user?.userMetadata?['client_id'] as String?;
-          clientId ??=
-              await getClientIdFromSharedPreference() ?? _generateClientId();
 
-          if (response.user?.userMetadata?['client_id'] == null) {
+          if (clientId == null) {
+            clientId =
+                await getClientIdFromSharedPreference() ?? _generateClientId();
             await Supabase.instance.client.auth.updateUser(
               UserAttributes(data: {'client_id': clientId}),
             );

@@ -94,9 +94,7 @@ class HttpApiService {
   Future<Map<String, dynamic>> _handleResponse(
       HttpClientResponse response) async {
     dev.log('Response status: ${response.statusCode}');
-    dev.log('Response headers: ${response.headers}');
     final content = await utf8.decodeStream(response);
-    dev.log('Response content length: ${content.length} bytes');
 
     if (response.statusCode >= HttpStatus.badRequest) {
       throw _handleErrorResponse(response.statusCode);
