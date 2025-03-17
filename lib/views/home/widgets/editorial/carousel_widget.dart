@@ -12,8 +12,6 @@ const _kAutoScrollDelay = Duration(seconds: 10);
 const _kScrollAnimationDuration = Duration(milliseconds: 500);
 const _kCardBorderRadius = 30.0;
 const _kCardAspectRatio = 16 / 9;
-const _kTitleFontSize = 24.0;
-const _kSubtitleFontSize = 16.0;
 const _kButtonHeight = 48.0;
 const _kButtonBorderRadius = 20.0;
 const _kButtonFontSize = 14.0;
@@ -23,8 +21,7 @@ const _kSmallSpacing = 8.0;
 class CarouselWidget extends ConsumerStatefulWidget {
   final List<HomeCarouselModel> carouselItems;
 
-  const CarouselWidget({Key? key, required this.carouselItems})
-      : super(key: key);
+  const CarouselWidget({super.key, required this.carouselItems});
 
   @override
   ConsumerState<CarouselWidget> createState() => _CarouselWidgetState();

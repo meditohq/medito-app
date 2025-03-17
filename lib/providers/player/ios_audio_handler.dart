@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:medito/models/track/track_model.dart';
 import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';

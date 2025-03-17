@@ -458,13 +458,9 @@ void main() {
       // Define dates for clarity
       // No activity: today, yesterday, day before yesterday (3 days)
       // Activity: 4 and 5 days ago
-      var today = DateTime(2025, 3, 10);
-      var yesterday = DateTime(2025, 3, 9);
-      var twoDaysAgo = DateTime(2025, 3, 8);
       var threeDaysAgo = DateTime(2025, 3, 7);
       var fourDaysAgo = DateTime(2025, 3, 6); // Has activity
       var fiveDaysAgo = DateTime(2025, 3, 5); // Has activity
-      var sixDaysAgo = DateTime(2025, 3, 4); // No activity
 
       // Create test SharedPreferences
       SharedPreferences.setMockInitialValues({});

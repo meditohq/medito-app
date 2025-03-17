@@ -42,10 +42,6 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
     try {
       final response = await client.getRequest(HTTPConstants.backgroundSounds);
 
-      if (response is! Map<String, dynamic>) {
-        throw const ServerError();
-      }
-
       final results = response['results'];
       if (results is! List) {
         throw const ServerError();

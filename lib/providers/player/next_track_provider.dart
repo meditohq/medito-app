@@ -7,7 +7,7 @@ import 'package:medito/providers/player/player_provider.dart';
 
 class NextTrackNotifier extends AsyncNotifier<void> {
   @override
-  Future<void> build() async => null;
+  Future<void> build() async {}
 
   Future<void> preloadNextTrack(String trackId) async {
     state = const AsyncValue.loading();

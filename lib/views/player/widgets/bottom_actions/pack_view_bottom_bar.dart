@@ -7,30 +7,28 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../constants/strings/string_constants.dart';
 import '../../../../models/favorites/favorite_item.dart';
-import '../../../../models/track/track_model.dart';
+import '../../../../models/pack/pack_model.dart';
 import '../../../../providers/favorites/favorites_provider.dart';
-import '../../../../providers/meditation/track_provider.dart';
+import '../../../../providers/pack/pack_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
 import 'bottom_action_bar.dart';
 
-class TrackViewBottomBar extends ConsumerWidget {
-  final String trackId;
-  final String trackTitle;
-  final String? coverUrl;
+class PackViewBottomBar extends ConsumerWidget {
+  final String packId;
+  final String packName;
   final VoidCallback onBackPressed;
 
-  const TrackViewBottomBar({
+  const PackViewBottomBar({
     super.key,
-    required this.trackId,
-    required this.trackTitle,
-    this.coverUrl,
+    required this.packId,
+    required this.packName,
     required this.onBackPressed,
   });
 
-  void _shareTrack() {
-    final deepLink = 'https://medito.app/tracks/$trackId';
-    final shareText = StringConstants.shareTrackText
-        .replaceAll('{trackName}', trackTitle)
+  void _sharePack() {
+    final deepLink = 'https://medito.app/packs/$packId';
+    final shareText = StringConstants.sharePackText
+        .replaceAll('{packName}', packName)
         .replaceAll('{link}', deepLink);
     Share.share(shareText);
   }
@@ -51,9 +49,9 @@ class TrackViewBottomBar extends ConsumerWidget {
                 title: StringConstants.addToSiri,
                 onTap: () {
                   addToSiri(
-                    title: '${StringConstants.open} $trackTitle',
-                    id: trackId,
-                    url: 'org.meditofoundation://tracks/$trackId',
+                    title: '${StringConstants.open} $packName',
+                    id: packId,
+                    url: 'org.meditofoundation://packs/$packId',
                   );
                   Navigator.pop(context);
                 },
@@ -65,7 +63,7 @@ class TrackViewBottomBar extends ConsumerWidget {
                   : HugeIcons.strokeRoundedShare08,
               title: StringConstants.share,
               onTap: () {
-                _shareTrack();
+                _sharePack();
                 Navigator.pop(context);
               },
             ),
@@ -98,41 +96,35 @@ class TrackViewBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trackState = ref.watch(tracksProvider(trackId: trackId));
+    final packData = ref.watch(packProvider(packId: packId));
     final favoritesState = ref.watch(favoritesNotifierProvider);
 
-    const dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
-    var isDailyMeditation = trackId == dailyMeditationId;
-
-    return trackState.when(
-      data: (track) {
+    return packData.when(
+      data: (pack) {
         return favoritesState.when(
           data: (favorites) {
-            final isFavorite = favorites.any((item) => item.id == trackId);
+            final isFavorite = favorites.any((item) => item.id == packId);
             return _buildBottomBar(
               context,
               ref,
-              track,
+              pack,
               isFavorite,
-              isDailyMeditation,
             );
           },
           loading: () {
             return _buildBottomBar(
               context,
               ref,
-              track,
+              pack,
               false,
-              isDailyMeditation,
             );
           },
           error: (error, stack) {
             return _buildBottomBar(
               context,
               ref,
-              track,
+              pack,
               false,
-              isDailyMeditation,
             );
           },
         );
@@ -145,9 +137,8 @@ class TrackViewBottomBar extends ConsumerWidget {
   Widget _buildBottomBar(
     BuildContext context,
     WidgetRef ref,
-    TrackModel track,
+    PackModel pack,
     bool isFavorite,
-    bool isDailyMeditation,
   ) {
     var colour = isFavorite ? ColorConstants.lightPurple : ColorConstants.white;
     var icon =
@@ -169,34 +160,32 @@ class TrackViewBottomBar extends ConsumerWidget {
               : HugeIcons.strokeRoundedShare08,
           color: ColorConstants.white,
         ),
-        onTap: Platform.isIOS ? () => _showBottomSheet(context) : _shareTrack,
+        onTap: Platform.isIOS ? () => _showBottomSheet(context) : _sharePack,
       ),
-      rightItem: isDailyMeditation
-          ? null
-          : BottomActionBarItem(
-              child: HugeIcon(
-                icon: icon,
-                color: colour,
-              ),
-              onTap: () {
-                if (isFavorite) {
-                  ref
-                      .read(favoritesNotifierProvider.notifier)
-                      .removeFromFavorites(trackId);
-                } else {
-                  ref.read(favoritesNotifierProvider.notifier).addToFavorites(
-                        FavoriteItem(
-                          id: trackId,
-                          title: trackTitle,
-                          coverUrl: coverUrl ?? track.coverUrl,
-                          subtitle: track.subtitle,
-                          type: FavoriteItemType.track,
-                          timestamp: DateTime.now().millisecondsSinceEpoch,
-                        ),
-                      );
-                }
-              },
-            ),
+      rightItem: BottomActionBarItem(
+        child: HugeIcon(
+          icon: icon,
+          color: colour,
+        ),
+        onTap: () {
+          if (isFavorite) {
+            ref
+                .read(favoritesNotifierProvider.notifier)
+                .removeFromFavorites(packId);
+          } else {
+            ref.read(favoritesNotifierProvider.notifier).addToFavorites(
+                  FavoriteItem(
+                    id: packId,
+                    title: packName,
+                    coverUrl: pack.coverUrl,
+                    subtitle: pack.subtitle,
+                    type: FavoriteItemType.pack,
+                    timestamp: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                );
+          }
+        },
+      ),
     );
   }
 }

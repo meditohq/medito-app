@@ -2,7 +2,6 @@ import 'dart:developer' as dev;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
@@ -185,15 +184,23 @@ class SplashViewState extends ConsumerState<SplashView> {
   }
 
   Future<void> _initializeServices() async {
-    HttpApiService().initializeAuth();
-    await _initializeDioHeaderService();
-    ref.read(meRefreshProvider)();
-    ref.read(rootCombineProvider(context));
-  }
+    try {
+      // Initialize device info and headers
+      final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+      final headerService = HeaderService(deviceInfo);
+      await headerService.initialise();
 
-  Future<void> _initializeDioHeaderService() async {
-    final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-    HeaderService(deviceInfo).initialise();
+      // Initialize HTTP API service
+      HttpApiService().initializeAuth();
+
+      // Initialize user data
+      await ref.read(meProvider.future);
+
+      ref.read(rootCombineProvider(context));
+    } catch (e) {
+      dev.log('Error initializing services: $e');
+      showSnackBar(context, StringConstants.appInitError);
+    }
   }
 
   @override

@@ -16,10 +16,20 @@ class HeaderService {
       _updateHeaders();
     });
   }
-
   Future<void> initialise() async {
-    _fcmToken = await FirebaseMessaging.instance.getToken();
-    _updateHeaders();
+    try {
+      _fcmToken = await FirebaseMessaging.instance.getToken();
+      if (_fcmToken == null) {
+        // Force token creation if it's null
+        await FirebaseMessaging.instance.deleteToken();
+        _fcmToken = await FirebaseMessaging.instance.getToken();
+      }
+    } catch (e) {
+      // Handle error but continue execution
+      print('Error getting FCM token: $e');
+    } finally {
+      _updateHeaders();
+    }
   }
 
   void _updateHeaders() {

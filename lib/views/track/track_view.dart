@@ -6,43 +6,68 @@ import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
+import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/track_view_bottom_bar.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TrackView extends ConsumerStatefulWidget {
-  final String trackId;
-
   const TrackView({super.key, required this.trackId});
+
+  final String trackId;
 
   @override
   ConsumerState<TrackView> createState() => _TrackViewState();
 }
 
-class _TrackViewState extends ConsumerState<TrackView> {
+class _TrackViewState extends ConsumerState<TrackView>
+    with AutomaticKeepAliveClientMixin<TrackView> {
+  final ScrollController _scrollController = ScrollController();
   TrackAudioModel? selectedAudio;
   TrackFilesModel? fileModel;
   final GlobalKey _contentKey = GlobalKey();
   bool _useCompactLayout = false;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkOverflow();
     });
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
     final guideNameState = ref.watch(guideNamePreferenceProvider);
     final lastSelectedDuration = ref.watch(durationPreferenceProvider);
+    final favoritesState = ref.watch(favoritesNotifierProvider);
+
+    void popContext() => Navigator.pop(context);
+
+    // Create a reusable back button widget
+    final backButton = SingleBackButtonActionBar(onBackPressed: popContext);
 
     // Initialize selected audio and file model when track data changes
     trackAsyncValue.whenData((trackModel) {
@@ -70,13 +95,14 @@ class _TrackViewState extends ConsumerState<TrackView> {
 
     return Scaffold(
       bottomNavigationBar: trackAsyncValue.when(
-        data: (trackModel) => TrackViewBottomBar(
+        data: (track) => TrackViewBottomBar(
           trackId: widget.trackId,
-          trackName: trackModel.title,
-          onBackPressed: () => Navigator.pop(context),
+          trackTitle: track.title,
+          coverUrl: track.coverUrl,
+          onBackPressed: popContext,
         ),
-        loading: () => const SizedBox(),
-        error: (_, __) => const SizedBox(),
+        loading: () => backButton,
+        error: (_, __) => backButton,
       ),
       body: SafeArea(
         child: OrientationBuilder(

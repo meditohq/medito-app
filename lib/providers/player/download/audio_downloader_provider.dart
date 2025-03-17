@@ -11,7 +11,7 @@ final audioDownloaderProvider =
 });
 
 class AudioDownloaderProvider extends ChangeNotifier {
-  ChangeNotifierProviderRef<AudioDownloaderProvider> ref;
+  Ref<AudioDownloaderProvider> ref;
 
   AudioDownloaderProvider(this.ref);
 

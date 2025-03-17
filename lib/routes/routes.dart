@@ -15,6 +15,7 @@ import 'package:medito/views/home/customise_home_layout_screen.dart';
 import 'package:medito/views/settings/help_screen.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/donation/donation_screen.dart';
+import 'package:medito/views/favorites/favorites_view.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -41,7 +42,11 @@ Future<void> handleNavigation(
         : type.contains('pack2')
             ? ids[1]!
             : ids.first!;
-    await _pushRoute(PackView(id: packId), ref);
+    if (packId == 'favorites') {
+      await _pushRoute(const FavoritesView(), ref);
+    } else {
+      await _pushRoute(PackView(id: packId), ref);
+    }
   } else if (type == TypeConstants.url || type == TypeConstants.link) {
     final url = ids.last ?? StringConstants.meditoUrl;
     final uri = Uri.parse(url);

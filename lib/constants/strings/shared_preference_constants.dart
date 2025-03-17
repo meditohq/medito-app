@@ -9,6 +9,8 @@ class SharedPreferenceConstants {
   static const String savedHours = 'savedHours';
   static const String savedMinutes = 'savedMinutes';
   static const String lastSelectedGuideName = 'lastSelectedGuideName';
+  static const String favoritePacks = 'favorite_packs';
+  static const String favorites = 'favorites';
 
   static const String userId = 'userId';
   static const String userEmail = 'userEmail';

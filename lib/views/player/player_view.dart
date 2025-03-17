@@ -149,7 +149,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: playbackState.track.title?.isNotEmpty == true
+          trackTitle: playbackState.track.title.isNotEmpty == true
               ? playbackState.track.title
               : '',
           artistName: playbackState.track.artist?.isNotEmpty == true
@@ -185,7 +185,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: playbackState.track.title?.isNotEmpty == true
+          trackTitle: playbackState.track.title.isNotEmpty == true
               ? playbackState.track.title
               : '',
           artistName: playbackState.track.artist?.isNotEmpty == true

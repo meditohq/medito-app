@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/constants/string_constants.dart';
 
 class ImpactCard extends StatelessWidget {
   const ImpactCard({super.key});

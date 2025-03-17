@@ -1,7 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 export 'device_and_app_info/device_and_app_info_provider.dart';
-export 'events/events_provider.dart';
 export 'feature_flags_provider.dart';
 export 'home/home_provider.dart';
 export 'internet/internet_connection_provider.dart';

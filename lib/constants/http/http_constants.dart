@@ -65,6 +65,7 @@ class HTTPConstants {
   static const String tokens = 'tokens';
   static const String packs = 'packs';
   static const String tracks = 'tracks';
+  static const String favorites = 'favorites';
   static const String backgroundSounds = 'backgroundsounds';
   static const String home = 'home';
   static const String latestAnnouncement = 'announcements?latest=true';

@@ -20,12 +20,6 @@ class PackRepositoryImpl extends PacksRepository {
   @override
   Future<List<PackModel>> fetchAllPacks() async {
     final response = await client.getRequest(HTTPConstants.packs);
-    print('Packs API response: $response');
-
-    // Handle null response
-    if (response == null) {
-      throw FormatException('Packs API returned null response');
-    }
 
     // Handle different response structures
     dynamic responseData = response;

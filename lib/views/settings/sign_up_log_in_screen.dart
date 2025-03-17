@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -163,6 +166,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         await StatsManager().clearAllStats();
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
+
+        // Initialize favorites after successful login
+        unawaited(
+            ref.read(favoritesNotifierProvider.notifier).syncWithServer());
 
         if (!mounted) return;
 

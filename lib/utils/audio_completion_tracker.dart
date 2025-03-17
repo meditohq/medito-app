@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/local_all_stats.dart';
 
@@ -35,8 +34,8 @@ class AudioCompletionTracker {
       );
     }
 
-    final newDuration = duration + (stats.totalTimeListened ?? 0);
-    final newTotalTracks = 1 + (stats.totalTracksCompleted ?? 0);
+    final newDuration = duration + (stats.totalTimeListened);
+    final newTotalTracks = 1 + (stats.totalTracksCompleted);
 
     var updatedTracksCompleted = stats.tracksChecked ?? [];
     if (!updatedTracksCompleted.contains(audioCompleted.id)) {

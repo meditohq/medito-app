@@ -321,6 +321,9 @@ class StringConstants {
   static const shareTrackText =
       'Take a moment to breathe. Try this meditation session: "{trackName}" on Medito. {link}';
 
+  static const String sharePackText =
+      'Check out {packName} on Medito! {link} #Meditation #Mindfulness';
+
   // Deep linking related strings - used when handling deep links in the app
   static const String followingDeepLink = 'Following deep link...';
   static const String invalidDeepLink = 'Invalid deep link';
@@ -605,4 +608,14 @@ class StringConstants {
   // String used in the ImpactCard widget for a testimonial
   static const String impactCardTestimonial =
       '"Medito pulled me through a seriously dark period in my life" - Medito meditator';
+
+  static const String favorites = 'Favorites';
+  static const String noFavoriteTracksYet = 'No favorite tracks yet';
+  static const String noFavoritePacksYet = 'No favorite packs yet';
+  static const String noFavoritesYet = 'No favorites yet';
+  static const String addItemsToFavoritesMessage =
+      'Add items to your favorites to see them here';
+  static const String all = 'All';
+  static const String tracks = 'Tracks';
+  static const String packs = 'Packs';
 }

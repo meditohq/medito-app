@@ -80,6 +80,6 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
 }
 
 @riverpod
-DownloaderRepository downloaderRepository(DownloaderRepositoryRef ref) {
+DownloaderRepository downloaderRepository(Ref ref) {
   return DownloaderRepositoryImpl(ref: ref);
 }

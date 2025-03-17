@@ -9,9 +9,7 @@ import '../../../providers/donation/donation_page_provider.dart';
 import '../../../repositories/me/me_repository.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/utils.dart';
-import '../../../widgets/buttons/loading_button_widget.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
-import '../../../widgets/snackbar_widget.dart';
 
 class DonationWidget extends ConsumerStatefulWidget {
   const DonationWidget({super.key});
@@ -22,7 +20,6 @@ class DonationWidget extends ConsumerStatefulWidget {
 
 class _DonationWidgetState extends ConsumerState<DonationWidget> {
   bool _isDonor = false;
-  bool _showFeedbackCard = true;
   bool _showThankYouMessage = false;
   bool _isCheckingSubscription = true;
 
@@ -67,7 +64,7 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
                       child: _buildDonationWidget(context, donationPageModel),
                     ),
               height20,
-              if (_showFeedbackCard) _buildFeedbackCard(context),
+               _buildFeedbackCard(context),
             ],
           );
         },

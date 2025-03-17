@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -5,6 +7,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/streak_freeze_suggestion_widget.dart';
@@ -42,10 +45,10 @@ class _BottomNavigationBarViewState
   }
 
   Future<void> _initializeStats() async {
-    // First refresh stats
-    await ref.read(statsProvider.notifier).refresh();
+    unawaited(
+        ref.read(favoritesNotifierProvider.notifier).loadFavoritesFromServer());
 
-    // Only check for streak freeze suggestions after stats are loaded
+    await ref.read(statsProvider.notifier).refresh();
     ref
         .read(streakFreezeSuggestionProvider.notifier)
         .checkForStreakFreezeSuggestion();

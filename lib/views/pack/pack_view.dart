@@ -1,11 +1,13 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:medito/views/pack/widgets/pack_item_widget.dart';
+import 'package:medito/views/player/widgets/bottom_actions/pack_view_bottom_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -40,13 +42,25 @@ class _PackViewState extends ConsumerState<PackView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var packs = ref.watch(packProvider(packId: widget.id));
+    final packAsyncValue = ref.watch(packProvider(packId: widget.id));
+    final favoritesAsyncValue = ref.watch(favoritesNotifierProvider);
+
+    void popContext() => Navigator.pop(context);
+
+    // Create a reusable back button widget
+    final backButton = SingleBackButtonActionBar(onBackPressed: popContext);
 
     return Scaffold(
-      bottomNavigationBar: SingleBackButtonActionBar(onBackPressed: () {
-        Navigator.pop(context);
-      }),
-      body: packs.when(
+      bottomNavigationBar: packAsyncValue.when(
+        data: (pack) => PackViewBottomBar(
+          packId: widget.id,
+          packName: pack.title,
+          onBackPressed: popContext,
+        ),
+        loading: () => backButton,
+        error: (_, __) => backButton,
+      ),
+      body: packAsyncValue.when(
         skipLoadingOnRefresh: false,
         skipLoadingOnReload: false,
         data: (data) => _buildScaffoldWithData(data, ref),
@@ -55,7 +69,7 @@ class _PackViewState extends ConsumerState<PackView>
           return MeditoErrorWidget(
             error: error,
             onTap: () => ref.refresh(packProvider(packId: widget.id)),
-            isLoading: packs.isLoading,
+            isLoading: packAsyncValue.isLoading,
           );
         },
         loading: () => const FolderShimmerWidget(),
@@ -72,7 +86,13 @@ class _PackViewState extends ConsumerState<PackView>
     WidgetRef ref,
   ) {
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(packProvider(packId: widget.id)),
+      onRefresh: () async {
+        if (widget.id == 'favorites') {
+          // If this is the favorites screen, refresh the favorites list from the server
+          await ref.read(favoritesNotifierProvider.notifier).syncWithServer();
+        }
+        return ref.refresh(packProvider(packId: widget.id));
+      },
       child: CustomScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),

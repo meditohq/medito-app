@@ -20,7 +20,6 @@ import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
-import 'package:medito/providers/dnd_provider.dart';
 
 final bearerTokenProvider = FutureProvider<String>((ref) async {
   final authRepository = ref.watch(authRepositoryProvider);
@@ -75,8 +74,6 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clientIdSync = ref.watch(userIdProvider);
-    final deviceInfoAsyncValue = ref.watch(deviceAndAppInfoProvider);
     final authRepository = ref.watch(authRepositoryProvider);
     final user = authRepository.currentUser;
 

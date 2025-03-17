@@ -73,7 +73,7 @@ class LocalAllStats {
       updated: updated,
       streakFreezes: streakFreezes ?? 0,
       maxStreakFreezes: maxStreakFreezes ?? 0,
-      freezeUsageDates: freezeUsageDates ?? [],
+      freezeUsageDates: freezeUsageDates,
     );
   }
 

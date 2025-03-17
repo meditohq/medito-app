@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/services/stats_service.dart';
-import 'package:medito/utils/audio_completion_tracker.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -341,7 +340,6 @@ void main() {
       var yesterday = baseDate.subtract(const Duration(days: 1));
       var twoDaysAgo = baseDate.subtract(const Duration(days: 2));
       var threeDaysAgo = baseDate.subtract(const Duration(days: 3));
-      var fourDaysAgo = baseDate.subtract(const Duration(days: 4));
       var fiveDaysAgo = baseDate.subtract(const Duration(days: 5));
 
       // Explicitly set the current date for testing to ensure streak calculation works correctly
@@ -650,7 +648,6 @@ void main() {
         var now = DateTime.now();
         var today = DateTime(now.year, now.month, now.day);
         var twoDaysAgo = today.subtract(const Duration(days: 2));
-        var yesterday = today.subtract(const Duration(days: 1));
         statsManager.setCurrentDateForTesting(today);
         when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
 
@@ -862,7 +859,6 @@ void main() {
         // Arrange
         var now = DateTime.now();
         var today = DateTime(now.year, now.month, now.day);
-        var yesterday = today.subtract(const Duration(days: 1));
         var twoDaysAgo = today.subtract(const Duration(days: 2));
         var threeDaysAgo = today.subtract(const Duration(days: 3));
         statsManager.setCurrentDateForTesting(today);

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

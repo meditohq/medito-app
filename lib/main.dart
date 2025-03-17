@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -12,8 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:medito/providers/player/ios_audio_handler.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
@@ -21,11 +20,8 @@ import 'package:medito/services/notifications/firebase_notifications_service.dar
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
-import 'package:medito/widgets/widgets.dart';
-import 'package:medito/providers/player/player_provider.dart'
-    show androidNotificationChannelId, androidNotificationIcon;
+import 'package:medito/widgets/snackbar_widget.dart';
 
-import 'constants/theme/app_theme.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();

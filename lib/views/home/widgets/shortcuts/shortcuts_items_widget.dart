@@ -34,8 +34,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     WidgetRef ref,
     ShortcutsModel element,
   ) async {
-    print('Shortcut tapped: \\${element.title}');
-
     await handleNavigation(
       element.type,
       [element.path.toString().getIdFromPath()],

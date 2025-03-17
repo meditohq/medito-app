@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:do_not_disturb/do_not_disturb.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
