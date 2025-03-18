@@ -167,21 +167,21 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final item = favorites[index];
-          return Column(
-            children: [
-              GestureDetector(
-                onTap: () => _onItemTap(item, context),
-                child: PackItemWidget(
+          return GestureDetector(
+            onTap: () => _onItemTap(item, context),
+            child: Column(
+              children: [
+                PackItemWidget(
                   item: _buildPackItemModel(item, statsState),
                 ),
-              ),
-              if (index < favorites.length - 1)
-                const Divider(
-                  color: ColorConstants.charcoal,
-                  thickness: 2,
-                  height: 2,
-                ),
-            ],
+                if (index < favorites.length - 1)
+                  const Divider(
+                    color: ColorConstants.charcoal,
+                    thickness: 2,
+                    height: 2,
+                  ),
+              ],
+            ),
           );
         },
         childCount: favorites.length,
