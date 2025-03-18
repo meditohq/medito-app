@@ -13,6 +13,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 enum AuthException {
   accountMarkedForDeletion,
   other,
+  userNotFound,
 }
 
 class AuthError implements Exception {
@@ -139,6 +140,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
           dev.log('[AUTH] User metadata updated successfully');
         } else {
           dev.log('[AUTH] Anonymous sign in failed', error: response);
+          throw AuthError(AuthException.userNotFound, 'Failed to create anonymous account');
         }
       },
       errorMessage: 'Failed to create anonymous account',
