@@ -8,7 +8,8 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/constants/http/http_constants.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
@@ -17,6 +18,7 @@ import '../../utils/stats_updater.dart';
 
 class IosAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
+  final _httpApiService = HttpApiService();
 
   IosAudioHandler() {
     _init();
@@ -176,16 +178,12 @@ class IosAudioHandler extends BaseAudioHandler {
 
   Future<String?> _getUserToken() async {
     try {
-      var user = Supabase.instance.client.auth.currentUser;
-      if (user?.userMetadata != null) {
-        return user?.userMetadata?['userToken'] as String?;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(SharedPreferenceConstants.userToken);
+      final response = await _httpApiService.getRequest(HTTPConstants.me);
+      return response['userToken'] as String?;
     } catch (e) {
       debugPrint('Error getting user token: $e');
-      return null;
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(SharedPreferenceConstants.userToken);
     }
   }
 

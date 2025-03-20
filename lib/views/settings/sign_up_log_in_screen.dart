@@ -200,10 +200,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Future<void> _refreshUserInfo() async {
+    // First invalidate the providers to clear their state
+    ref.invalidate(meProvider);
     ref.invalidate(deviceAppAndUserInfoProvider);
+
+    // Then initialize headers with device info
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-    HeaderService(deviceInfo).initialise();
-    ref.read(meRefreshProvider)();
+    await HeaderService(deviceInfo).initialise();
   }
 
   @override

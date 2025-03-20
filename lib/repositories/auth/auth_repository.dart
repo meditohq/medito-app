@@ -4,11 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:medito/utils/retry_mixin.dart';
 import 'dart:developer' as dev;
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/network/auth_api_service.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 enum AuthException {
   accountMarkedForDeletion,
@@ -26,9 +28,19 @@ class AuthError implements Exception {
   String toString() => message;
 }
 
+class User {
+  final String id;
+  final String? email;
+  final Map<String, dynamic>? metadata;
+
+  User({
+    required this.id,
+    this.email,
+    this.metadata,
+  });
+}
+
 abstract class AuthRepository {
-  Future<String?> getClientIdFromSharedPreference();
-  Future<void> initializeSupabase();
   Future<void> initializeUser();
   Future<String> getToken();
   String getUserEmail();
@@ -40,11 +52,18 @@ abstract class AuthRepository {
   Future<bool> isAccountMarkedForDeletion();
 }
 
-class AuthRepositoryImpl extends AuthRepository with RetryMixin {
-  static bool _hasInitialized = false;
+class AuthRepositoryImpl extends AuthRepository {
+  final _authService = AuthApiService();
+  final _httpApiService = HttpApiService();
+  User? _currentUser;
+  AuthTokens? _tokens;
 
-  @override
-  Future<String?> getClientIdFromSharedPreference() async {
+  String _generateClientId() {
+    var date = DateFormat('ddMMyy_HHmmss_').format(DateTime.now());
+    return '$date${const Uuid().v4()}';
+  }
+
+  Future<String?> _getStoredClientId() async {
     try {
       var prefs = await SharedPreferences.getInstance();
       return prefs.getString(SharedPreferenceConstants.userId);
@@ -54,7 +73,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
     }
   }
 
-  Future<void> saveClientIdToSharedPreference(String clientId) async {
+  Future<void> _saveClientId(String clientId) async {
     try {
       var prefs = await SharedPreferences.getInstance();
       await prefs.setString(SharedPreferenceConstants.userId, clientId);
@@ -63,183 +82,175 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
     }
   }
 
+  /// Reset the auth state without performing sign-out operations.
+  /// This is used for force logout situations where we need to clear state
+  /// but don't want to make API calls.
+  void resetAuthState() {
+    dev.log('[AUTH] Resetting auth state (force logout)');
+    _currentUser = null;
+    _tokens = null;
+    _httpApiService.clearAuthHeader();
+  }
+
   @override
   Future<void> initializeUser() async {
     dev.log('[AUTH] Starting user initialization');
-    if (Supabase.instance.client.auth.currentUser == null) {
+    if (_currentUser == null) {
       dev.log('[AUTH] No current user, creating anonymous account');
       await _signInAnonymously();
     } else {
-      dev.log(
-          '[AUTH] Found existing user: ${Supabase.instance.client.auth.currentUser?.id}');
+      dev.log('[AUTH] Found existing user: ${_currentUser?.id}');
     }
-  }
-
-  @override
-  Future<void> initializeSupabase() async {
-    if (_hasInitialized) {
-      dev.log('[AUTH] Supabase already initialized, skipping');
-      return;
-    }
-
-    var attempts = 0;
-    const maxAttempts = 3;
-    const delay = Duration(seconds: 2);
-    const errorMessage = 'Failed to initialize Supabase';
-
-    while (attempts < maxAttempts) {
-      try {
-        dev.log(
-            '[AUTH] Attempting to initialize Supabase (attempt ${attempts + 1}/$maxAttempts)');
-        await Supabase.initialize(
-          url: supabaseUrl,
-          anonKey: supabaseKey,
-        );
-        _hasInitialized = true;
-        dev.log('[AUTH] Supabase initialization successful');
-        return;
-      } catch (e) {
-        attempts++;
-        dev.log('[AUTH] Supabase initialization attempt failed', error: e);
-        if (attempts == maxAttempts) {
-          dev.log('[AUTH] $errorMessage after $maxAttempts attempts', error: e);
-          throw const ServerError();
-        }
-        await Future.delayed(delay * attempts);
-      }
-    }
-    throw const ServerError();
-  }
-
-  String _generateClientId() {
-    var date = DateFormat('ddMMyy_HHmmss_').format(DateTime.now());
-
-    return '$date${const Uuid().v4()}';
   }
 
   Future<void> _signInAnonymously() async {
-    var clientId =
-        await getClientIdFromSharedPreference() ?? _generateClientId();
-    dev.log('[AUTH] client ID for anonymous user: $clientId');
+    try {
+      var clientId = await _getStoredClientId() ?? _generateClientId();
+      dev.log('[AUTH] Signing in anonymously', error: {
+        'clientId': clientId,
+        'has_token': _tokens?.accessToken != null,
+      });
 
-    saveClientIdToSharedPreference(clientId);
+      final tokens = await _authService.signIn(
+        clientId: clientId,
+      );
 
-    await retryOperation(
-      operation: () async {
-        dev.log('[AUTH] Attempting anonymous sign in');
-        var response = await Supabase.instance.client.auth.signInAnonymously(
-          data: {'client_id': clientId},
-        );
+      dev.log('[AUTH] Anonymous sign in successful', error: {
+        'clientId': tokens.clientId,
+        'token_prefix': tokens.accessToken.substring(0, 10),
+      });
 
-        if (response.user != null) {
-          dev.log(
-              '[AUTH] Anonymous sign in successful, updating user metadata');
-          await Supabase.instance.client.auth.updateUser(
-            UserAttributes(data: {'client_id': clientId}),
-          );
-          dev.log('[AUTH] User metadata updated successfully');
-        } else {
-          dev.log('[AUTH] Anonymous sign in failed', error: response);
-          throw AuthError(AuthException.userNotFound, 'Failed to create anonymous account');
-        }
-      },
-      errorMessage: 'Failed to create anonymous account',
-    );
+      await _saveClientId(tokens.clientId);
+      _tokens = tokens;
+      _httpApiService.setAuthHeader(tokens.accessToken);
+      _currentUser = User(
+        id: tokens.clientId,
+        email: tokens.email,
+        metadata: {'client_id': tokens.clientId},
+      );
+      dev.log('[AUTH] User state updated',
+          error: jsonEncode({
+            'userId': _currentUser?.id,
+            'hasEmail': _currentUser?.email != null,
+          }));
+    } catch (e) {
+      dev.log('[AUTH] Anonymous sign in failed', error: e);
+      rethrow;
+    }
   }
 
   @override
   Future<String> getToken() async {
-    var currentSession = Supabase.instance.client.auth.currentSession;
-    if (currentSession != null) {
-      var bearer = currentSession.accessToken;
-
-      return bearer.isNotEmpty ? bearer : throw const UnauthorizedError();
+    if (_tokens?.accessToken != null) {
+      dev.log('[AUTH] Returning cached access token');
+      return _tokens!.accessToken;
     }
 
-    return '';
+    try {
+      dev.log('[AUTH] No cached token, attempting refresh');
+      final refreshToken = await _authService.getStoredRefreshToken();
+      if (refreshToken == null) {
+        dev.log('[AUTH] No refresh token found');
+        throw const UnauthorizedError();
+      }
+
+      final tokens = await _authService.refreshToken(refreshToken);
+      _tokens = tokens;
+      _httpApiService.setAuthHeader(tokens.accessToken);
+      dev.log('[AUTH] Token refresh successful');
+      return tokens.accessToken;
+    } catch (e) {
+      dev.log('[AUTH] Token refresh failed', error: e);
+      throw const UnauthorizedError();
+    }
   }
 
   @override
   String getUserEmail() {
-    var currentUser = Supabase.instance.client.auth.currentUser;
-    return currentUser?.email ?? '';
+    return _currentUser?.email ?? '';
   }
 
   @override
   Future<bool> requestOtp(String email) async {
-    return retryOperation(
-      operation: () async {
-        await Supabase.instance.client.auth.signInWithOtp(
-          email: email,
-        );
-
-        return true;
-      },
-      errorMessage: 'Error sending OTP',
-    );
+    try {
+      var clientId = await _getStoredClientId() ?? _generateClientId();
+      dev.log('[AUTH] Requesting OTP',
+          error: jsonEncode({'email': email, 'clientId': clientId}));
+      await _authService.requestOtp(email, clientId);
+      dev.log('[AUTH] OTP request successful');
+      return true;
+    } catch (e) {
+      dev.log('[AUTH] OTP request failed', error: e);
+      rethrow;
+    }
   }
 
   @override
   Future<bool> verifyOtp(String email, String otp) async {
-    return retryOperation(
-      operation: () async {
-        var response = await Supabase.instance.client.auth.verifyOTP(
-          email: email,
-          token: otp,
-          type: OtpType.magiclink,
-        );
+    try {
+      var clientId = await _getStoredClientId() ?? _generateClientId();
+      dev.log('[AUTH] Verifying OTP', error: {
+        'email': email,
+        'clientId': clientId,
+        'has_current_token': _tokens?.accessToken != null,
+      });
 
-        if (response.user != null) {
-          if (response.user?.userMetadata?['marked_for_deletion'] == true) {
-            throw AuthError(
-              AuthException.accountMarkedForDeletion,
-              'This account has been marked for deletion.',
-            );
-          }
+      final tokens = await _authService.signIn(
+        email: email,
+        otp: otp,
+        clientId: clientId,
+      );
 
-          var clientId = response.user?.userMetadata?['client_id'] as String?;
+      dev.log('[AUTH] OTP verification successful', error: {
+        'clientId': tokens.clientId,
+        'token_prefix': tokens.accessToken.substring(0, 10),
+      });
 
-          if (clientId == null) {
-            clientId =
-                await getClientIdFromSharedPreference() ?? _generateClientId();
-            await Supabase.instance.client.auth.updateUser(
-              UserAttributes(data: {'client_id': clientId}),
-            );
-          }
+      await _saveClientId(tokens.clientId);
+      _tokens = tokens;
+      _httpApiService.setAuthHeader(tokens.accessToken);
+      _currentUser = User(
+        id: tokens.clientId,
+        email: tokens.email,
+        metadata: {'client_id': tokens.clientId},
+      );
 
-          await saveClientIdToSharedPreference(clientId);
+      dev.log('[AUTH] User state updated', error: {
+        'userId': _currentUser?.id,
+        'hasEmail': _currentUser?.email != null,
+        'has_token': _tokens?.accessToken != null,
+      });
 
-          return true;
-        }
-
-        return false;
-      },
-      errorMessage: 'Error verifying OTP',
-    );
+      return true;
+    } catch (e) {
+      dev.log('[AUTH] OTP verification failed', error: e);
+      rethrow;
+    }
   }
 
   @override
-  User? get currentUser {
-    if (!AuthRepositoryImpl._hasInitialized) {
-      return null;
-    }
-    return Supabase.instance.client.auth.currentUser;
-  }
+  User? get currentUser => _currentUser;
 
   @override
   Future<bool> signOut() async {
+    dev.log('[AUTH] Starting sign out process');
     await FirebaseMessaging.instance.deleteToken();
-    var supabase = Supabase.instance.client;
-
-    final sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.remove(SharedPreferenceConstants.userId);
+    dev.log('[AUTH] Firebase token deleted');
 
     try {
-      await supabase.auth.signOut();
-      await _signInAnonymously();
+      await _httpApiService.signOut();
+      dev.log('[AUTH] Sign out request successful');
+
+      _tokens = null;
+      _currentUser = null;
+      _httpApiService.clearAuthHeader();
+      dev.log('[AUTH] Local auth state cleared');
+
+      // Client ID is preserved for future use but not automatically reused
 
       return true;
     } catch (error) {
+      dev.log('[AUTH] Sign out failed', error: error);
       if (error is AppError) {
         rethrow;
       }
@@ -250,11 +261,20 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
   @override
   Future<bool> markAccountForDeletion() async {
     try {
-      final supabase = Supabase.instance.client;
-      final response = await supabase.auth.updateUser(
-        UserAttributes(data: {'marked_for_deletion': true}),
+      if (_currentUser == null) return false;
+
+      await _httpApiService.postRequest(
+        HTTPConstants.me,
+        body: {'marked_for_deletion': true},
       );
-      return response.user != null;
+
+      _currentUser = User(
+        id: _currentUser!.id,
+        email: _currentUser!.email,
+        metadata: {...?_currentUser!.metadata, 'marked_for_deletion': true},
+      );
+
+      return true;
     } catch (e) {
       debugPrint('Error marking account for deletion: $e');
       return false;
@@ -263,14 +283,7 @@ class AuthRepositoryImpl extends AuthRepository with RetryMixin {
 
   @override
   Future<bool> isAccountMarkedForDeletion() async {
-    try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      return user?.userMetadata?['marked_for_deletion'] == true;
-    } catch (e) {
-      debugPrint('Error checking if account is marked for deletion: $e');
-      return false;
-    }
+    return _currentUser?.metadata?['marked_for_deletion'] == true;
   }
 }
 

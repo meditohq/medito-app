@@ -25,6 +25,7 @@ dependencies:
   flutter_local_notifications: ^18.0.0
   flutter_markdown: ^0.7.4+1
   flutter_riverpod: ^2.4.9
+  flutter_secure_storage: ^9.0.0
   flutter_svg: ^2.0.9
   freezed_annotation: ^2.4.4
   health: ^11.0.0
@@ -49,7 +50,6 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   share_plus: ^7.2.1
   app_links: ^6.3.2
-  supabase_flutter: ^2.0.0
   internet_connection_checker: ^3.0.1
   do_not_disturb: ^1.0.3
   font_awesome_flutter: ^10.1.0

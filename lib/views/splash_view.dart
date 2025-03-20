@@ -115,8 +115,6 @@ class SplashViewState extends ConsumerState<SplashView> {
     var auth = ref.read(authRepositoryProvider);
 
     try {
-      await auth.initializeSupabase();
-
       if (auth.currentUser != null) {
         await _initializeServices();
         if (!mounted) return;
@@ -136,7 +134,6 @@ class SplashViewState extends ConsumerState<SplashView> {
         });
       }
     } catch (e) {
-      dev.log('Failed to initialize Supabase', error: e);
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);
@@ -190,15 +187,12 @@ class SplashViewState extends ConsumerState<SplashView> {
       final headerService = HeaderService(deviceInfo);
       await headerService.initialise();
 
-      // Initialize HTTP API service
-      HttpApiService().initializeAuth();
-
       // Initialize user data
       await ref.read(meProvider.future);
 
       ref.read(rootCombineProvider(context));
-    } catch (e) {
-      dev.log('Error initializing services: $e');
+    } catch (e, stackTrace) {
+      dev.log('Error initializing services: $e', error: stackTrace);
       showSnackBar(context, StringConstants.appInitError);
     }
   }

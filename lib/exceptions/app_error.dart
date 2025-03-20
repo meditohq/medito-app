@@ -18,6 +18,10 @@ final class UnauthorizedError extends AppError {
   const UnauthorizedError();
 }
 
+final class RefreshTokenError extends AppError {
+  const RefreshTokenError();
+}
+
 final class NotFoundError extends AppError {
   const NotFoundError();
 }

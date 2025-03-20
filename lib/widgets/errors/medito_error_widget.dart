@@ -4,11 +4,12 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 
 import '../../views/downloads/downloads_view.dart';
 
@@ -37,6 +38,7 @@ class MeditoErrorWidget extends ConsumerWidget {
       NotFoundError() => StringConstants.errorNotFoundMessage,
       ServerError() => StringConstants.errorServerMessage,
       UnknownError() => StringConstants.errorUnknownMessage,
+      RefreshTokenError() => StringConstants.errorUnauthorizedMessage,
     };
   }
 
@@ -116,7 +118,9 @@ class MeditoErrorWidget extends ConsumerWidget {
               LoadingButtonWidget(
                 btnText: StringConstants.signInAgain,
                 onPressed: () async {
-                  await Supabase.instance.client.auth.signOut();
+                  final authRepository = ProviderScope.containerOf(context)
+                      .read(authRepositoryProvider);
+                  await authRepository.signOut();
                   await StatsManager().clearAllStats();
                   if (context.mounted) {
                     final ref = ProviderScope.containerOf(context);
@@ -126,9 +130,10 @@ class MeditoErrorWidget extends ConsumerWidget {
                     await Future.delayed(const Duration(milliseconds: 100));
 
                     if (context.mounted) {
+                      // Always go back to splash screen for unauthorized errors
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
-                          builder: (context) => const SignUpLogInPage(),
+                          builder: (context) => const SplashView(),
                         ),
                         (route) => false,
                       );

@@ -12,6 +12,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
+import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -191,6 +192,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   @override
   Widget build(BuildContext context) {
     var connectionState = ref.watch(connectionNotifierProvider);
+
+    // Initialize auth state listener to handle navigation on force logout
+    ref.watch(authStateListenerProvider);
 
     connectionState.whenData((state) {
       if (state.status == InternetConnectionStatus.disconnected &&

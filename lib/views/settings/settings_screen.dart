@@ -36,9 +36,7 @@ final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
 
 final userIdProvider = FutureProvider<String>((ref) async {
   final authRepository = ref.watch(authRepositoryProvider);
-  final userId = await authRepository.getClientIdFromSharedPreference();
-
-  return userId ?? '';
+  return authRepository.currentUser?.id ?? '';
 });
 
 TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {

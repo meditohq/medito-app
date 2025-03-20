@@ -3,15 +3,15 @@ import 'package:flutter/foundation.dart';
 class EnvConfig {
   final String environment;
   final String contentBaseUrl;
-  final String supabaseKey;
-  final String supabaseUrl;
+  final String authBaseUrl;
+  final String apiKey;
   final String editStatsUrl;
 
   const EnvConfig({
     required this.environment,
     required this.contentBaseUrl,
-    required this.supabaseKey,
-    required this.supabaseUrl,
+    required this.authBaseUrl,
+    required this.apiKey,
     required this.editStatsUrl,
   });
 }
@@ -20,8 +20,8 @@ class ProdEnv extends EnvConfig {
   const ProdEnv({
     required super.environment,
     required super.contentBaseUrl,
-    required super.supabaseKey,
-    required super.supabaseUrl,
+    required super.authBaseUrl,
+    required super.apiKey,
     required super.editStatsUrl,
   });
 }
@@ -30,34 +30,34 @@ class StagingEnv extends EnvConfig {
   const StagingEnv({
     required super.environment,
     required super.contentBaseUrl,
-    required super.supabaseKey,
-    required super.supabaseUrl,
+    required super.authBaseUrl,
+    required super.apiKey,
     required super.editStatsUrl,
   });
 }
 
 const _prodEnv = ProdEnv(
-  supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
-  supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
+  apiKey: String.fromEnvironment('APP_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
+  authBaseUrl: String.fromEnvironment('AUTH_URL'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
 const _stagingEnv = StagingEnv(
-  supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
-  supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
+  apiKey: String.fromEnvironment('APP_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
+  authBaseUrl: String.fromEnvironment('AUTH_URL'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
 
-String get supabaseUrl => _currentEnv.supabaseUrl;
-String get supabaseKey => _currentEnv.supabaseKey;
+String get apiKey => _currentEnv.apiKey;
 String get environment => _currentEnv.environment;
 String get contentBaseUrl => _currentEnv.contentBaseUrl;
+String get authBaseUrl => _currentEnv.authBaseUrl;
 String get editStatsUrl => _currentEnv.editStatsUrl;
 
 class HTTPConstants {
@@ -73,6 +73,12 @@ class HTTPConstants {
   static const String me = 'me';
   static const String searchTracks = 'search/tracks';
 
+  // AUTH END POINTS
+  static const String authSignIn = 'auth/signin';
+  static const String authOtpRequest = 'auth/otp/request';
+  static const String authTokensRefresh = 'auth/tokens/refresh';
+  static const String authTokensSignout = 'auth/tokens/signout';
+
   // MAINTENANCE END POINTS
   static String maintenance = '${contentBaseUrl}maintenance';
 
@@ -81,4 +87,57 @@ class HTTPConstants {
   static const String rate = '/rate';
   static const String favorite = '/favorite';
   static const String donate = 'donations/asks?random=true';
+}
+
+// Auth response models
+class AuthTokens {
+  final String accessToken;
+  final String refreshToken;
+  final int expiresIn;
+  final String clientId;
+  final String? email;
+
+  AuthTokens({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.expiresIn,
+    String? clientId,
+    this.email,
+  }) : clientId = clientId ?? '';
+
+  factory AuthTokens.fromJson(Map<String, dynamic> json) {
+    return AuthTokens(
+      accessToken: json['access_token'] as String,
+      refreshToken: json['refresh_token'] as String,
+      expiresIn: json['expires_in'] as int,
+      clientId: json['client_id'] as String?,
+      email: json['email'] as String?,
+    );
+  }
+}
+
+class OtpResponse {
+  final bool success;
+  final String message;
+  final int? expiresIn;
+  final bool? rateLimited;
+  final int? retryAfter;
+
+  OtpResponse({
+    required this.success,
+    required this.message,
+    this.expiresIn,
+    this.rateLimited,
+    this.retryAfter,
+  });
+
+  factory OtpResponse.fromJson(Map<String, dynamic> json) {
+    return OtpResponse(
+      success: json['success'] as bool,
+      message: json['message'] as String,
+      expiresIn: json['expires_in'] as int?,
+      rateLimited: json['rate_limited'] as bool?,
+      retryAfter: json['retry_after'] as int?,
+    );
+  }
 }

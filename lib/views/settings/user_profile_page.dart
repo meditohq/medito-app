@@ -8,6 +8,7 @@ import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/providers/me/me_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProfilePage extends ConsumerWidget {
   const UserProfilePage({super.key});
@@ -52,8 +53,11 @@ class UserProfilePage extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     try {
+                      // Clear client ID from SharedPreferences
+                      var prefs = await SharedPreferences.getInstance();
+                      await prefs.remove(SharedPreferenceConstants.userId);
+
                       await authRepository.signOut();
-                      HttpApiService().clearAuthHeaders();
                       await StatsManager().clearAllStats();
                       ref.read(meRefreshProvider)();
                       ref.read(statsProvider.notifier).refresh();
