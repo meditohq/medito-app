@@ -268,10 +268,30 @@ class HttpApiService {
       }
 
       final tokens = await _authService.refreshToken(refreshToken);
-      _headers[kAuthorizationHeader] = 'Bearer ${tokens.accessToken}';
 
+      // Update the auth header with the new token
+      setAuthHeader(tokens.accessToken);
+
+      // Reset retry count and retry the original request with new token
       _retryCount++;
-      return _handleRequest(requestBuilder, body: body);
+
+      // Create a new request with updated headers
+      final request = await requestBuilder();
+      _headers.forEach(request.headers.set);
+
+      if (body != null) {
+        final encodedBody = jsonEncode(body);
+        request.write(encodedBody);
+      }
+
+      final response = await request.close().timeout(kTimeoutDuration);
+      final content = await utf8.decodeStream(response);
+
+      if (response.statusCode >= HttpStatus.badRequest) {
+        throw _handleErrorResponse(response.statusCode);
+      }
+
+      return content.isEmpty ? {} : _parseResponseContent(content);
     } catch (e) {
       dev.log('Token refresh failed', error: e);
 

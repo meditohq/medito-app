@@ -9,7 +9,6 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -18,6 +17,7 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/providers/me/me_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -102,23 +102,52 @@ class SplashViewState extends ConsumerState<SplashView> {
   }
 
   Future<void> _initialiseApp() async {
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-    }
+    try {
+      dev.log('Initializing Firebase...');
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        dev.log('Firebase initialized successfully');
+      } else {
+        dev.log('Firebase was already initialized');
+      }
 
-    _checkAuthAndInitialize();
+      // Wait for Firebase to be fully ready
+      await Future.delayed(const Duration(seconds: 1));
+
+      await _checkAuthAndInitialize();
+    } catch (e, stackTrace) {
+      dev.log('Error initializing app', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+
+      setState(() {
+        _showAccountButtons = true;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _checkAuthAndInitialize() async {
     var auth = ref.read(authRepositoryProvider);
 
     try {
-      if (auth.currentUser != null) {
+      dev.log('Checking auth state...');
+      await auth.initializeUser();
+
+      final currentUser = auth.currentUser;
+      final isLoggedIn = await SharedPreferences.getInstance().then((prefs) =>
+          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false);
+
+      dev.log('Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}');
+
+      if (isLoggedIn && currentUser != null) {
+        dev.log('Initializing services for verified user...');
         await _initializeServices();
+
         if (!mounted) return;
 
+        dev.log('Navigation to main app...');
         await Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const RootPageView(
@@ -127,13 +156,15 @@ class SplashViewState extends ConsumerState<SplashView> {
           ),
         );
       } else {
+        dev.log('No verified user, showing auth buttons');
         if (!mounted) return;
         setState(() {
           _showAccountButtons = true;
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      dev.log('Error in auth check', error: e, stackTrace: stackTrace);
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);

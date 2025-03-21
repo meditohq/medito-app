@@ -96,23 +96,34 @@ class AuthApiService {
         },
       );
 
-      if (_tokens == null) {
-        dev.log('[AUTH] No existing tokens found during refresh');
-        throw const RefreshTokenError();
-      }
-
+      // Create new tokens object with the refreshed access token
       final tokens = AuthTokens(
         accessToken: response['access_token'] as String,
-        refreshToken: refreshToken,
+        refreshToken: refreshToken, // Keep the same refresh token
         expiresIn: response['expires_in'] as int,
-        clientId: _tokens!.clientId,
-        email: _tokens!.email,
+        clientId: _tokens?.clientId ?? '', // Preserve client ID if available
+        email: _tokens?.email, // Preserve email if available
       );
 
+      // Store the new tokens
       await setAuthTokens(tokens);
+
+      dev.log('[AUTH] Token refresh successful', error: {
+        'expires_in': tokens.expiresIn,
+        'has_email': tokens.email != null,
+        'token_prefix': tokens.accessToken.substring(0, 10),
+      });
+
       return tokens;
     } catch (e) {
-      dev.log('Token refresh failed', error: e);
+      dev.log('[AUTH] Token refresh failed', error: e);
+
+      // If we get an error response indicating invalid/expired refresh token,
+      // clear the stored tokens to force a new login
+      if (e is RefreshTokenError) {
+        await clearAuthTokens();
+      }
+
       rethrow;
     }
   }
@@ -122,6 +133,11 @@ class AuthApiService {
     if (tokens.refreshToken.isNotEmpty) {
       await _secureStorage.storeRefreshToken(tokens.refreshToken);
     }
+    dev.log('[AUTH] Tokens updated', error: {
+      'access_token_prefix': tokens.accessToken.substring(0, 10),
+      'has_refresh_token': tokens.refreshToken.isNotEmpty,
+      'expires_in': tokens.expiresIn,
+    });
   }
 
   Future<void> clearAuthTokens() async {
