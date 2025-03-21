@@ -8,7 +8,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/snackbar_widget.dart';
 
 class DebugInfoScreen extends ConsumerWidget {
-  const DebugInfoScreen({Key? key}) : super(key: key);
+  const DebugInfoScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

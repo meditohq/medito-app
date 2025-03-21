@@ -134,7 +134,7 @@ Future<String> _formatAudioCompletionInfo(LocalAllStats? stats) async {
 
     for (var session in recentSessions) {
       var formattedTimestamp = _formatSessionTimestamp(session);
-      formattedString += '\n$formattedTimestamp ';
+      formattedString += '\n$formattedTimestamp';
     }
 
     return formattedString;
@@ -155,9 +155,9 @@ List<LocalAudioCompleted> _getRecentAudioSessions(LocalAllStats stats) {
 String _formatSessionTimestamp(LocalAudioCompleted session) {
   var timestamp = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
 
-  return '${timestamp.month.toString().padLeft(2, '0')}'
-      '${timestamp.day.toString().padLeft(2, '0')}'
-      '${timestamp.hour.toString().padLeft(2, '0')}'
-      '${timestamp.minute.toString().padLeft(2, '0')}'
-      '${timestamp.second.toString().padLeft(2, '0')}';
+  return '${timestamp.day.toString().padLeft(2, '0')}/'
+      '${timestamp.month.toString().padLeft(2, '0')}/'
+      '${timestamp.year} '
+      '${timestamp.hour.toString().padLeft(2, '0')}:'
+      '${timestamp.minute.toString().padLeft(2, '0')}';
 }
