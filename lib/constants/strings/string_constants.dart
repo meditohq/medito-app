@@ -620,7 +620,7 @@ class StringConstants {
   static const String packs = 'Packs';
 
   // Add analytics related string constants to StringConstants class
-  static const String analyticsTitle = 'How do I turn off analytics?';
+  static const String analyticsTitle = 'How do I turn off 3rd-party analytics?';
   static const String analyticsContent =
       'Medito uses anonymous analytics to help us understand how the app is used and improve your experience. You can disable this if you prefer.';
   static const String analyticsEnabled = 'Analytics enabled';
