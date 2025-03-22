@@ -561,7 +561,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
 
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.inAppWebView);
+      await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     } else {
       showSnackBar(
         context,
