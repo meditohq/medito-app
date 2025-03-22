@@ -1,5 +1,6 @@
 ---
-description: How to show snackbar
+description: When a snackbar is shown, do this
 globs: 
+alwaysApply: false
 ---
 Snackbars should always be displayed using the method in [snackbar_widget.dart](mdc:lib/widgets/snackbar_widget.dart)

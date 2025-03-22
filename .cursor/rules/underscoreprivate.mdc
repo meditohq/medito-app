@@ -1,6 +1,7 @@
 ---
-description: String constant usage
+description: When using a UI string 
 globs: 
+alwaysApply: false
 ---
 
 

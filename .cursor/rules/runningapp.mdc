@@ -1,0 +1,6 @@
+---
+description: To run the app
+globs: 
+alwaysApply: false
+---
+use the commands in [launch.json](mdc:.vscode/launch.json) 
