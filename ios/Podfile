@@ -34,6 +34,8 @@ target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   pod 'Firebase/Core'
   
+  pod 'TikTokBusinessSDK'
+  
   target 'RunnerTests' do
     inherit! :search_paths
   end
@@ -58,6 +60,10 @@ post_install do |installer|
         # dart: PermissionGroup.notification
         'PERMISSION_NOTIFICATIONS=1',
       ]
+      
+      # Add app tracking transparency framework
+      config.build_settings['OTHER_LDFLAGS'] ||= '$(inherited)'
+      config.build_settings['OTHER_LDFLAGS'] += ' -framework AppTrackingTransparency'
     end 
   end
 end

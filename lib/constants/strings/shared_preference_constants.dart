@@ -24,4 +24,7 @@ class SharedPreferenceConstants {
   // DND settings
   static const String dndEnabled = 'dnd_enabled';
   static const String isLoggedIn = 'is_logged_in';
+
+  // Analytics settings
+  static const String tiktokAnalyticsEnabled = 'tiktok_analytics_enabled';
 }

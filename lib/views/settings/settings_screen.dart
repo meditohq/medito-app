@@ -13,6 +13,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
+import 'package:medito/views/debug/tiktok_test_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
@@ -238,14 +239,18 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
-    return RowItemWidget(
-      icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedHelpCircle,
-          size: 24,
-          color: Colors.white),
-      title: StringConstants.debugInfo,
-      hasUnderline: true,
+    return ListTile(
+      title: const Text(StringConstants.debugInfo),
+      leading: const Icon(Icons.bug_report),
       onTap: () => _showDebugBottomSheet(context, ref),
+    );
+  }
+
+  Widget _buildTikTokTestTile(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      title: const Text('TikTok Event Testing'),
+      leading: const Icon(Icons.track_changes),
+      onTap: () => _showTikTokTestScreen(context),
     );
   }
 
@@ -292,14 +297,11 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildOnboardingTile(BuildContext context, WidgetRef ref) {
-    return RowItemWidget(
-      icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedHelpCircle,
-          size: 24,
-          color: Colors.white),
-      title: 'Onboarding',
-      hasUnderline: true,
-      onTap: () => Navigator.of(context).push(
+    return ListTile(
+      title: const Text('Onboarding'),
+      leading: const Icon(Icons.arrow_right_alt),
+      onTap: () => Navigator.push(
+        context,
         MaterialPageRoute(
           builder: (context) => const OnboardingPagerScreen(),
         ),
@@ -355,6 +357,7 @@ class SettingsScreen extends ConsumerWidget {
                 .map((item) => _buildMenuItemTile(context, ref, item)),
             _buildSectionTitle(context, StringConstants.advanced),
             _buildDebugTile(context, ref),
+            _buildTikTokTestTile(context, ref),
             if (kDebugMode) _buildOnboardingTile(context, ref),
           ],
         ),
@@ -419,6 +422,14 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showClearReminderSnackBar(BuildContext context) {
     showSnackBar(context, StringConstants.reminderNotificationCleared);
+  }
+
+  void _showTikTokTestScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const TikTokTestScreen(),
+      ),
+    );
   }
 
   void _showDebugBottomSheet(BuildContext context, WidgetRef ref) {

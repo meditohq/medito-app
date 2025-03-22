@@ -39,6 +39,7 @@
 		<string>sms</string>
 		<string>tel</string>
 		<string>https</string>
+		<string>tiktok</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -108,5 +109,7 @@
 	</array>
 	<key>NSSiriUsageDescription</key>
 	<string>Add voice shortcuts to quickly play your favourite meditations</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This helps us understand how our meditation content is helping people, so we can improve it and keep Medito free for everyone.</string>
 </dict>
 </plist>

@@ -12,6 +12,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:medito/services/tiktok_events_service.dart';
 // import 'package:disable_battery_optimizations_latest/disable_battery_optimizations_latest.dart';
 
 class HelpScreen extends ConsumerStatefulWidget {
@@ -31,6 +32,18 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
   void initState() {
     super.initState();
     _checkSubscriptionStatus();
+  }
+
+  Future<void> _toggleAnalytics(bool enabled) async {
+    // Just update the StateNotifier - the provider listener will handle the rest
+    await ref.read(tiktokAnalyticsEnabledProvider.notifier).setEnabled(enabled);
+
+    showSnackBar(
+      context,
+      enabled
+          ? StringConstants.analyticsEnabled
+          : StringConstants.analyticsDisabled,
+    );
   }
 
   Future<void> _checkSubscriptionStatus() async {
@@ -75,6 +88,16 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         title: StringConstants.downloadTracksTitle,
         content: StringConstants.downloadTracksContent,
         icon: HugeIcons.solidRoundedDownloadSquare02,
+      ),
+    );
+
+    // Add analytics toggle help item
+    _helpItems.add(
+      HelpItem(
+        title: StringConstants.analyticsTitle,
+        content: StringConstants.analyticsContent,
+        icon: HugeIcons.solidRoundedShield01,
+        hasToggle: true, // Use a flag instead of ToggleAction
       ),
     );
 
@@ -325,14 +348,17 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
             ),
           ),
           const SizedBox(height: padding16),
-          _buildActionButtons(item),
+          _buildActionWidgets(item),
         ],
       ),
     );
   }
 
-  Widget _buildActionButtons(HelpItem item) {
-    if (item.multipleActions != null && item.multipleActions!.isNotEmpty) {
+  Widget _buildActionWidgets(HelpItem item) {
+    if (item.hasToggle == true) {
+      return _buildToggleWidget();
+    } else if (item.multipleActions != null &&
+        item.multipleActions!.isNotEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: item.multipleActions!
@@ -361,6 +387,38 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     }
 
     return const SizedBox.shrink();
+  }
+
+  Widget _buildToggleWidget() {
+    // Watch the analytics state
+    final analyticsEnabled = ref.watch(tiktokAnalyticsEnabledProvider);
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: ColorConstants.lightPurple),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            analyticsEnabled
+                ? StringConstants.analyticsEnabled
+                : StringConstants.analyticsDisabled,
+            style: const TextStyle(
+              color: ColorConstants.white,
+              fontSize: 16,
+            ),
+          ),
+          Switch(
+            value: analyticsEnabled,
+            onChanged: _toggleAnalytics,
+            activeColor: ColorConstants.lightPurple,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildActionButton(String text, VoidCallback onPressed) {
@@ -444,6 +502,7 @@ class HelpItem {
   final VoidCallback? onActionPressed;
   final List<ActionButton>? multipleActions;
   final IconData? icon;
+  final bool hasToggle;
 
   const HelpItem({
     required this.title,
@@ -452,6 +511,7 @@ class HelpItem {
     this.onActionPressed,
     this.multipleActions,
     this.icon,
+    this.hasToggle = false,
   });
 }
 

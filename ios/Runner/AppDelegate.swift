@@ -4,6 +4,7 @@ import Firebase
 import app_links
 import Intents
 import IntentsUI
+import AppTrackingTransparency
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -51,6 +52,16 @@ class AppDelegate: FlutterAppDelegate {
             #endif
             AppLinks.shared.handleLink(url: url)
             return true
+        }
+        
+        // Request tracking authorization after a delay to ensure it doesn't interfere with app launch
+        if #available(iOS 14.5, *) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                ATTrackingManager.requestTrackingAuthorization { status in
+                    // The status will be reported to the TikTok SDK automatically
+                    print("ATT authorization status: \(status.rawValue)")
+                }
+            }
         }
                 
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)

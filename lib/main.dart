@@ -22,6 +22,7 @@ import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/services/tiktok_events_service.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -94,6 +95,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinks();
+    _initTikTok();
+  }
+
+  Future<void> _initTikTok() async {
+    await ref.read(tiktokEventsServiceProvider).initialise();
   }
 
   void _setUpSystemUi() {

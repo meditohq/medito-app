@@ -6,6 +6,8 @@ class EnvConfig {
   final String authBaseUrl;
   final String apiKey;
   final String editStatsUrl;
+  final String tiktokAndroidId;
+  final String tiktokIosId;
 
   const EnvConfig({
     required this.environment,
@@ -13,6 +15,8 @@ class EnvConfig {
     required this.authBaseUrl,
     required this.apiKey,
     required this.editStatsUrl,
+    required this.tiktokAndroidId,
+    required this.tiktokIosId,
   });
 }
 
@@ -23,6 +27,8 @@ class ProdEnv extends EnvConfig {
     required super.authBaseUrl,
     required super.apiKey,
     required super.editStatsUrl,
+    required super.tiktokAndroidId,
+    required super.tiktokIosId,
   });
 }
 
@@ -33,6 +39,8 @@ class StagingEnv extends EnvConfig {
     required super.authBaseUrl,
     required super.apiKey,
     required super.editStatsUrl,
+    required super.tiktokAndroidId,
+    required super.tiktokIosId,
   });
 }
 
@@ -42,6 +50,8 @@ const _prodEnv = ProdEnv(
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_URL'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+  tiktokAndroidId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
+  tiktokIosId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
 );
 
 const _stagingEnv = StagingEnv(
@@ -50,6 +60,8 @@ const _stagingEnv = StagingEnv(
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_URL'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+  tiktokAndroidId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
+  tiktokIosId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -59,6 +71,8 @@ String get environment => _currentEnv.environment;
 String get contentBaseUrl => _currentEnv.contentBaseUrl;
 String get authBaseUrl => _currentEnv.authBaseUrl;
 String get editStatsUrl => _currentEnv.editStatsUrl;
+String get tiktokAndroidId => _currentEnv.tiktokAndroidId;
+String get tiktokIosId => _currentEnv.tiktokIosId;
 
 class HTTPConstants {
   //END POINTS
