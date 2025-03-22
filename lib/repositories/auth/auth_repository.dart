@@ -51,6 +51,7 @@ abstract class AuthRepository {
   Future<bool> signOut();
   Future<bool> markAccountForDeletion();
   Future<bool> isAccountMarkedForDeletion();
+  Future<void> signInAnonymously();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -131,11 +132,10 @@ class AuthRepositoryImpl extends AuthRepository {
       } catch (e) {
         dev.log('[AUTH] Token refresh failed, resetting auth state', error: e);
         resetAuthState();
-        await _signInAnonymously();
       }
     } else {
-      dev.log('[AUTH] No logged in user, creating anonymous account');
-      await _signInAnonymously();
+      dev.log('[AUTH] No logged in user found');
+      resetAuthState();
     }
   }
 
@@ -299,6 +299,9 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> isAccountMarkedForDeletion() async {
     return _currentUser?.metadata?['marked_for_deletion'] == true;
   }
+
+  @override
+  Future<void> signInAnonymously() => _signInAnonymously();
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

@@ -113,9 +113,6 @@ class SplashViewState extends ConsumerState<SplashView> {
         dev.log('Firebase was already initialized');
       }
 
-      // Wait for Firebase to be fully ready
-      await Future.delayed(const Duration(seconds: 1));
-
       await _checkAuthAndInitialize();
     } catch (e, stackTrace) {
       dev.log('Error initializing app', error: e, stackTrace: stackTrace);
@@ -182,7 +179,7 @@ class SplashViewState extends ConsumerState<SplashView> {
     var auth = ref.read(authRepositoryProvider);
 
     try {
-      await auth.initializeUser();
+      await auth.signInAnonymously();
       await _initializeServices();
       ref.read(meRefreshProvider)();
 
