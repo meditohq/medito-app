@@ -1,0 +1,6 @@
+---
+description: Know when to add comments
+globs: 
+alwaysApply: false
+---
+Only add comments if the code is doing something weird, it is a temporary fix, or if the code is not very readable.
