@@ -77,7 +77,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
 
       await _httpApiService.postRequest(
         HTTPConstants.favorites,
-        body: {'results': dtos.map((dto) => dto.toJson()).toList()},
+        body: dtos.map((dto) => dto.toJson()).toList(),
       );
     } catch (e) {
       debugPrint('Error syncing favorites with server: $e');
