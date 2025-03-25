@@ -101,12 +101,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
               fit: StackFit.expand,
               children: [
                 if (imageUrl.isNotEmpty)
-                  FadeInImage.assetNetwork(
-                    key: ValueKey(imageUrl),
-                    placeholder: AssetConstants.placeholder,
-                    image: imageUrl,
-                    fit: BoxFit.cover,
-                    fadeInDuration: const Duration(seconds: 2),
+                  _FadingNetworkImage(
+                    imageUrl: imageUrl,
+                    placeholderAsset: AssetConstants.placeholder,
                   ),
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -285,5 +282,62 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         }
       }
     });
+  }
+}
+
+class _FadingNetworkImage extends StatefulWidget {
+  final String imageUrl;
+  final String placeholderAsset;
+
+  const _FadingNetworkImage({
+    required this.imageUrl,
+    required this.placeholderAsset,
+  });
+
+  @override
+  State<_FadingNetworkImage> createState() => _FadingNetworkImageState();
+}
+
+class _FadingNetworkImageState extends State<_FadingNetworkImage> {
+  bool _imageLoaded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Placeholder image
+        Image.asset(
+          widget.placeholderAsset,
+          fit: BoxFit.cover,
+        ),
+
+        // Network image with fade-in effect
+        AnimatedOpacity(
+          opacity: _imageLoaded ? 1.0 : 0.0,
+          duration: const Duration(seconds: 2),
+          child: Image.network(
+            widget.imageUrl,
+            fit: BoxFit.cover,
+            cacheWidth: MediaQuery.of(context).size.width.toInt(),
+            errorBuilder: (context, error, stackTrace) {
+              return Container(color: ColorConstants.black);
+            },
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (frame != null && !_imageLoaded) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    setState(() {
+                      _imageLoaded = true;
+                    });
+                  }
+                });
+              }
+              return child;
+            },
+          ),
+        ),
+      ],
+    );
   }
 }
