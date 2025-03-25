@@ -29,7 +29,7 @@ class SignUpLogInPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
 
     if (user?.email != null && user?.email?.isNotEmpty == true) {
@@ -136,7 +136,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
     try {
       await ref
-          .read(authRepositoryProvider)
+          .read(authRepositorySyncProvider)
           .requestOtp(_emailController.text.trim());
       setState(() {
         _hasRequestedOtp = true;
@@ -156,7 +156,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     });
 
     try {
-      var success = await ref.read(authRepositoryProvider).verifyOtp(
+      var success = await ref.read(authRepositorySyncProvider).verifyOtp(
             _emailController.text.trim(),
             _otpController.text.trim(),
           );

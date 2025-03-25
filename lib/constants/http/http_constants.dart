@@ -88,10 +88,10 @@ class HTTPConstants {
   static const String searchTracks = 'search/tracks';
 
   // AUTH END POINTS
-  static const String authSignIn = 'auth/signin';
-  static const String authOtpRequest = 'auth/otp/request';
-  static const String authTokensRefresh = 'auth/tokens/refresh';
-  static const String authTokensSignout = 'auth/tokens/signout';
+  static const String authSignIn = 'signin';
+  static const String authOtpRequest = 'otp/request';
+  static const String authTokensRefresh = 'tokens/refresh';
+  static const String authTokensSignout = 'tokens/signout';
 
   // MAINTENANCE END POINTS
   static String maintenance = '${contentBaseUrl}maintenance';

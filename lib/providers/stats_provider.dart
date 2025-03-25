@@ -60,7 +60,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     var statsManager = ref.read(statsManagerProvider);
 
     try {
-      var authRepository = ref.read(authRepositoryProvider);
+      var authRepository = ref.read(authRepositorySyncProvider);
       if (authRepository.currentUser != null) {
         dev.log('StatsNotifier: Starting fetch');
         await statsManager.initialize();

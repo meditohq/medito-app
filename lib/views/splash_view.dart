@@ -88,7 +88,8 @@ class SplashView extends ConsumerStatefulWidget {
   ConsumerState<SplashView> createState() => SplashViewState();
 }
 
-class SplashViewState extends ConsumerState<SplashView> {
+class SplashViewState extends ConsumerState<SplashView>
+    with WidgetsBindingObserver {
   var _showAccountButtons = false;
   var _isLoading = true;
   final _pageController = PageController();
@@ -98,7 +99,43 @@ class SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initialiseApp();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // When app is resumed, try to refresh token silently without showing loader
+      _checkAuthStatusOnResume();
+    }
+  }
+
+  Future<void> _checkAuthStatusOnResume() async {
+    try {
+      var auth = ref.read(authRepositorySyncProvider);
+      if (auth.currentUser != null) {
+        var prefs = await SharedPreferences.getInstance();
+        var isLoggedIn =
+            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+
+        if (isLoggedIn) {
+          dev.log('[SPLASH] Checking auth status on resume');
+          // getToken will only refresh if the current token is expired
+          await auth.getToken();
+        }
+      }
+    } catch (e) {
+      dev.log('[SPLASH] Auth check failed: $e');
+      // We'll let normal API calls handle auth errors if they occur
+    }
   }
 
   Future<void> _initialiseApp() async {
@@ -126,7 +163,7 @@ class SplashViewState extends ConsumerState<SplashView> {
   }
 
   Future<void> _checkAuthAndInitialize() async {
-    var auth = ref.read(authRepositoryProvider);
+    var auth = ref.read(authRepositorySyncProvider);
 
     try {
       dev.log('Checking auth state...');
@@ -176,7 +213,7 @@ class SplashViewState extends ConsumerState<SplashView> {
 
   Future<void> _handleAnonymousSignIn() async {
     setState(() => _isSigningIn = true);
-    var auth = ref.read(authRepositoryProvider);
+    var auth = ref.read(authRepositorySyncProvider);
 
     try {
       await auth.signInAnonymously();
@@ -251,7 +288,7 @@ class SplashViewState extends ConsumerState<SplashView> {
                           child: SizedBox(
                             height: 400,
                             child: Image.asset(
-                              AssetConstants.splashBackground,
+                              AssetConstants.placeholder,
                               fit: BoxFit.cover,
                               alignment: Alignment.bottomCenter,
                             ),

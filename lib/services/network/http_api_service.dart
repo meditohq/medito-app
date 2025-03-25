@@ -1,15 +1,16 @@
-import 'dart:developer' as dev;
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
-import 'package:medito/routes/routes.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'package:medito/views/splash_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Event bus or callback type for auth events
 typedef AuthStateCallback = void Function(AuthEvent event);
@@ -216,19 +217,6 @@ class HttpApiService {
     }
   }
 
-  Future<Map<String, dynamic>> _handleResponse(
-      HttpClientResponse response) async {
-    dev.log('Response status: ${response.statusCode}');
-    final content = await utf8.decodeStream(response);
-
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw _handleErrorResponse(response.statusCode);
-    }
-
-    _retryCount = 0;
-    return content.isEmpty ? {} : _parseResponseContent(content);
-  }
-
   AppError _handleErrorResponse(int statusCode) {
     dev.log('HTTP Error $statusCode', level: 900);
 
@@ -251,28 +239,35 @@ class HttpApiService {
     dynamic body,
   ) async {
     dev.log('Unauthorized response - retry count: $_retryCount');
-    if (_retryCount >= kMaxRetries) {
+    await _addHttpDebugLog(
+        'Unauthorized response (401) - retry count: $_retryCount');
+
+    // Much higher retry limit (up to 5) to be extra forgiving
+    // when user might be coming back from background with expired tokens
+    const maxBackgroundRetries = 5;
+    if (_retryCount >= maxBackgroundRetries) {
       dev.log('Max retries reached - forcing logout');
-      await _forceLogout();
+      await _addHttpDebugLog(
+          'Max retries ($maxBackgroundRetries) reached - forcing logout');
+      await _forceLogout('Max token refresh retries reached');
       throw const UnauthorizedError();
     }
 
     try {
-      dev.log('Attempting token refresh...');
-      final refreshToken = await _authService.getStoredRefreshToken();
-      if (refreshToken == null) {
-        // No refresh token available - this is a legitimate refresh token error
-        dev.log('[HTTP] No refresh token available - forcing logout');
-        await _forceLogout();
-        throw const RefreshTokenError();
+      dev.log('Refreshing token through auth service...');
+
+      // Add a slight delay between retries to avoid hammering the server
+      if (_retryCount > 0) {
+        await Future.delayed(Duration(milliseconds: 500 * _retryCount));
       }
 
-      final tokens = await _authService.refreshToken(refreshToken);
+      // Use the refreshTokenThroughAuthService method
+      await _refreshTokenThroughAuthService();
 
-      // Update the auth header with the new token
-      setAuthHeader(tokens.accessToken);
+      await _addHttpDebugLog(
+          'Token refresh successful - attempt ${_retryCount + 1}');
 
-      // Reset retry count and retry the original request with new token
+      // Increment retry count and retry the original request with new token
       _retryCount++;
 
       // Create a new request with updated headers
@@ -288,22 +283,38 @@ class HttpApiService {
       final content = await utf8.decodeStream(response);
 
       if (response.statusCode >= HttpStatus.badRequest) {
+        var errorMsg =
+            'Request still failing after token refresh: ${response.statusCode}';
+        await _addHttpDebugLog(errorMsg);
         throw _handleErrorResponse(response.statusCode);
       }
 
+      // Successfully completed the request after token refresh, reset retry counter
+      _retryCount = 0;
+      await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
     } catch (e) {
       dev.log('Token refresh failed', error: e);
+      await _addHttpDebugLog(
+          'Token refresh error: ${e.toString().substring(0, min(200, e.toString().length))}');
 
-      // Only force logout for specific refresh token errors
-      if (e is RefreshTokenError) {
-        dev.log('[HTTP] Refresh token error - forcing logout');
-        await _forceLogout();
+      // Only force logout for specific refresh token errors and only after multiple retries
+      if (e is RefreshTokenError && _retryCount >= 3) {
+        dev.log(
+            '[HTTP] Refresh token error after multiple retries - forcing logout');
+        await _addHttpDebugLog('RefreshTokenError after multiple retries');
+        await _forceLogout(
+            'Refresh token invalid/expired after multiple attempts');
+      } else if (e is UnauthorizedError &&
+          _retryCount >= maxBackgroundRetries) {
+        dev.log('[HTTP] Too many failed attempts - forcing logout');
+        await _addHttpDebugLog('Too many failed attempts (${_retryCount})');
+        await _forceLogout('Too many token refresh failures');
       } else {
         dev.log(
-            '[HTTP] Non-refresh token error during refresh - not forcing logout');
-        // Just reset retry count for next attempt
-        _retryCount = 0;
+            '[HTTP] Error during refresh but still have retries - not forcing logout yet');
+        await _addHttpDebugLog(
+            'Error during refresh, will retry (attempt ${_retryCount + 1}/${maxBackgroundRetries})');
       }
 
       // Rethrow the original error for proper error handling
@@ -311,14 +322,42 @@ class HttpApiService {
     }
   }
 
-  Future<void> _forceLogout() async {
-    dev.log('[HTTP] Force logout initiated');
+  Future<void> _forceLogout([String reason = 'Unknown reason']) async {
+    dev.log('[HTTP] Force logout initiated: $reason');
     _retryCount = 0;
     _headers.remove(kAuthorizationHeader);
     await StatsManager().clearAllStats();
 
+    // Add debug log for force logout
+    await _addHttpDebugLog(
+        'FORCE LOGOUT triggered by HttpApiService - Reason: $reason');
+
     // Notify listeners that a force logout has occurred
     _notifyAuthEvent(AuthEvent.forceLogout);
+  }
+
+  // Store debug logs in shared preferences for debugging auth issues
+  Future<void> _addHttpDebugLog(String logEntry) async {
+    // Only log in debug mode
+    if (!kDebugMode) return;
+
+    try {
+      var prefs = await SharedPreferences.getInstance();
+      var logs = prefs.getStringList('auth_debug_logs') ?? [];
+
+      // Keep last 50 logs
+      if (logs.length > 50) {
+        logs = logs.sublist(logs.length - 50);
+      }
+
+      var timestamp = DateTime.now().toIso8601String();
+      logs.add('$timestamp: [HTTP] $logEntry');
+      await prefs.setStringList('auth_debug_logs', logs);
+
+      dev.log('[HTTP] Debug log added: $logEntry');
+    } catch (e) {
+      dev.log('[HTTP] Error saving debug log: $e');
+    }
   }
 
   void addDeviceHeaders(Map<String, String> headers) {
@@ -327,5 +366,21 @@ class HttpApiService {
     if (authHeader != null) {
       _headers[kAuthorizationHeader] = authHeader;
     }
+  }
+
+  // Helper method to refresh token through auth service
+  Future<void> _refreshTokenThroughAuthService() async {
+    // We cannot directly access the repository from here without making major changes
+    // so we'll use the AuthService's refreshToken method directly
+    final refreshToken = await _authService.getStoredRefreshToken();
+    if (refreshToken == null) {
+      dev.log('[HTTP] No refresh token available - forcing logout');
+      await _addHttpDebugLog('No refresh token available - forcing logout');
+      await _forceLogout('No refresh token found');
+      throw const RefreshTokenError();
+    }
+
+    final tokens = await _authService.refreshToken(refreshToken);
+    setAuthHeader(tokens.accessToken);
   }
 }

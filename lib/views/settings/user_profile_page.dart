@@ -15,7 +15,7 @@ class UserProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
 
     return Scaffold(

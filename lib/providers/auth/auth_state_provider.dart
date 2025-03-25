@@ -1,57 +1,46 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/routes/routes.dart';
 import 'package:medito/services/network/http_api_service.dart';
-import 'package:medito/views/splash_view.dart';
 
-/// Provider that handles navigation in response to auth events
-final authStateListenerProvider = Provider.autoDispose((ref) {
-  return AuthStateListener(ref);
+// Auth events that can be emitted
+enum AuthStateEvent {
+  forceLogout,
+}
+
+// Stream controller for auth state events
+final _authStateController = StreamController<AuthStateEvent>.broadcast();
+
+// Provider that exposes the auth state stream
+final authStateStreamProvider = StreamProvider<AuthStateEvent>((ref) {
+  return _authStateController.stream;
 });
 
-class AuthStateListener {
-  final ProviderRef _ref;
-  final HttpApiService _httpApiService = HttpApiService();
+// Provider that listens to HTTP service auth events and propagates them
+final authStateListenerProvider = Provider<void>((ref) {
+  final authRepository = ref.watch(authRepositorySyncProvider);
 
-  AuthStateListener(this._ref) {
-    // Register for auth events
-    _httpApiService.addAuthCallback(_handleAuthEvent);
+  // Subscribe to auth events from the HTTP service
+  final httpService = HttpApiService();
 
-    // Clean up when provider is disposed
-    _ref.onDispose(() {
-      _httpApiService.removeAuthCallback(_handleAuthEvent);
-    });
-  }
+  // Add callback for force logout events
+  httpService.addAuthCallback((event) {
+    if (event == AuthEvent.forceLogout) {
+      // Reset auth state in repository
+      authRepository.resetAuthState();
 
-  void _handleAuthEvent(AuthEvent event) {
-    switch (event) {
-      case AuthEvent.forceLogout:
-        _handleForceLogout();
-        break;
+      // Emit event to stream for UI to handle
+      _authStateController.add(AuthStateEvent.forceLogout);
     }
-  }
+  });
 
-  Future<void> _handleForceLogout() async {
-    // Reset the auth repository's state
-    final authRepository = _ref.read(authRepositoryProvider);
-    if (authRepository is AuthRepositoryImpl) {
-      // This will clear user and token state
-      (authRepository as AuthRepositoryImpl).resetAuthState();
-    }
+  // Clean up when provider is disposed
+  ref.onDispose(() {
+    httpService.removeAuthCallback((event) {});
+  });
+});
 
-    // Check if we have a navigator
-    if (navigatorKey.currentState != null) {
-      // Add a small delay to ensure we're not in the middle of another operation
-      await Future.delayed(const Duration(milliseconds: 100));
-
-      // Navigate to splash screen
-      navigatorKey.currentState!.pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => const SplashView(),
-        ),
-        (route) => false,
-      );
-    }
-  }
+// Helper to dispose the controller (call in app shutdown)
+void disposeAuthStateController() {
+  _authStateController.close();
 }

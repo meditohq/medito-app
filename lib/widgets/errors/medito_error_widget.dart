@@ -119,7 +119,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                 btnText: StringConstants.signInAgain,
                 onPressed: () async {
                   final authRepository = ProviderScope.containerOf(context)
-                      .read(authRepositoryProvider);
+                      .read(authRepositorySyncProvider);
                   await authRepository.signOut();
                   await StatsManager().clearAllStats();
                   if (context.mounted) {
@@ -130,7 +130,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                     await Future.delayed(const Duration(milliseconds: 100));
 
                     if (context.mounted) {
-                      // Always go back to splash screen for unauthorized errors
+                      // Navigate to splash screen from UI
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (context) => const SplashView(),

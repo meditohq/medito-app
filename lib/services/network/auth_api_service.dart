@@ -2,31 +2,43 @@ import 'dart:developer' as dev;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
 
+class HttpClientWrapper {
+  HttpClient createClient() => HttpClient();
+}
+
 class AuthApiService {
-  static AuthApiService? _instance;
-  final _client = HttpClient();
+  final SecureStorageService _secureStorage;
+  final String _baseUrl;
+  final String _apiKey;
+
+  final HttpClient _client;
   final _headers = <String, String>{};
-  final _secureStorage = SecureStorageService();
   AuthTokens? _tokens;
 
-  factory AuthApiService() {
-    _instance ??= AuthApiService._internal();
-    return _instance!;
-  }
-
-  AuthApiService._internal() {
+  // Use named constructors instead of factory+singleton pattern
+  AuthApiService({
+    SecureStorageService? secureStorage,
+    HttpClientWrapper? httpClientWrapper,
+    String? baseUrl,
+    String? customApiKey,
+  })  : _secureStorage = secureStorage ?? SecureStorageService(),
+        _baseUrl = baseUrl ?? authBaseUrl,
+        _apiKey =
+            customApiKey ?? apiKey, // Use the global apiKey if none provided
+        _client = (httpClientWrapper ?? HttpClientWrapper()).createClient() {
     _client.connectionTimeout = kTimeoutDuration;
     _initializeHeaders();
   }
 
   void _initializeHeaders() {
     _headers[kContentTypeHeader] = ContentType.json.value;
-    _headers[kAuthorizationHeader] = 'Bearer $apiKey';
+    _headers[kAuthorizationHeader] = 'Bearer $_apiKey';
   }
 
   Future<AuthTokens> signIn({
@@ -38,7 +50,7 @@ class AuthApiService {
       'email': email != null ? 'provided' : 'not provided',
       'otp': otp != null ? 'provided' : 'not provided',
       'clientId': clientId,
-      'url': '$authBaseUrl${HTTPConstants.authSignIn}',
+      'url': '$_baseUrl${HTTPConstants.authSignIn}',
     });
 
     final response = await _post(
@@ -71,13 +83,14 @@ class AuthApiService {
     dev.log('[AUTH] Requesting OTP for email', error: {
       'email': email,
       'clientId': clientId,
-      'url': '$authBaseUrl${HTTPConstants.authOtpRequest}',
+      'url': '$_baseUrl${HTTPConstants.authOtpRequest}',
     });
 
     await _post(
       HTTPConstants.authOtpRequest,
       body: {
         'email': email,
+        'client_id': clientId,
       },
     );
 
@@ -154,14 +167,15 @@ class AuthApiService {
     dynamic body,
   }) async {
     try {
-      final uri = Uri.parse('$authBaseUrl$path');
+      // Ensure the path is properly combined with base URL
+      final uri = Uri.parse('$_baseUrl$path');
 
       // Log the API key being used
       dev.log('[AUTH] API Key check',
           error: jsonEncode({
-            'api_key': apiKey,
-            'is_empty': apiKey.isEmpty,
-            'length': apiKey.length,
+            'api_key': _apiKey,
+            'is_empty': _apiKey.isEmpty,
+            'length': _apiKey.length,
           }));
 
       final request = await _client.postUrl(uri);

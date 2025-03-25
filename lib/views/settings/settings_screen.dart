@@ -22,7 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../home/widgets/header/home_header_widget.dart';
 
 final bearerTokenProvider = FutureProvider<String>((ref) async {
-  final authRepository = ref.watch(authRepositoryProvider);
+  final authRepository = ref.watch(authRepositorySyncProvider);
   final bearerToken = await authRepository.getToken();
 
   return bearerToken;
@@ -35,7 +35,7 @@ final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
 });
 
 final userIdProvider = FutureProvider<String>((ref) async {
-  final authRepository = ref.watch(authRepositoryProvider);
+  final authRepository = ref.watch(authRepositorySyncProvider);
   return authRepository.currentUser?.id ?? '';
 });
 
@@ -72,7 +72,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
 
     ref.listen(authRepositoryProvider, (previous, next) {
@@ -255,7 +255,7 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref,
     SettingsItem item,
   ) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
     final isAccountItem = item.type == TypeConstants.account;
     final userEmail = user?.email;

@@ -16,6 +16,7 @@ import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -23,6 +24,7 @@ import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/tiktok_events_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -192,6 +194,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void dispose() {
     _linkSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    // Close auth state stream controller to prevent memory leaks
+    disposeAuthStateController();
     super.dispose();
   }
 
@@ -201,6 +205,18 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     // Initialize auth state listener to handle navigation on force logout
     ref.watch(authStateListenerProvider);
+
+    // Listen for auth state events that require navigation
+    ref.listen<AsyncValue<AuthStateEvent>>(
+      authStateStreamProvider,
+      (_, state) => state.whenData((event) {
+        switch (event) {
+          case AuthStateEvent.forceLogout:
+            _handleForceLogout(context);
+            break;
+        }
+      }),
+    );
 
     connectionState.whenData((state) {
       if (state.status == InternetConnectionStatus.disconnected &&
@@ -245,6 +261,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
 
+    // Proactively refresh auth token when app comes to foreground
+    _refreshAuthToken();
+
     if (Platform.isIOS) {
       // Process any pending track completions when app comes back to foreground
       processPendingCompletedTracks().then((processedCount) {
@@ -252,6 +271,26 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           debugPrint('Processed $processedCount pending tracks on foreground');
         }
       });
+    }
+  }
+
+  Future<void> _refreshAuthToken() async {
+    try {
+      final authRepository = ref.read(authRepositorySyncProvider);
+      // The repository's getToken method will only refresh if token is expired
+      if (authRepository.currentUser != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final isLoggedIn =
+            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+
+        if (isLoggedIn) {
+          debugPrint('Checking auth token after app foregrounded');
+          await authRepository.getToken();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error with auth token on foreground: $e');
+      // Don't reset auth state here - let normal API calls handle auth errors
     }
   }
 
@@ -292,5 +331,21 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         ),
       ),
     );
+  }
+
+  // Handle force logout in UI layer
+  void _handleForceLogout(BuildContext context) {
+    // Add a small delay to ensure we're not in the middle of another operation
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!mounted) return;
+
+      // Use Navigator in UI context
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const SplashView(),
+        ),
+        (route) => false,
+      );
+    });
   }
 }

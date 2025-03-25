@@ -61,12 +61,13 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   pigeon: ^22.6.0
   mocktail: ^1.0.2
-  build_runner: ^2.4.13
+  build_runner: ^2.4.15
   riverpod_generator: ^2.3.9
-  json_serializable: ^6.7.1
+  json_serializable: ^6.9.0
   freezed: ^2.5.2
   mockito: ^5.4.4
   analyzer: ^6.7.0
+  json_annotation: ^4.9.0
 
 flutter:
   assets:

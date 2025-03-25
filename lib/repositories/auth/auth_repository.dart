@@ -1,31 +1,14 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/models/auth/auth_tokens.dart';
+import 'package:medito/services/secure_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:developer' as dev;
-import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
-
-enum AuthException {
-  accountMarkedForDeletion,
-  other,
-  userNotFound,
-}
-
-class AuthError implements Exception {
-  final AuthException type;
-  final String message;
-
-  AuthError(this.type, this.message);
-
-  @override
-  String toString() => message;
-}
 
 class User {
   final String id;
@@ -52,145 +35,112 @@ abstract class AuthRepository {
   Future<bool> markAccountForDeletion();
   Future<bool> isAccountMarkedForDeletion();
   Future<void> signInAnonymously();
+  void resetAuthState();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
-  final _authService = AuthApiService();
-  final _httpApiService = HttpApiService();
+  final AuthApiService _authService;
+  final HttpApiService _httpApiService;
+  final SecureStorageService _secureStorage;
+  final SharedPreferences _preferences;
+  final Uuid _uuid;
+
   User? _currentUser;
   AuthTokens? _tokens;
 
-  String _generateClientId() {
-    var date = DateFormat('ddMMyy_HHmmss_').format(DateTime.now());
-    return '$date${const Uuid().v4()}';
-  }
+  AuthRepositoryImpl({
+    AuthApiService? authService,
+    HttpApiService? httpApiService,
+    SecureStorageService? secureStorage,
+    required SharedPreferences preferences,
+    Uuid? uuid,
+  })  : _authService = authService ?? AuthApiService(),
+        _httpApiService = httpApiService ?? HttpApiService(),
+        _secureStorage = secureStorage ?? SecureStorageService(),
+        _preferences = preferences,
+        _uuid = uuid ?? const Uuid();
 
   @override
   User? get currentUser => _currentUser;
 
-  Future<bool> _checkLoginState() async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
-    } catch (e) {
-      dev.log('[AUTH] Error checking login state: $e');
-      return false;
-    }
-  }
-
-  Future<void> _setLoginState(bool isLoggedIn) async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(SharedPreferenceConstants.isLoggedIn, isLoggedIn);
-      dev.log('[AUTH] Login state updated: $isLoggedIn');
-    } catch (e) {
-      dev.log('[AUTH] Error saving login state: $e');
-    }
-  }
-
-  Future<String?> _getStoredClientId() async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      var clientId = prefs.getString(SharedPreferenceConstants.userId);
-      dev.log('[AUTH] Retrieved stored client ID: $clientId');
-      return clientId;
-    } catch (e) {
-      dev.log('[AUTH] Error reading clientId: $e');
-      return null;
-    }
-  }
-
-  Future<void> _saveClientId(String clientId) async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      await prefs.setString(SharedPreferenceConstants.userId, clientId);
-      dev.log('[AUTH] Saved client ID: $clientId');
-    } catch (e) {
-      dev.log('[AUTH] Error saving clientId: $e');
-    }
-  }
-
-  void resetAuthState() {
-    dev.log('[AUTH] Resetting auth state (force logout)');
-    _currentUser = null;
-    _tokens = null;
-    _httpApiService.clearAuthHeader();
-    _setLoginState(false);
-  }
-
   @override
   Future<void> initializeUser() async {
-    dev.log('[AUTH] Starting user initialization');
-    final isLoggedIn = await _checkLoginState();
-    final clientId = await _getStoredClientId();
-
-    if (isLoggedIn && clientId != null) {
-      dev.log('[AUTH] Found logged in user with client ID: $clientId');
-      _currentUser = User(id: clientId);
-      try {
-        await getToken();
-      } catch (e) {
-        dev.log('[AUTH] Token refresh failed, resetting auth state', error: e);
-        resetAuthState();
-      }
-    } else {
-      dev.log('[AUTH] No logged in user found');
-      resetAuthState();
-    }
-  }
-
-  Future<void> _signInAnonymously() async {
     try {
-      var clientId = await _getStoredClientId() ?? _generateClientId();
-      dev.log('[AUTH] Signing in anonymously with client ID: $clientId');
+      var clientId = _preferences.getString(SharedPreferenceConstants.userId);
 
-      final tokens = await _authService.signIn(
-        clientId: clientId,
-      );
+      if (clientId == null) {
+        // Generate and store a new client ID
+        clientId = _generateClientId();
+        await _preferences.setString(
+            SharedPreferenceConstants.userId, clientId);
+      }
 
-      await _saveClientId(tokens.clientId);
-      await _setLoginState(true);
+      // Check if the user is logged in
+      var isLoggedIn =
+          _preferences.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
-      _tokens = tokens;
-      _httpApiService.setAuthHeader(tokens.accessToken);
-      _currentUser = User(
-        id: tokens.clientId,
-        email: tokens.email,
-        metadata: {'client_id': tokens.clientId},
-      );
+      if (isLoggedIn) {
+        var refreshToken = await _secureStorage.getRefreshToken();
 
-      dev.log('[AUTH] Anonymous sign in successful');
-    } catch (e) {
-      dev.log('[AUTH] Anonymous sign in failed', error: e);
-      await _setLoginState(false);
+        if (refreshToken != null) {
+          try {
+            // Get a fresh token
+            _tokens = await _authService.refreshToken(refreshToken);
+
+            // Update the HTTP service with the new token
+            _httpApiService.setAuthHeader(_tokens!.accessToken);
+
+            // Set current user
+            _currentUser = User(
+              id: _tokens!.clientId,
+              email: _tokens!.email,
+            );
+
+            dev.log('[AUTH_REPO] User initialized from stored tokens');
+          } catch (e) {
+            dev.log('[AUTH_REPO] Error refreshing token during init', error: e);
+            await _resetAuth();
+          }
+        } else {
+          dev.log(
+              '[AUTH_REPO] No refresh token found despite logged in status');
+          await _resetAuth();
+        }
+      } else {
+        dev.log('[AUTH_REPO] User is not logged in');
+        _currentUser = User(id: clientId);
+      }
+    } catch (e, stackTrace) {
+      dev.log('[AUTH_REPO] Error initializing user',
+          error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
 
   @override
   Future<String> getToken() async {
-    if (_tokens?.accessToken != null) {
-      dev.log('[AUTH] Returning cached access token');
+    // If we have a valid token that isn't expired, return it immediately
+    if (_tokens != null && !_tokens!.isExpired) {
       return _tokens!.accessToken;
     }
 
-    try {
-      dev.log('[AUTH] No cached token, attempting refresh');
-      final refreshToken = await _authService.getStoredRefreshToken();
-      if (refreshToken == null) {
-        dev.log('[AUTH] No refresh token found');
-        throw const UnauthorizedError();
+    // Only attempt token refresh if we have stored refresh token and
+    // either our tokens are null or have expired
+    var refreshToken = await _secureStorage.getRefreshToken();
+    if (refreshToken != null) {
+      try {
+        dev.log('[AUTH_REPO] Refreshing expired token');
+        _tokens = await _authService.refreshToken(refreshToken);
+        _httpApiService.setAuthHeader(_tokens!.accessToken);
+        return _tokens!.accessToken;
+      } catch (e) {
+        dev.log('[AUTH_REPO] Error refreshing token', error: e);
+        // Let higher level code handle this error
+        rethrow;
       }
-
-      final tokens = await _authService.refreshToken(refreshToken);
-      _tokens = tokens;
-      _httpApiService.setAuthHeader(tokens.accessToken);
-      dev.log('[AUTH] Token refresh successful');
-      return tokens.accessToken;
-    } catch (e) {
-      dev.log('[AUTH] Token refresh failed', error: e);
-      throw const UnauthorizedError();
     }
+
+    throw const UnauthorizedError();
   }
 
   @override
@@ -201,109 +151,167 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<bool> requestOtp(String email) async {
     try {
-      var clientId = await _getStoredClientId() ?? _generateClientId();
-      dev.log('[AUTH] Requesting OTP',
-          error: jsonEncode({'email': email, 'clientId': clientId}));
+      var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
+          _generateClientId();
+
       await _authService.requestOtp(email, clientId);
-      dev.log('[AUTH] OTP request successful');
       return true;
     } catch (e) {
-      dev.log('[AUTH] OTP request failed', error: e);
-      rethrow;
+      dev.log('[AUTH_REPO] Error requesting OTP', error: e);
+      return false;
     }
   }
 
   @override
   Future<bool> verifyOtp(String email, String otp) async {
     try {
-      var clientId = await _getStoredClientId() ?? _generateClientId();
-      dev.log('[AUTH] Verifying OTP', error: {
-        'email': email,
-        'clientId': clientId,
-        'has_current_token': _tokens?.accessToken != null,
-      });
+      var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
+          _generateClientId();
 
-      final tokens = await _authService.signIn(
+      _tokens = await _authService.signIn(
         email: email,
         otp: otp,
         clientId: clientId,
       );
 
-      await _saveClientId(tokens.clientId);
-      await _setLoginState(true);
-
-      _tokens = tokens;
-      _httpApiService.setAuthHeader(tokens.accessToken);
+      // Update user info
       _currentUser = User(
-        id: tokens.clientId,
-        email: tokens.email,
-        metadata: {'client_id': tokens.clientId},
+        id: _tokens!.clientId,
+        email: _tokens!.email,
       );
 
-      dev.log('[AUTH] OTP verification successful');
-      return true;
-    } catch (e) {
-      dev.log('[AUTH] OTP verification failed', error: e);
-      rethrow;
-    }
-  }
+      // Update HTTP service with the new token
+      _httpApiService.setAuthHeader(_tokens!.accessToken);
 
-  @override
-  Future<bool> signOut() async {
-    dev.log('[AUTH] Starting sign out process');
-    await FirebaseMessaging.instance.deleteToken();
+      // Save client ID (might be different from the one we sent)
+      await _preferences.setString(
+          SharedPreferenceConstants.userId, _tokens!.clientId);
 
-    try {
-      await _httpApiService.signOut();
-      await _setLoginState(false);
-
-      _tokens = null;
-      _currentUser = null;
-      _httpApiService.clearAuthHeader();
-
-      dev.log('[AUTH] Sign out completed successfully');
-      return true;
-    } catch (error) {
-      dev.log('[AUTH] Sign out failed', error: error);
-      if (error is AppError) {
-        rethrow;
-      }
-      throw const ServerError();
-    }
-  }
-
-  @override
-  Future<bool> markAccountForDeletion() async {
-    try {
-      if (_currentUser == null) return false;
-
-      await _httpApiService.postRequest(
-        HTTPConstants.me,
-        body: {'marked_for_deletion': true},
-      );
-
-      _currentUser = User(
-        id: _currentUser!.id,
-        email: _currentUser!.email,
-        metadata: {...?_currentUser!.metadata, 'marked_for_deletion': true},
-      );
+      // Mark user as logged in
+      await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
 
       return true;
     } catch (e) {
-      debugPrint('Error marking account for deletion: $e');
+      dev.log('[AUTH_REPO] Error verifying OTP', error: e);
       return false;
     }
   }
 
   @override
-  Future<bool> isAccountMarkedForDeletion() async {
-    return _currentUser?.metadata?['marked_for_deletion'] == true;
+  Future<bool> signOut() async {
+    try {
+      // Try to sign out on the server
+      await _httpApiService.signOut();
+    } catch (e) {
+      dev.log('[AUTH_REPO] Error during server sign out', error: e);
+      // Continue with local sign out regardless of server response
+    }
+
+    await _resetAuth();
+    return true;
   }
 
   @override
-  Future<void> signInAnonymously() => _signInAnonymously();
+  Future<bool> markAccountForDeletion() async {
+    // We'll implement this when the server endpoint is ready
+    return false;
+  }
+
+  @override
+  Future<bool> isAccountMarkedForDeletion() async {
+    // We'll implement this when the server endpoint is ready
+    return false;
+  }
+
+  @override
+  Future<void> signInAnonymously() async {
+    try {
+      var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
+          _generateClientId();
+
+      _tokens = await _authService.signIn(
+        clientId: clientId,
+      );
+
+      // Update user info
+      _currentUser = User(
+        id: _tokens!.clientId,
+      );
+
+      // Update HTTP service with the new token
+      _httpApiService.setAuthHeader(_tokens!.accessToken);
+
+      // Save client ID (might be different from the one we sent)
+      await _preferences.setString(
+          SharedPreferenceConstants.userId, _tokens!.clientId);
+
+      // Mark user as logged in
+      await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
+
+      dev.log('[AUTH_REPO] Anonymous sign in successful');
+    } catch (e) {
+      dev.log('[AUTH_REPO] Error signing in anonymously', error: e);
+      rethrow;
+    }
+  }
+
+  @override
+  void resetAuthState() {
+    _resetAuth();
+  }
+
+  // Helper method to reset auth state
+  Future<void> _resetAuth() async {
+    // Don't clear the client ID, as it's used for anonymous access too
+    await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, false);
+
+    // Clear tokens
+    await _secureStorage.clearRefreshToken();
+    _tokens = null;
+
+    // Clear HTTP auth header
+    _httpApiService.clearAuthHeader();
+
+    // Reset current user (but keep the ID)
+    var clientId = _preferences.getString(SharedPreferenceConstants.userId);
+    _currentUser = clientId != null ? User(id: clientId) : null;
+  }
+
+  // Generate a client ID using date + random string
+  String _generateClientId() {
+    var dateStr = DateFormat('yyyyMMdd').format(DateTime.now());
+    var randomStr = _uuid.v6().split('-')[0]; // Use first part of UUID
+    return '$dateStr-$randomStr';
+  }
 }
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl();
+// Use FutureProvider for async initialization
+final authRepositoryProvider = FutureProvider<AuthRepository>((ref) async {
+  // Initialize shared preferences
+  final preferences = await SharedPreferences.getInstance();
+
+  // Return the repository with dependencies injected
+  return AuthRepositoryImpl(
+    preferences: preferences,
+  );
+});
+
+// Use this provider to access the AuthRepository synchronously after initialization
+final authRepositorySyncProvider = Provider<AuthRepository>((ref) {
+  final authRepo = ref.watch(authRepositoryProvider);
+
+  // Check if the repository is fully initialized
+  if (authRepo is AsyncData<AuthRepository>) {
+    return authRepo.value;
+  }
+
+  // If the repository is loading or has an error, throw an exception
+  if (authRepo is AsyncLoading) {
+    throw Exception('AuthRepository is still initializing');
+  } else if (authRepo is AsyncError) {
+    throw Exception('Failed to initialize AuthRepository: ${authRepo.error}');
+  }
+
+  // This should never happen with the current implementation, but just in case
+  throw Exception('Unexpected state: AuthRepository not initialized');
 });

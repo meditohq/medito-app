@@ -88,7 +88,7 @@ Future<_DeviceInfo> _getDeviceInfo() async {
 Future<String> deviceAppAndUserInfo(Ref ref) async {
   var me = await ref.watch(meProvider.future);
   var deviceInfo = await ref.watch(deviceAndAppInfoProvider.future);
-  var auth = ref.read(authRepositoryProvider);
+  var auth = ref.read(authRepositorySyncProvider);
   var email = auth.getUserEmail();
   var stats = await ref.read(statsProvider.future);
 
