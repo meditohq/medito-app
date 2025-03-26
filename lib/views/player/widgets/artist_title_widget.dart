@@ -60,7 +60,7 @@ class ArtistTitleWidget extends ConsumerWidget {
           fontFamily: dmMono,
           fontSize: artistNameFontSize,
           letterSpacing: 0,
-          color: ColorConstants.graphite,
+          color: ColorConstants.white,
         );
 
     return SizedBox(

@@ -33,8 +33,6 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
   Widget build(BuildContext context) {
     final donationPage = ref.watch(fetchDonationPageProvider);
 
-    debugPrint('Donation widget state: ${donationPage.toString()}');
-
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: donationPage.when(

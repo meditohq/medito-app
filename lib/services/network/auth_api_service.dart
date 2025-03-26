@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -98,7 +99,11 @@ class AuthApiService {
   }
 
   Future<AuthTokens> refreshToken(String refreshToken) async {
-    dev.log('[AUTH] Attempting to refresh token');
+    dev.log('[AUTH] Attempting to refresh token', error: {
+      'token_length': refreshToken.length,
+      'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
+      'timestamp': DateTime.now().toString(),
+    });
 
     try {
       // Send refresh token in the body instead of using it as a Bearer token
@@ -125,15 +130,23 @@ class AuthApiService {
         'expires_in': tokens.expiresIn,
         'has_email': tokens.email != null,
         'token_prefix': tokens.accessToken.substring(0, 10),
+        'refresh_token_length': tokens.refreshToken.length,
+        'refresh_token_prefix': tokens.refreshToken
+            .substring(0, min(10, tokens.refreshToken.length)),
       });
 
       return tokens;
     } catch (e) {
-      dev.log('[AUTH] Token refresh failed', error: e);
+      dev.log('[AUTH] Token refresh failed', error: {
+        'error': e.toString(),
+        'token_length': refreshToken.length,
+        'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
+      });
 
       // If we get an error response indicating invalid/expired refresh token,
       // clear the stored tokens to force a new login
       if (e is RefreshTokenError) {
+        dev.log('[AUTH] Clearing tokens due to RefreshTokenError');
         await clearAuthTokens();
       }
 
@@ -159,7 +172,17 @@ class AuthApiService {
   }
 
   Future<String?> getStoredRefreshToken() async {
-    return _secureStorage.getRefreshToken();
+    dev.log('[AUTH] Getting stored refresh token');
+    final token = await _secureStorage.getRefreshToken();
+    if (token != null) {
+      dev.log('[AUTH] Found stored refresh token', error: {
+        'token_length': token.length,
+        'token_prefix': token.substring(0, min(10, token.length)),
+      });
+    } else {
+      dev.log('[AUTH] No stored refresh token found');
+    }
+    return token;
   }
 
   Future<Map<String, dynamic>> _post(

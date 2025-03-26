@@ -25,6 +25,7 @@ import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/tiktok_events_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/services/network/http_api_service.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -261,6 +262,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
 
+    // Diagnose token state for debug purposes
+    _diagnoseSecurity();
+
     // Proactively refresh auth token when app comes to foreground
     _refreshAuthToken();
 
@@ -271,6 +275,19 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           debugPrint('Processed $processedCount pending tracks on foreground');
         }
       });
+    }
+  }
+
+  Future<void> _diagnoseSecurity() async {
+    try {
+      // Get the HTTP service instance
+      final httpService = HttpApiService();
+
+      // Run diagnostic
+      debugPrint('Running security diagnostic on app foreground');
+      await httpService.diagnoseSecurity();
+    } catch (e) {
+      debugPrint('Error running security diagnostic: $e');
     }
   }
 
@@ -336,13 +353,30 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   // Handle force logout in UI layer
   void _handleForceLogout(BuildContext context) {
     // Add a small delay to ensure we're not in the middle of another operation
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (!mounted) return;
+    Future.delayed(const Duration(milliseconds: 500), () {
+      // Check if we're already showing the SplashView by examining current route
+      final currentRoute = ModalRoute.of(context);
+      final isAlreadyOnSplash = currentRoute != null &&
+          currentRoute.settings.name == SplashView.routeName;
 
-      // Use Navigator in UI context
-      Navigator.of(context).pushAndRemoveUntil(
+      if (isAlreadyOnSplash) {
+        debugPrint(
+            'Already on splash screen, refreshing instead of navigating');
+        // If already on splash, just reset state without navigating
+        if (context.mounted) {
+          final splash = context.findAncestorStateOfType<SplashViewState>();
+          if (splash != null) {
+            splash.checkAuthAndInitialize();
+          }
+        }
+        return;
+      }
+
+      // If not on splash, navigate to it
+      navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => const SplashView(),
+          settings: RouteSettings(name: SplashView.routeName),
         ),
         (route) => false,
       );

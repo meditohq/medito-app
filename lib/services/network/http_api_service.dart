@@ -253,6 +253,22 @@ class HttpApiService {
       throw const UnauthorizedError();
     }
 
+    // Check if user is already logged out before attempting token refresh
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn =
+          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+
+      if (!isLoggedIn) {
+        dev.log('[HTTP] Skipping token refresh - user not logged in');
+        await _addHttpDebugLog('User not logged in, skipping refresh attempt');
+        throw const UnauthorizedError();
+      }
+    } catch (e) {
+      dev.log('[HTTP] Error checking login state: $e');
+      // Continue with refresh attempt
+    }
+
     try {
       dev.log('Refreshing token through auth service...');
 
@@ -295,8 +311,13 @@ class HttpApiService {
       return content.isEmpty ? {} : _parseResponseContent(content);
     } catch (e) {
       dev.log('Token refresh failed', error: e);
+
+      // Safely truncate error message
+      var errorStr = e.toString();
+      var maxLength = errorStr.length < 200 ? errorStr.length : 200;
+
       await _addHttpDebugLog(
-          'Token refresh error: ${e.toString().substring(0, min(200, e.toString().length))}');
+          'Token refresh error: ${errorStr.substring(0, maxLength)}');
 
       // Only force logout for specific refresh token errors and only after multiple retries
       if (e is RefreshTokenError && _retryCount >= 3) {
@@ -314,7 +335,7 @@ class HttpApiService {
         dev.log(
             '[HTTP] Error during refresh but still have retries - not forcing logout yet');
         await _addHttpDebugLog(
-            'Error during refresh, will retry (attempt ${_retryCount + 1}/${maxBackgroundRetries})');
+            'Error during refresh, will retry (attempt ${_retryCount + 1}/$maxBackgroundRetries)');
       }
 
       // Rethrow the original error for proper error handling
@@ -324,16 +345,39 @@ class HttpApiService {
 
   Future<void> _forceLogout([String reason = 'Unknown reason']) async {
     dev.log('[HTTP] Force logout initiated: $reason');
-    _retryCount = 0;
-    _headers.remove(kAuthorizationHeader);
-    await StatsManager().clearAllStats();
 
-    // Add debug log for force logout
-    await _addHttpDebugLog(
-        'FORCE LOGOUT triggered by HttpApiService - Reason: $reason');
+    // Check if we're already logged out before proceeding
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn =
+          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
-    // Notify listeners that a force logout has occurred
-    _notifyAuthEvent(AuthEvent.forceLogout);
+      if (!isLoggedIn) {
+        dev.log('[HTTP] Skipping force logout as user is already logged out');
+        // Still clear local state just to be safe
+        _retryCount = 0;
+        _headers.remove(kAuthorizationHeader);
+        return;
+      }
+
+      // Proceed with logout flow
+      _retryCount = 0;
+      _headers.remove(kAuthorizationHeader);
+      await StatsManager().clearAllStats();
+
+      // Add debug log for force logout
+      await _addHttpDebugLog(
+          'FORCE LOGOUT triggered by HttpApiService - Reason: $reason');
+
+      // Notify listeners that a force logout has occurred
+      _notifyAuthEvent(AuthEvent.forceLogout);
+    } catch (e) {
+      // If there's an error checking login state, still try to clear auth data
+      dev.log(
+          '[HTTP] Error while checking login state during force logout: $e');
+      _retryCount = 0;
+      _headers.remove(kAuthorizationHeader);
+    }
   }
 
   // Store debug logs in shared preferences for debugging auth issues
@@ -368,10 +412,78 @@ class HttpApiService {
     }
   }
 
+  // Expose a diagnostic method to validate token refresh flow
+  Future<Map<String, dynamic>> diagnoseSecurity() async {
+    var diagnosticInfo = <String, dynamic>{
+      'timestamp': DateTime.now().toString(),
+      'has_auth_header': _headers.containsKey(kAuthorizationHeader),
+    };
+
+    if (_headers.containsKey(kAuthorizationHeader)) {
+      var token = _headers[kAuthorizationHeader]!;
+      diagnosticInfo['auth_header_prefix'] =
+          token.substring(0, min(20, token.length));
+    }
+
+    try {
+      // Check shared preferences for login state
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn =
+          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+      diagnosticInfo['is_logged_in'] = isLoggedIn;
+
+      // Check if refresh token exists by trying to get it
+      final refreshToken = await _authService.getStoredRefreshToken();
+      diagnosticInfo['refresh_token_exists'] = refreshToken != null;
+      if (refreshToken != null) {
+        diagnosticInfo['refresh_token_length'] = refreshToken.length;
+        diagnosticInfo['refresh_token_prefix'] =
+            refreshToken.substring(0, min(10, refreshToken.length));
+      }
+
+      // Log comprehensive diagnostic info
+      dev.log('[HTTP] Security diagnosis', error: diagnosticInfo);
+    } catch (e) {
+      diagnosticInfo['error'] = e.toString();
+      dev.log('[HTTP] Error during security diagnosis', error: {
+        'error': e.toString(),
+      });
+    }
+
+    return diagnosticInfo;
+  }
+
   // Helper method to refresh token through auth service
   Future<void> _refreshTokenThroughAuthService() async {
     // We cannot directly access the repository from here without making major changes
     // so we'll use the AuthService's refreshToken method directly
+    dev.log(
+        '[HTTP] Starting token refresh through auth service, instance #$_instanceId');
+    await _addHttpDebugLog('Beginning token refresh through auth service');
+
+    // Run diagnostic to track what's happening
+    try {
+      await diagnoseSecurity();
+    } catch (e) {
+      dev.log('[HTTP] Failed to run diagnostics', error: e);
+    }
+
+    // First check if user is already logged out
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn =
+          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+
+      if (!isLoggedIn) {
+        dev.log('[HTTP] User is not logged in, no need to refresh token');
+        await _addHttpDebugLog('User not logged in, skipping token refresh');
+        throw const RefreshTokenError();
+      }
+    } catch (e) {
+      dev.log('[HTTP] Error checking login state: $e');
+      // Continue anyway, as we'll check the refresh token next
+    }
+
     final refreshToken = await _authService.getStoredRefreshToken();
     if (refreshToken == null) {
       dev.log('[HTTP] No refresh token available - forcing logout');
@@ -380,7 +492,34 @@ class HttpApiService {
       throw const RefreshTokenError();
     }
 
-    final tokens = await _authService.refreshToken(refreshToken);
-    setAuthHeader(tokens.accessToken);
+    dev.log('[HTTP] Got refresh token, attempting to refresh', error: {
+      'token_length': refreshToken.length,
+      'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
+    });
+    await _addHttpDebugLog(
+        'Using refresh token of length ${refreshToken.length}');
+
+    try {
+      final tokens = await _authService.refreshToken(refreshToken);
+      dev.log('[HTTP] Token refresh successful, updating auth header', error: {
+        'access_token_length': tokens.accessToken.length,
+        'access_token_prefix':
+            tokens.accessToken.substring(0, min(10, tokens.accessToken.length)),
+        'instance': _instanceId,
+        'refresh_token_length': tokens.refreshToken.length,
+        'refresh_token_prefix': tokens.refreshToken
+            .substring(0, min(10, tokens.refreshToken.length)),
+      });
+      setAuthHeader(tokens.accessToken);
+      await _addHttpDebugLog('Auth header updated successfully with new token');
+    } catch (e) {
+      dev.log('[HTTP] Exception during token refresh', error: {
+        'error_type': e.runtimeType.toString(),
+        'error_message': e.toString(),
+        'instance': _instanceId,
+      });
+      await _addHttpDebugLog('Error refreshing token: ${e.runtimeType}');
+      rethrow;
+    }
   }
 }

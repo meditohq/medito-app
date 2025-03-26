@@ -109,7 +109,7 @@ class _DurationIndicatorWidgetState
     return Text(
       label,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: ColorConstants.graphite,
+            color: ColorConstants.white,
             fontFamily: dmMono,
             fontSize: 12,
           ),
@@ -120,7 +120,7 @@ class _DurationIndicatorWidgetState
 class CustomTrackShape extends RoundedRectSliderTrackShape {
   CustomTrackShape({this.addTopPadding = true});
 
-  final addTopPadding;
+  bool addTopPadding;
 
   @override
   Rect getPreferredRect({

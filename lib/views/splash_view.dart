@@ -82,10 +82,13 @@ class TopCurvedClipper extends CustomClipper<Path> {
 }
 
 class SplashView extends ConsumerStatefulWidget {
-  const SplashView({super.key});
+  const SplashView({Key? key}) : super(key: key);
+
+  // Static route name for navigation
+  static const routeName = 'SplashView';
 
   @override
-  ConsumerState<SplashView> createState() => SplashViewState();
+  SplashViewState createState() => SplashViewState();
 }
 
 class SplashViewState extends ConsumerState<SplashView>
@@ -162,7 +165,7 @@ class SplashViewState extends ConsumerState<SplashView>
     }
   }
 
-  Future<void> _checkAuthAndInitialize() async {
+  Future<void> checkAuthAndInitialize() async {
     var auth = ref.read(authRepositorySyncProvider);
 
     try {
@@ -209,6 +212,10 @@ class SplashViewState extends ConsumerState<SplashView>
         ),
       );
     }
+  }
+
+  Future<void> _checkAuthAndInitialize() async {
+    return checkAuthAndInitialize();
   }
 
   Future<void> _handleAnonymousSignIn() async {
