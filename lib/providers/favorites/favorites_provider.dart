@@ -9,29 +9,32 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
   @override
   AsyncValue<List<FavoriteItem>> build() {
     _repository = ref.read(favoritesRepositoryProvider);
-    _loadFavorites();
+    _loadInitialFavorites();
     return const AsyncValue.loading();
   }
 
-  Future<void> _loadFavorites() async {
-    try {
-      final favorites = await _repository.loadFavorites();
-      state = AsyncValue.data(favorites);
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-    }
+  void _loadInitialFavorites() {
+    Future.microtask(() async {
+      try {
+        final favorites = await _repository.loadFavorites();
+        state = AsyncValue.data(favorites);
+        await loadFavoritesFromServer();
+      } catch (e) {
+        state = AsyncValue.error(e, StackTrace.current);
+      }
+    });
   }
 
   Future<void> loadFavoritesFromServer() async {
+    if (state is AsyncLoading) return;
+
     try {
-      state = const AsyncValue.loading();
       final serverFavorites = await _repository.loadFavoritesFromServer();
       state = AsyncValue.data(serverFavorites);
       await _repository.saveFavorites(serverFavorites);
     } catch (e) {
-      // If server load fails, keep local favorites
       debugPrint('Failed to load favorites from server: $e');
-      state = AsyncValue.error(e, StackTrace.current);
+      // Keep current state if server load fails
     }
   }
 

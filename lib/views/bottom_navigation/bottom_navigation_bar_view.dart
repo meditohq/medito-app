@@ -45,9 +45,6 @@ class _BottomNavigationBarViewState
   }
 
   Future<void> _initializeStats() async {
-    unawaited(
-        ref.read(favoritesNotifierProvider.notifier).loadFavoritesFromServer());
-
     await ref.read(statsProvider.notifier).refresh();
     ref
         .read(streakFreezeSuggestionProvider.notifier)
