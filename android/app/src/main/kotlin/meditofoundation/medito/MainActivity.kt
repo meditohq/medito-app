@@ -14,12 +14,18 @@ import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugins.GeneratedPluginRegistrant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 
 @UnstableApi
 class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager {
 
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
+    private val activityJob = SupervisorJob()
+    private val activityScope = CoroutineScope(Dispatchers.Main + activityJob)
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         FlutterEngineCache
@@ -41,6 +47,11 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     override fun onResume() {
         super.onResume()
         checkAndSendCompletionData()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activityJob.cancel()
     }
 
     private fun createNotificationChannels() {
@@ -118,15 +129,14 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     }
 
     private fun checkAndSendCompletionData() {
-        CoroutineScope(Dispatchers.IO).launch {
+        activityScope.launch(Dispatchers.IO) {
             val completionData = SharedPreferencesManager.getCompletionData(this@MainActivity)
             if (completionData != null) {
                 try {
                     withContext(Dispatchers.Main) {
                         meditoAudioApi?.handleCompletedTrack(completionData) {
-                            // Clear the saved data after sending
                             if (it.isSuccess) {
-                                CoroutineScope(Dispatchers.IO).launch {
+                                activityScope.launch(Dispatchers.IO) {
                                     SharedPreferencesManager.clearCompletionData(this@MainActivity)
                                 }
                             }
