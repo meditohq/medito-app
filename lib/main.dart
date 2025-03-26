@@ -240,13 +240,17 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       _checkForFreezeUsage(ref);
     }
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: kDebugMode,
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey,
-      theme: appTheme(context),
-      title: ParentWidget._title,
-      home: SplashView(),
+    return MediaQuery.withClampedTextScaling(
+      minScaleFactor: 0.8,
+      maxScaleFactor: 1.5,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: kDebugMode,
+        scaffoldMessengerKey: scaffoldMessengerKey,
+        navigatorKey: navigatorKey,
+        theme: appTheme(context),
+        title: ParentWidget._title,
+        home: const SplashView(),
+      ),
     );
   }
 
