@@ -38,7 +38,6 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
       child: donationPage.when(
         loading: () => _buildLoadingWidget(),
         error: (err, _) {
-          debugPrint('Donation page error: $err');
           final error = err is AppError ? err : const UnknownError();
           return MeditoErrorWidget(
             error: error,
@@ -47,8 +46,6 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
           );
         },
         data: (DonationPageModel donationPageModel) {
-          debugPrint('Donation page data: ${donationPageModel.toString()}');
-
           return Column(
             children: [
               _isCheckingSubscription

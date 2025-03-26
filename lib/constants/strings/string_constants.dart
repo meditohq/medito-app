@@ -212,7 +212,7 @@ class StringConstants {
   static const String editStatsTitle = 'Edit stats';
 
   /// Title for the Medito on Telegram section in the Settings screen
-  static const String telegramTitle = 'Medito on Telegram';
+  static const String telegramTitle = 'Join our Telegram community';
 
   /// Title for the Donate section in the Settings screen
   static const String donateTitle = 'Donate';
@@ -365,7 +365,7 @@ class StringConstants {
   static const String carouselTitle = 'Featured';
   static const String quoteTitle = 'Daily Quote';
 
-  static const customization = 'Customization';
+  static const customization = 'Customisation';
   static const String customiseHomeLayout = 'Organize Home Layout';
 
   // Section Titles
