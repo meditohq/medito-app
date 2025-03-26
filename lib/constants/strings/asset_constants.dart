@@ -6,6 +6,6 @@ class AssetConstants {
   static const String onboardingImage2 = 'assets/images/relationships.png';
   static const String onboardingImage3 =
       'assets/images/palouse_mindfulness_small.png';
-  static const String splashBackground =
-      'assets/images/palouse_mindfulness_small.png';
+        static const String splashBackground =
+      'assets/images/splashbg.png';
 }

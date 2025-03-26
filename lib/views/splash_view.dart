@@ -23,64 +23,6 @@ const _carouselHeight = 200.0;
 const _dotSize = 8.0;
 const _activeDotSize = 12.0;
 
-class BottomRoundedClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.moveTo(0, 0);
-    path.lineTo(0, size.height - 30);
-    path.quadraticBezierTo(
-      size.width / 2,
-      size.height + 20,
-      size.width,
-      size.height - 30,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-class TopCurvedClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final waveHeight = 25.0;
-    final waveLength = size.width / 3; // Creates 3 full waves
-    final initialY = size.height * 0.2;
-
-    path.moveTo(0, initialY);
-
-    // Create continuous waves across full width
-    for (double x = 0; x < size.width; x += waveLength) {
-      final endX = x + waveLength;
-      final controlX = x + waveLength / 2;
-      // Alternate wave direction
-      final controlY =
-          initialY + ((x / waveLength) % 2 < 1 ? -waveHeight : waveHeight);
-
-      path.quadraticBezierTo(
-        controlX,
-        controlY,
-        endX > size.width ? size.width : endX, // Clamp to width
-        initialY,
-      );
-    }
-
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({Key? key}) : super(key: key);
 
@@ -287,18 +229,15 @@ class SplashViewState extends ConsumerState<SplashView>
                   return Stack(
                     children: [
                       Positioned(
-                        bottom: -50,
+                        bottom: 0,
                         left: 0,
                         right: 0,
-                        child: ClipPath(
-                          clipper: TopCurvedClipper(),
-                          child: SizedBox(
-                            height: 400,
-                            child: Image.asset(
-                              AssetConstants.placeholder,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.bottomCenter,
-                            ),
+                        child: SizedBox(
+                          height: 500,
+                          child: Image.asset(
+                            AssetConstants.splashBackground,
+                            fit: BoxFit.fitWidth,
+                            alignment: Alignment.bottomCenter,
                           ),
                         ),
                       ),
