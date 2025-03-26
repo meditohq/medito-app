@@ -35,21 +35,18 @@ class ArtistTitleWidget extends ConsumerWidget {
   }
 
   Widget _title(BuildContext context) {
-    return SizedBox(
-      height: titleHeight * 2, // Fixed height for title
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Text(
-            trackTitle ?? '',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-                  fontFamily: sourceSerif,
-                  color: ColorConstants.white,
-                  fontSize: trackTitleFontSize,
-                  letterSpacing: 0.2,
-                ),
-          ),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: Text(
+          trackTitle ?? '',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+                fontFamily: sourceSerif,
+                color: ColorConstants.white,
+                fontSize: trackTitleFontSize,
+                letterSpacing: 0.2,
+              ),
         ),
       ),
     );

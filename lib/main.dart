@@ -204,53 +204,74 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   Widget build(BuildContext context) {
     var connectionState = ref.watch(connectionNotifierProvider);
 
-    // Initialize auth state listener to handle navigation on force logout
-    ref.watch(authStateListenerProvider);
+    // Watch the auth repository's loading state
+    final authRepo = ref.watch(authRepositoryProvider);
 
-    // Listen for auth state events that require navigation
-    ref.listen<AsyncValue<AuthStateEvent>>(
-      authStateStreamProvider,
-      (_, state) => state.whenData((event) {
-        switch (event) {
-          case AuthStateEvent.forceLogout:
-            _handleForceLogout(context);
-            break;
-        }
-      }),
-    );
-
-    connectionState.whenData((state) {
-      if (state.status == InternetConnectionStatus.disconnected &&
-          state.shouldShowMessage &&
-          mounted) {
-        showSnackBar(
-          context,
-          StringConstants.noConnection,
-          actionLabel: StringConstants.goToDownloads,
-          onActionPressed: () {
-            handleNavigation(
-                TypeConstants.flow, [TypeConstants.downloads], context);
-          },
-        );
-      }
-    });
-
-    final featureFlags = ref.watch(featureFlagsProvider);
-    if (featureFlags.isStreakFreezeEnabled) {
-      _checkForFreezeUsage(ref);
-    }
-
-    return MediaQuery.withClampedTextScaling(
-      minScaleFactor: 0.8,
-      maxScaleFactor: 1.5,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: kDebugMode,
-        scaffoldMessengerKey: scaffoldMessengerKey,
-        navigatorKey: navigatorKey,
-        theme: appTheme(context),
-        title: ParentWidget._title,
-        home: const SplashView(),
+    return authRepo.when(
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
       ),
+      error: (error, stack) => MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text('Error initializing: $error'),
+          ),
+        ),
+      ),
+      data: (_) {
+        // Initialize auth state listener to handle navigation on force logout
+        ref.watch(authStateListenerProvider);
+
+        // Listen for auth state events that require navigation
+        ref.listen<AsyncValue<AuthStateEvent>>(
+          authStateStreamProvider,
+          (_, state) => state.whenData((event) {
+            switch (event) {
+              case AuthStateEvent.forceLogout:
+                _handleForceLogout(context);
+                break;
+            }
+          }),
+        );
+
+        connectionState.whenData((state) {
+          if (state.status == InternetConnectionStatus.disconnected &&
+              state.shouldShowMessage &&
+              mounted) {
+            showSnackBar(
+              context,
+              StringConstants.noConnection,
+              actionLabel: StringConstants.goToDownloads,
+              onActionPressed: () {
+                handleNavigation(
+                    TypeConstants.flow, [TypeConstants.downloads], context);
+              },
+            );
+          }
+        });
+
+        final featureFlags = ref.watch(featureFlagsProvider);
+        if (featureFlags.isStreakFreezeEnabled) {
+          _checkForFreezeUsage(ref);
+        }
+
+        return MediaQuery.withClampedTextScaling(
+          minScaleFactor: 0.8,
+          maxScaleFactor: 1.5,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: kDebugMode,
+            scaffoldMessengerKey: scaffoldMessengerKey,
+            navigatorKey: navigatorKey,
+            theme: appTheme(context),
+            title: ParentWidget._title,
+            home: const SplashView(),
+          ),
+        );
+      },
     );
   }
 

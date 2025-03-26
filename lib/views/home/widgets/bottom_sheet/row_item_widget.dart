@@ -62,24 +62,28 @@ class RowItemWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  icon,
-                  width16,
-                  Text.rich(
-                    TextSpan(
-                      style: const TextStyle(fontSize: 18.0),
-                      children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    icon,
+                    width16,
+                    Expanded(
+                      child: Text.rich(
                         TextSpan(
-                          text: title,
-                          style: titleStyle ??
-                              Theme.of(context).textTheme.labelMedium,
+                          style: const TextStyle(fontSize: 18.0),
+                          children: [
+                            TextSpan(
+                              text: title,
+                              style: titleStyle ??
+                                  Theme.of(context).textTheme.labelMedium,
+                            ),
+                            if (subTitle != null) _subtitle(context),
+                          ],
                         ),
-                        if (subTitle != null) _subtitle(context),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               if (isTrailingIcon && !isSwitch)
                 Icon(
