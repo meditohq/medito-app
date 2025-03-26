@@ -16,6 +16,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.os.HandlerThread
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -47,45 +48,60 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private var isCompletionHandled = false
     
     private val fadeOutDurationMillis = 10000
-    private val handler = Handler(Looper.getMainLooper())
+    private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
+    private val backgroundHandler = Handler(HandlerThread("AudioServiceBackground").apply { start() }.looper)
+    private var lastUpdateTime = 0L
+    private val UPDATE_INTERVAL = 1000L  // Increase update interval to 1 second
+
     private val positionUpdateRunnable = object : Runnable {
         override fun run() {
             try {
+                val currentTime = System.currentTimeMillis()
                 val currentPosition = primaryPlayer.currentPosition
                 val trackDuration = primaryPlayer.duration
 
                 applyBackgroundSoundVolume(trackDuration, currentPosition)
 
-                val state = PlaybackState(
-                    isPlaying = primaryPlayer.isPlaying,
-                    position = primaryPlayer.currentPosition,
-                    volume = (primaryPlayer.volume).toLong(),
-                    speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
-                    isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                    duration = primaryPlayer.duration,
-                    isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                    isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
-                    track = Track(
-                        id = primaryPlayer.currentMediaItem?.mediaId ?: "",
-                        title = primaryPlayer.currentMediaItem?.mediaMetadata?.title?.toString() ?: "",
-                        description = primaryPlayer.currentMediaItem?.mediaMetadata?.description?.toString() ?: "",
-                        imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri?.toString() ?: "",
-                        artist = primaryPlayer.currentMediaItem?.mediaMetadata?.artist?.toString() ?: "",
-                    ),
-                )
+                // Only send updates if enough time has passed or there's a state change
+                if (currentTime - lastUpdateTime >= UPDATE_INTERVAL || 
+                    primaryPlayer.playbackState == Player.STATE_ENDED ||
+                    primaryPlayer.playbackState == Player.STATE_BUFFERING) {
+                    
+                    lastUpdateTime = currentTime
+                    val state = PlaybackState(
+                        isPlaying = primaryPlayer.isPlaying,
+                        position = currentPosition,
+                        volume = (primaryPlayer.volume).toLong(),
+                        speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
+                        isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                        duration = trackDuration,
+                        isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                        isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
+                        track = Track(
+                            id = primaryPlayer.currentMediaItem?.mediaId ?: "",
+                            title = primaryPlayer.currentMediaItem?.mediaMetadata?.title?.toString() ?: "",
+                            description = primaryPlayer.currentMediaItem?.mediaMetadata?.description?.toString() ?: "",
+                            imageUrl = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri?.toString() ?: "",
+                            artist = primaryPlayer.currentMediaItem?.mediaMetadata?.artist?.toString() ?: "",
+                        ),
+                    )
 
-                meditoAudioApi?.updatePlaybackState(state) {
-                    if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
-                        isCompletionHandled = true
-                        handleTrackCompletion(state)
-                    } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
-                        handler.postDelayed(this, 250)
+                    withContext(Dispatchers.Main) {
+                        meditoAudioApi?.updatePlaybackState(state) {
+                            if (primaryPlayer.playbackState == Player.STATE_ENDED && !isCompletionHandled) {
+                                isCompletionHandled = true
+                                handleTrackCompletion(state)
+                            } else if (primaryPlayer.playbackState != Player.STATE_ENDED) {
+                                backgroundHandler.postDelayed(this@Runnable, UPDATE_INTERVAL)
+                            }
+                        }
                     }
+                } else {
+                    backgroundHandler.postDelayed(this, UPDATE_INTERVAL)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                // Ensure we reschedule even if there's an error
-                handler.postDelayed(this, 250)
+                backgroundHandler.postDelayed(this, UPDATE_INTERVAL)
             }
         }
 
@@ -175,7 +191,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryPlayer.release()
         backgroundMusicPlayer.release()
 
-        handler.removeCallbacks(positionUpdateRunnable)
+        backgroundHandler.removeCallbacks(positionUpdateRunnable)
 
         primaryPlayer.removeListener(this)
         backgroundMusicPlayer.removeListener(this)
@@ -198,7 +214,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        handler.removeCallbacks(positionUpdateRunnable)
+        backgroundHandler.removeCallbacks(positionUpdateRunnable)
         clearNotification()
         this.primaryPlayer.stop()
         this.backgroundMusicPlayer.stop()
@@ -280,7 +296,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             notification
         )
 
-        handler.postDelayed(positionUpdateRunnable, 500)
+        backgroundHandler.postDelayed(positionUpdateRunnable, 500)
 
         playBackgroundSound()
         updateNotification()
@@ -289,30 +305,35 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     private fun updateNotification() {
-        // Then load artwork asynchronously
-        CoroutineScope(Dispatchers.Main).launch {
-            val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
-            val artworkBitmap = withContext(Dispatchers.IO) {
-                artworkUri?.let { downloadBitmap(it) }
-            }
-            // Only update if artwork was loaded successfully
-            if (artworkBitmap != null) {
-                notification = createMediaNotification(artworkBitmap)
-                try {
-                    NotificationUtil.setNotification(
-                        this@AudioPlayerService,
-                        NOTIFICATION_ID,
-                        notification
-                    )
-                } catch (e: Exception) {
-                    e.printStackTrace()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val artworkUri = primaryPlayer.currentMediaItem?.mediaMetadata?.artworkUri
+                val artworkBitmap = artworkUri?.let { downloadBitmap(it) }
+                
+                // Create notification on IO thread
+                val newNotification = createMediaNotification(artworkBitmap)
+                
+                // Only switch to main thread for the final notification update
+                withContext(Dispatchers.Main) {
+                    notification = newNotification
+                    try {
+                        NotificationUtil.setNotification(
+                            this@AudioPlayerService,
+                            NOTIFICATION_ID,
+                            notification
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
     private fun createMediaNotification(artworkBitmap: Bitmap?): Notification {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(primaryPlayer.currentMediaItem?.mediaMetadata?.title ?: "Medito")
             .setContentText(primaryPlayer.currentMediaItem?.mediaMetadata?.artist ?: "Medito")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -322,13 +343,12 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setOngoing(true)
-            
-        // Only set the media style if primaryMediaSession is not null
-        primaryMediaSession?.let {
-            builder.setStyle(MediaStyleNotificationHelper.MediaStyle(it))
-        }
-            
-        return builder.build()
+            .apply {
+                primaryMediaSession?.let {
+                    setStyle(MediaStyleNotificationHelper.MediaStyle(it))
+                }
+            }
+            .build()
     }
 
     private suspend fun downloadBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {

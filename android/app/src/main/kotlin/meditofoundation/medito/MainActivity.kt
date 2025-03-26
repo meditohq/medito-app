@@ -12,6 +12,9 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugins.GeneratedPluginRegistrant
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @UnstableApi
 class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager {
@@ -115,17 +118,23 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     }
 
     private fun checkAndSendCompletionData() {
-        val completionData = SharedPreferencesManager.getCompletionData(this)
-        if (completionData != null) {
-            try {
-                meditoAudioApi?.handleCompletedTrack(completionData) {
-                    // Clear the saved data after sending
-                    if (it.isSuccess) {
-                        SharedPreferencesManager.clearCompletionData(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            val completionData = SharedPreferencesManager.getCompletionData(this@MainActivity)
+            if (completionData != null) {
+                try {
+                    withContext(Dispatchers.Main) {
+                        meditoAudioApi?.handleCompletedTrack(completionData) {
+                            // Clear the saved data after sending
+                            if (it.isSuccess) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    SharedPreferencesManager.clearCompletionData(this@MainActivity)
+                                }
+                            }
+                        }
                     }
+                } catch (e: Exception) {
+                    println("Error parsing completion data: ${e.message}")
                 }
-            } catch (e: Exception) {
-                println("Error parsing completion data: ${e.message}")
             }
         }
     }
