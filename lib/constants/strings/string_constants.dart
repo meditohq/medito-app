@@ -625,4 +625,6 @@ class StringConstants {
       'Medito uses anonymous analytics to help us understand how the app is used and improve your experience. You can disable this if you prefer.';
   static const String analyticsEnabled = 'Analytics enabled';
   static const String analyticsDisabled = 'Analytics disabled';
+
+  static const String shopTitle = 'Shop';
 }

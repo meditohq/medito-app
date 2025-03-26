@@ -109,6 +109,15 @@ class SettingsScreen extends ConsumerWidget {
         path: RouteConstants.donation,
       ),
       SettingsItem(
+        section: StringConstants.supportCommunity,
+        type: TypeConstants.url,
+        title: StringConstants.shopTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedShoppingBag01,
+            color: ColorConstants.white),
+        path: 'https://shop.medito.app',
+      ),
+      SettingsItem(
         section: StringConstants.helpLegal,
         type: TypeConstants.url,
         title: StringConstants.faqTitle,
