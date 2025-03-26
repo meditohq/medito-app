@@ -4,7 +4,7 @@ description: A meditation learning tool
 # flutter clean && flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
 # cd android && bundle exec fastlane beta
 # flutter clean && flutter build ios --release --dart-define-from-file=../.prod.json
-version: 3.4.0+30088
+version: 3.4.1+30089
 
 
 environment:
@@ -68,6 +68,7 @@ dev_dependencies:
   mockito: ^5.4.4
   analyzer: ^6.7.0
   json_annotation: ^4.9.0
+  device_preview: ^1.1.0
 
 flutter:
   assets:
