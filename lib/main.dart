@@ -26,6 +26,8 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/tiktok_events_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:medito/config/debug_options.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -39,13 +41,23 @@ void main() async {
   _hasInitialized = true;
 
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeApp();
-  await _runApp();
-}
 
-Future<void> initializeApp() async {
   await initializeAudioService();
   usePathUrlStrategy();
+
+  var prefs = await initializeSharedPreferences();
+
+  runApp(
+    DevicePreview(
+      enabled: DebugOptions.enableDevicePreview,
+      builder: (context) => ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: const ParentWidget(),
+      ),
+    ),
+  );
 }
 
 void setupAudioCallback() {
@@ -64,18 +76,6 @@ Future<void> initializeAudioService() async {
   } else if (Platform.isAndroid) {
     setupAudioCallback();
   }
-}
-
-Future<void> _runApp() async {
-  var prefs = await initializeSharedPreferences();
-  runApp(
-    ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
-      child: const ParentWidget(),
-    ),
-  );
 }
 
 class ParentWidget extends ConsumerStatefulWidget {
