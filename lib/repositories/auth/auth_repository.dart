@@ -236,6 +236,7 @@ class AuthRepositoryImpl extends AuthRepository {
       // Update user info
       _currentUser = User(
         id: _tokens!.clientId,
+        email: _tokens!.email,
       );
 
       // Update HTTP service with the new token
