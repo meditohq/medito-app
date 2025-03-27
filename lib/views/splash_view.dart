@@ -9,6 +9,7 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -176,6 +177,63 @@ class SplashViewState extends ConsumerState<SplashView>
           builder: (context) => const OnboardingPagerScreen(),
         ),
       );
+    } on EmailExistsException catch (_) {
+      if (!mounted) return;
+
+      final shouldUseExistingAccount = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          backgroundColor: ColorConstants.ebony,
+          title: Text(
+            StringConstants.emailExistsDialogTitle,
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Text(
+            StringConstants.emailExistsDialogMessage,
+            style: const TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                StringConstants.emailExistsContinueNewAccount,
+                style: const TextStyle(color: ColorConstants.brightSky),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                StringConstants.emailExistsSignInWithEmail,
+                style: const TextStyle(color: ColorConstants.lightPurple),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (!mounted) return;
+
+      if (shouldUseExistingAccount == true) {
+        await Navigator.of(context)
+            .push(
+          MaterialPageRoute(
+            builder: (context) => const SignUpLogInPage(),
+          ),
+        )
+            .then((value) {
+          if (value == true) {
+            _checkAuthAndInitialize();
+          }
+        });
+      } else {
+        // User wants to continue with a new account
+        // Clear the stored client ID so a new one will be generated
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(SharedPreferenceConstants.userId);
+        // Try signing in anonymously again
+        await _handleAnonymousSignIn();
+      }
     } catch (e) {
       dev.log('Failed to initialize user', error: e);
       if (!mounted) return;

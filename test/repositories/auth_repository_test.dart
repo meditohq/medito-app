@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
@@ -228,6 +229,30 @@ void main() {
           SharedPreferenceConstants.isLoggedIn, true)).called(1);
     });
 
+    test(
+        'signInAnonymously throws EmailExistsException when API returns email exists error',
+        () async {
+      // Setup
+      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
+          .thenReturn(clientId);
+      when(() =>
+          mockAuthApiService.signIn(
+              clientId: clientId)).thenThrow(const EmailExistsException(
+          'Cannot sign in anonymously with a client ID that has an email associated with it'));
+
+      // Action & Assert
+      expect(
+        () => authRepository.signInAnonymously(),
+        throwsA(isA<EmailExistsException>()),
+      );
+
+      // Verify API was called but no tokens were stored
+      verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
+      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+      verifyNever(() =>
+          mockPreferences.setBool(SharedPreferenceConstants.isLoggedIn, true));
+    });
+
     test('verifyOtp calls API service and stores tokens', () async {
       // Setup
       const email = 'test@example.com';
@@ -290,11 +315,9 @@ void main() {
       verify(() => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn, false)).called(1);
     });
-
     test('initiateUser creates client ID with expected format', () async {
       // Setup
-      final dateStr =
-          DateTime.now().toString().substring(0, 10).replaceAll('-', '');
+      final dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
       when(() => mockUuid.v6()).thenReturn('test-uuid-value-123');
       when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
           .thenReturn(null);

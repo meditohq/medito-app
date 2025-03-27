@@ -42,51 +42,62 @@ class SecureStorageService {
   }
 
   Future<String?> getRefreshToken() async {
-    return _retrySecureOperation(() async {
-      final token = await _storage.read(key: _refreshTokenKey);
-      if (token != null) {
-        dev.log('[SECURE_STORAGE] Refresh token found', error: {
-          'token_length': token.length,
-          'token_prefix': token.substring(0, min(10, token.length)),
-          'timestamp': DateTime.now().toString(),
-        });
-      } else {
-        dev.log('[SECURE_STORAGE] Refresh token not found');
-        // Log secure storage diagnostics if possible
-        try {
-          final allItems = await _storage.storage.readAll();
-          dev.log('[SECURE_STORAGE] Storage diagnostic', error: {
-            'has_items': allItems.isNotEmpty,
-            'item_count': allItems.length,
-            'has_refresh_token_key': allItems.containsKey(_refreshTokenKey),
+    try {
+      return await _retrySecureOperation(() async {
+        final token = await _storage.read(key: _refreshTokenKey);
+        if (token != null) {
+          dev.log('[SECURE_STORAGE] Refresh token found', error: {
+            'token_length': token.length,
+            'token_prefix': token.substring(0, min(10, token.length)),
+            'timestamp': DateTime.now().toString(),
           });
-        } catch (e) {
-          if (e.toString().contains('-25308') ||
-              e.toString().contains('User interaction is not allowed')) {
-            // iOS security error - user interaction required but not available
-            dev.log(
-                '[SECURE_STORAGE] iOS security restriction - will retry when app is active',
-                error: e);
-          } else {
-            dev.log('[SECURE_STORAGE] Unable to get diagnostic info', error: e);
+        } else {
+          dev.log('[SECURE_STORAGE] Refresh token not found');
+          // Log secure storage diagnostics if possible
+          try {
+            final allItems = await _storage.storage.readAll();
+            dev.log('[SECURE_STORAGE] Storage diagnostic', error: {
+              'has_items': allItems.isNotEmpty,
+              'item_count': allItems.length,
+              'has_refresh_token_key': allItems.containsKey(_refreshTokenKey),
+            });
+          } catch (e) {
+            if (e.toString().contains('-25308') ||
+                e.toString().contains('User interaction is not allowed')) {
+              // iOS security error - user interaction required but not available
+              dev.log(
+                  '[SECURE_STORAGE] iOS security restriction - will retry when app is active',
+                  error: e);
+            } else {
+              dev.log('[SECURE_STORAGE] Unable to get diagnostic info',
+                  error: e);
+            }
           }
         }
-      }
-      return token;
-    });
+        return token;
+      });
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error retrieving refresh token', error: e);
+      return null;
+    }
   }
 
   Future<void> clearRefreshToken() async {
-    await _retrySecureOperation(() async {
-      await _storage.delete(key: _refreshTokenKey);
-      var stackTrace = StackTrace.current.toString();
-      var maxLength = stackTrace.length < 500 ? stackTrace.length : 500;
+    try {
+      await _retrySecureOperation(() async {
+        await _storage.delete(key: _refreshTokenKey);
+        var stackTrace = StackTrace.current.toString();
+        var maxLength = stackTrace.length < 500 ? stackTrace.length : 500;
 
-      dev.log('[SECURE_STORAGE] Refresh token cleared', error: {
-        'timestamp': DateTime.now().toString(),
-        'reason': stackTrace.substring(0, maxLength),
+        dev.log('[SECURE_STORAGE] Refresh token cleared', error: {
+          'timestamp': DateTime.now().toString(),
+          'reason': stackTrace.substring(0, maxLength),
+        });
       });
-    });
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error clearing refresh token', error: e);
+      // Silently handle the error
+    }
   }
 
   /// Helper method to retry secure storage operations with exponential backoff

@@ -10,6 +10,15 @@ import 'dart:developer' as dev;
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 
+class EmailExistsForClientIdException implements Exception {
+  final String email;
+
+  const EmailExistsForClientIdException(this.email);
+
+  @override
+  String toString() => 'Email exists for client ID: $email';
+}
+
 class User {
   final String id;
   final String? email;
@@ -233,10 +242,14 @@ class AuthRepositoryImpl extends AuthRepository {
         clientId: clientId,
       );
 
+      // If the response contains an email, this means the client ID is associated with an email account
+      if (_tokens!.email != null && _tokens!.email!.isNotEmpty) {
+        throw EmailExistsForClientIdException(_tokens!.email!);
+      }
+
       // Update user info
       _currentUser = User(
         id: _tokens!.clientId,
-        email: _tokens!.email,
       );
 
       // Update HTTP service with the new token
@@ -280,7 +293,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   // Generate a client ID using date + random string
   String _generateClientId() {
-    var dateStr = DateFormat('yyyyMMdd').format(DateTime.now());
+    var dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
     var randomStr = _uuid.v6().split('-')[0]; // Use first part of UUID
     return '$dateStr-$randomStr';
   }

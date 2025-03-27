@@ -76,6 +76,13 @@ class StatsService {
 
     dev.log('StatsService: Attempting to fetch stats');
 
+    // Check if user is logged in before syncing
+    var isLoggedIn = _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+    if (!isLoggedIn) {
+      dev.log('StatsService: User not logged in, skipping stats fetch');
+      return LocalAllStats.empty();
+    }
+
     var now = DateTime.now().millisecondsSinceEpoch;
     await _prefs.setInt(_lastSyncKey, now);
 
@@ -89,6 +96,13 @@ class StatsService {
     if (useMockBackend) {
       await MockStatsBackend.saveStats(stats);
       dev.log('MockStatsService: Saved stats locally');
+      return;
+    }
+
+    // Check if user is logged in before syncing
+    var isLoggedIn = _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+    if (!isLoggedIn) {
+      dev.log('StatsService: User not logged in, skipping stats post');
       return;
     }
 

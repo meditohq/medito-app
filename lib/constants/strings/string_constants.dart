@@ -627,4 +627,11 @@ class StringConstants {
   static const String analyticsDisabled = 'Analytics disabled';
 
   static const String shopTitle = 'Shop';
+
+  // Email exists dialog - shown when trying to sign in anonymously with a client ID that has an email associated
+  static const emailExistsDialogTitle = 'Existing Account Found';
+  static const emailExistsDialogMessage =
+      'Looks like you have signed in with an email address before. Would you like to sign in with your email address again?';
+  static const emailExistsContinueNewAccount = 'Continue with New Account';
+  static const emailExistsSignInWithEmail = 'Sign in with Email';
 }

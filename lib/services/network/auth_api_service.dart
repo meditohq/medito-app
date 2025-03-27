@@ -9,6 +9,14 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
 
+class EmailExistsException implements Exception {
+  final String message;
+  const EmailExistsException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
 }
@@ -271,6 +279,8 @@ class AuthApiService {
         'duration': e.duration?.toString(),
       });
       throw const TimeoutError();
+    } on EmailExistsException {
+      rethrow;
     } catch (e) {
       dev.log('[AUTH] Unexpected error', error: {
         'error': e.toString(),
@@ -283,12 +293,19 @@ class AuthApiService {
   AppError _handleErrorResponse(int statusCode, [String? content]) {
     dev.log('HTTP Error $statusCode', level: 900);
 
-    try {
-      // If content is available, parse it to see if we have specific error information
-      if (content != null && content.isNotEmpty) {
+    // If content is available, parse it to see if we have specific error information
+    if (content != null && content.isNotEmpty) {
+      try {
         final Map<String, dynamic> errorData =
             jsonDecode(content) as Map<String, dynamic>;
         final String? errorMessage = errorData['error'] as String?;
+        final String? errorCode = errorData['code'] as String?;
+
+        if (errorCode == 'EMAIL_ASSOCIATED' &&
+            statusCode == HttpStatus.forbidden) {
+          throw EmailExistsException(
+              errorMessage ?? 'Email exists for this account');
+        }
 
         if (errorMessage != null) {
           if (errorMessage.contains('Invalid refresh token') ||
@@ -297,10 +314,14 @@ class AuthApiService {
             return const RefreshTokenError();
           }
         }
+      } catch (e) {
+        // If the error is our custom exception, rethrow it
+        if (e is EmailExistsException) {
+          throw e;
+        }
+        // Otherwise log parsing error and continue with default handling
+        dev.log('[AUTH] Error parsing error response', error: e);
       }
-    } catch (e) {
-      // If parsing fails, fall back to the default error handling
-      dev.log('[AUTH] Error parsing error response', error: e);
     }
 
     return switch (statusCode) {
