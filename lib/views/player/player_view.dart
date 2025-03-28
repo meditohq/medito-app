@@ -212,10 +212,17 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void onPlayPausePressed() {
     final isPlaying = ref.read(audioStateProvider).isPlaying;
+
+    // Control primary track
     ref.read(playerProvider.notifier).playPause();
-    ref
-        .read(backgroundSoundsNotifierProvider.notifier)
-        .togglePlayPause(isPlaying);
+
+    // For iOS, we need to explicitly toggle background sound too
+    // Android will handle it in the native implementation
+    if (Platform.isIOS) {
+      ref
+          .read(backgroundSoundsNotifierProvider.notifier)
+          .togglePlayPause(isPlaying);
+    }
   }
 
   bool _isBackgroundSoundSelected() {

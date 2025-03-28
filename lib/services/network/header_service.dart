@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/services/network/http_api_service.dart';
 
@@ -28,7 +29,7 @@ class HeaderService {
       }
     } catch (e) {
       // Handle error but continue execution
-      print('Error getting FCM token: $e');
+      debugPrint('Error getting FCM token: $e');
     } finally {
       _updateHeaders();
     }

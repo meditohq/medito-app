@@ -29,6 +29,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     required TrackModel trackModel,
     required TrackFilesModel file,
   }) async {
+    debugPrint('🔊 Loading track: \\${trackModel.title}, fileId: \\${file.id}');
     var track = trackModel.customCopyWith();
     var audios = [...track.audio];
 
@@ -40,6 +41,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
             .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
       }
     }
+
+    debugPrint(
+        '🔊 Selected track: \\${track.title}, audio count: \\${track.audio.length}');
 
     await _playTrack(
       ref,
@@ -55,9 +59,15 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     TrackModel track,
     TrackFilesModel file,
   ) async {
+    debugPrint(
+        '🔊 _playTrack called for track: \\${track.id}, file: \\${file.id}');
     var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
           _constructFileName(track, file),
         );
+
+    debugPrint(
+        '🔊 Download path: \\${downloadPath ?? 'null'}, file path: \\${file.path}');
+    debugPrint('🔊 Will use path: \\${downloadPath ?? file.path}');
 
     var trackData = Track(
       id: track.id,
@@ -69,31 +79,104 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
 
     if (Platform.isAndroid) {
-      // Start the service and wait for it to initialize
-      await _androidServiceApi.startService();
-      await Future.delayed(const Duration(milliseconds: 500));
-
+      debugPrint('🔊 On Android - starting service and checking readiness');
       try {
-        await _api.playAudio(
-          AudioData(
-            url: downloadPath ?? file.path,
-            track: trackData,
-          ),
-        );
+        // Start service and wait for readiness
+        await _androidServiceApi.startService();
+        debugPrint('🔊 Service start requested, now checking readiness');
+
+        // Wait for service to be ready with timeout
+        final isReady = await _waitForServiceReadiness();
+
+        if (isReady) {
+          debugPrint('🔊 Service is ready, proceeding with playback');
+          await _playAudioWithRetry(downloadPath ?? file.path, trackData);
+        } else {
+          debugPrint(
+              '❌ Service failed to become ready, falling back to retry mechanism');
+          // Fall back to our retry mechanism
+          await Future.delayed(const Duration(milliseconds: 1000));
+          await _playAudioWithRetry(downloadPath ?? file.path, trackData);
+        }
       } catch (e) {
-        debugPrint('Error playing audio: $e');
-        // If playback fails, try once more after a delay
-        await Future.delayed(const Duration(milliseconds: 500));
-        await _api.playAudio(
-          AudioData(
-            url: downloadPath ?? file.path,
-            track: trackData,
-          ),
-        );
+        debugPrint(
+            '❌ Fatal error starting service or playing audio: \\${e.toString()}');
       }
     } else {
-      await iosAudioHandler.setUrl(downloadPath, file, trackData);
-      await iosAudioHandler.play();
+      debugPrint('🔊 On iOS - setting up audio');
+      try {
+        await iosAudioHandler.setUrl(downloadPath, file, trackData);
+        debugPrint('🔊 iOS setUrl succeeded');
+        await iosAudioHandler.play();
+        debugPrint('🔊 iOS play() called');
+      } catch (e) {
+        debugPrint('❌ Error playing audio on iOS: \\${e.toString()}');
+      }
+    }
+  }
+
+  // Wait for the service to become ready with timeout
+  Future<bool> _waitForServiceReadiness() async {
+    const maxAttempts = 5;
+    const initialDelayMs = 200;
+
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        debugPrint('🔊 Checking if service is ready (attempt ${attempt + 1})');
+
+        final isReady = await _androidServiceApi.isServiceReady();
+
+        if (isReady) {
+          debugPrint('🔊 Service is ready');
+          return true;
+        } else {
+          debugPrint('🔊 Service not ready yet, waiting...');
+          final delayMs = initialDelayMs * (1 << attempt);
+          await Future.delayed(Duration(milliseconds: delayMs));
+        }
+      } catch (e) {
+        debugPrint(
+            '❌ Error checking service readiness (attempt ${attempt + 1}): $e');
+        final delayMs = initialDelayMs * (1 << attempt);
+        await Future.delayed(Duration(milliseconds: delayMs));
+      }
+    }
+
+    debugPrint('❌ Service readiness check timed out');
+    return false;
+  }
+
+  // Retry playing audio with exponential backoff
+  Future<void> _playAudioWithRetry(String url, Track trackData) async {
+    const maxAttempts = 3;
+    const initialDelayMs = 300;
+
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        debugPrint(
+            '🔊 Calling playAudio with url: $url (attempt ${attempt + 1})');
+
+        await _api.playAudio(
+          AudioData(
+            url: url,
+            track: trackData,
+          ),
+        );
+
+        debugPrint('🔊 playAudio call succeeded');
+        return; // Success
+      } catch (e) {
+        debugPrint('❌ Error playing audio (attempt ${attempt + 1}): $e');
+
+        if (attempt < maxAttempts - 1) {
+          // Calculate backoff delay
+          final delayMs = initialDelayMs * (1 << attempt);
+          debugPrint('🔊 Retrying playAudio in ${delayMs}ms...');
+          await Future.delayed(Duration(milliseconds: delayMs));
+        } else {
+          rethrow; // Rethrow on final attempt
+        }
+      }
     }
   }
 

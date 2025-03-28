@@ -7,7 +7,7 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/src/audio_pigeon.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-  'android/app/src/main/kotlin/meditofoundation/medito/AudioPigeon.g.kt',
+      'android/app/src/main/kotlin/meditofoundation/medito/AudioPigeon.g.kt',
   kotlinOptions: KotlinOptions(),
 ))
 // #enddocregion config
@@ -27,6 +27,9 @@ class AudioData {
 @HostApi()
 abstract class MeditoAndroidAudioServiceManager {
   void startService();
+
+  @async
+  bool isServiceReady();
 }
 
 @HostApi()
@@ -54,7 +57,6 @@ abstract class MeditoAudioServiceApi {
   void playBackgroundSound();
 
   void pauseBackgroundSound();
-
 }
 
 // #enddocregion host-definitions
@@ -118,7 +120,6 @@ class Track {
     required this.artist,
     this.artistUrl,
   });
-
 }
 
 class CompletionData {

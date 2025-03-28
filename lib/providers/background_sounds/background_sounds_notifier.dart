@@ -55,14 +55,18 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   BackgroundSoundsNotifier(this.ref);
 
   void handleOnChangeVolume(double vol) {
+    debugPrint('🔊 BG Sound: Changing volume to $vol');
     ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
     volume = vol;
 
     var scaledVol = scaledVolume(vol);
+    debugPrint('🔊 BG Sound: Scaled volume: $scaledVol');
 
     if (Platform.isAndroid) {
+      debugPrint('🔊 BG Sound: Setting Android background sound volume');
       _api.setBackgroundSoundVolume(scaledVol);
     } else {
+      debugPrint('🔊 BG Sound: Setting iOS background sound volume');
       iosBackgroundPlayer.setVolume(scaledVol);
     }
 
@@ -70,6 +74,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void handleOnChangeSound(BackgroundSoundsModel? sound) {
+    debugPrint('🔊 BG Sound: Changing sound to: ${sound?.title}');
     selectedBgSound = sound;
     var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
 
@@ -79,9 +84,11 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
       if (sound.title != StringConstants.none) {
         var fileName = '${sound.title}.mp3';
+        debugPrint('🔊 BG Sound: File name: $fileName');
         final downloadAudio = ref.read(downloaderRepositoryProvider);
         downloadAudio.getDownloadedFile(fileName).then((url) {
           if (url == null) {
+            debugPrint('🔊 BG Sound: File not downloaded, downloading now');
             downloadingBgSound = sound;
             notifyListeners();
             downloadAudio
@@ -89,15 +96,24 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
                   sound.path,
                   fileName: fileName,
                 )
-                .then((_) => downloadingBgSound = null)
-                .then((_) => _play(selectedBgSound?.path))
+                .then((_) {
+                  debugPrint('🔊 BG Sound: Download completed');
+                  downloadingBgSound = null;
+                })
+                .then((_) => downloadAudio.getDownloadedFile(fileName))
+                .then((path) {
+                  debugPrint('🔊 BG Sound: Downloaded file path: $path');
+                  return _play(path);
+                })
                 .then((_) => notifyListeners());
           } else {
+            debugPrint('🔊 BG Sound: File already downloaded at: $url');
             _play(url);
           }
         });
       }
     } else {
+      debugPrint('🔊 BG Sound: Stopping background sound');
       stopBackgroundSound();
     }
     notifyListeners();
@@ -105,6 +121,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   Future<void> _play(String? uri) async {
     if (uri == null) {
+      debugPrint('❌ BG Sound: URI is null, cannot play');
       if (Platform.isAndroid) {
         unawaited(_api.stopBackgroundSound());
       } else {
@@ -114,44 +131,71 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
       return;
     }
 
+    debugPrint('🔊 BG Sound: Playing sound with URI: $uri');
     getVolumeFromPref();
 
     var parsedUri = Uri.parse(uri);
     var isUrl = ['http', 'https'].contains(parsedUri.scheme);
+    debugPrint('🔊 BG Sound: Is URL: $isUrl');
 
     if (Platform.isAndroid) {
-      if (isUrl) {
-        await _api.setBackgroundSound(uri);
-      } else {
-        await _api.setBackgroundSound('file://$uri');
+      try {
+        // First clear any existing background sound
+        debugPrint('🔊 BG Sound: Clearing previous background sound');
+        await _api.setBackgroundSound(null);
+        await _api.stopBackgroundSound();
+
+        // Set new background sound
+        var formattedUri = isUrl ? uri : 'file://$uri';
+        debugPrint(
+            '🔊 BG Sound: Setting Android background sound: $formattedUri');
+        await _api.setBackgroundSound(formattedUri);
+
+        // Play the background sound
+        debugPrint('🔊 BG Sound: Starting background playback');
+        await _api.playBackgroundSound();
+      } catch (e, s) {
+        debugPrint('❌ BG Sound: Error playing Android background sound: $e');
+        debugPrintStack(stackTrace: s);
       }
-      unawaited(_api.playBackgroundSound());
     } else {
       try {
         if (isUrl) {
+          debugPrint('🔊 BG Sound: Setting iOS background sound with URL');
           await iosBackgroundPlayer.setUrl(uri);
         } else {
+          debugPrint(
+              '🔊 BG Sound: Setting iOS background sound with file path');
           await iosBackgroundPlayer.setFilePath(uri);
         }
+        debugPrint('🔊 BG Sound: Playing iOS background sound');
+        unawaited(iosBackgroundPlayer.play());
+        _handleFadeAtEndForIos();
       } catch (e, s) {
-          debugPrintStack(stackTrace: s);
+        debugPrint('❌ BG Sound: Error playing iOS background sound: $e');
+        debugPrintStack(stackTrace: s);
       }
-      unawaited(iosBackgroundPlayer.play());
-      _handleFadeAtEndForIos();
     }
   }
 
-  void togglePlayPause(isPlaying) {
+  void togglePlayPause(bool isPlaying) {
+    debugPrint(
+        '🔊 BG Sound: Toggling background sound play/pause, current isPlaying: $isPlaying');
+
     if (Platform.isAndroid) {
       if (isPlaying) {
+        debugPrint('🔊 BG Sound: Pausing Android background sound only');
         _api.pauseBackgroundSound();
       } else {
+        debugPrint('🔊 BG Sound: Playing Android background sound only');
         _api.playBackgroundSound();
       }
     } else {
       if (isPlaying) {
+        debugPrint('🔊 BG Sound: Pausing iOS background sound only');
         iosBackgroundPlayer.pause();
       } else {
+        debugPrint('🔊 BG Sound: Playing iOS background sound only');
         iosBackgroundPlayer.play();
       }
     }
@@ -159,6 +203,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void stopBackgroundSound() {
+    debugPrint('🔊 BG Sound: Stopping background sound');
     if (Platform.isAndroid) {
       _api.setBackgroundSound(null);
       _api.stopBackgroundSound();

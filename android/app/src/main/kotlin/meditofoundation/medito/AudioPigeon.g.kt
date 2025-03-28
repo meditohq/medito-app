@@ -285,9 +285,11 @@ private open class AudioPigeonPigeonCodec : StandardMessageCodec() {
   }
 }
 
+
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface MeditoAndroidAudioServiceManager {
   fun startService()
+  fun isServiceReady(callback: (Result<Boolean>) -> Unit)
 
   companion object {
     /** The codec used by MeditoAndroidAudioServiceManager. */
@@ -309,6 +311,24 @@ interface MeditoAndroidAudioServiceManager {
               wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.MeditoAndroidAudioServiceManager.isServiceReady$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.isServiceReady{ result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
           }
         } else {
           channel.setMessageHandler(null)

@@ -74,6 +74,8 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+        
+        println("Created audio service notification channel with ID: ${AudioPlayerService.CHANNEL_ID}")
     }
 
     private fun createNewsNotificationChannel() {
@@ -125,6 +127,63 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
             startForegroundService(intent)
         } else {
             startService(intent)
+        }
+
+        // Log successful service start attempt
+        println("🔊 Service start requested")
+    }
+
+    override fun isServiceReady(callback: (Result<Boolean>) -> Unit) {
+        val intent = Intent(this, AudioPlayerService::class.java)
+        intent.action = AudioPlayerService.ACTION_BIND_SERVICE
+        val serviceConnection = object : android.content.ServiceConnection {
+            override fun onServiceConnected(name: android.content.ComponentName?, service: android.os.IBinder?) {
+                try {
+                    // Get the service instance through binder
+                    val binder = service as? AudioPlayerService.LocalBinder
+                    val audioService = binder?.service
+                    
+                    if (audioService != null) {
+                        // Check if service is fully initialized
+                        audioService.checkReadiness { isReady ->
+                            callback(Result.success(isReady))
+                            // Unbind after checking
+                            unbindService(this)
+                        }
+                    } else {
+                        // Service connected but binder is wrong type
+                        callback(Result.success(false))
+                        unbindService(this)
+                    }
+                } catch (e: Exception) {
+                    // Error during service connection
+                    println("❌ Error checking service readiness: ${e.message}")
+                    callback(Result.success(false))
+                    try {
+                        unbindService(this)
+                    } catch (e: Exception) {
+                        // Ignore unbinding errors
+                    }
+                }
+            }
+
+            override fun onServiceDisconnected(name: android.content.ComponentName?) {
+                // Service crashed or was killed
+                callback(Result.success(false))
+            }
+        }
+        
+        try {
+            // Try to bind to the service
+            val bound = bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+            if (!bound) {
+                // Could not bind to service
+                callback(Result.success(false))
+            }
+        } catch (e: Exception) {
+            // Error binding to service
+            println("❌ Error binding to service: ${e.message}")
+            callback(Result.success(false))
         }
     }
 
