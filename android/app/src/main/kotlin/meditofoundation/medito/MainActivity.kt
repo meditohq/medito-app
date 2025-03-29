@@ -19,6 +19,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import android.os.Handler
+import android.os.Looper
 
 @UnstableApi
 class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager {
@@ -134,55 +136,95 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     }
 
     override fun isServiceReady(callback: (Result<Boolean>) -> Unit) {
+        println("🔊 [Native] isServiceReady called")
         val intent = Intent(this, AudioPlayerService::class.java)
         intent.action = AudioPlayerService.ACTION_BIND_SERVICE
+        
+        // Add a timeout handler
+        val timeoutHandler = Handler(Looper.getMainLooper())
+        val timeoutRunnable = Runnable {
+            println("❌ [Native] Service binding timeout occurred")
+            try {
+                callback(Result.success(false))
+            } catch (e: Exception) {
+                println("❌ [Native] Error handling timeout: ${e.message}")
+            }
+        }
+        // Set a 5-second timeout
+        timeoutHandler.postDelayed(timeoutRunnable, 5000)
+        
         val serviceConnection = object : android.content.ServiceConnection {
             override fun onServiceConnected(name: android.content.ComponentName?, service: android.os.IBinder?) {
+                // Cancel the timeout since we connected
+                timeoutHandler.removeCallbacks(timeoutRunnable)
+                
+                println("🔊 [Native] onServiceConnected called")
                 try {
-                    // Get the service instance through binder
                     val binder = service as? AudioPlayerService.LocalBinder
                     val audioService = binder?.service
                     
                     if (audioService != null) {
-                        // Check if service is fully initialized
+                        println("🔊 [Native] Service connected, calling audioService.checkReadiness")
                         audioService.checkReadiness { isReady ->
+                            println("🔊 [Native] audioService.checkReadiness callback: isReady = $isReady")
                             callback(Result.success(isReady))
-                            // Unbind after checking
-                            unbindService(this)
+                            println("🔊 [Native] Unbinding service after readiness check")
+                            try {
+                                unbindService(this)
+                            } catch (e: Exception) {
+                                println("❌ [Native] Error unbinding service: ${e.message}")
+                            }
                         }
                     } else {
-                        // Service connected but binder is wrong type
+                        println("❌ [Native] Service connected but binder is null or wrong type")
                         callback(Result.success(false))
-                        unbindService(this)
+                        println("🔊 [Native] Unbinding service due to binder issue")
+                        try {
+                            unbindService(this)
+                        } catch (e: Exception) {
+                            println("❌ [Native] Error unbinding service: ${e.message}")
+                        }
                     }
                 } catch (e: Exception) {
-                    // Error during service connection
-                    println("❌ Error checking service readiness: ${e.message}")
+                    println("❌ [Native] Error in onServiceConnected: ${e.message}")
                     callback(Result.success(false))
                     try {
+                        println("🔊 [Native] Unbinding service due to error in onServiceConnected")
                         unbindService(this)
                     } catch (e: Exception) {
-                        // Ignore unbinding errors
+                        println("❌ [Native] Error unbinding service: ${e.message}")
                     }
                 }
             }
 
             override fun onServiceDisconnected(name: android.content.ComponentName?) {
-                // Service crashed or was killed
+                // Cancel timeout if disconnected
+                timeoutHandler.removeCallbacks(timeoutRunnable)
+                
+                println("❌ [Native] onServiceDisconnected called")
                 callback(Result.success(false))
             }
         }
         
         try {
-            // Try to bind to the service
+            println("🔊 [Native] Attempting to bind service...")
             val bound = bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
             if (!bound) {
-                // Could not bind to service
+                // Cancel the timeout since binding failed immediately
+                timeoutHandler.removeCallbacks(timeoutRunnable)
+                
+                println("❌ [Native] bindService returned false")
                 callback(Result.success(false))
             }
+            else {
+                println("🔊 [Native] bindService returned true")
+                // Keep timeout handler running as we're waiting for connection
+            }
         } catch (e: Exception) {
-            // Error binding to service
-            println("❌ Error binding to service: ${e.message}")
+            // Cancel the timeout since there was an exception
+            timeoutHandler.removeCallbacks(timeoutRunnable)
+            
+            println("❌ [Native] Error binding to service: ${e.message}")
             callback(Result.success(false))
         }
     }

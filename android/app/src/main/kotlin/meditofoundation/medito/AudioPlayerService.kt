@@ -41,6 +41,7 @@ import android.media.AudioManager
 import android.media.AudioFocusRequest
 import android.content.Context
 import android.os.Binder
+import android.os.IBinder
 
 @UnstableApi
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi {
@@ -62,7 +63,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private var isCompletionHandled = false
     private var hasAudioFocus = false
     private var isServiceFullyInitialized = false
-    
+    private var flutterEngine: io.flutter.embedding.engine.FlutterEngine? = null
+    private lateinit var audioManager: AudioManager
+
     // Result callback when service is ready
     private var readinessCallback: ((Boolean) -> Unit)? = null
 
@@ -206,9 +209,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
     }
 
+    private var playbackState: PlaybackState? = null
+
     override fun onCreate() {
         super.onCreate()
+        println("🔊 [AudioPlayerService] onCreate called")
         Log.d(TAG, "🔊 Service onCreate called")
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        // Flutter Engine and API setup is handled in onStartCommand
+        // flutterEngine = FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID) ?: run { ... }
 
         try {
             // Create audio attributes for primary player - meditation track
@@ -325,6 +335,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             readinessCallback?.invoke(false)
             readinessCallback = null
         }
+        println("🔊 [AudioPlayerService] onCreate finished")
     }
 
     override fun onDestroy() {
@@ -463,6 +474,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             try {
                 FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID)?.let { engine ->
                     Log.d(TAG, "🔊 Found Flutter engine in cache")
+                    flutterEngine = engine // Save engine reference
                     withContext(Dispatchers.Main) {
                         MeditoAudioServiceApi.setUp(
                             engine.dartExecutor.binaryMessenger,
@@ -924,6 +936,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         } else {
             readinessCallback = callback
         }
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        println("🔊 [AudioPlayerService] onBind called with intent action: ${intent?.action}")
+        if (intent?.action == ACTION_BIND_SERVICE) {
+            println("🔊 [AudioPlayerService] Returning binder")
+            return binder
+        }
+        println("🔊 [AudioPlayerService] Calling super.onBind")
+        return super.onBind(intent)
     }
 
     companion object {

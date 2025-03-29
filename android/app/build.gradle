@@ -34,7 +34,8 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     namespace "meditofoundation.medito"
-    compileSdkVersion 34  // Update this
+    compileSdkVersion 35
+    ndkVersion = "26.3.11579264"
 
     compileOptions {
         coreLibraryDesugaringEnabled true

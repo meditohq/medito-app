@@ -83,7 +83,10 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       try {
         // Start service and wait for readiness
         await _androidServiceApi.startService();
-        debugPrint('🔊 Service start requested, now checking readiness');
+        debugPrint(
+            '🔊 Service start requested, now waiting briefly before checking readiness');
+        // Add a small delay to allow the service to initialize
+        await Future.delayed(const Duration(milliseconds: 500));
 
         // Wait for service to be ready with timeout
         final isReady = await _waitForServiceReadiness();
@@ -93,9 +96,9 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
           await _playAudioWithRetry(downloadPath ?? file.path, trackData);
         } else {
           debugPrint(
-              '❌ Service failed to become ready, falling back to retry mechanism');
-          // Fall back to our retry mechanism
-          await Future.delayed(const Duration(milliseconds: 1000));
+              '❌ Service failed to become ready, attempting playback anyway');
+          // Proceed with playback attempt even if service readiness times out
+          await Future.delayed(const Duration(seconds: 1));
           await _playAudioWithRetry(downloadPath ?? file.path, trackData);
         }
       } catch (e) {
@@ -117,14 +120,15 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
   // Wait for the service to become ready with timeout
   Future<bool> _waitForServiceReadiness() async {
-    const maxAttempts = 5;
-    const initialDelayMs = 200;
+    const maxAttempts = 10;
+    const initialDelayMs = 500;
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         debugPrint('🔊 Checking if service is ready (attempt ${attempt + 1})');
-
         final isReady = await _androidServiceApi.isServiceReady();
+        debugPrint(
+            '🔊 Service readiness check returned: $isReady (attempt ${attempt + 1})');
 
         if (isReady) {
           debugPrint('🔊 Service is ready');
@@ -136,7 +140,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         }
       } catch (e) {
         debugPrint(
-            '❌ Error checking service readiness (attempt ${attempt + 1}): $e');
+            '❌ Error during service readiness check (attempt ${attempt + 1}): $e');
         final delayMs = initialDelayMs * (1 << attempt);
         await Future.delayed(Duration(milliseconds: delayMs));
       }
