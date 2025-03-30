@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -18,6 +19,7 @@ import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
+import '../../errors/exceptions.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
   const SignUpLogInPage({
@@ -59,6 +61,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   var _isEmailValid = false;
   var _isOtpValid = false;
   var _hasRequestedOtp = false;
+  var _isRateLimited = false;
+  var _retryAfterSeconds = 0;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -69,6 +74,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   @override
   void dispose() {
+    _timer?.cancel();
     _emailController.removeListener(_validateEmail);
     _otpController.removeListener(_validateOtp);
     _emailController.dispose();
@@ -92,6 +98,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       _isEmailValid && (_hasRequestedOtp ? _isOtpValid : true);
 
   Future<void> _requestOtp() async {
+    if (_isLoading || _isRateLimited) return;
+
     final hasLocalStats = await StatsManager().hasLocalStats();
 
     if (hasLocalStats) {
@@ -141,6 +149,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       setState(() {
         _hasRequestedOtp = true;
       });
+    } on RateLimitError catch (e) {
+      showSnackBar(context, e.message);
+      setState(() {
+        _isRateLimited = true;
+        _retryAfterSeconds = e.tryAfterSeconds ?? 60;
+      });
+      _startRetryTimer();
     } catch (e) {
       showSnackBar(context, 'Error: ${e.toString()}');
     } finally {
@@ -148,6 +163,22 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _isLoading = false;
       });
     }
+  }
+
+  void _startRetryTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_retryAfterSeconds > 0) {
+        setState(() {
+          _retryAfterSeconds--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          _isRateLimited = false;
+        });
+      }
+    });
   }
 
   Future<void> _verifyOtp() async {
@@ -279,7 +310,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _buildEmailField(inputTextStyle),
         height16,
         ElevatedButton(
-          onPressed: (_isLoading || !_isFormValid) ? null : _requestOtp,
+          onPressed: (_isLoading || !_isFormValid || _isRateLimited)
+              ? null
+              : _requestOtp,
           style: _getButtonStyle(),
           child: _isLoading
               ? const SizedBox(
@@ -290,7 +323,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-              : const Text(StringConstants.sendMeMyPasswordText),
+              : _isRateLimited
+                  ? Text('Retry in $_retryAfterSeconds s')
+                  : const Text(StringConstants.sendMeMyPasswordText),
         ),
         _buildPrivacyPolicyLink(),
         SizedBox.square(
@@ -349,16 +384,20 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         ),
         height16,
         TextButton(
-          onPressed: _isLoading ? null : _requestOtp,
+          onPressed: _isLoading || _isRateLimited ? null : _requestOtp,
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             minimumSize: const Size(0, 32),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: Text(
-            StringConstants.resendCode,
+            _isRateLimited
+                ? 'Resend code in $_retryAfterSeconds s'
+                : StringConstants.resendCode,
             style: TextStyle(
-              color: _isLoading ? Colors.white38 : ColorConstants.brightSky,
+              color: _isLoading || _isRateLimited
+                  ? Colors.white38
+                  : ColorConstants.brightSky,
               fontSize: 14,
             ),
           ),

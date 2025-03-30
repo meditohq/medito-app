@@ -8,14 +8,8 @@ import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
-
-class EmailExistsException implements Exception {
-  final String message;
-  const EmailExistsException(this.message);
-
-  @override
-  String toString() => message;
-}
+import '../../errors/exceptions.dart'; // Import the custom exception
+import 'package:flutter/foundation.dart'; // Import for visibleForTesting
 
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
@@ -168,7 +162,8 @@ class AuthApiService {
       await _secureStorage.storeRefreshToken(tokens.refreshToken);
     }
     dev.log('[AUTH] Tokens updated', error: {
-      'access_token_prefix': tokens.accessToken.substring(0, 10),
+      'access_token_prefix':
+          tokens.accessToken.substring(0, min(10, tokens.accessToken.length)),
       'has_refresh_token': tokens.refreshToken.isNotEmpty,
       'expires_in': tokens.expiresIn,
     });
@@ -262,7 +257,8 @@ class AuthApiService {
           'raw_content': content,
           'parsed_content': content.isNotEmpty ? jsonDecode(content) : null,
         });
-        throw _handleErrorResponse(response.statusCode, content);
+        handleErrorResponse(response.statusCode, content);
+        throw Exception('handleErrorResponse did not throw');
       }
 
       return content.isEmpty ? {} : jsonDecode(content) as Map<String, dynamic>;
@@ -279,10 +275,8 @@ class AuthApiService {
         'duration': e.duration?.toString(),
       });
       throw const TimeoutError();
-    } on EmailExistsException {
-      rethrow;
     } catch (e) {
-      dev.log('[AUTH] Unexpected error', error: {
+      dev.log('[AUTH] Unexpected error in _post', error: {
         'error': e.toString(),
         'type': e.runtimeType.toString(),
       });
@@ -290,45 +284,74 @@ class AuthApiService {
     }
   }
 
-  AppError _handleErrorResponse(int statusCode, [String? content]) {
+  @visibleForTesting
+  void handleErrorResponse(int statusCode, [String? content]) {
     dev.log('HTTP Error $statusCode', level: 900);
 
-    // If content is available, parse it to see if we have specific error information
     if (content != null && content.isNotEmpty) {
       try {
         final Map<String, dynamic> errorData =
             jsonDecode(content) as Map<String, dynamic>;
-        final String? errorMessage = errorData['error'] as String?;
+        final String? errorMessage =
+            errorData['message'] as String? ?? errorData['error'] as String?;
         final String? errorCode = errorData['code'] as String?;
+        final bool? rateLimited =
+            errorData['rate_limited'] as bool?; // Check for rate limit flag
+        final int? retryAfter =
+            errorData['retry_after'] as int?; // Check for retry after seconds
+        final String? emailFromError = errorData['email']
+            as String?; // Attempt to get email from error response
 
+        // Handle Rate Limit specifically
+        if (statusCode == HttpStatus.tooManyRequests &&
+            rateLimited == true &&
+            retryAfter != null) {
+          throw RateLimitError(
+            tryAfterSeconds: retryAfter,
+            message: errorMessage ?? 'Too many requests. Please wait.',
+          );
+        }
+
+        // Handle Email Exists specifically using the new AppError type
         if (errorCode == 'EMAIL_ASSOCIATED' &&
             statusCode == HttpStatus.forbidden) {
-          throw EmailExistsException(
-              errorMessage ?? 'Email exists for this account');
+          throw EmailExistsError(
+            email: emailFromError, // Pass the email if available
+            message: errorMessage ??
+                'This device is already associated with an email account.',
+          );
         }
 
         if (errorMessage != null) {
           if (errorMessage.contains('Invalid refresh token') ||
               errorMessage.contains('Expired refresh token') ||
               errorMessage.contains('Token has been revoked')) {
-            return const RefreshTokenError();
+            throw const RefreshTokenError();
           }
         }
       } catch (e) {
-        // If the error is our custom exception, rethrow it
-        if (e is EmailExistsException) {
-          throw e;
+        if (e is RateLimitError ||
+            e is EmailExistsError ||
+            e is RefreshTokenError) {
+          rethrow; // Rethrow specific exceptions
         }
-        // Otherwise log parsing error and continue with default handling
         dev.log('[AUTH] Error parsing error response', error: e);
+        // Fall through to default handling if parsing failed
       }
     }
 
-    return switch (statusCode) {
-      HttpStatus.notFound => const NotFoundError(),
-      HttpStatus.unauthorized => const UnauthorizedError(),
-      >= 500 => const ServerError(),
-      _ => const UnknownError(),
-    };
+    // Default handling - Always throw an AppError
+    switch (statusCode) {
+      case HttpStatus.notFound:
+        throw const NotFoundError();
+      case HttpStatus.unauthorized:
+        throw const UnauthorizedError();
+      default:
+        if (statusCode >= 500) {
+          throw const ServerError();
+        } else {
+          throw const UnknownError();
+        }
+    }
   }
 }

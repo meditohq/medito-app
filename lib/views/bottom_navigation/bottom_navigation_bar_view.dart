@@ -7,7 +7,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
-import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/streak_freeze_suggestion_widget.dart';

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/errors/exceptions.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
@@ -19,6 +20,7 @@ import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/exceptions/app_error.dart';
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -177,7 +179,7 @@ class SplashViewState extends ConsumerState<SplashView>
           builder: (context) => const OnboardingPagerScreen(),
         ),
       );
-    } on EmailExistsException catch (_) {
+    } on EmailExistsError catch (e) {
       if (!mounted) return;
 
       final shouldUseExistingAccount = await showDialog<bool>(

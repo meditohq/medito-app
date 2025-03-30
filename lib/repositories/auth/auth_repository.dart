@@ -9,15 +9,8 @@ import 'package:uuid/uuid.dart';
 import 'dart:developer' as dev;
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
-
-class EmailExistsForClientIdException implements Exception {
-  final String email;
-
-  const EmailExistsForClientIdException(this.email);
-
-  @override
-  String toString() => 'Email exists for client ID: $email';
-}
+import '../../errors/exceptions.dart'; // Import RateLimitException
+import '../../exceptions/app_error.dart'; // Import RateLimitError & other AppErrors
 
 class User {
   final String id;
@@ -37,7 +30,7 @@ abstract class AuthRepository {
   Future<void> initializeUser();
   Future<String> getToken();
   String getUserEmail();
-  Future<bool> requestOtp(String email);
+  Future<void> requestOtp(String email);
   Future<bool> verifyOtp(String email, String otp);
   User? get currentUser;
   Future<bool> signOut();
@@ -158,16 +151,20 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<bool> requestOtp(String email) async {
+  Future<void> requestOtp(String email) async {
     try {
       var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
           _generateClientId();
-
       await _authService.requestOtp(email, clientId);
-      return true;
+    } on RateLimitError catch (e) {
+      dev.log('[AUTH_REPO] Caught RateLimitException', error: e);
+      throw RateLimitError(
+        message: e.message,
+        tryAfterSeconds: e.tryAfterSeconds,
+      );
     } catch (e) {
       dev.log('[AUTH_REPO] Error requesting OTP', error: e);
-      return false;
+      rethrow;
     }
   }
 
@@ -238,16 +235,12 @@ class AuthRepositoryImpl extends AuthRepository {
       var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
           _generateClientId();
 
+      // Call the service. It will throw EmailExistsError if applicable.
       _tokens = await _authService.signIn(
         clientId: clientId,
       );
 
-      // If the response contains an email, this means the client ID is associated with an email account
-      if (_tokens!.email != null && _tokens!.email!.isNotEmpty) {
-        throw EmailExistsForClientIdException(_tokens!.email!);
-      }
-
-      // Update user info
+      // Update user info only on success (i.e., no exception thrown)
       _currentUser = User(
         id: _tokens!.clientId,
       );
@@ -264,8 +257,9 @@ class AuthRepositoryImpl extends AuthRepository {
 
       dev.log('[AUTH_REPO] Anonymous sign in successful');
     } catch (e) {
+      // Catch errors from the service layer (including EmailExistsError)
       dev.log('[AUTH_REPO] Error signing in anonymously', error: e);
-      rethrow;
+      rethrow; // Rethrow the error (e.g., EmailExistsError, ServerError, etc.)
     }
   }
 

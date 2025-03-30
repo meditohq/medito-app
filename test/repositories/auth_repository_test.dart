@@ -10,6 +10,7 @@ import 'package:medito/services/secure_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:medito/errors/exceptions.dart';
 
 // Mock dependencies
 class MockAuthApiService extends Mock implements AuthApiService {}
@@ -22,154 +23,8 @@ class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 class MockUuid extends Mock implements Uuid {}
 
-class TestableAuthRepository extends AuthRepository {
-  final AuthApiService authService;
-  final SecureStorageService secureStorage;
-  final HttpApiService httpApiService;
-  AuthTokens? tokens;
-  User? _currentUser;
-
-  TestableAuthRepository({
-    required this.authService,
-    required this.secureStorage,
-    required this.httpApiService,
-  });
-
-  @override
-  User? get currentUser => _currentUser;
-
-  set currentUserForTest(User? value) => _currentUser = value;
-
-  @override
-  Future<void> initializeUser() async {
-    // Simplified for testing
-    var prefs = await SharedPreferences.getInstance();
-    var clientId = prefs.getString('userId');
-
-    if (clientId == null) {
-      clientId = 'test-generated-id';
-      await prefs.setString('userId', clientId);
-    }
-
-    _currentUser = User(id: clientId);
-  }
-
-  @override
-  Future<String> getToken() async {
-    if (tokens != null && !tokens!.isExpired) {
-      return tokens!.accessToken;
-    }
-
-    var refreshToken = await secureStorage.getRefreshToken();
-    if (refreshToken != null) {
-      tokens = await authService.refreshToken(refreshToken);
-      httpApiService.setAuthHeader(tokens!.accessToken);
-      return tokens!.accessToken;
-    }
-
-    throw const UnauthorizedError();
-  }
-
-  @override
-  String getUserEmail() {
-    return _currentUser?.email ?? '';
-  }
-
-  @override
-  Future<bool> requestOtp(String email) async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      var clientId = prefs.getString('userId') ?? 'test-client-id';
-      await authService.requestOtp(email, clientId);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  @override
-  Future<bool> verifyOtp(String email, String otp) async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      var clientId = prefs.getString('userId') ?? 'test-client-id';
-
-      tokens = await authService.signIn(
-        email: email,
-        otp: otp,
-        clientId: clientId,
-      );
-
-      _currentUser = User(
-        id: tokens!.clientId,
-        email: tokens!.email,
-      );
-
-      httpApiService.setAuthHeader(tokens!.accessToken);
-      await prefs.setString('userId', tokens!.clientId);
-      await prefs.setBool('isLoggedIn', true);
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  @override
-  Future<bool> signOut() async {
-    try {
-      await httpApiService.signOut();
-    } catch (e) {
-      // Continue anyway
-    }
-
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    await secureStorage.clearRefreshToken();
-    httpApiService.clearAuthHeader();
-
-    // Reset user but keep the ID
-    var clientId = prefs.getString('userId');
-    _currentUser = clientId != null ? User(id: clientId) : null;
-
-    return true;
-  }
-
-  @override
-  Future<bool> markAccountForDeletion() async {
-    return false;
-  }
-
-  @override
-  Future<bool> isAccountMarkedForDeletion() async {
-    return false;
-  }
-
-  @override
-  Future<void> signInAnonymously() async {
-    var prefs = await SharedPreferences.getInstance();
-    var clientId = prefs.getString('userId') ?? 'test-client-id';
-
-    tokens = await authService.signIn(
-      clientId: clientId,
-    );
-
-    _currentUser = User(
-      id: tokens!.clientId,
-    );
-
-    httpApiService.setAuthHeader(tokens!.accessToken);
-    await prefs.setString('userId', tokens!.clientId);
-    await prefs.setBool('isLoggedIn', true);
-  }
-
-  @override
-  void resetAuthState() {
-    // No-op for tests
-  }
-}
-
 void main() {
-  late AuthRepository authRepository;
+  late AuthRepositoryImpl authRepository;
   late MockAuthApiService mockAuthApiService;
   late MockHttpApiService mockHttpApiService;
   late MockSecureStorageService mockSecureStorageService;
@@ -183,7 +38,6 @@ void main() {
     mockPreferences = MockSharedPreferences();
     mockUuid = MockUuid();
 
-    // Create testable repo with all dependencies injected
     authRepository = AuthRepositoryImpl(
       authService: mockAuthApiService,
       httpApiService: mockHttpApiService,
@@ -191,12 +45,19 @@ void main() {
       preferences: mockPreferences,
       uuid: mockUuid,
     );
+
+    // Register fallback values for mocktail
+    registerFallbackValue(Uri.parse('http://example.com'));
+    registerFallbackValue(<String, String>{});
   });
 
-  group('AuthRepository', () {
+  group('AuthRepositoryImpl', () {
     const clientId = 'test-client-id';
+    const email = 'test@example.com';
+    const refreshToken = 'test-refresh-token';
 
-    test('signInAnonymously calls API service and stores tokens', () async {
+    test('signInAnonymously calls API service and stores tokens on success',
+        () async {
       // Setup
       final tokens = AuthTokens(
         accessToken: 'test-access',
@@ -204,13 +65,12 @@ void main() {
         expiresIn: 900,
         clientId: clientId,
       );
-
-      when(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
+      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
+          .thenReturn(clientId);
+      when(() => mockAuthApiService.signIn(clientId: clientId))
           .thenAnswer((_) async => tokens);
       when(() => mockHttpApiService.setAuthHeader(any()))
           .thenAnswer((_) async {});
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
       when(() => mockPreferences.setString(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockPreferences.setBool(any(), any()))
@@ -229,33 +89,80 @@ void main() {
           SharedPreferenceConstants.isLoggedIn, true)).called(1);
     });
 
-    test(
-        'signInAnonymously throws EmailExistsException when API returns email exists error',
+    test('signInAnonymously throws EmailExistsError when service throws it',
         () async {
       // Setup
       when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
           .thenReturn(clientId);
-      when(() =>
-          mockAuthApiService.signIn(
-              clientId: clientId)).thenThrow(const EmailExistsException(
-          'Cannot sign in anonymously with a client ID that has an email associated with it'));
+      when(() => mockAuthApiService.signIn(clientId: clientId))
+          .thenThrow(const EmailExistsError(email: email));
 
       // Action & Assert
-      expect(
-        () => authRepository.signInAnonymously(),
-        throwsA(isA<EmailExistsException>()),
-      );
-
-      // Verify API was called but no tokens were stored
+      expect(() => authRepository.signInAnonymously(),
+          throwsA(isA<EmailExistsError>()));
       verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
       verifyNever(() => mockHttpApiService.setAuthHeader(any()));
       verifyNever(() =>
-          mockPreferences.setBool(SharedPreferenceConstants.isLoggedIn, true));
+          mockPreferences.setBool(SharedPreferenceConstants.isLoggedIn, any()));
+    });
+
+    test('requestOtp completes successfully when service call succeeds',
+        () async {
+      // Setup
+      when(() => mockAuthApiService.requestOtp(any(), any()))
+          .thenAnswer((_) async {});
+      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
+          .thenReturn(clientId);
+
+      // Action & Assert
+      await expectLater(authRepository.requestOtp(email), completes);
+      verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
+    });
+
+    test(
+        'requestOtp throws RateLimitError when service throws RateLimitException',
+        () async {
+      // Setup
+      const retrySeconds = 59;
+      const exceptionMessage = 'Please wait 59 seconds';
+      final serviceException = RateLimitError(
+        tryAfterSeconds: retrySeconds,
+        message: exceptionMessage,
+      );
+      when(() => mockAuthApiService.requestOtp(email, clientId))
+          .thenThrow(serviceException);
+      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
+          .thenReturn(clientId);
+
+      // Action & Assert
+      expect(
+        () => authRepository.requestOtp(email),
+        throwsA(
+          isA<RateLimitError>()
+              .having((e) => e.message, 'message', exceptionMessage)
+              .having(
+                  (e) => e.tryAfterSeconds, 'tryAfterSeconds', retrySeconds),
+        ),
+      );
+      verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
+    });
+
+    test('requestOtp rethrows other errors from service', () async {
+      // Setup
+      final otherError = Exception('Some unexpected service error');
+      when(() => mockAuthApiService.requestOtp(email, clientId))
+          .thenThrow(otherError);
+      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
+          .thenReturn(clientId);
+
+      // Action & Assert
+      expect(
+          () => authRepository.requestOtp(email), throwsA(equals(otherError)));
+      verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
     });
 
     test('verifyOtp calls API service and stores tokens', () async {
       // Setup
-      const email = 'test@example.com';
       const otp = '123456';
       final tokens = AuthTokens(
         accessToken: 'test-access',
@@ -315,6 +222,7 @@ void main() {
       verify(() => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn, false)).called(1);
     });
+
     test('initiateUser creates client ID with expected format', () async {
       // Setup
       final dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
@@ -335,59 +243,51 @@ void main() {
       expect(capturedId, contains('test'));
     });
 
-    test('requestOtp calls API service with correct parameters', () async {
-      // Setup
-      const email = 'test@example.com';
-      when(() => mockAuthApiService.requestOtp(any(), any()))
-          .thenAnswer((_) async {});
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
-
-      // Action
-      await authRepository.requestOtp(email);
-
-      // Verify
-      verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
-    });
-
-    test('getToken refreshes token when current is expired', () async {
-      // Create a testable repository for this test
-      final testRepo = TestableAuthRepository(
-        authService: mockAuthApiService,
-        secureStorage: mockSecureStorageService,
-        httpApiService: mockHttpApiService,
-      );
-
-      // Setup with expired tokens
-      testRepo.tokens = AuthTokens(
-        accessToken: 'old-access',
-        refreshToken: 'test-refresh',
-        expiresIn: 0, // Expired
-        clientId: clientId,
-      );
+    test(
+        'getToken refreshes token when internal token is null but refresh token exists',
+        () async {
+      // Setup: Assume internal token is null (initial state or after logout)
+      // No need to call setTokensForTest(null) explicitly
 
       final newTokens = AuthTokens(
-        accessToken: 'new-access',
-        refreshToken: 'test-refresh',
-        expiresIn: 900,
-        clientId: clientId,
-      );
+          accessToken: 'new-access',
+          refreshToken: refreshToken,
+          expiresIn: 900,
+          clientId: clientId);
 
       when(() => mockSecureStorageService.getRefreshToken())
-          .thenAnswer((_) async => 'test-refresh');
-      when(() => mockAuthApiService.refreshToken('test-refresh'))
+          .thenAnswer((_) async => refreshToken);
+      when(() => mockAuthApiService.refreshToken(refreshToken))
           .thenAnswer((_) async => newTokens);
       when(() => mockHttpApiService.setAuthHeader(any()))
           .thenAnswer((_) async {});
 
       // Action
-      final result = await testRepo.getToken();
+      final result = await authRepository.getToken();
 
       // Verify
       expect(result, equals(newTokens.accessToken));
-      verify(() => mockAuthApiService.refreshToken('test-refresh')).called(1);
+      verify(() => mockSecureStorageService.getRefreshToken()).called(1);
+      verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
       verify(() => mockHttpApiService.setAuthHeader(newTokens.accessToken))
           .called(1);
+    });
+
+    test(
+        'getToken throws UnauthorizedError if no internal token and no refresh token',
+        () async {
+      // Setup: Assume internal token is null
+      // No need to call setTokensForTest(null) explicitly
+      when(() => mockSecureStorageService.getRefreshToken())
+          .thenAnswer((_) async => null);
+
+      // Action & Assert
+      expect(
+          () => authRepository.getToken(), throwsA(isA<UnauthorizedError>()));
+
+      // Verify
+      verify(() => mockSecureStorageService.getRefreshToken()).called(1);
+      verifyNever(() => mockAuthApiService.refreshToken(any()));
     });
   });
 }
