@@ -1,6 +1,7 @@
 name: medito
 description: A meditation learning tool
 
+# ./build_prod_apk.sh
 # flutter clean && flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
 # cd android && bundle exec fastlane beta
 # flutter clean && flutter build ios --release --dart-define-from-file=../.prod.json
