@@ -8,6 +8,8 @@ import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 
 part 'stats_provider.g.dart';
 
@@ -17,8 +19,16 @@ final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
   return StatsNotifier();
 });
 
-final editStatsUrlProvider = Provider<String>((ref) {
-  final clientId = ref.watch(userIdProvider).valueOrNull ?? '';
+final editStatsUrlProvider = FutureProvider<String>((ref) async {
+  var clientId = ref.watch(userIdProvider).valueOrNull ?? '';
+
+  // If clientId is empty, try to get it directly from SharedPreferences
+  if (clientId.isEmpty) {
+    final prefs = await SharedPreferences.getInstance();
+    clientId = prefs.getString(SharedPreferenceConstants.userId) ?? '';
+    dev.log('Using fallback clientId from SharedPreferences: $clientId');
+  }
+
   final stats = ref.watch(statsProvider).valueOrNull;
   final deviceInfo = ref.watch(deviceAndAppInfoProvider).valueOrNull;
 

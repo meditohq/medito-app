@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -134,7 +135,11 @@ class SettingsScreen extends ConsumerWidget {
           icon: HugeIcons.solidRoundedQuestion,
           color: ColorConstants.white,
         ),
-        path: ref.watch(editStatsUrlProvider),
+        path: ref.watch(editStatsUrlProvider).when(
+              data: (url) => url,
+              loading: () => '$editStatsUrl?clientid=',
+              error: (_, __) => '$editStatsUrl?clientid=',
+            ),
       ),
       SettingsItem(
         section: StringConstants.supportCommunity,

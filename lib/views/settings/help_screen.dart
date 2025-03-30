@@ -486,8 +486,11 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
   }
 
   void _openStatsEditPage() async {
-    final statsUrl = ref.read(editStatsUrlProvider);
-    await _launchUrl(statsUrl);
+    final statsUrlAsync = ref.read(editStatsUrlProvider);
+
+    statsUrlAsync.whenData((statsUrl) async {
+      await _launchUrl(statsUrl);
+    });
   }
 
   Future<void> _handleBatteryOptimization() async {
