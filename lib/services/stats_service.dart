@@ -99,6 +99,12 @@ class StatsService {
       return;
     }
 
+    // Don't push if stats are empty
+    if (stats.audioCompleted?.isEmpty == true) {
+      dev.log('StatsService: No stats to post, skipping');
+      return;
+    }
+
     // Check if user is logged in before syncing
     var isLoggedIn = _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
     if (!isLoggedIn) {
