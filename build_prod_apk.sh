@@ -36,3 +36,11 @@ else
 fi
 
 echo "✨ Build process completed successfully"
+
+# Open Finder and reveal the APK
+open -R "$DEST_APK"
+
+# Open Telegram app
+open -a "Telegram"
+
+echo "📤 Finder opened at APK location, and Telegram launched"
