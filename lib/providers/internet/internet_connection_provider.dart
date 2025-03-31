@@ -24,18 +24,15 @@ class ConnectionNotifier extends AsyncNotifier<ConnectionState> {
     InternetConnectionChecker.instance.onStatusChange
         .listen(_handleStatusChange);
 
-    return ConnectionState(status, shouldShowMessage: false);
+    return ConnectionState(status,
+        shouldShowMessage: status == InternetConnectionStatus.disconnected);
   }
 
   void _handleStatusChange(InternetConnectionStatus status) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(seconds: 2), () {
-      if (_isFirstCheck) {
-        _isFirstCheck = false;
-        state = AsyncData(ConnectionState(status, shouldShowMessage: false));
-        return;
-      }
-      state = AsyncData(ConnectionState(status, shouldShowMessage: true));
+      state = AsyncData(ConnectionState(status,
+          shouldShowMessage: status == InternetConnectionStatus.disconnected));
     });
   }
 }
