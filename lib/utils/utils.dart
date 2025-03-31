@@ -54,8 +54,8 @@ Future<void> launchURLInBrowser(String url) async {
     }
   } catch (e) {
     if (kDebugMode) {
-        print(e);
-      }
+      print(e);
+    }
   }
 }
 
@@ -118,34 +118,6 @@ String getAudioFileExtension(String path) {
   }
 
   return '.mp3';
-}
-
-Future<File?> capturePng(BuildContext context, GlobalKey globalKey) async {
-  try {
-    // Add a small delay to ensure widget has updated
-    await Future.delayed(const Duration(milliseconds: 100));
-    
-    RenderRepaintBoundary boundary =
-        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List pngBytes = byteData!.buffer.asUint8List();
-
-    final directory = await getApplicationDocumentsDirectory();
-    final appDir = Directory('${directory.path}/medito');
-    if (!await appDir.exists()) {
-      await appDir.create(recursive: true);
-    }
-    final file = File('${appDir.path}/stats.png');
-
-    await file.writeAsBytes(pngBytes);
-    debugPrint('File saved at: ${file.path}');
-
-    return file;
-  } catch (e) {
-    debugPrint('Error in capturePng: $e');
-    return null;
-  }
 }
 
 int formatIcon(String icon) {

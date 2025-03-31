@@ -7,20 +7,21 @@ import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
-import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:medito/utils/utils.dart';
 
-class QuoteWidget extends ConsumerWidget {
-  QuoteWidget({super.key, required this.data});
+class QuoteWidget extends ConsumerStatefulWidget {
+  const QuoteWidget({super.key, required this.data});
 
   final HomeQuoteModel? data;
-  final isCapturing = ValueNotifier<bool>(false);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var globalKey = GlobalKey();
+  ConsumerState<QuoteWidget> createState() => QuoteWidgetState();
+}
 
+class QuoteWidgetState extends ConsumerState<QuoteWidget> {
+  @override
+  Widget build(BuildContext context) {
     final quoteStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontFamily: sourceSerif,
           fontWeight: FontWeight.w300,
@@ -55,74 +56,47 @@ class QuoteWidget extends ConsumerWidget {
           ),
         ),
         height8,
-        RepaintBoundary(
-          key: globalKey,
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              color: ColorConstants.onyx,
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: padding16),
-            padding: const EdgeInsets.all(padding16),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _buildBackgroundIcon(),
-                _buildQuoteContent(quoteStyle, authorStyle),
-                ValueListenableBuilder<bool>(
-                  valueListenable: isCapturing,
-                  builder: (context, capturing, child) {
-                    if (capturing) return const SizedBox.shrink();
-
-                    return Positioned(
-                      right: -12,
-                      bottom: -12,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => _handleShare(context, globalKey),
-                        icon: HugeIcon(
-                          icon: Platform.isIOS
-                              ? HugeIcons.solidRoundedShare03
-                              : HugeIcons.solidRoundedShare08,
-                          color: Colors.white.withOpacity(0.6),
-                          size: 16,
-                        ),
-                      ),
-                    );
-                  },
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: ColorConstants.onyx,
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: padding16),
+          padding: const EdgeInsets.all(padding16),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              _buildBackgroundIcon(),
+              _buildQuoteContent(quoteStyle, authorStyle),
+              Positioned(
+                right: -12,
+                bottom: -12,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: _shareQuote,
+                  icon: HugeIcon(
+                    icon: Platform.isIOS
+                        ? HugeIcons.solidRoundedShare03
+                        : HugeIcons.solidRoundedShare08,
+                    color: Colors.white.withOpacity(0.6),
+                    size: 16,
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Future<void> _handleShare(BuildContext context, GlobalKey key) async {
-    try {
-      isCapturing.value = true;
-      // Add setState call to ensure widget updates
-      await Future.microtask(() {});
+  void _shareQuote() {
+    if (widget.data == null) return;
 
-      var file = await capturePng(context, key);
-      if (file != null) {
-        var shareText =
-            '${data?.quote}\n- ${data?.author}\n\n${StringConstants.shareStatsText}';
-
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: shareText,
-        );
-      } else {
-        showSnackBar(context, StringConstants.someThingWentWrong);
-      }
-    } catch (e) {
-      showSnackBar(context, StringConstants.someThingWentWrong);
-    } finally {
-      isCapturing.value = false;
-    }
+    final shareText =
+        '${widget.data?.quote}\n- ${widget.data?.author}\n\n${StringConstants.shareStatsText}';
+    Share.share(shareText);
   }
 
   Widget _buildBackgroundIcon() {
@@ -146,18 +120,18 @@ class QuoteWidget extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (data?.quote != null)
+          if (widget.data?.quote != null)
             Padding(
               padding: const EdgeInsets.only(right: 60.0),
               child: Text(
-                data!.quote,
+                widget.data!.quote,
                 style: quoteStyle,
               ),
             ),
-          if (data?.author != null) ...[
+          if (widget.data?.author != null) ...[
             height4,
             Text(
-              data!.author,
+              widget.data!.author,
               style: authorStyle,
             ),
           ],

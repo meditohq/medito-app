@@ -9,9 +9,9 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../row_item_widget.dart';
-import '../share_btn/share_btn_widget.dart';
 
 class StatsBottomSheetWidget extends ConsumerWidget {
   const StatsBottomSheetWidget({super.key});
@@ -19,7 +19,6 @@ class StatsBottomSheetWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var statsAsync = ref.watch(statsProvider);
-    var globalKey = GlobalKey();
 
     return SafeArea(
       child: Container(
@@ -50,7 +49,7 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                         color: ColorConstants.white),
                   ),
                 ),
-                data: (stats) => _statsList(context, globalKey, stats, ref),
+                data: (stats) => _statsList(context, stats, ref),
               ),
             ],
           ),
@@ -89,37 +88,43 @@ class StatsBottomSheetWidget extends ConsumerWidget {
 
   Column _statsList(
     BuildContext context,
-    GlobalKey key,
     LocalAllStats stats,
     WidgetRef ref,
   ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RepaintBoundary(
-          key: key,
-          child: Container(
-            color: ColorConstants.onyx,
-            child: Column(
-              children: [
-                _buildStatRow(context, StringConstants.currentStreak,
-                    '${stats.streakCurrent} ${StringConstants.days}'),
-                _buildStatRow(context, StringConstants.longestStreak,
-                    '${stats.streakLongest} ${StringConstants.days}'),
-                _buildStatRow(context, StringConstants.totalTracksCompleted,
-                    '${stats.totalTracksCompleted}'),
-                _buildStatRow(context, StringConstants.totalTimeListened,
-                    _formatTotalTimeListened(stats.totalTimeListened)),
-                _buildFreezeInfo(stats, context, ref),
-              ],
-            ),
+        Container(
+          color: ColorConstants.onyx,
+          child: Column(
+            children: [
+              _buildStatRow(context, StringConstants.currentStreak,
+                  '${stats.streakCurrent} ${StringConstants.days}'),
+              _buildStatRow(context, StringConstants.longestStreak,
+                  '${stats.streakLongest} ${StringConstants.days}'),
+              _buildStatRow(context, StringConstants.totalTracksCompleted,
+                  '${stats.totalTracksCompleted}'),
+              _buildStatRow(context, StringConstants.totalTimeListened,
+                  _formatTotalTimeListened(stats.totalTimeListened)),
+              _buildFreezeInfo(stats, context, ref),
+            ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ShareBtnWidget(
-            globalKey: key,
-            shareText: StringConstants.shareStatsText,
+          padding: const EdgeInsets.all(16),
+          child: ElevatedButton.icon(
+            onPressed: () => Share.share(StringConstants.shareStatsText),
+            icon: HugeIcon(
+              icon: HugeIcons.solidRoundedShare08,
+              size: 20,
+              color: ColorConstants.white,
+            ),
+            label: Text(StringConstants.share),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorConstants.lightPurple,
+              foregroundColor: ColorConstants.white,
+              minimumSize: const Size(double.infinity, 48),
+            ),
           ),
         ),
       ],
