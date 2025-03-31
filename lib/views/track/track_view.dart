@@ -1,11 +1,10 @@
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/providers/pack/pack_provider.dart';
-import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
@@ -451,7 +450,6 @@ class _TrackViewState extends ConsumerState<TrackView>
       ref.read(durationPreferenceProvider.notifier).setDuration(value.duration);
     }
   }
-
   void _handlePlay(
     WidgetRef ref,
     TrackModel trackModel,

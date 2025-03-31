@@ -8,6 +8,7 @@ import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
@@ -28,10 +29,23 @@ class EndScreenView extends ConsumerStatefulWidget {
 }
 
 class _EndScreenViewState extends ConsumerState<EndScreenView> {
+  final _animatedSwitcherKey = GlobalKey();
+  bool _hasFiredHapticFeedback = false;
+
   @override
   void initState() {
     super.initState();
     _loadStats();
+  }
+
+  Future<void> _triggerHapticFeedback() async {
+    if (_hasFiredHapticFeedback) return;
+
+    _hasFiredHapticFeedback = true;
+    final canVibrate = await Haptics.canVibrate();
+    if (canVibrate) {
+      await Haptics.vibrate(HapticsType.success);
+    }
   }
 
   void _loadStats() {
@@ -116,6 +130,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
+        _hasFiredHapticFeedback = false;
         var streak = localAllStats.streakCurrent;
         var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
@@ -128,8 +143,14 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedSwitcher(
+              key: _animatedSwitcherKey,
               duration: const Duration(milliseconds: 500),
               transitionBuilder: (Widget child, Animation<double> animation) {
+                if (animation.status == AnimationStatus.forward &&
+                    !_hasFiredHapticFeedback) {
+                  _triggerHapticFeedback();
+                }
+
                 return FadeTransition(
                   opacity: animation,
                   child: ScaleTransition(
