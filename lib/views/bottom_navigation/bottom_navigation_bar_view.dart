@@ -27,6 +27,7 @@ class _BottomNavigationBarViewState
     extends ConsumerState<BottomNavigationBarView> {
   var _currentPageIndex = 0;
   final _searchFocusNode = FocusNode();
+  final _exploreViewKey = GlobalKey<ExploreViewState>();
 
   late final List<Widget> _pages;
 
@@ -35,7 +36,7 @@ class _BottomNavigationBarViewState
     super.initState();
     _pages = [
       const HomeView(),
-      ExploreView(searchFocusNode: _searchFocusNode),
+      ExploreView(key: _exploreViewKey, searchFocusNode: _searchFocusNode),
       const JourneyView(),
       const SettingsScreen(),
     ];
@@ -170,9 +171,15 @@ class _BottomNavigationBarViewState
     if (_currentPageIndex == 1 && index != 1) {
       _searchFocusNode.unfocus();
     }
+
     setState(() {
       _currentPageIndex = index;
     });
+
+    // Load explore data only on the first visit to the explore tab
+    if (index == 1) {
+      _exploreViewKey.currentState?.loadData();
+    }
   }
 
   void _showStreakFreezeSuggestion(BuildContext context, LocalAllStats stats) {

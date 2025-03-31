@@ -18,13 +18,15 @@ class ExploreView extends ConsumerStatefulWidget {
   const ExploreView({super.key, required this.searchFocusNode});
 
   @override
-  ConsumerState<ExploreView> createState() => _ExploreViewState();
+  ConsumerState<ExploreView> createState() => ExploreViewState();
 }
 
-class _ExploreViewState extends ConsumerState<ExploreView> {
+// Make the state class public so it can be referenced by GlobalKey
+class ExploreViewState extends ConsumerState<ExploreView> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   Timer? _debounce;
+  bool _hasLoadedData = false;
 
   @override
   void dispose() {
@@ -50,9 +52,15 @@ class _ExploreViewState extends ConsumerState<ExploreView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(explorePacksProvider);
-    });
+  }
+
+  void loadData() {
+    if (!_hasLoadedData) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.invalidate(explorePacksProvider);
+        _hasLoadedData = true;
+      });
+    }
   }
 
   Future<void> _refreshExploreList() async {
