@@ -9,8 +9,9 @@ import '../../utils/stats_updater.dart';
 
 class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   final AudioStateNotifier notifier;
+  final WidgetRef? ref;
 
-  AudioStateProvider(this.notifier);
+  AudioStateProvider(this.notifier, {this.ref});
 
   @override
   void updatePlaybackState(PlaybackState state) {
@@ -27,14 +28,13 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
         TypeConstants.fileIdKey: completionData.fileId,
         TypeConstants.guideIdKey: completionData.guideId,
         TypeConstants.timestampIdKey: completionData.timestamp,
-      });
+      }, ref: ref);
 
       return true;
     } on Exception catch (_) {
       return false;
     }
   }
-
 }
 
 class AudioStateNotifier extends StateNotifier<PlaybackState> {

@@ -4,6 +4,7 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/me/me_provider.dart';
+import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,8 +35,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
   }
 
   void _loadStats() {
-    Future.delayed(const Duration(seconds: 1), () {
-      ref.read(statsProvider.notifier).refresh();
+    // Load stats immediately
+    ref.read(statsProvider.notifier).refresh().then((_) {
+      // Once stats are loaded, check for app review request
+      final reviewService = ref.read(reviewServiceProvider);
+      reviewService.checkAndRequestReview();
     });
   }
 

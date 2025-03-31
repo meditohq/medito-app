@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/review_service_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/types/type_constants.dart';
 import 'completed_tracks_storage.dart';
@@ -16,8 +19,9 @@ const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
 bool _isProcessingPendingTracks = false;
 
 Future<bool> handleStats(
-  Map<String, dynamic> payload,
-) async {
+  Map<String, dynamic> payload, {
+  WidgetRef? ref,
+}) async {
   try {
     // First try to sync with HealthKit
     await _syncHealthKit(payload).catchError((e) {
