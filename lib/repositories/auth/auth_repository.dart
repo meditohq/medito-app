@@ -9,8 +9,6 @@ import 'package:uuid/uuid.dart';
 import 'dart:developer' as dev;
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
-import '../../errors/exceptions.dart'; // Import RateLimitException
-import '../../exceptions/app_error.dart'; // Import RateLimitError & other AppErrors
 
 class User {
   final String id;
@@ -22,6 +20,11 @@ class User {
     this.email,
     this.metadata,
   });
+
+  @override
+  String toString() {
+    return 'User{id: $id, email: $email, metadata: $metadata}';
+  }
 }
 
 enum AuthType { anonymous, verified, none }
@@ -29,7 +32,7 @@ enum AuthType { anonymous, verified, none }
 abstract class AuthRepository {
   Future<void> initializeUser();
   Future<String> getToken();
-  String getUserEmail();
+  String? getUserEmail();
   Future<void> requestOtp(String email);
   Future<bool> verifyOtp(String email, String otp);
   User? get currentUser;
@@ -63,80 +66,225 @@ class AuthRepositoryImpl extends AuthRepository {
         _uuid = uuid ?? const Uuid();
 
   @override
-  User? get currentUser => _currentUser;
+  User? get currentUser {
+    if (_currentUser == null) {
+      // Create an anonymous user with the stored client ID
+      var clientId = _preferences.getString(SharedPreferenceConstants.userId);
+      if (clientId != null) {
+        return User(id: clientId);
+      }
+      return null;
+    }
+
+    // If the user ID is empty but we have a client ID in preferences, use that
+    if (_currentUser!.id.isEmpty) {
+      var clientId = _preferences.getString(SharedPreferenceConstants.userId);
+      if (clientId != null) {
+        return User(
+          id: clientId,
+          email: _currentUser!.email,
+          metadata: _currentUser!.metadata,
+        );
+      }
+    }
+
+    return _currentUser;
+  }
 
   @override
   Future<void> initializeUser() async {
     try {
+      dev.log('🔍 [AUTH_REPO] Starting initializeUser', level: 100);
       var clientId = _preferences.getString(SharedPreferenceConstants.userId);
+      dev.log('[AUTH_REPO] Retrieved clientId from preferences: $clientId',
+          level: 800);
 
       if (clientId == null) {
         // Generate and store a new client ID
         clientId = _generateClientId();
         await _preferences.setString(
             SharedPreferenceConstants.userId, clientId);
+        dev.log('[AUTH_REPO] Generated new clientId: $clientId', level: 800);
       }
 
       // Check if the user is logged in
       var isLoggedIn =
           _preferences.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+      dev.log('[AUTH_REPO] isLoggedIn from SharedPreferences: $isLoggedIn',
+          level: 800);
+
+      // Get stored email
+      var storedEmail = await _secureStorage.getUserEmail();
+      dev.log('[AUTH_REPO] Retrieved stored email: $storedEmail', level: 800);
 
       if (isLoggedIn) {
         var refreshToken = await _secureStorage.getRefreshToken();
+        dev.log(
+            '[AUTH_REPO] Retrieved refreshToken: ${refreshToken != null ? 'present' : 'missing'}',
+            level: 800);
 
         if (refreshToken != null) {
           try {
             // Get a fresh token
+            dev.log('[AUTH_REPO] Refreshing token during initialization',
+                level: 800);
             _tokens = await _authService.refreshToken(refreshToken);
+            dev.log(
+                '[AUTH_REPO] Token refresh successful. Access token starts with: ${_tokens?.accessToken.substring(0, 10)}...',
+                level: 800);
+            dev.log('[AUTH_REPO] Token email: ${_tokens?.email}', level: 800);
+            dev.log('[AUTH_REPO] Token clientId: ${_tokens?.clientId}',
+                level: 800);
+            dev.log('[AUTH_REPO] Token expires in: ${_tokens?.expiresIn}',
+                level: 800);
+
+            // If the refreshed token doesn't have an email but we have a stored one, use it
+            if (_tokens!.email == null && storedEmail != null) {
+              dev.log(
+                  '[AUTH_REPO] Using stored email as token email is missing: $storedEmail',
+                  level: 800);
+
+              // Create a new token object with the stored email
+              _tokens = AuthTokens(
+                accessToken: _tokens!.accessToken,
+                refreshToken: _tokens!.refreshToken,
+                expiresIn: _tokens!.expiresIn,
+                clientId: _tokens!.clientId,
+                email: storedEmail,
+              );
+            }
 
             // Update the HTTP service with the new token
             _httpApiService.setAuthHeader(_tokens!.accessToken);
 
-            // Set current user
+            // Set current user with clientId from preferences for consistency
             _currentUser = User(
-              id: _tokens!.clientId,
-              email: _tokens!.email,
+              // Use the client ID from preferences to ensure consistency
+              id: clientId,
+              email:
+                  _tokens!.email ?? storedEmail, // Use stored email as fallback
             );
+            dev.log('[AUTH_REPO] Current user set to: $_currentUser',
+                level: 800);
 
-            dev.log('[AUTH_REPO] User initialized from stored tokens');
+            dev.log('[AUTH_REPO] User initialized from stored tokens',
+                level: 800);
           } catch (e) {
-            dev.log('[AUTH_REPO] Error refreshing token during init', error: e);
+            dev.log('[AUTH_REPO] Error refreshing token during init',
+                error: e, level: 800);
             await _resetAuth();
           }
         } else {
-          dev.log(
-              '[AUTH_REPO] No refresh token found despite logged in status');
+          dev.log('[AUTH_REPO] No refresh token found despite logged in status',
+              level: 800);
           await _resetAuth();
         }
       } else {
-        dev.log('[AUTH_REPO] User is not logged in');
+        dev.log('[AUTH_REPO] User is not logged in', level: 800);
+        // Always set the client ID from preferences for consistency
         _currentUser = User(id: clientId);
+        dev.log('[AUTH_REPO] Set current user as anonymous: $_currentUser',
+            level: 800);
       }
     } catch (e, stackTrace) {
       dev.log('[AUTH_REPO] Error initializing user',
-          error: e, stackTrace: stackTrace);
+          error: e, stackTrace: stackTrace, level: 800);
       rethrow;
     }
   }
 
   @override
   Future<String> getToken() async {
+    dev.log('[AUTH_REPO] getToken called', level: 800);
+
     // If we have a valid token that isn't expired, return it immediately
     if (_tokens != null && !_tokens!.isExpired) {
+      dev.log(
+          '[AUTH_REPO] Using cached token - not expired. Email: ${_tokens?.email}',
+          level: 800);
       return _tokens!.accessToken;
     }
 
     // Only attempt token refresh if we have stored refresh token and
     // either our tokens are null or have expired
     var refreshToken = await _secureStorage.getRefreshToken();
+    dev.log(
+        '[AUTH_REPO] Retrieved refresh token: ${refreshToken != null ? 'present' : 'missing'}',
+        level: 800);
+
     if (refreshToken != null) {
       try {
-        dev.log('[AUTH_REPO] Refreshing expired token');
+        dev.log('[AUTH_REPO] Refreshing expired token', level: 800);
+
+        // Store existing tokens details before refresh for debugging
+        var oldEmail = _tokens?.email;
+        var oldClientId = _tokens?.clientId;
+        dev.log(
+            '[AUTH_REPO] Before refresh - Email: $oldEmail, ClientId: $oldClientId',
+            level: 800);
+
+        // Get stored email as additional fallback
+        var storedEmail = await _secureStorage.getUserEmail();
+        dev.log('[AUTH_REPO] Retrieved stored email: $storedEmail', level: 800);
+
         _tokens = await _authService.refreshToken(refreshToken);
+
+        dev.log(
+            '[AUTH_REPO] After refresh - Email: ${_tokens?.email}, ClientId: ${_tokens?.clientId}',
+            level: 800);
+
+        // If for some reason email is lost in the new tokens, try to preserve it
+        if (_tokens?.email == null) {
+          // Try using old email first
+          if (oldEmail != null && oldEmail.isNotEmpty) {
+            dev.log(
+                '[AUTH_REPO] Email lost during refresh, restoring from previous token',
+                level: 800);
+            _tokens = AuthTokens(
+              accessToken: _tokens!.accessToken,
+              refreshToken: _tokens!.refreshToken,
+              expiresIn: _tokens!.expiresIn,
+              clientId: _tokens!.clientId,
+              email: oldEmail,
+            );
+          }
+          // If no old email, try using stored email
+          else if (storedEmail != null && storedEmail.isNotEmpty) {
+            dev.log(
+                '[AUTH_REPO] Email lost during refresh, restoring from secure storage',
+                level: 800);
+            _tokens = AuthTokens(
+              accessToken: _tokens!.accessToken,
+              refreshToken: _tokens!.refreshToken,
+              expiresIn: _tokens!.expiresIn,
+              clientId: _tokens!.clientId,
+              email: storedEmail,
+            );
+          }
+        }
+
+        // If we have email in the token now, ensure it's saved to secure storage
+        if (_tokens?.email != null && _tokens!.email!.isNotEmpty) {
+          await _secureStorage.storeUserEmail(_tokens!.email!);
+          dev.log('[AUTH_REPO] Updated stored email: ${_tokens!.email}',
+              level: 800);
+        }
+
+        // Update current user with refreshed token info
+        if (_currentUser != null) {
+          _currentUser = User(
+            id: _tokens!.clientId,
+            email: _tokens!.email,
+          );
+          dev.log(
+              '[AUTH_REPO] Updated current user after token refresh: $_currentUser',
+              level: 800);
+        }
+
         _httpApiService.setAuthHeader(_tokens!.accessToken);
         return _tokens!.accessToken;
       } catch (e) {
-        dev.log('[AUTH_REPO] Error refreshing token', error: e);
+        dev.log('[AUTH_REPO] Error refreshing token', error: e, level: 800);
         // Let higher level code handle this error
         rethrow;
       }
@@ -146,8 +294,61 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  String getUserEmail() {
-    return _currentUser?.email ?? '';
+  String? getUserEmail() {
+    dev.log('[AUTH_REPO] getUserEmail called', level: 800);
+
+    var email = _currentUser?.email;
+    dev.log('[AUTH_REPO] Current email: $email', level: 800);
+
+    // If email is empty but tokens has email, update current user
+    if ((email == null || email.isEmpty) && _tokens?.email != null) {
+      dev.log('[AUTH_REPO] Email empty but found in tokens: ${_tokens?.email}',
+          level: 800);
+      if (_currentUser != null) {
+        _currentUser = User(
+          id: _currentUser!.id,
+          email: _tokens!.email,
+        );
+        email = _tokens!.email;
+        dev.log('[AUTH_REPO] Updated current user with token email: $email',
+            level: 800);
+      }
+    }
+
+    // If still empty, check secure storage as last resort
+    if (email == null || email.isEmpty) {
+      dev.log('[AUTH_REPO] Email still empty, checking secure storage',
+          level: 800);
+      _retrieveEmailFromStorage();
+    }
+
+    return email;
+  }
+
+  // Helper method to retrieve email from storage
+  Future<void> _retrieveEmailFromStorage() async {
+    try {
+      dev.log('[AUTH_REPO] Retrieving email from storage', level: 800);
+      var storedEmail = await _secureStorage.getUserEmail();
+
+      if (storedEmail != null && storedEmail.isNotEmpty) {
+        dev.log('[AUTH_REPO] Found email in storage: $storedEmail', level: 800);
+
+        if (_currentUser != null) {
+          _currentUser = User(
+            id: _currentUser!.id,
+            email: storedEmail,
+          );
+          dev.log('[AUTH_REPO] Updated current user with stored email',
+              level: 800);
+        }
+      } else {
+        dev.log('[AUTH_REPO] No email found in storage', level: 800);
+      }
+    } catch (e) {
+      dev.log('[AUTH_REPO] Error retrieving email from storage',
+          error: e, level: 800);
+    }
   }
 
   @override
@@ -171,6 +372,9 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<bool> verifyOtp(String email, String otp) async {
     try {
+      dev.log('[AUTH_REPO] Starting OTP verification for email: $email',
+          level: 500);
+
       var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
           _generateClientId();
 
@@ -180,11 +384,18 @@ class AuthRepositoryImpl extends AuthRepository {
         clientId: clientId,
       );
 
+      dev.log(
+          '[AUTH_REPO] OTP verification successful. Token details - Email: ${_tokens?.email}, ClientId: ${_tokens?.clientId}',
+          level: 500);
+
       // Update user info
       _currentUser = User(
         id: _tokens!.clientId,
         email: _tokens!.email,
       );
+      dev.log(
+          '[AUTH_REPO] Current user updated after OTP verification: $_currentUser',
+          level: 500);
 
       // Update HTTP service with the new token
       _httpApiService.setAuthHeader(_tokens!.accessToken);
@@ -196,24 +407,59 @@ class AuthRepositoryImpl extends AuthRepository {
       // Mark user as logged in
       await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
 
+      // Store email in secure storage for persistence
+      if (_tokens!.email != null) {
+        dev.log(
+            '[AUTH_REPO] Storing email in secure storage: ${_tokens!.email}',
+            level: 500);
+        await _secureStorage.storeUserEmail(_tokens!.email!);
+      } else {
+        dev.log(
+            '[AUTH_REPO] WARNING: Unable to store email - it is null in tokens',
+            level: 500);
+        // Fallback - store the email parameter
+        dev.log('[AUTH_REPO] Storing provided email parameter instead: $email',
+            level: 500);
+        await _secureStorage.storeUserEmail(email);
+      }
+
+      dev.log('[AUTH_REPO] OTP verification completed successfully',
+          level: 500);
       return true;
     } catch (e) {
-      dev.log('[AUTH_REPO] Error verifying OTP', error: e);
+      dev.log('[AUTH_REPO] Error verifying OTP', error: e, level: 500);
       return false;
     }
   }
 
   @override
   Future<bool> signOut() async {
+    dev.log('[AUTH_REPO] Starting signOut process', level: 500);
+
+    // First reset local auth state
+    await _resetAuth();
+    dev.log('[AUTH_REPO] Local auth state reset', level: 500);
+
+    // Then try to inform the server, but don't wait for success
     try {
-      // Try to sign out on the server
-      await _httpApiService.signOut();
+      dev.log('[AUTH_REPO] Attempting server sign out notification',
+          level: 500);
+      // We don't need to handle the response, this is just a courtesy call to the server
+      await _httpApiService.signOut().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          dev.log('[AUTH_REPO] Server sign out timed out, continuing',
+              level: 500);
+          return;
+        },
+      );
     } catch (e) {
-      dev.log('[AUTH_REPO] Error during server sign out', error: e);
-      // Continue with local sign out regardless of server response
+      dev.log('[AUTH_REPO] Error during server sign out, ignoring',
+          error: e, level: 500);
+      // Ignore errors since we've already cleared local state
     }
 
-    await _resetAuth();
+    dev.log('[AUTH_REPO] Sign out complete', level: 500);
     return true;
   }
 
@@ -270,19 +516,25 @@ class AuthRepositoryImpl extends AuthRepository {
 
   // Helper method to reset auth state
   Future<void> _resetAuth() async {
-    // Don't clear the client ID, as it's used for anonymous access too
+    dev.log('[AUTH_REPO] Resetting auth state', level: 500);
+
+    // Mark user as logged out
     await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, false);
 
     // Clear tokens
     await _secureStorage.clearRefreshToken();
+
+    // Clear stored email
+    await _secureStorage.clearUserEmail();
     _tokens = null;
 
     // Clear HTTP auth header
     _httpApiService.clearAuthHeader();
 
-    // Reset current user (but keep the ID)
-    var clientId = _preferences.getString(SharedPreferenceConstants.userId);
-    _currentUser = clientId != null ? User(id: clientId) : null;
+    // Reset current user to null
+    _currentUser = null;
+
+    dev.log('[AUTH_REPO] Auth state reset, user cleared', level: 500);
   }
 
   // Generate a client ID using date + random string

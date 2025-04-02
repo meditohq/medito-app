@@ -1,4 +1,6 @@
 // Business logic model for auth tokens
+import 'dart:developer' as dev;
+
 class AuthTokens {
   final String accessToken;
   final String refreshToken;
@@ -15,7 +17,18 @@ class AuthTokens {
     required this.expiresIn,
     required this.clientId,
     this.email,
-  }) : createdAt = DateTime.now();
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now() {
+    dev.log('[AUTH_TOKENS] Created new tokens object', level: 1000);
+    dev.log(
+        '[AUTH_TOKENS] Access token prefix: ${accessToken.substring(0, 10)}...',
+        level: 1000);
+    dev.log('[AUTH_TOKENS] Has refresh token: ${refreshToken.isNotEmpty}',
+        level: 1000);
+    dev.log('[AUTH_TOKENS] Expires in: $expiresIn seconds', level: 1000);
+    dev.log('[AUTH_TOKENS] Client ID: $clientId', level: 1000);
+    dev.log('[AUTH_TOKENS] Email: $email', level: 1000);
+  }
 
   // Convert from API response
   factory AuthTokens.fromJson(Map<String, dynamic> json) {
@@ -41,8 +54,12 @@ class AuthTokens {
 
   // Check if token is expired or about to expire (with 30s buffer)
   bool get isExpired {
-    var expiryTime = createdAt.add(Duration(seconds: expiresIn - 30));
-    return DateTime.now().isAfter(expiryTime);
+    final expiration = createdAt.add(Duration(seconds: expiresIn));
+    final isExpired = DateTime.now().isAfter(expiration);
+    dev.log(
+        '[AUTH_TOKENS] Token expired check: $isExpired (expiration: $expiration)',
+        level: 1000);
+    return isExpired;
   }
 
   // Create a new instance with refreshed access token
@@ -77,4 +94,54 @@ class AuthTokens {
       expiresIn.hashCode ^
       clientId.hashCode ^
       (email?.hashCode ?? 0);
+
+  @override
+  String toString() {
+    return 'AuthTokens{accessToken: ${accessToken.substring(0, 10)}..., '
+        'refreshToken: ${refreshToken.substring(0, 5)}..., '
+        'expiresIn: $expiresIn, '
+        'createdAt: $createdAt, '
+        'clientId: $clientId, '
+        'email: $email}';
+  }
+
+  // Static method to help with debugging token refresh
+  static void logTokenDifferences(AuthTokens? oldTokens, AuthTokens newTokens) {
+    if (oldTokens == null) {
+      dev.log('[AUTH_TOKENS] No old tokens to compare with', level: 1000);
+      return;
+    }
+
+    dev.log('[AUTH_TOKENS] Comparing tokens', level: 1000);
+
+    // Check if email changed
+    if (oldTokens.email != newTokens.email) {
+      dev.log(
+          '[AUTH_TOKENS] ⚠️ EMAIL CHANGED from ${oldTokens.email} to ${newTokens.email}',
+          level: 1000);
+    } else {
+      dev.log('[AUTH_TOKENS] Email unchanged: ${newTokens.email}', level: 1000);
+    }
+
+    // Check if client ID changed
+    if (oldTokens.clientId != newTokens.clientId) {
+      dev.log(
+          '[AUTH_TOKENS] ⚠️ CLIENT ID CHANGED from ${oldTokens.clientId} to ${newTokens.clientId}',
+          level: 1000);
+    } else {
+      dev.log('[AUTH_TOKENS] Client ID unchanged: ${newTokens.clientId}',
+          level: 1000);
+    }
+
+    // Access token always changes in a refresh
+    dev.log(
+        '[AUTH_TOKENS] New access token prefix: ${newTokens.accessToken.substring(0, 10)}...',
+        level: 1000);
+
+    // Check expiration time
+    dev.log('[AUTH_TOKENS] New expiration: ${newTokens.expiresIn} seconds',
+        level: 1000);
+    dev.log('[AUTH_TOKENS] Creation timestamp: ${newTokens.createdAt}',
+        level: 1000);
+  }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,9 +35,16 @@ class SignUpLogInPage extends ConsumerWidget {
     final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
 
+    dev.log('[SIGN_UP] Building SignUpLogInPage', level: 1000);
+    dev.log('[SIGN_UP] Current user: $user', level: 1000);
+    dev.log('[SIGN_UP] User email: ${user?.email}', level: 1000);
+
     if (user?.email != null && user?.email?.isNotEmpty == true) {
+      dev.log('[SIGN_UP] User has email, navigating to profile page',
+          level: 1000);
       return const UserProfilePage();
     } else {
+      dev.log('[SIGN_UP] User has no email, showing sign-up form', level: 1000);
       return SignUpLogInForm(fromSettings: fromSettings);
     }
   }
@@ -187,13 +195,31 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     });
 
     try {
+      dev.log('[SIGN_UP] Starting OTP verification', level: 1000);
+      dev.log('[SIGN_UP] Email: ${_emailController.text.trim()}', level: 1000);
+      dev.log('[SIGN_UP] OTP length: ${_otpController.text.trim().length}',
+          level: 1000);
+
       var success = await ref.read(authRepositorySyncProvider).verifyOtp(
             _emailController.text.trim(),
             _otpController.text.trim(),
           );
 
+      dev.log('[SIGN_UP] OTP verification result: $success', level: 1000);
+
       if (success) {
+        dev.log('[SIGN_UP] OTP verification successful, refreshing user info',
+            level: 1000);
         await _refreshUserInfo();
+
+        // Log the state of the auth repository after successful login
+        final authRepo = ref.read(authRepositorySyncProvider);
+        dev.log(
+            '[SIGN_UP] User after successful login: ${authRepo.currentUser}',
+            level: 1000);
+        dev.log('[SIGN_UP] User email after login: ${authRepo.getUserEmail()}',
+            level: 1000);
+
         await StatsManager().clearAllStats();
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
@@ -204,6 +230,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
         if (!mounted) return;
 
+        dev.log('[SIGN_UP] Login complete, navigating to next screen',
+            level: 1000);
         if (widget.fromSettings) {
           Navigator.of(context).pop();
         } else {
@@ -218,6 +246,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         showSnackBar(context, 'Authentication failed');
       }
     } catch (e) {
+      dev.log('[SIGN_UP] Error during OTP verification', error: e, level: 1000);
       if (e.toString().contains('403')) {
         showSnackBar(context, 'Invalid verification code. Please try again.');
       } else {
@@ -231,13 +260,24 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Future<void> _refreshUserInfo() async {
+    dev.log('[SIGN_UP] Starting user info refresh', level: 1000);
+
     // First invalidate the providers to clear their state
     ref.invalidate(meProvider);
     ref.invalidate(deviceAppAndUserInfoProvider);
 
+    // Log current auth state before header initialization
+    final authRepo = ref.read(authRepositorySyncProvider);
+    dev.log('[SIGN_UP] Auth state before header init: ${authRepo.currentUser}',
+        level: 1000);
+
     // Then initialize headers with device info
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     await HeaderService(deviceInfo).initialise();
+
+    dev.log(
+        '[SIGN_UP] Headers initialized, auth state after: ${authRepo.currentUser}',
+        level: 1000);
   }
 
   @override

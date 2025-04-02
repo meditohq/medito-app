@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +76,28 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
+
+    dev.log('[SETTINGS] Building settings screen', level: 1000);
+    dev.log('[SETTINGS] Current user: $user', level: 1000);
+    dev.log('[SETTINGS] User email directly: ${user?.email}', level: 1000);
+    dev.log(
+        '[SETTINGS] User email from getUserEmail(): ${authRepository.getUserEmail()}',
+        level: 1000);
+
+    // Try to refresh the token and check if that updates the email
+    Future.microtask(() async {
+      try {
+        await authRepository.getToken();
+        final updatedUser = authRepository.currentUser;
+        dev.log('[SETTINGS] User after token refresh: $updatedUser',
+            level: 1000);
+        dev.log('[SETTINGS] Email after refresh: ${updatedUser?.email}',
+            level: 1000);
+      } catch (e) {
+        dev.log('[SETTINGS] Error refreshing token in settings: $e',
+            level: 1000);
+      }
+    });
 
     ref.listen(authRepositoryProvider, (previous, next) {
       // No need to do anything here, just listening for changes

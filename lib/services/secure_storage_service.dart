@@ -25,6 +25,7 @@ class SecureStorage {
 
 class SecureStorageService {
   static const _refreshTokenKey = 'medito_refresh_token';
+  static const _userEmailKey = 'medito_user_email';
   final SecureStorage _storage;
 
   SecureStorageService({SecureStorage? storage})
@@ -82,6 +83,45 @@ class SecureStorageService {
     }
   }
 
+  // Add method to store user email
+  Future<void> storeUserEmail(String email) async {
+    try {
+      await _retrySecureOperation(() async {
+        await _storage.write(key: _userEmailKey, value: email);
+        dev.log('[SECURE_STORAGE] Email stored successfully: $email',
+            level: 500);
+      });
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error storing email', error: e, level: 500);
+    }
+  }
+
+  // Add method to retrieve user email
+  Future<String?> getUserEmail() async {
+    try {
+      return await _retrySecureOperation(() async {
+        final email = await _storage.read(key: _userEmailKey);
+        dev.log('[SECURE_STORAGE] Retrieved email: $email', level: 500);
+        return email;
+      });
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error retrieving email', error: e, level: 500);
+      return null;
+    }
+  }
+
+  // Add method to clear user email
+  Future<void> clearUserEmail() async {
+    try {
+      await _retrySecureOperation(() async {
+        await _storage.delete(key: _userEmailKey);
+        dev.log('[SECURE_STORAGE] User email cleared', level: 1000);
+      });
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error clearing user email', error: e);
+    }
+  }
+
   Future<void> clearRefreshToken() async {
     try {
       await _retrySecureOperation(() async {
@@ -97,6 +137,17 @@ class SecureStorageService {
     } catch (e) {
       dev.log('[SECURE_STORAGE] Error clearing refresh token', error: e);
       // Silently handle the error
+    }
+  }
+
+  // Clear all auth data
+  Future<void> clearAllAuthData() async {
+    try {
+      await clearRefreshToken();
+      await clearUserEmail();
+      dev.log('[SECURE_STORAGE] All auth data cleared', level: 1000);
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error clearing auth data', error: e);
     }
   }
 

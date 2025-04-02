@@ -70,6 +70,10 @@ class SplashViewState extends ConsumerState<SplashView>
     try {
       var auth = ref.read(authRepositorySyncProvider);
       if (auth.currentUser != null) {
+        dev.log(
+            '[SPLASH] Current user before resume check: ${auth.currentUser}',
+            level: 1000);
+
         var prefs = await SharedPreferences.getInstance();
         var isLoggedIn =
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
@@ -77,8 +81,20 @@ class SplashViewState extends ConsumerState<SplashView>
         if (isLoggedIn) {
           dev.log('[SPLASH] Checking auth status on resume');
           // getToken will only refresh if the current token is expired
-          await auth.getToken();
+          try {
+            await auth.getToken();
+            dev.log(
+                '[SPLASH] Token refresh successful on resume, current user: ${auth.currentUser}',
+                level: 1000);
+            dev.log('[SPLASH] User email after resume: ${auth.getUserEmail()}',
+                level: 1000);
+          } catch (e) {
+            dev.log('[SPLASH] Token refresh failed on resume',
+                error: e, level: 1000);
+          }
         }
+      } else {
+        dev.log('[SPLASH] No current user during resume check', level: 1000);
       }
     } catch (e) {
       dev.log('[SPLASH] Auth check failed: $e');
@@ -110,26 +126,34 @@ class SplashViewState extends ConsumerState<SplashView>
     }
   }
 
-  Future<void> checkAuthAndInitialize() async {
+  Future<void> _checkAuthAndInitialize() async {
     var auth = ref.read(authRepositorySyncProvider);
 
     try {
-      dev.log('Checking auth state...');
+      dev.log('[SPLASH] Starting auth initialization', level: 1000);
       await auth.initializeUser();
+      dev.log('[SPLASH] Auth initialized, current user: ${auth.currentUser}',
+          level: 1000);
+      dev.log('[SPLASH] User email from auth: ${auth.getUserEmail()}',
+          level: 1000);
 
       final currentUser = auth.currentUser;
       final isLoggedIn = await SharedPreferences.getInstance().then((prefs) =>
           prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false);
 
-      dev.log('Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}');
+      dev.log(
+          '[SPLASH] Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}, has email: ${currentUser?.email != null}',
+          level: 1000);
 
       if (isLoggedIn && currentUser != null) {
-        dev.log('Initializing services for verified user...');
+        dev.log('[SPLASH] Initializing services for verified user...',
+            level: 1000);
         await _initializeServices();
+        dev.log('[SPLASH] Services initialized', level: 1000);
 
         if (!mounted) return;
 
-        dev.log('Navigation to main app...');
+        dev.log('[SPLASH] Navigation to main app...', level: 1000);
         await Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const RootPageView(
@@ -138,7 +162,7 @@ class SplashViewState extends ConsumerState<SplashView>
           ),
         );
       } else {
-        dev.log('No verified user, showing auth buttons');
+        dev.log('[SPLASH] No verified user, showing auth buttons', level: 1000);
         if (!mounted) return;
         setState(() {
           _showAccountButtons = true;
@@ -146,7 +170,8 @@ class SplashViewState extends ConsumerState<SplashView>
         });
       }
     } catch (e, stackTrace) {
-      dev.log('Error in auth check', error: e, stackTrace: stackTrace);
+      dev.log('[SPLASH] Error in auth check',
+          error: e, stackTrace: stackTrace, level: 1000);
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);
@@ -157,10 +182,6 @@ class SplashViewState extends ConsumerState<SplashView>
         ),
       );
     }
-  }
-
-  Future<void> _checkAuthAndInitialize() async {
-    return checkAuthAndInitialize();
   }
 
   Future<void> _handleAnonymousSignIn() async {
@@ -256,17 +277,29 @@ class SplashViewState extends ConsumerState<SplashView>
 
   Future<void> _initializeServices() async {
     try {
+      dev.log('[SPLASH] Starting services initialization', level: 1000);
+
       // Initialize device info and headers
       final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
       final headerService = HeaderService(deviceInfo);
       await headerService.initialise();
+      dev.log('[SPLASH] Header service initialized', level: 1000);
 
       // Initialize user data
-      await ref.read(meProvider.future);
+      try {
+        dev.log('[SPLASH] Fetching user data...', level: 1000);
+        final userData = await ref.read(meProvider.future);
+        dev.log('[SPLASH] User data fetched: ${userData.toString()}',
+            level: 1000);
+      } catch (e) {
+        dev.log('[SPLASH] Error fetching user data', error: e, level: 1000);
+      }
 
       ref.read(rootCombineProvider(context));
+      dev.log('[SPLASH] Services initialization complete', level: 1000);
     } catch (e, stackTrace) {
-      dev.log('Error initializing services: $e', error: stackTrace);
+      dev.log('[SPLASH] Error initializing services: $e',
+          error: stackTrace, level: 1000);
       showSnackBar(context, StringConstants.appInitError);
     }
   }
@@ -541,5 +574,10 @@ class SplashViewState extends ConsumerState<SplashView>
         shape: BoxShape.circle,
       ),
     );
+  }
+
+  // Public method that can be called from outside the class
+  Future<void> checkAuthAndInitialize() async {
+    return _checkAuthAndInitialize();
   }
 }

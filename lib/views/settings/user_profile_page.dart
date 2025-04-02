@@ -6,9 +6,8 @@ import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
-import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/providers/me/me_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/views/splash_view.dart';
 
 class UserProfilePage extends ConsumerWidget {
   const UserProfilePage({super.key});
@@ -53,18 +52,28 @@ class UserProfilePage extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      // Clear client ID from SharedPreferences
-                      var prefs = await SharedPreferences.getInstance();
-                      await prefs.remove(SharedPreferenceConstants.userId);
-
+                      // Sign out using auth repository which will handle the full process
                       await authRepository.signOut();
+
+                      // Clear app stats
                       await StatsManager().clearAllStats();
+
+                      // Refresh affected providers
                       ref.read(meRefreshProvider)();
                       ref.read(statsProvider.notifier).refresh();
                       ref.invalidate(packProvider);
                       ref.invalidate(authRepositoryProvider);
 
-                      Navigator.of(context).pop(true);
+                      // Navigate to splash screen to reinitialize
+                      if (context.mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const SplashView(),
+                          ),
+                          (route) => false, // Clear all routes
+                        );
+                      }
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(StringConstants.signOutSuccessMessage),

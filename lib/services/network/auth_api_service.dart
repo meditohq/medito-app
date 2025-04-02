@@ -101,13 +101,19 @@ class AuthApiService {
   }
 
   Future<AuthTokens> refreshToken(String refreshToken) async {
-    dev.log('[AUTH] Attempting to refresh token', error: {
+    dev.log('[AUTH_API] Starting token refresh', level: 1000);
+    dev.log('[AUTH_API] Attempting to refresh token', error: {
       'token_length': refreshToken.length,
       'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
       'timestamp': DateTime.now().toString(),
+      'current_tokens_email': _tokens?.email,
+      'current_tokens_clientId': _tokens?.clientId,
     });
 
     try {
+      // Store a copy of the existing tokens for comparison
+      final oldTokens = _tokens;
+
       // Send refresh token in the body instead of using it as a Bearer token
       final response = await _post(
         HTTPConstants.authTokensRefresh,
@@ -116,21 +122,46 @@ class AuthApiService {
         },
       );
 
+      dev.log('[AUTH_API] Raw refresh token response: ${jsonEncode(response)}',
+          level: 1000);
+
+      // Check explicitly if email is present in response
+      final emailInResponse = response['email'] as String?;
+      dev.log('[AUTH_API] Email in token refresh response: $emailInResponse',
+          level: 1000);
+
       // Create new tokens object with the refreshed access token
       final tokens = AuthTokens(
         accessToken: response['access_token'] as String,
         refreshToken: refreshToken, // Keep the same refresh token
         expiresIn: response['expires_in'] as int,
-        clientId: _tokens?.clientId ?? '', // Preserve client ID if available
-        email: _tokens?.email, // Preserve email if available
+        clientId: response['client_id'] as String? ??
+            _tokens?.clientId ??
+            '', // Get from response or preserve existing
+        email: emailInResponse ??
+            _tokens
+                ?.email, // Try to get email from response or preserve existing
       );
+
+      // Log differences between old and new tokens
+      AuthTokens.logTokenDifferences(oldTokens, tokens);
+
+      // Log what email value we're using
+      dev.log(
+          '[AUTH_API] Final email used in refreshed tokens: ${tokens.email}',
+          level: 1000);
+      dev.log(
+          '[AUTH_API] Email source: ${emailInResponse != null ? 'from response' : 'preserved from old token'}',
+          level: 1000);
 
       // Store the new tokens
       await setAuthTokens(tokens);
 
-      dev.log('[AUTH] Token refresh successful', error: {
+      dev.log('[AUTH_API] Token refresh successful', error: {
         'expires_in': tokens.expiresIn,
         'has_email': tokens.email != null,
+        'email': tokens.email,
+        'client_id': tokens.clientId,
         'token_prefix': tokens.accessToken.substring(0, 10),
         'refresh_token_length': tokens.refreshToken.length,
         'refresh_token_prefix': tokens.refreshToken
@@ -139,7 +170,7 @@ class AuthApiService {
 
       return tokens;
     } catch (e) {
-      dev.log('[AUTH] Token refresh failed', error: {
+      dev.log('[AUTH_API] Token refresh failed', error: {
         'error': e.toString(),
         'token_length': refreshToken.length,
         'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
@@ -148,7 +179,7 @@ class AuthApiService {
       // If we get an error response indicating invalid/expired refresh token,
       // clear the stored tokens to force a new login
       if (e is RefreshTokenError) {
-        dev.log('[AUTH] Clearing tokens due to RefreshTokenError');
+        dev.log('[AUTH_API] Clearing tokens due to RefreshTokenError');
         await clearAuthTokens();
       }
 
@@ -157,14 +188,24 @@ class AuthApiService {
   }
 
   Future<void> setAuthTokens(AuthTokens tokens) async {
+    final previousEmail = _tokens?.email;
     _tokens = tokens;
+
+    dev.log('[AUTH_API] setAuthTokens called', error: {
+      'previous_email': previousEmail,
+      'new_email': tokens.email,
+      'email_changed': previousEmail != tokens.email,
+    });
+
     if (tokens.refreshToken.isNotEmpty) {
       await _secureStorage.storeRefreshToken(tokens.refreshToken);
     }
-    dev.log('[AUTH] Tokens updated', error: {
+    dev.log('[AUTH_API] Tokens updated', error: {
       'access_token_prefix':
           tokens.accessToken.substring(0, min(10, tokens.accessToken.length)),
       'has_refresh_token': tokens.refreshToken.isNotEmpty,
+      'has_email': tokens.email != null,
+      'email': tokens.email,
       'expires_in': tokens.expiresIn,
     });
   }
@@ -243,12 +284,24 @@ class AuthApiService {
         responseHeadersMap[name] = values;
       });
 
-      dev.log('[AUTH] Complete response details',
+      // Add specific logging for email in auth responses
+      final parsedContent = content.isNotEmpty ? jsonDecode(content) : null;
+      final hasEmail = parsedContent != null &&
+          parsedContent is Map<String, dynamic> &&
+          parsedContent.containsKey('email');
+
+      dev.log('[AUTH_API] Response contains email: $hasEmail', level: 1000);
+      if (hasEmail) {
+        dev.log('[AUTH_API] Email in response: ${parsedContent['email']}',
+            level: 1000);
+      }
+
+      dev.log('[AUTH_API] Complete response details',
           error: jsonEncode({
             'status_code': response.statusCode,
             'all_headers': responseHeadersMap,
             'raw_content': content,
-            'parsed_content': content.isNotEmpty ? jsonDecode(content) : null,
+            'parsed_content': parsedContent,
           }));
 
       if (response.statusCode >= HttpStatus.badRequest) {

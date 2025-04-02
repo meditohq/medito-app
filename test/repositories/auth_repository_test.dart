@@ -200,16 +200,30 @@ void main() {
           SharedPreferenceConstants.isLoggedIn, true)).called(1);
     });
 
-    test('signOut clears tokens', () async {
+    test('signOut clears tokens and creates a new anonymous session', () async {
       // Setup
+      final dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
       when(() => mockHttpApiService.signOut()).thenAnswer((_) async {});
       when(() => mockSecureStorageService.clearRefreshToken())
+          .thenAnswer((_) async {});
+      when(() => mockSecureStorageService.clearUserEmail())
           .thenAnswer((_) async {});
       when(() => mockHttpApiService.clearAuthHeader()).thenAnswer((_) async {});
       when(() => mockPreferences.setBool(any(), any()))
           .thenAnswer((_) async => true);
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
+      when(() => mockPreferences.setString(any(), any()))
+          .thenAnswer((_) async => true);
+      when(() => mockUuid.v6()).thenReturn('test-uuid-value-123');
+
+      // For anonymous sign-in
+      final newTokens = AuthTokens(
+        accessToken: 'anon-access',
+        refreshToken: 'anon-refresh',
+        expiresIn: 900,
+        clientId: 'new-client-id',
+      );
+      when(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
+          .thenAnswer((_) async => newTokens);
 
       // Action
       final result = await authRepository.signOut();
@@ -218,9 +232,17 @@ void main() {
       expect(result, isTrue);
       verify(() => mockHttpApiService.signOut()).called(1);
       verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
+      verify(() => mockSecureStorageService.clearUserEmail()).called(1);
       verify(() => mockHttpApiService.clearAuthHeader()).called(1);
       verify(() => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn, false)).called(1);
+
+      // Verify new anonymous session
+      verify(() => mockPreferences.setString(
+              SharedPreferenceConstants.userId, captureAny()))
+          .called(greaterThan(0));
+      verify(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
+          .called(1);
     });
 
     test('initiateUser creates client ID with expected format', () async {

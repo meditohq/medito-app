@@ -113,13 +113,11 @@ class HttpApiService {
   }
 
   Future<void> signOut() async {
-    dev.log('[HTTP] Signing out user', error: {
-      'url': '$authBaseUrl${HTTPConstants.authTokensSignout}',
-      'has_auth_header': _headers.containsKey(kAuthorizationHeader),
-    });
+    dev.log('[HTTP] Signing out user', level: 500);
 
     if (!_headers.containsKey(kAuthorizationHeader)) {
-      dev.log('[HTTP] No auth header present, skipping signout request');
+      dev.log('[HTTP] No auth header present, skipping signout request',
+          level: 500);
       return;
     }
 
@@ -128,33 +126,29 @@ class HttpApiService {
           await _client.postUrl(_buildAuthUri(HTTPConstants.authTokensSignout));
       _headers.forEach(request.headers.set);
 
-      dev.log('[HTTP] Signout request headers set', error: {
-        'instance': _instanceId,
-        'has_auth': request.headers.value(kAuthorizationHeader) != null,
-        'auth_header':
-            request.headers.value(kAuthorizationHeader)?.substring(0, 20),
-      });
+      dev.log('[HTTP] Signout request headers set', level: 500);
 
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
 
-      dev.log('[HTTP] Signout response received', error: {
-        'instance': _instanceId,
+      dev.log('[HTTP] Signout response received', level: 500, error: {
         'status_code': response.statusCode,
         'content': content,
       });
 
       if (response.statusCode >= HttpStatus.badRequest) {
-        dev.log('[HTTP] Signout request failed', error: {
+        dev.log('[HTTP] Signout request failed', level: 500, error: {
           'status_code': response.statusCode,
           'content': content,
         });
       }
     } catch (e) {
-      dev.log('[HTTP] Signout request error', error: e);
+      dev.log('[HTTP] Signout request error', error: e, level: 500);
     } finally {
+      // Always clear local auth state even if the request fails
       clearAuthHeader();
       await _authService.clearAuthTokens();
+      dev.log('[HTTP] Local auth state cleared during signout', level: 500);
     }
   }
 
