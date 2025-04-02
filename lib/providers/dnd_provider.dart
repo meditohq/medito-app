@@ -9,9 +9,12 @@ class DndNotifier extends Notifier<bool> {
 
   @override
   bool build() {
-    _loadPreference();
-    _initDndState();
-    return false;
+    return _loadSavedPreference();
+  }
+
+  bool _loadSavedPreference() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getBool(SharedPreferenceConstants.dndEnabled) ?? false;
   }
 
   Future<bool> checkNotificationPolicyAccess() async {
@@ -22,18 +25,6 @@ class DndNotifier extends Notifier<bool> {
     await _dndPlugin.openNotificationPolicyAccessSettings();
   }
 
-  Future<void> _initDndState() async {
-    if (Platform.isAndroid) {
-      final isDndEnabled = await _dndPlugin.isDndEnabled();
-      state = isDndEnabled;
-    }
-  }
-
-  Future<void> _loadPreference() async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    state = prefs.getBool(SharedPreferenceConstants.dndEnabled) ?? false;
-  }
-
   Future<void> _savePreference(bool value) async {
     final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setBool(SharedPreferenceConstants.dndEnabled, value);
@@ -42,10 +33,10 @@ class DndNotifier extends Notifier<bool> {
   Future<void> toggleDnd(bool isEnabled) async {
     if (Platform.isAndroid) {
       if (isEnabled) {
-        // When enabling, check and request permission
         final hasAccess = await _dndPlugin.isNotificationPolicyAccessGranted();
         if (!hasAccess) {
           await _dndPlugin.openNotificationPolicyAccessSettings();
+          return;
         }
       }
 
