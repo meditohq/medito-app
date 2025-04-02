@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
+import 'package:medito/models/me/me_model.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/repositories/me/me_repository.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/secure_storage_service.dart';
@@ -23,6 +25,8 @@ class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 class MockUuid extends Mock implements Uuid {}
 
+class MockMeRepository extends Mock implements MeRepository {}
+
 void main() {
   late AuthRepositoryImpl authRepository;
   late MockAuthApiService mockAuthApiService;
@@ -30,6 +34,9 @@ void main() {
   late MockSecureStorageService mockSecureStorageService;
   late MockSharedPreferences mockPreferences;
   late MockUuid mockUuid;
+
+  const email = 'test@example.com';
+  const clientId = 'test-client-id';
 
   setUp(() {
     mockAuthApiService = MockAuthApiService();
@@ -299,6 +306,102 @@ void main() {
       // Verify
       verify(() => mockSecureStorageService.getRefreshToken()).called(1);
       verifyNever(() => mockAuthApiService.refreshToken(any()));
+    });
+  });
+
+  group('Email Migration Tests', () {
+    test('skips migration for anonymous user', () async {
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(false);
+
+      await authRepository.migrateEmailToStorage();
+
+      verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
+    });
+
+    test('migrates email from current state if available', () async {
+      const email = 'test@example.com';
+      final mockUser = User(id: 'test-id', email: email);
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(true);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => null);
+      when(() => mockSecureStorageService.storeUserEmail(any()))
+          .thenAnswer((_) async {});
+
+      authRepository.setCurrentUserForTesting(mockUser);
+      await authRepository.migrateEmailToStorage();
+
+      verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
+    });
+
+    test('fetches and migrates email from /me endpoint when upgrading app',
+        () async {
+      const email = 'test@example.com';
+      final mockUser =
+          User(id: 'test-id', email: null); // No email in current state
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(true);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => null);
+      when(() => mockSecureStorageService.storeUserEmail(any()))
+          .thenAnswer((_) async {});
+      when(() => mockHttpApiService.getRequest(any())).thenAnswer((_) async =>
+          MeModel(id: 'test-id', email: email, hasActiveSubscription: false)
+              .toJson());
+
+      authRepository.setCurrentUserForTesting(mockUser);
+      await authRepository.migrateEmailToStorage();
+
+      verify(() => mockHttpApiService.getRequest(any())).called(1);
+      verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
+    });
+
+    test('handles /me endpoint returning no email', () async {
+      final mockUser = User(id: 'test-id', email: null);
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(true);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => null);
+      when(() => mockHttpApiService.getRequest(any())).thenAnswer((_) async =>
+          MeModel(id: 'test-id', email: null, hasActiveSubscription: false)
+              .toJson());
+
+      authRepository.setCurrentUserForTesting(mockUser);
+      await authRepository.migrateEmailToStorage();
+
+      verify(() => mockHttpApiService.getRequest(any())).called(1);
+      verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
+    });
+
+    test('handles /me endpoint error gracefully', () async {
+      final mockUser = User(id: 'test-id', email: null);
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(true);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => null);
+      when(() => mockHttpApiService.getRequest(any()))
+          .thenThrow(Exception('Network error'));
+
+      authRepository.setCurrentUserForTesting(mockUser);
+      await authRepository.migrateEmailToStorage();
+
+      verify(() => mockHttpApiService.getRequest(any())).called(1);
+      verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
+    });
+
+    test('does not store email if already in secure storage', () async {
+      const email = 'test@example.com';
+      final mockUser = User(id: 'test-id', email: null);
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(true);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => email);
+
+      authRepository.setCurrentUserForTesting(mockUser);
+      await authRepository.migrateEmailToStorage();
+
+      verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
     });
   });
 }

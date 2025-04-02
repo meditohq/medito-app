@@ -9,6 +9,8 @@ import 'package:uuid/uuid.dart';
 import 'dart:developer' as dev;
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
+import 'package:medito/repositories/me/me_repository.dart';
+import 'package:flutter/foundation.dart';
 
 class User {
   final String id;
@@ -41,6 +43,7 @@ abstract class AuthRepository {
   Future<bool> isAccountMarkedForDeletion();
   Future<void> signInAnonymously();
   void resetAuthState();
+  Future<void> migrateEmailToStorage();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -537,11 +540,81 @@ class AuthRepositoryImpl extends AuthRepository {
     dev.log('[AUTH_REPO] Auth state reset, user cleared', level: 500);
   }
 
+  // Test helper method to set the current user
+  @visibleForTesting
+  void setCurrentUserForTesting(User user) {
+    _currentUser = user;
+  }
+
   // Generate a client ID using date + random string
   String _generateClientId() {
     var dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
     var randomStr = _uuid.v6().split('-')[0]; // Use first part of UUID
     return '$dateStr-$randomStr';
+  }
+
+  @override
+  Future<void> migrateEmailToStorage() async {
+    // First check if we're dealing with an anonymous user
+    var isLoggedIn =
+        _preferences.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+    if (!isLoggedIn) {
+      dev.log('[AUTH_REPO] User is not logged in, skipping email migration',
+          level: 500);
+      return;
+    }
+
+    // Try getting email from current state
+    var email = getUserEmail();
+    if (email == null || email.isEmpty) {
+      dev.log('[AUTH_REPO] No email in current state, checking /me endpoint',
+          level: 500);
+      try {
+        // Create MeRepository instance to fetch user data
+        final meRepo = MeRepositoryImpl(client: _httpApiService);
+        final meData = await meRepo.fetchMe();
+
+        // If /me endpoint returns no email, this is likely an anonymous user
+        if (meData.email == null || meData.email!.isEmpty) {
+          dev.log(
+              '[AUTH_REPO] No email from /me endpoint, user is likely anonymous',
+              level: 500);
+          return;
+        }
+
+        email = meData.email;
+        dev.log('[AUTH_REPO] Found email from /me endpoint: $email',
+            level: 500);
+      } catch (e) {
+        dev.log('[AUTH_REPO] Error fetching email from /me endpoint',
+            error: e, level: 500);
+        // Don't return here as we might still have a valid email from tokens
+      }
+    }
+
+    // Only proceed with storage if we have a valid email
+    if (email != null && email.isNotEmpty) {
+      final storedEmail = await _secureStorage.getUserEmail();
+      if (storedEmail == null) {
+        dev.log('[AUTH_REPO] Migrating email to secure storage: $email',
+            level: 500);
+        await _secureStorage.storeUserEmail(email);
+
+        // Update current user with the email if needed
+        if (_currentUser != null &&
+            (_currentUser!.email == null || _currentUser!.email!.isEmpty)) {
+          _currentUser = User(
+            id: _currentUser!.id,
+            email: email,
+          );
+          dev.log('[AUTH_REPO] Updated current user with migrated email',
+              level: 500);
+        }
+      }
+    } else {
+      dev.log('[AUTH_REPO] No email found to migrate, user may be anonymous',
+          level: 500);
+    }
   }
 }
 
