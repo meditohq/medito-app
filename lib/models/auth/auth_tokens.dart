@@ -21,13 +21,20 @@ class AuthTokens {
   }) : createdAt = createdAt ?? DateTime.now() {
     dev.log('[AUTH_TOKENS] Created new tokens object', level: 1000);
     dev.log(
-        '[AUTH_TOKENS] Access token prefix: ${accessToken.substring(0, 10)}...',
+        '[AUTH_TOKENS] Access token prefix: ${_safeSubstring(accessToken, 0, 10)}...',
         level: 1000);
     dev.log('[AUTH_TOKENS] Has refresh token: ${refreshToken.isNotEmpty}',
         level: 1000);
     dev.log('[AUTH_TOKENS] Expires in: $expiresIn seconds', level: 1000);
     dev.log('[AUTH_TOKENS] Client ID: $clientId', level: 1000);
     dev.log('[AUTH_TOKENS] Email: $email', level: 1000);
+  }
+
+  // Helper method to safely get a substring
+  static String _safeSubstring(String text, int start, int end) {
+    if (text.isEmpty) return '';
+    int safeEnd = end > text.length ? text.length : end;
+    return text.substring(start, safeEnd);
   }
 
   // Convert from API response
@@ -97,8 +104,8 @@ class AuthTokens {
 
   @override
   String toString() {
-    return 'AuthTokens{accessToken: ${accessToken.substring(0, 10)}..., '
-        'refreshToken: ${refreshToken.substring(0, 5)}..., '
+    return 'AuthTokens{accessToken: ${_safeSubstring(accessToken, 0, 10)}..., '
+        'refreshToken: ${_safeSubstring(refreshToken, 0, 5)}..., '
         'expiresIn: $expiresIn, '
         'createdAt: $createdAt, '
         'clientId: $clientId, '
@@ -135,7 +142,7 @@ class AuthTokens {
 
     // Access token always changes in a refresh
     dev.log(
-        '[AUTH_TOKENS] New access token prefix: ${newTokens.accessToken.substring(0, 10)}...',
+        '[AUTH_TOKENS] New access token prefix: ${_safeSubstring(newTokens.accessToken, 0, 10)}...',
         level: 1000);
 
     // Check expiration time

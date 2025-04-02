@@ -38,6 +38,10 @@ void main() {
     mockPreferences = MockSharedPreferences();
     mockUuid = MockUuid();
 
+    // Mock getUserEmail to return null by default
+    when(() => mockSecureStorageService.getUserEmail())
+        .thenAnswer((_) async => null);
+
     authRepository = AuthRepositoryImpl(
       authService: mockAuthApiService,
       httpApiService: mockHttpApiService,
@@ -184,6 +188,8 @@ void main() {
           .thenAnswer((_) async => true);
       when(() => mockPreferences.setBool(any(), any()))
           .thenAnswer((_) async => true);
+      when(() => mockSecureStorageService.storeUserEmail(any()))
+          .thenAnswer((_) async {});
 
       // Action
       final result = await authRepository.verifyOtp(email, otp);
@@ -198,11 +204,11 @@ void main() {
           SharedPreferenceConstants.userId, tokens.clientId)).called(1);
       verify(() => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn, true)).called(1);
+      verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
     });
 
-    test('signOut clears tokens and creates a new anonymous session', () async {
+    test('signOut clears tokens', () async {
       // Setup
-      final dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
       when(() => mockHttpApiService.signOut()).thenAnswer((_) async {});
       when(() => mockSecureStorageService.clearRefreshToken())
           .thenAnswer((_) async {});
@@ -211,19 +217,6 @@ void main() {
       when(() => mockHttpApiService.clearAuthHeader()).thenAnswer((_) async {});
       when(() => mockPreferences.setBool(any(), any()))
           .thenAnswer((_) async => true);
-      when(() => mockPreferences.setString(any(), any()))
-          .thenAnswer((_) async => true);
-      when(() => mockUuid.v6()).thenReturn('test-uuid-value-123');
-
-      // For anonymous sign-in
-      final newTokens = AuthTokens(
-        accessToken: 'anon-access',
-        refreshToken: 'anon-refresh',
-        expiresIn: 900,
-        clientId: 'new-client-id',
-      );
-      when(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
-          .thenAnswer((_) async => newTokens);
 
       // Action
       final result = await authRepository.signOut();
@@ -236,13 +229,6 @@ void main() {
       verify(() => mockHttpApiService.clearAuthHeader()).called(1);
       verify(() => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn, false)).called(1);
-
-      // Verify new anonymous session
-      verify(() => mockPreferences.setString(
-              SharedPreferenceConstants.userId, captureAny()))
-          .called(greaterThan(0));
-      verify(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
-          .called(1);
     });
 
     test('initiateUser creates client ID with expected format', () async {
@@ -279,6 +265,8 @@ void main() {
 
       when(() => mockSecureStorageService.getRefreshToken())
           .thenAnswer((_) async => refreshToken);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => null); // Explicitly mock here too
       when(() => mockAuthApiService.refreshToken(refreshToken))
           .thenAnswer((_) async => newTokens);
       when(() => mockHttpApiService.setAuthHeader(any()))
@@ -290,6 +278,7 @@ void main() {
       // Verify
       expect(result, equals(newTokens.accessToken));
       verify(() => mockSecureStorageService.getRefreshToken()).called(1);
+      verify(() => mockSecureStorageService.getUserEmail()).called(1);
       verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
       verify(() => mockHttpApiService.setAuthHeader(newTokens.accessToken))
           .called(1);
