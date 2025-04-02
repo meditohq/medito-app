@@ -112,18 +112,24 @@ class StatsBottomSheetWidget extends ConsumerWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: ElevatedButton.icon(
-            onPressed: () => Share.share(StringConstants.shareStatsText),
-            icon: HugeIcon(
-              icon: HugeIcons.solidRoundedShare08,
-              size: 20,
-              color: ColorConstants.white,
-            ),
-            label: Text(StringConstants.share),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ColorConstants.lightPurple,
-              foregroundColor: ColorConstants.white,
-              minimumSize: const Size(double.infinity, 48),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => Share.share(StringConstants.shareStatsText),
+              icon: HugeIcon(
+                icon: HugeIcons.solidRoundedShare08,
+                size: 20,
+                color: ColorConstants.white,
+              ),
+              label: Text(StringConstants.share),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstants.lightPurple,
+                foregroundColor: ColorConstants.white,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
         ),

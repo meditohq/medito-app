@@ -221,14 +221,14 @@ class SplashViewState extends ConsumerState<SplashView>
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 StringConstants.emailExistsContinueNewAccount,
-                style: const TextStyle(color: ColorConstants.brightSky),
+                style: const TextStyle(color: ColorConstants.brightSky, fontSize: 12),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 StringConstants.emailExistsSignInWithEmail,
-                style: const TextStyle(color: ColorConstants.lightPurple),
+                style: const TextStyle(color: ColorConstants.lightPurple, fontSize: 12),
               ),
             ),
           ],

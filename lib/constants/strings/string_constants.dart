@@ -16,7 +16,7 @@ class StringConstants {
   static const String retry = 'Retry';
   static const String statsSuccess = 'Stats updated';
   static const String shareStatsText =
-      '''Discover calmness for FREE with #Medito‍♂️ I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download medito.app #Calm #Meditation #Headspace''';
+      '''Discover calmness for FREE with #Medito I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download https://medito.app #Calm #Meditation #Headspace''';
 
   static const String backgroundSounds = 'Background Sound';
   static const String x06 = 'x0.6';
