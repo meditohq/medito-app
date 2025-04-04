@@ -111,3 +111,4 @@ lib/firebase_options.dart
 fastlane/keys
 android/fastlane/keys/
 android/fastlane/report.xml
+upload_ios.sh
