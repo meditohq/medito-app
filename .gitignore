@@ -112,3 +112,4 @@ fastlane/keys
 android/fastlane/keys/
 android/fastlane/report.xml
 upload_ios.sh
+build_and_upload_ios.sh
