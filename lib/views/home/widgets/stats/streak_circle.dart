@@ -52,8 +52,41 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
 
         return statsAsync.when(
           loading: () => _buildShimmer(),
-          error: (_, __) => _buildErrorState(ref),
+          error: (error, stackTrace) {
+            // If there was a previous successful state, display that instead of the error
+            if (statsAsync.hasValue) {
+              final stats = statsAsync.value!;
+              final isStreakDoneToday =
+                  _isStreakDoneToday(stats.audioCompleted);
+              final streakText = '${stats.streakCurrent}';
+
+              // We might stop the animation here since we are in an error/offline state
+              if (_animationController.isAnimating) {
+                _animationController.stop();
+              }
+
+              return AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) =>
+                    _buildStreakCircle(isStreakDoneToday, streakText),
+              );
+            } else {
+              // If there's no previous data, show the actual error state
+              return _buildErrorState(ref);
+            }
+          },
           data: (stats) {
+            // If 1the stats have a zero 'updated' timestamp, they're either initial empty stats
+            // or they haven't been properly fetched yet
+            final isPossiblyStillLoading = stats.updated == 0;
+
+            if (isPossiblyStillLoading) {
+              // Only try to refresh if it's the initial load
+              Future.microtask(
+                  () => ref.read(statsProvider.notifier).refresh());
+              return _buildShimmer();
+            }
+
             final isStreakDoneToday = _isStreakDoneToday(stats.audioCompleted);
             final streakText = '${stats.streakCurrent}';
 

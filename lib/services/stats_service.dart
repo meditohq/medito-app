@@ -5,7 +5,9 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/stats_backup_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:meta/meta.dart';
 
 class MockStatsBackend {
   static LocalAllStats? _mockStorage = LocalAllStats(
@@ -15,33 +17,59 @@ class MockStatsBackend {
     totalTimeListened: 3600,
     tracksChecked: [],
     audioCompleted: [
-           LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 27,).millisecondsSinceEpoch, id: '1',),
-     LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 26,).millisecondsSinceEpoch, id: '2',),
-          LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 25,).millisecondsSinceEpoch, id: '3',),
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 22,).millisecondsSinceEpoch, id: '4',),
+        timestamp: DateTime.utc(
+          2025,
+          2,
+          27,
+        ).millisecondsSinceEpoch,
+        id: '1',
+      ),
       LocalAudioCompleted(
-          timestamp: DateTime.utc(2025, 2, 20,).millisecondsSinceEpoch,id: '6'),
+        timestamp: DateTime.utc(
+          2025,
+          2,
+          26,
+        ).millisecondsSinceEpoch,
+        id: '2',
+      ),
+      LocalAudioCompleted(
+        timestamp: DateTime.utc(
+          2025,
+          2,
+          25,
+        ).millisecondsSinceEpoch,
+        id: '3',
+      ),
+      LocalAudioCompleted(
+        timestamp: DateTime.utc(
+          2025,
+          2,
+          22,
+        ).millisecondsSinceEpoch,
+        id: '4',
+      ),
+      LocalAudioCompleted(
+          timestamp: DateTime.utc(
+            2025,
+            2,
+            20,
+          ).millisecondsSinceEpoch,
+          id: '6'),
     ],
     updated: DateTime.now().millisecondsSinceEpoch,
     streakFreezes: 2,
     maxStreakFreezes: 2,
-    freezeUsageDates: [
-    ],
+    freezeUsageDates: [],
   );
 
   static Future<void> saveStats(LocalAllStats stats) async {
     _mockStorage = stats;
-    await Future.delayed(
-        const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
   }
 
   static Future<LocalAllStats?> getStats() async {
-    await Future.delayed(
-        const Duration(milliseconds: 50));
+    await Future.delayed(const Duration(milliseconds: 50));
     return _mockStorage;
   }
 }
@@ -49,6 +77,8 @@ class MockStatsBackend {
 class StatsService {
   final HttpApiService _httpApiService;
   final SharedPreferences _prefs;
+  StatsBackupService _backupService;
+
   static const _lastSyncKey = 'last_stats_sync';
   static const _minTimeBetweenRequests = 2000; // 2 seconds
 
@@ -59,7 +89,8 @@ class StatsService {
     required HttpApiService httpApiService,
     required SharedPreferences prefs,
   })  : _httpApiService = httpApiService,
-        _prefs = prefs;
+        _prefs = prefs,
+        _backupService = StatsBackupService(prefs: prefs);
 
   Future<bool> hasRecentlySync() async {
     var lastSync = _prefs.getInt(_lastSyncKey);
@@ -77,7 +108,8 @@ class StatsService {
     dev.log('StatsService: Attempting to fetch stats');
 
     // Check if user is logged in before syncing
-    var isLoggedIn = _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+    var isLoggedIn =
+        _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
     if (!isLoggedIn) {
       dev.log('StatsService: User not logged in, skipping stats fetch');
       return LocalAllStats.empty();
@@ -86,10 +118,39 @@ class StatsService {
     var now = DateTime.now().millisecondsSinceEpoch;
     await _prefs.setInt(_lastSyncKey, now);
 
-    var response = await _httpApiService.getRequest(HTTPConstants.allStats);
-    var serverStats = AllStats.fromJson(response);
+    try {
+      var response = await _httpApiService.getRequest(HTTPConstants.allStats);
+      var serverStats = AllStats.fromJson(response);
+      var stats = LocalAllStats.fromAllStats(serverStats);
 
-    return LocalAllStats.fromAllStats(serverStats);
+      // If the stats are empty, try to restore from backup
+      if (stats.totalTracksCompleted == 0 &&
+          (stats.audioCompleted?.isEmpty ?? true)) {
+        dev.log('StatsService: Server returned empty stats, checking backup');
+        var userId = _prefs.getString(SharedPreferenceConstants.userId) ?? '';
+        var backupStats = await _backupService.getLatestBackup(userId);
+
+        if (backupStats != null) {
+          dev.log('StatsService: Restored stats from backup');
+          return backupStats;
+        }
+      }
+
+      return stats;
+    } catch (e) {
+      dev.log('StatsService: Failed to fetch stats: $e');
+
+      // Try to restore from backup on error
+      var userId = _prefs.getString(SharedPreferenceConstants.userId) ?? '';
+      var backupStats = await _backupService.getLatestBackup(userId);
+
+      if (backupStats != null) {
+        dev.log('StatsService: Restored stats from backup after fetch error');
+        return backupStats;
+      }
+
+      return LocalAllStats.empty();
+    }
   }
 
   Future<void> postStats(LocalAllStats stats) async {
@@ -106,10 +167,22 @@ class StatsService {
     }
 
     // Check if user is logged in before syncing
-    var isLoggedIn = _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+    var isLoggedIn =
+        _prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
     if (!isLoggedIn) {
       dev.log('StatsService: User not logged in, skipping stats post');
       return;
+    }
+
+    // Backup the stats before posting to server
+    var userId = _prefs.getString(SharedPreferenceConstants.userId) ?? '';
+    var backupSuccess = await _backupService.backupStats(stats, userId);
+
+    if (backupSuccess) {
+      dev.log('StatsService: Successfully backed up stats locally');
+    } else {
+      dev.log(
+          'StatsService: Failed to back up stats - they may be empty or backup failed');
     }
 
     try {
@@ -120,6 +193,18 @@ class StatsService {
       dev.log('StatsManager: Successfully posted stats');
     } catch (e) {
       dev.log('StatsManager: Failed to post stats: $e');
+
+      // If backup failed and posting failed, try backup again
+      if (!backupSuccess) {
+        dev.log('StatsService: Attempting backup again after post failure');
+        await _backupService.backupStats(stats, userId);
+      }
     }
+  }
+
+  /// Test helper to replace the backup service
+  @visibleForTesting
+  void setBackupServiceForTesting(StatsBackupService backupService) {
+    _backupService = backupService;
   }
 }

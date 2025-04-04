@@ -95,8 +95,15 @@ class StatsManager {
   Future<void> _doSync() async {
     //dev.log'StatsManager: Fetching remote stats');
     var remoteStats = await _statsService.fetchAllStats();
-    //dev.log
-       // 'StatsManager: Remote stats received: ${remoteStats.totalTracksCompleted}');
+
+    // If we got empty stats but have valid local stats, keep the local stats
+    if (remoteStats.totalTracksCompleted == 0 &&
+        (remoteStats.audioCompleted?.isEmpty ?? true) &&
+        _allStats != null &&
+        _allStats!.totalTracksCompleted > 0) {
+      //dev.log'StatsManager: Keeping local stats instead of empty remote stats');
+      return;
+    }
 
     // Save the remote stats to a temporary variable instead of immediately
     // overwriting _allStats
@@ -107,7 +114,7 @@ class StatsManager {
     await _merge(tempRemoteStats);
 
     //dev.log
-      //  'StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
+    //  'StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
 
     if (_allStats != null) {
       // Store the current streak values before recalculating
@@ -140,6 +147,13 @@ class StatsManager {
     if (_allStats == null) {
       //dev.log'StatsManager: Loading local stats');
       _allStats = await _loadLocalAllStats();
+
+      // If local stats are empty, sync with server to try to get valid stats
+      if (_allStats!.totalTracksCompleted == 0 &&
+          (_allStats!.audioCompleted?.isEmpty ?? true)) {
+        //dev.log'StatsManager: Local stats are empty, syncing with server');
+        await sync();
+      }
     }
     return _allStats!;
   }
@@ -167,7 +181,7 @@ class StatsManager {
     // If remote stats contain recent dummy data, prefer remote data completely
     if (hasRecentDummyTracks) {
       //dev.log
-          //'StatsManager: Remote stats contain recent dummy data, using remote stats only');
+      //'StatsManager: Remote stats contain recent dummy data, using remote stats only');
       _allStats = remoteStats.copyWith(
         updated: _getCurrentDate().millisecondsSinceEpoch,
       );
@@ -187,13 +201,13 @@ class StatsManager {
         localAllStats = LocalAllStats.fromJson(
             jsonDecode(localAllStatsJson) as Map<String, dynamic>);
         //dev.log
-            //'StatsManager: Loaded local stats from SharedPreferences: ${localAllStats.totalTracksCompleted}');
+        //'StatsManager: Loaded local stats from SharedPreferences: ${localAllStats.totalTracksCompleted}');
       } else {
         //dev.log'StatsManager: No local stats found in SharedPreferences');
       }
     } else {
       //dev.log
-          //'StatsManager: Using existing _allStats as local stats: ${localAllStats.totalTracksCompleted}');
+      //'StatsManager: Using existing _allStats as local stats: ${localAllStats.totalTracksCompleted}');
     }
 
     // If we have no remote stats but have local stats, use local
@@ -221,9 +235,9 @@ class StatsManager {
     if (localAllStats != null) {
       //dev.log'DEBUG - MERGING:');
       //dev.log
-         // 'Local audio: ${localAllStats.audioCompleted?.map((a) => a.id).toList()}');
+      // 'Local audio: ${localAllStats.audioCompleted?.map((a) => a.id).toList()}');
       //dev.log
-         // 'Remote audio: ${remoteStats.audioCompleted?.map((a) => a.id).toList()}');
+      // 'Remote audio: ${remoteStats.audioCompleted?.map((a) => a.id).toList()}');
 
       // Create a combined list of tracks checked
       var combinedTracksChecked = {
@@ -250,7 +264,7 @@ class StatsManager {
       final deduplicatedAudioCompleted = audioCompletedMap.values.toList();
 
       //dev.log
-          //'Deduplicated audio: ${deduplicatedAudioCompleted.map((a) => a.id).toList()}');
+      //'Deduplicated audio: ${deduplicatedAudioCompleted.map((a) => a.id).toList()}');
 
       // Create a combined list of freeze usage dates, removing duplicates
       var deduplicatedFreezeUsageDates = {
@@ -321,18 +335,18 @@ class StatsManager {
     // Remove duplicate dates
     audioDates = audioDates.toSet().toList();
     //dev.log
-        //'Unique audio dates: ${audioDates.map((d) => d.toIso8601String()).toList()}');
+    //'Unique audio dates: ${audioDates.map((d) => d.toIso8601String()).toList()}');
 
     freezeDates = freezeDates.toSet().toList();
     //dev.log
-       // 'Unique freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
+    // 'Unique freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
 
     // Only use freeze dates that don't already have activity and aren't in the future
     freezeDates = freezeDates
         .where((date) => !audioDates.contains(date) && !date.isAfter(today))
         .toList();
     //dev.log
-        //'Filtered freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
+    //'Filtered freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
 
     // Combine all activity dates and freeze dates
     var allActivityDates = [...audioDates, ...freezeDates];
@@ -340,7 +354,7 @@ class StatsManager {
     // Sort dates in descending order (newest first)
     allActivityDates.sort((a, b) => b.compareTo(a));
     //dev.log
-       // 'All activity dates (sorted): ${allActivityDates.map((d) => d.toIso8601String()).toList()}');
+    // 'All activity dates (sorted): ${allActivityDates.map((d) => d.toIso8601String()).toList()}');
 
     // No dates at all
     if (allActivityDates.isEmpty) {
@@ -360,7 +374,7 @@ class StatsManager {
     // Check yesterday's activity
     var yesterday = today.subtract(const Duration(days: 1));
     //dev.log
-        //'Checking for activity on yesterday: ${yesterday.toIso8601String()}');
+    //'Checking for activity on yesterday: ${yesterday.toIso8601String()}');
 
     var hasActivityYesterday = allActivityDates.any((date) =>
         date.year == yesterday.year &&
@@ -407,7 +421,7 @@ class StatsManager {
       } else {
         // No activity on this date, break the streak
         //dev.log
-           // 'No activity on ${checkDate.toIso8601String()}, breaking streak');
+        // 'No activity on ${checkDate.toIso8601String()}, breaking streak');
         break;
       }
     }
@@ -419,7 +433,7 @@ class StatsManager {
     }
 
     //dev.log
-       // 'Final streak calculation: current=$streak, longest=$longestStreak');
+    // 'Final streak calculation: current=$streak, longest=$longestStreak');
     //dev.log'===== END STREAK CALCULATION =====');
 
     return allStats.copyWith(
@@ -715,7 +729,7 @@ class StatsManager {
     await _statsService.postStats(_allStats!);
 
     //dev.log
-        //'Applied ${missedDays.length} streak freezes to: ${missedDays.map((d) => d.toIso8601String()).join(", ")}');
+    //'Applied ${missedDays.length} streak freezes to: ${missedDays.map((d) => d.toIso8601String()).join(", ")}');
 
     return true;
   }

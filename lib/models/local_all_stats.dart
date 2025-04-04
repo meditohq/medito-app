@@ -4,6 +4,20 @@ import 'package:medito/models/stats/all_stats_model.dart';
 
 part 'local_all_stats.g.dart';
 
+// NOTE ON SCHEMA EVOLUTION AND BACKUPS:
+// When this class changes in the future (adding, removing, or modifying fields),
+// it will affect the stored backups in StatsBackupService.
+//
+// Schema versioning is implemented in the StatsBackupService (not in this model)
+// by storing a 'version' field alongside the serialized stats.
+//
+// If/when the schema changes:
+// 1. Increment the version number in StatsBackupService
+// 2. Add a mapper/migration function in StatsBackupService to handle old versions
+// 3. Ensure backward compatibility by properly mapping old data to new structure
+//
+// This approach keeps this model clean while handling versioning at the backup level.
+
 @JsonSerializable()
 class LocalAllStats {
   final int streakCurrent;

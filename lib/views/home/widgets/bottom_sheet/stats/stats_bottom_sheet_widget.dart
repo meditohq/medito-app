@@ -41,15 +41,45 @@ class StatsBottomSheetWidget extends ConsumerWidget {
                     ),
                   ),
                 ),
-                error: (error, stack) => Center(
-                  child: GestureDetector(
-                    onTap: () => ref.read(statsProvider.notifier).refresh(),
-                    child: HugeIcon(
-                        icon: HugeIcons.strokeRoundedHelpCircle,
-                        color: ColorConstants.white),
-                  ),
-                ),
-                data: (stats) => _statsList(context, stats, ref),
+                error: (error, stack) {
+                  // If there was a previous successful state, display that instead of the error
+                  if (statsAsync.hasValue) {
+                    final stats = statsAsync.value!;
+                    return _statsList(context, stats, ref);
+                  } else {
+                    // If there's no previous data, show the actual error state
+                    return Center(
+                      child: GestureDetector(
+                        onTap: () => ref.read(statsProvider.notifier).refresh(),
+                        child: HugeIcon(
+                            icon: HugeIcons.strokeRoundedHelpCircle,
+                            color: ColorConstants.white),
+                      ),
+                    );
+                  }
+                },
+                data: (stats) {
+                  // If the stats have a zero 'updated' timestamp, they're either initial empty stats
+                  // or they haven't been properly fetched yet
+                  final isPossiblyStillLoading = stats.updated == 0;
+
+                  if (isPossiblyStillLoading) {
+                    // Only try to refresh if it's the initial load
+                    Future.microtask(
+                        () => ref.read(statsProvider.notifier).refresh());
+                    return const Center(
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return _statsList(context, stats, ref);
+                },
               ),
             ],
           ),

@@ -59,10 +59,37 @@ final editStatsUrlProvider = FutureProvider<String>((ref) async {
 class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   static DateTime? _lastRefresh;
   static const _minRefreshInterval = Duration(seconds: 2);
+  static const _maxRetries = 2;
 
   @override
   Future<LocalAllStats> build() async {
     dev.log('StatsNotifier: Building');
+    return _fetchStatsWithRetry();
+  }
+
+  Future<LocalAllStats> _fetchStatsWithRetry() async {
+    // Try to fetch valid stats with retries
+    for (var attempt = 0; attempt <= _maxRetries; attempt++) {
+      var stats = await _fetchStats();
+
+      // If we have valid stats, return them
+      if (stats.totalTracksCompleted > 0 ||
+          (stats.audioCompleted?.isNotEmpty ?? false)) {
+        dev.log('StatsNotifier: Got valid stats on attempt ${attempt + 1}');
+        return stats;
+      }
+
+      // If this isn't the last attempt, wait before retrying
+      if (attempt < _maxRetries) {
+        dev.log(
+            'StatsNotifier: Empty stats on attempt ${attempt + 1}, retrying...');
+        await Future.delayed(const Duration(milliseconds: 500));
+      } else {
+        dev.log('StatsNotifier: Still empty stats after all retries');
+      }
+    }
+
+    // If we still have empty stats after all retries, return them
     return _fetchStats();
   }
 
@@ -101,7 +128,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     }
 
     _lastRefresh = DateTime.now();
-    state = await AsyncValue.guard(() => _fetchStats());
+    state = await AsyncValue.guard(() => _fetchStatsWithRetry());
     dev.log('StatsNotifier: Refresh completed');
   }
 }
