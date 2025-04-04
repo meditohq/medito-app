@@ -52,8 +52,11 @@ post_install do |installer|
   end
   
   installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
+      # Apply Flutter specific settings first
+      flutter_additional_ios_build_settings(target)
+
+      # Then apply general settings
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
@@ -64,6 +67,13 @@ post_install do |installer|
       # Add app tracking transparency framework
       config.build_settings['OTHER_LDFLAGS'] ||= '$(inherited)'
       config.build_settings['OTHER_LDFLAGS'] += ' -framework AppTrackingTransparency'
+
+      # Finally, force Automatic signing for Pods targets AFTER other settings
+      config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
+      config.build_settings['DEVELOPMENT_TEAM'] = nil
+      config.build_settings['CODE_SIGN_IDENTITY'] = ''
+      config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''
+      config.build_settings['PROVISIONING_PROFILE'] = ''
     end 
   end
 end
