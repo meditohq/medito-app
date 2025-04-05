@@ -7,10 +7,10 @@ class AnimatedScaleWidget extends StatefulWidget {
   const AnimatedScaleWidget({super.key, required this.child, this.scale = 0.9});
 
   @override
-  _ScaleOnTapState createState() => _ScaleOnTapState();
+  ScaleOnTapState createState() => ScaleOnTapState();
 }
 
-class _ScaleOnTapState extends State<AnimatedScaleWidget>
+class ScaleOnTapState extends State<AnimatedScaleWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;

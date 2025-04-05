@@ -162,7 +162,6 @@ class StreakFreezeSuggestionWidgetState
   }
 
   Widget _buildAnimatedIcon(int index, int availableCount) {
-    final theme = Theme.of(context);
 
     // If this is not an available freeze or not the animating one
     if (index >= availableCount || index != _animatingIconIndex) {

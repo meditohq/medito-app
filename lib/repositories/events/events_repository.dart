@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -63,7 +64,7 @@ class EventsRepositoryImpl extends EventsRepository {
       return [];
     } catch (e) {
       // Handle errors, return empty list if there's an issue
-      print('Error fetching favorites: $e');
+      debugPrint('Error fetching favorites: $e');
       return [];
     }
   }
@@ -76,7 +77,7 @@ class EventsRepositoryImpl extends EventsRepository {
         body: favoritesList,
       );
     } catch (e) {
-      print('Error sending favorites to backend: $e');
+      debugPrint('Error sending favorites to backend: $e');
       rethrow;
     }
   }

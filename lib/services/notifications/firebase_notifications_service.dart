@@ -297,5 +297,5 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await handler._clearIOSBadge();
   }
 
-  print('Handling a background message ${message.messageId}');
+  debugPrint('Handling a background message ${message.messageId}');
 }
