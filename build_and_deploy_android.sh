@@ -4,7 +4,7 @@
 set -e
 
 # Build the APK using the existing script
-./build_prod_apk.sh
+./build_apk.sh
 
 # Get the package name from the app
 PACKAGE_NAME="meditofoundation.medito"
