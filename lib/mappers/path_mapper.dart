@@ -11,7 +11,7 @@ class PathMapper {
       return JourneyResultSuccess(steps);
     } catch (e) {
       debugPrint(e.toString());
-      return PathResultError.JourneyResultError(
+      return PathResultError.journeyResultError(
           'Failed to map path data: ${e.toString()}');
     } 
   }

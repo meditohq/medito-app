@@ -13,7 +13,7 @@ class JourneyResultSuccess extends JourneyResult {
 class PathResultError extends JourneyResult {
   final String message;
 
-  PathResultError.JourneyResultError(this.message);
+  PathResultError.journeyResultError(this.message);
 }
 
 @freezed
