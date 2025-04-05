@@ -63,6 +63,9 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
 
   @override
   Future<void> syncWithServer(List<FavoriteItem> favorites) async {
+    
+    if (favorites.isEmpty) return;
+
     try {
       final dtos = favorites
           .map((item) => FavoriteItemDto(
