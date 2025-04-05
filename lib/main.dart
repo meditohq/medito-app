@@ -202,9 +202,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
-    var connectionState = ref.watch(connectionNotifierProvider);
-
-    // Watch the auth repository's loading state
     final authRepo = ref.watch(authRepositoryProvider);
 
     return authRepo.when(
@@ -237,22 +234,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
             }
           }),
         );
-
-        connectionState.whenData((state) {
-          if (state.status == InternetConnectionStatus.disconnected &&
-              state.shouldShowMessage &&
-              mounted) {
-            showSnackBar(
-              context,
-              StringConstants.noConnection,
-              actionLabel: StringConstants.goToDownloads,
-              onActionPressed: () {
-                handleNavigation(
-                    TypeConstants.flow, [TypeConstants.downloads], context);
-              },
-            );
-          }
-        });
 
         final featureFlags = ref.watch(featureFlagsProvider);
         if (featureFlags.isStreakFreezeEnabled) {
