@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer' as dev;
 
 import 'package:firebase_core/firebase_core.dart';
