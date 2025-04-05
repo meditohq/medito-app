@@ -127,60 +127,28 @@ class AuthRepositoryImpl extends AuthRepository {
             level: 800);
 
         if (refreshToken != null) {
-          try {
-            // Get a fresh token
-            dev.log('[AUTH_REPO] Refreshing token during initialization',
-                level: 800);
-            _tokens = await _authService.refreshToken(refreshToken);
-            dev.log(
-                '[AUTH_REPO] Token refresh successful. Access token starts with: ${_tokens?.accessToken.substring(0, 10)}...',
-                level: 800);
-            dev.log('[AUTH_REPO] Token email: ${_tokens?.email}', level: 800);
-            dev.log('[AUTH_REPO] Token clientId: ${_tokens?.clientId}',
-                level: 800);
-            dev.log('[AUTH_REPO] Token expires in: ${_tokens?.expiresIn}',
-                level: 800);
+          // We have a refresh token, assume user is logged in.
+          // We won't refresh the access token proactively here.
+          // getToken() will handle refreshing when an API call needs it.
+          dev.log(
+              '[AUTH_REPO] User is logged in, refresh token exists. Skipping proactive refresh.',
+              level: 800);
 
-            // If the refreshed token doesn't have an email but we have a stored one, use it
-            if (_tokens!.email == null && storedEmail != null) {
-              dev.log(
-                  '[AUTH_REPO] Using stored email as token email is missing: $storedEmail',
-                  level: 800);
+          // Set the current user based on stored info
+          _currentUser = User(
+            id: clientId,
+            email: storedEmail, // Use the email retrieved earlier
+          );
+          dev.log(
+              '[AUTH_REPO] Initialized logged-in user state (without immediate token refresh): $_currentUser',
+              level: 800);
 
-              // Create a new token object with the stored email
-              _tokens = AuthTokens(
-                accessToken: _tokens!.accessToken,
-                refreshToken: _tokens!.refreshToken,
-                expiresIn: _tokens!.expiresIn,
-                clientId: _tokens!.clientId,
-                email: storedEmail,
-              );
-            }
-
-            // Update the HTTP service with the new token
-            _httpApiService.setAuthHeader(_tokens!.accessToken);
-
-            // Set current user with clientId from preferences for consistency
-            _currentUser = User(
-              // Use the client ID from preferences to ensure consistency
-              id: clientId,
-              email:
-                  _tokens!.email ?? storedEmail, // Use stored email as fallback
-            );
-            dev.log('[AUTH_REPO] Current user set to: $_currentUser',
-                level: 800);
-
-            dev.log('[AUTH_REPO] User initialized from stored tokens',
-                level: 800);
-          } catch (e) {
-            dev.log('[AUTH_REPO] Error refreshing token during init',
-                error: e, level: 800);
-            await _resetAuth();
-          }
+          // We don't have an access token yet, so don't set the auth header here.
         } else {
           dev.log('[AUTH_REPO] No refresh token found despite logged in status',
               level: 800);
           await _resetAuth();
+          // Inconsistent state: logged in flag true, but no token. Reset.
         }
       } else {
         dev.log('[AUTH_REPO] User is not logged in', level: 800);

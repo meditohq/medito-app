@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';

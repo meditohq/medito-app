@@ -1,7 +1,6 @@
 export 'device_and_app_info/device_and_app_info_provider.dart';
 export 'feature_flags_provider.dart';
 export 'home/home_provider.dart';
-export 'internet/internet_connection_provider.dart';
 export 'me/me_provider.dart';
 export 'meditation/download_track_provider.dart';
 export 'pack/pack_provider.dart';

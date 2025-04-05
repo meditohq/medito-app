@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/stats_backup_service.dart';
 import 'package:medito/services/stats_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -538,5 +539,10 @@ class MockStatsService implements StatsService {
   @override
   Future<bool> hasRecentlySync() async {
     return false;
+  }
+
+  @override
+  void setBackupServiceForTesting(StatsBackupService backupService) {
+    // TODO: implement setBackupServiceForTesting
   }
 }

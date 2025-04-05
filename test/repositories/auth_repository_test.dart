@@ -307,6 +307,30 @@ void main() {
       verify(() => mockSecureStorageService.getRefreshToken()).called(1);
       verifyNever(() => mockAuthApiService.refreshToken(any()));
     });
+
+    test(
+        'initializeUser when logged in with refresh token does not refresh immediately',
+        () async {
+      // Setup
+      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
+          .thenReturn(clientId);
+      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
+          .thenReturn(true);
+      when(() => mockSecureStorageService.getRefreshToken())
+          .thenAnswer((_) async => refreshToken);
+      when(() => mockSecureStorageService.getUserEmail())
+          .thenAnswer((_) async => email);
+
+      // Action
+      await authRepository.initializeUser();
+
+      // Verify
+      expect(authRepository.currentUser, isNotNull);
+      expect(authRepository.currentUser?.id, clientId);
+      expect(authRepository.currentUser?.email, email);
+      verifyNever(() => mockAuthApiService.refreshToken(any()));
+      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+    });
   });
 
   group('Email Migration Tests', () {
