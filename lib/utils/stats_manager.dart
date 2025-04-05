@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -306,13 +305,6 @@ class StatsManager {
       );
     }
 
-    // Debug output for audio entries
-    //dev.log'Raw audio entries:');
-    for (var audio in allStats.audioCompleted!) {
-      var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      //dev.log'  ID: ${audio.id}, Date: ${date.toIso8601String()}');
-    }
-
     // Convert audio completed to dates (year-month-day format)
     var audioDates = allStats.audioCompleted!.map((audio) {
       var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
@@ -324,13 +316,6 @@ class StatsManager {
       var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
       return DateTime(date.year, date.month, date.day);
     }).toList();
-
-    // Debug output for freeze dates
-    //dev.log'Raw freeze dates:');
-    for (var timestamp in allStats.freezeUsageDates) {
-      var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      //dev.log'  Date: ${date.toIso8601String()}');
-    }
 
     // Remove duplicate dates
     audioDates = audioDates.toSet().toList();

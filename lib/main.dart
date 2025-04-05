@@ -25,6 +25,7 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/tiktok_events_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/network/http_api_service.dart';
+// ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
 
@@ -135,6 +136,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _handleDeepLink(Uri uri) {
+    final currentContext = context;
     debugPrint('[DEEPLINK] Handling deep link: ${uri.toString()}');
     debugPrint('[DEEPLINK] Scheme: ${uri.scheme}');
     debugPrint('[DEEPLINK] Host: ${uri.host}');
@@ -156,16 +158,18 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           id = pathSegments.length > 1 ? pathSegments[1] : '';
         }
       } else {
+        if (!mounted) return;
         showSnackBar(
-          context,
+          currentContext,
           StringConstants.invalidDeepLink,
         );
         return;
       }
 
       if (path.isEmpty) {
+        if (!mounted) return;
         showSnackBar(
-          context,
+          currentContext,
           StringConstants.invalidDeepLink,
         );
         return;
@@ -173,18 +177,21 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
       debugPrint('[DEEPLINK] Navigating to: $path with id: $id');
 
+      if (!mounted) return;
       showSnackBar(
-        context,
+        currentContext,
         StringConstants.followingDeepLink,
       );
 
       Future.delayed(const Duration(seconds: 2), () {
-        handleNavigation(path, [id], context);
+        if (!mounted) return;
+        handleNavigation(path, [id], currentContext);
       });
     } catch (e) {
       debugPrint('[DEEPLINK] Error handling deep link: $e');
+      if (!mounted) return;
       showSnackBar(
-        context,
+        currentContext,
         StringConstants.deepLinkError,
       );
     }
@@ -201,6 +208,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   @override
   Widget build(BuildContext context) {
+    final currentContext = context;
     final authRepo = ref.watch(authRepositoryProvider);
 
     return authRepo.when(
@@ -228,7 +236,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           (_, state) => state.whenData((event) {
             switch (event) {
               case AuthStateEvent.forceLogout:
-                _handleForceLogout(context);
+                _handleForceLogout(currentContext);
                 break;
             }
           }),
@@ -317,6 +325,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _checkForFreezeUsage(WidgetRef ref) {
+    final currentContext = context;
     final stats = ref.watch(statsProvider).valueOrNull;
     final isDonor =
         ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
@@ -324,8 +333,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     if (stats != null && isDonor && stats.freezeUsageDates.isNotEmpty == true) {
       final lastFreezeUse = stats.freezeUsageDates.last;
       _hasShownFreezeAlert(lastFreezeUse).then((hasShown) {
+        if (!mounted) return;
         if (!hasShown) {
-          _showFreezeUsedAlert(context);
+          _showFreezeUsedAlert(currentContext);
           _markFreezeAlertShown(lastFreezeUse);
         }
       });

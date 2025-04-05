@@ -3,7 +3,6 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';

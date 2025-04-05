@@ -7,7 +7,7 @@ import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/stats_backup_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 
 class MockStatsBackend {
   static LocalAllStats? _mockStorage = LocalAllStats(

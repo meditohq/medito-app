@@ -83,8 +83,8 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
             begin: Alignment.topLeft,
             end: Alignment.bottomLeft,
             colors: [
-              ColorConstants.black.withOpacity(0),
-              ColorConstants.black.withOpacity(0.3),
+              ColorConstants.black.withValues(alpha: 255 * 0.5),
+              ColorConstants.black.withValues(alpha: 255 * 0.5),
             ],
           ),
           url: coverUrl,

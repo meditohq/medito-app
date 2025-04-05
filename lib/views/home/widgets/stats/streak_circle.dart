@@ -113,11 +113,11 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
           ? BoxDecoration(
               gradient: SweepGradient(
                 colors: [
-                  ColorConstants.lightPurple.withOpacity(0.2),
-                  ColorConstants.lightPurple.withOpacity(0.35),
-                  ColorConstants.lightPurple.withOpacity(1),
-                  ColorConstants.lightPurple.withOpacity(0.3),
-                  ColorConstants.lightPurple.withOpacity(0.25),
+                  ColorConstants.lightPurple.withValues(alpha: 255 * 0.2),
+                  ColorConstants.lightPurple.withValues(alpha: 255 * 0.35),
+                  ColorConstants.lightPurple.withValues(alpha: 255 * 1.0),
+                  ColorConstants.lightPurple.withValues(alpha: 255 * 0.3),
+                  ColorConstants.lightPurple.withValues(alpha: 255 * 0.25),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform:
@@ -155,9 +155,8 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
                           ),
                         HugeIcon(
                           icon: HugeIcons.solidRoundedFire,
-                          color: isStreakDoneToday
-                              ? ColorConstants.lightPurple
-                              : ColorConstants.white,
+                          color: ColorConstants.lightPurple
+                              .withValues(alpha: 255 * 0.35),
                           size: _kInnerIconSize,
                         )
                       ],

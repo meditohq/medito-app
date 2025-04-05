@@ -364,7 +364,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: ColorConstants.lightPurple.withOpacity(0.1),
+                color: ColorConstants.lightPurple.withValues(alpha: 255 * 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(

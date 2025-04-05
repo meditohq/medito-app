@@ -43,7 +43,6 @@ class _PackViewState extends ConsumerState<PackView>
   Widget build(BuildContext context) {
     super.build(context);
     final packAsyncValue = ref.watch(packProvider(packId: widget.id));
-    final favoritesAsyncValue = ref.watch(favoritesNotifierProvider);
 
     void popContext() => Navigator.pop(context);
 

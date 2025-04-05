@@ -108,7 +108,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    color: ColorConstants.black.withOpacity(0.3),
+                    color: ColorConstants.black.withValues(alpha: 255 * 0.3),
                   ),
                 ),
                 SafeArea(

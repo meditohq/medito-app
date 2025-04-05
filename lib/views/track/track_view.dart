@@ -1,11 +1,9 @@
-import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -61,7 +59,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
     final guideNameState = ref.watch(guideNamePreferenceProvider);
     final lastSelectedDuration = ref.watch(durationPreferenceProvider);
-    final favoritesState = ref.watch(favoritesNotifierProvider);
 
     void popContext() => Navigator.pop(context);
 
@@ -245,14 +242,16 @@ class _TrackViewState extends ConsumerState<TrackView>
   Widget _buildLoadingCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: ColorConstants.black.withOpacity(0.6)),
+      child:
+          Container(color: ColorConstants.black.withValues(alpha: 255 * 0.6)),
     );
   }
 
   Widget _buildErrorCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: ColorConstants.black.withOpacity(0.6)),
+      child:
+          Container(color: ColorConstants.black.withValues(alpha: 255 * 0.6)),
     );
   }
 
@@ -450,6 +449,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       ref.read(durationPreferenceProvider.notifier).setDuration(value.duration);
     }
   }
+
   void _handlePlay(
     WidgetRef ref,
     TrackModel trackModel,

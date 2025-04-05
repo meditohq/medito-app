@@ -323,7 +323,7 @@ class HttpApiService {
       } else if (e is UnauthorizedError &&
           _retryCount >= maxBackgroundRetries) {
         dev.log('[HTTP] Too many failed attempts - forcing logout');
-        await _addHttpDebugLog('Too many failed attempts (${_retryCount})');
+        await _addHttpDebugLog('Too many failed attempts ($_retryCount)');
         await _forceLogout('Too many token refresh failures');
       } else {
         dev.log(
@@ -512,7 +512,7 @@ class HttpApiService {
         'error_message': e.toString(),
         'instance': _instanceId,
       });
-      await _addHttpDebugLog('Error refreshing token: ${e.runtimeType}');
+      await _addHttpDebugLog('Error refreshing token: $e.runtimeType');
       rethrow;
     }
   }

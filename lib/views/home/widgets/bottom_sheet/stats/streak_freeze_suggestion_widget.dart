@@ -142,8 +142,8 @@ class StreakFreezeSuggestionWidgetState
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorConstants.lightPurple,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor:
-                        theme.colorScheme.onSurface.withOpacity(0.2),
+                    disabledBackgroundColor: theme.colorScheme.onSurface
+                        .withValues(alpha: 255 * 0.2),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -171,9 +171,7 @@ class StreakFreezeSuggestionWidgetState
             ? HugeIcons.solidRoundedSnow
             : HugeIcons.solidSharpCircle,
         size: 50,
-        color: index < availableCount
-            ? ColorConstants.lightPurple
-            : theme.colorScheme.onSurface.withOpacity(0.4),
+        color: ColorConstants.white.withValues(alpha: 255 * 0.5),
       );
     }
 
@@ -221,7 +219,7 @@ class StreakFreezeSuggestionWidgetState
         // Color transition
         final colorAnimation = ColorTween(
           begin: ColorConstants.lightPurple,
-          end: theme.colorScheme.onSurface.withOpacity(0.4),
+          end: ColorConstants.white.withValues(alpha: 255 * 0.7),
         ).animate(iconTransition);
 
         return Transform.scale(

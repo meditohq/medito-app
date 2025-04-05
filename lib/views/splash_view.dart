@@ -5,12 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/errors/exceptions.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -27,7 +25,7 @@ const _dotSize = 8.0;
 const _activeDotSize = 12.0;
 
 class SplashView extends ConsumerStatefulWidget {
-  const SplashView({Key? key}) : super(key: key);
+  const SplashView({super.key});
 
   // Static route name for navigation
   static const routeName = 'SplashView';
@@ -127,6 +125,7 @@ class SplashViewState extends ConsumerState<SplashView>
   }
 
   Future<void> _checkAuthAndInitialize() async {
+    final currentContext = context;
     var auth = ref.read(authRepositorySyncProvider);
 
     try {
@@ -154,7 +153,7 @@ class SplashViewState extends ConsumerState<SplashView>
         if (!mounted) return;
 
         dev.log('[SPLASH] Navigation to main app...', level: 1000);
-        await Navigator.of(context).pushReplacement(
+        await Navigator.of(currentContext).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const RootPageView(
               firstChild: BottomNavigationBarView(),
@@ -174,9 +173,9 @@ class SplashViewState extends ConsumerState<SplashView>
           error: e, stackTrace: stackTrace, level: 1000);
       if (!mounted) return;
 
-      showSnackBar(context, StringConstants.offlineMode);
+      showSnackBar(currentContext, StringConstants.offlineMode);
 
-      await Navigator.of(context).pushReplacement(
+      await Navigator.of(currentContext).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const DownloadsView(),
         ),
@@ -186,6 +185,7 @@ class SplashViewState extends ConsumerState<SplashView>
 
   Future<void> _handleAnonymousSignIn() async {
     setState(() => _isSigningIn = true);
+    final currentContext = context;
     var auth = ref.read(authRepositorySyncProvider);
 
     try {
@@ -195,16 +195,16 @@ class SplashViewState extends ConsumerState<SplashView>
 
       if (!mounted) return;
 
-      await Navigator.of(context).pushReplacement(
+      await Navigator.of(currentContext).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const OnboardingPagerScreen(),
         ),
       );
-    } on EmailExistsError catch (e) {
+    } on EmailExistsError catch (_) {
       if (!mounted) return;
 
       final shouldUseExistingAccount = await showDialog<bool>(
-        context: context,
+        context: currentContext,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           backgroundColor: ColorConstants.ebony,
@@ -221,14 +221,16 @@ class SplashViewState extends ConsumerState<SplashView>
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 StringConstants.emailExistsContinueNewAccount,
-                style: const TextStyle(color: ColorConstants.brightSky, fontSize: 12),
+                style: const TextStyle(
+                    color: ColorConstants.brightSky, fontSize: 12),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 StringConstants.emailExistsSignInWithEmail,
-                style: const TextStyle(color: ColorConstants.lightPurple, fontSize: 12),
+                style: const TextStyle(
+                    color: ColorConstants.lightPurple, fontSize: 12),
               ),
             ),
           ],
@@ -238,7 +240,7 @@ class SplashViewState extends ConsumerState<SplashView>
       if (!mounted) return;
 
       if (shouldUseExistingAccount == true) {
-        await Navigator.of(context)
+        await Navigator.of(currentContext)
             .push(
           MaterialPageRoute(
             builder: (context) => const SignUpLogInPage(),
@@ -261,9 +263,9 @@ class SplashViewState extends ConsumerState<SplashView>
       dev.log('Failed to initialize user', error: e);
       if (!mounted) return;
 
-      showSnackBar(context, StringConstants.offlineMode);
+      showSnackBar(currentContext, StringConstants.offlineMode);
 
-      await Navigator.of(context).pushReplacement(
+      await Navigator.of(currentContext).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const DownloadsView(),
         ),
@@ -276,6 +278,7 @@ class SplashViewState extends ConsumerState<SplashView>
   }
 
   Future<void> _initializeServices() async {
+    final currentContext = context;
     try {
       dev.log('[SPLASH] Starting services initialization', level: 1000);
 
@@ -295,12 +298,14 @@ class SplashViewState extends ConsumerState<SplashView>
         dev.log('[SPLASH] Error fetching user data', error: e, level: 1000);
       }
 
-      ref.read(rootCombineProvider(context));
+      if (!mounted) return;
+      ref.read(rootCombineProvider(currentContext));
       dev.log('[SPLASH] Services initialization complete', level: 1000);
     } catch (e, stackTrace) {
       dev.log('[SPLASH] Error initializing services: $e',
           error: stackTrace, level: 1000);
-      showSnackBar(context, StringConstants.appInitError);
+      if (!mounted) return;
+      showSnackBar(currentContext, StringConstants.appInitError);
     }
   }
 
