@@ -10,13 +10,17 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   // Set up the method channel mocking
-  const MethodChannel('plugins.it_nomads.com/flutter_secure_storage')
-      .setMockMethodCallHandler((MethodCall methodCall) async {
-    if (methodCall.method == 'read') {
-      return null; // Default return for read is null
-    }
-    return null;
-  });
+  const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(
+    channel,
+    (MethodCall methodCall) async {
+      if (methodCall.method == 'read') {
+        return null; // Default return for read is null
+      }
+      return null;
+    },
+  );
 
   late SecureStorageService secureStorage;
   late MockSecureStorage mockStorage;
