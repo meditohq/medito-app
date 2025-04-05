@@ -30,4 +30,5 @@ echo "🚀 Starting iOS build and upload..."
 echo "🚀 Starting Android build and deploy..."
 ./build_and_deploy_android.sh
 
-echo "✅ All builds completed!" 
+echo "✅ All builds completed! Opening APK directory..."
+open build/app/outputs/apk/prod/release/ # Open the specific APK output directory 
