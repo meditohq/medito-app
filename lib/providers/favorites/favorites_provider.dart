@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/favorites/favorite_item.dart';
 import 'package:medito/repositories/favorites/favorites_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'package:medito/utils/favorites_merger.dart';
 
 class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
   late final FavoritesRepository _repository;
@@ -9,73 +10,111 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
   @override
   AsyncValue<List<FavoriteItem>> build() {
     _repository = ref.read(favoritesRepositoryProvider);
-    _loadInitialFavorites();
+    // Load initial local data synchronously if possible or show loading.
+    // Start async fetch/merge immediately but don't block build.
+    _loadInitialAndFetch();
     return const AsyncValue.loading();
   }
 
-  void _loadInitialFavorites() {
+  // Renamed and adjusted initial loading logic
+  void _loadInitialAndFetch() {
     Future.microtask(() async {
       try {
-        final favorites = await _repository.loadFavorites();
-        state = AsyncValue.data(favorites);
-        await loadFavoritesFromServer();
-      } catch (e) {
-        state = AsyncValue.error(e, StackTrace.current);
+        final localFavorites = await _repository.loadFavorites();
+        // Set initial state with local data first
+        state = AsyncValue.data(localFavorites);
+        // Then attempt to fetch from server and merge
+        await _fetchAndMergeFromServer();
+      } catch (e, stackTrace) {
+        // Only report error if initial local load fails
+        state = AsyncValue.error(e, stackTrace);
+        debugPrint('Error loading initial favorites: $e');
       }
     });
   }
 
-  Future<void> loadFavoritesFromServer() async {
-    if (state is AsyncLoading) return;
-
+  // New function to handle fetching and merging
+  Future<void> _fetchAndMergeFromServer() async {
     try {
       final serverFavorites = await _repository.loadFavoritesFromServer();
-      state = AsyncValue.data(serverFavorites);
-      await _repository.saveFavorites(serverFavorites);
+      final currentLocalFavorites = state.valueOrNull ?? [];
+      final mergedFavorites =
+          mergeFavoriteLists(currentLocalFavorites, serverFavorites);
+
+      // Update state only if merged list differs from current state
+      // to avoid unnecessary rebuilds
+      if (!listEquals(state.value, mergedFavorites)) {
+        state = AsyncValue.data(mergedFavorites);
+      }
+
+      // Save the potentially updated merged list locally
+      await _repository.saveFavorites(mergedFavorites);
     } catch (e) {
-      debugPrint('Failed to load favorites from server: $e');
-      // Keep current state if server load fails
+      // If server fetch fails, log it but keep the current (local) state.
+      debugPrint('Failed to load or merge favorites from server: $e');
+      // Do not change state to error here, local data is still valid.
     }
   }
 
+  // Renamed for clarity, now primarily for pull-to-refresh
+  Future<void> refreshFromServer() async {
+    // Re-use the fetch and merge logic
+    await _fetchAndMergeFromServer();
+  }
+
+  // Sync logic remains similar, but ensures it sends the current state
   Future<void> syncWithServer() async {
-    try {
-      final currentFavorites = state.valueOrNull ?? [];
+    // Ensure we only sync if there's data available
+    if (state.hasValue && state.value!.isNotEmpty) {
+      final currentFavorites = state.value!;
       try {
         await _repository.syncWithServer(currentFavorites);
       } catch (e) {
-        // Don't update state on sync error, keep local state
-        // The error is logged but we don't propagate it up
+        debugPrint('Failed to sync favorites with server: $e');
+        // Keep local state on sync error. Merge logic will handle later.
       }
-    } catch (e) {
-      // Don't update state on sync error, keep local state
     }
   }
 
+  // Updated Add logic
   void addToFavorites(FavoriteItem item) async {
+    final currentFavorites = List<FavoriteItem>.from(state.valueOrNull ?? []);
+    // Avoid adding duplicates based on ID
+    if (currentFavorites.any((fav) => fav.id == item.id)) return;
+
+    final updatedFavorites = [...currentFavorites, item];
+    // Update state immediately for responsiveness
+    state = AsyncValue.data(updatedFavorites);
+    // Save locally then attempt sync
     try {
-      final currentFavorites = state.valueOrNull ?? [];
-      final updatedFavorites = [...currentFavorites, item];
-      state = AsyncValue.data(updatedFavorites);
       await _repository.saveFavorites(updatedFavorites);
       await syncWithServer();
     } catch (e) {
-      // Revert state on error
-      state = AsyncValue.error(e, StackTrace.current);
+      // Log save error, but state remains optimistically updated
+      debugPrint('Failed to save or sync after adding favorite: $e');
+      // Do not revert state here.
     }
   }
 
+  // Updated Remove logic
   void removeFromFavorites(String id) async {
+    final currentFavorites = state.valueOrNull ?? [];
+    final updatedFavorites =
+        currentFavorites.where((item) => item.id != id).toList();
+
+    // Check if the list actually changed
+    if (updatedFavorites.length == currentFavorites.length) return;
+
+    // Update state immediately
+    state = AsyncValue.data(updatedFavorites);
+    // Save locally then attempt sync
     try {
-      final currentFavorites = state.valueOrNull ?? [];
-      final updatedFavorites =
-          currentFavorites.where((item) => item.id != id).toList();
-      state = AsyncValue.data(updatedFavorites);
       await _repository.saveFavorites(updatedFavorites);
-      await syncWithServer();
+      await syncWithServer(); // Sync after saving
     } catch (e) {
-      // Revert state on error
-      state = AsyncValue.error(e, StackTrace.current);
+      // Log save error, but state remains optimistically updated
+      debugPrint('Failed to save or sync after removing favorite: $e');
+      // Do not revert state here.
     }
   }
 }

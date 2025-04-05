@@ -47,9 +47,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
   }
 
   Future<void> _onRefresh() async {
-    await ref
-        .read(favoritesNotifierProvider.notifier)
-        .loadFavoritesFromServer();
+    await ref.read(favoritesNotifierProvider.notifier).refreshFromServer();
   }
 
   @override
