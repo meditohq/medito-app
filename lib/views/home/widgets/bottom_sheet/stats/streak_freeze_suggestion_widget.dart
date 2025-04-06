@@ -120,7 +120,7 @@ class StreakFreezeSuggestionWidgetState
                 for (var i = 0; i < maxCount; i++)
                   Padding(
                     padding: const EdgeInsets.only(right: 12),
-                    child: _buildAnimatedIcon(i, availableCount),
+                    child: _buildAnimatedIcon(i, availableCount, theme),
                   ),
               ],
             ),
@@ -161,8 +161,7 @@ class StreakFreezeSuggestionWidgetState
     );
   }
 
-  Widget _buildAnimatedIcon(int index, int availableCount) {
-
+  Widget _buildAnimatedIcon(int index, int availableCount, ThemeData theme) {
     // If this is not an available freeze or not the animating one
     if (index >= availableCount || index != _animatingIconIndex) {
       return Icon(
