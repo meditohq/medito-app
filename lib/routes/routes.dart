@@ -90,7 +90,14 @@ Future<void> handleNavigation(
     await _pushRoute(const HelpScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-    await _pushRoute(const DonationScreen(), ref);
+         if (await canLaunchUrl(Uri.parse(StringConstants.donationFormUrl))) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _URLLauncherScreen(url: Uri.parse(StringConstants.donationFormUrl)),
+        ),
+      );
+    }
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }
