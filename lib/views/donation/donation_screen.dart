@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -82,7 +84,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                 color: Colors.white, size: 18),
             const SizedBox(width: 8),
             Text(
-              StringConstants.donateToMedito,
+              Platform.isIOS ? StringConstants.donateTitle : StringConstants.donateToMedito,
               style: Theme.of(context).textTheme.displayLarge,
             ),
           ],
