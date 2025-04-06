@@ -7,7 +7,8 @@ class EmptyStateWidget extends StatelessWidget {
   final String? message;
   final SvgPicture? image;
 
-  const EmptyStateWidget({super.key, this.message, this.image});
+  const EmptyStateWidget({Key? key, this.message, this.image})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

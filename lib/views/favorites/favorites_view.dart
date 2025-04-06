@@ -147,7 +147,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
             Text(
               StringConstants.addItemsToFavoritesMessage,
               style: TextStyle(
-                color: ColorConstants.white.withValues(alpha: 255 * 0.5),
+                color: ColorConstants.white.withOpacity(0.7),
               ),
               textAlign: TextAlign.center,
             ),

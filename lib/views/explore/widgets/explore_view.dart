@@ -323,7 +323,7 @@ class SearchBox extends StatelessWidget {
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: ColorConstants.white.withValues(alpha: 255 * 0.5),
+        fillColor: ColorConstants.white.withOpacity(0.1),
       ),
       style: const TextStyle(color: ColorConstants.white),
       onChanged: onChanged,

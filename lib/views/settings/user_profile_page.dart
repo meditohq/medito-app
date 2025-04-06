@@ -94,7 +94,7 @@ class UserProfilePage extends ConsumerWidget {
                     backgroundColor: ColorConstants.lightPurple,
                     disabledForegroundColor: Colors.white60,
                     disabledBackgroundColor:
-                        ColorConstants.lightPurple.withValues(alpha: 255 * 0.5),
+                        ColorConstants.lightPurple.withOpacity(0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4),
                     ),

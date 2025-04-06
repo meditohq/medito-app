@@ -98,6 +98,6 @@ class TrackRepositoryImpl extends TrackRepository {
 }
 
 @riverpod
-TrackRepository trackRepository(Ref ref) {
+TrackRepository trackRepository(TrackRepositoryRef ref) {
   return TrackRepositoryImpl(ref: ref, client: HttpApiService());
 }

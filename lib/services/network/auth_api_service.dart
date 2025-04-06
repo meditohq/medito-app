@@ -8,6 +8,7 @@ import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
+import '../../errors/exceptions.dart'; // Import the custom exception
 import 'package:flutter/foundation.dart'; // Import for visibleForTesting
 
 class HttpClientWrapper {

@@ -76,10 +76,10 @@ class AuthTokens {
   }) {
     return AuthTokens(
       accessToken: accessToken,
-      refreshToken: refreshToken,
+      refreshToken: this.refreshToken,
       expiresIn: expiresIn,
-      clientId: clientId,
-      email: email,
+      clientId: this.clientId,
+      email: this.email,
     );
   }
 

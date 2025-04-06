@@ -26,7 +26,7 @@ class BoxShimmerWidget extends StatelessWidget {
       height: height ?? size.height,
       child: Shimmer.fromColors(
         baseColor: ColorConstants.greyIsTheNewBlack,
-        highlightColor: ColorConstants.white.withValues(alpha: 255 * 0.1),
+        highlightColor: ColorConstants.greyIsTheNewGrey.withOpacity(0.4),
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(

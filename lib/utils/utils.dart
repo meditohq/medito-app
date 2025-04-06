@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Color parseColor(String? color) {
@@ -28,7 +32,7 @@ void createSnackBar(
   try {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   } catch (e) {
-    debugPrint(e.toString());
+    print(e);
   }
 }
 

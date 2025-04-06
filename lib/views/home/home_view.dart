@@ -96,7 +96,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                       default:
                         return const SizedBox.shrink();
                     }
-                  }),
+                  }).toList(),
                 ],
               ),
             ),

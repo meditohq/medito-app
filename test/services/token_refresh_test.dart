@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medito/constants/http/http_constants.dart' as http_constants;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/network/auth_api_service.dart';
@@ -15,6 +16,7 @@ class MockAuthApiService extends Mock implements AuthApiService {}
 void main() {
   late MockSecureStorageService mockSecureStorage;
   late MockAuthApiService mockAuthService;
+  late HttpApiService httpService;
 
   setUp(() {
     mockSecureStorage = MockSecureStorageService();
@@ -25,6 +27,7 @@ void main() {
 
     // For real tests, we would need a way to inject dependencies into HttpApiService
     // HttpApiService._instance = null; // This line won't work due to private access
+    httpService = HttpApiService();
 
     // Replace the authService in httpService with our mock
     // This requires modifying HttpApiService to allow injection for testing

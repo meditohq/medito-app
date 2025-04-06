@@ -8,7 +8,7 @@ class SecureStorage {
   final FlutterSecureStorage storage;
 
   SecureStorage({FlutterSecureStorage? storage})
-      : storage = storage ?? const FlutterSecureStorage();
+      : this.storage = storage ?? const FlutterSecureStorage();
 
   Future<void> write({required String key, required String? value}) {
     return storage.write(key: key, value: value);
