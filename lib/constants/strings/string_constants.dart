@@ -132,8 +132,12 @@ class StringConstants {
   static const String totalTracksCompleted = 'Total Tracks Completed';
   static const String totalTimeListened = 'Total Time Listened';
   static const String days = 'days';
+  static const String day = 'day';
   static const String hours = 'h';
+  static const String hoursFull = 'hours';
+  static const String hourFull = 'hour';
   static const String minutes = 'minutes';
+  static const String minute = 'minute';
 
   static const String signUpLogInTitle = 'Sign in to Medito';
   static const String createAccountTitle = 'Create account';

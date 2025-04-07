@@ -110,9 +110,15 @@ class StatsBottomSheetWidget extends ConsumerWidget {
     var minutes = (milliseconds % (1000 * 60 * 60)) ~/ (1000 * 60);
 
     if (hours > 0) {
-      return '$hours ${StringConstants.hours} ${minutes.toString().padLeft(2, '0')} ${StringConstants.minutes}';
+      var hourText =
+          hours == 1 ? StringConstants.hourFull : StringConstants.hoursFull;
+      var minuteText =
+          minutes == 1 ? StringConstants.minute : StringConstants.minutes;
+      return '$hours $hourText ${minutes.toString().padLeft(2, '0')} $minuteText';
     } else {
-      return '$minutes ${StringConstants.minutes}';
+      var minuteText =
+          minutes == 1 ? StringConstants.minute : StringConstants.minutes;
+      return '$minutes $minuteText';
     }
   }
 
@@ -129,9 +135,9 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           child: Column(
             children: [
               _buildStatRow(context, StringConstants.currentStreak,
-                  '${stats.streakCurrent} ${StringConstants.days}'),
+                  '${stats.streakCurrent} ${stats.streakCurrent == 1 ? StringConstants.day : StringConstants.days}'),
               _buildStatRow(context, StringConstants.longestStreak,
-                  '${stats.streakLongest} ${StringConstants.days}'),
+                  '${stats.streakLongest} ${stats.streakLongest == 1 ? StringConstants.day : StringConstants.days}'),
               _buildStatRow(context, StringConstants.totalTracksCompleted,
                   '${stats.totalTracksCompleted}'),
               _buildStatRow(context, StringConstants.totalTimeListened,
