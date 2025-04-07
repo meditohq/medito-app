@@ -7,12 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/errors/exceptions.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -29,7 +27,7 @@ const _dotSize = 8.0;
 const _activeDotSize = 12.0;
 
 class SplashView extends ConsumerStatefulWidget {
-  const SplashView({Key? key}) : super(key: key);
+  const SplashView({super.key});
 
   // Static route name for navigation
   static const routeName = 'SplashView';
