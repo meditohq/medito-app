@@ -93,8 +93,8 @@ class StatsBottomSheetWidget extends ConsumerWidget {
       icon: MeditoHugeIcon(icon: title),
       iconColor: ColorConstants.white.toString(),
       trailingIconSize: 20,
-      title: title,
-      subTitle: value,
+      title: value,
+      subTitle: title,
       hasUnderline: true,
       isTrailingIcon: false,
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
