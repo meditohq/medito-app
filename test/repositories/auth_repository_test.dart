@@ -12,7 +12,6 @@ import 'package:medito/services/secure_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:medito/errors/exceptions.dart';
 
 // Mock dependencies
 class MockAuthApiService extends Mock implements AuthApiService {}
@@ -34,9 +33,6 @@ void main() {
   late MockSecureStorageService mockSecureStorageService;
   late MockSharedPreferences mockPreferences;
   late MockUuid mockUuid;
-
-  const email = 'test@example.com';
-  const clientId = 'test-client-id';
 
   setUp(() {
     mockAuthApiService = MockAuthApiService();

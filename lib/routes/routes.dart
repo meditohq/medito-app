@@ -16,7 +16,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
 import 'package:medito/views/settings/help_screen.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
-import 'package:medito/views/donation/donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
 
 extension SanitisePath on String {

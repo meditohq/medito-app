@@ -151,10 +151,6 @@ PODS:
   - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
-  - tiktok_events_sdk (0.0.1):
-    - Flutter
-    - TikTokBusinessSDK
-  - TikTokBusinessSDK (1.3.7)
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -181,8 +177,6 @@ DEPENDENCIES:
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
-  - tiktok_events_sdk (from `.symlinks/plugins/tiktok_events_sdk/ios`)
-  - TikTokBusinessSDK
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -198,7 +192,6 @@ SPEC REPOS:
     - GoogleUtilities
     - nanopb
     - PromisesObjC
-    - TikTokBusinessSDK
 
 EXTERNAL SOURCES:
   app_links:
@@ -243,8 +236,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite_darwin:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
-  tiktok_events_sdk:
-    :path: ".symlinks/plugins/tiktok_events_sdk/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
@@ -281,10 +272,8 @@ SPEC CHECKSUMS:
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
-  tiktok_events_sdk: a17263dc678931e4020dc26c499953851645fd7d
-  TikTokBusinessSDK: a80fcf28416a0ce4a1f141e50c19aade85dbec14
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
 
-PODFILE CHECKSUM: 32e4c069117250da4af959947b8231561da6e29c
+PODFILE CHECKSUM: a4f38edbe620e059a41acee1d28085f20086821d
 
 COCOAPODS: 1.16.2

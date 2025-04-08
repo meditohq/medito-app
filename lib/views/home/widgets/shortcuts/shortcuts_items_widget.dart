@@ -8,7 +8,6 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:reorderables/reorderables.dart';
-import 'package:medito/services/tiktok_events_service.dart';
 
 import '../../../../providers/home/home_provider.dart';
 import '../../../../widgets/medito_huge_icon.dart';
@@ -37,13 +36,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     WidgetRef ref,
     ShortcutsModel element,
   ) async {
-    await ref.read(tiktokEventsServiceProvider).logShortcutTap(
-          shortcutId: element.id ?? 'unknown',
-          shortcutTitle: element.title ?? 'unknown',
-          shortcutType: element.type,
-          shortcutPath: element.path ?? 'unknown',
-        );
-
     await handleNavigation(
       element.type,
       [element.path.toString().getIdFromPath()],

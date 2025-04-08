@@ -63,7 +63,6 @@ dependencies:
   app_links: ^6.3.2
   do_not_disturb: ^1.0.3
   font_awesome_flutter: ^10.1.0
-  tiktok_events_sdk: ^1.0.6
 
 dev_dependencies:
   flutter_test:

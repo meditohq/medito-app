@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medito/constants/http/http_constants.dart' as http_constants;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/network/auth_api_service.dart';

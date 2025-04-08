@@ -6,7 +6,6 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -62,7 +61,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
     final guideNameState = ref.watch(guideNamePreferenceProvider);
     final lastSelectedDuration = ref.watch(durationPreferenceProvider);
-    final favoritesState = ref.watch(favoritesNotifierProvider);
 
     void popContext() => Navigator.pop(context);
 

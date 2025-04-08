@@ -22,7 +22,6 @@ import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
-import '../../errors/exceptions.dart';
 
 class SignUpLogInPage extends ConsumerWidget {
   const SignUpLogInPage({

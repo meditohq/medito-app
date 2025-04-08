@@ -8,7 +8,6 @@ import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:medito/utils/utils.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {
   const QuoteWidget({super.key, required this.data});

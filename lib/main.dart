@@ -24,9 +24,9 @@ import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
-import 'package:medito/services/tiktok_events_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/network/http_api_service.dart';
+// ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
 
@@ -99,11 +99,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinks();
-    _initTikTok();
-  }
-
-  Future<void> _initTikTok() async {
-    await ref.read(tiktokEventsServiceProvider).initialise();
   }
 
   void _setUpSystemUi() {

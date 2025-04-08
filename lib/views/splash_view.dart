@@ -200,7 +200,7 @@ class SplashViewState extends ConsumerState<SplashView>
           builder: (context) => const OnboardingPagerScreen(),
         ),
       );
-    } on EmailExistsError catch (e) {
+    } on EmailExistsError catch (_) {
       if (!mounted) return;
 
       final shouldUseExistingAccount = await showDialog<bool>(
@@ -221,14 +221,16 @@ class SplashViewState extends ConsumerState<SplashView>
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 StringConstants.emailExistsContinueNewAccount,
-                style: const TextStyle(color: ColorConstants.brightSky, fontSize: 12),
+                style: const TextStyle(
+                    color: ColorConstants.brightSky, fontSize: 12),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 StringConstants.emailExistsSignInWithEmail,
-                style: const TextStyle(color: ColorConstants.lightPurple, fontSize: 12),
+                style: const TextStyle(
+                    color: ColorConstants.lightPurple, fontSize: 12),
               ),
             ),
           ],
@@ -316,7 +318,12 @@ class SplashViewState extends ConsumerState<SplashView>
         extendBody: true,
         backgroundColor: _isLoading ? ColorConstants.black : Colors.transparent,
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(
+                child: SvgPicture.asset(
+                  AssetConstants.icLogo,
+                  width: 80,
+                ),
+              )
             : LayoutBuilder(
                 builder: (context, constraints) {
                   return Stack(
