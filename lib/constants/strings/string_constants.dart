@@ -8,6 +8,8 @@ class StringConstants {
   static const String home = 'Home';
   static const String none = 'None';
   static const String removed = 'Removed';
+  static const String meditationProducts = 'Support Us';
+  static const String fromPrefix = 'From ';
   static const String emptyDownloadsMessage =
       'It looks like you haven\'t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.';
   static const String meanWhileListen = 'Meanwhile, you can listen to your';

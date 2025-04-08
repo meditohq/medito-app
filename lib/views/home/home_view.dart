@@ -1,7 +1,10 @@
+import 'dart:developer' as dev;
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
+import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/home/products_provider.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +16,7 @@ import 'widgets/announcement/announcement_widget.dart';
 import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
+import 'widgets/products/products_widget.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
 
@@ -93,6 +97,8 @@ class _HomeViewState extends ConsumerState<HomeView>
                           key: const ValueKey('quote'),
                           data: homeData.todayQuote,
                         );
+                      case 'products':
+                        return _getProductsWidget();
                       default:
                         return const SizedBox.shrink();
                     }
@@ -101,6 +107,45 @@ class _HomeViewState extends ConsumerState<HomeView>
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _getProductsWidget() {
+    dev.log('HomeView: _getProductsWidget called');
+    final products = ref.watch(productsProvider);
+
+    dev.log('HomeView: productsProvider state: ${products.toString()}');
+
+    return products.when(
+      loading: () {
+        dev.log('HomeView: Products are loading');
+        return const SizedBox(height: 230);
+      },
+      error: (err, stack) {
+        dev.log('HomeView: Error loading products: ${err.toString()}',
+            error: err, stackTrace: stack);
+        return const SizedBox.shrink();
+      },
+      data: (List<ProductGroupModel> productGroups) {
+        dev.log(
+            'HomeView: Products loaded successfully, count: ${productGroups.length}');
+
+        // Shuffle the order of product groups
+        var shuffledProducts = List<ProductGroupModel>.from(productGroups)
+          ..shuffle();
+
+        dev.log('HomeView: Products shuffled for display');
+
+        if (shuffledProducts.isNotEmpty) {
+          dev.log(
+              'HomeView: First product group after shuffle: ${shuffledProducts.first.name}');
+        }
+
+        return ProductsWidget(
+          key: const ValueKey('products'),
+          productGroups: shuffledProducts,
         );
       },
     );
@@ -136,6 +181,8 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
     await ref.read(refreshHomeAPIsProvider.future);
+    ref.invalidate(refreshProductsProvider);
+    await ref.read(refreshProductsProvider.future);
   }
 
   void _onStatsButtonTapped(BuildContext context) {
