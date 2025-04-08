@@ -12,7 +12,7 @@ import 'widgets/sound_listtile_widget.dart';
 import 'widgets/volume_slider_widget.dart';
 
 class BackgroundSoundView extends ConsumerStatefulWidget {
-  const BackgroundSoundView({Key? key}) : super(key: key);
+  const BackgroundSoundView({super.key});
 
   @override
   ConsumerState<BackgroundSoundView> createState() =>

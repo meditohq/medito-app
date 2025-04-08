@@ -28,7 +28,7 @@ void createSnackBar(
   try {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   } catch (e) {
-    print(e);
+    debugPrint(e.toString());
   }
 }
 
