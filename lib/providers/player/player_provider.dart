@@ -29,7 +29,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     required TrackModel trackModel,
     required TrackFilesModel file,
   }) async {
-    debugPrint('🔊 Loading track: \\${trackModel.title}, fileId: \\${file.id}');
+    AppLogger.d('PLAYER', '🔊 Loading track: \\${trackModel.title}, fileId: \\${file.id}');
     var track = trackModel.customCopyWith();
     var audios = [...track.audio];
 
@@ -67,7 +67,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
     debugPrint(
         '🔊 Download path: \\${downloadPath ?? 'null'}, file path: \\${file.path}');
-    debugPrint('🔊 Will use path: \\${downloadPath ?? file.path}');
+    AppLogger.d('PLAYER', '🔊 Will use path: \\${downloadPath ?? file.path}');
 
     var trackData = Track(
       id: track.id,
@@ -79,7 +79,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
 
     if (Platform.isAndroid) {
-      debugPrint('🔊 On Android - starting service and checking readiness');
+      AppLogger.d('PLAYER', '🔊 On Android - starting service and checking readiness');
       try {
         // Start service and wait for readiness
         await _androidServiceApi.startService();
@@ -92,7 +92,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         final isReady = await _waitForServiceReadiness();
 
         if (isReady) {
-          debugPrint('🔊 Service is ready, proceeding with playback');
+          AppLogger.d('PLAYER', '🔊 Service is ready, proceeding with playback');
           await _playAudioWithRetry(downloadPath ?? file.path, trackData);
         } else {
           debugPrint(
@@ -106,14 +106,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
             '❌ Fatal error starting service or playing audio: \\${e.toString()}');
       }
     } else {
-      debugPrint('🔊 On iOS - setting up audio');
+      AppLogger.d('PLAYER', '🔊 On iOS - setting up audio');
       try {
         await iosAudioHandler.setUrl(downloadPath, file, trackData);
-        debugPrint('🔊 iOS setUrl succeeded');
+        AppLogger.d('PLAYER', '🔊 iOS setUrl succeeded');
         await iosAudioHandler.play();
-        debugPrint('🔊 iOS play() called');
+        AppLogger.d('PLAYER', '🔊 iOS play() called');
       } catch (e) {
-        debugPrint('❌ Error playing audio on iOS: \\${e.toString()}');
+        AppLogger.e('PLAYER', '❌ Error playing audio on iOS: \\${e.toString()}');
       }
     }
   }
@@ -125,16 +125,16 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
-        debugPrint('🔊 Checking if service is ready (attempt ${attempt + 1})');
+        AppLogger.d('PLAYER', '🔊 Checking if service is ready (attempt ${attempt + 1})');
         final isReady = await _androidServiceApi.isServiceReady();
         debugPrint(
             '🔊 Service readiness check returned: $isReady (attempt ${attempt + 1})');
 
         if (isReady) {
-          debugPrint('🔊 Service is ready');
+          AppLogger.d('PLAYER', '🔊 Service is ready');
           return true;
         } else {
-          debugPrint('🔊 Service not ready yet, waiting...');
+          AppLogger.d('PLAYER', '🔊 Service not ready yet, waiting...');
           final delayMs = initialDelayMs * (1 << attempt);
           await Future.delayed(Duration(milliseconds: delayMs));
         }
@@ -146,7 +146,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       }
     }
 
-    debugPrint('❌ Service readiness check timed out');
+    AppLogger.e('PLAYER', '❌ Service readiness check timed out');
     return false;
   }
 
@@ -167,15 +167,15 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
           ),
         );
 
-        debugPrint('🔊 playAudio call succeeded');
+        AppLogger.d('PLAYER', '🔊 playAudio call succeeded');
         return; // Success
       } catch (e) {
-        debugPrint('❌ Error playing audio (attempt ${attempt + 1}): $e');
+        AppLogger.e('PLAYER', '❌ Error playing audio (attempt ${attempt + 1}): $e');
 
         if (attempt < maxAttempts - 1) {
           // Calculate backoff delay
           final delayMs = initialDelayMs * (1 << attempt);
-          debugPrint('🔊 Retrying playAudio in ${delayMs}ms...');
+          AppLogger.d('PLAYER', '🔊 Retrying playAudio in ${delayMs}ms...');
           await Future.delayed(Duration(milliseconds: delayMs));
         } else {
           rethrow; // Rethrow on final attempt
@@ -260,3 +260,5 @@ const audioPercentageListened = 0.8;
 const androidNotificationIcon = 'logo';
 const notificationId = 1595122;
 const androidNotificationChannelId = 'medito_reminder_channel';
+
+import '../../utils/logger.dart';

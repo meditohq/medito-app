@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/types/type_constants.dart';
+import 'logger.dart';
 
 /// Helper class to manage storage of completed track data in SharedPreferences
 class CompletedTracksStorage {
@@ -27,9 +28,10 @@ class CompletedTracksStorage {
 
       await _prefs.setStringList(completedTracksKey, currentList);
       final trackId = payload[TypeConstants.trackIdKey];
-      debugPrint('Stored track completion for later processing: $trackId');
+      AppLogger.d(
+          'STORAGE', 'Stored track completion for later processing: $trackId');
     } catch (e) {
-      debugPrint('Error storing completed track: $e');
+      AppLogger.e('STORAGE', 'Error storing completed track', e);
     }
   }
 

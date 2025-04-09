@@ -10,6 +10,7 @@ import 'completed_tracks_storage.dart';
 import 'health_kit_manager.dart';
 import 'stats_manager.dart';
 import '../models/local_audio_completed.dart';
+import 'logger.dart';
 
 // Export the key for backward compatibility if needed
 const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
@@ -24,7 +25,7 @@ Future<bool> handleStats(
   try {
     // First try to sync with HealthKit
     await _syncHealthKit(payload).catchError((e) {
-      debugPrint('HealthKit sync error: $e');
+      AppLogger.e('STATS', 'HealthKit sync error', e);
       // Continue even if HealthKit sync fails
     });
 
@@ -39,10 +40,11 @@ Future<bool> handleStats(
     var duration = payload[TypeConstants.durationIdKey];
 
     await statsManager.addAudioCompleted(newAudioCompleted, duration);
-    debugPrint('Stats updated successfully for track ${newAudioCompleted.id}');
+    AppLogger.d('STATS',
+        'Stats updated successfully for track ${newAudioCompleted.id}');
     return true;
   } catch (e) {
-    debugPrint('Failed to update stats: $e');
+    AppLogger.e('STATS', 'Failed to update stats', e);
     return false;
   }
 }
@@ -61,7 +63,8 @@ Future<bool> handleStats(
 Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
   // If already processing, skip this call
   if (_isProcessingPendingTracks) {
-    debugPrint('Already processing pending tracks, skipping this call');
+    AppLogger.d(
+        'STATS', 'Already processing pending tracks, skipping this call');
     return 0;
   }
 
@@ -96,7 +99,7 @@ Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
         }
       } catch (e) {
         failedTracks.add(trackJson);
-        debugPrint('Error processing track: $e');
+        AppLogger.e('STATS', 'Error processing track', e);
       }
     }
 
@@ -104,7 +107,7 @@ Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
     await storage.updatePendingTracks(failedTracks);
     return successCount;
   } catch (e) {
-    debugPrint('Error processing pending tracks: $e');
+    AppLogger.e('STATS', 'Error processing pending tracks', e);
     return 0;
   } finally {
     _isProcessingPendingTracks = false;

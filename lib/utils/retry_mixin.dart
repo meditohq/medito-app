@@ -15,7 +15,7 @@ mixin RetryMixin {
       } catch (e) {
         attempts++;
         if (attempts == maxAttempts) {
-          debugPrint('$errorMessage after $maxAttempts attempts: $e');
+          AppLogger.e('RETRY', '$errorMessage after $maxAttempts attempts: $e');
           if (e is AppError) {
             rethrow;
           }
@@ -27,3 +27,5 @@ mixin RetryMixin {
     throw const ServerError();
   }
 }
+
+import 'logger.dart';

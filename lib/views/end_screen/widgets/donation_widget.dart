@@ -180,7 +180,7 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
         });
       }
     } catch (e) {
-      debugPrint('Error checking subscription: $e');
+      AppLogger.e('DONATION', 'Error checking subscription: $e');
       if (mounted) {
         setState(() {
           _isDonor = false;
@@ -364,3 +364,5 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
     }
   }
 }
+
+import '../../../utils/logger.dart';

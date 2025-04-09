@@ -67,7 +67,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
           final sound = BackgroundSoundsModel.fromJson(map);
           sounds.add(sound);
         } catch (e) {
-          debugPrint('Error parsing background sound: $e');
+          AppLogger.e('BACKGROUND', 'Error parsing background sound: $e');
           // Skip invalid items instead of failing the whole request
           continue;
         }
@@ -75,7 +75,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
       return sounds;
     } catch (e) {
-      debugPrint('Error fetching background sounds: $e');
+      AppLogger.e('BACKGROUND', 'Error fetching background sounds: $e');
       if (e is AppError) rethrow;
       throw const ServerError();
     }
@@ -99,7 +99,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         return sounds;
       }
     } catch (err) {
-      debugPrint(err.toString());
+      AppLogger.d('BACKGROUND', err.toString());
     }
 
     return null;
@@ -133,7 +133,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         }
       }
     } catch (err) {
-      debugPrint(err.toString());
+      AppLogger.d('BACKGROUND', err.toString());
     }
   }
 
@@ -187,3 +187,5 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 BackgroundSoundsRepository backgroundSoundsRepository(Ref ref) {
   return BackgroundSoundsRepositoryImpl(client: HttpApiService(), ref: ref);
 }
+
+import '../../utils/logger.dart';

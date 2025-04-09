@@ -29,7 +29,7 @@ class HeaderService {
       }
     } catch (e) {
       // Handle error but continue execution
-      debugPrint('Error getting FCM token: $e');
+      AppLogger.e('HEADER', 'Error getting FCM token: $e');
     } finally {
       _updateHeaders();
     }
@@ -51,3 +51,5 @@ class HeaderService {
         'currency-name': deviceInfo.currencyName,
       };
 }
+
+import '../../utils/logger.dart';

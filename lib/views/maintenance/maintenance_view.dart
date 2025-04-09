@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/colors/color_constants.dart';
 import '../../constants/strings/string_constants.dart';
-import '../../constants/styles/widget_styles.dart';
 
 class MaintenanceView extends ConsumerStatefulWidget {
   const MaintenanceView({super.key, required this.maintenanceModel});
@@ -26,64 +25,87 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
           fontWeight: FontWeight.w400,
         );
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: ColorConstants.ebony,
+      body: SafeArea(
+        child: Stack(
           children: [
-            const SizedBox(
-              height: 24,
-            ),
-            const Text(
-              StringConstants.hey,
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            MarkdownWidget(
-              body: widget.maintenanceModel.message ?? '',
-              textAlign: WrapAlignment.start,
-              a: markDownTheme?.copyWith(
-                decoration: TextDecoration.underline,
-                fontWeight: FontWeight.w700,
-              ),
-              p: markDownTheme?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: MaterialButton(
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onPressed: onPressed,
-                color: ColorConstants.white,
-                splashColor: ColorConstants.transparent,
-                padding: const EdgeInsets.symmetric(
-                  vertical: padding14,
-                  horizontal: padding16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Text(
-                      widget.maintenanceModel.ctaLabel ?? '',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            fontFamily: sourceSerif,
-                            fontSize: 20,
-                            color: ColorConstants.ebony,
-                            fontWeight: FontWeight.w700,
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      const Text(
+                        StringConstants.hey,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      MarkdownWidget(
+                        body: widget.maintenanceModel.message ?? '',
+                        textAlign: WrapAlignment.start,
+                        a: markDownTheme?.copyWith(
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        p: markDownTheme?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white70,
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      if (widget.maintenanceModel.ctaLabel != null &&
+                          widget.maintenanceModel.ctaLabel!.isNotEmpty)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: onPressed,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorConstants.lightPurple,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              widget.maintenanceModel.ctaLabel ?? '',
+                            ),
                           ),
-                    ),
-                  ],
+                        ),
+                    ],
+                  ),
                 ),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
             ),
           ],
@@ -94,8 +116,8 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
 
   void onPressed() {
     var url = widget.maintenanceModel.ctaUrl;
-    if (url.isNotNullAndNotEmpty()) {
-      launchURLInBrowser(url!);
+    if (url != null && url.isNotEmpty) {
+      launchURLInBrowser(url);
     }
   }
 }

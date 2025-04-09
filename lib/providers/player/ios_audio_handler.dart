@@ -68,7 +68,7 @@ class IosAudioHandler extends BaseAudioHandler {
 
       _isInitialized = true;
     } catch (e) {
-      debugPrint('Failed to initialize audio session: $e');
+      AppLogger.e('IOS', 'Failed to initialize audio session: $e');
       rethrow;
     }
   }
@@ -209,7 +209,7 @@ class IosAudioHandler extends BaseAudioHandler {
       // Failed to update stats directly, store for later processing
       await _storeForLaterProcessing(payload);
     } catch (e) {
-      debugPrint('Error processing track completion in AudioHandler: $e');
+      AppLogger.e('IOS', 'Error processing track completion in AudioHandler: $e');
     }
   }
 
@@ -230,15 +230,15 @@ class IosAudioHandler extends BaseAudioHandler {
   /// Try to update stats directly and return success status
   Future<bool> _tryUpdateStats(Map<String, dynamic> payload) async {
     try {
-      debugPrint('Track completed: ${trackState.id}');
+      AppLogger.d('IOS', 'Track completed: ${trackState.id}');
       final success = await handleStats(payload);
 
       if (success) {
-        debugPrint('Successfully updated stats from audio handler');
+        AppLogger.d('IOS', 'Successfully updated stats from audio handler');
         return true;
       }
     } catch (e) {
-      debugPrint('Error updating stats directly from audio handler: $e');
+      AppLogger.e('IOS', 'Error updating stats directly from audio handler: $e');
     }
     return false;
   }
@@ -256,7 +256,7 @@ class IosAudioHandler extends BaseAudioHandler {
       final response = await _httpApiService.getRequest(HTTPConstants.me);
       return response['userToken'] as String?;
     } catch (e) {
-      debugPrint('Error getting user token: $e');
+      AppLogger.e('IOS', 'Error getting user token: $e');
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(SharedPreferenceConstants.userToken);
     }
@@ -332,3 +332,5 @@ class IosStateData {
     this.duration,
   );
 }
+
+import '../../utils/logger.dart';

@@ -64,7 +64,7 @@ class EventsRepositoryImpl extends EventsRepository {
       return [];
     } catch (e) {
       // Handle errors, return empty list if there's an issue
-      debugPrint('Error fetching favorites: $e');
+      AppLogger.e('EVENTS', 'Error fetching favorites: $e');
       return [];
     }
   }
@@ -77,7 +77,7 @@ class EventsRepositoryImpl extends EventsRepository {
         body: favoritesList,
       );
     } catch (e) {
-      debugPrint('Error sending favorites to backend: $e');
+      AppLogger.e('EVENTS', 'Error sending favorites to backend: $e');
       rethrow;
     }
   }
@@ -86,3 +86,5 @@ class EventsRepositoryImpl extends EventsRepository {
 @riverpod
 EventsRepository eventsRepository(Ref _) =>
     EventsRepositoryImpl(client: HttpApiService());
+
+import '../../utils/logger.dart';

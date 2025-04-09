@@ -56,7 +56,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
           jsonList.map((json) => FavoriteItemDto.fromJson(json)).toList();
       return dtos.map((dto) => FavoriteItem.fromDto(dto)).toList();
     } catch (e) {
-      debugPrint('Error loading favorites from server: $e');
+      AppLogger.e('FAVORITES', 'Error loading favorites from server: $e');
       rethrow;
     }
   }
@@ -83,7 +83,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
         body: dtos.map((dto) => dto.toJson()).toList(),
       );
     } catch (e) {
-      debugPrint('Error syncing favorites with server: $e');
+      AppLogger.e('FAVORITES', 'Error syncing favorites with server: $e');
       rethrow;
     }
   }
@@ -96,3 +96,5 @@ FavoritesRepository favoritesRepository(Ref ref) {
     prefs: ref.read(sharedPreferencesProvider),
   );
 }
+
+import '../../utils/logger.dart';

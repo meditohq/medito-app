@@ -10,7 +10,7 @@ class PathMapper {
           dto.steps.map((stepDto) => _mapStepDtoToStep(stepDto)).toList();
       return JourneyResultSuccess(steps);
     } catch (e) {
-      debugPrint(e.toString());
+      AppLogger.d('PATH', e.toString());
       return PathResultError.journeyResultError(
           'Failed to map path data: ${e.toString()}');
     } 
@@ -72,3 +72,5 @@ class PathMapper {
     }
   }
 }
+
+import '../utils/logger.dart';

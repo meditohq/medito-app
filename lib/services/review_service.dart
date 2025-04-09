@@ -35,7 +35,7 @@ class ReviewService {
       // 5. Save the timestamp of this request
       await _saveReviewRequestTimestamp();
     } catch (e) {
-      debugPrint('Error checking for app review: $e');
+      AppLogger.e('REVIEW', 'Error checking for app review: $e');
     }
   }
 
@@ -77,7 +77,7 @@ class ReviewService {
           appStoreId: '1500780518',
         );
       } catch (storeError) {
-        debugPrint('Error opening store listing: $storeError');
+        AppLogger.e('REVIEW', 'Error opening store listing: $storeError');
       }
     }
   }
@@ -88,7 +88,9 @@ class ReviewService {
       await prefs.setInt(
           _reviewRequestKey, DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
-      debugPrint('Error saving review request timestamp: $e');
+      AppLogger.e('REVIEW', 'Error saving review request timestamp: $e');
     }
   }
 }
+
+import '../utils/logger.dart';

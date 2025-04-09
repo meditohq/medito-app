@@ -48,7 +48,7 @@ Future<void> deleteTrackFromPreference(Ref ref,
 
     ref.invalidate(downloadedTracksProvider);
   } catch (e) {
-    debugPrint('Error in deleteTrackFromPreference: $e');
+    AppLogger.e('DOWNLOAD', 'Error in deleteTrackFromPreference: $e');
   }
 }
 
@@ -78,3 +78,5 @@ Future<void> addSingleTrackInPreference(Ref ref,
   );
   unawaited(ref.refresh(downloadedTracksProvider.future));
 }
+
+import '../../utils/logger.dart';

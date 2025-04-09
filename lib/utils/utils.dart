@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Color parseColor(String? color) {
@@ -28,7 +29,7 @@ void createSnackBar(
   try {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   } catch (e) {
-    debugPrint(e.toString());
+    AppLogger.e('SNACKBAR', 'Error showing snackbar', e);
   }
 }
 
@@ -49,9 +50,7 @@ Future<void> launchURLInBrowser(String url) async {
       }
     }
   } catch (e) {
-    if (kDebugMode) {
-      print(e);
-    }
+    AppLogger.e('URL', 'Error launching URL: $url', e);
   }
 }
 

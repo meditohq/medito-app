@@ -21,6 +21,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
@@ -29,6 +30,7 @@ import 'package:medito/services/network/http_api_service.dart';
 // ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
+import 'package:medito/widgets/maintenance_checker_widget.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -117,25 +119,25 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   Future<void> _initDeepLinks() async {
     _appLinks = AppLinks();
-    debugPrint('[DEEPLINK] Setting up deep link handlers');
+    AppLogger.d('DEEPLINK', 'Setting up deep link handlers');
 
     // Handle links
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
-        debugPrint('[DEEPLINK] Got deep link: $uri');
+        AppLogger.d('DEEPLINK', 'Got deep link: $uri');
         _handleDeepLink(uri);
       },
       onError: (err) {
-        debugPrint('[DEEPLINK] Error from link stream: $err');
+        AppLogger.e('DEEPLINK', 'Error from link stream', err);
       },
     );
   }
 
   void _handleDeepLink(Uri uri) {
-    debugPrint('[DEEPLINK] Handling deep link: ${uri.toString()}');
-    debugPrint('[DEEPLINK] Scheme: ${uri.scheme}');
-    debugPrint('[DEEPLINK] Host: ${uri.host}');
-    debugPrint('[DEEPLINK] Path: ${uri.path}');
+    AppLogger.d('DEEPLINK', 'Handling deep link: ${uri.toString()}');
+    AppLogger.d('DEEPLINK', 'Scheme: ${uri.scheme}');
+    AppLogger.d('DEEPLINK', 'Host: ${uri.host}');
+    AppLogger.d('DEEPLINK', 'Path: ${uri.path}');
 
     var path = '';
     var id = '';
@@ -168,7 +170,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         return;
       }
 
-      debugPrint('[DEEPLINK] Navigating to: $path with id: $id');
+      AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
       showSnackBar(
         context,
@@ -179,7 +181,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         handleNavigation(path, [id], context);
       });
     } catch (e) {
-      debugPrint('[DEEPLINK] Error handling deep link: $e');
+      AppLogger.e('DEEPLINK', 'Error handling deep link', e);
       showSnackBar(
         context,
         StringConstants.deepLinkError,
@@ -239,13 +241,15 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         return MediaQuery.withClampedTextScaling(
           minScaleFactor: 0.8,
           maxScaleFactor: 1.5,
-          child: MaterialApp(
-            debugShowCheckedModeBanner: kDebugMode,
-            scaffoldMessengerKey: scaffoldMessengerKey,
-            navigatorKey: navigatorKey,
-            theme: appTheme(context),
-            title: ParentWidget._title,
-            home: const SplashView(),
+          child: MaintenanceChecker(
+            child: MaterialApp(
+              debugShowCheckedModeBanner: kDebugMode,
+              scaffoldMessengerKey: scaffoldMessengerKey,
+              navigatorKey: navigatorKey,
+              theme: appTheme(context),
+              title: ParentWidget._title,
+              home: const SplashView(),
+            ),
           ),
         );
       },
@@ -274,7 +278,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       // Process any pending track completions when app comes back to foreground
       processPendingCompletedTracks().then((processedCount) {
         if (processedCount > 0) {
-          debugPrint('Processed $processedCount pending tracks on foreground');
+          AppLogger.d('STATS',
+              'Processed $processedCount pending tracks on foreground');
         }
       });
     }
@@ -286,10 +291,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       final httpService = HttpApiService();
 
       // Run diagnostic
-      debugPrint('Running security diagnostic on app foreground');
+      AppLogger.d('SECURITY', 'Running security diagnostic on app foreground');
       await httpService.diagnoseSecurity();
     } catch (e) {
-      debugPrint('Error running security diagnostic: $e');
+      AppLogger.e('SECURITY', 'Error running security diagnostic', e);
     }
   }
 
@@ -303,12 +308,12 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
         if (isLoggedIn) {
-          debugPrint('Checking auth token after app foregrounded');
+          AppLogger.d('AUTH', 'Checking auth token after app foregrounded');
           await authRepository.getToken();
         }
       }
     } catch (e) {
-      debugPrint('Error with auth token on foreground: $e');
+      AppLogger.e('AUTH', 'Error with auth token on foreground', e);
       // Don't reset auth state here - let normal API calls handle auth errors
     }
   }
@@ -362,7 +367,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           currentRoute.settings.name == SplashView.routeName;
 
       if (isAlreadyOnSplash) {
-        debugPrint(
+        AppLogger.d('NAVIGATION',
             'Already on splash screen, refreshing instead of navigating');
         // If already on splash, just reset state without navigating
         if (context.mounted) {

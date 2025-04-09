@@ -116,7 +116,7 @@ Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
     var trackId = ids.first!;
     await _pushRoute(TrackView(trackId: trackId), ref);
   } catch (e, s) {
-    debugPrint(s.toString());
+    AppLogger.d('ROUTES', s.toString());
   }
 }
 

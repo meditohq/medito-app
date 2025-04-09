@@ -28,7 +28,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       } catch (e, stackTrace) {
         // Only report error if initial local load fails
         state = AsyncValue.error(e, stackTrace);
-        debugPrint('Error loading initial favorites: $e');
+        AppLogger.e('FAVORITES', 'Error loading initial favorites: $e');
       }
     });
   }
@@ -51,7 +51,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       await _repository.saveFavorites(mergedFavorites);
     } catch (e) {
       // If server fetch fails, log it but keep the current (local) state.
-      debugPrint('Failed to load or merge favorites from server: $e');
+      AppLogger.e('FAVORITES', 'Failed to load or merge favorites from server: $e');
       // Do not change state to error here, local data is still valid.
     }
   }
@@ -70,7 +70,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       try {
         await _repository.syncWithServer(currentFavorites);
       } catch (e) {
-        debugPrint('Failed to sync favorites with server: $e');
+        AppLogger.e('FAVORITES', 'Failed to sync favorites with server: $e');
         // Keep local state on sync error. Merge logic will handle later.
       }
     }
@@ -91,7 +91,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       await syncWithServer();
     } catch (e) {
       // Log save error, but state remains optimistically updated
-      debugPrint('Failed to save or sync after adding favorite: $e');
+      AppLogger.e('FAVORITES', 'Failed to save or sync after adding favorite: $e');
       // Do not revert state here.
     }
   }
@@ -113,7 +113,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       await syncWithServer(); // Sync after saving
     } catch (e) {
       // Log save error, but state remains optimistically updated
-      debugPrint('Failed to save or sync after removing favorite: $e');
+      AppLogger.e('FAVORITES', 'Failed to save or sync after removing favorite: $e');
       // Do not revert state here.
     }
   }
@@ -122,3 +122,5 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
 final favoritesNotifierProvider =
     NotifierProvider<FavoritesNotifier, AsyncValue<List<FavoriteItem>>>(
         FavoritesNotifier.new);
+
+import '../../utils/logger.dart';

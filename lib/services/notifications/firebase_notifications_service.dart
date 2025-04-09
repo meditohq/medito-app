@@ -13,6 +13,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/utils/logger.dart';
 
 import '../../models/notification/notification_payload_model.dart';
 import '../../routes/routes.dart';
@@ -299,5 +300,5 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await handler._clearIOSBadge();
   }
 
-  debugPrint('Handling a background message ${message.messageId}');
+  AppLogger.d('FIREBASE', 'Handling a background message ${message.messageId}');
 }

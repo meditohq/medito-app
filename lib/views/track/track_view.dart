@@ -470,7 +470,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             ref.invalidate(packProvider),
           });
     } catch (e) {
-      debugPrint(e.toString());
+      AppLogger.d('TRACK', e.toString());
     }
   }
 
