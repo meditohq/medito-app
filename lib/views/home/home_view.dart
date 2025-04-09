@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/models/home/product/product_model.dart';
@@ -82,27 +83,25 @@ class _HomeViewState extends ConsumerState<HomeView>
                   _getAnnouncementBanner(),
                   ...widgetOrder.map((type) {
                     switch (type) {
-                      case 'shortcuts':
+                      case HomeWidgetType.shortcuts:
                         return ShortcutsItemsWidget(
-                          key: const ValueKey('shortcuts'),
+                          key: ValueKey(type.name),
                           data: homeData.shortcuts,
                         );
-                      case 'carousel':
+                      case HomeWidgetType.carousel:
                         return CarouselWidget(
-                          key: const ValueKey('carousel'),
+                          key: ValueKey(type.name),
                           carouselItems: homeData.carousel,
                         );
-                      case 'quote':
+                      case HomeWidgetType.quote:
                         return QuoteWidget(
-                          key: const ValueKey('quote'),
+                          key: ValueKey(type.name),
                           data: homeData.todayQuote,
                         );
-                      case 'products':
+                      case HomeWidgetType.products:
                         return _getProductsWidget();
-                      default:
-                        return const SizedBox.shrink();
                     }
-                  }).toList(),
+                  }),
                 ],
               ),
             ),
@@ -144,7 +143,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         }
 
         return ProductsWidget(
-          key: const ValueKey('products'),
+          key: ValueKey(HomeWidgetType.products.name),
           productGroups: shuffledProducts,
         );
       },

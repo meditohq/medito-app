@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 
@@ -37,7 +38,7 @@ class CustomiseHomeLayoutScreen extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final widgetType = order[index];
                   return ListTile(
-                    key: ValueKey(widgetType),
+                    key: ValueKey(widgetType.name),
                     leading: HugeIcon(
                       icon: HugeIcons.solidSharpMenu01,
                       color: ColorConstants.white,
@@ -63,16 +64,16 @@ class CustomiseHomeLayoutScreen extends ConsumerWidget {
     );
   }
 
-  String _getTitleForType(String type) {
+  String _getTitleForType(HomeWidgetType type) {
     switch (type) {
-      case 'shortcuts':
+      case HomeWidgetType.shortcuts:
         return StringConstants.shortcutsTitle;
-      case 'carousel':
+      case HomeWidgetType.carousel:
         return StringConstants.carouselTitle;
-      case 'quote':
+      case HomeWidgetType.quote:
         return StringConstants.quoteTitle;
-      default:
-        return '';
+      case HomeWidgetType.products:
+        return StringConstants.meditationProducts;
     }
   }
 }

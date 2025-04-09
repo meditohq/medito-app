@@ -24,6 +24,9 @@ if [ "$CURRENT_VERSION" = "$LAST_COMMITTED_VERSION" ]; then
     fi
 fi
 
+echo "🧪 Running Flutter tests..."
+flutter test
+
 echo "🚀 Starting iOS build and upload..."
 ./build_and_upload_ios.sh
 
