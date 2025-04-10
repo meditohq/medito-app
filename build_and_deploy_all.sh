@@ -27,11 +27,11 @@ fi
 echo "🧪 Running Flutter tests..."
 flutter test
 
-echo "🚀 Starting iOS build and upload..."
-./build_and_upload_ios.sh
-
 echo "🚀 Starting Android build and deploy..."
 ./build_apk.sh
+
+echo "🚀 Starting iOS build and upload..."
+./build_and_upload_ios.sh
 
 echo "✅ All builds completed! Opening APK directory..."
 open build/app/outputs/apk/prod/release/ # Open the specific APK output directory 
