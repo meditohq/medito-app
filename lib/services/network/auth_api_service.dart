@@ -1,14 +1,14 @@
-import 'dart:developer' as dev;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/foundation.dart'; // Import for visibleForTesting
 import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
-import 'package:flutter/foundation.dart'; // Import for visibleForTesting
+import 'package:medito/utils/logger.dart';
 
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
@@ -48,12 +48,8 @@ class AuthApiService {
     String? otp,
     required String clientId,
   }) async {
-    dev.log('[AUTH] Attempting sign in', error: {
-      'email': email != null ? 'provided' : 'not provided',
-      'otp': otp != null ? 'provided' : 'not provided',
-      'clientId': clientId,
-      'url': '$_baseUrl${HTTPConstants.authSignIn}',
-    });
+    AppLogger.i('AUTH',
+        'Attempting sign in. Email: ${email != null}, OTP: ${otp != null}, ClientId: $clientId');
 
     final response = await _post(
       HTTPConstants.authSignIn,
@@ -64,10 +60,8 @@ class AuthApiService {
       },
     );
 
-    dev.log('[AUTH] Sign in successful', error: {
-      'clientId': response['client_id'],
-      'hasEmail': response['email'] != null,
-    });
+    AppLogger.i('AUTH',
+        'Sign in successful. ClientId: ${response['client_id']}, HasEmail: ${response['email'] != null}');
 
     final tokens = AuthTokens(
       accessToken: response['access_token'] as String,
@@ -82,11 +76,8 @@ class AuthApiService {
   }
 
   Future<void> requestOtp(String email, String clientId) async {
-    dev.log('[AUTH] Requesting OTP for email', error: {
-      'email': email,
-      'clientId': clientId,
-      'url': '$_baseUrl${HTTPConstants.authOtpRequest}',
-    });
+    AppLogger.i(
+        'AUTH', 'Requesting OTP for email: $email, ClientId: $clientId');
 
     await _post(
       HTTPConstants.authOtpRequest,
@@ -96,18 +87,13 @@ class AuthApiService {
       },
     );
 
-    dev.log('[AUTH] OTP request successful');
+    AppLogger.i('AUTH', 'OTP request successful for email: $email');
   }
 
   Future<AuthTokens> refreshToken(String refreshToken) async {
-    dev.log('[AUTH_API] Starting token refresh', level: 1000);
-    dev.log('[AUTH_API] Attempting to refresh token', error: {
-      'token_length': refreshToken.length,
-      'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
-      'timestamp': DateTime.now().toString(),
-      'current_tokens_email': _tokens?.email,
-      'current_tokens_clientId': _tokens?.clientId,
-    });
+    AppLogger.i('AUTH_API', 'Starting token refresh');
+    AppLogger.d('AUTH_API',
+        'Attempting token refresh. TokenLength: ${refreshToken.length}, Prefix: ${refreshToken.substring(0, min(10, refreshToken.length))}');
 
     try {
       // Store a copy of the existing tokens for comparison
@@ -121,13 +107,13 @@ class AuthApiService {
         },
       );
 
-      dev.log('[AUTH_API] Raw refresh token response: ${jsonEncode(response)}',
-          level: 1000);
+      AppLogger.d(
+          'AUTH_API', 'Raw refresh token response: ${jsonEncode(response)}');
 
       // Check explicitly if email is present in response
       final emailInResponse = response['email'] as String?;
-      dev.log('[AUTH_API] Email in token refresh response: $emailInResponse',
-          level: 1000);
+      AppLogger.d(
+          'AUTH_API', 'Email in token refresh response: $emailInResponse');
 
       // Create new tokens object with the refreshed access token
       final tokens = AuthTokens(
@@ -146,39 +132,25 @@ class AuthApiService {
       AuthTokens.logTokenDifferences(oldTokens, tokens);
 
       // Log what email value we're using
-      dev.log(
-          '[AUTH_API] Final email used in refreshed tokens: ${tokens.email}',
-          level: 1000);
-      dev.log(
-          '[AUTH_API] Email source: ${emailInResponse != null ? 'from response' : 'preserved from old token'}',
-          level: 1000);
+      AppLogger.d(
+          'AUTH_API', 'Final email used in refreshed tokens: ${tokens.email}');
+      AppLogger.d('AUTH_API',
+          'Email source: ${emailInResponse != null ? 'from response' : 'preserved from old token'}');
 
       // Store the new tokens
       await setAuthTokens(tokens);
 
-      dev.log('[AUTH_API] Token refresh successful', error: {
-        'expires_in': tokens.expiresIn,
-        'has_email': tokens.email != null,
-        'email': tokens.email,
-        'client_id': tokens.clientId,
-        'token_prefix': tokens.accessToken.substring(0, 10),
-        'refresh_token_length': tokens.refreshToken.length,
-        'refresh_token_prefix': tokens.refreshToken
-            .substring(0, min(10, tokens.refreshToken.length)),
-      });
+      AppLogger.i('AUTH_API',
+          'Token refresh successful. ExpiresIn: ${tokens.expiresIn}, Email: ${tokens.email}, ClientId: ${tokens.clientId}');
 
       return tokens;
-    } catch (e) {
-      dev.log('[AUTH_API] Token refresh failed', error: {
-        'error': e.toString(),
-        'token_length': refreshToken.length,
-        'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
-      });
+    } catch (e, stackTrace) {
+      AppLogger.e('AUTH_API', 'Token refresh failed', e, stackTrace);
 
       // If we get an error response indicating invalid/expired refresh token,
       // clear the stored tokens to force a new login
       if (e is RefreshTokenError) {
-        dev.log('[AUTH_API] Clearing tokens due to RefreshTokenError');
+        AppLogger.w('AUTH_API', 'Clearing tokens due to RefreshTokenError');
         await clearAuthTokens();
       }
 
@@ -190,23 +162,14 @@ class AuthApiService {
     final previousEmail = _tokens?.email;
     _tokens = tokens;
 
-    dev.log('[AUTH_API] setAuthTokens called', error: {
-      'previous_email': previousEmail,
-      'new_email': tokens.email,
-      'email_changed': previousEmail != tokens.email,
-    });
+    AppLogger.d('AUTH_API',
+        'setAuthTokens called. PreviousEmail: $previousEmail, NewEmail: ${tokens.email}');
 
     if (tokens.refreshToken.isNotEmpty) {
       await _secureStorage.storeRefreshToken(tokens.refreshToken);
     }
-    dev.log('[AUTH_API] Tokens updated', error: {
-      'access_token_prefix':
-          tokens.accessToken.substring(0, min(10, tokens.accessToken.length)),
-      'has_refresh_token': tokens.refreshToken.isNotEmpty,
-      'has_email': tokens.email != null,
-      'email': tokens.email,
-      'expires_in': tokens.expiresIn,
-    });
+    AppLogger.d('AUTH_API',
+        'Tokens updated. HasRefreshToken: ${tokens.refreshToken.isNotEmpty}, Email: ${tokens.email}, ExpiresIn: ${tokens.expiresIn}');
   }
 
   Future<void> clearAuthTokens() async {
@@ -215,15 +178,13 @@ class AuthApiService {
   }
 
   Future<String?> getStoredRefreshToken() async {
-    dev.log('[AUTH] Getting stored refresh token');
+    AppLogger.d('AUTH', 'Getting stored refresh token');
     final token = await _secureStorage.getRefreshToken();
     if (token != null) {
-      dev.log('[AUTH] Found stored refresh token', error: {
-        'token_length': token.length,
-        'token_prefix': token.substring(0, min(10, token.length)),
-      });
+      AppLogger.d('AUTH',
+          'Found stored refresh token. Length: ${token.length}, Prefix: ${token.substring(0, min(10, token.length))}');
     } else {
-      dev.log('[AUTH] No stored refresh token found');
+      AppLogger.d('AUTH', 'No stored refresh token found');
     }
     return token;
   }
@@ -236,13 +197,7 @@ class AuthApiService {
       // Ensure the path is properly combined with base URL
       final uri = Uri.parse('$_baseUrl$path');
 
-      // Log the API key being used
-      dev.log('[AUTH] API Key check',
-          error: jsonEncode({
-            'api_key': _apiKey,
-            'is_empty': _apiKey.isEmpty,
-            'length': _apiKey.length,
-          }));
+      AppLogger.d('AUTH', 'API Key Length: ${_apiKey.length}');
 
       final request = await _client.postUrl(uri);
 
@@ -255,23 +210,13 @@ class AuthApiService {
         headersMap[name] = values;
       });
 
-      dev.log('[AUTH] Complete request details',
-          error: jsonEncode({
-            'url': uri.toString(),
-            'method': 'POST',
-            'all_headers': headersMap,
-            'body': body,
-            'auth_type': 'API Key',
-          }));
+      AppLogger.d(
+          'AUTH', 'POST Request: ${uri.toString()}, Body: ${body != null}');
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
         request.write(encodedBody);
-        dev.log('[AUTH] Request body',
-            error: jsonEncode({
-              'raw': body,
-              'encoded': encodedBody,
-            }));
+        AppLogger.d('AUTH', 'Request Body: $encodedBody');
       }
 
       final response = await request.close().timeout(kTimeoutDuration);
@@ -289,56 +234,37 @@ class AuthApiService {
           parsedContent is Map<String, dynamic> &&
           parsedContent.containsKey('email');
 
-      dev.log('[AUTH_API] Response contains email: $hasEmail', level: 1000);
+      AppLogger.d('AUTH_API', 'Response contains email: $hasEmail');
       if (hasEmail) {
-        dev.log('[AUTH_API] Email in response: ${parsedContent['email']}',
-            level: 1000);
+        AppLogger.d('AUTH_API', 'Email in response: ${parsedContent['email']}');
       }
 
-      dev.log('[AUTH_API] Complete response details',
-          error: jsonEncode({
-            'status_code': response.statusCode,
-            'all_headers': responseHeadersMap,
-            'raw_content': content,
-            'parsed_content': parsedContent,
-          }));
+      AppLogger.d('AUTH_API',
+          'Response Status: ${response.statusCode}, Content Length: ${content.length}');
 
       if (response.statusCode >= HttpStatus.badRequest) {
-        dev.log('[AUTH] Request failed', error: {
-          'status_code': response.statusCode,
-          'raw_content': content,
-          'parsed_content': content.isNotEmpty ? jsonDecode(content) : null,
-        });
+        AppLogger.w('AUTH',
+            'Request failed. Status: ${response.statusCode}, Content: $content');
         handleErrorResponse(response.statusCode, content);
         throw Exception('handleErrorResponse did not throw');
       }
 
       return content.isEmpty ? {} : jsonDecode(content) as Map<String, dynamic>;
-    } on SocketException catch (e) {
-      dev.log('[AUTH] Network error', error: {
-        'error': e.toString(),
-        'address': e.address?.toString(),
-        'port': e.port,
-      });
+    } on SocketException catch (e, stackTrace) {
+      AppLogger.e('AUTH', 'Network error (SocketException)', e, stackTrace);
       throw const NoInternetError();
-    } on TimeoutException catch (e) {
-      dev.log('[AUTH] Request timeout', error: {
-        'error': e.toString(),
-        'duration': e.duration?.toString(),
-      });
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.e('AUTH', 'Request timeout', e, stackTrace);
       throw const TimeoutError();
-    } catch (e) {
-      dev.log('[AUTH] Unexpected error in _post', error: {
-        'error': e.toString(),
-        'type': e.runtimeType.toString(),
-      });
+    } catch (e, stackTrace) {
+      AppLogger.e('AUTH', 'Unexpected error in _post', e, stackTrace);
       rethrow;
     }
   }
 
   @visibleForTesting
   void handleErrorResponse(int statusCode, [String? content]) {
-    dev.log('HTTP Error $statusCode', level: 900);
+    AppLogger.w('AUTH', 'HTTP Error $statusCode');
 
     if (content != null && content.isNotEmpty) {
       try {
@@ -387,7 +313,8 @@ class AuthApiService {
             e is RefreshTokenError) {
           rethrow; // Rethrow specific exceptions
         }
-        dev.log('[AUTH] Error parsing error response', error: e);
+        AppLogger.e(
+            'AUTH', 'Error parsing error response content: $content', e);
         // Fall through to default handling if parsing failed
       }
     }

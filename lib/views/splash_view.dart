@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:developer' as dev;
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +19,7 @@ import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/utils/logger.dart';
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -70,50 +69,48 @@ class SplashViewState extends ConsumerState<SplashView>
     try {
       var auth = ref.read(authRepositorySyncProvider);
       if (auth.currentUser != null) {
-        dev.log(
-            '[SPLASH] Current user before resume check: ${auth.currentUser}',
-            level: 1000);
+        AppLogger.d(
+            'SPLASH', 'Current user before resume check: ${auth.currentUser}');
 
         if (await auth.isLoggedIn()) {
-          dev.log('[SPLASH] Checking auth status on resume');
+          AppLogger.d('SPLASH', 'Checking auth status on resume');
           // getToken will only refresh if the current token is expired
           try {
             await auth.getToken();
-            dev.log(
-                '[SPLASH] Token refresh successful on resume, current user: ${auth.currentUser}',
-                level: 1000);
-            dev.log('[SPLASH] User email after resume: ${auth.getUserEmail()}',
-                level: 1000);
-          } catch (e) {
-            dev.log('[SPLASH] Token refresh failed on resume',
-                error: e, level: 1000);
+            AppLogger.i('SPLASH',
+                'Token refresh successful on resume, current user: ${auth.currentUser}');
+            AppLogger.i(
+                'SPLASH', 'User email after resume: ${auth.getUserEmail()}');
+          } catch (e, stackTrace) {
+            AppLogger.e(
+                'SPLASH', 'Token refresh failed on resume', e, stackTrace);
             // Auth repository handles whether to force logout or not for different error types
           }
         }
       } else {
-        dev.log('[SPLASH] No current user during resume check', level: 1000);
+        AppLogger.w('SPLASH', 'No current user during resume check');
       }
-    } catch (e) {
-      dev.log('[SPLASH] Auth check failed: $e');
+    } catch (e, stackTrace) {
+      AppLogger.e('SPLASH', 'Auth check on resume failed', e, stackTrace);
       // We'll let normal API calls handle auth errors if they occur
     }
   }
 
   Future<void> _initialiseApp() async {
     try {
-      dev.log('Initializing Firebase...');
+      AppLogger.i('SPLASH', 'Initializing Firebase...');
       if (Firebase.apps.isEmpty) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
-        dev.log('Firebase initialized successfully');
+        AppLogger.i('SPLASH', 'Firebase initialized successfully');
       } else {
-        dev.log('Firebase was already initialized');
+        AppLogger.i('SPLASH', 'Firebase was already initialized');
       }
 
       await _checkAuthAndInitialize();
     } catch (e, stackTrace) {
-      dev.log('Error initializing app', error: e, stackTrace: stackTrace);
+      AppLogger.e('SPLASH', 'Error initializing app', e, stackTrace);
       if (!mounted) return;
 
       setState(() {
@@ -127,28 +124,25 @@ class SplashViewState extends ConsumerState<SplashView>
     var auth = ref.read(authRepositorySyncProvider);
 
     try {
-      dev.log('[SPLASH] Starting auth initialization', level: 1000);
+      AppLogger.i('SPLASH', 'Starting auth initialization');
       await auth.initializeUser();
-      dev.log('[SPLASH] Auth initialized, current user: ${auth.currentUser}',
-          level: 1000);
-      dev.log('[SPLASH] User email from auth: ${auth.getUserEmail()}',
-          level: 1000);
+      AppLogger.i(
+          'SPLASH', 'Auth initialized, current user: ${auth.currentUser}');
+      AppLogger.i('SPLASH', 'User email from auth: ${auth.getUserEmail()}');
 
       final currentUser = auth.currentUser;
       final isLoggedIn = await auth.isLoggedIn();
-      dev.log(
-          '[SPLASH] Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}, has email: ${currentUser?.email != null}',
-          level: 1000);
+      AppLogger.i('SPLASH',
+          'Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}, has email: ${currentUser?.email != null}');
 
       if (isLoggedIn && currentUser != null) {
-        dev.log('[SPLASH] Initializing services for verified user...',
-            level: 1000);
+        AppLogger.i('SPLASH', 'Initializing services for verified user...');
         await _initializeServices();
-        dev.log('[SPLASH] Services initialized', level: 1000);
+        AppLogger.i('SPLASH', 'Services initialized');
 
         if (!mounted) return;
 
-        dev.log('[SPLASH] Navigation to main app...', level: 1000);
+        AppLogger.i('SPLASH', 'Navigation to main app...');
         await Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const RootPageView(
@@ -157,7 +151,7 @@ class SplashViewState extends ConsumerState<SplashView>
           ),
         );
       } else {
-        dev.log('[SPLASH] No verified user, showing auth buttons', level: 1000);
+        AppLogger.i('SPLASH', 'No verified user, showing auth buttons');
         if (!mounted) return;
         setState(() {
           _showAccountButtons = true;
@@ -165,8 +159,7 @@ class SplashViewState extends ConsumerState<SplashView>
         });
       }
     } catch (e, stackTrace) {
-      dev.log('[SPLASH] Error in auth check',
-          error: e, stackTrace: stackTrace, level: 1000);
+      AppLogger.e('SPLASH', 'Error in _checkAuthAndInitialize', e, stackTrace);
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);
@@ -254,8 +247,9 @@ class SplashViewState extends ConsumerState<SplashView>
         // Try signing in anonymously again
         await _handleAnonymousSignIn();
       }
-    } catch (e) {
-      dev.log('Failed to initialize user', error: e);
+    } catch (e, stackTrace) {
+      AppLogger.e('SPLASH', 'Failed to initialize user (anonymous sign-in)', e,
+          stackTrace);
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);
@@ -274,29 +268,27 @@ class SplashViewState extends ConsumerState<SplashView>
 
   Future<void> _initializeServices() async {
     try {
-      dev.log('[SPLASH] Starting services initialization', level: 1000);
+      AppLogger.i('SPLASH', 'Starting services initialization');
 
       // Initialize device info and headers
       final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
       final headerService = HeaderService(deviceInfo);
       await headerService.initialise();
-      dev.log('[SPLASH] Header service initialized', level: 1000);
+      AppLogger.i('SPLASH', 'Header service initialized');
 
       // Initialize user data
       try {
-        dev.log('[SPLASH] Fetching user data...', level: 1000);
+        AppLogger.i('SPLASH', 'Fetching user data...');
         final userData = await ref.read(meProvider.future);
-        dev.log('[SPLASH] User data fetched: ${userData.toString()}',
-            level: 1000);
-      } catch (e) {
-        dev.log('[SPLASH] Error fetching user data', error: e, level: 1000);
+        AppLogger.d('SPLASH', 'User data fetched: ${userData.toString()}');
+      } catch (e, stackTrace) {
+        AppLogger.e('SPLASH', 'Error fetching user data', e, stackTrace);
       }
 
       ref.read(rootCombineProvider(context));
-      dev.log('[SPLASH] Services initialization complete', level: 1000);
+      AppLogger.i('SPLASH', 'Services initialization complete');
     } catch (e, stackTrace) {
-      dev.log('[SPLASH] Error initializing services: $e',
-          error: stackTrace, level: 1000);
+      AppLogger.e('SPLASH', 'Error initializing services', e, stackTrace);
       showSnackBar(context, StringConstants.appInitError);
     }
   }

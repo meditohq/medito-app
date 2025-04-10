@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
@@ -9,6 +8,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/services/network/auth_api_service.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,12 +38,13 @@ class HttpApiService {
 
   factory HttpApiService() {
     _instance ??= HttpApiService._internal();
-    dev.log('[HTTP] Returning singleton instance #${_instance!._instanceId}');
+    AppLogger.d(
+        'HTTP', 'Returning singleton instance #${_instance!._instanceId}');
     return _instance!;
   }
 
   HttpApiService._internal() {
-    dev.log('[HTTP] Creating new HttpApiService instance #$_instanceId');
+    AppLogger.d('HTTP', 'Creating new HttpApiService instance #$_instanceId');
     _client.connectionTimeout = kTimeoutDuration;
     _initializeHeaders();
     _refreshTokenCompleter.complete(); // Initialize as completed
@@ -67,20 +68,18 @@ class HttpApiService {
   }
 
   void _initializeHeaders() {
-    dev.log('[HTTP] Initializing headers for instance #$_instanceId');
+    AppLogger.d('HTTP', 'Initializing headers for instance #$_instanceId');
     _headers[kContentTypeHeader] = ContentType.json.value;
   }
 
   void setAuthHeader(String accessToken) {
-    dev.log('[HTTP] Setting auth header on instance #$_instanceId', error: {
-      'token_prefix': accessToken.substring(0, 10),
-      'current_headers': _headers.toString(),
-    });
+    AppLogger.d('HTTP',
+        'Setting auth header on instance #$_instanceId. Prefix: ${accessToken.substring(0, min(10, accessToken.length))}');
     _headers[kAuthorizationHeader] = 'Bearer $accessToken';
   }
 
   void clearAuthHeader() {
-    dev.log('[HTTP] Clearing auth header on instance #$_instanceId');
+    AppLogger.d('HTTP', 'Clearing auth header on instance #$_instanceId');
     _headers.remove(kAuthorizationHeader);
   }
 
@@ -118,11 +117,10 @@ class HttpApiService {
   }
 
   Future<void> signOut() async {
-    dev.log('[HTTP] Signing out user', level: 500);
+    AppLogger.i('HTTP', 'Signing out user');
 
     if (!_headers.containsKey(kAuthorizationHeader)) {
-      dev.log('[HTTP] No auth header present, skipping signout request',
-          level: 500);
+      AppLogger.i('HTTP', 'No auth header present, skipping signout request');
       return;
     }
 
@@ -131,29 +129,25 @@ class HttpApiService {
           await _client.postUrl(_buildAuthUri(HTTPConstants.authTokensSignout));
       _headers.forEach(request.headers.set);
 
-      dev.log('[HTTP] Signout request headers set', level: 500);
+      AppLogger.d('HTTP', 'Signout request headers set');
 
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
 
-      dev.log('[HTTP] Signout response received', level: 500, error: {
-        'status_code': response.statusCode,
-        'content': content,
-      });
+      AppLogger.d('HTTP',
+          'Signout response received. Status: ${response.statusCode}, Content: $content');
 
       if (response.statusCode >= HttpStatus.badRequest) {
-        dev.log('[HTTP] Signout request failed', level: 500, error: {
-          'status_code': response.statusCode,
-          'content': content,
-        });
+        AppLogger.w('HTTP',
+            'Signout request failed. Status: ${response.statusCode}, Content: $content');
       }
-    } catch (e) {
-      dev.log('[HTTP] Signout request error', error: e, level: 500);
+    } catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Signout request error', e, stackTrace);
     } finally {
       // Always clear local auth state even if the request fails
       clearAuthHeader();
       await _authService.clearAuthTokens();
-      dev.log('[HTTP] Local auth state cleared during signout', level: 500);
+      AppLogger.i('HTTP', 'Local auth state cleared during signout');
     }
   }
 
@@ -162,16 +156,11 @@ class HttpApiService {
     dynamic body,
   }) async {
     try {
-
       final request = await requestBuilder();
       _headers.forEach(request.headers.set);
 
-      dev.log('[HTTP] Request headers set', error: {
-        'instance': _instanceId,
-        'has_auth': request.headers.value(kAuthorizationHeader) != null,
-        'auth_header':
-            request.headers.value(kAuthorizationHeader)?.substring(0, 20),
-      });
+      AppLogger.d('HTTP',
+          'Request headers set. Instance: $_instanceId, HasAuth: ${request.headers.value(kAuthorizationHeader) != null}');
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
@@ -181,11 +170,8 @@ class HttpApiService {
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
 
-      dev.log('[HTTP] Response received', error: {
-        'instance': _instanceId,
-        'status_code': response.statusCode,
-        'content_length': content.length,
-      });
+      AppLogger.d('HTTP',
+          'Response received. Instance: $_instanceId, Status: ${response.statusCode}, Length: ${content.length}');
 
       if (response.statusCode == HttpStatus.unauthorized) {
         return _handleUnauthorizedResponse(
@@ -198,21 +184,23 @@ class HttpApiService {
 
       _retryCount = 0;
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on SocketException {
+    } on SocketException catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Network Error (SocketException)', e, stackTrace);
       throw const NoInternetError();
-    } on TimeoutException {
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Request Timeout', e, stackTrace);
       throw const TimeoutError();
-    } on HttpException catch (e) {
-      dev.log('[HTTP] HTTP exception', error: e);
+    } on HttpException catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'HTTP exception', e, stackTrace);
       throw Exception('HTTP exception');
-    } catch (e) {
-      dev.log('[HTTP] Unexpected error', error: e);
+    } catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Unexpected error in _handleRequest', e, stackTrace);
       throw const UnknownError();
     }
   }
 
   AppError _handleErrorResponse(int statusCode) {
-    dev.log('HTTP Error $statusCode', level: 900);
+    AppLogger.w('HTTP', 'HTTP Error $statusCode');
 
     return switch (statusCode) {
       HttpStatus.notFound => const NotFoundError(),
@@ -232,7 +220,8 @@ class HttpApiService {
     Future<HttpClientRequest> Function() requestBuilder,
     dynamic body,
   ) async {
-    dev.log('Unauthorized response - retry count: $_retryCount');
+    AppLogger.w(
+        'HTTP', 'Unauthorized response (401) - retry count: $_retryCount');
     await _addHttpDebugLog(
         'Unauthorized response (401) - retry count: $_retryCount');
 
@@ -240,9 +229,10 @@ class HttpApiService {
     // when user might be coming back from background with expired tokens
     const maxBackgroundRetries = 5;
     if (_retryCount >= maxBackgroundRetries) {
-      dev.log('Max retries reached - forcing logout');
+      AppLogger.w('HTTP',
+          'Max retries ($maxBackgroundRetries) reached for request after auth error');
       await _addHttpDebugLog(
-          'Max retries ($maxBackgroundRetries) reached - forcing logout');
+          'Max retries ($maxBackgroundRetries) reached - FORCING LOGOUT (removed)');
       throw const UnauthorizedError();
     }
 
@@ -253,17 +243,18 @@ class HttpApiService {
           prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
       if (!isLoggedIn) {
-        dev.log('[HTTP] Skipping token refresh - user not logged in');
+        AppLogger.w('HTTP', 'Skipping token refresh - user not logged in');
         await _addHttpDebugLog('User not logged in, skipping refresh attempt');
         throw const UnauthorizedError();
       }
-    } catch (e) {
-      dev.log('[HTTP] Error checking login state: $e');
+    } catch (e, stackTrace) {
+      AppLogger.e(
+          'HTTP', 'Error checking login state before refresh', e, stackTrace);
       // Continue with refresh attempt
     }
 
     try {
-      dev.log('Refreshing token through auth service...');
+      AppLogger.i('HTTP', 'Refreshing token through auth service...');
 
       // Add a slight delay between retries to avoid hammering the server
       if (_retryCount > 0) {
@@ -294,21 +285,24 @@ class HttpApiService {
       if (response.statusCode >= HttpStatus.badRequest) {
         var errorMsg =
             'Request still failing after token refresh: ${response.statusCode}';
+        AppLogger.w('HTTP', errorMsg);
         await _addHttpDebugLog(errorMsg);
         throw _handleErrorResponse(response.statusCode);
       }
 
       // Successfully completed the request after token refresh, reset retry counter
       _retryCount = 0;
+      AppLogger.i('HTTP', 'Request successful after token refresh');
       await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on NoInternetError {
+    } on NoInternetError catch (e, stackTrace) {
       // Don't log out on connection issues - let the user retry when connection is available
-      dev.log('[HTTP] No internet connection during token refresh');
+      AppLogger.w('HTTP', 'No internet connection during token refresh attempt',
+          e, stackTrace);
       await _addHttpDebugLog('No internet connection during token refresh');
       rethrow;
-    } catch (e) {
-      dev.log('Token refresh failed', error: e);
+    } catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Token refresh process failed', e, stackTrace);
 
       // Safely truncate error message
       var errorStr = e.toString();
@@ -319,19 +313,29 @@ class HttpApiService {
 
       // Only force logout for specific refresh token errors and only after multiple retries
       if (e is RefreshTokenError && _retryCount >= 3) {
-        dev.log(
-            '[HTTP] Refresh token error after multiple retries - forcing logout');
+        AppLogger.e(
+            'HTTP',
+            'RefreshTokenError after multiple retries - forcing logout',
+            e,
+            stackTrace);
         await _addHttpDebugLog('RefreshTokenError after multiple retries');
         await _forceLogout(
             'Refresh token invalid/expired after multiple attempts');
       } else if (e is UnauthorizedError &&
           _retryCount >= maxBackgroundRetries) {
-        dev.log('[HTTP] Too many failed attempts - forcing logout');
+        AppLogger.e(
+            'HTTP',
+            'Too many failed attempts after refresh - forcing logout',
+            e,
+            stackTrace);
         await _addHttpDebugLog('Too many failed attempts ($_retryCount)');
         await _forceLogout('Too many token refresh failures');
       } else {
-        dev.log(
-            '[HTTP] Error during refresh but still have retries - not forcing logout yet');
+        AppLogger.w(
+            'HTTP',
+            'Error during refresh but still have retries - not forcing logout yet',
+            e,
+            stackTrace);
         await _addHttpDebugLog(
             'Error during refresh, will retry (attempt ${_retryCount + 1}/$maxBackgroundRetries)');
       }
@@ -342,7 +346,7 @@ class HttpApiService {
   }
 
   Future<void> _forceLogout([String reason = 'Unknown reason']) async {
-    dev.log('[HTTP] Force logout initiated: $reason');
+    AppLogger.w('HTTP', 'Force logout initiated: $reason');
 
     // Check if we're already logged out before proceeding
     try {
@@ -351,7 +355,8 @@ class HttpApiService {
           prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
       if (!isLoggedIn) {
-        dev.log('[HTTP] Skipping force logout as user is already logged out');
+        AppLogger.i(
+            'HTTP', 'Skipping force logout as user is already logged out');
         // Still clear local state just to be safe
         _retryCount = 0;
         _headers.remove(kAuthorizationHeader);
@@ -369,10 +374,12 @@ class HttpApiService {
 
       // Notify listeners that a force logout has occurred
       _notifyAuthEvent(AuthEvent.forceLogout);
-    } catch (e) {
-      // If there's an error checking login state, still try to clear auth data
-      dev.log(
-          '[HTTP] Error while checking login state during force logout: $e');
+    } catch (e, stackTrace) {
+      AppLogger.e(
+          'HTTP',
+          'Error while checking login state during force logout',
+          e,
+          stackTrace);
       _retryCount = 0;
       _headers.remove(kAuthorizationHeader);
     }
@@ -396,9 +403,12 @@ class HttpApiService {
       logs.add('$timestamp: [HTTP] $logEntry');
       await prefs.setStringList('auth_debug_logs', logs);
 
-      dev.log('[HTTP] Debug log added: $logEntry');
-    } catch (e) {
-      dev.log('[HTTP] Error saving debug log: $e');
+      // We don't need to log that we added a log entry using the same mechanism
+    } catch (e, stackTrace) {
+      debugPrint('[HTTP] 🛑 ERROR: Error saving debug log: $e');
+      if (kDebugMode) {
+        debugPrintStack(stackTrace: stackTrace);
+      }
     }
   }
 
@@ -440,12 +450,10 @@ class HttpApiService {
       }
 
       // Log comprehensive diagnostic info
-      dev.log('[HTTP] Security diagnosis', error: diagnosticInfo);
-    } catch (e) {
+      AppLogger.i('HTTP', 'Security diagnosis: ${jsonEncode(diagnosticInfo)}');
+    } catch (e, stackTrace) {
       diagnosticInfo['error'] = e.toString();
-      dev.log('[HTTP] Error during security diagnosis', error: {
-        'error': e.toString(),
-      });
+      AppLogger.e('HTTP', 'Error during security diagnosis', e, stackTrace);
     }
 
     return diagnosticInfo;
@@ -455,18 +463,21 @@ class HttpApiService {
   Future<void> _refreshTokenThroughAuthService() async {
     // Wait if a refresh is already in progress
     if (_isRefreshingToken) {
-      dev.log(
-          '[HTTP] Token refresh already in progress, waiting for completion');
+      AppLogger.i(
+          'HTTP', 'Token refresh already in progress, waiting for completion');
       await _addHttpDebugLog(
           'Token refresh already in progress, waiting for results');
       try {
         await _refreshTokenCompleter.future;
-        dev.log('[HTTP] Using result of already in-progress token refresh');
+        AppLogger.i(
+            'HTTP', 'Using result of already in-progress token refresh');
         return;
-      } catch (e) {
-        dev.log(
-            '[HTTP] Previous token refresh failed, will attempt new refresh',
-            error: e);
+      } catch (e, stackTrace) {
+        AppLogger.w(
+            'HTTP',
+            'Previous token refresh failed, will attempt new refresh',
+            e,
+            stackTrace);
         // Previous refresh failed, we'll try again
       }
     }
@@ -476,15 +487,16 @@ class HttpApiService {
     _refreshTokenCompleter = Completer<void>();
 
     try {
-      dev.log(
-          '[HTTP] Starting token refresh through auth service, instance #$_instanceId');
+      AppLogger.i('HTTP',
+          'Starting token refresh through auth service, instance #$_instanceId');
       await _addHttpDebugLog('Beginning token refresh through auth service');
 
       // Run diagnostic to track what's happening
       try {
         await diagnoseSecurity();
-      } catch (e) {
-        dev.log('[HTTP] Failed to run diagnostics', error: e);
+      } catch (e, stackTrace) {
+        AppLogger.e('HTTP', 'Failed to run diagnostics during token refresh', e,
+            stackTrace);
       }
 
       // First check if user is already logged out
@@ -494,57 +506,48 @@ class HttpApiService {
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
         if (!isLoggedIn) {
-          dev.log('[HTTP] User is not logged in, no need to refresh token');
+          AppLogger.w(
+              'HTTP', 'User is not logged in, no need to refresh token');
           await _addHttpDebugLog('User not logged in, skipping token refresh');
           throw const RefreshTokenError();
         }
-      } catch (e) {
-        dev.log('[HTTP] Error checking login state: $e');
+      } catch (e, stackTrace) {
+        AppLogger.e('HTTP', 'Error checking login state during token refresh',
+            e, stackTrace);
         // Continue anyway, as we'll check the refresh token next
       }
 
       final refreshToken = await _authService.getStoredRefreshToken();
       if (refreshToken == null) {
-        dev.log('[HTTP] No refresh token available - forcing logout');
+        AppLogger.e('HTTP', 'No refresh token available - forcing logout');
         await _addHttpDebugLog('No refresh token available - forcing logout');
         await _forceLogout('No refresh token found');
         throw const RefreshTokenError();
       }
 
-      dev.log('[HTTP] Got refresh token, attempting to refresh', error: {
-        'token_length': refreshToken.length,
-        'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
-      });
+      AppLogger.i('HTTP',
+          'Got refresh token (length ${refreshToken.length}), attempting to refresh');
       await _addHttpDebugLog(
           'Using refresh token of length ${refreshToken.length}');
 
       try {
         final tokens = await _authService.refreshToken(refreshToken);
-        dev.log('[HTTP] Token refresh successful, updating auth header',
-            error: {
-              'access_token_length': tokens.accessToken.length,
-              'access_token_prefix': tokens.accessToken
-                  .substring(0, min(10, tokens.accessToken.length)),
-              'instance': _instanceId,
-              'refresh_token_length': tokens.refreshToken.length,
-              'refresh_token_prefix': tokens.refreshToken
-                  .substring(0, min(10, tokens.refreshToken.length)),
-            });
+        AppLogger.i('HTTP',
+            'Token refresh successful, updating auth header. Instance: $_instanceId');
         setAuthHeader(tokens.accessToken);
         await _addHttpDebugLog(
             'Auth header updated successfully with new token');
         _refreshTokenCompleter.complete();
-      } catch (e) {
-        dev.log('[HTTP] Exception during token refresh', error: {
-          'error_type': e.runtimeType.toString(),
-          'error_message': e.toString(),
-          'instance': _instanceId,
-        });
+      } catch (e, stackTrace) {
+        AppLogger.e('HTTP', 'Exception during _authService.refreshToken call',
+            e, stackTrace);
         await _addHttpDebugLog('Error refreshing token: ${e.runtimeType}');
         _refreshTokenCompleter.completeError(e);
         rethrow;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Error in _refreshTokenThroughAuthService outer try',
+          e, stackTrace);
       _refreshTokenCompleter.completeError(e);
       rethrow;
     } finally {

@@ -1,11 +1,11 @@
-import 'dart:developer' as dev;
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/models/home/product/product_model.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductsWidget extends StatelessWidget {
   final List<ProductGroupModel>? productGroups;
@@ -17,19 +17,19 @@ class ProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dev.log(
-        'ProductsWidget: build called, productGroups: ${productGroups?.length ?? 0}');
+    AppLogger.d('ProductsWidget',
+        'build called, productGroups: ${productGroups?.length ?? 0}');
 
     if (productGroups == null || productGroups!.isEmpty) {
-      dev.log('ProductsWidget: No product groups to display');
+      AppLogger.d('ProductsWidget', 'No product groups to display');
       return const SizedBox.shrink();
     }
 
-    dev.log(
-        'ProductsWidget: Rendering ${productGroups!.length} product groups');
+    AppLogger.d(
+        'ProductsWidget', 'Rendering ${productGroups!.length} product groups');
     if (productGroups!.isNotEmpty) {
-      dev.log(
-          'ProductsWidget: First product group - ${productGroups![0].name}, variants: ${productGroups![0].variants.length}');
+      AppLogger.d('ProductsWidget',
+          'First product group - ${productGroups![0].name}, variants: ${productGroups![0].variants.length}');
     }
 
     return Padding(
@@ -60,8 +60,8 @@ class ProductsWidget extends StatelessWidget {
               itemCount: productGroups!.length,
               itemBuilder: (context, index) {
                 final productGroup = productGroups![index];
-                dev.log(
-                    'ProductsWidget: Building product group card for ${productGroup.name} at index $index');
+                AppLogger.d('ProductsWidget',
+                    'Building product group card for ${productGroup.name} at index $index');
                 return ProductGroupCard(productGroup: productGroup);
               },
             ),
